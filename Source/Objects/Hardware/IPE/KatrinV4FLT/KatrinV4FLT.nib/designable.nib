@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="box content view" minToolsVersion="7.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORKatrinV4FLTController">
@@ -46,6 +46,7 @@
                 <outlet property="hitRateAllButton" destination="1809" id="1812"/>
                 <outlet property="hitRateEnabledCBs" destination="1145" id="1169"/>
                 <outlet property="hitRateLengthPU" destination="1824" id="1859"/>
+                <outlet property="hitRateModePU" destination="9Lg-ce-QCB" id="40w-Tv-6wn"/>
                 <outlet property="hitRateNoneButton" destination="1810" id="1814"/>
                 <outlet property="initBoardButton" destination="1872" id="1875"/>
                 <outlet property="interruptMaskField" destination="1851" id="1855"/>
@@ -172,11 +173,11 @@
                         <tabViewItems>
                             <tabViewItem label="Settings" identifier="" id="1185">
                                 <view key="view" id="1187">
-                                    <rect key="frame" x="10" y="29" width="613" height="661"/>
+                                    <rect key="frame" x="10" y="25" width="613" height="665"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Control Register" id="595">
-                                            <rect key="frame" x="-1" y="545" width="280" height="112"/>
+                                            <rect key="frame" x="-1" y="549" width="280" height="112"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="iWR-qe-1Lq">
                                                 <rect key="frame" x="2" y="2" width="276" height="95"/>
@@ -284,10 +285,10 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc HW Settings" id="2907">
-                                            <rect key="frame" x="452" y="76" width="147" height="157"/>
+                                            <rect key="frame" x="452" y="80" width="147" height="144"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="KKy-KN-lvH">
-                                                <rect key="frame" x="1" y="1" width="145" height="141"/>
+                                                <rect key="frame" x="1" y="1" width="145" height="128"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="2730">
@@ -388,14 +389,14 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc Requests" id="2988">
-                                            <rect key="frame" x="452" y="498" width="147" height="159"/>
+                                            <rect key="frame" x="452" y="513" width="147" height="148"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="FPb-hv-qb4">
-                                                <rect key="frame" x="1" y="1" width="145" height="143"/>
+                                                <rect key="frame" x="1" y="1" width="145" height="132"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="650">
-                                                        <rect key="frame" x="15" y="59" width="115" height="28"/>
+                                                        <rect key="frame" x="15" y="53" width="115" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Reset" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2801">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -406,7 +407,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="653">
-                                                        <rect key="frame" x="15" y="113" width="115" height="28"/>
+                                                        <rect key="frame" x="15" y="103" width="115" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Version" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2802">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -417,7 +418,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="1613">
-                                                        <rect key="frame" x="15" y="86" width="115" height="28"/>
+                                                        <rect key="frame" x="15" y="78" width="115" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Status" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2842">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -428,7 +429,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="1873">
-                                                        <rect key="frame" x="15" y="34" width="115" height="28"/>
+                                                        <rect key="frame" x="15" y="30" width="115" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Report" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2846">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -439,7 +440,7 @@
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3030">
-                                                        <rect key="frame" x="15" y="7" width="115" height="28"/>
+                                                        <rect key="frame" x="15" y="5" width="115" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <buttonCell key="cell" type="push" title="Use Defaults" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3031">
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -453,7 +454,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Thresold Finder" id="3255">
-                                            <rect key="frame" x="452" y="294" width="147" height="82"/>
+                                            <rect key="frame" x="452" y="310" width="147" height="82"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Ykk-NE-LQe">
                                                 <rect key="frame" x="1" y="1" width="145" height="66"/>
@@ -483,7 +484,7 @@
                                             </view>
                                         </box>
                                         <tabView drawsBackground="NO" controlSize="small" type="noTabsNoBorder" id="3343">
-                                            <rect key="frame" x="-4" y="-7" width="458" height="553"/>
+                                            <rect key="frame" x="-4" y="-3" width="458" height="553"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Tab" identifier="1" id="3344">
@@ -2862,7 +2863,7 @@ Enable</string>
                                             </tabViewItems>
                                         </tabView>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Debug Displays" id="3901">
-                                            <rect key="frame" x="452" y="384" width="147" height="54"/>
+                                            <rect key="frame" x="452" y="392" width="147" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="bmV-YY-lEt">
                                                 <rect key="frame" x="1" y="1" width="145" height="38"/>
@@ -2883,7 +2884,7 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Init Event Time with" id="4220">
-                                            <rect key="frame" x="452" y="444" width="147" height="54"/>
+                                            <rect key="frame" x="452" y="451" width="147" height="54"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <view key="contentView" id="TLv-J0-iyv">
                                                 <rect key="frame" x="1" y="1" width="145" height="38"/>
@@ -2911,7 +2912,7 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Filter Parameters" id="3006">
-                                            <rect key="frame" x="279" y="545" width="164" height="112"/>
+                                            <rect key="frame" x="279" y="549" width="164" height="112"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="enX-Fg-qYe">
                                                 <rect key="frame" x="1" y="1" width="162" height="96"/>
@@ -2961,20 +2962,18 @@ Enable</string>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3118">
                                                         <rect key="frame" x="50" y="37" width="105" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="1.6 µs" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="5" imageScaling="proportionallyDown" inset="2" selectedItem="3129" id="3119">
+                                                        <popUpButtonCell key="cell" type="push" title="200 ns" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="2" imageScaling="proportionallyDown" inset="2" selectedItem="3959" id="3119">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="3120">
                                                                 <items>
-                                                                    <menuItem title="Boxcar  (veto)" id="3123"/>
-                                                                    <menuItem title="100 ns" tag="1" id="4201"/>
                                                                     <menuItem title="200 ns" tag="2" id="3959"/>
                                                                     <menuItem title="400 ns" tag="3" id="3122"/>
                                                                     <menuItem title="800 ns" tag="4" id="3121"/>
-                                                                    <menuItem title="1.6 µs" state="on" tag="5" id="3129"/>
+                                                                    <menuItem title="1.6 µs" tag="5" id="3129"/>
                                                                     <menuItem title="3.2 µs" tag="6" id="3130"/>
                                                                     <menuItem title="6.4 µs" tag="7" id="3131"/>
-                                                                    <menuItem title="12.8 µs -&gt;gap 0" tag="8" id="3132"/>
+                                                                    <menuItem title="12.8 µs" tag="8" id="3132"/>
                                                                 </items>
                                                             </menu>
                                                         </popUpButtonCell>
@@ -2994,12 +2993,12 @@ Enable</string>
                                                     <popUpButton toolTip="For pre-2016 firmware only (0)-(3) available." verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="4203">
                                                         <rect key="frame" x="51" y="8" width="104" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="50 ns (0)" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4209" id="4204">
+                                                        <popUpButtonCell key="cell" type="push" title="50 ns (0)" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4209" id="4204">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <menu key="menu" title="OtherViews" id="4205">
                                                                 <items>
-                                                                    <menuItem title="50 ns (0)" state="on" id="4209"/>
+                                                                    <menuItem title="50 ns (0)" id="4209"/>
                                                                     <menuItem title="100 ns (1)" tag="1" id="4206"/>
                                                                     <menuItem title="150 ns (2)" tag="2" id="4214"/>
                                                                     <menuItem title="200 ns (3)" tag="3" id="4208"/>
@@ -3017,15 +3016,15 @@ Enable</string>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Hit Rate" id="3035">
-                                            <rect key="frame" x="449" y="237" width="150" height="53"/>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Hit Rate Polling" id="3035">
+                                            <rect key="frame" x="449" y="228" width="150" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="XBP-b6-1Ty">
-                                                <rect key="frame" x="1" y="1" width="148" height="37"/>
+                                                <rect key="frame" x="1" y="1" width="148" height="62"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="1824">
-                                                        <rect key="frame" x="50" y="7" width="81" height="22"/>
+                                                        <rect key="frame" x="50" y="7" width="88" height="22"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <popUpButtonCell key="cell" type="push" title="1 Sec" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="1827" id="2844">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -3055,6 +3054,27 @@ Enable</string>
                                                         </popUpButtonCell>
                                                         <connections>
                                                             <action selector="hitRateLengthAction:" target="-2" id="1860"/>
+                                                        </connections>
+                                                    </popUpButton>
+                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="9Lg-ce-QCB">
+                                                        <rect key="frame" x="3" y="32" width="135" height="22"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <popUpButtonCell key="cell" type="push" title="During Run Only" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Les-sL-xzU" id="0gg-UO-DMj">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <menu key="menu" title="OtherViews" id="OXZ-nd-aUM">
+                                                                <items>
+                                                                    <menuItem title="During Run Only" state="on" id="Les-sL-xzU">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                    <menuItem title="Always" tag="1" id="KJ3-g8-26F">
+                                                                        <modifierMask key="keyEquivalentModifierMask"/>
+                                                                    </menuItem>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                        <connections>
+                                                            <action selector="hitRateModeAction:" target="-2" id="olA-St-W7f"/>
                                                         </connections>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="NO" id="1802">
@@ -3595,8 +3615,8 @@ Enable</string>
                             </tabViewItem>
                             <tabViewItem label="Testing" identifier="" id="2908">
                                 <view key="view" id="2909">
-                                    <rect key="frame" x="10" y="25" width="588" height="665"/>
-                                    <autoresizingMask key="autoresizingMask"/>
+                                    <rect key="frame" x="10" y="25" width="613" height="665"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box boxType="oldStyle" borderType="none" title="Title" titlePosition="noTitle" id="2910">
                                             <rect key="frame" x="-3" y="402" width="308" height="230"/>

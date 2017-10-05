@@ -37,6 +37,7 @@ NSString* ORPulser33500USBNextConnection			= @"ORPulser33500USBNextConnection";
 NSString* ORPulser33500USBInterfaceChanged			= @"ORPulser33500USBInterfaceChanged";
 NSString* ORPulser33500LoadingChanged				= @"ORPulser33500LoadingChanged";
 NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
+NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
 
 
 @implementation ORPulser33500Model
@@ -182,7 +183,7 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 	else {
 		[self setCanChangeConnectionProtocol:YES];
 	}
-	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
+	NSArray* interfaces = [[self getUSBController] interfacesForVenders:[self vendorIDs] products:[self productIDs]];
 	NSString* sn = serialNumber;
 	if([interfaces count] == 1 && ![sn length]){
 		sn = [[interfaces objectAtIndex:0] serialNumber];
@@ -248,14 +249,14 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 	return [NSString stringWithFormat:@"33500 Pulser (%d)",[self tag]];
 }
 
-- (unsigned long) vendorID
+- (NSArray*) vendorIDs
 {
-	return 0x0957;
+    return @[@0x0957,@0x0957];
 }
 
-- (unsigned long) productID
+- (NSArray*) productIDs
 {
-	return 0x2307;
+    return @[@0x2307,@0x2c07];
 }
 
 - (id) getUSBController
@@ -266,6 +267,20 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 }
 
 #pragma mark ***Accessors
+- (BOOL) showInKHz
+{
+    return showInKHz;
+}
+
+- (void) setShowInKHz:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowInKHz:showInKHz];
+    
+    showInKHz = aFlag;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33500ShowInKHzChanged object:self];
+
+}
 
 - (BOOL) loading
 {
@@ -529,7 +544,7 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 
 - (NSArray*) usbInterfaces
 {
-	return [[self getUSBController]  interfacesForVender:[self vendorID] product:[self productID]];
+	return [[self getUSBController]  interfacesForVenders:[self vendorIDs] products:[self productIDs]];
 }
 
 - (NSString*) usbInterfaceDescription
@@ -690,6 +705,7 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 	[self setIpAddress:			 [decoder decodeObjectForKey:@"ipAddress"]];
     [self setConnectionProtocol: [decoder decodeIntForKey:@"connectionProtocol"]];
     [self setChannels:			 [decoder decodeObjectForKey: @"channels"]];
+    [self setShowInKHz:			 [decoder decodeBoolForKey: @"showInKHz"]];
 	
 	if(!channels)[self makeChannels];
 	for(id aChannel in channels) [aChannel setPulser:self];
@@ -702,10 +718,11 @@ NSString* ORPulser33500Lock							= @"ORPulser33500Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:serialNumber		 forKey:@"serialNumber"];
-    [encoder encodeObject:ipAddress			 forKey:@"ipAddress"];
-    [encoder encodeInt:connectionProtocol	 forKey:@"connectionProtocol"];
-    [encoder encodeObject:channels			 forKey:@"channels"];
+    [encoder encodeObject:serialNumber		forKey:@"serialNumber"];
+    [encoder encodeObject:ipAddress			forKey:@"ipAddress"];
+    [encoder encodeInt:connectionProtocol	forKey:@"connectionProtocol"];
+    [encoder encodeObject:channels			forKey:@"channels"];
+    [encoder encodeBool:showInKHz           forKey:@"showInKHz"];
 }
 
 

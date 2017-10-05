@@ -49,6 +49,7 @@
     IBOutlet NSButton*		dumpAllRegistersButton;
     IBOutlet NSButton*		snapShotRegistersButton;
     IBOutlet NSButton*		compareRegistersButton;
+    IBOutlet NSButton*      doHwCheckButton;
 
 	//Firmware loading
 	IBOutlet NSTextField*			fpgaFilePathField;
@@ -56,6 +57,7 @@
 	IBOutlet NSButton*				stopFPGALoadButton;
     IBOutlet NSProgressIndicator*	loadFPGAProgress;
 	IBOutlet NSTextField*			mainFPGADownLoadStateField;
+    IBOutlet NSTextField*           firmwareStatusStringField;
 
     //rates
     IBOutlet NSMatrix*                  rateTextFields;
@@ -69,6 +71,12 @@
     IBOutlet ORCompositeTimeLineView*   timeRatePlot;
     IBOutlet ORValueBarGroupView*       rate0;
     IBOutlet ORValueBarGroupView*       totalRate;
+
+    //counters
+    IBOutlet NSMatrix*                  aHitCountMatrix;
+    IBOutlet NSMatrix*                  acceptedEventCountMatrix;
+    IBOutlet NSMatrix*                  droppedEventCountMatrix;
+    IBOutlet NSMatrix*                  discriminatorCountMatrix;
 
     
     //SerDes and Clock Distribution
@@ -86,7 +94,7 @@
     //hardware setup
     IBOutlet NSButton*		forceFullCardInitCB;
     IBOutlet NSMatrix*		forceFullInitMatrix;
-    
+
     IBOutlet NSMatrix*      extDiscrSrcMatrix;
     IBOutlet NSTextField*   userPackageDataField;
     IBOutlet NSTextField*   windowCompMinField;
@@ -94,15 +102,13 @@
    
     IBOutlet NSMatrix*      pileupWaveformOnlyModeMatrix;
     IBOutlet NSMatrix*      pileupExtensionModeMatrix;
-    IBOutlet NSMatrix*      eventExtensionModeMatrix;
     IBOutlet NSMatrix*      discCountModeMatrix;
     IBOutlet NSMatrix*      aHitCountModeMatrix;
     IBOutlet NSMatrix*      eventCountModeMatrix;
     IBOutlet NSMatrix*      droppedEventCountModeMatrix;
-//    IBOutlet NSButton*      writeFlagCB;
+
     IBOutlet NSMatrix*      decimationFactorMatrix;
     IBOutlet NSMatrix*      triggerPolarityMatrix;
-    IBOutlet NSMatrix*      premapResetDelayEnMatrix;
     IBOutlet NSMatrix*      pileupModeMatrix;
     IBOutlet NSMatrix*		enabledMatrix;
 
@@ -115,11 +121,12 @@
     IBOutlet NSTextField*   p2WindowField;
     IBOutlet NSMatrix*      discWidthMatrix;
 
-    IBOutlet NSTextField*   holdoffTimeField;
+    IBOutlet NSTextField*   downSampleHoldOffTimeField;
+    IBOutlet NSButton*      downSamplePauseEnableCB;
+    IBOutlet NSTextField*   holdOffTimeField;
     IBOutlet NSButton*		autoModeCB;
     IBOutlet NSTextField*   vetoGateWidthField;
 
-    IBOutlet NSMatrix*      premapResetDelayMatrix;
     IBOutlet NSTextField*   rawDataLengthField; //bad name in docs. really raw_data_offset
     IBOutlet NSTextField*   rawDataWindowField; //bad name in docs. really max length of event packet
     IBOutlet NSMatrix*      baselineStartMatrix;
@@ -127,6 +134,8 @@
     IBOutlet NSTextField*   trackingSpeedField;
     IBOutlet NSTextField*   peakSensitivityField;
     IBOutlet NSPopUpButton* triggerConfigPU;
+    IBOutlet NSPopUpButton* clockSourcePU;
+    IBOutlet NSTextField*   clockLockedField;
 
     
     NSView *blankView;
@@ -167,6 +176,7 @@
 - (void) fpgaDownProgressChanged:(NSNotification*)aNote;
 - (void) mainFPGADownLoadStateChanged:(NSNotification*)aNote;
 - (void) fpgaFilePathChanged:(NSNotification*)aNote;
+- (void) firmwareStatusStringChanged:(NSNotification*)aNote;
 
 #pragma mark - rates
 - (void) scaleAction:(NSNotification*)aNote;
@@ -187,9 +197,11 @@
 - (void) forceFullInitChanged:(NSNotification*)aNote;
 - (void) extDiscrSrcChanged:(NSNotification*)aNote;
 - (void) userPackageDataChanged:(NSNotification*)aNote;
-- (void) holdoffTimeChanged:(NSNotification*)aNote;
+- (void) downSampleHoldOffTimeChanged:(NSNotification*)aNote;
+- (void) holdOffTimeChanged:(NSNotification*)aNote;
 - (void) autoModeChanged:(NSNotification*)aNote;
 - (void) vetoGateWidthChanged:(NSNotification*)aNote;
+- (void) clockSourceChanged:(NSNotification*)aNote;
 
 
 - (void) acqDcmCtrlStatusChanged:(NSNotification*)aNote;
@@ -202,18 +214,14 @@
 - (void) adcDcmResetChanged:(NSNotification*)aNote;
 - (void) adcPhShiftOverflowChanged:(NSNotification*)aNote;
 - (void) adcDcmClockStoppedChanged:(NSNotification*)aNote;
-- (void) preampResetDelayEnChanged:(NSNotification*)aNote;
 - (void) decimationFactorChanged:(NSNotification*)aNote;
-//- (void) writeFlagChanged:(NSNotification*)aNote;
 - (void) pileupModeChanged:(NSNotification*)aNote;
 - (void) droppedEventCountModeChanged:(NSNotification*)aNote;
 - (void) eventCountModeChanged:(NSNotification*)aNote;
 - (void) ledThresholdChanged:(NSNotification*)aNote;
-- (void) preampResetDelayChanged:(NSNotification*)aNote;
 - (void) triggerPolarityChanged:(NSNotification*)aNote;
 - (void) aHitCountModeChanged:(NSNotification*)aNote;
 - (void) discCountModeChanged:(NSNotification*)aNote;
-- (void) eventExtensionModeChanged:(NSNotification*)aNote;
 - (void) pileupExtensionModeChanged:(NSNotification*)aNote;
 - (void) pileupWaveformOnlyModeChanged:(NSNotification*)aNote;
 - (void) triggerConfigChanged:(NSNotification*)aNote;
@@ -264,6 +272,11 @@
 - (void) serialNumChanged:(NSNotification*)aNote;
 - (void) boardRevNumChanged:(NSNotification*)aNote;
 - (void) vhdlVerNumChanged:(NSNotification*)aNote;
+- (void) doHwCheckChanged:(NSNotification*)aNote;
+- (void) aHitCountChanged:(NSNotification*)aNote;
+- (void) droppedEventCountChanged:(NSNotification*)aNote;
+- (void) discCountChanged:(NSNotification*)aNote;
+- (void) acceptedEventCountChanged:(NSNotification*)aNote;
 
 - (IBAction) decimationFactorAction:(id)sender;
 
@@ -285,14 +298,11 @@
 - (IBAction) ledThresholdAction:    (id)sender;
 //- (IBAction) writeFlagAction: (id)sender;
 - (IBAction) pileupModeAction:(id)sender;
-- (IBAction) preampResetDelayEnAction:(id)sender;
-- (IBAction) preampResetDelayAction:(id)sender;
 - (IBAction) droppedEventCountModeAction:(id)sender;
 - (IBAction) eventCountModeAction:(id)sender;
 - (IBAction) triggerPolarityAction:(id)sender;
 - (IBAction) aHitCountModeAction:(id)sender;
 - (IBAction) discCountModeAction:(id)sender;
-- (IBAction) eventExtensionModeAction:(id)sender;
 - (IBAction) pileupExtensionModeAction:(id)sender;
 - (IBAction) pileupWaveformOnlyModeAction:(id)sender;
 - (IBAction) rawDataLengthAction:(id)sender;
@@ -310,10 +320,12 @@
 - (IBAction) triggerConfigAction:(id)sender;
 - (IBAction) windowCompMinAction:(id)sender;
 - (IBAction) windowCompMaxAction:(id)sender;
-- (IBAction) holdoffTimeAction:(id)sender;
+- (IBAction) downSampleHoldOffPauseEnableAction:(id)sender;
+- (IBAction) downSampleHoldOffTimeAction:(id)sender;
+- (IBAction) holdOffTimeAction:(id)sender;
 - (IBAction) autoModeAction:(id)sender;
 - (IBAction) vetoGateWidthAction:(id)sender;
-- (IBAction) loadDelaysAction:(id)sender;
+- (IBAction) loadThresholdsAction:(id)sender;
 
 #pragma mark - Low-level registers and diagnostics
 - (IBAction) selectedChannelAction:(id)sender;
@@ -344,6 +356,13 @@
 - (IBAction) readLatTimeStamp:(id)sender;
 - (IBAction) readFPGAVersions:(id)sender;
 - (IBAction) readVmeAuxStatus:(id)sender;
+- (IBAction) dumpCounters:(id)sender;
+- (IBAction) doHwCheckButtonAction:(id)sender;
+- (IBAction) compareHwNowAction:(id)sender;
+- (IBAction) openPreampDialog:(id)sender;
+- (IBAction) clockSourceAction:(id)sender;
+- (IBAction) readCounters:(id)sender;
+- (IBAction) clearCounters:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

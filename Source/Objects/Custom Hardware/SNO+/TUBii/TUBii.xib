@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14F2109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
@@ -136,11 +136,11 @@
                         <tabViewItems>
                             <tabViewItem label="TUBii" identifier="" id="T81-Ks-egO">
                                 <view key="view" id="tgY-du-t2x">
-                                    <rect key="frame" x="10" y="25" width="389" height="0.0"/>
+                                    <rect key="frame" x="10" y="25" width="575" height="655"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o6D-C9-MfD">
-                                            <rect key="frame" x="64" y="-54" width="137" height="22"/>
+                                            <rect key="frame" x="64" y="601" width="137" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="" drawsBackground="YES" id="k6h-Fw-gTo">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -155,7 +155,7 @@
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fw8-QQ-H0F">
-                                            <rect key="frame" x="64" y="-31" width="54" height="17"/>
+                                            <rect key="frame" x="64" y="624" width="54" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="TUBii IP" id="EFE-oa-VtN">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -163,7 +163,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fXd-cQ-We0">
-                                            <rect key="frame" x="231" y="-31" width="30" height="17"/>
+                                            <rect key="frame" x="231" y="624" width="30" height="17"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Port" id="JST-8r-J4g">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -171,7 +171,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Lgn-4t-R8b">
-                                            <rect key="frame" x="356" y="-60" width="68" height="32"/>
+                                            <rect key="frame" x="356" y="595" width="68" height="32"/>
                                             <buttonCell key="cell" type="push" title="Ping" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="NlH-dt-PjR">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -181,7 +181,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="STE-s6-s7D">
-                                            <rect key="frame" x="56" y="-104" width="90" height="32"/>
+                                            <rect key="frame" x="56" y="551" width="90" height="32"/>
                                             <buttonCell key="cell" type="push" title="Initialize" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aEy-eQ-ZTb">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -191,7 +191,7 @@
                                             </connections>
                                         </button>
                                         <matrix toolTip="Tells TUBii to begine reading out it's data." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="CrM-oe-jTF">
-                                            <rect key="frame" x="62" y="-169" width="89" height="58"/>
+                                            <rect key="frame" x="62" y="486" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="76.573170731707322" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
@@ -221,7 +221,7 @@
                                             </connections>
                                         </matrix>
                                         <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TSo-02-c2u">
-                                            <rect key="frame" x="233" y="-54" width="96" height="22"/>
+                                            <rect key="frame" x="233" y="601" width="96" height="22"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="J1d-dr-fE0">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -233,7 +233,7 @@
                                             </connections>
                                         </textField>
                                         <matrix toolTip="Use this to enable TUBii's ECA mode. This re-routes GT to EXT PED OUT and causes EXT PED IN to be ignored." verticalHuggingPriority="750" fixedFrame="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="iur-DA-0o0">
-                                            <rect key="frame" x="62" y="-241" width="89" height="58"/>
+                                            <rect key="frame" x="62" y="414" width="89" height="58"/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             <size key="cellSize" width="72.951219512195109" height="18"/>
                                             <size key="intercellSpacing" width="4" height="2"/>
@@ -263,7 +263,7 @@
                                             </connections>
                                         </matrix>
                                         <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="w0X-hT-uEH">
-                                            <rect key="frame" x="17" y="-54" width="33" height="37"/>
+                                            <rect key="frame" x="17" y="601" width="33" height="37"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="iLY-pS-cXs">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="label"/>
@@ -838,6 +838,9 @@
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
+                                                        <connections>
+                                                            <action selector="trigMaskAction:" target="-2" id="vAj-x1-rmQ"/>
+                                                        </connections>
                                                     </matrix>
                                                 </subviews>
                                             </view>
@@ -1024,7 +1027,7 @@
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <connections>
-                                                                        <action selector="MTCAMimicTextFieldChanged:" target="-2" id="xZz-ny-raS"/>
+                                                                        <action selector="PGTRateAction:" target="-2" id="EOH-Si-IqU"/>
                                                                         <outlet property="formatter" destination="1xr-qD-OOh" id="el9-kI-2kb"/>
                                                                     </connections>
                                                                 </textField>
@@ -1075,7 +1078,7 @@
                                                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                     <connections>
-                                                                        <action selector="MTCAMimicTextFieldChanged:" target="-2" id="l9Y-PR-EjK"/>
+                                                                        <action selector="MTCAMimicAction:" target="-2" id="J1h-ZF-gyR"/>
                                                                         <outlet property="formatter" destination="1xr-qD-OOh" id="TPm-fc-GMG"/>
                                                                     </connections>
                                                                 </textField>
@@ -1103,7 +1106,7 @@
                                                                     <rect key="frame" x="37" y="81" width="228" height="24"/>
                                                                     <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="-5" maxValue="5" doubleValue="5" tickMarkPosition="above" numberOfTickMarks="4096" allowsTickMarkValuesOnly="YES" sliderType="linear" id="RQk-oK-sqf"/>
                                                                     <connections>
-                                                                        <action selector="MTCAMimicSliderChanged:" target="-2" id="tt6-HN-vKC"/>
+                                                                        <action selector="MTCAMimicAction:" target="-2" id="oRr-kl-i5W"/>
                                                                     </connections>
                                                                 </slider>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yku-Mh-D0S">
@@ -1178,6 +1181,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="gzg-md-a9w"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1218,6 +1224,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="xj8-MR-4In"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1258,6 +1267,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="Ijo-KS-Qov"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1298,6 +1310,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="NBT-wo-2ZP"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1337,6 +1352,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="AUu-iO-8bT"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1376,6 +1394,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="oAF-Px-Ct5"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1415,6 +1436,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="dfN-M5-uEY"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1454,6 +1478,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="G48-YZ-tIb"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1546,6 +1573,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="2pU-fw-R1k"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1587,6 +1617,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="xoN-oS-xAH"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1628,6 +1661,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="QaV-Q3-rZn"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1677,6 +1713,9 @@
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CAENMaskAction:" target="-2" id="4Qu-sL-sgt"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
@@ -1743,7 +1782,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="LODelayLengthTextFieldChagned:" target="-2" id="lBH-RF-KFj"/>
+                                                <action selector="GTDelaysMaskAction:" target="-2" id="HcO-hs-pFV"/>
                                                 <outlet property="formatter" destination="win-26-dRT" id="MjG-s1-k55"/>
                                             </connections>
                                         </textField>
@@ -1767,7 +1806,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="LODelayLengthTextFieldChagned:" target="-2" id="WF2-Se-vGs"/>
+                                                <action selector="GTDelaysMaskAction:" target="-2" id="QVb-Ck-DA4"/>
                                                 <outlet property="formatter" destination="c35-5B-D2k" id="zei-Jl-slj"/>
                                             </connections>
                                         </textField>
@@ -1806,7 +1845,7 @@
                                                 </column>
                                             </cells>
                                             <connections>
-                                                <action selector="LOSrcSelectChanged:" target="-2" id="6ye-5T-lvv"/>
+                                                <action selector="LOSrcSelectAction:" target="-2" id="oId-jc-Rd7"/>
                                             </connections>
                                         </matrix>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Gvm-rz-K8T">
@@ -1825,14 +1864,14 @@
                                             </constraints>
                                             <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="1275" tickMarkPosition="above" numberOfTickMarks="256" allowsTickMarkValuesOnly="YES" sliderType="linear" id="0q2-Fu-ex6"/>
                                             <connections>
-                                                <action selector="LODelayLengthSliderChagned:" target="-2" id="5eG-GO-6iS"/>
+                                                <action selector="GTDelaysMaskAction:" target="-2" id="ryB-qz-1YH"/>
                                             </connections>
                                         </slider>
                                         <slider verticalHuggingPriority="750" misplaced="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="Kr0-MY-jx1">
                                             <rect key="frame" x="135" y="518" width="308" height="24"/>
                                             <sliderCell key="cell" continuous="YES" state="on" alignment="left" maxValue="510" tickMarkPosition="above" numberOfTickMarks="256" allowsTickMarkValuesOnly="YES" sliderType="linear" id="5Zf-EG-eKx"/>
                                             <connections>
-                                                <action selector="LODelayLengthSliderChagned:" target="-2" id="awU-VV-aZc"/>
+                                                <action selector="GTDelaysMaskAction:" target="-2" id="01f-uB-HkZ"/>
                                             </connections>
                                         </slider>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dLE-wM-7aQ">
@@ -1894,7 +1933,7 @@
                                                 <rect key="frame" x="1" y="1" width="545" height="202"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <matrix toolTip="Select desired inputs to counter." verticalHuggingPriority="750" fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G7o-87-J17">
+                                                    <matrix toolTip="Select desired inputs to counter." verticalHuggingPriority="750" fixedFrame="YES" tag="1" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G7o-87-J17">
                                                         <rect key="frame" x="221" y="14" width="124" height="184"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="124" height="23"/>
@@ -1907,61 +1946,40 @@
                                                                 <buttonCell type="check" title="Burst" bezelStyle="regularSquare" imagePosition="left" tag="18" inset="2" id="BnZ-kV-lQ6">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="3B6-dY-f7O"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Combo" bezelStyle="regularSquare" imagePosition="left" tag="19" inset="2" id="VZ2-NL-xbD">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="XF0-88-fHO"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" tag="20" inset="2" id="BJx-Q4-CYp">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="a3a-c6-2an"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="Pzp-L6-Y3o">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="o7z-ve-DQF"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="17" inset="2" id="oo3-Lm-jJe">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="b2B-se-S0o"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="R6K-Sh-1aI">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="mju-7o-U10"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="23" inset="2" id="yLK-8H-OZO">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="k9G-qF-ivB"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="24" inset="2" id="rEm-w3-T4y">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="dW0-ea-YWA"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
+                                                        <connections>
+                                                            <action selector="SpeakerCounterMaskAction:" target="-2" id="erD-gU-uc0"/>
+                                                        </connections>
                                                     </matrix>
                                                     <textField toolTip="Enter mask value to specify desired speaker inputs." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AQh-yw-DbT">
                                                         <rect key="frame" x="401" y="14" width="121" height="22"/>
@@ -2014,7 +2032,7 @@
                                                             <action selector="SpeakerCounterUnCheckAll:" target="-2" id="GkN-Of-bCN"/>
                                                         </connections>
                                                     </button>
-                                                    <matrix toolTip="Select desired inputs to counter." verticalHuggingPriority="750" fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6lV-eq-FNs">
+                                                    <matrix toolTip="Select desired inputs to counter." verticalHuggingPriority="750" fixedFrame="YES" tag="1" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6lV-eq-FNs">
                                                         <rect key="frame" x="3" y="14" width="226" height="184"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="113" height="23"/>
@@ -2027,119 +2045,74 @@
                                                                 <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="QkR-1k-63e">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="bZS-Va-D5I"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="zbS-Dn-DaF">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="N1e-cM-FYK"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="0OO-qj-MzT">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="hK0-BU-Uwx"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="q5m-UG-Fp8">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="ThP-JA-716"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="qSi-5E-Rep">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="8Bd-Fj-Evc"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="qW0-at-0BA">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="MBC-Xw-PV1"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="72c-ma-Els">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="yBR-MC-Tt2"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="fW9-HK-BiZ">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="IEH-sY-grl"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                             </column>
                                                             <column>
                                                                 <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" state="on" tag="8" inset="2" id="X1r-tO-jjM">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="dTU-Yw-qsr"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" state="on" tag="9" inset="2" id="p89-x5-V0F">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="eSf-jm-Fsu"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="L1r-Cl-cyM">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="Kkp-ql-oYo"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" state="on" tag="11" inset="2" id="LeU-Em-go3">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="RwH-ni-3ko"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" state="on" tag="12" inset="2" id="Izq-wK-aZs">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="PYg-id-c6p"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" state="on" tag="13" inset="2" id="vLg-1d-Ldb">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="LZ4-2O-2XD"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" state="on" tag="14" inset="2" id="stA-sW-mBH">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="KkH-y5-CC5"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" state="on" tag="15" inset="2" id="6Rd-Ci-WJ9">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="SpeakerCheckBoxChanged:" target="-2" id="lwE-Xc-0EH"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
+                                                        <connections>
+                                                            <action selector="SpeakerCounterMaskAction:" target="-2" id="yip-R8-9iB"/>
+                                                        </connections>
                                                     </matrix>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XJp-A5-whx">
                                                         <rect key="frame" x="400" y="35" width="75" height="17"/>
@@ -2160,133 +2133,6 @@
                                                 <rect key="frame" x="1" y="1" width="545" height="312"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <matrix autoresizesSubviews="NO" toolTip="Select desired inputs to counter." fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dqv-dF-Qdb">
-                                                        <rect key="frame" x="18" y="80" width="545" height="227"/>
-                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="cellSize" width="110" height="23"/>
-                                                        <buttonCell key="prototype" type="check" title="0" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rwD-3x-TMR">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                        <cells>
-                                                            <column>
-                                                                <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="89G-59-eqc">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="pbU-jv-qgn"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="q1h-DP-oZ7">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="zba-kV-tl7"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="i4r-bc-Yrp">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="ERO-z8-33X"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="hRG-Ec-rbk">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="Rzk-4b-pOe"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="mi0-1b-au3">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="898-ln-zu6"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="uzX-yJ-Wpf">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="jTq-Od-AjE"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="SCs-oT-Zqx">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="5ak-Pd-jjc"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="Vhu-fO-1iD">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="gTL-RV-8VZ"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                            </column>
-                                                            <column>
-                                                                <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" state="on" tag="8" inset="2" id="dfS-WR-znG">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="azB-bA-Cun"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" state="on" tag="9" inset="2" id="Ovh-jm-7He">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="Sln-eu-etl"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="p6Z-k0-SI6">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="Xbh-9S-FgK"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" state="on" tag="11" inset="2" id="yBB-K9-oZU">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="WhN-Ul-Cyk"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" state="on" tag="12" inset="2" id="rdQ-px-aIV">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="mPw-17-HgM"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" state="on" tag="13" inset="2" id="GHU-Ik-k3r">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="F8f-s0-wFr"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" state="on" tag="14" inset="2" id="PzK-C7-ptX">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="bi1-9W-jVu"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                                <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" state="on" tag="15" inset="2" id="MP7-CF-ksS">
-                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="12n-ZK-YPQ"/>
-                                                                    </connections>
-                                                                </buttonCell>
-                                                            </column>
-                                                        </cells>
-                                                    </matrix>
                                                     <textField toolTip="Enter mask value to specify desired counter inputs." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LRn-VV-QtB">
                                                         <rect key="frame" x="406" y="124" width="121" height="22"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Tdl-Es-S2v">
@@ -2376,6 +2222,9 @@
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="CounterMaskAction:" target="-2" id="Ls4-DA-O0p"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button toolTip="Prevents counter from counting. (I have yet to figure out why you'd want to use this)" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="R9S-QB-kA2">
                                                                     <rect key="frame" x="16" y="12" width="60" height="18"/>
@@ -2383,6 +2232,9 @@
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="CounterMaskAction:" target="-2" id="Cw8-Ip-9ca"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <button toolTip="Counter value is pre-pended by zeroes." fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="T1W-5S-E4n">
                                                                     <rect key="frame" x="16" y="61" width="142" height="18"/>
@@ -2390,6 +2242,9 @@
                                                                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                         <font key="font" metaFont="system"/>
                                                                     </buttonCell>
+                                                                    <connections>
+                                                                        <action selector="CounterMaskAction:" target="-2" id="IVY-kX-0Eh"/>
+                                                                    </connections>
                                                                 </button>
                                                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LTo-qx-qrt">
                                                                     <rect key="frame" x="196" y="61" width="99" height="17"/>
@@ -2399,7 +2254,7 @@
                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     </textFieldCell>
                                                                 </textField>
-                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="1" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2I-tx-Kgy">
+                                                                <matrix verticalHuggingPriority="750" fixedFrame="YES" tag="-1" allowsExpansionToolTips="YES" allowsEmptySelection="NO" autorecalculatesCellSize="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2I-tx-Kgy">
                                                                     <rect key="frame" x="200" y="37" width="156" height="19"/>
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                     <size key="cellSize" width="74" height="18"/>
@@ -2410,25 +2265,28 @@
                                                                     </buttonCell>
                                                                     <cells>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="Rate" imagePosition="left" alignment="left" state="on" tag="1" inset="2" id="ROp-FS-ViT">
+                                                                            <buttonCell type="radio" title="Rate" imagePosition="left" alignment="left" state="on" tag="-1" inset="2" id="ROp-FS-ViT">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                         <column>
-                                                                            <buttonCell type="radio" title="Totalizer" imagePosition="left" alignment="left" tag="2" inset="2" id="05u-bh-Lt3">
+                                                                            <buttonCell type="radio" title="Totalizer" imagePosition="left" alignment="left" tag="-1" inset="2" id="05u-bh-Lt3">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                                 <font key="font" metaFont="system"/>
                                                                             </buttonCell>
                                                                         </column>
                                                                     </cells>
+                                                                    <connections>
+                                                                        <action selector="CounterModeAction:" target="-2" id="hbV-4m-WZn"/>
+                                                                    </connections>
                                                                 </matrix>
                                                             </subviews>
                                                         </view>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     </box>
-                                                    <matrix toolTip="Select desired inputs to counter." verticalHuggingPriority="750" fixedFrame="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rNc-wm-RDv">
+                                                    <matrix toolTip="Select desired inputs to counter." verticalHuggingPriority="750" fixedFrame="YES" tag="2" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rNc-wm-RDv">
                                                         <rect key="frame" x="229" y="124" width="124" height="184"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="124" height="23"/>
@@ -2441,63 +2299,121 @@
                                                                 <buttonCell type="check" title="Burst" bezelStyle="regularSquare" imagePosition="left" tag="18" inset="2" id="AjO-Ce-XOt">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="XMT-zl-L1H"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Combo" bezelStyle="regularSquare" imagePosition="left" tag="19" inset="2" id="9hz-dc-v6M">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="4JX-Qt-mrs"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="Prescale" bezelStyle="regularSquare" imagePosition="left" tag="20" inset="2" id="R6d-j5-HAe">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="HQE-Dc-oRj"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="MTCA MIMIC 1" bezelStyle="regularSquare" imagePosition="left" tag="16" inset="2" id="3Ze-C0-0cX">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="Izh-Xc-yDN"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="MTCA MIMIC 2" bezelStyle="regularSquare" imagePosition="left" tag="17" inset="2" id="nnG-Po-gLa">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="jSk-ds-TyX"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="TELLIE" bezelStyle="regularSquare" imagePosition="left" tag="22" inset="2" id="Igl-Ld-Sa7">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="Ir2-YC-hfj"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="SMELLIE" bezelStyle="regularSquare" imagePosition="left" tag="23" inset="2" id="rAu-od-OoG">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="kh7-Qk-bKm"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                                 <buttonCell type="check" title="GT" bezelStyle="regularSquare" imagePosition="left" state="on" tag="24" inset="2" id="qs8-Do-7HB">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="system"/>
-                                                                    <connections>
-                                                                        <action selector="CounterCheckBoxChanged:" target="-2" id="TwV-1R-Yha"/>
-                                                                    </connections>
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
                                                         <connections>
-                                                            <action selector="CounterCheckBoxChanged:" target="-2" id="WQR-hY-eT4"/>
+                                                            <action selector="SpeakerCounterMaskAction:" target="-2" id="zS3-xJ-wTc"/>
+                                                        </connections>
+                                                    </matrix>
+                                                    <matrix autoresizesSubviews="NO" toolTip="Select desired inputs to counter." fixedFrame="YES" tag="2" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dqv-dF-Qdb">
+                                                        <rect key="frame" x="3" y="125" width="226" height="184"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="113" height="23"/>
+                                                        <buttonCell key="prototype" type="check" title="0" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rwD-3x-TMR">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="check" title="ExtTrig 0" bezelStyle="regularSquare" imagePosition="left" inset="2" id="89G-59-eqc">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 1" bezelStyle="regularSquare" imagePosition="left" tag="1" inset="2" id="q1h-DP-oZ7">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 2" bezelStyle="regularSquare" imagePosition="left" tag="2" inset="2" id="i4r-bc-Yrp">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 3" bezelStyle="regularSquare" imagePosition="left" tag="3" inset="2" id="hRG-Ec-rbk">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 4" bezelStyle="regularSquare" imagePosition="left" tag="4" inset="2" id="mi0-1b-au3">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 5" bezelStyle="regularSquare" imagePosition="left" tag="5" inset="2" id="uzX-yJ-Wpf">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 6" bezelStyle="regularSquare" imagePosition="left" tag="6" inset="2" id="SCs-oT-Zqx">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 7" bezelStyle="regularSquare" imagePosition="left" state="on" tag="7" inset="2" id="Vhu-fO-1iD">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                            <column>
+                                                                <buttonCell type="check" title="ExtTrig 8" bezelStyle="regularSquare" imagePosition="left" state="on" tag="8" inset="2" id="dfS-WR-znG">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 9" bezelStyle="regularSquare" imagePosition="left" state="on" tag="9" inset="2" id="Ovh-jm-7He">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 10" bezelStyle="regularSquare" imagePosition="left" state="on" tag="10" inset="2" id="p6Z-k0-SI6">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 11" bezelStyle="regularSquare" imagePosition="left" state="on" tag="11" inset="2" id="yBB-K9-oZU">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 12" bezelStyle="regularSquare" imagePosition="left" state="on" tag="12" inset="2" id="rdQ-px-aIV">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 13" bezelStyle="regularSquare" imagePosition="left" state="on" tag="13" inset="2" id="GHU-Ik-k3r">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 14" bezelStyle="regularSquare" imagePosition="left" state="on" tag="14" inset="2" id="PzK-C7-ptX">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="check" title="ExtTrig 15" bezelStyle="regularSquare" imagePosition="left" state="on" tag="15" inset="2" id="MP7-CF-ksS">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="system"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="SpeakerCounterMaskAction:" target="-2" id="wL9-3m-OaN"/>
                                                         </connections>
                                                     </matrix>
                                                 </subviews>
@@ -2544,6 +2460,9 @@
                                                     </buttonCell>
                                                 </column>
                                             </cells>
+                                            <connections>
+                                                <action selector="ClockSourceAction:" target="-2" id="nsz-S9-oGf"/>
+                                            </connections>
                                         </matrix>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DgN-Yt-Ups">
                                             <rect key="frame" x="11" y="525" width="142" height="32"/>

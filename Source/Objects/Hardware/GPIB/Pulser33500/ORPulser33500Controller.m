@@ -81,11 +81,17 @@
                          name : ORPulser33500Lock
                         object: model];
 	
-	[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(setButtonStates)
                          name : ORPulser33500LoadingChanged
                        object : model];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(showInKHzChanged:)
+                         name : ORPulser33500ShowInKHzChanged
+                       object : model];
+
+    
 }
 
 - (void) awakeFromNib
@@ -102,7 +108,8 @@
 	[self ipAddressChanged:nil];
 	[self ipConnectedChanged:nil];
 	[self canChangeConnectionProtocolChanged:nil];
-	[self serialNumberChanged:nil];
+    [self serialNumberChanged:nil];
+    [self showInKHzChanged:nil];
     [self lockChanged:nil];
 }
 
@@ -118,6 +125,11 @@
     BOOL secure = [gSecurity globalSecurityEnabled];
     [gSecurity setLock:ORPulser33500Lock to:secure];
     [lockButton setEnabled:secure];
+}
+
+- (void) showInKHzChanged:(NSNotification*) aNotification
+{
+    [showInKHzCB setIntValue:[model showInKHz]];
 }
 
 - (void) lockChanged: (NSNotification*) aNotification
@@ -199,6 +211,11 @@
 }
 
 #pragma mark •••Actions
+- (IBAction) showInKHzAction:(id)sender
+{
+    [model setShowInKHz:[sender intValue]];
+}
+
 - (IBAction) ipAddressTextFieldAction:(id)sender
 {
 	[model setIpAddress:[sender stringValue]];	
@@ -239,7 +256,7 @@
 
 - (void) validateInterfacePopup
 {
-	NSArray* interfaces = [[model getUSBController] interfacesForVender:[model vendorID] product:[model productID]];
+	NSArray* interfaces = [[model getUSBController] interfacesForVenders:[model vendorIDs] products:[model productIDs]];
 	NSEnumerator* e = [interfaces objectEnumerator];
 	ORUSBInterface* anInterface;
 	while(anInterface = [e nextObject]){

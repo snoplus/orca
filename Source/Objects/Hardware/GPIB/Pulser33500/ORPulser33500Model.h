@@ -37,6 +37,7 @@
 @interface ORPulser33500Model : ORGpibDeviceModel <USBDevice> 
 {
 	ORUSBInterface* usbInterface;
+    NSMutableArray* channels;
     int				connectionProtocol;
     NSString*		ipAddress;
     BOOL			usbConnected;
@@ -47,11 +48,10 @@
     NSString*		serialNumber;
 	ORAlarm*		noUSBAlarm;
 	BOOL			okToCheckUSB;
-	
 	BOOL			waitForAsyncDownloadDone;
 	BOOL			waitForGetWaveformsLoadedDone;
 	BOOL			loading;
-	NSMutableArray* channels;
+    BOOL            showInKHz;
 }
 
 - (void) makeUSBConnectors;
@@ -63,6 +63,8 @@
 - (void) makeChannels;
 
 #pragma mark ***Accessors
+- (BOOL) showInKHz;
+- (void) setShowInKHz:(BOOL)aFlag;
 - (BOOL) loading;
 - (void) setLoading:(BOOL)aState;
 - (NSMutableArray*)channels;
@@ -90,8 +92,8 @@
 - (BOOL) waitForAsyncDownloadDone;
 - (void) setWaitForAsyncDownloadDone:(BOOL)aState;
 
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSArray*) vendorIDs;
+- (NSArray*) productIDs;
 - (NSString*) usbInterfaceDescription;
 - (void) logSystemResponse;
 
@@ -134,4 +136,6 @@ extern NSString* ORPulser33500IpAddressChanged;
 extern NSString* ORPulser33500ConnectionProtocolChanged;
 extern NSString* ORPulser33500USBInterfaceChanged;
 extern NSString* ORPulser33500LoadingChanged;
+extern NSString* ORPulser33500ShowInKHzChanged;
 extern NSString* ORPulser33500Lock;
+

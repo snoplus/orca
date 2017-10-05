@@ -33,6 +33,9 @@
 #define kFlashDataAutoIncReg        0x984
 #define kFlashDataReg               0x988
 #define kFlashCommandReg            0x98C
+#define kANLMainFPGAControlReg      0x90C
+
+
 
 #define kFlashBusy                  0x80
 #define kFlashEnableWrite           0x10
@@ -53,6 +56,9 @@ void processMJDCommand(SBC_Packet* aPacket);
 void readPreAmpAdcs(SBC_Packet* inputPacket);
 void singleAuxIO(SBC_Packet* aPacket);
 uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData);
+void readANLPreAmpAdcs(SBC_Packet* aPacket);
+void singleANLAuxIO(SBC_Packet* aPacket);
+uint32_t writeANLAuxIOSPI(uint32_t baseAddress,uint32_t spiData);
 
 void flashGretinaFPGA(SBC_Packet* aPacket);
 void setJobStatus(const char* message,uint32_t progress);
@@ -63,7 +69,8 @@ uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t numBytes);
 void programFlashBufferBlock(uint8_t* theData,uint32_t anAddress,uint32_t aNumber);
 void readDevice(uint32_t address,uint32_t* retValue);
 void writeDevice(uint32_t address,uint32_t aValue);
-void reloadMainFpgaFromFlash(void);
+void reloadMainFpgaFromFlash();
+void reloadMainFpgaFromFlash_ANL();
 
 
 #endif //__MJD_H__

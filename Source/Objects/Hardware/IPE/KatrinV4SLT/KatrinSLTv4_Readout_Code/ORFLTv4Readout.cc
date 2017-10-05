@@ -1025,7 +1025,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
 
                     //clear the buffers for the sum histogram
-                    ClearSumHistogramBuffer();
+                    //ClearSumHistogramBuffer();
                 
                     //set page manager to automatic mode
                     //srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
@@ -1040,19 +1040,16 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                 else {
                     pageAB = srack->theFlt[col]->status->histPageAB->read();
                     if(oldPageAB != pageAB){
-                        printf("page flip\n");
                         oldPageAB = pageAB;
                         uint32_t fpgaHistogramID     = currentFlt->histNofMeas->read();
                         uint32_t chan;
                         for(chan=0;chan<kNumChan;chan++) {
-                            if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
-                            currentFlt->histLastFirst->read(chan);  //read to cache ... Must do!!!
-                            uint32_t first       = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
-                            uint32_t last        = currentFlt->histLastFirst->histLastEntry->getCache(chan);
-                            uint32_t readoutSec  = currentFlt->secondCounter->read();
-                            printf("first: %lu last: %lu\n",(unsigned long)first,(unsigned long)last);
+                            if((triggerEnabledMask & (0x1L << chan)) ){
+                                //currentFlt->histLastFirst->read(chan);  //read to cache ... Must do!!!
+                                //uint32_t first       = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
+                                // uint32_t last        = currentFlt->histLastFirst->histLastEntry->getCache(chan);
+                                uint32_t readoutSec  = currentFlt->secondCounter->read();
 
-                            //if(first == last){
                                 uint32_t totalLength = 12 + 2048;
                                 ensureDataCanHold(totalLength); 
                                 data[dataIndex++] = histogramId | totalLength;    
@@ -1069,7 +1066,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 data[dataIndex++] = pageAB & 0x1;
                                 srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)&data[dataIndex], 0, 2048);
                                 dataIndex += 2048;
-                            //}
+                            }
                         }
                     } 
                 }
@@ -1082,43 +1079,42 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
 bool ORFLTv4Readout::Stop()
 {
-    if( histoShipSumHistogram & kShipSumHistogramFlag ) {
-		uint32_t histogramId        = GetHardwareMask()[2];
-		uint32_t crate              = GetCrate();
-		uint32_t col                = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
-		uint32_t location           = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
-		uint32_t fltRunMode         = GetDeviceSpecificData()[2];
-		uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
-		if(fltRunMode == kKatrinV4FLT_Histo_Mode ) {//only in histogram mode ...
-			hw4::FltKatrin *currentFlt  = srack->theFlt[col];
-			uint32_t readoutSec         = currentFlt->secondCounter->read();
-			uint32_t histoBinWidth      = currentFlt->histogramSettings->histEBin->getCache();
-			uint32_t histoEnergyOffset  = currentFlt->histogramSettings->histEMin->getCache();
-            uint32_t histoRefreshTime   = currentFlt->histMeasTime->read();
-
-
-            uint32_t chan;
-            for(chan=0; chan < kNumChan ; chan++) {
-				if( !(triggerEnabledMask & (0x1L << chan)) ) continue; //skip channels with disabled trigger
-				unsigned long totalLength = 12 + 2048;
-				ensureDataCanHold(totalLength); 
-				data[dataIndex++] = histogramId | totalLength;    
-				data[dataIndex++] = location | chan<<8;
-				data[dataIndex++] = readoutSec;
-				data[dataIndex++] = histoRefreshTime;
-				data[dataIndex++] = 0;                  //first bin
-				data[dataIndex++] = 2047;               //last bin
-				data[dataIndex++] = 2048;               //histo len
-				data[dataIndex++] = 2048;               //max histo len
-				data[dataIndex++] = histoBinWidth;
-				data[dataIndex++] = histoEnergyOffset;
-				data[dataIndex++] = (col+1)*100+chan;   //histo 'tag' number
-				data[dataIndex++] = 0x2;                //a 'sum' histo
+    uint32_t daqRunMode         = GetDeviceSpecificData()[5];
+    if(daqRunMode == kKatrinV4Flt_Histogram_DaqMode){
+        uint32_t histogramId        = GetHardwareMask()[2];
+        uint32_t crate              = GetCrate();
+        uint32_t col                = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
+        uint32_t location           = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
+        uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
+        srack->theSlt->pageSelect->write((long unsigned int)0x0); //flip the page so we get the last bit of data
+        hw4::FltKatrin* currentFlt  = srack->theFlt[col];
+        uint32_t readoutSec         = currentFlt->secondCounter->read();
+        uint32_t histoBinWidth      = currentFlt->histogramSettings->histEBin->getCache();
+        uint32_t histoEnergyOffset  = currentFlt->histogramSettings->histEMin->getCache();
+        uint32_t histoRefreshTime   = currentFlt->histMeasTime->read();
+        uint32_t chan;
+        for(chan=0; chan < kNumChan ; chan++) {
+            if((triggerEnabledMask & (0x1L << chan)) ){
+                unsigned long totalLength = 12 + 2048;
+                ensureDataCanHold(totalLength); 
+                data[dataIndex++] = histogramId | totalLength;    
+                data[dataIndex++] = location | chan<<8;
+                data[dataIndex++] = readoutSec;
+                data[dataIndex++] = histoRefreshTime;
+                data[dataIndex++] = 0;                  //first bin
+                data[dataIndex++] = 2047;               //last bin
+                data[dataIndex++] = 2048;               //histo len
+                data[dataIndex++] = 2048;               //max histo len
+                data[dataIndex++] = histoBinWidth;
+                data[dataIndex++] = histoEnergyOffset;
+                data[dataIndex++] = (col+1)*100+chan;   //histo 'tag' number
+                data[dataIndex++] = 0x2;                //a 'sum' histo
 
                 srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)&data[dataIndex], 0, 2048);
                 dataIndex += 2048;
             }
-		}
+        }
+		
 	}
 	
 	return true;

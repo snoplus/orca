@@ -27,14 +27,17 @@
 #import "ORAdcInfoProviding.h"
 #import "SBC_Link.h"
 #import "ORGretina4ARegisters.h"
+#import "ORGretinaTriggerProtocol.h"
 
 @class ORRateGroup;
 @class ORConnector;
 @class ORFileMoverOp;
+@class ORRunningAverageGroup;
+@class ORConnector;
 
 #define kG4MDataPacketSize 2048+2  //waveforms have max size, ORCA header is 2
 
-@interface ORGretina4AModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding>
+@interface ORGretina4AModel : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting,ORAdcInfoProviding,ORGretinaTriggerProtocol>
 {
   @private
     //connectors
@@ -50,20 +53,20 @@
     //control reg bits
     BOOL  enabled[kNumGretina4AChannels];
     BOOL  pileupMode[kNumGretina4AChannels];
-    BOOL  preampResetDelayEn[kNumGretina4AChannels];
     short triggerPolarity[kNumGretina4AChannels];
     short decimationFactor[kNumGretina4AChannels];
-//    BOOL  writeFlag;
     BOOL  droppedEventCountMode[kNumGretina4AChannels];
     BOOL  eventCountMode[kNumGretina4AChannels];
     BOOL  aHitCountMode[kNumGretina4AChannels];
     BOOL  discCountMode[kNumGretina4AChannels];
-    short eventExtensionMode[kNumGretina4AChannels];
     BOOL  pileupWaveformOnlyMode[kNumGretina4AChannels];
-    
     short ledThreshold[kNumGretina4AChannels];
-    short preampResetDelay[kNumGretina4AChannels];
-
+    //counters
+    unsigned long aHitCounter[kNumGretina4AChannels];
+    unsigned long droppedEventCount[kNumGretina4AChannels];
+    unsigned long acceptedEventCount[kNumGretina4AChannels];
+    unsigned long discriminatorCount[kNumGretina4AChannels];
+    
     //firmware loading
     NSThread*	fpgaProgrammingThread;
     NSString*   mainFPGADownLoadState;
@@ -87,11 +90,12 @@
     unsigned long       fpgaSnapShot[kNumberOfFPGARegisters];
     
     //rates
-    ORRateGroup*        waveFormRateGroup;
-    unsigned long       waveFormCount[kNumGretina4AChannels];
+    ORRateGroup*    waveFormRateGroup;
+    unsigned long   waveFormCount[kNumGretina4AChannels];
+    ORRunningAverageGroup* rateRunningAverages; //initialized in initWithCoder, start by runstart
 
     //clock sync
-    int                 initializationState;
+    int             initializationState;
     
     //data taker
     unsigned long   dataId;
@@ -110,19 +114,19 @@
     BOOL			forceFullInit[kNumGretina4AChannels];
     BOOL            forceFullCardInit;
     
-    BOOL pileupExtensionMode[kNumGretina4AChannels];
-    short rawDataLength;
-    short rawDataWindow;
-    short dWindow[kNumGretina4AChannels];
-    short kWindow[kNumGretina4AChannels];
-    short mWindow[kNumGretina4AChannels];
-    short d3Window[kNumGretina4AChannels];
-    short discWidth[kNumGretina4AChannels];
-    short baselineStart[kNumGretina4AChannels];
-    short p1Window[kNumGretina4AChannels];
-    unsigned long p2Window;
-    short dacChannelSelect;
-    short dacAttenuation;
+    BOOL            pileupExtensionMode[kNumGretina4AChannels];
+    short           rawDataLength;
+    short           rawDataWindow;
+    short           dWindow[kNumGretina4AChannels];
+    short           kWindow[kNumGretina4AChannels];
+    short           mWindow[kNumGretina4AChannels];
+    short           d3Window[kNumGretina4AChannels];
+    short           discWidth[kNumGretina4AChannels];
+    short           baselineStart[kNumGretina4AChannels];
+    short           p1Window[kNumGretina4AChannels];
+    unsigned long   p2Window;
+    short           dacChannelSelect;
+    short           dacAttenuation;
     
     unsigned short baselineDelay;
     unsigned long  extDiscriminatorMode;
@@ -132,56 +136,58 @@
     unsigned long  diagMuxControl;
     
 
-    unsigned short holdoffTime;
-    unsigned short peakSensitivity;
-    BOOL autoMode;
-    unsigned short diagInput;
-    unsigned short diagChannelEventSel;
-    unsigned short vetoGateWidth;
+    unsigned short  downSampleHoldOffTime;
+    BOOL            downSamplePauseEnable;
+    unsigned short  holdOffTime;
+    unsigned short  peakSensitivity;
+    BOOL            autoMode;
+    unsigned short  diagInput;
+    unsigned short  diagChannelEventSel;
+    unsigned short  vetoGateWidth;
     
-    unsigned long rj45SpareIoMuxSel;
-    BOOL rj45SpareIoDir;
-    unsigned long ledStatus;
-    unsigned long liveTimestampLsb;
-    unsigned long liveTimestampMsb;
-    BOOL diagIsync;
-    BOOL serdesSmLostLock;
-    BOOL overflowFlagChan[kNumGretina4AChannels];
-    unsigned short triggerConfig;
-    unsigned long phaseErrorCount;
-    unsigned long phaseStatus;
-    unsigned long serdesPhaseValue;
-    unsigned long codeRevision;
-    unsigned long codeDate;
-    unsigned long tSErrCntCtrl;
-    unsigned long tSErrorCount;
-    unsigned long droppedEventCount[kNumGretina4AChannels];
-    unsigned long acceptedEventCount[kNumGretina4AChannels];
-    unsigned long ahitCount[kNumGretina4AChannels];
-    unsigned long discCount[kNumGretina4AChannels];
-    unsigned long auxIoRead;
-    unsigned long auxIoWrite;
-    unsigned long auxIoConfig;
-    unsigned long sdPem;
-    BOOL sdSmLostLockFlag;
-    BOOL configMainFpga;
-    unsigned long vmeStatus;
-     BOOL clkSelect0;
-    BOOL clkSelect1;
-    BOOL flashMode;
-    unsigned long serialNum;
-    unsigned long boardRevNum;
-    unsigned long vhdlVerNum;
+    unsigned long   rj45SpareIoMuxSel;
+    BOOL            rj45SpareIoDir;
+    unsigned long   ledStatus;
+    unsigned long   liveTimestampLsb;
+    unsigned long   liveTimestampMsb;
+    BOOL            diagIsync;
+    BOOL            serdesSmLostLock;
+    BOOL            overflowFlagChan[kNumGretina4AChannels];
+    unsigned short  triggerConfig;
+    unsigned long   phaseErrorCount;
+    unsigned long   phaseStatus;
+    unsigned long   serdesPhaseValue;
+    unsigned long   codeRevision;
+    unsigned long   codeDate;
+    unsigned long   tSErrCntCtrl;
+    unsigned long   tSErrorCount;
+    unsigned long   auxIoRead;
+    unsigned long   auxIoWrite;
+    unsigned long   auxIoConfig;
+    unsigned long   sdPem;
+    BOOL            sdSmLostLockFlag;
+    BOOL            configMainFpga;
+    unsigned long   vmeStatus;
+    BOOL            clkSelect0;
+    BOOL            clkSelect1;
+    BOOL            flashMode;
+    unsigned long   serialNum;
+    unsigned long   boardRevNum;
+    unsigned long   vhdlVerNum;
+    BOOL            firstTime;
+    BOOL            doHwCheck;
+    short           clockSource;
+
 }
 
 #pragma mark - Boilerplate
-- (id) init;
-- (void) dealloc;
-- (void) setUpImage;
-- (void) makeMainController;
-- (NSString*) helpURL;
-- (Class) guardianClass;
-- (NSRange)	memoryFootprint;
+- (id)          init;
+- (void)        dealloc;
+- (void)        setUpImage;
+- (void)        makeMainController;
+- (NSString*)   helpURL;
+- (Class)       guardianClass;
+- (NSRange)     memoryFootprint;
 
 
 - (void) makeConnectors;
@@ -197,6 +203,7 @@
 - (void)            setLinkConnector:(ORConnector*)aConnector;
 - (ORConnector*)    spiConnector;
 - (void)            setSpiConnector:(ORConnector*)aConnector;
+- (void)            openPreampDialog;
 
 #pragma mark ***Access Methods for Low-Level Access
 - (unsigned long)   spiWriteValue;
@@ -246,8 +253,12 @@
 - (void) setForceFullCardInit:  (BOOL)aValue;
 - (BOOL) forceFullInit:         (short)chan;
 - (void) setForceFullInit:      (short)chan withValue:(BOOL)aValue;
+- (BOOL) doHwCheck;
+- (void) setDoHwCheck:          (BOOL)aFlag;
 
 #pragma mark - Persistant Register Values
+- (void)            loadCardDefaults;
+- (void)            loadChannelDefaults:(unsigned short) aChan;
 - (unsigned long)   extDiscriminatorSrc;
 - (void)            setExtDiscriminatorSrc:(unsigned long)aValue;
 - (unsigned long)   hardwareStatus;
@@ -262,14 +273,10 @@
 - (void)            setEnabled:             (unsigned short)chan withValue:(BOOL)aValue;
 - (BOOL)            pileupMode:             (unsigned short)chan;
 - (void)            setPileupMode:          (unsigned short)chan withValue:(BOOL)aValue;
-- (BOOL)            preampResetDelayEn:     (unsigned short)chan;
-- (void)            setPreampResetDelayEn:  (unsigned short)chan withValue:(BOOL)aValue;
 - (short)           triggerPolarity:        (unsigned short)chan;
 - (void)            setTriggerPolarity:     (unsigned short)chan withValue:(unsigned short)aValue;
 - (short)           decimationFactor:       (unsigned short)chan;
 - (void)            setDecimationFactor:    (unsigned short)chan withValue:(unsigned short)aValue;
-//- (BOOL)            writeFlag;
-//- (void)            setWriteFlag:(BOOL)aValue;
 - (BOOL)            droppedEventCountMode:  (unsigned short)chan;
 - (void)            setDroppedEventCountMode:(unsigned short)chan withValue:(BOOL)aValue;
 - (BOOL)            eventCountMode:         (unsigned short)chan;
@@ -278,8 +285,6 @@
 - (void)            setAHitCountMode:       (unsigned short)chan withValue:(BOOL)aValue;
 - (BOOL)            discCountMode:          (unsigned short)chan;
 - (void)            setDiscCountMode:       (unsigned short)chan withValue:(BOOL)aValue;
-- (short)           eventExtensionMode:     (unsigned short)chan;
-- (void)            setEventExtensionMode:  (unsigned short)chan withValue:(unsigned short)aValue;
 - (BOOL)            pileupExtensionMode:    (unsigned short)chan;
 - (void)            setPileupExtensionMode: (unsigned short)chan withValue:(BOOL)aValue;
 - (BOOL)            pileupWaveformOnlyMode: (unsigned short)chan;
@@ -287,8 +292,6 @@
 - (void)            setThreshold:           (unsigned short)chan withValue:(int)aValue;
 - (short)           ledThreshold:           (unsigned short)chan;
 - (void)            setLedThreshold:        (unsigned short)chan withValue:(unsigned short)aValue;
-- (short)           preampResetDelay:       (unsigned short)chan;
-- (void)            setPreampResetDelay:    (unsigned short)chan withValue:(unsigned short)aValue;
 - (short)           rawDataLength;
 - (void)            setRawDataLength:       (unsigned short)aValue;
 - (short)           rawDataWindow;
@@ -317,8 +320,12 @@
 - (void)            setChannelPulsedControl:(unsigned long)aValue;
 - (unsigned long)   diagMuxControl;
 - (void)            setDiagMuxControl:      (unsigned long)aValue;
-- (unsigned short)  holdoffTime;
-- (void)            setHoldoffTime:         (unsigned short)aValue;
+- (BOOL)            downSamplePauseEnable;
+- (void)            setDownSamplePauseEnable:(BOOL)aFlag;
+- (unsigned short)  downSampleHoldOffTime;
+- (void)            setDownSampleHoldOffTime:(unsigned short)aValue;
+- (unsigned short)  holdOffTime;
+- (void)            setHoldOffTime:         (unsigned short)aValue;
 - (unsigned short)  peakSensitivity;
 - (void)            setPeakSensitivity:     (unsigned short)aValue;
 - (BOOL)            autoMode;
@@ -366,13 +373,9 @@
 - (unsigned long)   tSErrorCount;
 - (void)            setTSErrorCount:        (unsigned long)aValue;
 - (unsigned long)   droppedEventCount:      (unsigned short)chan;
-- (void)            setDroppedEventCount:   (unsigned short)chan withValue:(unsigned long)aValue;
 - (unsigned long)   acceptedEventCount:     (unsigned short)chan;
-- (void)            setAcceptedEventCount:  (unsigned short)chan withValue:(unsigned long)aValue;
-- (unsigned long)   ahitCount:              (unsigned short)chan;
-- (void)            setAhitCount:           (unsigned short)chan withValue:(unsigned long)aValue;
+- (unsigned long)   aHitCount:              (unsigned short)chan;
 - (unsigned long)   discCount:              (unsigned short)chan;
-- (void)            setDiscCount:           (unsigned short)chan withValue:(unsigned long)aValue;
 - (unsigned long)   auxIoRead;
 - (void)            setAuxIoRead:           (unsigned long)aValue;
 - (unsigned long)   auxIoWrite;
@@ -399,17 +402,21 @@
 - (void)            setBoardRevNum:         (unsigned long)aValue;
 - (unsigned long)   vhdlVerNum;
 - (void)            setVhdlVerNum:          (unsigned long)aValue;
+- (short)           clockSource;
+- (void)            setClockSource:(short)aClockSource;
 
 #pragma mark - Hardware Access
 - (void)            writeLong:          (unsigned long)aValue toReg:(int)aReg;
+- (void)            writeLong:          (unsigned long)aValue toReg:(int)aReg channel:(int)aChan;
 - (unsigned long)   readLongFromReg:    (int)aReg;
-- (void)            writeLong:          (unsigned long)aValue toOffset:(int)anOffset;
-- (unsigned long)   readLongFromOffset: (int)anOffset;
+- (unsigned long)   readLongFromReg:    (int)aReg channel:(int)aChan;
 - (short)           readBoardIDReg;
 - (BOOL)            checkFirmwareVersion;
 - (BOOL)            checkFirmwareVersion:(BOOL)verbose;
 - (BOOL)            fifoIsEmpty;
+- (void)            resetSingleFIFO;
 - (void)            resetFIFO;
+- (void)            writeThresholds;
 - (unsigned long)   readExtDiscriminatorSrc;
 - (void)            writeExtDiscriminatorSrc;
 - (unsigned long)   readHardwareStatus;
@@ -442,13 +449,14 @@
 - (void)            writeBaselineStart: (unsigned short)channel;
 - (unsigned long)   readP1Window:        (unsigned short)channel;
 - (void)            writeP1Window:       (unsigned short)channel;
-- (unsigned long)   readP2Window:        (unsigned short)channel;
+- (unsigned long)   readP2Window;
 - (void)            writeP2Window;
-- (unsigned long)   readChannelPulsedControl:(unsigned short)channel;
-- (void)            writeChannelPulsedControl;
-- (void)            loadWindowDelays;
+- (void)            loadBaselines;
+- (void)            loadDelays;
 - (unsigned long)   readBaselineDelay;
 - (void)            writeBaselineDelay;
+- (unsigned long)   readDownSampleHoldOffTime;
+- (void)            writeDownSampleHoldOffTime;
 - (unsigned long)   readHoldoffControl;
 - (void)            writeHoldoffControl;
 - (unsigned long long) readLiveTimeStamp;
@@ -461,14 +469,33 @@
 - (void)            readFPGAVersions;
 - (unsigned long)   readVmeAuxStatus;
 - (void)            readCodeRevision;
-- (unsigned long)   readDroppedEventCount:  (unsigned short) aChan;
-- (unsigned long)   readAcceptedEventCount: (unsigned short) aChan;
-- (unsigned long)   readAHitCount:          (unsigned short) aChan;
-- (unsigned long)   readDiscCount:          (unsigned short) aChan;
+- (void)            readaHitCounts;
+- (void)            readDroppedEventCounts;
+- (void)            readAcceptedEventCounts;
+- (void)            readDiscriminatorCounts;
+- (void)            clearCounters;
 - (short)           readClockSource;
+- (void)            writeClockSource: (unsigned long) clocksource;
+- (void)            writeClockSource;
 - (void)            resetBoard;
 - (void)            resetMainFPGA;
 - (void)            initBoard;
+- (void)            initBoard:(BOOL)doChannelEnable;
+- (void)            dumpCounters;
+- (void)            dumpBoardIdDetails:         (unsigned long)aValue;
+- (void)            dumpProgrammingDoneDetails: (unsigned long)aValue;
+- (void)            dumpHardwareStatusDetails:  (unsigned long)aValue;
+- (void)            dumpExternalDiscSrcDetails: (unsigned long)aValue;
+- (void)            dumpChannelControlDetails:  (unsigned long)aValue;
+- (void)            dumpHoldoffControlDetails:  (unsigned long)aValue;
+- (void)            dumpBaselineDelayDetails:   (unsigned long)aValue;
+- (void)            dumpExtDiscSelDetails:      (unsigned long)aValue;
+- (void)            dumpMasterStatusDetails:    (unsigned long)aValue;
+
+- (void) setForceFullInitCard:(BOOL)aValue;
+- (void) setLedThreshold:(unsigned short)chan withValue:(unsigned short)aValue;
+- (void) writeLedThreshold:(unsigned short)aChan;
+- (BOOL) trapEnabled:(int)aChan;
 
 #pragma mark - Clock Sync
 - (short)           initState;
@@ -504,6 +531,9 @@
 - (void) clearWaveFormCounts;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (int)  load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
+- (id) rateObject:(short)channel;
+- (void) setRateIntegrationTime:(double)newIntegrationTime;
+- (ORRunningAverageGroup*) rateRunningAverages;
 
 #pragma mark - Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -514,6 +544,26 @@
 
 #pragma mark - AutoTesting
 - (NSArray*) autoTests;
+- (void) checkBoard:(BOOL)verbose;
+- (BOOL) checkExtDiscriminatorSrc:  (BOOL)verbose;
+- (BOOL) checkWindowCompMin:        (BOOL)verbose;
+- (BOOL) checkWindowCompMax:        (BOOL)verbose;
+- (BOOL) checkP2Window:             (BOOL)verbose;
+- (BOOL) checkDownSampleHoldOffTime:(BOOL)verbose;
+- (BOOL) checkHoldoffControl:       (BOOL)verbose;
+- (BOOL) checkBaselineDelay:        (BOOL)verbose;
+- (BOOL) checkVetoGateWidth:        (BOOL)verbose;
+- (BOOL) checkTriggerConfig:        (BOOL)verbose;
+- (BOOL) checkDiscWidth:    (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkP1Window:     (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkDWindow:      (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkKWindow:      (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkMWindow:      (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkD3Window:     (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkLedThreshold: (int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkRawDataWindow:(int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkRawDataLength:(int)aChan verbose:(BOOL)verbose;
+- (BOOL) checkBaselineStart:(int)aChan verbose:(BOOL)verbose;
 
 #pragma mark - SPI Interface
 - (unsigned long) writeAuxIOSPI:(unsigned long)spiData;
@@ -527,6 +577,11 @@
 - (unsigned short)  gainForDisplay:(unsigned short) aChan;
 - (void)            clearEventCounts;
 - (void)            postAdcInfoProvidingValueChanged;
+
+- (void)            rateSpikeChanged:(NSNotification*)aNote;
+- (float)           getRate:(short)channel;
+
+
 @end
 
 @interface NSObject (Gretina4A)
@@ -548,7 +603,6 @@ extern NSString* ORGretina4AWindowCompMaxChanged;
 //---channel control parts---
 extern NSString* ORGretina4APileupWaveformOnlyModeChanged;
 extern NSString* ORGretina4APileupExtensionModeChanged;
-extern NSString* ORGretina4AEventExtensionModeChanged;
 extern NSString* ORGretina4ADiscCountModeChanged;
 extern NSString* ORGretina4AAHitCountModeChanged;
 extern NSString* ORGretina4AEventCountModeChanged;
@@ -556,12 +610,10 @@ extern NSString* ORGretina4ADroppedEventCountModeChanged;
 //extern NSString* ORGretina4AWriteFlagChanged;
 extern NSString* ORGretina4ADecimationFactorChanged;
 extern NSString* ORGretina4ATriggerPolarityChanged;
-extern NSString* ORGretina4APreampResetDelayEnChanged;
 extern NSString* ORGretina4APileupModeChanged;
 extern NSString* ORGretina4AEnabledChanged;
 //---------
 extern NSString* ORGretina4ALedThreshold0Changed;
-extern NSString* ORGretina4APreampResetDelay0Changed;
 extern NSString* ORGretina4ARawDataLengthChanged;
 extern NSString* ORGretina4ARawDataWindowChanged;
 extern NSString* ORGretina4ADWindowChanged;
@@ -578,7 +630,9 @@ extern NSString* ORGretina4ADacAttenuationChanged;
 extern NSString* ORGretina4AP2WindowChanged;
 extern NSString* ORGretina4AChannelPulseControlChanged;
 extern NSString* ORGretina4ADiagMuxControlChanged;
-extern NSString* ORGretina4AHoldoffTimeChanged;
+extern NSString* ORGretina4ADownSampleHoldOffTimeChanged;
+extern NSString* ORGretina4ADownSamplePauseEnableChanged;
+extern NSString* ORGretina4AHoldOffTimeChanged;
 extern NSString* ORGretina4APeakSensitivityChanged;
 extern NSString* ORGretina4AAutoModeChanged;
 //---Baseline Delay---
@@ -607,12 +661,7 @@ extern NSString* ORGretina4AMjrCodeRevisionChanged;
 extern NSString* ORGretina4AMinCodeRevisionChanged;
 extern NSString* ORGretina4ACodeDateChanged;
 extern NSString* ORGretina4ACodeRevisionChanged;
-extern NSString* ORGretina4ATSErrCntCtrlChanged;
-extern NSString* ORGretina4ATSErrorCountChanged;
-extern NSString* ORGretina4ADroppedEventCountChanged;
-extern NSString* ORGretina4AAcceptedEventCountChanged;
-extern NSString* ORGretina4AAhitCountChanged;
-extern NSString* ORGretina4ADiscCountChanged;
+
 //---sd_config Reg
 extern NSString* ORGretina4ASdPemChanged;
 extern NSString* ORGretina4ASdSmLostLockFlagChanged;
@@ -631,13 +680,13 @@ extern NSString* ORGretina4AVhdlVerNumChanged;
 extern NSString* ORGretina4AAuxIoReadChanged;
 extern NSString* ORGretina4AAuxIoWriteChanged;
 extern NSString* ORGretina4AAuxIoConfigChanged;
-//------
 
 //===Notifications for Low-Level Reg Access===
 extern NSString* ORGretina4ARegisterIndexChanged;
 extern NSString* ORGretina4ASelectedChannelChanged;
 extern NSString* ORGretina4ARegisterWriteValueChanged;
 extern NSString* ORGretina4ASPIWriteValueChanged;
+
 //===Notifications for Firmware Loading===
 extern NSString* ORGretina4AFpgaDownProgressChanged;
 extern NSString* ORGretina4AMainFPGADownLoadStateChanged;
@@ -652,7 +701,18 @@ extern NSString* ORGretina4AModelInitStateChanged;
 extern NSString* ORGretina4ACardInited;
 extern NSString* ORGretina4AForceFullCardInitChanged;
 extern NSString* ORGretina4AForceFullInitChanged;
-
+extern NSString* ORGretina4ADoHwCheckChanged;
 extern NSString* ORGretina4ASettingsLock;
 extern NSString* ORGretina4ARegisterLock;
 extern NSString* ORGretina4ALockChanged;
+extern NSString* ORGretina4AModelRateSpiked;
+extern NSString* ORGretina4AModelRAGChanged;
+extern NSString* ORGretina4AClockSourceChanged;
+
+//====Counters
+extern NSString* ORGretina4ATSErrCntCtrlChanged;
+extern NSString* ORGretina4ATSErrorCountChanged;
+extern NSString* ORGretina4AAHitCountChanged;
+extern NSString* ORGretina4ADroppedEventCountChanged;
+extern NSString* ORGretina4ADiscCountChanged;
+extern NSString* ORGretina4AAcceptedEventCountChanged;

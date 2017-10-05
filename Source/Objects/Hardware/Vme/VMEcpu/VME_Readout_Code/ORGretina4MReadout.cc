@@ -25,7 +25,7 @@ bool ORGretina4MReadout::Readout(SBC_LAM_Data* /*lamData*/)
 
     int32_t  result;
     uint32_t fifoState = 0;
-    uint32_t fifoFlag;
+    uint32_t fifoFlag = 0;
     
     result = VMERead(fifoStateAddress,
                      GetAddressModifier(),

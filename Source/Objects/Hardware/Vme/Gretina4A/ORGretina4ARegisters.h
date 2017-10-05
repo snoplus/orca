@@ -48,7 +48,7 @@ enum {
     kChannelControl,        //0x0040	channel_control0
     kLedThreshold,          //0x0080	led_threshold0
     kCFDFraction,           //0x00C0	CFD_fraction0
-    kRawDataLength,         //0x0100	raw_data_length0
+    kRawDataLength,         //0x0100	raw_data_length0 (waveform offset)
     kRawDataWindow,         //0x0140	raw_data_window0
     kDWindow,               //0x0180	d_window0
     kKWindow,               //0x01C0	k_window0
@@ -56,9 +56,9 @@ enum {
     kD3Window,              //0x0240	d2_window0
     kDiscWidth,             //0x0280	disc_width0
     kBaselineStart,         //0x02C0	baseline_start0
-    kP1Window,              //0x0300    p1_2indow
+    kP1Window,              //0x0300    p1_window
     kDac,                   //0x0400	dac
-    kP2Window,              //0x0404    p2_2indow
+    kP2Window,              //0x0404    p2_window
     kIlaConfig,             //0x0408	ila_config
     kChannelPulsedControl,	//0x040C	channel_pulsed_control
     kDiagMuxControl,        //0x0410	diag_mux_control
@@ -68,6 +68,7 @@ enum {
     kExtDiscSel,            //0x0420	ext_desc_sel
     kRj45SpareDoutControl,	//0x0424	rj45_spare_dout_control
     kLedStatus,             //0x0428	led_status
+    kDownSampleHoldOffTime, //0x0434    downsample holdoff
     kLatTimestampLsb,       //0x0480	lat_timestamp_lsb
     kLatTimestampMsb,       //0x0488	lat_timestamp_msb
     kLiveTimestampLsb,      //0x048C	live_timestamp_lsb
@@ -105,6 +106,7 @@ enum {
     kVMEGPControl,				//0x0910 General Purpose VME Control Settings
     kVMETimeoutValue,			//0x0914 VME Timeout Value Register
     kVMEFPGAVersionStatus,		//0x0920 VME Version/Status
+    kVMEFPGADate,
     kVMEFPGASandbox1,			//0x0930 VME Sandbox1
     kVMEFPGASandbox2,			//0x0934 VME Sandbox2
     kVMEFPGASandbox3,			//0x0938 VME Sandbox3
@@ -148,17 +150,6 @@ enum {
 #define kSDLockBit      (0x1<<17)
 #define kSDLostLockBit  (0x1<<24)
 
-enum {
-    kSerDesIdle,
-    kSerDesSetup,
-    kSetDigitizerClkSrc,
-    kFlushFifo,
-    kReleaseClkManager,
-    kPowerUpRTPower,
-    kSetMasterLogic,
-    kSetSDSyncBit,
-    kSerDesError,
-};
 
 
 @interface ORGretina4ARegisters : NSObject
@@ -177,10 +168,10 @@ enum {
 - (BOOL)          regIsWriteable: (unsigned short) anIndex;
 - (NSString*)     registerName:   (unsigned short) anIndex;
 - (short)         accessType:     (unsigned short) anIndex;
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex;
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel;
-- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex;
-- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex chan:(unsigned short)aChannel;
+- (unsigned long) address:(unsigned long)baseAddress forReg:(unsigned short)anIndex;
+- (unsigned long) address:(unsigned long)baseAddress forReg:(unsigned short)anIndex chan:(unsigned short)aChannel;
+- (unsigned long) offsetforReg:(unsigned short)anIndex;
+- (unsigned long) offsetforReg:(unsigned short)anIndex chan:(unsigned short)aChannel;
 - (void)          checkChannel:(unsigned short)aChannel;
 - (void)          checkIndex:(unsigned short)anIndex;
 @end
@@ -201,8 +192,8 @@ enum {
 - (BOOL)          regIsWriteable: (unsigned short) anIndex;
 - (NSString*)     registerName:   (unsigned short) anIndex;
 - (short)         accessType:     (unsigned short) anIndex;
-- (unsigned long) offsetForRegisterIndex:(unsigned short)anIndex;
-- (unsigned long) address:(unsigned long)baseAddress forRegisterIndex:(unsigned short)anIndex;
+- (unsigned long) offsetforReg:(unsigned short)anIndex;
+- (unsigned long) address:(unsigned long)baseAddress forReg:(unsigned short)anIndex;
 - (void)          checkIndex:(unsigned short)anIndex;
 
 @end

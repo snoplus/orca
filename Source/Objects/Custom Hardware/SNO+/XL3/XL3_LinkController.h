@@ -122,7 +122,7 @@
     IBOutlet NSButton *hvOffButton;
     IBOutlet NSButton *hvStepUpButton;
     IBOutlet NSButton *hvStepDownButton;
-    IBOutlet NSButton *hvRampUpButton;
+    IBOutlet NSButton *hvRampToTargetButton;
     IBOutlet NSButton *hvRampDownButton;
     IBOutlet NSButton *hvStopRampButton;
     IBOutlet NSButton *loadNominalSettingsButton;
@@ -313,7 +313,7 @@
 - (IBAction)hvChangePowerSupplyAction:(id)sender;
 - (IBAction)hvStepUpAction:(id)sender;
 - (IBAction)hvStepDownAction:(id)sender;
-- (IBAction)hvRampUpAction:(id)sender;
+- (IBAction)hvRampToTargetAction:(id)sender;
 - (IBAction)hvRampDownAction:(id)sender;
 - (IBAction)hvRampPauseAction:(id)sender;
 - (IBAction)hvPanicAction:(id)sender;

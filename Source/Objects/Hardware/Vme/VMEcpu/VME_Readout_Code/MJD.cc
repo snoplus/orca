@@ -49,26 +49,168 @@ extern pthread_mutex_t  jobInfoMutex;
 extern SBC_JOB          sbc_job;
 
 TUVMEDevice* fpgaDevice = NULL;
-
+bool flashANLVersion = 0;
 
 void processMJDCommand(SBC_Packet* aPacket)
 {
 	switch(aPacket->cmdHeader.cmdID){
 		case kMJDReadPreamps:       readPreAmpAdcs(aPacket);             break;
         case kMJDSingleAuxIO:       singleAuxIO(aPacket);                break;
-        case kMJDFlashGretinaFPGA:  startJob(&flashGretinaFPGA,aPacket); break;
+        case kMJDFlashGretinaFPGA:  flashANLVersion=false; startJob(&flashGretinaFPGA,aPacket); break;
+        case kMJDFlashGretinaAFPGA: flashANLVersion=true; startJob(&flashGretinaFPGA,aPacket); break;
+        case kMJDReadPreampsANL:    readANLPreAmpAdcs(aPacket);          break;
+        case kMJDSingleAuxIOANL:    singleANLAuxIO(aPacket);             break;
 	}
 }
 
+
+//------------------ANL Aux I/O ------------------------------
+void singleANLAuxIO(SBC_Packet* aPacket)
+{
+    //create the packet that will be returned
+    GRETINA4_SingleAuxIOStruct* p    = (GRETINA4_SingleAuxIOStruct*)aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    uint32_t baseAddress = p->baseAddress;
+    p->spiData = writeANLAuxIOSPI(baseAddress,p->spiData);
+    
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    if (writeBuffer(aPacket) < 0) {
+        LogError("SingleAuxIO Error: %s", strerror(errno));
+    }
+}
+
+//read preAmps from the ANL Gretina card
+void readANLPreAmpAdcs(SBC_Packet* aPacket)
+{
+    //create the packet that will be returned
+    GRETINA4_PreAmpReadStruct* p    = (GRETINA4_PreAmpReadStruct*)aPacket->payload;
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    
+    uint32_t baseAddress = p->baseAddress;
+    uint32_t chip        = p->chip;
+    uint32_t enabledMask = p->readEnabledMask>>(chip*8); //mask comes for all channels. shift to get the part we care about.
+    uint32_t i;
+    for(i=0;i<8;i++){
+        uint32_t rawValue = 0;
+        if(enabledMask & (0x1<<i)){
+            //don't like it, but have to do multiple reads because of latencies
+             if( i==0 ){
+                // one latency here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( (i>0) && (i<5) ){
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( i==5 ){
+                // one latency here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i+1]);
+            }
+            if( i==6 ){
+                // one write here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+            }
+            if( i==7 ){
+                // catch up with previous writes here
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+                rawValue = writeANLAuxIOSPI(baseAddress,p->adc[i]);
+            }
+        }
+        else rawValue=0;
+        p->adc[i] = rawValue;
+    }
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    if (writeBuffer(aPacket) < 0) {
+        LogError("PreAmp Error: %s", strerror(errno));
+    }
+}
+
+uint32_t writeANLAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
+{
+//--------------------------------------------------------------------------------------------------
+//Bits 20:19 control whether the Aux I/O pins are inputs or outputs.
+//value of "00" sets bits 9:8 and bits 3:0 as enabled outputs, other pins are inputs.
+//In this mode the value written to bits 30:21 of this same register (address 0x424) are mapped to the AUX I/O pins:
+//Register bit  =>  30   29   28   27   26   25   24   23   22   21
+//Aux I/O  bit  =>   9    8    7    6    5    4    3    2    1    0
+//When you have bits 20:19 of register 0x424 set to "00", other bits in that register allow you to drive data out of bits
+//9:8 and 3:0 of the AUX I/O connector, but the assumption is that bits 7:4 of the connector are inputs.  To read the
+//state of the input pins, you read the register at address 0x020.  Bits 7:4 of that register read back the state of
+//bits 7:4 of the AUX I/O connector.
+//--------------------------------------------------------------------------------------------------
+
+#define kANLSPIDataHi       (0x1 << 22)   //bit 22 of the control/mode/data register
+#define kANLSPIDataLo       0x0           //just to have a clean definition for the bit when lo
+#define kANLSPIClock        (0x1 << 23)   //bit 23 of the control/mode/data register
+#define kANLSPIChipSelect   (0x1 << 24)   //bit 24 of the control/mode/data register
+#define kANLSPIRead         (0x1 <<  4)   //bit  4 of status register is the SPIRead pin
+    
+#define kSPIMode00          (0x00 << 19)  //9:8 and 3:0 outputs, others are inputs
+#define kSPIMode01          (0x01 << 19)  //all bits are outputs, driving pulses when channels have hits
+#define kSPIMode10          (0x10 << 19)  //all bits are outputs, driving all zeros
+#define kSPIMode11          (0x11 << 19)  //same as mode 00 but ALL are outputs
+    
+    TUVMEDevice* device = get_new_device(baseAddress, 0x09, 4, 0x0);
+    uint32_t readBack   = 0;
+    if(device!=0){
+        uint32_t auxIORead   =  0x020;   //status register
+        uint32_t auxIOWrite  =  0x424;   //aux io control/data/mode register
+        uint32_t auxIOConfig =  0x424;   //aux io control/data/mode register
+        
+        uint32_t valueToWrite = (kSPIMode00 | kANLSPIChipSelect | kANLSPIClock);    //set mode, chip select high, clock high
+        write_device(device, (char*)(&valueToWrite), 4, auxIOConfig);
+        //signify that we are starting
+        valueToWrite = kANLSPIChipSelect | kANLSPIClock | kANLSPIDataHi;
+        write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+
+        uint32_t dataBit;
+        uint32_t bit;
+        for(bit=0x80000000; bit; bit >>= 1) {
+            
+            dataBit = (spiData & bit)?kANLSPIDataLo:kANLSPIDataHi;
+            
+            //write data with clock low
+            valueToWrite = kSPIMode00 | kANLSPIChipSelect | dataBit  | kANLSPIClock;
+            write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+
+            //repeat with clock high
+            valueToWrite = kSPIMode00 | kANLSPIChipSelect  | dataBit;
+            write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+
+            //get the readBack value
+            uint32_t valueRead;
+            read_device(device,(char*)(&valueRead),4,auxIORead);
+            
+            if(valueRead & kANLSPIRead){
+                readBack |= bit;
+            }
+        }
+        
+        //unset kSPIChipSelect to signify that we are done
+        valueToWrite = kANLSPIClock | kANLSPIDataHi;
+        write_device(device, (char*)(&valueToWrite), 4, auxIOWrite);
+        close_device(device);
+    }
+    return readBack;
+}
+
+
+//------------------LBL Aux I/O ------------------------------
 void singleAuxIO(SBC_Packet* aPacket)
 {
-    //create the packet that will be returned    
-	GRETINA4_SingleAuxIOStruct* p    = (GRETINA4_SingleAuxIOStruct*)aPacket->payload;
+    //create the packet that will be returned
+    GRETINA4_SingleAuxIOStruct* p    = (GRETINA4_SingleAuxIOStruct*)aPacket->payload;
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
-
+    
     uint32_t baseAddress = p->baseAddress;
     p->spiData = writeAuxIOSPI(baseAddress,p->spiData);
-
+    
     if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
     if (writeBuffer(aPacket) < 0) {
         LogError("SingleAuxIO Error: %s", strerror(errno));
@@ -76,6 +218,7 @@ void singleAuxIO(SBC_Packet* aPacket)
 }
 
 
+//read preAmps from the LBL Gretina card
 void readPreAmpAdcs(SBC_Packet* aPacket)
 {
     //create the packet that will be returned
@@ -95,7 +238,6 @@ void readPreAmpAdcs(SBC_Packet* aPacket)
 			//rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
 			//rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
             if( i==0 ){
-               
                 // one latency here
                 rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
                 rawValue = writeAuxIOSPI(baseAddress,p->adc[i]);
@@ -175,8 +317,8 @@ uint32_t writeAuxIOSPI(uint32_t baseAddress,uint32_t spiData)
             if( (spiData & 0x80000000) != 0) rawValueToWrite &= (~kSPIData);
             //toggle the kSPIClock bit
             valueToWrite = rawValueToWrite | kSPIClock;
-            write_device(device, (char*)(&valueToWrite),    4, auxIOWrite);
-            write_device(device, (char*)(&rawValueToWrite), 4, auxIOWrite);
+            write_device(device, (char*)(&valueToWrite),    4, auxIOWrite);//clock hi
+            write_device(device, (char*)(&rawValueToWrite), 4, auxIOWrite);//clock lo
             
             read_device(device,(char*)(&valueRead),4,auxIORead);
            
@@ -235,7 +377,8 @@ void flashGretinaFPGA(SBC_Packet* aPacket)
                 programFlashBuffer(map,sb.st_size);
                 if(verifyFlashBuffer(map,sb.st_size)&& !sbc_job.killJobNow){
                     strcpy(errorMessage,"Done$No Errors Reported");
-                    reloadMainFpgaFromFlash();
+                    if(flashANLVersion==false)  reloadMainFpgaFromFlash();
+                    else                        reloadMainFpgaFromFlash_ANL();
                     finalStatus = 1;
                 }
                 else {
@@ -425,18 +568,52 @@ uint8_t verifyFlashBuffer(uint8_t* theData, uint32_t totalSize)
         return 0;
     }
 }
-void reloadMainFpgaFromFlash(void)
+
+void reloadMainFpgaFromFlash()
 {
+    //LBL version
     writeDevice(kMainFPGAControlReg,kResetMainFPGACmd);
     writeDevice(kMainFPGAControlReg,kReloadMainFPGACmd);
-    setJobStatus("Finishing$Flash Memory-->FPGA", 0);
-    //wait until done
+    setJobStatus("FinishingLBL$Flash Memory-->FPGA", 0);
+    //wait until done or timeout
+    time_t start = time(NULL);
     uint32_t statusRegValue;
     readDevice(kMainFPGAStatusReg,&statusRegValue);
     while(!(statusRegValue & kMainFPGAIsLoaded)) {
         if(sbc_job.killJobNow)return;
         readDevice(kMainFPGAStatusReg,&statusRegValue);
+        if(time(NULL) > start+10){
+            setJobStatus("Timeout$Flash Memory", 0);
+            break;
+        }
     }
+}
+
+void reloadMainFpgaFromFlash_ANL()
+{
+//ANL version
+    time_t start = time(NULL);
+    uint32_t statusRegValue;
+    readDevice(kMainFPGAStatusReg,&statusRegValue);
+    setJobStatus("FinishingLBL$Flash Memory-->FPGA", 0);
+
+    writeDevice(kANLMainFPGAControlReg,0x2); //acknowledge power-up is complete
+    writeDevice(kANLMainFPGAControlReg,0x0); //remove acknowledge
+    writeDevice(kANLMainFPGAControlReg,0x1); //ask for  reconfiguration
+
+    readDevice(kMainFPGAStatusReg,&statusRegValue);
+
+    while(!(statusRegValue & 0x01)) {
+        if(sbc_job.killJobNow)return;
+        readDevice(kMainFPGAStatusReg,&statusRegValue);
+       if(time(NULL) > start+10){
+           setJobStatus("Timeout$Flash Memory", 0);
+           break;
+        }
+    }
+    printf("got here 2: 0x%08x\n",statusRegValue);
+
+    writeDevice(kANLMainFPGAControlReg,0x0); //remove request
 }
 
 void setJobStatus(const char* message,uint32_t progress)

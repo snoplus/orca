@@ -34,13 +34,13 @@
 #import "ORMTCModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SNOCaenModel.h"
+#import "TUBiiModel.h"
 #import "RunTypeWordBits.hh"
 #import "ECARun.h"
 #import "NHitMonitor.h"
 
 NSString* ORSNOPRequestHVStatus = @"ORSNOPRequestHVStatus";
 NSString* ORRunWaitFinished = @"ORRunWaitFinished";
-
 
 #define UNITS_UNDECIDED 0
 #define UNITS_RAW       1
@@ -272,7 +272,9 @@ snopGreenColor;
     [doggy_icon start_animation];
 
     [self initializeUnits];
-    [self mtcDataBaseChanged:nil];
+    [self MTCSettingsChanged:nil];
+    [self CAENSettingsChanged:nil];
+    [self TUBiiSettingsChanged:nil];
     //Update runtype word
     [self refreshRunWordLabels:nil];
     [self runTypeWordChanged:nil];
@@ -422,29 +424,123 @@ snopGreenColor;
                         object: nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCAThresholdChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCAConversionChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCABaselineChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCPulserRateChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCSettingsChanged
                         object: nil];
     [notifyCenter addObserver : self
-                     selector : @selector(mtcDataBaseChanged:)
+                     selector : @selector(MTCSettingsChanged:)
                          name : ORMTCGTMaskChanged
                         object: nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(MTCSettingsChanged:)
+                         name : ORMTCModelIsPedestalEnabledInCSR
+                        object: nil];
+
+
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelEventSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelEnabledMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelPostTriggerSettingChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelTriggerSourceMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelTriggerOutMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelFrontPanelControlMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelCoincidenceLevelChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelAcquisitionModeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelCountAllTriggersChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelCustomSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelIsCustomSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelIsFixedSizeChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenModelChannelConfigMaskChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenChnlDacChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenOverUnderThresholdChanged
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(CAENSettingsChanged:)
+                         name : SNOCaenChnlThresholdChanged
+                        object: nil];
+
+
+
+    [notifyCenter addObserver : self
+                     selector : @selector(TUBiiSettingsChanged:)
+                         name : ORTubiiSettingsChangedNotification
+                        object: nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(updateSettings:)
                          name : @"SNOPSettingsChanged"
@@ -651,34 +747,37 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
+    /* Action when the user clicks on the Start or Restart Button. */
+    unsigned long dbruntypeword = 0;
 
     /* If we are not going to maintenance we shouldn't be polling */
-    unsigned long dbruntypeword = 0;
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
-    if(runSettings != nil){
-        //Get the run type word of the next run
-        dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
+
+    if (runSettings == nil) {
+        NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n", [model standardRunType], [model standardRunVersion]);
+        return;
     }
 
-    if( !((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun)) ){
-        //Make sure we are not polling
-        NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-        for(ORXL3Model *anXL3 in xl3s){
-            if([anXL3 isPollingXl3]) {
+    // Get the run type word of the next run
+    dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
+
+    if (!((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun))) {
+        // Make sure we are not polling
+        NSArray *xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
+        for (ORXL3Model *anXL3 in xl3s) {
+            if ([anXL3 isPollingXl3]) {
                 NSLog(@"Stopping XL3 polling on crate %d\n",[anXL3 crateNumber]);
                 [anXL3 setIsPollingXl3:false];
             }
         }
     }
 
-    //Start the standard run and stop run initialization if failed
-    if(![model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]]) return;
-
+    // Start the standard run
+    [model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
 }
 
-- (IBAction)resyncRunAction:(id)sender
+- (IBAction) resyncRunAction:(id)sender
 {
-
     /* A resync run does a hard stop and start without the user having to hit
      * stop run and then start run. Doing this resets the GTID, which resyncs
      * crate 9 after it goes out of sync :). */
@@ -686,7 +785,6 @@ snopGreenColor;
     [model setResync:YES];
 
     [self startRunAction:nil];
-
 }
 
 - (IBAction) stopRunAction:(id)sender
@@ -1985,39 +2083,35 @@ err:
     [runsLockButton setState: locked];
 
     //Enable or disable fields
-    [standardRunThresCurrentValues setEnabled:!lockedOrNotRunningMaintenance];
+    [standardRunThresCurrentValues setEnabled:!locked];
     [standardRunSaveButton setEnabled:!locked];
     [standardRunLoadButton setEnabled:!locked];
     [standardRunLoadinHWButton setEnabled:!lockedOrNotRunningMaintenance];
     [triggersOFFButton setEnabled:notRunningOrInMaintenance];
 
-    //Do not lock detector state bits to the operator
-    for(int irow=0;irow<21;irow++){
-        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
-    }
     [timedRunCB setEnabled:!runInProgress];
-    [timeLimitField setEnabled:!lockedOrNotRunningMaintenance];
-    [repeatRunCB setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBIPAddressPU setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBIPAddressPU setEnabled:!lockedOrNotRunningMaintenance];
-    [mtcPort setEnabled:!lockedOrNotRunningMaintenance];
-    [mtcHost setEnabled:!lockedOrNotRunningMaintenance];
-    [xl3Port setEnabled:!lockedOrNotRunningMaintenance];
-    [xl3Host setEnabled:!lockedOrNotRunningMaintenance];
-    [dataPort setEnabled:!lockedOrNotRunningMaintenance];
-    [dataHost setEnabled:!lockedOrNotRunningMaintenance];
-    [logPort setEnabled:!lockedOrNotRunningMaintenance];
-    [logHost setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBUser setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBPswd setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBName setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBPort setEnabled:!lockedOrNotRunningMaintenance];
-    [orcaDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBUser setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBPswd setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBName setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBPort setEnabled:!lockedOrNotRunningMaintenance];
-    [debugDBClearButton setEnabled:!lockedOrNotRunningMaintenance];
+    [timeLimitField setEnabled:!locked];
+    [repeatRunCB setEnabled:!locked];
+    [orcaDBIPAddressPU setEnabled:!locked];
+    [debugDBIPAddressPU setEnabled:!locked];
+    [mtcPort setEnabled:!locked];
+    [mtcHost setEnabled:!locked];
+    [xl3Port setEnabled:!locked];
+    [xl3Host setEnabled:!locked];
+    [dataPort setEnabled:!locked];
+    [dataHost setEnabled:!locked];
+    [logPort setEnabled:!locked];
+    [logHost setEnabled:!locked];
+    [orcaDBUser setEnabled:!locked];
+    [orcaDBPswd setEnabled:!locked];
+    [orcaDBName setEnabled:!locked];
+    [orcaDBPort setEnabled:!locked];
+    [orcaDBClearButton setEnabled:!locked];
+    [debugDBUser setEnabled:!locked];
+    [debugDBPswd setEnabled:!locked];
+    [debugDBName setEnabled:!locked];
+    [debugDBPort setEnabled:!locked];
+    [debugDBClearButton setEnabled:!locked];
     [nhitMonitorAutoPulserRate setEnabled:!locked];
     [nhitMonitorAutoNumPulses setEnabled:!locked];
     [nhitMonitorAutoMaxNhit setEnabled:!locked];
@@ -2025,6 +2119,10 @@ err:
     [nhitMonitorCrateMaskMatrix setEnabled:!locked];
     [nhitMonitorTimeInterval setEnabled:!locked];
 
+    //Do not lock detector state bits to the operator
+    for(int irow=0;irow<21;irow++){
+        [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
+    }
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
     [inMaintenanceLabel setHidden:notRunningOrInMaintenance];
 
@@ -2256,7 +2354,7 @@ err:
     }
 }
 
-- (void) mtcDataBaseChanged:(NSNotification*)aNotification
+- (void) MTCSettingsChanged:(NSNotification*)aNotification
 {
     if(aNotification && [[aNotification name] isEqualToString:ORMTCAConversionChanged])
     {
@@ -2308,7 +2406,47 @@ err:
     {
         [self redisplayThresholdValuesUsingModel:mtcModel];
     }
-    
+
+    //LO width
+    [[standardRunMTCCurrentValues cellAtRow:0 column:0] setIntValue:[mtcModel lockoutWidth]];
+    //Pulser ON
+    [[standardRunMTCCurrentValues cellAtRow:1 column:0] setStringValue:([mtcModel pulserEnabled]?@"ON":@"OFF")];
+    //Pulser mode (PGT/PED)
+    [[standardRunMTCCurrentValues cellAtRow:2 column:0] setStringValue:([mtcModel isPedestalEnabledInCSR]?@"PED":@"PGT")];
+
+    [self highlightDifferencesBetween:standardRunMTCCurrentValues And:standardRunMTCStoredValues];
+
+}
+
+- (void) CAENSettingsChanged:(NSNotification*)aNotification
+{
+    SNOCaenModel *caenModel = [aNotification object];
+    if(caenModel==NULL){
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+        if ([objs count]) {
+            caenModel = [objs objectAtIndex:0];
+        } else {
+            NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+            return;
+        }
+    }
+    [self displayCAENSettings:[caenModel serializeToDictionary] inMatrix:standardRunCAENCurrentMatrix];
+}
+
+- (void) TUBiiSettingsChanged:(NSNotification*)aNotification
+{
+
+    TUBiiModel *tubiiModel = [aNotification object];
+    if(tubiiModel==NULL){
+        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+        if ([objs count]) {
+            tubiiModel = [objs objectAtIndex:0];
+        } else {
+            NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+            return;
+        }
+    }
+    [self displayTUBiiSettings:[tubiiModel serializeToDictionary] inMatrix:standardRunTUBiiCurrentMatrix];
 }
 
 - (IBAction)loadStandardRunFromDBAction:(id)sender
@@ -2321,7 +2459,10 @@ err:
 
 - (IBAction)loadCurrentSettingsInHW:(id)sender
 {
-    [model loadSettingsInHW];
+    BOOL cancel = ORRunAlertPanel(@"Loading current Standard Run settings into Hardware",@"Is this really what you want?",@"Cancel",@"Yes, reload hardware",nil);
+    if (!cancel) {
+        [model loadSettingsInHW];
+    }
 }
 
 - (IBAction)saveStandardRunToDBAction:(id)sender
@@ -2329,7 +2470,9 @@ err:
     NSString *standardRun = [standardRunPopupMenu objectValueOfSelectedItem];
     NSString *standardRunVer = [standardRunVersionPopupMenu objectValueOfSelectedItem];
     
-    [model saveStandardRun:standardRun withVersion:standardRunVer];
+    if(![model saveStandardRun:standardRun withVersion:standardRunVer]){
+        NSLogColor([NSColor redColor], @"Couldn't save standard run due to a problem. \n");
+    }
 }
 
 // Create a new SR item if doesn't exist, set the runType string value and query the DB to display the trigger configuration
@@ -2444,15 +2587,6 @@ err:
 //and display the values in the GUI.
 -(void) displayThresholdsFromDB
 {
-    /* Get models */
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtcModel;
-    if ([objs count]) {
-        mtcModel = [objs objectAtIndex:0];
-    } else {
-        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
-        return;
-    }
 
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
     if(runSettings == nil){
@@ -2472,10 +2606,6 @@ err:
     //Get run type word first
     unsigned long dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
 
-    //Setup format
-    NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
-    [thresholdFormatter setFormat:@"##0.0"];
-    
     //If in DIAGNOSTIC run: display null threshold values
     if(dbruntypeword & kDiagnosticRun){
         for (int i=0; i<[standardRunThresStoredValues numberOfRows];i++) {
@@ -2490,33 +2620,12 @@ err:
         }
     //If in non-DIAGNOSTIC run: display DB threshold values
     } else {
-        float mVolts;
-        int gtmask = [[runSettings valueForKey:GTMaskSerializationString] intValue];
-        
-        for(int i=0;i<10;i++) {
-            float raw = [[runSettings valueForKey:[mtcModel stringForThreshold:view_model_map[i]]] floatValue];
-            BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
-            [self updateSingleDBThresholdDisplayForRow:i inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
-        }
-
-        //Prescale
-        mVolts = [[runSettings valueForKey:PrescaleValueSerializationString] floatValue];
-        [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 11) & 1){
-            [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
-        }
-        //Pulser
-        mVolts = [[runSettings valueForKey:PulserRateSerializationString] floatValue];
-        [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
-        [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
-        if((gtmask >> 10) & 1){
-            [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
-        } else{
-            [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
-        }
+        //MTC
+        [self displayMTCSettings:runSettings];
+        //CAEN
+        [self displayCAENSettings:runSettings inMatrix:standardRunCAENDBMatrix];
+        //TUBii
+        [self displayTUBiiSettings:runSettings inMatrix:standardRunTUBiiDBMatrix];
     }
     
     //Display runtype word
@@ -2526,6 +2635,156 @@ err:
         } else{
             [[runTypeWordSRMatrix cellAtRow:ibit column:0] setState:0];
         }
+    }
+}
+
+- (void) displayMTCSettings:(NSMutableDictionary*)settingsDict
+{
+    /* Get models */
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel* mtcModel;
+    if ([objs count]) {
+        mtcModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find MTC model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    //Setup format
+    NSNumberFormatter *thresholdFormatter = [[[NSNumberFormatter alloc] init] autorelease];;
+    [thresholdFormatter setFormat:@"##0.0"];
+
+    float mVolts;
+    int gtmask = [[settingsDict valueForKey:GTMaskSerializationString] intValue];
+
+    for(int i=0;i<10;i++) {
+        float raw = [[settingsDict valueForKey:[mtcModel stringForThreshold:view_model_map[i]]] floatValue];
+        BOOL inMask = ((1<< view_mask_map[i]) & gtmask) != 0;
+        [self updateSingleDBThresholdDisplayForRow:i inMask:inMask withModel:mtcModel withFormatter:thresholdFormatter toValue:raw];
+    }
+
+    //Prescale
+    mVolts = [[settingsDict valueForKey:PrescaleValueSerializationString] floatValue];
+    [[standardRunThresStoredValues cellAtRow:10 column:0] setFloatValue:mVolts];
+    [[standardRunThresStoredValues cellAtRow:10 column:0] setFormatter:thresholdFormatter];
+    if((gtmask >> 11) & 1){
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopBlueColor]];
+    } else{
+        [[standardRunThresStoredValues cellAtRow:10 column:0] setTextColor:[self snopRedColor]];
+    }
+    //Pulser
+    mVolts = [[settingsDict valueForKey:PulserRateSerializationString] floatValue];
+    [[standardRunThresStoredValues cellAtRow:11 column:0] setFloatValue:mVolts];
+    [[standardRunThresStoredValues cellAtRow:11 column:0] setFormatter:thresholdFormatter];
+    if((gtmask >> 10) & 1){
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopBlueColor]];
+    } else{
+        [[standardRunThresStoredValues cellAtRow:11 column:0] setTextColor:[self snopRedColor]];
+    }
+    //LO width
+    [[standardRunMTCStoredValues cellAtRow:0 column:0] setIntValue:[[settingsDict valueForKey:LockOutWidthSerializationString] intValue]];
+    //Pulser ON
+    [[standardRunMTCStoredValues cellAtRow:1 column:0] setStringValue:[[settingsDict valueForKey:PulserEnabledSerializationString] boolValue]?@"ON":@"OFF"];
+    //Pulser mode (PGT/PED)
+    [[standardRunMTCStoredValues cellAtRow:2 column:0] setStringValue:[[settingsDict valueForKey:PGT_PED_Mode_SerializationString] boolValue]?@"PED":@"PGT"];
+
+    [self highlightDifferencesBetween:standardRunMTCCurrentValues And:standardRunMTCStoredValues];
+
+}
+
+
+- (void) displayCAENSettings:(NSMutableDictionary*) settingsDict inMatrix:(NSMatrix*)aMatrix
+{
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
+    SNOCaenModel* caenModel;
+    if ([objs count]) {
+        caenModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    NSNumberFormatter *dacFormat = [[NSNumberFormatter alloc] init];
+    [dacFormat setFormat:@"##.##"];
+    [[aMatrix cellAtRow:0 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_enabledMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:1 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_0"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:1 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:2 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_1"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:2 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:3 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_2"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:3 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:4 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_3"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:4 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:5 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_4"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:5 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:6 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_5"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:6 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:7 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_6"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:8 column:0] setFloatValue:[caenModel convertDacToVolts:[[settingsDict valueForKey:@"CAEN_dac_7"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:8 column:0] setFormatter:dacFormat];
+    [[aMatrix cellAtRow:9 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_triggerSourceMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_triggerOutMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:11 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_coincidenceLevel"]];
+    [[aMatrix cellAtRow:12 column:0] setObjectValue:[NSString stringWithFormat:@"%@",[[settingsDict valueForKey:@"CAEN_countAllTriggers"] boolValue]? @"YES":@"NO"]];
+    [[aMatrix cellAtRow:13 column:0] setObjectValue:[NSString stringWithFormat:@"%@",[[settingsDict valueForKey:@"CAEN_isCustomSize"] boolValue]? @"YES":@"NO"]];
+    [[aMatrix cellAtRow:14 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_eventSize"]];
+    [[aMatrix cellAtRow:15 column:0] setIntValue:[[settingsDict valueForKey:@"CAEN_customSize"] unsignedIntValue]*4];
+    [[aMatrix cellAtRow:16 column:0] setIntValue:[[settingsDict valueForKey:@"CAEN_postTriggerSetting"] unsignedIntValue]*4];
+    [[aMatrix cellAtRow:17 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_channelConfigMask"] unsignedShortValue]]];
+    [[aMatrix cellAtRow:18 column:0] setObjectValue:[settingsDict valueForKey:@"CAEN_acquisitionMode"]];
+    [[aMatrix cellAtRow:19 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"CAEN_frontPanelControlMask"] unsignedIntValue]]];
+
+    [dacFormat release];
+
+    [self highlightDifferencesBetween:standardRunCAENCurrentMatrix And:standardRunCAENDBMatrix];
+
+}
+
+
+- (void) displayTUBiiSettings:(NSMutableDictionary*)settingsDict inMatrix:(NSMatrix*)aMatrix
+{
+
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
+    TUBiiModel* tubiiModel;
+    if ([objs count]) {
+        tubiiModel = [objs objectAtIndex:0];
+    } else {
+        NSLogColor([NSColor redColor], @"couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+
+    NSNumberFormatter *format = [[NSNumberFormatter alloc] init];
+    [format setFormat:@"#.###"];
+    [[aMatrix cellAtRow:0 column:0] setIntValue:[[settingsDict valueForKey:@"TUBii_TUBiiPGT_Rate"] intValue]]; //for formatting purposes
+    [[aMatrix cellAtRow:1 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_syncTrigMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:2 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_asyncTrigMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:3 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_CaenChannelMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:4 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_CaenGainMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:5 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_counterMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:6 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_speakerMask"] unsignedIntValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFloatValue:[tubiiModel MTCAMimic_BitsToVolts:[[settingsDict valueForKey:@"TUBii_MTCAMimic1_ThresholdInBits"] integerValue]]];
+    [[aMatrix cellAtRow:7 column:0] setFormatter:format];
+    [[aMatrix cellAtRow:8 column:0] setIntegerValue:[tubiiModel DGT_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_DGT_Bits"] integerValue]]];
+    [[aMatrix cellAtRow:9 column:0] setIntegerValue:[tubiiModel LODelay_BitsToNanoSeconds:[[settingsDict valueForKey:@"TUBii_LO_Bits"] integerValue]]];
+    [[aMatrix cellAtRow:10 column:0] setObjectValue:[NSString stringWithFormat:@"0x%X",[[settingsDict valueForKey:@"TUBii_controlReg"] unsignedIntValue]]];
+
+    [self highlightDifferencesBetween:standardRunTUBiiCurrentMatrix And:standardRunTUBiiDBMatrix];
+
+    [format release];
+}
+
+- (void) highlightDifferencesBetween:(NSMatrix*)aMatrix And:(NSMatrix*)bMatrix
+{
+    NSInteger aNEntries = [aMatrix numberOfRows];
+    NSInteger bNEntries = [bMatrix numberOfRows];
+    if(aNEntries != bNEntries) NSLogColor([NSColor redColor], @"Problem highlighting differences for matrices! Different number of rows. \n");
+
+    for(int irow=0; irow<aNEntries; irow++){
+        if( [[[aMatrix cellAtRow:irow column:0] stringValue] isEqualToString:[[bMatrix cellAtRow:irow column:0] stringValue]] )
+            [[aMatrix cellAtRow:irow column:0] setTextColor:snopBlackColor];
+        else
+            [[aMatrix cellAtRow:irow column:0] setTextColor:snopRedColor];
     }
 }
 

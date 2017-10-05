@@ -47,7 +47,7 @@ void SwapLongBlock(void* p, int32_t n);
 void SwapShortBlock(void* p, int32_t n);
 int32_t writeBuffer(SBC_Packet* aPacket);
 
-extern char needToSwap;
+extern char     needToSwap;
 extern int32_t  dataIndex;
 extern int32_t* data;
 
@@ -70,7 +70,7 @@ void FindHardware(void)
     controlHandle = get_ctl_device(); 
     if (controlHandle == NULL) LogBusError("Device controlHandle: %s",strerror(errno));
 
-	fDevice = get_new_device(0x0, 0x9, 4, 0x0); 
+	fDevice = get_new_device(0x0, 0x9, 4, 0x0);
     if (fDevice == NULL) LogBusError("fDevice: %s",strerror(errno));
 
     /* The following is particular to the concurrent boards. */
@@ -118,12 +118,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     } 
 	else if(unitSize*numItems >= kDMALowerLimit) {
 		useDMADevice = true;
-        if (addressSpace == kPollSameAddress) { 
-          memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
-        } 
-		else {
-          memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
-        }
+        memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, addressSpace != kPollSameAddress);
         addressSpace=0x1;
         startAddress = 0x0;
     } 
@@ -132,33 +127,31 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
 	}
     
     p++; /*point to the data*/
-    int16_t *sptr;
-    int32_t  *lptr;
-    switch(unitSize){
-        case 1: /*bytes*/
-        break;
-        
-        case 2: /*shorts*/
-            sptr = (int16_t*)p; /* cast to the data type*/ 
-            if(needToSwap) SwapShortBlock(sptr,numItems);
-        break;
-        
-        case 4: /*longs*/
-            lptr = (int32_t*)p; /* cast to the data type*/ 
-            if(needToSwap) SwapLongBlock(lptr,numItems);
-        break;
+    if(needToSwap){
+        int16_t* sptr;
+        int32_t* lptr;
+        switch(unitSize){
+            case 2: /*shorts*/
+                sptr = (int16_t*)p; /* cast to the data type*/ 
+                 SwapShortBlock(sptr,numItems);
+            break;
+            
+            case 4: /*longs*/
+                lptr = (int32_t*)p; /* cast to the data type*/ 
+                SwapLongBlock(lptr,numItems);
+            break;
+        }
     }
-    
     if (!useDMADevice) lock_device(memMapHandle);
 	
-	if(memMapHandle==fDevice){	
+	if(memMapHandle==fDevice){
 		setup_device(fDevice,oldAddress,addressModifier,unitSize);
-	}
-	
+    }
+    
 	int32_t result = 0;
 	if (addressSpace == kPollSameAddress) {
         /* We have to poll the same address. */
-        uint32_t i = 0;
+        int32_t i = 0;
         for (i=0;i<numItems;i++) {
             result = write_device(memMapHandle,(char*)p + i*unitSize,unitSize,startAddress&0xffff);
             if (result != unitSize) break;
@@ -190,7 +183,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
         returnDataPtr->errorCode = errno;        
     }
 
-    lptr = (int32_t*)returnDataPtr;
+    int32_t* lptr = (int32_t*)returnDataPtr;
     if(needToSwap) SwapLongBlock(lptr,numItems);
 
     if(reply)writeBuffer(aPacket);    
@@ -229,12 +222,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     else if(unitSize*numItems >= kDMALowerLimit) {
         // Use DMA access which is normally faster.
 		useDMADevice = true;
-        if (addressSpace == kPollSameAddress) {
-            memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, false);
-		} 
-		else {
-            memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, true);
-         }
+        memMapHandle = get_dma_device(oldAddress, addressModifier, unitSize, addressSpace != kPollSameAddress);
         //addressSpace =0x1; // reset this for the later call.
         startAddress = 0x0;
     }
@@ -260,7 +248,7 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
 	
     if (addressSpace == kPollSameAddress) {
         /* We have to poll the same address. */
-        uint32_t i = 0;
+        int32_t i = 0;
         for (i=0;i<numItems;i++) {
             result = read_device(memMapHandle, returnPayload + i*unitSize,unitSize,startAddress&0xffff);
             if (result != unitSize) break;
@@ -280,17 +268,17 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     returnDataPtr->numItems        = numItems;
     if(result == (numItems*unitSize)){
         returnDataPtr->errorCode = 0;
-        switch(unitSize){
-            case 1: /*bytes*/
-			break;
-            case 2: /*shorts*/
-                if(needToSwap) SwapShortBlock((int16_t*)returnPayload,numItems);
+        if(needToSwap){
+            switch(unitSize){
+             case 2: /*shorts*/
+                SwapShortBlock((int16_t*)returnPayload,numItems);
                 break;
-            case 4: /*longs*/
-                if(needToSwap) SwapLongBlock((int32_t*)returnPayload,numItems);
+             case 4: /*longs*/
+                SwapLongBlock((int32_t*)returnPayload,numItems);
                 break;
+            }
         }
-    } 
+    }
 	else {
         sprintf(aPacket->message,"error: %d %d : %s\n",(int32_t)result,(int32_t)errno,strerror(errno));
         aPacket->cmdHeader.numberBytesinPayload  = sizeof(SBC_VmeReadBlockStruct);
