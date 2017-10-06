@@ -742,6 +742,11 @@ tellieRunFiles = _tellieRunFiles;
                        object : nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(runPostStopped:)
+                         name : ORRunFinalCallNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
                      selector : @selector(subRunStarted:)
                          name : ORRunStartSubRunNotification
                        object : nil];
@@ -1061,9 +1066,7 @@ err:
     /* Load the ECA settings if it's an ECA run
      * This will set MTC settings for correct ECA running, so 
      * we want this to be done before loading settings in HW. */
-    if( ![[self anECARun] setECASettings:NULL] ){
-        NSLogColor([NSColor redColor], @"runAboutToStart: ECA settings not set.\n");
-    };
+    [[self anECARun] setECASettings:nil];
 
     switch (startMode) {
     case COLD_START:
@@ -1133,12 +1136,12 @@ err:
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
-    if([gOrcaGlobals runType] & (kECAPedestalRun | kECATSlopeRun)){
-        /* Launch the ECA algorithm if this is an ECA run, as in
+    if(run_type & (kECAPedestalRun | kECATSlopeRun)){
+        /* Launch the ECA routine if this is an ECA run, as in
          * the PDST or TSLP bits are enabled */
         [[self anECARun] launchECAThread:NULL];
     }
-    else if ([gOrcaGlobals runType] & kPhysicsRun) {
+    else if (run_type & kPhysicsRun) {
         /* If this is a physics run with no ECAs, we ping each slot in the 
          * detector once at the beginning of the run to look for any trigger 
          * issues. */
@@ -1286,14 +1289,21 @@ err:
         break;
     }
 
-    /* At this point the run has stopped. So start the next scheduled SR, if any */
+}
+
+- (void) runPostStopped:(NSNotification*)aNote
+{
+    /* Automatic start of scheduled standard run.
+     * This doesn't work properly since this function is not called when
+     * the run is completely stopped and there exist a race condition in
+     * the restartRun method. Will leave this here as a placeholder for
+     * when it's fixed. */
     if(nextStandardRunType != nil && nextStandardRunVersion != nil){
-        NSLogColor([NSColor redColor], @"runStopped: starting next run %@ and %@ \n",nextStandardRunType,nextStandardRunVersion);
-        [self startStandardRun:nextStandardRunType withVersion:nextStandardRunVersion];
+        //[self startStandardRun:nextStandardRunType withVersion:nextStandardRunVersion];
         [self setNextStandardRunType:nil];
         [self setNextStandardRunVersion:nil];
     }
-
+    
 }
 
 - (void) subRunStarted:(NSNotification*)aNote

@@ -30,8 +30,6 @@
     NSArray *anXL3Model;
     NSArray *aFECModel;
     //Previous run
-    NSString *previousSR;
-    NSString *previousSRVersion;
     bool start_eca_run;
     int prev_coarsedelay;
     int prev_finedelay;

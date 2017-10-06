@@ -252,6 +252,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runAboutToStop:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
+- (void) runPostStopped:(NSNotification*)aNote;
 
 - (void) _waitForBuffers;
 
