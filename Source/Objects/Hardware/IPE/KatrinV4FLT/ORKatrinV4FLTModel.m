@@ -1699,6 +1699,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     unsigned long sltSubSec     = 0;
     unsigned long sltSec        = 0;
+    unsigned long sltRunStartSec = 0;
+    
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	@try {
         id slt      = [[self crate] adapter];
@@ -1773,14 +1775,18 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 
                 sltSec      =  [slt getSeconds];
                 sltSubSec   =  [slt readSubSecondsCounter];
-
-                if(dataIndex>0 && [gOrcaGlobals runInProgress]){
+                
+                // Don't ship hitrate before the run has been started
+                sltRunStartSec = [slt getRunStartSecond];
+                
+                
+                if(dataIndex>0 && [gOrcaGlobals runInProgress] && (sltSec > sltRunStartSec) ){
                     time_t	ut_time;
-                    time(&ut_time);
+                    time(&ut_time); // where is this used ??? --ak
 
                     data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
                     data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
-                    data[2] = sltSec;
+                    data[2] = sltSec - 1;
                     data[3] = hitRateLengthSec;	
                     data[4] = newTotal;
 

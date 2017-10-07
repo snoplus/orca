@@ -160,6 +160,7 @@
 		unsigned long   lastDisplaySec;
 		unsigned long   lastDisplayCounter;
 		double          lastDisplayRate;
+        unsigned long   runStartSec;
 		
 		unsigned long   lastSimSec;
 		unsigned long   pageSize; //< Length of the ADC data (0..100us)
@@ -326,6 +327,7 @@
 - (unsigned long) readSecondsCounter;
 - (unsigned long) readSubSecondsCounter;
 - (unsigned long) getSeconds;
+- (unsigned long) getRunStartSecond;
 
 - (void)		reset;
 - (void)		hw_config;

@@ -1210,6 +1210,11 @@ return;
 	return clockTime;
 }
 
+- (unsigned long) getRunStartSecond
+{
+    return runStartSec;
+}
+    
 - (void) initBoard
 {
     if(countersEnabled) [self writeEnCnt];
@@ -1499,6 +1504,11 @@ return;
 #pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    int i;
+    unsigned long lStatus;
+    uint32_t sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
+    
+    
     [self setIsPartOfRun: YES];
 
     [self clearExceptionCount];
@@ -1516,7 +1526,33 @@ return;
 	pollingWasRunning = [poller isRunning];
 	if(pollingWasRunning) [poller stop];
 	
-	[self writeSetInhibit];  //TODO: maybe move to readout loop to avoid dead time -tb-
+    
+    //
+    // Todo: Check, if inhibit source is enabled
+    //
+    
+    // Stop crate
+    [self writeSetInhibit];
+    
+    // Wait for inhibit; changes state with the next second strobe
+    i = 0;
+    do {
+        lStatus = [self readStatusReg];
+        //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+        
+        //NSLog(@"waiting for inhibit %x i=%d t=%d %04d\n", lStatus, i, sltsec, sltsubsec2);
+        usleep(100000);
+        i++;
+    } while(((lStatus & kStatusInh) == 0) && (i<15));
+    
+    if (i>= 15){
+        NSLog(@"Set inhibit failed\n");
+        [NSException raise:@"SLT error" format:@"Set inhibit failed"];
+    }
+    
+    
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
         
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
@@ -1602,6 +1638,38 @@ return;
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
 	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
+    
+    
+    // Write run counters - should be alway zero
+    unsigned long long runcount = [self readRunTime];
+    [self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
+    [self shipSltSecondCounter: kStartRunType];
+    
+    
+    // Release inhibit with the next second strobe
+    [self writeClrInhibit];
+
+    //
+    // Save the first second of the run
+    // Is used by hitrate readout to aviod too early storage
+    //
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+ 
+    runStartSec = sltsec + 1;
+    
+    // If inhibit has been released the time needs to be corrected
+    lStatus = [self readStatusReg];
+    if ((lStatus & kStatusInh) == 0) {
+        
+        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        
+        runStartSec = sltsec;
+    }
+
+    
+    
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1609,13 +1677,8 @@ return;
 	if(first){
 		//TODO: -tb- [self writePageManagerReset];
 		//TODO: -tb- [self writeClrCnt];
-        
-		unsigned long long runcount = [self readRunTime];
-		[self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-		[self writeClrInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
-
-		[self shipSltSecondCounter: kStartRunType];
-		first = NO;
+                
+        first = NO;
 	}
     else {
         //event readout controlled by the SLT cpu now. ORCA reads out
@@ -1626,20 +1689,67 @@ return;
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    
+    int i;
+    unsigned long lStatus;
+    uint32_t sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
+    
+    
+    //
+    // Todo: Check if run time close to completion
+    //
+    
+    //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+    
+    
+    
+    [self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
+    
+    // Wait for inhibit; changes state with the next second strobe
+    i = 0;
+    do {
+        lStatus = [self readStatusReg];
+        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+        
+        //NSLog(@"waiting for inhibit %x i=%d t=%d %04d\n", lStatus, i, sltsec, sltsubsec2);
+        usleep(100000);
+        i++;
+    } while(((lStatus & kStatusInh) == 0) && (i<15));
+    
+    if (i>= 15){
+        NSLog(@"Set inhibit failed\n");
+        // But continue anyway
+    }
+ 
+    
+    // Ship the run counter - it should be exactly like the run time specified in RunControl
+    [self shipSltSecondCounter: kStopRunType];
+    unsigned long long runcount = [self readRunTime];
+    [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
+    
+    
+    //
+    // Todo: check if all events are already processed
+    //
+    
+    
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
 	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
+    
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	[self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
-	[self shipSltSecondCounter: kStopRunType];
-	unsigned long long runcount = [self readRunTime];
-	[self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-	
+    
+    
     //TODO: set a run control 'wait', if we record the hitrate counter -> wait for final hitrate event (... in change state notification callback ...) -tb-
+
     
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
