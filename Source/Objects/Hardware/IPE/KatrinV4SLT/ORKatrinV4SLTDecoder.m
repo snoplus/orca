@@ -309,8 +309,9 @@ static NSString* kFLTChanKey[24] = {
         unsigned long f5 = ptr[event + 4];
         unsigned long f6 = ptr[event + 5];
         
-        unsigned long subsec   = f1 & 0x0fffffff;
-        unsigned long sec      = f2;
+        unsigned long prec     = (f1 >> 28) & 0x00000001;
+        unsigned long subsec   = (f1 >>  3) & 0x01ffffff;
+        unsigned long sec      = ((f1 & 0x7) << 29) | (f2 & 0x1fffffff);
         unsigned long flt      = (f3 >> 24) & 0x001f;
         unsigned long chan     = (f3 >> 19) & 0x001f;
         unsigned long mult     = (f3 >> 14) & 0x001f;
@@ -321,7 +322,7 @@ static NSString* kFLTChanKey[24] = {
         unsigned long aValley  =  4096 - (f5 & 0xfff);
         unsigned long energy   =  f6 & 0xfffff;
         
-        content = [content stringByAppendingFormat:@"Event: %d EventID: %lu \nSeconds: %lu.%lu\nFLT: %lu  Chan: %lu\n",i,eventID,sec,subsec,flt,chan];
+        content = [content stringByAppendingFormat:@"Event: %d EventID: %lu \nSeconds: %lu.%06lu \nPrec: %03ld ns\nFLT: %lu  Chan: %lu\n",i,eventID,sec,subsec/20,(subsec%20)*50+prec*25,flt,chan];
         content = [content stringByAppendingFormat:@"TPeak: %lu TValley: %lu\n",tPeak,tValley];
         content = [content stringByAppendingFormat:@"APeak: %lu AValley: %lu\n",aPeak,aValley];
         content = [content stringByAppendingFormat:@"Multi: %lu Energy: %lu\n",mult,energy];
