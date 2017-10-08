@@ -1650,25 +1650,27 @@ return;
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
 	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
-    
-    
+
+   
     // Write run counters - should be alway zero
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-    [self shipSltSecondCounter: kStartRunType];
+
     
     
     // Release inhibit with the next second strobe
     [self writeClrInhibit];
 
+    
     //
     // Save the first second of the run
     // Is used by hitrate readout to aviod too early storage
     //
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
- 
+    
     runStartSec = sltsec + 1;
+
     
     // If inhibit has been released the time needs to be corrected
     lStatus = [self readStatusReg];
@@ -1679,7 +1681,10 @@ return;
         
         runStartSec = sltsec;
     }
-
+    
+    
+    // Write run start time; starts always with the second strobe
+    [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
     
     
 }
@@ -1739,7 +1744,11 @@ return;
  
     
     // Ship the run counter - it should be exactly like the run time specified in RunControl
-    [self shipSltSecondCounter: kStopRunType];
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltsec low:0 ];
+    
+    // Write run counter
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
     
