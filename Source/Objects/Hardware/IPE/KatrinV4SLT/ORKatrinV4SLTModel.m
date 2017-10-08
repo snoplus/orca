@@ -1531,6 +1531,7 @@ return;
     // Todo: Check, if inhibit source is enabled
     //
     
+    
     // Stop crate
     [self writeSetInhibit];
     
@@ -1551,6 +1552,17 @@ return;
         NSLog(@"Set inhibit failed\n");
         [NSException raise:@"SLT error" format:@"Set inhibit failed"];
     }
+    
+    
+    // Make sure we start not at the very end of the secons
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+    
+    if (sltsubsec2 > 8000) {
+        usleep(205000);
+    }
+    
     
     
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
@@ -1765,6 +1777,15 @@ return;
 	dataTakers = nil;
 
     [self setIsPartOfRun: NO];
+    
+    
+    //
+    // Activate crate during the run pause for configuration
+    // Release inhibit with the next second strobe
+    //
+    [self writeClrInhibit];
+
+    
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text
