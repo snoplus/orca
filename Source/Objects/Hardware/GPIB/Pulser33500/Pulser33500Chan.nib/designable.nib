@@ -233,19 +233,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="205" height="119"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button toolTip="Load just the above parameters" verticalHuggingPriority="750" imageHugsTitle="YES" id="825">
-                                <rect key="frame" x="89" y="15" width="67" height="17"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="roundRect" title="Trigger" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="831">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="smallSystem"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="triggerAction:" target="-2" id="835"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" id="837">
-                                <rect key="frame" x="87" y="41" width="75" height="18"/>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="837">
+                                <rect key="frame" x="96" y="36" width="75" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="8000.000000" drawsBackground="YES" id="838">
                                     <font key="font" metaFont="label"/>
@@ -257,14 +246,14 @@
                                 </connections>
                             </textField>
                             <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autosizesCells="NO" id="826">
-                                <rect key="frame" x="18" y="15" width="68" height="94"/>
+                                <rect key="frame" x="18" y="7" width="68" height="102"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                <size key="cellSize" width="68" height="22"/>
+                                <size key="cellSize" width="68" height="24"/>
                                 <size key="intercellSpacing" width="4" height="2"/>
-                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="leading" alignment="left" inset="2" id="830">
+                                <buttonCell key="prototype" type="radio" title="Radio" imagePosition="leading" alignment="left" controlSize="small" inset="2" id="830">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="smallSystem"/>
                                 </buttonCell>
                                 <cells>
                                     <column>
@@ -290,8 +279,8 @@
                                     <action selector="triggerSourceAction:" target="-2" id="836"/>
                                 </connections>
                             </matrix>
-                            <textField verticalHuggingPriority="750" id="842">
-                                <rect key="frame" x="163" y="43" width="25" height="17"/>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="842">
+                                <rect key="frame" x="172" y="38" width="25" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="sec" id="843">
                                     <font key="font" metaFont="system"/>
@@ -299,178 +288,199 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button toolTip="Load just the above parameters" verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="825">
+                                <rect key="frame" x="96" y="10" width="67" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="roundRect" title="Trigger" bezelStyle="roundedRect" alignment="center" controlSize="small" borderStyle="border" inset="2" id="831">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystem"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="triggerAction:" target="-2" id="835"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                 </box>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="845">
-                    <rect key="frame" x="168" y="35" width="76" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Burst Phase" id="846">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="794">
-                    <rect key="frame" x="167" y="89" width="76" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Burst Rate (Hz)" id="800">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="818">
-                    <rect key="frame" x="168" y="63" width="76" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Burst Count" id="819">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="796">
-                    <rect key="frame" x="21" y="91" width="73" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Freq (Hz)" id="797">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="851">
-                    <rect key="frame" x="98" y="64" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="854">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="voltageOffsetAction:" target="-2" id="857"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="795">
-                    <rect key="frame" x="98" y="92" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="798">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="frequencyAction:" target="-2" id="811"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="793">
-                    <rect key="frame" x="25" y="115" width="71" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Voltage (V)" id="801">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="813">
-                    <rect key="frame" x="177" y="4" width="126" height="28"/>
+                <box autoresizesSubviews="NO" misplaced="YES" borderType="none" title="Waveform Parameters" id="G84-L5-GtT">
+                    <rect key="frame" x="6" y="9" width="294" height="136"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="push" title="Load Parameters" bezelStyle="rounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="814">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="loadParametersAction:" target="-2" id="816"/>
-                    </connections>
-                </button>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="844">
-                    <rect key="frame" x="246" y="36" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="847">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="burstPhaseAction:" target="-2" id="850"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="791">
-                    <rect key="frame" x="98" y="117" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5.000" drawsBackground="YES" id="804">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="voltageAction:" target="-2" id="812"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="792">
-                    <rect key="frame" x="245" y="90" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="802">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="burstRateAction:" target="-2" id="810"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="817">
-                    <rect key="frame" x="246" y="64" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="820">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="burstCountAction:" target="-2" id="822"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="852">
-                    <rect key="frame" x="33" y="63" width="63" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Offset (V)" id="853">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
-                <button misplaced="YES" id="guT-yE-yy4">
-                    <rect key="frame" x="203" y="115" width="83" height="20"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    <buttonCell key="cell" type="check" title="Burst Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="Yhb-FP-CsT">
-                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                        <font key="font" metaFont="smallSystem"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="burstModeAction:" target="-2" id="38D-j8-3U2"/>
-                    </connections>
-                </button>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="1jQ-MH-aFJ">
-                    <rect key="frame" x="98" y="36" width="52" height="18"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="5kJ-15-tHQ">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                    <connections>
-                        <action selector="dutyCycleAction:" target="-2" id="VFj-cb-5q2"/>
-                    </connections>
-                </textField>
-                <textField verticalHuggingPriority="750" misplaced="YES" id="mtT-Jw-Our">
-                    <rect key="frame" x="16" y="35" width="80" height="17"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Duty Cycle (%) " id="DdI-Fz-j5V">
-                        <font key="font" metaFont="label"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
+                    <view key="contentView" id="D6E-FE-6r6">
+                        <rect key="frame" x="0.0" y="0.0" width="294" height="121"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button misplaced="YES" id="guT-yE-yy4">
+                                <rect key="frame" x="189" y="101" width="83" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="check" title="Burst Mode" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="Yhb-FP-CsT">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="smallSystem"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="burstModeAction:" target="-2" id="38D-j8-3U2"/>
+                                </connections>
+                            </button>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="852">
+                                <rect key="frame" x="23" y="43" width="63" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Offset (V)" id="853">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="796">
+                                <rect key="frame" x="11" y="69" width="73" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Freq (Hz)" id="797">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="844">
+                                <rect key="frame" x="232" y="29" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="847">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="burstPhaseAction:" target="-2" id="850"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="817">
+                                <rect key="frame" x="232" y="54" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="820">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="burstCountAction:" target="-2" id="822"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="1jQ-MH-aFJ">
+                                <rect key="frame" x="88" y="18" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="5kJ-15-tHQ">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="dutyCycleAction:" target="-2" id="VFj-cb-5q2"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="791">
+                                <rect key="frame" x="88" y="93" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="5.000" drawsBackground="YES" id="804">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="voltageAction:" target="-2" id="812"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="845">
+                                <rect key="frame" x="154" y="28" width="76" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Burst Phase" id="846">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="794">
+                                <rect key="frame" x="154" y="76" width="76" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Burst Rate (Hz)" id="800">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="795">
+                                <rect key="frame" x="88" y="70" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="798">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="frequencyAction:" target="-2" id="811"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="793">
+                                <rect key="frame" x="15" y="91" width="71" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Voltage (V)" id="801">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="818">
+                                <rect key="frame" x="154" y="53" width="76" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Burst Count" id="819">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="mtT-Jw-Our">
+                                <rect key="frame" x="6" y="17" width="80" height="17"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Duty Cycle (%) " id="DdI-Fz-j5V">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="851">
+                                <rect key="frame" x="88" y="44" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="854">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="voltageOffsetAction:" target="-2" id="857"/>
+                                </connections>
+                            </textField>
+                            <textField verticalHuggingPriority="750" misplaced="YES" id="792">
+                                <rect key="frame" x="231" y="77" width="52" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="802">
+                                    <font key="font" metaFont="label"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                                <connections>
+                                    <action selector="burstRateAction:" target="-2" id="810"/>
+                                </connections>
+                            </textField>
+                            <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="813">
+                                <rect key="frame" x="163" y="-6" width="126" height="28"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Load Parameters" bezelStyle="rounded" alignment="center" controlSize="small" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="814">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="smallSystem"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="loadParametersAction:" target="-2" id="816"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                    </view>
+                </box>
             </subviews>
         </customView>
     </objects>
