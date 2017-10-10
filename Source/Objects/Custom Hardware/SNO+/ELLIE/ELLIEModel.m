@@ -64,6 +64,7 @@ NSString* ORAMELLIERunStart = @"ORAMELLIERunStarted";
 NSString* ORSMELLIERunFinished = @"ORSMELLIERunFinished";
 NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
+NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 
 ///////////////////////////////
 // Define private methods
@@ -565,6 +566,25 @@ NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
     return channel;
 }
 
+-(NSNumber*) calcAmellieChannelForFibre:(NSString*)fibre
+{
+    /*
+     Use patch pannel map loaded from the amelliedb to map a given fibre to the correct amellie channel.
+     */
+    if([self amellieFibreMapping] == nil){
+        NSLogColor([NSColor redColor], @"[AMELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
+        return [NSNumber numberWithInt:-1];
+    }
+    if(![[[self amellieFibreMapping] objectForKey:@"fibres"] containsObject:fibre]){
+        NSLogColor([NSColor redColor], @"[AMELLIE]: Patch map does not include a reference to fibre: %@\n",fibre);
+        return [NSNumber numberWithInt:-2];
+    }
+    NSUInteger fibreIndex = [[[self amellieFibreMapping] objectForKey:@"fibres"] indexOfObject:fibre];
+    NSUInteger channelInt = [[[[self amellieFibreMapping] objectForKey:@"channels"] objectAtIndex:fibreIndex] integerValue];
+    NSNumber* channel = [NSNumber numberWithInt:channelInt];
+    return channel;
+}
+
 -(NSString*) calcTellieFibreForChannel:(NSUInteger)channel
 {
     /*
@@ -804,7 +824,7 @@ err:
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
     if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find Tubii model.\n");
+        NSLogColor([NSColor redColor], @"%@: Couldn't find Tubii model.\n",prefix);
         goto err;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
@@ -813,7 +833,7 @@ err:
     //Add run control object
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
+        NSLogColor([NSColor redColor], @"%@: Couldn't find ORRunModel please add one to the experiment\n",prefix);
         goto err;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
@@ -822,17 +842,26 @@ err:
     //Add SNOPModel object
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel\n");
+        NSLogColor([NSColor redColor], @"%@: Couldn't find SNOPModel\n",prefix);
         goto err;
     }
     SNOPModel* snopModel = [snopModels objectAtIndex:0];
 
     ///////////////////////
     // Check TELLIE run type is masked in
-    if(!([snopModel lastRunTypeWord] & kTELLIERun)){
-        NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
-        NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
-        goto err;
+    if(forTELLIE){
+        if(!([snopModel lastRunTypeWord] & kTELLIERun)){
+            NSLogColor([NSColor redColor], @"%@: TELLIE bit is not masked into the run type word.\n",prefix);
+            NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
+            goto err;
+        }
+    } else {
+        if(!([snopModel lastRunTypeWord] & kAMELLIERun)){
+            NSLogColor([NSColor redColor], @"%@: AMELLIE bit is not masked into the run type word.\n",prefix);
+            NSLogColor([NSColor redColor], @"%@: Please load the TELLIE standard run type.\n",prefix);
+            goto err;
+        }
+        
     }
 
     ///////////////////////
@@ -844,7 +873,7 @@ err:
     @try{
         asyncTrigMask = [theTubiiModel asyncTrigMask];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[TELLIE]: Error requesting asyncTrigMask from Tubii.\n");
+        NSLogColor([NSColor redColor], @"%@: Error requesting asyncTrigMask from Tubii.\n",prefix);
         goto err;
     }
 
@@ -1087,7 +1116,7 @@ err:
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
-        NSLog(@"[TELLIE]: Pin response received %i +/- %1.1f\n", [[pinReading objectAtIndex:0] integerValue], [[pinReading objectAtIndex:1] floatValue]);
+        NSLog(@"%@: Pin response received %i +/- %1.1f\n", prefix, [[pinReading objectAtIndex:0] integerValue], [[pinReading objectAtIndex:1] floatValue]);
         @try {
             [valuesToFillPerSubRun setObject:[pinReading objectAtIndex:0] forKey:@"pin_value"];
             [valuesToFillPerSubRun setObject:[pinReading objectAtIndex:1] forKey:@"pin_rms"];
@@ -1482,11 +1511,12 @@ err:
     [self setAmellieFireParameters:nil];
     [self setAmellieFibreMapping:nil];
     
-    NSString* parsString = [NSString stringWithFormat:@"_design/amellieQuery/_view/fetchFireParameters?descending=False&limit=1"];
-    NSString* mapString = [NSString stringWithFormat:@"_design/amellieQuery/_view/fetchCurrentMapping?key=2147483647"];
+    
+    //NSString* parsString = [NSString stringWithFormat:@"_design/amellieQuery/_view/fetchFireParameters?descending=False&limit=1"];
+    NSString* mapString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchCurrentMapping?key=2147483647"];
     
     // Make requests
-    [[self couchDBRef:self withDB:@"amellie"] getDocumentId:parsString tag:kAmellieParsRetrieved];
+    //[[self couchDBRef:self withDB:@"amellie"] getDocumentId:parsString tag:kAmellieParsRetrieved];
     [[self couchDBRef:self withDB:@"amellie"] getDocumentId:mapString tag:kAmellieMapRetrieved];
 }
 
@@ -1502,6 +1532,9 @@ err:
     NSMutableDictionary* mappingDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
     NSLog(@"[AMELLIE_DATABASE]: mapping document sucessfully loaded\n");
     [self setAmellieFibreMapping:mappingDoc];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIEMappingReceived object:self];
+    });
 }
 
 /*********************************************************/

@@ -167,15 +167,20 @@
 -(void)parseTellieFibreMap:(id)aResult;
 -(void)parseTellieNodeMap:(id)aResult;
 
-// AMELLIE database interactions
+/************************/
+/*   AMELLIE Functions   */
+/************************/
+-(NSNumber*)calcAmellieChannelForFibre:(NSString*)fibre;
 -(NSMutableDictionary*)returnAmellieFireCommands:(NSString*)fibre
                                        withNHits:(NSUInteger)nHits
                                withFireFrequency:(NSUInteger)frequency
                                      withNPulses:(NSUInteger)pulses
                                 withTriggerDelay:(NSUInteger)delay
                                          inSlave:(BOOL)mode;
+// AMELLIE database interactions
 -(void) pushInitialAmellieRunDocument;
 -(void) updateAmellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) loadAMELLIEStaticsFromDB;
 
 /************************/
 /*  SMELLIE Functions   */
@@ -229,3 +234,4 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
+extern NSString* ORAMELLIEMappingReceived;

@@ -11,7 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ELLIEController : OrcaObjectController <NSTextFieldDelegate>{
+@interface ELLIEController : OrcaObjectController <NSTextFieldDelegate>
+{
 
     //TAB Views
     IBOutlet NSTabView *ellieTabView;
@@ -123,6 +124,9 @@
     NSThread* _smellieThread;
     NSButton *interlockPing;
     NSButton *tubiiRestart;
+    
+    //For delegation
+    NSHashTable* _delegates;
 }
 
 // Properties
@@ -130,6 +134,7 @@
 @property (nonatomic,strong) NSMutableDictionary* guiFireSettings;
 @property (nonatomic, strong) NSThread* tellieThread;
 @property (nonatomic, strong) NSThread* smellieThread;
+@property (nonatomic, strong) NSHashTable *delegates;
 
 -(id)init;
 -(void)dealloc;
@@ -174,8 +179,12 @@
 -(NSString*)validateTellieTriggerDelay:(NSString *)currentText;
 -(NSString*)validateTellieNoPulses:(NSString *)currentText;
 
+// Some extra's
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+-(void)displayAmellieFibres:(id)sender;
+-(void)updateAmellieChannel:(NSMenuItem *)sender;
+
 
 //Build Custom sequence
 -(IBAction)tellieBuildValidateAction:(id)sender;

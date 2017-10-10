@@ -23,6 +23,7 @@
 @synthesize guiFireSettings = _guiFireSettings;
 @synthesize tellieThread = _tellieThread;
 @synthesize smellieThread = _smellieThread;
+@synthesize delegates = _delegates;
 
 //Set up functions
 -(id)init
@@ -59,6 +60,7 @@
     [_smellieThread release];
     [_guiFireSettings release];
     [_tellieThread release];
+    [_delegates release];
     [super dealloc];
 }
 
@@ -105,6 +107,11 @@
                         object: nil];
 
     [notifyCenter addObserver : self
+                     selector : @selector(displayAmellieFibres:)
+                         name : ORAMELLIEMappingReceived
+                        object: nil];
+    
+    [notifyCenter addObserver : self
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
                         object: nil];
@@ -134,6 +141,7 @@
 {
     // Load static (calibration and mapping) parameters from DB.
     [model loadTELLIEStaticsFromDB];
+    [model loadAMELLIEStaticsFromDB];
 
     //Make sure sensible tabs are selected to begin with
     [ellieTabView selectTabViewItem:tellieTViewItem];
@@ -154,8 +162,6 @@
     [amellieOperationModePb selectItemAtIndex:0];
 
     [amellieFibreSelectPb removeAllItems];
-    [amellieFibreSelectPb addItemsWithTitles:@[@"FA008", @"FA108", @"FA050", @"FA150", @"FA092", @"FA173", @"FA089", @"FA189"]];
-    [amellieFibreSelectPb selectItemAtIndex:0];
     
     //Grey out fibre until node is given
     [tellieGeneralFibreSelectPb setTarget:self];
@@ -200,9 +206,10 @@
     [amellieFibreDelayTf setDelegate:self];
     [amellieTriggerDelayTf setDelegate:self];
     [amellieNoPulsesTf setDelegate:self];
+    [amellieFibreSelectPb setAction:@selector(updateAmellieChannel:)];
     [amellieTriggerDelayTf setStringValue:@"650"];
     [amelliePulseHeightTf setStringValue:@"16383"];
-
+    
     // Build custom run tab
     [tellieBuildPushToDB setEnabled:NO];
     [tellieBuildOpMode removeAllItems];
@@ -217,6 +224,29 @@
             [[tellieBuildNodeSelection cellWithTag:i] setState:0];
         }
     }
+}
+
+-(void)displayAmellieFibres:(id)sender
+{
+    // Fill the NSPopUpButton
+    [amellieFibreSelectPb setEnabled:YES];
+    // Once we get a note saying mapping is loaded, fill the push button
+    for(id fname in [[model amellieFibreMapping] objectForKey:@"fibres"]){
+        @try{
+            [amellieFibreSelectPb addItemWithTitle:fname];
+        } @catch(NSException * e){
+            NSLog(@"[AMELLIE]: Problem setting fibre select option : %@\n", [e reason]);
+        }
+    }
+    // Select the first one and make sure the channel field gets set appropriately
+    [amellieFibreSelectPb selectItemAtIndex:0];
+    [self updateAmellieChannel:[amellieFibreSelectPb selectedItem]];
+}
+
+-(void)updateAmellieChannel:(NSMenuItem *)sender
+{
+    // When someone changes the Fibre selection, automatically update the channel field
+    [amellieChannelTf setStringValue:[NSString stringWithFormat:@"%@",[model calcAmellieChannelForFibre:[sender title]]]];
 }
 
 -(IBAction)tellieGeneralFireAction:(id)sender
@@ -871,7 +901,7 @@
         float pulseSeparation = 1000.*(1./[amelliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
         NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
         [settingsDict setValue:[amellieFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
-        [settingsDict setValue:[NSNumber numberWithInteger:[model fibreToChannel:[amellieFibreSelectPb titleOfSelectedItem]]] forKey:@"channel"];
+        [settingsDict setValue:[NSNumber numberWithInteger:[amellieChannelTf integerValue]] forKey:@"channel"];
         [settingsDict setValue:[amellieOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
         [settingsDict setValue:[NSNumber numberWithInteger:[amelliePulseWidthTf integerValue]] forKey:@"pulse_width"];
         [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_separation"];
@@ -932,10 +962,19 @@
     if(![model tellieNodeMapping]){
         [model loadTELLIEStaticsFromDB];
     }
-
+    if(![model amellieFibreMapping]){
+        [model loadAMELLIEStaticsFromDB];
+    }
+    
     //If still can't get reference, return
     if(![model tellieNodeMapping]){
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        return;
+    }
+
+    //If still can't get reference, return
+    if(![model amellieFibreMapping]){
+        NSLogColor([NSColor redColor], @"[AMELLIE]: Cannot connect to couchdb database\n");
         return;
     }
     
@@ -952,7 +991,9 @@
     //Make sure background gets drawn
     [editedField setDrawsBackground:YES];
 
+    /////////////////////////////////////////////////////////////
     //check if this notification originated from the expert tab
+    //
     if([note object] == tellieExpertNodeTf){
         expertMsg = [self validateExpertTellieNode:currentString];
         gotInside = YES;
@@ -1024,10 +1065,12 @@
         return;
     }
     
+    /////////////////////////////////////////////////////////////
+    //check if this notification originated from the general tab
+
     //Re-set got inside.
     gotInside = NO;
     
-    //check if this notification originated from the general tab
     if([note object] == tellieGeneralNodeTf){
         generalMsg = [self validateGeneralTellieNode:currentString];
         gotInside = YES;
@@ -1060,7 +1103,7 @@
         return;
     }
 
-    ///////////////////////////
+    /////////////////////////////////////////////////////////////
     // check if this notification originated from tellie run plan tab
 
     //Re-set got inside.
@@ -1092,7 +1135,7 @@
         return;
     }
     
-    ///////////////////////////
+    /////////////////////////////////////////////////////////////
     // check if this notification originated from the AMELLIE tab
     
     //Re-set got inside.
@@ -1117,7 +1160,7 @@
         amellieMsg = [self validateTellieNoPulses:currentString];
         gotInside = YES;
     }
-    
+
     if(amellieMsg){
         [amellieFireButton setEnabled:NO];
         [amellieValidationStatusTf setStringValue:expertMsg];
