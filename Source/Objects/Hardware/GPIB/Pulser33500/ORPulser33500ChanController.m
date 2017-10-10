@@ -72,7 +72,8 @@
 	NSNumberFormatter* formatter = [[[NSNumberFormatter alloc] init] autorelease];
 	[formatter setFormat:@"#0.00"];	
 	[frequencyField setFormatter:formatter];
-	[burstRateField setFormatter:formatter];
+    [burstRateField setFormatter:formatter];
+    [dutyCycleField setFormatter:formatter];
 
 	NSNumberFormatter* mFormatter = [[[NSNumberFormatter alloc] init] autorelease];
 	[mFormatter setFormat:@"#0.000"];	
@@ -112,9 +113,14 @@
                        object : model];
 	
 	
-	[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(frequencyChanged:)
                          name : ORPulser33500ChanFrequencyChanged
+                       object : model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(dutyCycleChanged:)
+                         name : ORPulser33500ChanDutyCycleChanged
                        object : model];
 
 	[notifyCenter addObserver : self
@@ -147,7 +153,6 @@
                      selector : @selector(selectedWaveformChanged:)
                          name : ORPulser33500ChanSelectedWaveformChanged
                        object : model];
-	
 	
     [notifyCenter addObserver : self
                      selector : @selector(negativePulseChanged:)
@@ -190,7 +195,12 @@
                      selector : @selector(updateFreqLabels)
                          name : ORPulser33500ShowInKHzChanged
                        object : [model pulser]];
-	
+
+    [notifyCenter addObserver : self
+                     selector : @selector(burstModeChanged:)
+                         name : ORPulser33500BurstModeChanged
+                       object : model];
+
 	
 }
 
@@ -199,6 +209,8 @@
 	[self voltageChanged:nil];
 	[self voltageOffsetChanged:nil];
     [self frequencyChanged:nil];
+    [self dutyCycleChanged:nil];
+    [self burstModeChanged:nil];
     [self burstRateChanged:nil];
     [self burstPhaseChanged:nil];
     [self burstCountChanged:nil];
@@ -243,6 +255,7 @@
 - (void) selectedWaveformChanged:(NSNotification*)aNotification
 {
 	[selectedWaveformPU selectItemAtIndex:[model selectedWaveform]];
+    [self setButtonStates];
 }
 
 - (void) triggerTimerChanged:(NSNotification*)aNotification
@@ -273,6 +286,18 @@
 	[frequencyField setFloatValue:freq];
 }
 
+- (void) dutyCycleChanged:(NSNotification*)aNotification
+{
+    float freq = [model dutyCycle];
+    [dutyCycleField setFloatValue:freq];
+}
+
+- (void) burstModeChanged:(NSNotification*)aNotification
+{
+    [burstModeCB setIntValue:[model burstMode]];
+    [self setButtonStates];
+}
+    
 - (void) burstPhaseChanged:(NSNotification*)aNotification
 {
 	[burstPhaseField setFloatValue:[model burstPhase]];
@@ -298,23 +323,26 @@
 	BOOL triggerModeIsTimer			= [model triggerSource] == kTimerTrigger;
     BOOL selfLoading				= [model loading];
 	BOOL somebodyLoading			= [[model pulser]loading];
+    BOOL burstMode                  = [model burstMode];
 
     [downloadButton setTitle: selfLoading ? @"Stop":@"Load"];
 	[downloadButton setEnabled:!locked && (selfLoading || !somebodyLoading)];
 	
-    [triggerButton setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && triggerModeIsSoftware];
-    [triggerTimerField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && triggerModeIsTimer];
-    [voltageField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [voltageOffsetField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [frequencyField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [burstRateField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [burstPhaseField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [burstCountField setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-	[triggerSourceMatrix setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [negativePulseMatrix setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
-    [selectedWaveformPU setEnabled:!somebodyLoading && !locked];
-    [burstPhaseField setEnabled:!somebodyLoading && !locked];
-    [loadParametersButton setEnabled:!somebodyLoading && !somebodyLoading];
+    [triggerButton          setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && triggerModeIsSoftware];
+    [triggerTimerField      setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && triggerModeIsTimer];
+    [voltageField           setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
+    [voltageOffsetField     setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
+    [frequencyField         setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
+    
+    [burstRateField         setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && burstMode];
+    [burstPhaseField        setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && burstMode];
+    [burstCountField        setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && burstMode];
+    
+	[triggerSourceMatrix    setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
+    [negativePulseMatrix    setEnabled:!somebodyLoading && !lockedOrRunningMaintenance];
+    [selectedWaveformPU     setEnabled:!somebodyLoading && !locked];
+    [loadParametersButton   setEnabled:!somebodyLoading && !somebodyLoading];
+    [dutyCycleField         setEnabled:!somebodyLoading && !lockedOrRunningMaintenance && [model selectedWaveform] == kBuiltInSquare];
 }
 
 - (void) waveformLoadStarted:(NSNotification*)aNotification
@@ -384,7 +412,17 @@
     if([[model pulser] showInKHz])freq *= 1000;
     [model setFrequency:freq];
 }
-
+    
+- (IBAction) dutyCycleAction:(id)sender
+{
+    [model setDutyCycle:[sender floatValue]];
+}
+    
+- (IBAction) burstModeAction:(id)sender
+{
+    [model setBurstMode:[sender intValue]];
+}
+    
 - (IBAction) burstRateAction:(id)sender
 {
 	[model setBurstRate:[sender floatValue]];	
