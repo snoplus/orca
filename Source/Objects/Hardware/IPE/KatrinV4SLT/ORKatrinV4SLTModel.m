@@ -35,7 +35,7 @@
 #import "SLTv4GeneralOperations.h"
 #import "ORTaskSequence.h"
 #import "ORFileMover.h"
-
+#import "ORAlarm.h"
 
 #pragma mark ***Notification Strings
 NSString* ORKatrinV4SLTModelPixelBusEnableRegChanged        = @"ORKatrinV4SLTModelPixelBusEnableRegChanged";
@@ -92,7 +92,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	[self setSecondsSetInitWithHost: YES];
 	[self setSecondsSetSendToFLTs: YES];
-
+    [self setDefaults];
 	[self registerNotificationObservers];
     return self;
 }
@@ -107,6 +107,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [poller release];
 	[pmcLink setDelegate:nil];
 	[pmcLink release];
+    [swInhibitDisabledAlarm clearAlarm];
+    [swInhibitDisabledAlarm release];
+    [pixelTriggerDisabledAlarm clearAlarm];
+    [pixelTriggerDisabledAlarm release];
+
+    
     [super dealloc];
 }
 
@@ -171,8 +177,44 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                      selector : @selector(runIsStartingSubRun:)
                          name : ORRunStartSubRunNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(cardsChanged:)
+                         name : ORGroupObjectsRemoved
+                       object : [self guardian]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(cardsChanged:)
+                         name : ORGroupObjectsAdded
+                       object : [self guardian]];
+
+    
 }
 
+- (void) cardsChanged:(NSNotification*) aNote
+{
+    if([aNote object] == [self guardian]){
+        NSArray* allCards = [[self guardian] children];
+        unsigned long aMask = 0x0;
+        for(id aCard in allCards){
+            if(![[aCard className] isEqualToString:[self className]]){
+                int n = [aCard stationNumber]-1;
+                aMask |= (0x1<<n);
+            }
+        }
+        [[self undoManager] disableUndoRegistration];
+        [self setPixelBusEnableReg:aMask];
+        [[self undoManager] enableUndoRegistration];
+    }
+}
+
+- (void) setDefaults
+{
+    //SW Inhibit enabled
+    //Run enabled
+    unsigned long defaultMask = (1L<<kCtrlInhEnShift) | kCtrlRunMask;
+    [self setControlReg:defaultMask];
+}
 
 #pragma mark •••Accessors
 
@@ -186,6 +228,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [[[self undoManager] prepareWithInvocationTarget:self] setPixelBusEnableReg:pixelBusEnableReg];
     pixelBusEnableReg = aPixelBusEnableReg;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelPixelBusEnableRegChanged object:self];
+    [self checkPixelTrigger];
+
 }
 
 - (bool) secondsSetSendToFLTs
@@ -331,11 +375,58 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     return controlReg;
 }
 
+- (void) checkPixelTrigger
+{
+    NSArray* allCards = [[self guardian] children];
+    unsigned long aMask = 0x0;
+    for(id aCard in allCards){
+        if(![[aCard className] isEqualToString:[self className]]){
+            int n = [aCard stationNumber]-1;
+            aMask |= (0x1<<n);
+        }
+    }
+    
+    
+    if(((controlReg & kCtrlRunMask)==0) || (aMask != pixelBusEnableReg)){
+        if(!pixelTriggerDisabledAlarm){
+            pixelTriggerDisabledAlarm = [[ORAlarm alloc] initWithName:@"Pixel Trigger (partially) Deactivated" severity:kSetupAlarm];
+            [pixelTriggerDisabledAlarm setSticky:YES];
+            [pixelTriggerDisabledAlarm setHelpString:@"Check the 'Run' check box in the SLT Misc Ctrl Flags section and/or the Pixelbus setup for the available FLTs"];
+            [pixelTriggerDisabledAlarm postAlarm];
+        }
+    }
+    else {
+        [pixelTriggerDisabledAlarm clearAlarm];
+        [pixelTriggerDisabledAlarm release];
+        pixelTriggerDisabledAlarm = nil;
+    }
+}
+
+- (void) checkSoftwareInhibit
+{
+    if((controlReg & (0x1<<kCtrlInhEnShift))==0){
+        if(!swInhibitDisabledAlarm){
+            swInhibitDisabledAlarm = [[ORAlarm alloc] initWithName:@"SLT Software Inhibit Deactivated" severity:kSetupAlarm];
+            [swInhibitDisabledAlarm setSticky:YES];
+            [swInhibitDisabledAlarm postAlarm];
+        }
+    }
+    else {
+        [swInhibitDisabledAlarm clearAlarm];
+        [swInhibitDisabledAlarm release];
+        swInhibitDisabledAlarm = nil;
+    }
+}
+
 - (void) setControlReg:(unsigned long)aControlReg
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setControlReg:controlReg];
     controlReg = aControlReg;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelControlRegChanged object:self];
+    
+    [self checkSoftwareInhibit];
+    [self checkPixelTrigger];
+    
 }
 
 - (unsigned long) projectVersion  { return (hwVersion & kRevisionProject)>>28;}
@@ -988,6 +1079,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (void) writeControlReg
 {
 	[self writeReg:kKatrinV4SLTControlReg value:controlReg];
+    [self readStatusReg];
 }
 
 - (void)writeControlRegRunFlagOn:(BOOL) aState
@@ -995,6 +1087,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long controlRegValue = controlReg;
     controlRegValue &= ~kCtrlRunMask;//
 	[self writeReg:kKatrinV4SLTControlReg value:controlRegValue];
+    [self readStatusReg];
 }
 
 - (void) writePixelBusEnableReg
@@ -1346,7 +1439,7 @@ return;
     else                  [pmcLink setDelegate:self];
 
     
-	[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
+	//[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
 	[self setSltScriptArguments:    [decoder decodeObjectForKey:@"sltScriptArguments"]];
 	[self setControlReg:            [decoder decodeInt32ForKey:@"controlReg"]];
 	[self setSecondsSet:            [decoder decodeInt32ForKey:@"secondsSet"]];
@@ -1388,7 +1481,7 @@ return;
 {
 	[super encodeWithCoder:encoder];
 	
-	[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
+	//[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
 	[encoder encodeBool:secondsSetSendToFLTs    forKey:@"secondsSetSendToFLTs"];
 	[encoder encodeBool:secondsSetInitWithHost  forKey:@"secondsSetInitWithHost"];
 	[encoder encodeObject:sltScriptArguments    forKey:@"sltScriptArguments"];
@@ -1504,10 +1597,6 @@ return;
 #pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    int i;
-    unsigned long lStatus;
-    uint32_t sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
-    
     
     [self setIsPartOfRun: YES];
 
@@ -1536,7 +1625,8 @@ return;
     [self writeSetInhibit];
     
     // Wait for inhibit; changes state with the next second strobe
-    i = 0;
+    unsigned long lStatus;
+    int i = 0;
     do {
         lStatus = [self readStatusReg];
         //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
@@ -1555,9 +1645,9 @@ return;
     
     
     // Make sure we start not at the very end of the secons
-    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+    unsigned long sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    unsigned long sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    unsigned long sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
     
     if (sltsubsec2 > 8000) {
         usleep(205000);

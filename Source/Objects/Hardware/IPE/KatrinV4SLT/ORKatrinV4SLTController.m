@@ -24,6 +24,7 @@
 #import "ORKatrinV4SLTModel.h"
 #import "TimedWorker.h"
 #import "SBC_Link.h"
+#import "StopLightView.h"
 
 
 @interface ORKatrinV4SLTController (private)
@@ -54,12 +55,15 @@
 {
 	controlSize			= NSMakeSize(555,630);
     statusSize			= NSMakeSize(555,480);
-    lowLevelSize		= NSMakeSize(555,430);
+    lowLevelSize		= NSMakeSize(555,490);
     cpuManagementSize	= NSMakeSize(485,450);
     cpuTestsSize		= NSMakeSize(555,355);
 	
-	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
-	
+	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];
+    
+    [lightBoardView hideCautionLight];
+    [lightBoardView1 hideCautionLight];
+
     [super awakeFromNib];
     [self updateWindow];
 	
@@ -273,6 +277,15 @@
 	[[statusMatrix cellWithTag:6] setStringValue: IsBitSet(statusReg,kStatusVttErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:7] setStringValue: IsBitSet(statusReg,kStatusFanErr)?@"ERR":@"OK"]; 
 
+    
+    if(statusReg & kStatusInh){
+        [lightBoardView setState:kGoLight];
+        [lightBoardView1 setState:kGoLight];
+    }
+    else {
+        [lightBoardView setState:kStoppedLight];
+        [lightBoardView1 setState:kStoppedLight];
+    }
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem

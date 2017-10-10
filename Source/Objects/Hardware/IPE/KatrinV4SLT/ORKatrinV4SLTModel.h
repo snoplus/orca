@@ -31,13 +31,14 @@
 @class TimedWorker;
 @class PMC_Link;
 @class SBC_Link;
+@class ORAlarm;
 
 #define IsBitSet(A,B)       (((A) & (B)) == (B))
 #define ExtractValue(A,B,C) (((A) & (B)) >> (C))
 
 //control reg bit masks
 #define kCtrlTrgEnShift		0
-#define kCtrlInhEnShift		6
+#define kCtrlInhEnShift		6 //SW Inhibit
 #define kCtrlPPSShift		10
 #define kCtrlTpEnEnShift	11
 
@@ -167,18 +168,20 @@
 
 		PMC_Link*		pmcLink;
         
-		unsigned long controlReg;
-		unsigned long statusReg;
-		unsigned long secondsSet;
-		unsigned long long deadTime;
-		unsigned long long vetoTime;
-		unsigned long long runTime;
-		unsigned long      clockTime;
-		BOOL        countersEnabled;
-        NSString*   sltScriptArguments;
-        BOOL        secondsSetInitWithHost;
-        bool        secondsSetSendToFLTs;
-        unsigned long    pixelBusEnableReg;
+		unsigned long       controlReg;
+		unsigned long       statusReg;
+		unsigned long       secondsSet;
+		unsigned long long  deadTime;
+		unsigned long long  vetoTime;
+		unsigned long long  runTime;
+		unsigned long       clockTime;
+		BOOL                countersEnabled;
+        NSString*           sltScriptArguments;
+        BOOL                secondsSetInitWithHost;
+        bool                secondsSetSendToFLTs;
+        unsigned long       pixelBusEnableReg;
+        ORAlarm*            swInhibitDisabledAlarm;
+        ORAlarm*            pixelTriggerDisabledAlarm;
 }
 
 #pragma mark •••Initialization
@@ -187,15 +190,17 @@
 - (void) setUpImage;
 - (void) makeMainController;
 - (void) setGuardian:(id)aGuardian;
+- (void) setDefaults;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
+- (void) cardsChanged:(NSNotification*) aNote;
 
 #pragma mark •••Accessors
 - (unsigned long) pixelBusEnableReg;
-- (void) setPixelBusEnableReg:(unsigned long)aPixelBusEnableReg;
+- (void) setPixelBusEnableReg:(unsigned long)aMask;
 - (bool) secondsSetSendToFLTs;
 - (void) setSecondsSetSendToFLTs:(bool)aSecondsSetSendToFLTs;
 - (BOOL) secondsSetInitWithHost;
@@ -260,6 +265,8 @@
 - (void) sendLinkWithDmaLibConfigScriptON;
 - (void) sendLinkWithDmaLibConfigScriptOFF;
 
+- (void) checkPixelTrigger;
+- (void) checkSoftwareInhibit;
 
 
 - (void) sendPMCCommandScript: (NSString*)aString;

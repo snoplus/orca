@@ -24,6 +24,8 @@
 #import "ORKatrinV4SLTModel.h"
 #import "SBC_LinkController.h"
 
+@class StopLightView;
+
 @interface ORKatrinV4SLTController : SBC_LinkController {
 	@private
 	
@@ -36,7 +38,9 @@
 		IBOutlet NSButton*		secondsSetInitWithHostButton;
 	    IBOutlet NSButton*      secondsSetSendToFLTsCB;
 		IBOutlet NSButton*		hwVersionButton;
-	
+        IBOutlet StopLightView* lightBoardView;
+        IBOutlet StopLightView* lightBoardView1;
+
 		//control reg
 		IBOutlet NSMatrix*		triggerEnableMatrix;
 		IBOutlet NSMatrix*		inhibitEnableMatrix;
