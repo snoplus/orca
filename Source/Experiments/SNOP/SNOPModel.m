@@ -45,6 +45,7 @@
 #import "SNOCmds.h"
 #import "RedisClient.h"
 #include <stdint.h>
+#include <unistd.h>
 #import "SNOCaenModel.h"
 #import "TUBiiModel.h"
 #import "XL3_Link.h"
@@ -91,6 +92,7 @@ lockDBName = _lockDBName,
 lockDBIPAddress = _lockDBIPAddress,
 lockDBPort = _lockDBPort,
 lockDBLockID = _lockDBLockID,
+sessionKey = _sessionKey,
 orcaDBUserName = _orcaDBUserName,
 smellieRunNameLabel = _smellieRunNameLabel,
 tellieRunNameLabel = _tellieRunNameLabel,
@@ -154,7 +156,70 @@ tellieRunFiles = _tellieRunFiles;
     return self;
 }
 
-- (bool) acquireDatabaseLock
+#pragma mark ¥¥¥Orca session and locking DB
+
+/* Initialize the connection to the session/locking database. */
+- (bool) initOrcaSessionDBConnection
+{
+    ORPQConnection* conn = [self dbLockConnection];
+
+    if (!conn) {
+        conn = [[ORPQConnection alloc] init];
+    }
+
+    if (conn && (![conn isConnected] || ![conn checkConnection])) {
+        [conn disconnect];
+        NSString* host = [NSString stringWithFormat:@"%@:%u", _lockDBIPAddress, _lockDBPort];
+        [conn connectToHost:host
+                   userName:_lockDBUserName
+                   passWord:_lockDBPassword
+                   dataBase:_lockDBName];
+    }
+
+    [self setDBLockConnection:conn];
+
+    return conn && [conn isConnected] && [conn checkConnection];
+}
+
+/* Post some system information to the session DB. */
+- (void) postSessionStart
+{
+    bool connected = [self initOrcaSessionDBConnection];
+
+    if (!connected) {
+        NSLogColor([NSColor redColor], @"Unable to post session start to DB: DB not connected.");
+        return;
+    }
+
+    char hostname[255];
+    gethostname(hostname, 255);
+    NSString* osxVersion = [[NSProcessInfo processInfo] operatingSystemVersionString];
+
+    NSString* query = [NSString stringWithFormat:@"insert into orca_sessions (orca_version, hostname, osx_version) values ('%s', '%s', '%@') returning key", SNOP_ORCA_VERSION, hostname, osxVersion];
+    ORPQResult* result = [dbLockConnection queryString:query];
+    self.sessionKey = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"key"];
+
+    NSLog(@"Session: hostname: %s, orca: %s, os: %@, key: %@\n",
+          hostname, SNOP_ORCA_VERSION, osxVersion, self.sessionKey);
+}
+
+/* Update the session DB with the end timestamp before Quitting. */
+- (void) postSessionEnd: (NSNotification*) aNote
+{
+    bool connected = [self initOrcaSessionDBConnection];
+
+    if (!connected) {
+        NSLogColor([NSColor redColor], @"Unable to post session end to DB: DB not connected.");
+        return;
+    }
+
+    NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", self.sessionKey];
+    NSLog(@"%@", query);
+    [dbLockConnection queryString:query];
+}
+
+/* Try to obtain an exclusive advisory lock. */
+- (bool) acquireDatabaseLock : (bool) connect
 {
     NSNumber* gotLock = [NSNumber numberWithBool:false];
 
@@ -162,33 +227,31 @@ tellieRunFiles = _tellieRunFiles;
         return true;
     }
 
-    if (![self dbLockConnection]) {
-        dbLockConnection = [[ORPQConnection alloc] init];
-    }
+    bool connected = [self initOrcaSessionDBConnection];
 
-    if (![[self dbLockConnection] isConnected]) {
-        NSString* host = [NSString stringWithFormat:@"%@:%u", _lockDBIPAddress, _lockDBPort];
-        [dbLockConnection connectToHost:host
-                               userName:_lockDBUserName
-                               passWord:_lockDBPassword
-                               dataBase:_lockDBName];
-    }
-
-    /* Try to get an advisory lock, returns t if we get it or already own it, else f. */
-    if ([[self dbLockConnection] isConnected]) {
+    /* Try to get the lock. */
+    if (connected) {
         ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
         gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
         NSLog(@"Obtaining lock for %@ on %@:%u/%@ ID %u\n",
               _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID);
+
         if (![gotLock boolValue]) {
             NSLogColor([NSColor redColor], @"Unable to obtain database lock.\n");
         }
+    }
+    else {
+        NSLogColor([NSColor redColor], @"Unable to obtain database lock: DB not connected.\n");
     }
 
     return [gotLock boolValue];
 }
 
-- (void) checkDatabaseLock
+/**
+ * Try to obtain the database lock, and block with a modal dialog if we can't.
+ * If connect is YES, attempt to connect to the session DB first.
+ */
+- (void) checkDatabaseLock : (bool) connect
 {
     /* If the lock database is not set up, disable locking. */
     if (!self.lockDBIPAddress || [self.lockDBIPAddress isEqualToString:@""]) {
@@ -197,14 +260,14 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     /* Try to acquire the lock. If we get it, proceed with initialization. */
-    if (ignoreDBLock || [self acquireDatabaseLock]) {
+    if (ignoreDBLock || [self acquireDatabaseLock:connect]) {
         return;
     }
 
     /* We don't have the lock. Open a modal dialog asking whether to quit Orca, retry immediately, or ignore the lock (hostile takeover). */
     [(ORAppDelegate*)[NSApp delegate] closeSplashWindow];
 
-    NSAlert *alert = [[NSAlert alloc] init];
+    NSAlert* alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:@"Quit Orca"];
     [alert addButtonWithTitle:@"Retry Now"];
     [alert addButtonWithTitle:@"Hostile Takeover"];
@@ -214,9 +277,9 @@ tellieRunFiles = _tellieRunFiles;
     /* A timer to check the lock every 5 seconds, and close the window/proceed if we can obtain it. */
     NSTimer* dbModalTimer = [NSTimer scheduledTimerWithTimeInterval:5
                                                              target:self
-                                                           selector:@selector(timerCheckDatabaseLock:)
+                                                           selector:@selector(timerCheckDatabaseLockModal:)
                                                            userInfo:nil
-                                                            repeats:true];
+                                                            repeats:YES];
 
     [[NSRunLoop currentRunLoop] addTimer:dbModalTimer forMode:NSModalPanelRunLoopMode];
 
@@ -224,17 +287,16 @@ tellieRunFiles = _tellieRunFiles;
     [[NSRunningApplication currentApplication] activateWithOptions:NSApplicationActivateIgnoringOtherApps];
     int modalAction = [alert runModal];
 
-    /* Respond to a press of the modal buttons. */
-    if (modalAction == NSAlertFirstButtonReturn) {
+    if (modalAction == NSAlertFirstButtonReturn) {  // Quit Orca
         ORAppDelegate* delegate = [NSApp delegate];
         [alert release];
         [delegate terminate:self];
     }
-    else if (modalAction == NSAlertSecondButtonReturn) {
+    else if (modalAction == NSAlertSecondButtonReturn) {  // Retry Now
         [alert release];
-        [self checkDatabaseLock];
+        [self checkDatabaseLock:true];
     }
-    else if (modalAction == NSAlertThirdButtonReturn) {
+    else if (modalAction == NSAlertThirdButtonReturn) {  // Hostile Takeover
         [alert release];
         ignoreDBLock = YES;
     }
@@ -242,16 +304,22 @@ tellieRunFiles = _tellieRunFiles;
         [alert release];
     }
 
-    /* Clean up and proceed with loading the SNOPModel. */
     [dbModalTimer invalidate];
 }
 
-- (void) timerCheckDatabaseLock: (NSTimer*) timer
+/* Try again to acquire the database lock. If we get it, close the modal and loading can proceed. */
+- (void) timerCheckDatabaseLockModal: (NSTimer*) timer
 {
-    /* Try again to acquire the database lock. If we get it, close the modal and loading can proceed. */
-    if ([self acquireDatabaseLock]) {
+    if ([self acquireDatabaseLock:true]) {
         [NSApp abortModal];
     }
+}
+
+/* Check the DB lock (to see if we still have it). */
+- (void) timerCheckDatabaseLock: (NSTimer*) timer
+{
+    /* Check that we still have the DB lock. */
+    [self checkDatabaseLock:false];
 }
 
 - (void) setDBLockConnection: (ORPQConnection *) conn
@@ -262,6 +330,8 @@ tellieRunFiles = _tellieRunFiles;
 - (ORPQConnection*) dbLockConnection {
     return dbLockConnection;
 }
+
+#pragma mark ¥¥¥Hardware
 
 - (void) setMTCPort: (int) port
 {
@@ -564,7 +634,19 @@ tellieRunFiles = _tellieRunFiles;
 - (void) awakeAfterDocumentLoaded
 {
     /* Check that no other Orca is controlling the detector, using a database lock. This will either block or quit. */
-    [self checkDatabaseLock];
+    [self checkDatabaseLock:true];
+
+    [self postSessionStart];
+
+    /* A timer to check the lock every 10 seconds, to make sure we still have it. */
+    //NSTimer* dbCheckTimer =
+    [NSTimer scheduledTimerWithTimeInterval:10.0
+                                                    target:self
+                                                  selector:@selector(timerCheckDatabaseLock:)
+                                                  userInfo:nil
+                                                   repeats:YES];
+
+    //[[NSRunLoop mainRunLoop] addTimer:dbCheckTimer forMode:NSRunLoopCommonModes];
 
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
@@ -649,6 +731,11 @@ tellieRunFiles = _tellieRunFiles;
     [notifyCenter addObserver : self
                      selector : @selector(detectorStateChanged:)
                          name : ORPQDetectorStateChanged
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(postSessionEnd:)
+                         name : OROrcaAboutToQuitNotice
                        object : nil];
 }
 
