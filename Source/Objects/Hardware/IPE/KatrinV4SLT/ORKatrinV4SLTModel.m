@@ -1082,10 +1082,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self readStatusReg];
 }
 
-- (void)writeControlRegRunFlagOn:(BOOL) aState
+- (void) writeControlRegRunFlagOn:(BOOL) aState
 {
-    unsigned long controlRegValue = controlReg;
-    controlRegValue &= ~kCtrlRunMask;//
+    unsigned long controlRegValue = [self readControlReg];
+    if(aState) controlRegValue |= kCtrlRunMask;
+    else       controlRegValue &= ~kCtrlRunMask;
 	[self writeReg:kKatrinV4SLTControlReg value:controlRegValue];
     [self readStatusReg];
 }
@@ -1615,12 +1616,6 @@ return;
 	pollingWasRunning = [poller isRunning];
 	if(pollingWasRunning) [poller stop];
 	
-    
-    //
-    // Todo: Check, if inhibit source is enabled
-    //
-    
-    
     // Stop crate
     [self writeSetInhibit];
     
@@ -1642,8 +1637,7 @@ return;
         NSLog(@"Set inhibit failed\n");
         [NSException raise:@"SLT error" format:@"Set inhibit failed"];
     }
-    
-    
+
     // Make sure we start not at the very end of the secons
     unsigned long sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     unsigned long sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
@@ -1652,8 +1646,6 @@ return;
     if (sltsubsec2 > 8000) {
         usleep(205000);
     }
-    
-    
     
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
         
@@ -1877,14 +1869,11 @@ return;
 
     [self setIsPartOfRun: NO];
     
-    
     //
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
     //
     [self writeClrInhibit];
-
-    
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text
