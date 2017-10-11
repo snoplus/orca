@@ -1733,6 +1733,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                         countHREnabledChans++;
                     }
                 }
+                
                 [self executeCommandList:aList];
                 
                 //pull out the result (same order as commands)
@@ -1781,9 +1782,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 
                 
                 if(dataIndex>0 && [gOrcaGlobals runInProgress] && (sltSec > sltRunStartSec) ){
-                    time_t	ut_time;
-                    time(&ut_time); // where is this used ??? --ak
-
+                    
                     data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
                     data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
                     data[2] = sltSec - 1;
@@ -3147,7 +3146,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				}
 				
 				[self initBoard];
-				[self writeControl];
 				
 				if(atLeastOne)	noiseFloorState = 1;
 				else			noiseFloorState = 4; //nothing to do
@@ -3168,7 +3166,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 					}
 				}
 				[self initBoard];
-				[self writeControl];
 				
 				if(hitRateEnabledMask)	noiseFloorState = 2;	//go check for data
 				else					noiseFloorState = 3;	//done
@@ -3191,7 +3188,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				}
 				
 				[self initBoard];
-				[self writeControl];
 				
 				noiseFloorState = 1;
 				break;
@@ -3203,7 +3199,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 					[self setThreshold:i withValue:newThreshold[i]];
 				}
 				[self initBoard];
-				[self writeControl];
 				noiseFloorRunning = NO;
 			break;
 		}
@@ -3222,7 +3217,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
             [self setThreshold:i withValue:oldThreshold[i]];
 			//[self reset];
 			[self initBoard];
-			[self writeControl];
         }
 		NSLog(@"FLT4 LED threshold finder quit because of exception\n");
     }
