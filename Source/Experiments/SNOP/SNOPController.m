@@ -791,10 +791,6 @@ snopGreenColor;
         [theELLIEModel stopSmellieRun];
     }
 
-    //Make sure we don't start a new run
-    [model setNextStandardRunType:nil];
-    [model setNextStandardRunVersion:nil];
-
 err:
     {
         [model stopRun];

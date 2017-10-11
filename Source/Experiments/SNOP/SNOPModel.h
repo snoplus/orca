@@ -103,8 +103,6 @@ BOOL isNotRunningOrIsInMaintenance();
     NSString* standardRunVersion;
     NSString* lastStandardRunType;
     NSString* lastStandardRunVersion;
-    NSString* nextStandardRunType;
-    NSString* nextStandardRunVersion;
     NSNumber* standardRunTableVersion;
 
     bool rolloverRun;
@@ -238,8 +236,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) runNhitMonitor;
 - (void) stopNhitMonitor;
 
-- (int) startMode;
-
 #pragma mark ¥¥orcascript helpers
 - (void) zeroPedestalMasks;
 - (void) hvMasterTriggersOFF;
@@ -252,7 +248,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) runStarted:(NSNotification*)aNote;
 - (void) runAboutToStop:(NSNotification*)aNote;
 - (void) runStopped:(NSNotification*)aNote;
-- (void) runPostStopped:(NSNotification*)aNote;
 
 - (void) _waitForBuffers;
 
@@ -310,10 +305,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) setStandardRunType:(NSString*)aValue;
 - (NSString*) standardRunVersion;
 - (void) setStandardRunVersion:(NSString*)aValue;
-- (NSString*) nextStandardRunType;
-- (void) setNextStandardRunType:(NSString*)aValue;
-- (NSString*) nextStandardRunVersion;
-- (void) setNextStandardRunVersion:(NSString*)aValue;
 - (NSString*) lastStandardRunType;
 - (void) setLastStandardRunType:(NSString*)aValue;
 - (NSString*) lastStandardRunVersion;

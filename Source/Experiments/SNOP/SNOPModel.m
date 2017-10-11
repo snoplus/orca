@@ -476,11 +476,6 @@ tellieRunFiles = _tellieRunFiles;
     return xl3Host;
 }
 
-- (int) startMode
-{
-    return startMode;
-}
-
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -530,8 +525,6 @@ tellieRunFiles = _tellieRunFiles;
     [self setLastRunTypeWordHex:[decoder decodeObjectForKey:@"SNOPlastRunTypeWordHex"]];
     [self setStandardRunType:[decoder decodeObjectForKey:@"SNOPStandardRunType"]];
     [self setStandardRunVersion:[decoder decodeObjectForKey:@"SNOPStandardRunVersion"]];
-    [self setNextStandardRunType:nil];
-    [self setNextStandardRunVersion:nil];
 
     //ECA
     [anECARun setECA_pattern:[decoder decodeIntForKey:@"SNOPECApattern"]];
@@ -742,11 +735,6 @@ tellieRunFiles = _tellieRunFiles;
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(runPostStopped:)
-                         name : ORRunFinalCallNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
                      selector : @selector(subRunStarted:)
                          name : ORRunStartSubRunNotification
                        object : nil];
@@ -819,21 +807,17 @@ tellieRunFiles = _tellieRunFiles;
 
     switch (state) {
     case STOPPED:
-        NSLogColor([NSColor redColor], @"runInitialization: COLD_START.\n");
         startMode = COLD_START;
         break;
     case RUNNING:
         if (rolloverRun) {
-            NSLogColor([NSColor redColor], @"runInitialization: ROLLOVER_START.\n");
             startMode = ROLLOVER_START;
             rolloverRun = NO;
         } else {
-            NSLogColor([NSColor redColor], @"runInitialization: CONTINUOUS_START.\n");
             startMode = CONTINUOUS_START;
         }
         break;
     default:
-        NSLogColor([NSColor redColor], @"runInitialization: COLD_START.\n");
         startMode = COLD_START;
     }
 
@@ -1066,7 +1050,7 @@ err:
     /* Load the ECA settings if it's an ECA run
      * This will set MTC settings for correct ECA running, so 
      * we want this to be done before loading settings in HW. */
-    [[self anECARun] setECASettings:nil];
+    [[self anECARun] setECASettings];
 
     switch (startMode) {
     case COLD_START:
@@ -1289,21 +1273,6 @@ err:
         break;
     }
 
-}
-
-- (void) runPostStopped:(NSNotification*)aNote
-{
-    /* Automatic start of scheduled standard run.
-     * This doesn't work properly since this function is not called when
-     * the run is completely stopped and there exist a race condition in
-     * the restartRun method. Will leave this here as a placeholder for
-     * when it's fixed. */
-    if(nextStandardRunType != nil && nextStandardRunVersion != nil){
-        //[self startStandardRun:nextStandardRunType withVersion:nextStandardRunVersion];
-        [self setNextStandardRunType:nil];
-        [self setNextStandardRunVersion:nil];
-    }
-    
 }
 
 - (void) subRunStarted:(NSNotification*)aNote
@@ -2595,28 +2564,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     [lastStandardRunVersion autorelease];//MAH -- strings should be handled like this
     lastStandardRunVersion = [aValue copy];
-}
-
-- (NSString*)nextStandardRunType
-{
-    return nextStandardRunType;
-}
-
-- (void) setNextStandardRunType:(NSString *)aValue
-{
-    [nextStandardRunType autorelease];
-    nextStandardRunType = [aValue copy];
-}
-
-- (NSString*) nextStandardRunVersion
-{
-    return nextStandardRunVersion;
-}
-
-- (void) setNextStandardRunVersion:(NSString *)aValue
-{
-    [nextStandardRunVersion autorelease];
-    nextStandardRunVersion = [aValue copy];
 }
 
 - (NSNumber*) standardRunTableVersion

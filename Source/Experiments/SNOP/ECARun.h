@@ -73,7 +73,7 @@
 - (BOOL) isFinished;
 - (BOOL) isFinishing;
 - (void) stop;
-- (bool) setECASettings:(NSNotification*)aNote;
+- (bool) setECASettings;
 - (void) launchECAThread:(NSNotification*)aNote;
 - (void) doECAs;
 - (BOOL) doPedestals;

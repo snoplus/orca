@@ -22,10 +22,10 @@ NSString* ORECARunChangedNotification = @"ORECARunChangedNotification";
 NSString* ORECARunStartedNotification = @"ORECARunStartedNotification";
 NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
-/* This flag must be enabled for commissioning 
- * and normal detector running. Disable it only 
+/* This flag must DISABLED for commissioning
+ * and normal detector running. Enable it only
  * for testing. */
-//#define __COMMISSIONING__ 1
+// #define __TESTING__ 1
 
 /* Definitions */
 // Defaults
@@ -97,7 +97,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     return isFinishing;
 }
 
-- (bool) setECASettings:(NSNotification*)aNote
+- (bool) setECASettings
 {
     /* Set ECA parameters based on the run type word and
      * harcoded settings needed for the ECA algorithm */
@@ -190,8 +190,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 
         // If we are here, that means this is an ECA run. Do the thing:
         // Start a maintenance run with previous settings after ECAs are done
-        [aSNOPModel setNextStandardRunType:@"MAINTENANCE"];
-        [aSNOPModel setNextStandardRunVersion:@"DEFAULT"];
         prev_gtmask = [anMTCModel GTCrateMask];
         prev_pedmask = [anMTCModel pedCrateMask];
         prev_coarsedelay = [anMTCModel coarseDelay];
@@ -207,9 +205,8 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             @throw ECAException;
         }
         anMTCModel = [objs objectAtIndex:0];
-        [anMTCModel setGtMask:( [anMTCModel gtMask] | MTC_EXT_8_MASK )];
         [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
-#ifdef __COMMISSIONING__
+#ifndef __TESTING__
         [anMTCModel loadPulserRateToHardware];
 #endif
 
@@ -219,7 +216,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         /* Enable Pedestal and GT crate mask for all the crates */
         [anMTCModel setGTCrateMask: (prev_gtmask | 0x7FFFF) ];
         [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF) ];
-#ifdef __COMMISSIONING__
+#ifndef __TESTING__
         [anMTCModel loadGTCrateMaskToHardware];
         [anMTCModel loadPedestalCrateMaskToHardware];
 #endif
@@ -245,7 +242,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     [ECAThread release];
     ECAThread = [[NSThread alloc] initWithTarget:self selector:@selector(doECAs) object:nil];
     [ECAThread start];
-    //[ECAThread autorelease];
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECARunStartedNotification object:self];
 
 }
@@ -253,7 +249,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
 - (void) doECAs
 {
 
-    /* This is the actual ECA algorithm, that runs must run a different thread */
+    /* This is the actual ECA algorithm, which needs to be run in a separate thread */
     @autoreleasepool {
 
         [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORECAStatusChangedNotification object: self userInfo: nil];
@@ -312,7 +308,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
             [anMTCModel setCoarseDelay:ECA_COARSE_DELAY];
             [anMTCModel setFineDelay:ECA_FINE_DELAY];
             [anMTCModel setPedestalWidth:ECA_PEDESTAL_WIDTH];
-#ifdef __COMMISSIONING__
+#ifndef __TESTING__
             [anMTCModel loadCoarseDelayToHardware];
             [anMTCModel loadFineDelayToHardware];
             [anMTCModel loadPedWidthToHardware];
@@ -341,16 +337,12 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         if([ECA_type isEqualToString:@"PDST"]){
             if(![self doPedestals]) {
                 // User stopped manually
-                [aSNOPModel setNextStandardRunType:nil];
-                [aSNOPModel setNextStandardRunVersion:nil];
                 goto stop;
             }
         }
         else if([ECA_type isEqualToString:@"TSLP"]){
             if(![self doTSlopes]) {
                 // User stopped manually
-                [aSNOPModel setNextStandardRunType:nil];
-                [aSNOPModel setNextStandardRunVersion:nil];
                 goto stop;
             }
         }
@@ -536,7 +528,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     [anMTCModel setCoarseDelay:current_coarse_delay];
                     [anMTCModel setFineDelay:current_fine_delay];
-#ifdef __COMMISSIONING__
+#ifndef __TESTING__
                     [anMTCModel loadCoarseDelayToHardware];
                     [anMTCModel loadFineDelayToHardware];
 #endif
