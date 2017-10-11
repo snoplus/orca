@@ -267,6 +267,10 @@
 
 - (void) statusRegChanged:(NSNotification*)aNote
 {
+    if(![NSThread isMainThread]){
+        [self performSelectorOnMainThread:@selector(statusRegChanged:) withObject:aNote waitUntilDone:NO];
+        return;
+    }
 	unsigned long statusReg = [model statusReg];
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusFltRq)?@"ERR":@"OK"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusWDog)?@"ERR":@"OK"];
