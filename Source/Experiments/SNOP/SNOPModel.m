@@ -187,7 +187,7 @@ tellieRunFiles = _tellieRunFiles;
     bool connected = [self initOrcaSessionDBConnection];
 
     if (!connected) {
-        NSLogColor([NSColor redColor], @"Unable to post session start to DB: DB not connected.");
+        NSLogColor([NSColor redColor], @"Unable to post session start to DB: DB not connected.\n");
         return;
     }
 
@@ -195,12 +195,20 @@ tellieRunFiles = _tellieRunFiles;
     gethostname(hostname, 255);
     NSString* osxVersion = [[NSProcessInfo processInfo] operatingSystemVersionString];
 
+    NSNumber* key = nil;
     NSString* query = [NSString stringWithFormat:@"insert into orca_sessions (orca_version, hostname, osx_version) values ('%s', '%s', '%@') returning key", SNOP_ORCA_VERSION, hostname, osxVersion];
-    ORPQResult* result = [dbLockConnection queryString:query];
-    [self setSessionKey:[[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"key"]];
 
-    NSLog(@"Session: hostname: %s, orca: %s, os: %@, key: %@\n",
-          hostname, SNOP_ORCA_VERSION, osxVersion, [self sessionKey]);
+    @try {
+        ORPQResult* result = [dbLockConnection queryString:query];
+        key = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"key"];
+        NSLog(@"Session: hostname: %s, orca: %s, os: %@, key: %@\n",
+              hostname, SNOP_ORCA_VERSION, osxVersion, key);
+    }
+    @catch (NSException* e) {
+        NSLogColor([NSColor redColor], @"Error posting session start to DB: \"%@\"\n", e.reason);
+    }
+
+    [self setSessionKey:key];
 }
 
 /* Update the session DB with the end timestamp before Quitting. */
@@ -209,12 +217,19 @@ tellieRunFiles = _tellieRunFiles;
     bool connected = [self initOrcaSessionDBConnection];
 
     if (!connected) {
-        NSLogColor([NSColor redColor], @"Unable to post session end to DB: DB not connected.");
+        NSLogColor([NSColor redColor], @"Unable to post session end to DB: DB not connected.\n");
         return;
     }
 
-    NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", [self sessionKey]];
-    [dbLockConnection queryString:query];
+    if ([self sessionKey]) {
+        NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", [self sessionKey]];
+        @try {
+            [dbLockConnection queryString:query];
+        }
+        @catch (NSException* e) {
+            NSLogColor([NSColor redColor], @"Error posting session end to DB: \"%@\"\n", e.reason);
+        }
+    }
 }
 
 /* Try to obtain an exclusive advisory lock. */
@@ -230,11 +245,16 @@ tellieRunFiles = _tellieRunFiles;
 
     /* Try to get the lock. */
     if (connected) {
-        ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
-        gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
+        @try {
+            ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
+            gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
+        }
+        @catch (NSException* e) {
+            NSLogColor([NSColor redColor], @"Unable to obtain database lock: \"%@\"\n", e.reason);
+        }
 
         if (![gotLock boolValue]) {
-            NSLogColor([NSColor redColor], @"Unable to obtain database lock: for %@ on %@:%u/%@ ID %u\n",
+            NSLogColor([NSColor redColor], @"Unable to obtain database lock: %@ on %@:%u/%@ ID %u\n",
                        _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID);
         }
     }
