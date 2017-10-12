@@ -16,8 +16,6 @@
 #import "ORRunModel.h"
 #import "ORCouchDB.h"
 
-NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
-
 @implementation ELLIEController
 
 @synthesize nodeMapWC = _nodeMapWC;

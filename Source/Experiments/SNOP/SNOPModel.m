@@ -2173,7 +2173,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [runFiles release];
     
     [self setSmellieDocUploaded:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"SmellieRunFilesLoaded" object:nil];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SmellieRunFilesLoaded" object:self];
+    });
 }
 
 - (void) getTellieRunFiles

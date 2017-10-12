@@ -171,6 +171,5 @@
 @end
 
 extern NSString* ORTELLIERunStart;
-extern NSString* ORSMELLIERunFinished;
 extern NSString* ORTELLIERunFinished;
 

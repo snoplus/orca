@@ -1381,6 +1381,7 @@ snopGreenColor;
     [smellieLoadRunFile setEnabled:YES];
     
     [self setSmellieRunFileList:runFileDict];
+    NSLog(@"[SMELLIE] %i run plan documents sucessfully loaded\n", [runFileDict count]);
     [runFileDict release];
 }
 
@@ -1660,12 +1661,12 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
         return;
     }
-
+/*
     if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
         ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
-
+*/
     /////////////////////
     // Set a flag which defines if we should
     // roll over into maintenance or not.
@@ -1757,26 +1758,12 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
-    //Call stop smellie run method to tidy up TELLIE's hardware state
+    //Call stop tellie run method to tidy up TELLIE's hardware state
     @try{
         [theELLIEModel stopTellieRun];
     } @catch(NSException* e){
         NSLogColor([NSColor redColor], @"Problem stopping tellie run: %@\n", [e reason]);
         return;
-    }
-
-    ////////////
-    // Handle end of run sequencing
-    if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
-        // If user was running a TELLIE standard sequence, roll over into maintinance run
-        if([self tellieStandardSequenceFlag]){
-            [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-        // If user is using the ellie gui simply start a new run as they'll likely need to run
-        // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
-        // will dictate the user should start a new standard run manualy when they're finished
-        } else {
-            [self startRunAction:self];
-        }
     }
 
     [self setTellieFireSettings:nil];

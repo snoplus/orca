@@ -56,6 +56,8 @@
     NSArray* _tellieRunNames;
     BOOL _ellieFireFlag;
     BOOL _tellieMultiFlag;
+    BOOL _maintenanceRollOver;
+    BOOL _smellieStopButton;
 
     //smellie config mappings
     NSMutableDictionary* _smellieLaserHeadToSepiaMapping;
@@ -102,6 +104,8 @@
 @property (nonatomic,retain) XmlrpcClient* interlockClient;
 @property (nonatomic,retain) NSThread* tellieThread;
 @property (nonatomic,retain) NSThread* smellieThread;
+@property (nonatomic,assign) BOOL maintenanceRollOver;
+@property (nonatomic,assign) BOOL smellieStopButton;
 
 
 -(id) init;
@@ -139,8 +143,7 @@
 -(void) startTellieMultiRun:(NSArray*)fireCommandArray;
 -(void) startTellieRun:(NSDictionary*)fireCommands;
 -(void) stopTellieRun;
--(void) waitForTellieRunToFinish;
--(void) tellieTidyUp;
+-(void) tellieRunTransition;
 
 // TELLIE database interactions
 -(void) pushInitialTellieRunDocument;
@@ -157,7 +160,7 @@
 
 //SMELLIE Control Functions
 -(void) setSmellieNewRun:(NSNumber *)runNumber;
--(void) deactivateSmellie;
+-(void) deactivateSmellieLasers;
 -(void) CancelSmellieTriggers;
 -(void) setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain;
 
@@ -177,8 +180,7 @@
 -(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
--(void) waitForSmellieRunToFinish;
--(void) smellieTidyUp;
+-(void) smellieRunTransition;
 -(NSNumber*)estimateSmellieRunTime:(NSDictionary*)smellieSettings;
 
 // SMELLIE database interactions
@@ -203,3 +205,7 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
+extern NSString* ORSMELLIERunFinished;
+extern NSString* ORTELLIERunFinished;
+extern NSString* ORSMELLIEInterlockKilled;
+extern NSString* ORELLIEFlashing;

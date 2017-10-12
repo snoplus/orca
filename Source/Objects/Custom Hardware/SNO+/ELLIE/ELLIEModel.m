@@ -60,8 +60,10 @@ NSString* ELLIEAllLasersChanged = @"ELLIEAllLasersChanged";
 NSString* ELLIEAllFibresChanged = @"ELLIEAllFibresChanged";
 NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
 NSString* ORSMELLIERunFinished = @"ORSMELLIERunFinished";
+NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
-
+NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
+NSString* ORELLIEFlashing = @"ORELLIEFlashing";
 
 
 ///////////////////////////////
@@ -118,6 +120,9 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 
 @synthesize tellieThread = _tellieThread;
 @synthesize smellieThread = _smellieThread;
+
+@synthesize maintenanceRollOver = _maintenanceRollOver;
+@synthesize smellieStopButton = _smellieStopButton;
 
 /*********************************************************/
 /*                  Class control methods                */
@@ -230,6 +235,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     // Server Clients
     [_tellieClient release];
     [_smellieClient release];
+    [_smellieFlaggingClient release];
     
     // tellie settings
     [_tellieSubRunSettings release];
@@ -284,6 +290,7 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
      the ellieModel will post the run wait notification and launch a thread that waits for the smellieThread
      to stop executing before tidying up and, finally, releasing the run wait.
      */
+    [self setMaintenanceRollOver:NO];
     if([[self tellieThread] isExecuting]){
         [self stopTellieRun];
     }
@@ -703,10 +710,21 @@ NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
     //////////////////////////////
     // Loop over all objects in
     // passed array
+    int count = 0;
+    NSUInteger nloops = [fireCommandArray count];
     for(NSDictionary* fireCommands in fireCommandArray){
         if([[NSThread currentThread] isCancelled]){
             goto err;
         }
+        
+        // Check if we're at the end of a sequence. If we are, set the multiFlag to NO.
+        // This will mean all shutdown stuff will be performed at the end of flashing.
+        count = count + 1;
+        if(count == nloops){
+            [self setTellieMultiFlag:NO];
+        }
+        
+        // Run flash sequence
         [self startTellieRun:fireCommands];
     }
 
@@ -782,7 +800,7 @@ err:
         goto err;
     }
     SNOPModel* snopModel = [snopModels objectAtIndex:0];
-
+/*
     ///////////////////////
     // Check TELLIE run type is masked in
     if(!([snopModel lastRunTypeWord] & kTELLIERun)){
@@ -805,7 +823,7 @@ err:
         NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
     }
-
+*/
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
@@ -897,6 +915,10 @@ err:
         }
     }
     
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIEFlashing object:self];
+    });
+    
     ///////////////
     // Fire loop! Pass variables to the tellie server.
     for(int i = 0; i<[loops integerValue]; i++){
@@ -944,7 +966,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-            
+
             @try{
                 [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
             } @catch(NSException* e) {
@@ -952,7 +974,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-            
+ 
         }
 
         //////////////////
@@ -1063,49 +1085,76 @@ err:
         }
     }
 
-    ////////////
-    // Release pooled memory
-    [pool release];
+    // Set fire flag
     [self setEllieFireFlag:NO];
 
-    NSLog(@"[TELLIE]: TELLIE fire sequence completed\n");
+    ////////////
+    // Make sure hardware is put back into safe state
     if(![self tellieMultiFlag]){
-        ////////////
-        // Finish and tidy up
-        [[NSThread currentThread] cancel];
+    
+        // TELLIE
+        @try{
+            NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
+            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+        } @catch(NSException* e){
+            // This should only ever be called from the main thread so can raise
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+        }
+        
+        // TUBii
+        @try{
+            [theTubiiModel stopTelliePulser];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+            [pool release];
+            return;
+        }
+        
         dispatch_sync(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
         });
-
+        [[NSThread currentThread] cancel];
     }
+
+    [pool release];
+
     return;
 
 err:
     {
-        [pool release];
         [self setEllieFireFlag:NO];
         [self setTellieMultiFlag:NO];
         
         //Resetting the mtcd to settings before the smellie run
         NSLog(@"[TELLIE]: Killing requested flash sequence\n");
         
-        //Make a dictionary to push into sub-run array to indicate error.
-        //NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:10];
-        //[errorDict setObject:errorString forKey:@"tellie_error"];
-        //[self updateTellieRunDocument:errorDict];
-
+        // TELLIE
+        @try{
+            NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
+            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+        } @catch(NSException* e){
+            // This should only ever be called from the main thread so can raise
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+        }
+        
+        // TUBii
+        @try{
+            [theTubiiModel stopTelliePulser];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+            [pool release];
+            return;
+        }
+        
         ////////////
-        // If thread errored we need to post a note to
-        // call the formal stop proceedure. If the thread
-        // was canelled we must already be in a 'stop'
-        // button push, so don't need to post.
+        // Post a note saying we've jumped out of the run sequence
         if(![[NSThread currentThread] isCancelled]){
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
             });
         }
         [[NSThread currentThread] cancel];
-
+        [pool release];
     }
 }
 
@@ -1128,71 +1177,46 @@ err:
     NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for tellie run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
-    // Detatch thread to monitor smellie run thread
-    [NSThread detachNewThreadSelector:@selector(waitForTellieRunToFinish) toTarget:self withObject:nil];
-}
-
--(void)waitForTellieRunToFinish
-{
-    @autoreleasepool {
-        while ([[self tellieThread] isExecuting]) {
-            [NSThread sleepForTimeInterval:0.1];
-        }
-        [self tellieTidyUp];
-    }
-}
-
--(void) tellieTidyUp
-{
-    /*
-     Stop TELLIE firing, tidy up and ensure system is in a well defined state.
-     */
-
     //////////////////////
     // Set fire flag to no. If a run sequence is currently underway, this will stop
     [self setEllieFireFlag:NO];
     [self setTellieMultiFlag:NO];
-
-    /////////////
-    // This may run in a thread so add release pool
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
-    //////////////////////
-    // Send stop command to tellie hardware
-    @try{
-        NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-        NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
-    } @catch(NSException* e){
-        // This should only ever be called from the main thread so can raise
-        NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
-        [pool release];
-        return;
+    // Detatch thread and transition runs once the TELLIE thread has stopped executing
+    [NSThread detachNewThreadSelector:@selector(tellieRunTransition) toTarget:self withObject:nil];
+}
+
+-(void)tellieRunTransition
+{
+    /////////////
+    // This will run in a thread so add release pool
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    ///////////////////////////////////////////
+    // Wait for thread to stop
+    while ([[self tellieThread] isExecuting]) {
+        [NSThread sleepForTimeInterval:0.1];
     }
 
-    ///////////////////
-    // Incase of slave, also get a Tubii object so we can stop Tubii sending pulses
-    NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find TUBii model in stopRun.\n");
-        [pool release];
-        return;
+    ////////////
+    // Handle end of run sequencing
+    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if(![snopModels count]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel\n");
+        goto err;
     }
-    TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    @try{
-        [theTubiiModel stopTelliePulser];
-    } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
-        [pool release];
-        return;
-    }
+    SNOPModel* snopModel = [snopModels objectAtIndex:0];
+    [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
 
+err:{
     // Tell run control it can stop the run.
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
     });
-
+    
     NSLog(@"[TELLIE]: Stop commands sucessfully sent to TELLIE and TUBii\n");
     [pool release];
+}
 }
 
 /*****************************/
@@ -1357,7 +1381,7 @@ err:
     }
 }
 
--(void) deactivateSmellie
+-(void) deactivateSmellieLasers
 {
     id result = [[self smellieFlaggingClient] command:@"deactivate"];
     if([result isKindOfClass:[NSString class]]){
@@ -1518,6 +1542,9 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
     
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIEInterlockKilled object:self];
+    });
     NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
     [pool release];
 }
@@ -1745,12 +1772,15 @@ err:
     /*
      Form a smellie run using the passed smellie run file, stored in smellieSettings dictionary.
     */
-    NSLog(@"[SMELLIE]:Setting up a SMELLIE Run\n");
+    NSLog(@"[SMELLIE]: Setting up a SMELLIE Run\n");
 
     //////////////
     // This will likely run in thread so make an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
+    [self setMaintenanceRollOver:YES]; // Asssume we roll over by default.
+    [self setSmellieStopButton:YES]; // Had the stop button been pressed?
+    
     //////////////
     //   GET TUBii & RunControl MODELS
     //////////////
@@ -1849,6 +1879,12 @@ err:
             goto err;
         }
     }
+    
+    ///////////////
+    // Tell gui we're about to flash
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIEFlashing object:self];
+    });
     
     // ***********************
     // BEGIN LOOPING!
@@ -2083,33 +2119,42 @@ err:
         }//end of FIBRE loop
     }//end of LASER loop
 
+err:
+{
+    ////////////////////////
+    // Deactivate the system
+    
+    // Keep alive - will stop light any light
+    [self killKeepAlive:nil];
+
+    // Tubii
+    @try{
+        [theTubiiModel stopSmelliePulser];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
+    }
+
+    // Smellie lasers
+    @try{
+        NSLog(@"[SMELLIE]: Waiting for lasers to deactivate....\n");
+        [self deactivateSmellieLasers];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command failed, reason: %@\n", [e reason]);
+    }
+
+    NSLog(@"[SMELLIE]: Run sequence stopped.\n");
+    
     //Release dict holding sub-run info
     [valuesToFillPerSubRun release];
     [pool release];
-
-    //Post a note. on the main thread to request a call to stopSmellieRun
+    
+    //////////////////////////////////////////
+    //Post a note. on the main thread to request a call to handle run rollover stuff
     [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
     });
-    return;
 
-err:
-{
-    //Resetting the mtcd to settings before the smellie run
-    NSLogColor([NSColor redColor], @"[SMELLIE]: Sent to err statement. Stopping fire sequence.\n");
-    [pool release];
-
-    ////////////
-    // If thread errored we need to post a note to
-    // call the formal stop proceedure. If the thread
-    // was canelled we must already be in a 'stop'
-    // button push, so don't need to post.
-    if(![[NSThread currentThread] isCancelled]){
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
-        });
-    }
     [[NSThread currentThread] cancel];
 }
 }
@@ -2118,7 +2163,7 @@ err:
 {
     /*
      Before we perform any tidy-up actions, we want to make sure the run thread has stopped
-     executing. If the run has not been ended using the tellie specific 'stop fibre' button,
+     executing. If the run has not been canceled using the smellie specific 'stop fibre' button,
      but instead the user has simply hit the main run stop button on the SNOPController, we
      need to make sure SMELLIE has properly cleaned up before we roll into a new run.
      Fortunately there is a handy wait notification that gets picked up by the run control.
@@ -2137,13 +2182,15 @@ err:
     
         // Tell SMELLIE hardware to stop generating triggers
         @try{
+            // Use a second SMELLIE client (which is not being blocked by the current fire sequence) to set
+            // a flag on the server. The flag will cause it to jump out of it's current trigger sequence early.
             [self CancelSmellieTriggers];
         } @catch(NSException *e) {
             NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
         }
         // Detatch thread to monitor smellie run thread
         NSLog(@"[SMELLIE]: Waiting for SMELLIE server to release blocking trigger function...\n");
-        [NSThread detachNewThreadSelector:@selector(waitForSmellieRunToFinish) toTarget:self withObject:nil];
+        [NSThread detachNewThreadSelector:@selector(smellieRunTransition) toTarget:self withObject:nil];
     } else {
         // Tell run control it can stop waiting
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -2152,78 +2199,62 @@ err:
     }
 }
 
--(void)waitForSmellieRunToFinish
+-(void)smellieRunTransition
 {
-    @autoreleasepool {
-        while ([[self smellieThread] isExecuting]) {
-            [NSThread sleepForTimeInterval:0.1];
-        }
-        [self smellieTidyUp];
-    }
-}
-
--(void)smellieTidyUp
-{
-    /*
-     Some sign off / tidy up stuff to be called at the end of a smellie run.
-     */
-
-    ///////////
-    // This could be run in a thread, so set-up an auto release pool
+    //////////////////////////////////////////////
+    // Make a pool to handle this stuff
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-    @try{
-        NSLog(@"[SMELLIE]: Waiting for lasers to deactivate....\n");
-        [self deactivateSmellie];
-    } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command failed, reason: %@\n", [e reason]);
+    /////////////////////////////////////////////
+    // Wait for smellie thread to stop executing
+    while ([[self smellieThread] isExecuting]) {
+        [NSThread sleepForTimeInterval:0.1];
     }
 
-    // Kill the keepalive
-    [self killKeepAlive:nil];
-
-    // Get a Tubii object
-    NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
-        goto err;
-    }
-    TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    @try{
-        [theTubiiModel stopSmelliePulser];
-    } @catch(NSException* e){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
-        goto err;
-    }
-
+    ////////////////////////////////////////////
     // Tell run control it can stop waiting
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
     });
-
-    NSLog(@"[SMELLIE]: Run sequence stopped.\n");
     
-    ///////////////
-    //ROLL OVER INTO A MAINTENANCE RUN
-    NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-    if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel\n");
-        goto err;
-    }
-    SNOPModel* snopModel = [snopModels objectAtIndex:0];
+    //////////////////////////////////////////
+    // HANDLE RUN ROLLOVERS
+    //
     
-    ////////////
-    // Roll over into maintenance run
-    NSLog(@"[SMELLIE]: Moving into a Maintenance run.\n");
-    if([[snopModel lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-        });
+    // If the sequence finished without external influence, move into a maintenance run.
+    if([self maintenanceRollOver]){
+        NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+        if(![snopModels count]){
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel\n");
+            goto err;
+        }
+        SNOPModel* snopModel = [snopModels objectAtIndex:0];
+        [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+        return;
     }
+        
+    ///////
+    // Now, there's two possible cases. Either someone hit the SMELLIE stop lasers button,
+    // or they hit stop / resync / start run.
+    //
+    // In the fist case we want to roll over the run number so the 'bad' data set which was
+    // cancelled is separated from any futher SMELLIE data by a run boundary. In the second case
+    // do nothing and let the run control sort out whatever was requested.
+    if([self smellieStopButton]){
+        NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        if(![runModels count]){
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
+            goto err;
+        }
+        ORRunModel* runControl = [runModels objectAtIndex:0];
+        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+    }
+    
     [pool release];
     return;
-
+        
 err:
+{
     // Tell run control it can stop waiting
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
@@ -2232,6 +2263,8 @@ err:
     [pool release];
     NSLog(@"[SMELLIE]: Run sequence stopped - TUBii is in an undefined state (may still be sending triggers).\n");
 }
+}
+
 
 /*****************************/
 /*  smellie db interactions  */
