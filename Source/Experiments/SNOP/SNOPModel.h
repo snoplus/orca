@@ -43,11 +43,22 @@
 #define kNumTubes	20 //XL3s
 #define kNumOfCrates 19 //number of Crates in SNO+
 #define STANDARD_RUN_VERSION 2 //Increase if Standard Runs table structure is changed
+#define SNOP_ORCA_VERSION "0.10.1" //The current Orca release
 
 BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
+    ORPQConnection* dbLockConnection;
+    BOOL ignoreDBLock;
+    NSString* _lockDBUserName;
+    NSString* _lockDBPassword;
+    NSString* _lockDBName;
+    NSString* _lockDBIPAddress;
+    unsigned int _lockDBPort;
+    unsigned int _lockDBLockID;
+    NSNumber* _sessionKey;
+
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
     NSString* _orcaDBName;
@@ -145,6 +156,14 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunFiles;
 
+@property (nonatomic,copy) NSString* lockDBUserName;
+@property (nonatomic,copy) NSString* lockDBPassword;
+@property (nonatomic,copy) NSString* lockDBName;
+@property (nonatomic,copy) NSString* lockDBIPAddress;
+@property (nonatomic,assign) unsigned int lockDBPort;
+@property (nonatomic,assign) unsigned int lockDBLockID;
+@property (nonatomic,copy) NSNumber* sessionKey;
+
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
 @property (nonatomic,copy) NSString* orcaDBName;
@@ -177,6 +196,13 @@ BOOL isNotRunningOrIsInMaintenance();
 
 - (id) init;
 - (void) awakeAfterDocumentLoaded;
+
+- (bool) initOrcaSessionDBConnection;
+- (void) postSessionStart;
+- (bool) acquireDatabaseLock : (bool) connect;
+- (void) checkDatabaseLock : (bool) connect;
+- (void) timerCheckDatabaseLockModal : (NSTimer*) timer;
+- (void) timerCheckDatabaseLock : (NSTimer*) timer;
 
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;
@@ -228,6 +254,8 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
 - (void) detectorStateChanged:(NSNotification*)aNote;
+- (void) postSessionEnd: (NSNotification*) aNote;
+
 - (void) enableGlobalSecurity;
 
 - (void) updateEPEDStructWithCoarseDelay: (unsigned long) coarseDelay

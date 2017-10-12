@@ -1852,6 +1852,12 @@ err:
     [dataHost setEnabled:!locked];
     [logPort setEnabled:!locked];
     [logHost setEnabled:!locked];
+    [lockDBUser setEnabled:!locked];
+    [lockDBPswd setEnabled:!locked];
+    [lockDBName setEnabled:!locked];
+    [lockDBIPAddress setEnabled:!locked];
+    [lockDBPort setEnabled:!locked];
+    [lockDBID setEnabled:!locked];
     [orcaDBUser setEnabled:!locked];
     [orcaDBPswd setEnabled:!locked];
     [orcaDBName setEnabled:!locked];
