@@ -1617,6 +1617,7 @@ return;
 	if(pollingWasRunning) [poller stop];
 	
     // Stop crate
+    lastInhibitStatus = [self readStatusReg] & kStatusInh;
     [self writeSetInhibit];
     
     // Wait for inhibit; changes state with the next second strobe
@@ -1873,7 +1874,10 @@ return;
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
     //
-    [self writeClrInhibit];
+    if (lastInhibitStatus == 0){
+        [self writeClrInhibit];
+    }
+    
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text

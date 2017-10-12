@@ -283,12 +283,12 @@
 
     
     if(statusReg & kStatusInh){
-        [lightBoardView setState:kGoLight];
-        [lightBoardView1 setState:kGoLight];
-    }
-    else {
         [lightBoardView setState:kStoppedLight];
         [lightBoardView1 setState:kStoppedLight];
+    }
+    else {
+        [lightBoardView setState:kGoLight];
+        [lightBoardView1 setState:kGoLight];
     }
 }
 

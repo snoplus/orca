@@ -1774,6 +1774,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
                 }
                 
+                [slt readStatusReg];
+                
                 sltSec      =  [slt getSeconds];
                 sltSubSec   =  [slt readSubSecondsCounter];
                 

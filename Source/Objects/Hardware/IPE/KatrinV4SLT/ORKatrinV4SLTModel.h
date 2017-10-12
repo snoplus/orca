@@ -158,6 +158,7 @@
 		BOOL			first;
 		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
 		BOOL            displayEventLoop;  //< Display the event loop parameter
+        unsigned long   lastInhibitStatus; //< Saves inhibit state at run start
 		unsigned long   lastDisplaySec;
 		unsigned long   lastDisplayCounter;
 		double          lastDisplayRate;
