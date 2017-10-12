@@ -1741,6 +1741,14 @@ return;
 
     
     
+    // Check finally, if the inhibit soiurce has been deactivated during config upload
+    lStatus = [self readStatusReg];
+    if ((lStatus & kStatusInh) == 0) {
+        NSLog(@"Set inhibit failed\n");
+        [NSException raise:@"SLT error" format:@"Set inhibit failed"];
+    }
+
+    
     // Release inhibit with the next second strobe
     [self writeClrInhibit];
 
