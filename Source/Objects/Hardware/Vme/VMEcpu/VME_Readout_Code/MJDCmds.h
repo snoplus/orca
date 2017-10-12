@@ -27,21 +27,22 @@
 #define kMJDReadPreamps         0x01
 #define kMJDSingleAuxIO         0x02
 #define kMJDFlashGretinaFPGA    0x03
+#define kMJDReadPreampsANL      0x04
+#define kMJDSingleAuxIOANL      0x05
+#define kMJDFlashGretinaAFPGA   0x06
 
 typedef struct {
     uint32_t baseAddress;
     uint32_t chip;              /*0 or 1 so we know the channel offset*/
     uint32_t readEnabledMask;
     uint32_t adc[8];           /*spiData to SBC .. adcData upon return*/
-}
-GRETINA4_PreAmpReadStruct;
+} GRETINA4_PreAmpReadStruct;
 
 typedef struct {
     uint32_t baseAddress;
     uint32_t readEnabledMask;
     uint32_t spiData;           /*spiData to SBC .. result upon return*/
-}
-GRETINA4_SingleAuxIOStruct;
+} GRETINA4_SingleAuxIOStruct;
 
 typedef struct {
 	uint32_t baseAddress;

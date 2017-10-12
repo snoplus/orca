@@ -61,12 +61,13 @@
     ORAlarm*		adcAlarm[kMJDPreAmpAdcChannels];
     BOOL            rangesHaveBeenSet;
     NSDate*         lastDataBaseUpdate;
-    BOOL            useSBC;
     int             boardRev;
     BOOL            connected;
     BOOL            doNotUseHWMap;
     int             firmwareRev;
     BOOL            pollRequestInFlight;
+    BOOL            connectedToANLCard;
+    
     //error counting
     BOOL            supplyOutOfBounds[4]; //only count if this goes from low to high
     unsigned long   supplyErrors[4];
@@ -83,8 +84,6 @@
 - (void) setFirmwareRev:(int)aFirmwareRev;
 - (int)  boardRev;
 - (void) setBoardRev:(int)aBoardRev;
-- (BOOL) useSBC;
-- (void) setUseSBC:(BOOL)aUseSBC;
 - (NSString*) detectorName:(int)i;
 - (void) setDetector:(int)i name:(NSString*)aName;
 - (NSMutableArray*) feedBackResistors;
@@ -184,7 +183,6 @@
 extern NSString* ORMJDPreAmpModelFirmwareRevChanged;
 extern NSString* ORMJDPreAmpModelDoNotUseHWMapChanged;
 extern NSString* ORMJDPreAmpModelBoardRevChanged;
-extern NSString* ORMJDPreAmpModelUseSBCChanged;
 extern NSString* ORMJDPreAmpModelAdcEnabledMaskChanged;
 extern NSString*  ORMJDPreAmpModelPollTimeChanged;
 extern NSString* ORMJDPreAmpModelShipValuesChanged;

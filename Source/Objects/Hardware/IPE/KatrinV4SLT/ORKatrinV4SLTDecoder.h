@@ -32,7 +32,7 @@
 @end
 
 @interface ORKatrinV4SLTDecoderForEnergy : ORIpeCardDecoder {
-	NSMutableDictionary* actualFlts;
+    int filter[21];
 }
 - (int) filterShapingLength;
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;

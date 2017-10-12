@@ -25,7 +25,7 @@ typedef struct katrinV4FLTRegNamesStruct {
     eKatrinV4FLTRegEnum enumCheckValue;
 } katrinv4FLTRegNamesStruct;
 
-static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
+static katrinv4FLTRegNamesStruct regKatrinV4FLT[kFLTV4NumRegs] = {
 
     {@"Status",			 0x0000, kReadOnly,               kFLTV4StatusReg          },
     {@"Control",		 0x0004, kReadWrite,              kFLTV4ControlReg         },
@@ -47,13 +47,13 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
     {@"HistMeasTime",    0x004C, kReadWrite,              kFLTV4HistMeasTimeReg    },
     {@"HistRecTime",     0x0050, kReadOnly,               kFLTV4HistRecTimeReg     },
     {@"HistNumMeas",     0x0054, kReadOnly,               kFLTV4HistNumMeasReg     },
-    {@"PostTrigger",     0x0058, kReadWrite,              kFLTV4PostTrigger        },
+    {@"PostTrigger",     0x0058, kReadWrite,              kFLTV4PostTriggerReg     },
     {@"EnergyOffset",	 0x005C, kReadWrite,              kFLTV4EnergyOffsetReg    },
     {@"Threshold",       0x2080, kReadWrite | kChanReg,   kFLTV4ThresholdReg       },
-    {@"pStatusA",        0x2000, kReadWrite | kChanReg,   kFLTV4pStatusA           },
-    {@"pStatusB",        0x12000,kReadOnly,               kFLTV4pStatusB           },
-    {@"pStatusC",        0x52000,kReadOnly,               kFLTV4pStatusC           },
-    {@"Analog Offset",   0x1000, kReadOnly,               kFLTV4AnalogOffset       },
+    {@"pStatusA",        0x2000, kReadWrite | kChanReg,   kFLTV4pStatusAReg        },
+    {@"pStatusB",        0x12000,kReadOnly,               kFLTV4pStatusBReg        },
+    {@"pStatusC",        0x52000,kReadOnly,               kFLTV4pStatusCReg        },
+    {@"Analog Offset",   0x1000, kReadOnly,               kFLTV4AnalogOffsetReg    },
     {@"Gain",			 0x1004, kReadWrite | kChanReg,   kFLTV4GainReg            },
     {@"Hit Rate",		 0x1100, kReadOnly  | kChanReg,   kFLTV4HitRateReg         },
     {@"Event FIFO1",	 0x1800, kReadOnly,               kFLTV4EventFifo1Reg      },
@@ -86,7 +86,7 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
 {
     int i;
     for(i=0;i<kFLTV4NumRegs;i++){
-        if(regV4FLT[i].enumCheckValue != i){
+        if(regKatrinV4FLT[i].enumCheckValue != i){
             if(printedOnce){
                 NSLogColor([NSColor redColor],@"KATRIN V4 Register table has error at index: %d\n",i);
                 printedOnce = YES;
@@ -111,20 +111,24 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
 
 - (NSString*) registerName: (short) anIndex
 {
-    if([self indexInRange:anIndex]) return regV4FLT[anIndex].regName;
+    if([self indexInRange:anIndex]) return regKatrinV4FLT[anIndex].regName;
     else                            return @"Illegal";
 }
-
+- (short) addressOffset: (short) anIndex
+{
+    if([self indexInRange:anIndex]) return regKatrinV4FLT[anIndex].addressOffset;
+    else                            return 0x0;
+}
 - (short) accessType: (short) anIndex
 {
-    if([self indexInRange:anIndex]) return regV4FLT[anIndex].accessType;
+    if([self indexInRange:anIndex]) return regKatrinV4FLT[anIndex].accessType;
     else                            return 0x0;
 }
 
 - (unsigned long) addressForStation:(int)aStation registerIndex:(int)anIndex chan:(int)aChannel
 {
     if([self indexInRange:anIndex]){
-        return (aStation << 17) | (aChannel << 12) | (regV4FLT[anIndex].addressOffset>>2);
+        return (aStation << 17) | (aChannel << 12) | (regKatrinV4FLT[anIndex].addressOffset>>2);
     }
     else return 0x0;
 }
@@ -132,7 +136,7 @@ static katrinv4FLTRegNamesStruct regV4FLT[kFLTV4NumRegs] = {
 - (unsigned long) addressForStation:(int)aStation registerIndex:(int)anIndex
 {
     if([self indexInRange:anIndex]){
-        return (aStation << 17) | (regV4FLT[anIndex].addressOffset>>2);
+        return (aStation << 17) | (regKatrinV4FLT[anIndex].addressOffset>>2);
     }
     else return 0x0;
 }

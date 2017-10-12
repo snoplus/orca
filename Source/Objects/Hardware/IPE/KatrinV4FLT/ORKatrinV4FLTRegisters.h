@@ -27,6 +27,9 @@
 
 #define katrinV4FLTRegisters [ORKatrinV4FLTRegisters sharedRegSet]
 
+#define kKatrinV4HitRunRateAlways    1
+#define kKatrinV4HitRunRateWithRun   0
+
 static ORKatrinV4FLTRegisters* sharedKatrinV4FLTRegisters;
 
 typedef enum eKatrinV4FLTRegEnum {
@@ -50,13 +53,13 @@ typedef enum eKatrinV4FLTRegEnum {
     kFLTV4HistMeasTimeReg,
     kFLTV4HistRecTimeReg,
     kFLTV4HistNumMeasReg,
-    kFLTV4PostTrigger,
+    kFLTV4PostTriggerReg,
     kFLTV4EnergyOffsetReg,
     kFLTV4ThresholdReg,
-    kFLTV4pStatusA,
-    kFLTV4pStatusB,
-    kFLTV4pStatusC,
-    kFLTV4AnalogOffset,
+    kFLTV4pStatusAReg,
+    kFLTV4pStatusBReg,
+    kFLTV4pStatusCReg,
+    kFLTV4AnalogOffsetReg,
     kFLTV4GainReg,
     kFLTV4HitRateReg,
     kFLTV4EventFifo1Reg,
@@ -81,6 +84,7 @@ typedef enum eKatrinV4FLTRegEnum {
 
 - (int)           numRegisters;
 - (NSString*)     registerName: (short) anIndex;
+- (short) addressOffset: (short) anIndex;
 - (short)         accessType: (short) anIndex;
 - (unsigned long) addressForStation:(int)aStation registerIndex:(int)aReg chan:(int)aChannel;
 - (unsigned long) addressForStation:(int)aStation registerIndex:(int)aReg;

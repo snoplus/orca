@@ -30,6 +30,7 @@
     self = [super init];
     [self setTag: aTag];
     [self setWindowLength:wl];
+    dataCount = 0;
     return self;
 }
 
@@ -81,13 +82,17 @@
     return spikeValue;
 }
 
-- (void) calculateAverage:(float)dataPoint minSamples:(int)minSamples triggerValue:(float)triggerValue spikeType:(BOOL)triggerType group:(ORRunningAverageGroup*)aGroup
+- (void) calculateAverage:(float)dataPoint
+               minSamples:(int)minSamples
+             triggerValue:(float)triggerValue
+                spikeType:(BOOL)triggerType
+                    group:(ORRunningAverageGroup*)aGroup
 {
     
-    dataCount = dataCount+1;
+    dataCount= dataCount+1;
     if(dataCount>windowLength)dataCount = windowLength;
     
-    if(dataCount<=5){
+    if(dataCount<=3){
         spikeState     = NO;
         lastSpikeState = NO;
         runningAverage = dataPoint;
@@ -95,40 +100,50 @@
         return;
     }
     
+    runningAverage = ((dataCount-1)*runningAverage + dataPoint)/(float)dataCount;
+
     spikeValue = 0;
     switch(triggerType){
         case kRASpikeOnRatio: //trigger on the ratio of the rate over the average
             if(runningAverage != 0) {
-                if(fabs(dataPoint/runningAverage) >= triggerValue){
-                    spikeValue           = dataPoint;
-                    averageAtTimeOfSpike = runningAverage;
+                float ratio = fabsf(dataPoint/runningAverage);
+                if(ratio >= triggerValue){
+                    if(!spikeState){
+                        averageAtTimeOfSpike = runningAverage;
+                        spikeValue           = dataPoint;
+                    }
                     spikeState           = YES;
                 }
                 else {
-                    //don't reset state unless the new value is lower than the ave that triggered spike
-                    if(fabs(dataPoint/averageAtTimeOfSpike)<triggerValue) spikeState = NO;
+                    //reset state if the new value is lower than the ave that triggered spike
+                    if(ratio < averageAtTimeOfSpike){
+                        if(spikeState)dataCount=0;
+                        spikeState = NO;
+                    }
                 }
             }            
         break;
             
         case kRASpikeOnThreshold:
-            if(fabs(dataPoint-runningAverage) > triggerValue){
-                spikeValue           = dataPoint;
-                averageAtTimeOfSpike = runningAverage;
-                spikeState           = YES;
-            }
-            else {
-                //don't reset state unless the new value is lower than the ave that triggered spike
-                if(fabs(dataPoint-averageAtTimeOfSpike) < triggerValue) spikeState = NO;
+            {
+                float diff =fabsf(dataPoint-runningAverage);
+                if( diff > triggerValue){
+                    if(!spikeState){
+                        spikeValue = dataPoint;
+                    }
+                    spikeState = YES;
+                }
+                else {
+                    if(diff < triggerValue){
+                        if(spikeState)dataCount=0;
+                        spikeState = NO;
+                    }
+                }
             }
         break;
             
         default:
         break;
-    }
-    
-    if(spikeState == NO){
-        runningAverage = ((dataCount-1)*runningAverage + dataPoint)/(float)dataCount;
     }
     
     if(lastSpikeState != spikeState){

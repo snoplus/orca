@@ -24,6 +24,7 @@
 #import "ORKatrinV4SLTModel.h"
 #import "TimedWorker.h"
 #import "SBC_Link.h"
+#import "StopLightView.h"
 
 
 @interface ORKatrinV4SLTController (private)
@@ -54,12 +55,15 @@
 {
 	controlSize			= NSMakeSize(555,630);
     statusSize			= NSMakeSize(555,480);
-    lowLevelSize		= NSMakeSize(555,430);
+    lowLevelSize		= NSMakeSize(555,490);
     cpuManagementSize	= NSMakeSize(485,450);
     cpuTestsSize		= NSMakeSize(555,355);
 	
-	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];	
-	
+	[[self window] setTitle:@"IPE-DAQ-V4 SLT"];
+    
+    [lightBoardView hideCautionLight];
+    [lightBoardView1 hideCautionLight];
+
     [super awakeFromNib];
     [self updateWindow];
 	
@@ -206,7 +210,7 @@
 {
 	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
 	int i;
-	for(i=0;i<19;i++){
+	for(i=0;i<20;i++){
 		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
 	}    
 
@@ -273,6 +277,15 @@
 	[[statusMatrix cellWithTag:6] setStringValue: IsBitSet(statusReg,kStatusVttErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:7] setStringValue: IsBitSet(statusReg,kStatusFanErr)?@"ERR":@"OK"]; 
 
+    
+    if(statusReg & kStatusInh){
+        [lightBoardView setState:kGoLight];
+        [lightBoardView1 setState:kGoLight];
+    }
+    else {
+        [lightBoardView setState:kStoppedLight];
+        [lightBoardView1 setState:kStoppedLight];
+    }
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -795,7 +808,6 @@
 - (IBAction) tpStartAction:(id)sender                 { [self do:@selector(writeTpStart)            name:@"Test Pattern Start"];               }
 - (IBAction) resetFLTAction:(id)sender                { [self do:@selector(writeFltReset)           name:@"FLT Reset"];                        }
 - (IBAction) resetSLTAction:(id)sender                { [self do:@selector(writeSltReset)           name:@"SLT Reset"];                        }
-- (IBAction) writeSWTrigAction:(id)sender             { [self do:@selector(writeSwTrigger)          name:@"SW Trigger"];                       }
 - (IBAction) writeClrInhibitAction:(id)sender         { [self do:@selector(writeClrInhibit)         name:@"Clr Inhibit"];                      }
 - (IBAction) writeSetInhibitAction:(id)sender         { [self do:@selector(writeSetInhibit)         name:@"Set Inhibit"];                      }
 - (IBAction) resetPageManagerAction:(id)sender        { [self do:@selector(writePageManagerReset)   name:@"Reset Page Manager"];               }

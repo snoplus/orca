@@ -73,6 +73,7 @@ NSString* ORGretina4ADacAttenuationChanged              = @"ORGretina4ADacAttenu
 NSString* ORGretina4AChannelPulseControlChanged         = @"ORGretina4AChannelPulseControlChanged";
 NSString* ORGretina4ADiagMuxControlChanged              = @"ORGretina4ADiagMuxControlChanged";
 NSString* ORGretina4ADownSampleHoldOffTimeChanged       = @"ORGretina4ADownSampleHoldOffTimeChanged";
+NSString* ORGretina4ADownSamplePauseEnableChanged       = @"ORGretina4ADownSamplePauseEnableChanged";
 NSString* ORGretina4AHoldOffTimeChanged                 = @"ORGretina4AHoldOffTimeChanged";
 NSString* ORGretina4APeakSensitivityChanged             = @"ORGretina4APeakSensitivityChanged";
 NSString* ORGretina4AAutoModeChanged                    = @"ORGretina4AAutoModeChanged";
@@ -102,12 +103,6 @@ NSString* ORGretina4AMinCodeRevisionChanged             = @"ORGretina4AMinCodeRe
 NSString* ORGretina4ACodeDateChanged                    = @"ORGretina4ACodeDateChanged";
 NSString* ORGretina4ACodeRevisionChanged                 = @"ORGretina4ACodeRevisionChanged";
 NSString* ORGretina4AFwTypeChanged                      = @"ORGretina4AFwTypeChanged";
-NSString* ORGretina4ATSErrCntCtrlChanged                = @"ORGretina4ATSErrCntCtrlChanged";
-NSString* ORGretina4ATSErrorCountChanged                = @"ORGretina4ATSErrorCountChanged";
-NSString* ORGretina4ADroppedEventCountChanged           = @"ORGretina4ADroppedEventCountChanged";
-NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedEventCountChanged";
-NSString* ORGretina4AAhitCountChanged                   = @"ORGretina4AAhitCountChanged";
-NSString* ORGretina4ADiscCountChanged                   = @"ORGretina4ADiscCountChanged";
 //---sd_config Reg
 NSString* ORGretina4ASdPemChanged                       = @"ORGretina4ASdPemChanged";
 NSString* ORGretina4ASdSmLostLockFlagChanged            = @"ORGretina4ASdSmLostLockFlagChanged";
@@ -149,6 +144,18 @@ NSString* ORGretina4ADoHwCheckChanged                   = @"ORGretina4ADoHwCheck
 NSString* ORGretina4AModelRateSpiked                    = @"ORGretina4AModelRateSpiked";
 NSString* ORGretina4AModelRAGChanged                    = @"ORGretina4AModelRAGChanged";
 NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSourceChanged";
+//=====Counters
+NSString* ORGretina4ATSErrCntCtrlChanged                = @"ORGretina4ATSErrCntCtrlChanged";
+NSString* ORGretina4ATSErrorCountChanged                = @"ORGretina4ATSErrorCountChanged";
+NSString* ORGretina4AAHitCountChanged                   = @"ORGretina4AAHitCountChanged";
+NSString* ORGretina4ADroppedEventCountChanged           = @"ORGretina4ADroppedEventCountChanged";
+NSString* ORGretina4ADiscCountChanged                   = @"ORGretina4ADiscCountChanged";
+NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedEventCountChanged";
+
+
+
+
+
 
 @interface ORGretina4AModel (private)
 //firmware loading
@@ -549,16 +556,15 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
         unsigned long theValue = [self readRegister:i channel:[self selectedChannel]];
         NSLogFont(aFont,@"0x%04x 0x%08x %10lu %@\n",[Gretina4ARegisters offsetforReg:i],theValue,theValue,[Gretina4ARegisters registerName:i]);
         snapShot[i] = theValue;
-        if(i == kBoardId)          [self dumpBoardIdDetails:theValue];
-        if(i == kProgrammingDone)  [self dumpProgrammingDoneDetails:theValue];
-        if(i == kHardwareStatus)   [self dumpHardwareStatusDetails:theValue];
-        if(i == kExternalDiscSrc)  [self dumpExternalDiscSrcDetails:theValue];
-        if(i == kChannelControl)   [self dumpChannelControlDetails:theValue];
-        if(i == kLedThreshold)     [self dumpLedThresholdDetails:theValue];
-        if(i == kHoldoffControl)   [self dumpHoldoffControlDetails:theValue];
-        if(i == kBaselineDelay)    [self dumpBaselineDelayDetails:theValue];
-        if(i == kExtDiscSel)       [self dumpExtDiscSelDetails:theValue];
-        if(i == kMasterLogicStatus)[self dumpMasterStatusDetails:theValue];
+        if(i == kBoardId)           [self dumpBoardIdDetails:theValue];
+        if(i == kProgrammingDone)   [self dumpProgrammingDoneDetails:theValue];
+        if(i == kHardwareStatus)    [self dumpHardwareStatusDetails:theValue];
+        if(i == kExternalDiscSrc)   [self dumpExternalDiscSrcDetails:theValue];
+        if(i == kChannelControl)    [self dumpChannelControlDetails:theValue];
+        if(i == kHoldoffControl)    [self dumpHoldoffControlDetails:theValue];
+        if(i == kBaselineDelay)     [self dumpBaselineDelayDetails:theValue];
+        if(i == kExternalDiscMode)  [self dumpExtDiscModeDetails:theValue];
+        if(i == kMasterLogicStatus) [self dumpMasterStatusDetails:theValue];
         
     }
     NSLog(@"------------------------------------------------\n");
@@ -662,11 +668,6 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     NSLogFont(aFont,@"     Pileup Waveform Only: %@\n", ((aValue>>30)&0x1)?@"Enabled": @"Disabled");
 }
 
-- (void) dumpLedThresholdDetails:(unsigned long)aValue
-{
-    NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10.0];
-    NSLogFont(aFont,@"     LED Threshold     : %d\n", (aValue>> 0)&0x3fff);
-}
 
 - (void) dumpHoldoffControlDetails:(unsigned long)aValue
 {
@@ -683,7 +684,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     NSLogFont(aFont,@"     Status         : %d\n", ((aValue>>(12+[self selectedChannel]))& 0x1));
 }
 
-- (void) dumpExtDiscSelDetails:(unsigned long)aValue
+- (void) dumpExtDiscModeDetails:(unsigned long)aValue
 {
     NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10.0];
     NSString* descSel[4] = {
@@ -717,7 +718,6 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     NSLogFont(aFont,@"     Master Counter Reset : %@\n", (aValue>>5)&0x1?@"Reset":@"Run");
     NSLogFont(aFont,@"     BGO discbit sel      : %@\n", (aValue>>7)&0x1?@"All":@"Accepted Only");
     NSLogFont(aFont,@"     Veto enable          : %@\n", (aValue>>8)&0x1?@"Enabled":@"Disabled");
-    NSLogFont(aFont,@"     CFD Mode             : %@\n", (aValue>>15)&0x1?@"CFD":@"LED");
     NSLogFont(aFont,@"     PU Time Err          : %@\n", (aValue>>16)&0x1?@"Error":@"OK");
     NSLogFont(aFont,@"     Serdes lock          : %@\n", (aValue>>17)&0x1?@"Lock":@"Unlock");
     NSLogFont(aFont,@"     Serdes sm locked     : %@\n", (aValue>>18)&0x1?@"Lock":@"Unlock");
@@ -731,7 +731,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     windowCompMin   = 256;
     windowCompMax   = 32000;
     rawDataLength   = 500;
-    rawDataWindow   = 2000;
+    rawDataWindow   = 0x7fc;
     p2Window        = 0;
     holdOffTime     = 160;
     baselineDelay   = 511;
@@ -757,6 +757,64 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     baselineStart[aChan]          = 100;
 
 }
+#pragma mark - Counters
+- (void) readaHitCounts
+{
+    [[self adapter] readLongBlock:aHitCounter
+                        atAddress:[self baseAddress]+[Gretina4ARegisters offsetforReg:kAhitCount]
+                        numToRead:kNumGretina4AChannels
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAHitCountChanged object:self];
+}
+
+- (void) readDroppedEventCounts
+{
+    [[self adapter] readLongBlock:droppedEventCount
+                        atAddress:[self baseAddress]+[Gretina4ARegisters offsetforReg:kDroppedEventCount]
+                        numToRead:kNumGretina4AChannels
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADroppedEventCountChanged object:self];
+}
+- (void) readAcceptedEventCounts
+{
+    [[self adapter] readLongBlock:acceptedEventCount
+                        atAddress:[self baseAddress]+[Gretina4ARegisters offsetforReg:kAcceptedEventCount]
+                        numToRead:kNumGretina4AChannels
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcceptedEventCountChanged object:self];
+}
+
+- (void) readDiscriminatorCounts
+{
+    [[self adapter] readLongBlock:discriminatorCount
+                        atAddress:[self baseAddress]+[Gretina4ARegisters offsetforReg:kDiscCount]
+                        numToRead:kNumGretina4AChannels
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountChanged object:self];
+}
+
+- (void) clearCounters
+{
+    int chan;
+    for(chan=0;chan<kNumGretina4AChannels;chan++){
+        unsigned long old = [self readLongFromReg:kChannelControl channel:chan];
+        //toggle the reset bit
+        old |= (0x1<<27);
+        [self writeLong:old toReg:kChannelControl channel:chan];
+        old ^= (0x1<<27);
+        [self writeLong:old toReg:kChannelControl channel:chan];
+    }
+    
+    [self readaHitCounts];
+    [self readDroppedEventCounts];
+    [self readAcceptedEventCounts];
+    [self readDiscriminatorCounts];
+}
+
 
 #pragma mark - Firmware loading
 - (BOOL) downLoadMainFPGAInProgress
@@ -1004,6 +1062,24 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 }
 
 #pragma mark - Initialization
+//---functions to allow the MJD threshold fineder script to work
+- (void) setForceFullInitCard:(BOOL)aValue { [self setForceFullCardInit:aValue]; }
+- (void) setTrapThreshold:(unsigned short)chan withValue:(unsigned short)aValue
+{
+    [self setLedThreshold:chan withValue:aValue];
+}
+- (short) trapThreshold:(unsigned short)chan
+{
+    return [self ledThreshold:chan];
+}
+
+- (void) writeTrapThreshold:(unsigned short)aChan
+{
+    [self writeLedThreshold:aChan];
+}
+- (BOOL) trapEnabled:(int)aChan { return YES; }
+//----------------------------------------------------------------
+
 - (BOOL) forceFullCardInit		{ return forceFullCardInit; }
 - (void) setForceFullCardInit:(BOOL)aValue
 {
@@ -1118,7 +1194,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 //------------------- kChannelControl  Bit Field = 10..11 ---------------
 - (short) triggerPolarity:(unsigned short)chan
 {
-    if(chan < kNumGretina4AChannels ) return triggerPolarity[chan];
+    if(chan < kNumGretina4AChannels ) return triggerPolarity[chan] & 0x3;
     else                            return 0;
 }
 
@@ -1135,7 +1211,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 //------------------- kChannelControl  Bit Field = 12..14 ---------------
 - (short) decimationFactor:(unsigned short)chan
 {
-    if(chan < kNumGretina4AChannels) return decimationFactor[chan];
+    if(chan < kNumGretina4AChannels) return decimationFactor[chan] & 0x7;
     else                             return 0;
 }
 
@@ -1148,16 +1224,6 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
         [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADecimationFactorChanged object:self];
     }
 }
-
-//------------------- kChannelControl  Bit Field = 15 ---------------
-//******format all channels the same
-//- (BOOL) writeFlag { return writeFlag; }
-//- (void) setWriteFlag:(BOOL)aValue
-//{
-//        [[[self undoManager] prepareWithInvocationTarget:self] setWriteFlag:writeFlag];
-//        writeFlag = aValue;
-//        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AWriteFlagChanged object:self];
-//}
 
 //------------------- kChannelControl  Bit Field = 20 ---------------
 - (BOOL) droppedEventCountMode:(unsigned short)chan
@@ -1310,7 +1376,8 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 - (void) setRawDataWindow:(unsigned short)aValue
 {
     //same value for all channels
-    if(aValue>0x7FF)aValue = 0x7FF;
+    if(aValue>0x7FC)aValue = 0x7FC;
+    aValue = (aValue/2)*2; //make it even
     [[[self undoManager] prepareWithInvocationTarget:self] setRawDataWindow:rawDataWindow];
     rawDataWindow = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ARawDataWindowChanged object:self];
@@ -1610,6 +1677,16 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     downSampleHoldOffTime = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADownSampleHoldOffTimeChanged object:self];
 }
+
+- (BOOL) downSamplePauseEnable {return downSamplePauseEnable;}
+- (void) setDownSamplePauseEnable:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDownSamplePauseEnable:downSamplePauseEnable];
+    downSamplePauseEnable = aFlag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADownSamplePauseEnableChanged object:self];
+  
+}
+
 //------------------- Address = 0x048C  Bit Field = 31..0 ---------------
 //------------------- Address = 0x0490  Bit Field = 15..0 ---------------
 //------------------- Address = 0x0494  Bit Field = 15..0 ---------------
@@ -1736,15 +1813,6 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     else return 0;
 }
 
-- (void) setDroppedEventCount:(unsigned short)chan withValue:(unsigned long)aValue
-{
-    if(chan < kNumGretina4AChannels) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setDroppedEventCount:chan withValue:droppedEventCount[chan]];
-        droppedEventCount[chan] = aValue;
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADroppedEventCountChanged object:self userInfo:userInfo];
-    }
-}
 
 //------------------- Address = 0x0740  Bit Field = 31..0 ---------------
 - (unsigned long) acceptedEventCount:(unsigned short)chan
@@ -1753,50 +1821,21 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     else return 0;
 }
 
-- (void) setAcceptedEventCount:(unsigned short)chan withValue:(unsigned long)aValue
-{
-    if((chan < kNumGretina4AChannels)){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAcceptedEventCount:chan withValue:acceptedEventCount[chan]];
-        acceptedEventCount[chan] = aValue;
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAcceptedEventCountChanged object:self userInfo:userInfo];
-    }
-}
 
 //------------------- Address = 0x0780  Bit Field = 31..0 ---------------
-- (unsigned long) ahitCount:(unsigned short)chan
+- (unsigned long) aHitCount:(unsigned short)chan
 {
-    if(chan<kNumGretina4AChannels )return ahitCount[chan];
+    if(chan<kNumGretina4AChannels )return aHitCounter[chan];
     else return 0;
-}
-
-- (void) setAhitCount:(unsigned short)chan withValue:(unsigned long)aValue
-{
-    if(chan < kNumGretina4AChannels){
-        [[[self undoManager] prepareWithInvocationTarget:self] setAhitCount:chan withValue:ahitCount[chan]];
-        ahitCount[chan] = aValue;
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4AAhitCountChanged object:self userInfo:userInfo];
-    }
 }
 
 //------------------- Address = 0x07C0  Bit Field = 31..0 ---------------
 - (unsigned long) discCount:(unsigned short)chan
 {
-    if(chan < kNumGretina4AChannels )return discCount[chan];
+    if(chan < kNumGretina4AChannels )return discriminatorCount[chan];
     else return 0;
 }
 
-- (void) setDiscCount:(unsigned short)chan withValue:(unsigned long)aValue
-{
-    if(chan < kNumGretina4AChannels) {
-        [[[self undoManager] prepareWithInvocationTarget:self] setDiscCount:chan withValue:discCount[chan]];
-        discCount[chan] = aValue;
-        
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:chan] forKey:@"Channel"];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ADiscCountChanged object:self userInfo:userInfo];
-    }
-}
 
 //------------------- Address = 0x0800  Bit Field = 31..0 ---------------
 - (unsigned long) auxIoRead { return auxIoRead; }
@@ -2003,8 +2042,8 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     }
 }
 
-//------------------------- Ext Discrim Mode Reg------------------------------------
-- (unsigned long) readExtDiscriminatorSrc { return [self readLongFromReg:kUserPackageData] & 0x1fffffff; }
+//------------------------- Ext Discrim Src Reg------------------------------------
+- (unsigned long) readExtDiscriminatorSrc { return [self readLongFromReg:kExternalDiscSrc] & 0x1fffffff; }
 - (void) writeExtDiscriminatorSrc
 {
     unsigned long theValue = (extDiscriminatorSrc & 0x3fffffff);
@@ -2068,41 +2107,28 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     if(forceEnable)	startStop = enabled[chan];
     else			startStop = NO;
 
-    BOOL writeFlag = NO;
-    
     unsigned long theValue =
     (startStop                        << 0)  |
-    (pileupMode[chan]                 << 2)  |
+    (!pileupMode[chan]                << 2)  |
     ((triggerPolarity[chan]  & 0x3)   << 10) |
     ((decimationFactor[chan] & 0x7)   << 12) |
-    (writeFlag                        << 15) | //default to data with flags
+    (downSamplePauseEnable            << 16) |
     (droppedEventCountMode[chan]      << 20) |
     (eventCountMode[chan]             << 21) |
     (aHitCountMode[chan]              << 22) |
     (discCountMode[chan]              << 23) |
     (pileupExtensionMode[chan]        << 26) |
-    (!startStop                       << 27) | //counters reset at run stop
+    //(0x1L                             << 27) | //start counters
     (pileupWaveformOnlyMode[chan]     << 30);
-
+    
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kChannelControl chan:chan]
-                       mask:0x4FF0FC0D //mask off the reserved bits
+                       mask:0x4ff1fc0d //mask off the reserved bits
                   reportKey:[NSString stringWithFormat:@"ControlStatus_%d",chan]
               forceFullInit:forceFullInit[chan]];
 }
 
-- (void) clearCounters
-{
-    int chan;
-    for(chan=0;chan<kNumGretina4AChannels;chan++){
-        unsigned long old = [self readLongFromReg:kChannelControl channel:chan];
-        //toggle the reset bit
-        old ^= (0x1<<27);
-        [self writeLong:old toReg:kChannelControl channel:chan];
-        old ^= (0x1<<27);
-        [self writeLong:old toReg:kChannelControl channel:chan];
-    }
-}
+
 
 //-------------------------kLedThreshold Reg----------------------------------------
 - (unsigned long) readLedThreshold:(unsigned short)channel
@@ -2118,7 +2144,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     unsigned long theValue =  ledThreshold[aChan] & 0x3fff;
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kLedThreshold chan:aChan]
-                       mask:0xff03ff
+                       mask:0x03fff
                   reportKey:[NSString stringWithFormat:@"LedThreshold_%d",aChan]
               forceFullInit:forceFullInit[aChan]];
     
@@ -2151,10 +2177,10 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 - (void) writeRawDataWindow:(unsigned short)aChan
 {
     //***NOTE that we write same value to all
-    unsigned long theValue = (rawDataWindow & 0x000007ff);
+    unsigned long theValue = (rawDataWindow & 0x000007fc);
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kRawDataWindow chan:aChan]
-                       mask:0x000007ff
+                       mask:0x000007fc
                   reportKey:[NSString stringWithFormat:@"RawDataWindow_%d",aChan]
               forceFullInit:forceFullInit[aChan]];
 
@@ -2335,6 +2361,19 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
               forceFullInit:forceFullCardInit];
 }
 
+//------------------------- Ext Discrim Mode Reg------------------------------------
+- (unsigned long) readExtDiscriminatorMode { return [self readLongFromReg:kExternalDiscMode] & 0xfffff; }
+- (void) writeExtDiscriminatorMode
+{
+    unsigned long theValue = (extDiscriminatorMode & 0xfffff);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetforReg:kExternalDiscMode]
+                       mask:0xfffff
+                  reportKey:@"ExternalDiscMode"
+              forceFullInit:forceFullCardInit];
+}
+
+
 //-------------------------kHoldoffControl Reg----------------------------------------
 - (unsigned long) readHoldoffControl
 {
@@ -2363,7 +2402,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     unsigned long theValue = downSampleHoldOffTime;
     [self writeAndCheckLong:theValue
               addressOffset:[Gretina4ARegisters offsetforReg:kDownSampleHoldOffTime]
-                       mask:0x00001FFF
+                       mask:0x00003FF
                   reportKey:@"holdoffControl"
               forceFullInit:forceFullCardInit];
 }
@@ -2438,39 +2477,6 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     NSLog(@"Code: %02d.%02d \n",    ((codeVersion>>  4) & 0xf),(codeVersion&0xf));
 }
 
-//------------------------kDroppedEventCount Reg----------------------------------------
-- (unsigned long) readDroppedEventCount:(unsigned short) aChan
-{
-    if(aChan<kNumGretina4AChannels){
-        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kDroppedEventCount chan:aChan]];
-    }
-    else return 0;
-}
-
-//------------------------kAcceptedEventCount Reg----------------------------------------
-- (unsigned long) readAcceptedEventCount:(unsigned short) aChan
-{
-    if(aChan<kNumGretina4AChannels){
-        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kAcceptedEventCount chan:aChan]];
-    }
-    else return 0;
-}
-//------------------------kAhitCount Reg----------------------------------------
-- (unsigned long) readAHitCount:(unsigned short) aChan
-{
-    if(aChan<kNumGretina4AChannels){
-        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kAhitCount chan:aChan]];
-    }
-    else return 0;
-}
-//------------------------kDiscCount Reg----------------------------------------
-- (unsigned long) readDiscCount:(unsigned short) aChan
-{
-    if(aChan<kNumGretina4AChannels){
-        return [self readLongFromReg:[Gretina4ARegisters address:[self baseAddress] forReg:kDiscCount chan:aChan]];
-    }
-    else return 0;
-}
 
 //-------------------------kVMEFPGAVersionStatus Reg----------------------------------------
 - (void) readFPGAVersions
@@ -2558,6 +2564,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
         }
         //write the card level params
         [self writeExtDiscriminatorSrc];
+        [self writeExtDiscriminatorMode];
         [self writeWindowCompMin];
         [self writeWindowCompMax];
         [self writeP2Window];
@@ -2567,7 +2574,6 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
         [self loadBaselines];
         [self writeVetoGateWidth];
         [self writeTriggerConfig];
-        [self clearCounters];
         
         //write the channel level params
         for(i=0;i<kNumGretina4AChannels;i++) {
@@ -2588,19 +2594,35 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
         for(i=0;i<kNumGretina4AChannels;i++) {
             [self writeControlReg:i enabled:[self enabled:i]];
         }
+        [self clearCounters];
 
         [self writeLong:(0x1<<27) toReg:kProgrammingDone]; //reset
         [self writeLong:0   toReg:kProgrammingDone];
         [self writeMasterLogic:YES];
     }
+
     if(doHwCheck)[self checkBoard:YES];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACardInited object:self];
 }
 
+- (void) softwareTrigger
+{
+    [self writeLong:0x1<<10 toReg:kChannelPulsedControl];
+}
+
+
+- (void) writeThresholds
+{
+    int i;
+    for(i=0;i<kNumGretina4AChannels;i++) {
+        [self writeLedThreshold:i];
+    }
+}
 - (void) checkBoard:(BOOL)verbose
 {
     BOOL extDiscriminatorSrcResult   = [self checkExtDiscriminatorSrc:verbose];
+    BOOL extDiscriminatorModeResult  = [self checkExtDiscriminatorMode:verbose];
     BOOL windowCompMinResult         = [self checkWindowCompMin:verbose];
     BOOL windowCompMaxResult         = [self checkWindowCompMax:verbose];
     BOOL p2WindowResult              = [self checkP2Window:verbose];
@@ -2638,6 +2660,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     }
     if(verbose){
         if( extDiscriminatorSrcResult   &&
+            extDiscriminatorModeResult  &&
             windowCompMinResult         &&
             windowCompMaxResult         &&
             p2WindowResult              &&
@@ -2663,6 +2686,15 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     if(aValue == extDiscriminatorSrc)return YES;
     else {
         if(verbose)NSLog(@"extDiscriminatorSrc mismatch: 0x%x != 0x%x\n",aValue,extDiscriminatorSrc);
+        return NO;
+    }
+}
+- (BOOL) checkExtDiscriminatorMode:(BOOL)verbose
+{
+    unsigned long aValue = [self readRegister:kExternalDiscMode]& 0xfffff;
+    if(aValue == extDiscriminatorMode)return YES;
+    else {
+        if(verbose)NSLog(@"extDiscriminatorMode mismatch: 0x%x != 0x%x\n",aValue,extDiscriminatorMode);
         return NO;
     }
 }
@@ -2802,7 +2834,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 
 - (BOOL) checkRawDataWindow:(int)aChan verbose:(BOOL)verbose
 {
-    unsigned long aValue = [self readRegister:kRawDataWindow channel:aChan] & 0x7ff;
+    unsigned long aValue = [self readRegister:kRawDataWindow channel:aChan] & 0x7fc;
     
     if(aValue == rawDataWindow)return YES;
     else {
@@ -2813,7 +2845,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 
 - (BOOL) checkRawDataLength:(int)aChan verbose:(BOOL)verbose
 {
-    unsigned long aValue = [self readRegister:kRawDataLength channel:aChan] & 0x3ff;
+    unsigned long aValue = [self readRegister:kRawDataLength channel:aChan] & 0x3fe;
     
     if(aValue == rawDataLength)return YES;
     else {
@@ -3349,7 +3381,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     configStruct->card_info[index].deviceSpecificData[0]	= [Gretina4ARegisters offsetforReg:kProgrammingDone];  //fifoStateAddress
     configStruct->card_info[index].deviceSpecificData[1]	= [Gretina4ARegisters offsetforReg:kFifo]; // fifoAddress
     configStruct->card_info[index].deviceSpecificData[2]	= [Gretina4ARegisters offsetforReg:kProgrammingDone];   // fifoReset Address
-    configStruct->card_info[index].deviceSpecificData[3]	= [self rawDataWindow];
+    configStruct->card_info[index].deviceSpecificData[3]	= [self rawDataWindow]/2 + 1; //longs
     configStruct->card_info[index].num_Trigger_Indexes		= 0;
     
     configStruct->card_info[index].next_Card_Index 	= index+1;
@@ -3372,6 +3404,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     [self setSPIWriteValue:     		[decoder decodeInt32ForKey: @"spiWriteValue"]];
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
     [self setExtDiscriminatorSrc:       [decoder decodeInt32ForKey: @"extDiscriminatorSrc"]];
+    [self setExtDiscriminatorMode:      [decoder decodeInt32ForKey: @"extDiscriminatorMode"]];
     [self setUserPackageData:           [decoder decodeInt32ForKey: @"userPackageData"]];
     [self setWindowCompMin:             [decoder decodeIntForKey:   @"windowCompMin"]];
     [self setWindowCompMax:             [decoder decodeIntForKey:   @"windowCompMax"]];
@@ -3382,6 +3415,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     [self setDiagMuxControl:            [decoder decodeInt32ForKey: @"diagMuxControl"]];
     [self setHoldOffTime:               [decoder decodeIntForKey:   @"holdOffTime"]];
     [self setDownSampleHoldOffTime:     [decoder decodeIntForKey:   @"downSampleHoldOffTime"]];
+    [self setDownSamplePauseEnable:     [decoder decodeBoolForKey:  @"downSamplePauseEnable"]];
     [self setPeakSensitivity:           [decoder decodeIntForKey:   @"peakSensitivity"]];
     [self setAutoMode:                  [decoder decodeBoolForKey:  @"autoMode"]];
     [self setTrackingSpeed:             [decoder decodeIntForKey:   @"trackingSpeed"]];
@@ -3461,7 +3495,8 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
     [encoder encodeInt32:spiWriteValue			    forKey:@"spiWriteValue"];
     [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
-    [encoder encodeInt32:extDiscriminatorSrc        forKey:@"extDiscriminatorSrc"];
+    [encoder encodeInt32:extDiscriminatorSrc        forKey:@"extDiscriminatorMode"];
+    [encoder encodeInt32:extDiscriminatorMode       forKey:@"extDiscriminatorSrc"];
     [encoder encodeInt32:userPackageData            forKey:@"userPackageData"];
     [encoder encodeInt32:windowCompMin              forKey:@"windowCompMin"];
     [encoder encodeInt32:windowCompMax              forKey:@"windowCompMax"];
@@ -3472,6 +3507,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
     [encoder encodeInt32:diagMuxControl             forKey:@"diagMuxControl"];
     [encoder encodeInt:holdOffTime                  forKey:@"holdOffTime"];
     [encoder encodeInt:downSampleHoldOffTime        forKey:@"downSampleHoldOffTime"];
+    [encoder encodeBool:downSamplePauseEnable       forKey:@"downSamplePauseEnable"];
     [encoder encodeInt:peakSensitivity              forKey:@"peakSensitivity"];
     [encoder encodeBool:autoMode                    forKey:@"autoMode"];
     [encoder encodeInt:trackingSpeed                forKey:@"trackingSpeed"];
@@ -3920,8 +3956,10 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
 - (void) reloadMainFPGAFromFlash
 {
     
-    [self writeToAddress:0x900 aValue:kGretina4AResetMainFPGACmd];
-    [self writeToAddress:0x900 aValue:kGretina4AReloadMainFPGACmd];
+//    [self writeToAddress:0x900 aValue:kGretina4AResetMainFPGACmd];
+//    [self writeToAddress:0x900 aValue:kGretina4AReloadMainFPGACmd];
+    [self writeToAddress:0x900 aValue:0x10];
+    [self writeToAddress:0x900 aValue:0x20];
     
     unsigned long statusRegValue=[self readFromAddress:0x904];
     
@@ -4011,7 +4049,7 @@ NSString* ORGretina4AClockSourceChanged                 = @"ORGretina4AClockSour
         //if an SBC is available we pass the request to flash the fpga. this assumes the .bin file is already there
         SBC_Packet aPacket;
         aPacket.cmdHeader.destination           = kMJD;
-        aPacket.cmdHeader.cmdID                 = kMJDFlashGretinaFPGA;
+        aPacket.cmdHeader.cmdID                 = kMJDFlashGretinaAFPGA;
         aPacket.cmdHeader.numberBytesinPayload	= sizeof(MJDFlashGretinaFPGAStruct);
         
         MJDFlashGretinaFPGAStruct* p = (MJDFlashGretinaFPGAStruct*) aPacket.payload;

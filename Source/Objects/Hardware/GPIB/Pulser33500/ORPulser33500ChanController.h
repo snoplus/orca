@@ -27,7 +27,8 @@
 	IBOutlet NSBox*				controlsView;
     IBOutlet NSTextField*		voltageField;
     IBOutlet NSTextField*		voltageOffsetField;
-    IBOutlet NSTextField*		frequencyField;
+    IBOutlet NSTextField*       frequencyField;
+    IBOutlet NSTextField*       dutyCycleField;
     IBOutlet NSTextField*		burstRateField;
     IBOutlet NSTextField*		burstPhaseField;
     IBOutlet NSTextField*		burstCountField;
@@ -41,7 +42,9 @@
     IBOutlet NSMatrix*			negativePulseMatrix;
     IBOutlet NSTextField*		voltageDisplay;
     IBOutlet NSTextField*		burstRateDisplay;
+    IBOutlet NSTextField*		freqLabel;
     IBOutlet ORCompositePlotView*	plotter;
+    IBOutlet NSButton*            burstModeCB;
     NSArray*                    topLevelObjects;
 }
 
@@ -57,10 +60,13 @@
 - (void) downloadWaveform;
 
 #pragma mark ***Interface Management
+- (void) updateFreqLabels;
 - (void) loadConstantsChanged:(NSNotification*)aNote;
 - (void) voltageChanged:(NSNotification*)aNote;
 - (void) voltageOffsetChanged:(NSNotification*)aNote;
 - (void) frequencyChanged:(NSNotification*)aNote;
+- (void) burstModeChanged:(NSNotification*)aNote;
+- (void) dutyCycleChanged:(NSNotification*)aNote;
 - (void) burstRateChanged:(NSNotification*)aNote;
 - (void) burstPhaseChanged:(NSNotification*)aNote;
 - (void) burstCountChanged:(NSNotification*)aNote;
@@ -78,6 +84,8 @@
 - (IBAction) voltageAction:(id)sender;
 - (IBAction) voltageOffsetAction:(id)sender;
 - (IBAction) frequencyAction:(id)sender;
+- (IBAction) dutyCycleAction:(id)sender;
+- (IBAction) burstModeAction:(id)sender;
 - (IBAction) burstRateAction:(id)sender;
 - (IBAction) burstPhaseAction:(id)sender;
 - (IBAction) burstCountAction:(id)sender;

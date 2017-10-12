@@ -79,7 +79,7 @@
 	unsigned char chan		= ShiftAndExtract(ptr[1], 8,0xff);
 	int boxcarLen           = ShiftAndExtract(ptr[1], 4,0x03);
 	int filterShapingLength = ShiftAndExtract(ptr[1], 0,0x0f);
-	unsigned long histoLen  = 4096;//=max. ADC value for 12 bit ADC
+	unsigned long histoLen  = 4*4096;
 	unsigned long filterDiv = 1L << filterShapingLength;
 	if(filterShapingLength==0){
 		filterDiv = boxcarLen + 1;
@@ -91,8 +91,8 @@
 
 	//note the ptr[6] shares the eventID and the energy
 	//the eventID must be masked off
-    //unsigned long energy = (ptr[6] & 0xfffff)/filterDiv; //keep this
-    unsigned long energy = (ptr[6] & 0xfffff)>>8; //scale to 4096
+    unsigned long energy = (ptr[6] & 0xfffff)/filterDiv; //keep this
+    //unsigned long energy = (ptr[6] & 0xfffff)>>8; //scale to 4096
 		
 	//channel by channel histograms
 	[aDataSet histogram:energy
@@ -383,7 +383,7 @@
 	int i;
     NSMutableString* hrString;
     if(version==0x1){
-	    hrString = [NSMutableString stringWithFormat:@"SLTsecond     = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
+	    hrString = [NSMutableString stringWithFormat:@"\nSLTsecond  = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
 						  ut_time,hitRateLengthSec,newTotal];
         for(i=0; i<countHREnabledChans; i++){
         unsigned long chan	= ShiftAndExtract(ptr[5+i],20,0xff);
@@ -395,12 +395,12 @@
             else
                 [hrString appendString: [NSString stringWithFormat:@"Chan %2lu    = %lu\n", chan,hitrate] ];
             //[hrString appendString: [NSString stringWithFormat:@"PilUpCnt %2d    = %d\n", chan,  pileupcount] ];
-            [hrString appendString: [NSString stringWithFormat:    @"  PilUpCnt = %lu\n",   pileupcount] ];
+            [hrString appendString: [NSString stringWithFormat:    @"PilUpCnt   = %lu\n",   pileupcount] ];
         }
         
     }
     else{
-	    hrString = [NSMutableString stringWithFormat:@"UTTime     = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
+	    hrString = [NSMutableString stringWithFormat:@"\nUTTime     = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
 						  ut_time,hitRateLengthSec,newTotal];
         for(i=0; i<length-5; i++){
         unsigned long chan	= ShiftAndExtract(ptr[5+i],20,0xff);

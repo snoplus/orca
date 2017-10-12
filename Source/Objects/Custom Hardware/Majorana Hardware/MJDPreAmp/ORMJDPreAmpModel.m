@@ -32,7 +32,6 @@
 
 #pragma mark ¥¥¥Notification Strings
 NSString* ORMJDPreAmpModelBoardRevChanged   = @"ORMJDPreAmpModelBoardRevChanged";
-NSString* ORMJDPreAmpModelUseSBCChanged     = @"ORMJDPreAmpModelUseSBCChanged";
 NSString* ORMJDPreAmpModelAdcEnabledMaskChanged = @"ORMJDPreAmpModelAdcEnabledMaskChanged";
 NSString* ORMJDPreAmpModelPollTimeChanged	= @"ORMJDPreAmpModelPollTimeChanged";
 NSString* ORMJDPreAmpModelShipValuesChanged = @"ORMJDPreAmpModelShipValuesChanged";
@@ -298,9 +297,11 @@ struct {
     id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
     if(connectedObj){
         connected = YES;
+        connectedToANLCard = [connectedObj isKindOfClass:NSClassFromString(@"ORGretina4AModel")];
     }
     else {
         connected = NO;
+        connectedToANLCard = NO;
         [self clearAllAlarms];
     }
 }
@@ -485,19 +486,7 @@ struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelFirmwareRevChanged object:self];
 }
 
-- (BOOL) useSBC
-{
-    return useSBC;
-}
 
-- (void) setUseSBC:(BOOL)aUseSBC
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setUseSBC:useSBC];
-    
-    useSBC = aUseSBC;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelUseSBCChanged object:self];
-}
 
 - (NSString*) detectorName:(int)i
 {
@@ -1024,19 +1013,26 @@ struct {
     [self readAllAdcs:NO];
 }
 
+
 - (void) readAllAdcs:(BOOL)verbose
 {
+    if(!connected)return;
     if(!rangesHaveBeenSet)[self writeAdcRanges];
     unsigned long rawAdcValue[16];
     int chan;
-    if([self controllerIsSBC] && useSBC ){
+    if([self controllerIsSBC] ){
+        
+        unsigned long cmdType;
+        if(connectedToANLCard)cmdType = kMJDReadPreampsANL;
+        else                  cmdType = kMJDReadPreamps;
+        
         //if an SBC is available we pass the request to read the adcs
         //to it.
         int chip;
         for(chip=0;chip<2;chip++){
             SBC_Packet aPacket;
             aPacket.cmdHeader.destination	= kMJD;
-            aPacket.cmdHeader.cmdID			= kMJDReadPreamps;
+            aPacket.cmdHeader.cmdID			= cmdType;
             aPacket.cmdHeader.numberBytesinPayload	= (8 + 3)*sizeof(long);
             
             GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
@@ -1066,119 +1062,6 @@ struct {
             }
             @catch(NSException* e){
                 
-            }
-        }
-        
-    }
-    else {
-        for(chan=0;chan<kMJDPreAmpAdcChannels;chan++){
-            if(adcEnabledMask & (0x1<<chan)){
-            
-                /*
-                unsigned long controlWord;
-                controlWord = (kControlReg << 13)               //sel the chan set
-                |((chan%8)<<10)                                 //set chan
-                |(mjdPreAmpTable[chan].conversionType << 5)
-                |(0x1 << 4)                                     //use internal voltage reference for conversion
-                |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-
-                
-            
-                //-------------------------------------------------------
-                //don't like the following where we have to read four times, but seems we have no choice
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                //-------------------------------------------------------
-                */
-                
-                unsigned long controlWord;
-                if( (chan%8)==0 ){
-                
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |((chan%8)<<10)                                 //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    // one latency here (will show up at power cycling the chips)
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |(((chan%8)+1)<<10)                             //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    
-                    
-                    
-                }
-                if( ((chan%8)>0) && ((chan%8)<5) ){
-                 
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |((chan%8)<<10)                                 //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |(((chan%8)+1)<<10)                             //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];                    
-                }
-                if( (chan%8)==5 ){
-                    
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |((chan%8)<<10)                                 //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |(((chan%8)+1)<<10)                             //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    // one latency here
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                }
-                if( (chan%8)==6 ){
-                    
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |((chan%8)<<10)                                 //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    // one write enough
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                }
-                if( (chan%8)==7 ){
-                    
-                    controlWord = (kControlReg << 13)               //sel the chan set
-                    |((chan%8)<<10)                                 //set chan
-                    |(mjdPreAmpTable[chan].conversionType << 5)
-                    |(0x1 << 4)                                     //use internal voltage reference for conversion
-                    |(mjdPreAmpTable[chan].mode << 8);              //set mode, other bits are zero
-                    
-                    // catch up previous writes
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                    rawAdcValue[chan] = [self writeAuxIOSPI:(mjdPreAmpTable[chan].adcSelection) | (controlWord<<8)];
-                }
             }
         }
         
@@ -1408,7 +1291,6 @@ struct {
 	
     [[self undoManager] disableUndoRegistration];
     [self setBoardRev:      [decoder decodeIntForKey:   @"boardRev"]];
-    [self setUseSBC:        [decoder decodeBoolForKey:  @"useSBC"]];
     [self setAdcEnabledMask:[decoder decodeInt32ForKey: @"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey:  @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:   @"pollTime"]];
@@ -1437,12 +1319,11 @@ struct {
     if(!dacs || !amplitudes || !feedBackResistors || !baselineVoltages)	[self setUpArrays];
 
     if(!baselineRunningAverages){
-        [self setBaselineRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kMJDPreAmpAdcChannels groupTag:0 withLength:10] autorelease]];
+        [self setBaselineRunningAverages:[[[ORRunningAverageGroup alloc] initGroup:kMJDPreAmpAdcChannels groupTag:0 withLength:4] autorelease]];
     }
     
-   // [baselineRunningAverages resetCounters:0];
     [baselineRunningAverages setVerbose:false];
-    [baselineRunningAverages setTriggerValue:1.5];
+    [baselineRunningAverages setTriggerValue:1];
     [baselineRunningAverages setTriggerType:kRASpikeOnThreshold];
     
     [self registerNotificationObservers];
@@ -1457,7 +1338,6 @@ struct {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:doNotUseHWMap   forKey:@"doNotUseHWMap"];
 	[encoder encodeInt:boardRev         forKey:@"boardRev"];
-	[encoder encodeBool:useSBC          forKey:@"useSBC"];
 	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
 	[encoder encodeInt:pollTime			forKey:@"pollTime"];

@@ -92,7 +92,8 @@
 		IBOutlet NSButton*		hitRateNoneButton;
 		IBOutlet NSButton*		triggersAllButton;
 		IBOutlet NSButton*		triggersNoneButton;
-		IBOutlet NSButton*		fireSoftwareTriggerButton;
+        IBOutlet NSButton*		fireSoftwareTriggerButton;
+        IBOutlet NSButton*		fireSoftwareTriggerButton1;
 		IBOutlet NSButton*		defaultsButton;
 		IBOutlet NSTextField*	group1NFoldField;
 		IBOutlet NSTextField*	group2NFoldField;
@@ -137,6 +138,7 @@
 		IBOutlet NSButton*		configTPButton;
 		IBOutlet NSButton*		fireTPButton;
 		IBOutlet NSButton*		resetTPButton;
+        IBOutlet NSPopUpButton* hitRateModePU;
 
 	
 		IBOutlet NSButton*      noiseFloorButton;
@@ -228,8 +230,10 @@
 - (void) writeValueChanged:(NSNotification*) aNote;
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
+- (void) hitRateModeChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
+- (IBAction) hitRateModeAction:(id)sender;
 - (IBAction) energyOffsetTextFieldAction:(id)sender;
 - (IBAction) forceFLTReadoutCBAction:(id)sender;
 - (IBAction) skipFltEventReadoutCBAction:(id)sender;

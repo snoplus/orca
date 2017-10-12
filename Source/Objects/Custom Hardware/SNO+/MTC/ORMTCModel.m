@@ -242,6 +242,10 @@ tubRegister;
         /* Setup MTCA Thresholds */
         [self loadTheMTCADacs];
 
+        /* Update the mapping between crates and channels on the front of the
+         * MTCA+s from the detector state database. */
+        [self loadMTCACrateMapping];
+
         /* Setup MTCA relays */
         [self mtcatLoadCrateMasks];
 
@@ -1952,6 +1956,19 @@ tubRegister;
 		NSLog(@"Failed to load Tub serial register\n");
 		[localException raise];
 	}
+}
+
+- (void) loadMTCACrateMapping
+{
+    /* Sends a command to the MTC server to update the mapping between crates
+     * and channels on the MTCA+s from the detector state database. */
+    @try {
+        [mtc okCommand:"load_mtca_crate_mapping"];
+    } @catch (NSException* e) {
+        NSLogColor([NSColor redColor], @"failed to update the MTCA+ crate mappings: %@\n", [e reason]);
+        [e raise];
+    }
+    NSLog(@"Successfully updated the MTCA+ crate mappings\n");
 }
 
 - (void) mtcatResetMtcat:(unsigned char) mtcat

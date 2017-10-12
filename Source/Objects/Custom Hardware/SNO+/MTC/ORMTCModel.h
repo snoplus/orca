@@ -270,6 +270,7 @@
 - (void) loadMTCXilinx;
 - (void) loadTubRegister;
 
+- (void) loadMTCACrateMapping;
 - (void) mtcatResetMtcat:(unsigned char) mtcat;
 - (void) mtcatResetAll;
 - (void) mtcatLoadCrateMasks;

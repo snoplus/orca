@@ -43,6 +43,10 @@
     [stopLight release];
     [super dealloc];
 }
+- (void) hideCautionLight
+{
+    hideCautionLight = YES;
+}
 
 #pragma mark ***Accessors
 
@@ -117,13 +121,17 @@
     else {
         [offLight      drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
     }
-    frame.origin.y += 35;
-    if(state == kCautionLight){
-        [cautionLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+    
+    if(!hideCautionLight){
+        frame.origin.y += 35;
+        if(state == kCautionLight){
+            [cautionLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+        }
+        else {
+            [offLight      drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+        }
     }
-    else {
-        [offLight      drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
-    }
+    
     frame.origin.y += 35;
     if(state == kGoLight){
         [goLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
@@ -134,3 +142,5 @@
 }
 
 @end
+
+
