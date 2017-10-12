@@ -197,10 +197,10 @@ tellieRunFiles = _tellieRunFiles;
 
     NSString* query = [NSString stringWithFormat:@"insert into orca_sessions (orca_version, hostname, osx_version) values ('%s', '%s', '%@') returning key", SNOP_ORCA_VERSION, hostname, osxVersion];
     ORPQResult* result = [dbLockConnection queryString:query];
-    self.sessionKey = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"key"];
+    [self setSessionKey:[[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"key"]];
 
     NSLog(@"Session: hostname: %s, orca: %s, os: %@, key: %@\n",
-          hostname, SNOP_ORCA_VERSION, osxVersion, self.sessionKey);
+          hostname, SNOP_ORCA_VERSION, osxVersion, [self sessionKey]);
 }
 
 /* Update the session DB with the end timestamp before Quitting. */
@@ -213,7 +213,7 @@ tellieRunFiles = _tellieRunFiles;
         return;
     }
 
-    NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", self.sessionKey];
+    NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", [self sessionKey]];
     NSLog(@"%@", query);
     [dbLockConnection queryString:query];
 }
@@ -233,11 +233,10 @@ tellieRunFiles = _tellieRunFiles;
     if (connected) {
         ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
         gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
-        NSLog(@"Obtaining lock for %@ on %@:%u/%@ ID %u\n",
-              _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID);
 
         if (![gotLock boolValue]) {
-            NSLogColor([NSColor redColor], @"Unable to obtain database lock.\n");
+            NSLogColor([NSColor redColor], @"Unable to obtain database lock: for %@ on %@:%u/%@ ID %u\n",
+                       _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID);
         }
     }
     else {

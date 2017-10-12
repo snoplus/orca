@@ -162,7 +162,7 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,copy) NSString* lockDBIPAddress;
 @property (nonatomic,assign) unsigned int lockDBPort;
 @property (nonatomic,assign) unsigned int lockDBLockID;
-@property (nonatomic,assign) NSNumber* sessionKey;
+@property (nonatomic,copy) NSNumber* sessionKey;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
