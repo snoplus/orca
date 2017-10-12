@@ -214,7 +214,6 @@ tellieRunFiles = _tellieRunFiles;
     }
 
     NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", [self sessionKey]];
-    NSLog(@"%@", query);
     [dbLockConnection queryString:query];
 }
 
@@ -635,17 +634,15 @@ tellieRunFiles = _tellieRunFiles;
     /* Check that no other Orca is controlling the detector, using a database lock. This will either block or quit. */
     [self checkDatabaseLock:true];
 
+    /* Post information about this Orca session the database. */
     [self postSessionStart];
 
     /* A timer to check the lock every 10 seconds, to make sure we still have it. */
-    //NSTimer* dbCheckTimer =
     [NSTimer scheduledTimerWithTimeInterval:10.0
-                                                    target:self
-                                                  selector:@selector(timerCheckDatabaseLock:)
-                                                  userInfo:nil
-                                                   repeats:YES];
-
-    //[[NSRunLoop mainRunLoop] addTimer:dbCheckTimer forMode:NSRunLoopCommonModes];
+                                     target:self
+                                   selector:@selector(timerCheckDatabaseLock:)
+                                   userInfo:nil
+                                    repeats:YES];
 
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
