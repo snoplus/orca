@@ -1661,12 +1661,12 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"[TELLIE]: A tellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
         return;
     }
-/*
+
     if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
         ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
-*/
+
     /////////////////////
     // Set a flag which defines if we should
     // roll over into maintenance or not.
