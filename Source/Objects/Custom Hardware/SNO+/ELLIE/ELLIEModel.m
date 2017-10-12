@@ -800,7 +800,7 @@ err:
         goto err;
     }
     SNOPModel* snopModel = [snopModels objectAtIndex:0];
-/*
+
     ///////////////////////
     // Check TELLIE run type is masked in
     if(!([snopModel lastRunTypeWord] & kTELLIERun)){
@@ -823,7 +823,7 @@ err:
         NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
         goto err;
     }
-*/
+
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
@@ -1182,9 +1182,20 @@ err:
     [self setEllieFireFlag:NO];
     [self setTellieMultiFlag:NO];
     
-    // Detatch thread and transition runs once the TELLIE thread has stopped executing
-    [NSThread detachNewThreadSelector:@selector(tellieRunTransition) toTarget:self withObject:nil];
-}
+    if([[self tellieThread] isExecuting]){
+
+        [[self tellieThread] cancel];
+
+        // Detatch thread and transition runs once the TELLIE thread has stopped executing
+        [NSThread detachNewThreadSelector:@selector(tellieRunTransition) toTarget:self withObject:nil];
+
+    } else {
+        // Tell run control it can stop waiting
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
+        });
+    }
+  }
 
 -(void)tellieRunTransition
 {
