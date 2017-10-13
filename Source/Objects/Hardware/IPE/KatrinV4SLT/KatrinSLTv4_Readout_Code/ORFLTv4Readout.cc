@@ -966,12 +966,13 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     hw4::FltKatrinEventFIFO2* eventFIFO2 = srack->theFlt[col]->eventFIFO2;
                     uint32_t f1                 = eventFIFO1->read();
                     uint32_t f2                 = eventFIFO2->read();
+     
                     uint32_t eventSec           = srack->theFlt[col]->eventFIFO4->read(0);
                     uint32_t channelMap         = eventFIFO1->channelMap->getCache();
                     uint32_t fifoEventID        = ((f1&0xff)<<4) | (f2>>28);
                     uint32_t eventSubsec        = eventFIFO2->subSec->getCache();
                     uint32_t adcoffset          = eventSubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)
-                    uint32_t traceStart16       = (adcoffset + postTriggerTime) % 2048;   //TODO: take this as standard from FW 2.1.1.4 on -tb-
+                    uint32_t traceStart16       = (adcoffset + postTriggerTime + 14) % 2048;   //TODO: take this as standard from FW 2.1.1.4 on -tb-
                     uint32_t precision          = eventFIFO2->timePrecision->getCache();
                     uint32_t waveformLength     = 2048;               //in shorts
                     uint32_t waveformLength32   = waveformLength/2;   //in longs
@@ -1001,10 +1002,17 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
                             //select the page and dma the waveform into the data buffer ... should have a safety check here in case need to dump record
                             srack->theSlt->pageSelect->write(0x100 | pagenr);
-                            srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)&data[dataIndex],1024);
+                            
+                            
+                            // Warning: This command does only work in DMA block readout and
+                            //          will fail, if the command is splitt in a sequence of single
+                            //          read operations !!!
+                            
+                            srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)&data[dataIndex],(traceStart16/2)%1024,1024);
                             dataIndex+=1024;
                         }
                     }
+                    
                 }
             }
   

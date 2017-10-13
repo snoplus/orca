@@ -216,12 +216,8 @@
     unsigned long traceStart16  = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
     
     unsigned short* dataPtr     = (unsigned short*)&ptr[9];
-    unsigned short* startPtr    = dataPtr+traceStart16;
     NSMutableData* waveformData = [NSMutableData dataWithLength:4096];
-
-    [waveformData replaceBytesInRange:NSMakeRange(0,4096-traceStart16*2) withBytes:startPtr];
-    
-    [waveformData replaceBytesInRange:NSMakeRange(4096-traceStart16*2,traceStart16*2) withBytes:dataPtr];
+    [waveformData replaceBytesInRange:NSMakeRange(0,4096) withBytes:dataPtr];
     
 	[aDataSet loadWaveform: waveformData
 					offset: 0
