@@ -972,7 +972,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                     uint32_t fifoEventID        = ((f1&0xff)<<4) | (f2>>28);
                     uint32_t eventSubsec        = eventFIFO2->subSec->getCache();
                     uint32_t adcoffset          = eventSubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)
-                    uint32_t traceStart16       = (adcoffset + postTriggerTime + 14) % 2048;   //TODO: take this as standard from FW 2.1.1.4 on -tb-
+                    uint32_t traceStart16       = (adcoffset + postTriggerTime) % 2048;   //TODO: take this as standard from FW 2.1.1.4 on -tb-
                     uint32_t precision          = eventFIFO2->timePrecision->getCache();
                     uint32_t waveformLength     = 2048;               //in shorts
                     uint32_t waveformLength32   = waveformLength/2;   //in longs
