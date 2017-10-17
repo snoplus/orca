@@ -54,7 +54,9 @@
 - (id) measuredValueItem:(int)i forKey:(NSString*)aKey;
 - (void) setSetPoint: (int)aIndex withValue: (float)value;
 - (void) setSetPointReadback: (int)aIndex withValue: (float)value;
-
+- (id) setPointAtIndex:(int)i;
+- (id) setPointReadBackAtIndex:(int)i;
+- (id) measuredValueAtIndex:(int)i;
 - (NetSocket*) socket;
 - (void) setSocket:(NetSocket*)aSocket;
 - (NSString*) ipAddress;

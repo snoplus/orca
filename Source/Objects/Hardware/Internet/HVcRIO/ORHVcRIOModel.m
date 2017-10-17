@@ -1017,7 +1017,20 @@ static NSString* measuredValueList[] = {
     measuredValues = anArray;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointsChanged object:self];
 }
-
+- (id) setPointAtIndex:(int)i
+{
+    if(i<[setPoints count]){
+        return [[setPoints objectAtIndex:i] objectForKey:@"setPoint"];
+    }
+    else return nil;
+}
+- (id) setPointReadBackAtIndex:(int)i
+{
+    if(i<[setPoints count]){
+        return [[setPoints objectAtIndex:i] objectForKey:@"readBack"];
+    }
+    else return nil;
+}
 - (id) setPointItem:(int)i forKey:(NSString*)aKey
 {
     if(i<[setPoints count]){
@@ -1030,6 +1043,14 @@ static NSString* measuredValueList[] = {
 {
     if(i<[measuredValues count]){
         return [[measuredValues objectAtIndex:i] objectForKey:aKey];
+    }
+    else return nil;
+}
+
+- (id) measuredValueAtIndex:(int)i
+{
+    if(i<[measuredValues count]){
+        return [[measuredValues objectAtIndex:i] objectForKey:@"value"];
     }
     else return nil;
 }
@@ -1250,7 +1271,11 @@ static NSString* measuredValueList[] = {
                               @"readBackSetpoints",
                               @"readMeasuredValues",
                               @"readSetPointsFile:(NSString*)",
-                              @"setSetPoint: (int) withValue:(float)",
+                              @"setSetPoint:(int) withValue:(float)",
+                              @"setPointAtIndex:(int)",
+                              @"setPointReadBackAtIndex:(int)",
+                              @"measuredValueAtIndex:(int)",
+
                               nil];
     
     return [selectorArray componentsJoinedByString:@"\n"];
