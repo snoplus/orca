@@ -1252,10 +1252,12 @@ static NSString* measuredValueList[] = {
 {
 	return [cmdQueue count];
 }
+
 - (BOOL) isBusy
 {
-    return [self queCount]!=0;
+    return [self queCount]!=0 || lastRequest!=nil;
 }
+
 - (NSString*) lastRequest
 {
 	return lastRequest;
