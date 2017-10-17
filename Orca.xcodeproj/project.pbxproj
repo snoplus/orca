@@ -393,8 +393,6 @@
 		543BF2041E5481C3003E4582 /* HVcRIO.tif in Resources */ = {isa = PBXBuildFile; fileRef = 543BF1FC1E5481C3003E4582 /* HVcRIO.tif */; };
 		543BF2051E5481C3003E4582 /* ORHVcRIOController.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */; };
 		543BF2061E5481C3003E4582 /* ORHVcRIOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */; };
-		543BF2071E5481C3003E4582 /* ORHVcRIODecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */; };
-		543BF2081E5481C3003E4582 /* ORHVcRIODecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */; };
 		543BF2091E5481C3003E4582 /* ORHVcRIOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */; };
 		543BF20A1E5481C3003E4582 /* ORHVcRIOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
@@ -4146,8 +4144,6 @@
 		543BF1FC1E5481C3003E4582 /* HVcRIO.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HVcRIO.tif; path = HVcRIO/HVcRIO.tif; sourceTree = "<group>"; };
 		543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOController.h; path = HVcRIO/ORHVcRIOController.h; sourceTree = "<group>"; };
 		543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIOController.m; path = HVcRIO/ORHVcRIOController.m; sourceTree = "<group>"; };
-		543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIODecoders.h; path = HVcRIO/ORHVcRIODecoders.h; sourceTree = "<group>"; };
-		543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIODecoders.m; path = HVcRIO/ORHVcRIODecoders.m; sourceTree = "<group>"; };
 		543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOModel.h; path = HVcRIO/ORHVcRIOModel.h; sourceTree = "<group>"; };
 		543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIOModel.m; path = HVcRIO/ORHVcRIOModel.m; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
@@ -7851,8 +7847,6 @@
 				543BF1FC1E5481C3003E4582 /* HVcRIO.tif */,
 				543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */,
 				543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */,
-				543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */,
-				543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */,
 				543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */,
 				543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */,
 			);
@@ -15528,7 +15522,6 @@
 				84A5CD5B0D464F4600D9833C /* ORFilterController.h in Headers */,
 				84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */,
 				9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */,
-				543BF2071E5481C3003E4582 /* ORHVcRIODecoders.h in Headers */,
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
 				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
@@ -18141,7 +18134,6 @@
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
 				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
 				8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */,
-				543BF2081E5481C3003E4582 /* ORHVcRIODecoders.m in Sources */,
 				4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */,
 				4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */,
 				EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */,
