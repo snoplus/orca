@@ -1217,7 +1217,8 @@ static NSString* measuredValueList[] = {
 
 - (NSString*) setPointFile
 {
-    return setPointFile;
+    if(setPointFile==nil)return @"";
+    else return setPointFile;
 }
 
 - (void) setSetPointFile:(NSString*)aPath
@@ -1242,7 +1243,18 @@ static NSString* measuredValueList[] = {
 	[lastRequest release];
 	lastRequest = aRequest;    
 }
-
+- (NSString*) commonScriptMethods
+{
+    NSArray* selectorArray = [NSArray arrayWithObjects:
+                              @"writeSetpoints",
+                              @"readBackSetpoints",
+                              @"readMeasuredValues",
+                              @"readSetPointsFile:(NSString*)",
+                              @"setSetPoint: (int) withValue:(float)",
+                              nil];
+    
+    return [selectorArray componentsJoinedByString:@"\n"];
+}
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {

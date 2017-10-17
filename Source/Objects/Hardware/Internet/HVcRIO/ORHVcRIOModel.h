@@ -48,6 +48,7 @@
 
 #pragma mark ***Initialization
 - (void) dealloc;
+- (NSString*) commonScriptMethods;
 
 #pragma mark ***Accessors
 - (id) setPointItem:(int)i forKey:(NSString*)aKey;
