@@ -43,7 +43,6 @@
         BOOL                expertPCControlOnly;
         BOOL                zeusHasControl;
         BOOL                orcaHasControl;
-
 }
 
 #pragma mark ***Initialization
