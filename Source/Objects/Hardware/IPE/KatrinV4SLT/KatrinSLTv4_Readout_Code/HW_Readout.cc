@@ -596,6 +596,19 @@ void readSltSecSubsec(uint32_t & sec, uint32_t & subsec)
 
 void setHostTimeToFLTsAndSLT(int32_t* args)
 {
+    unsigned long time;
+    
+    time = srack->setSecondCounter();
+    
+    if (time > 0)
+        printf("Set second counter to %lds\n", time);
+    else
+        printf("The timer was not set properly - repeat!\n");
+
+    
+    /*
+   
+     
     uint32_t flags=args[0];
     uint32_t secondsSet=args[1];
     //DEBUG    fprintf(stderr,"setHostTimeToFLTsAndSLT(int32_t* args):   args 0x%x %u\n",flags,secondsSet);
@@ -677,6 +690,7 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
 	    //DEBUG    fprintf(stdout,"setHostTimeToFLTsAndSLT:  SLT timer already OK:  sec %u,   subsec %u, setpoint %u\n", sltsec,  sltsubsec, secSetpoint);//TODO: DEBUG -tb-
     }
 
+     */
 }
 
 
