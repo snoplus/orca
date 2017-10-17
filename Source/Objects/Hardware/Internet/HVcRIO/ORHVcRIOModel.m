@@ -1252,7 +1252,10 @@ static NSString* measuredValueList[] = {
 {
 	return [cmdQueue count];
 }
-
+- (BOOL) isBusy
+{
+    return [self queCount]!=0;
+}
 - (NSString*) lastRequest
 {
 	return lastRequest;
@@ -1267,6 +1270,7 @@ static NSString* measuredValueList[] = {
 - (NSString*) commonScriptMethods
 {
     NSArray* selectorArray = [NSArray arrayWithObjects:
+                              @"isBusy",
                               @"writeSetpoints",
                               @"readBackSetpoints",
                               @"readMeasuredValues",
@@ -1275,7 +1279,6 @@ static NSString* measuredValueList[] = {
                               @"setPointAtIndex:(int)",
                               @"setPointReadBackAtIndex:(int)",
                               @"measuredValueAtIndex:(int)",
-
                               nil];
     
     return [selectorArray componentsJoinedByString:@"\n"];

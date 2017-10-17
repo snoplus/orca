@@ -43,6 +43,7 @@
         BOOL                expertPCControlOnly;
         BOOL                zeusHasControl;
         BOOL                orcaHasControl;
+        BOOL                isBusy;
 }
 
 #pragma mark ***Initialization
@@ -74,6 +75,7 @@
 - (NSString*) lastRequest;
 - (void) setLastRequest:(NSString*)aRequest;
 - (int) queCount;
+- (BOOL) isBusy;
 - (void) flushQueue;
 - (void) createSetPointArray;
 - (NSInteger) numSetPoints;
