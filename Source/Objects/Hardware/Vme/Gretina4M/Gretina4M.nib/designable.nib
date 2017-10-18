@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
         <capability name="box content view" minToolsVersion="7.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORGretina4MController">
@@ -126,11 +126,11 @@
                         <tabViewItems>
                             <tabViewItem label="Basic Ops" identifier="" id="1337">
                                 <view key="view" id="1339">
-                                    <rect key="frame" x="10" y="29" width="932" height="417"/>
+                                    <rect key="frame" x="10" y="25" width="932" height="421"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box boxType="secondary" borderType="bezel" title="Board Ops" titlePosition="noTitle" id="1214">
-                                            <rect key="frame" x="44" y="3" width="886" height="33"/>
+                                            <rect key="frame" x="44" y="7" width="886" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="J11-eo-Ggn">
                                                 <rect key="frame" x="3" y="3" width="880" height="27"/>
@@ -229,7 +229,7 @@
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
                                         <button id="1224">
-                                            <rect key="frame" x="6" y="7" width="33" height="36"/>
+                                            <rect key="frame" x="6" y="11" width="33" height="36"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" state="on" inset="2" id="2271">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -240,13 +240,13 @@
                                             </connections>
                                         </button>
                                         <box title="Card Parameters" id="1298">
-                                            <rect key="frame" x="28" y="336" width="902" height="78"/>
+                                            <rect key="frame" x="28" y="340" width="902" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="CN0-Dj-s1V">
                                                 <rect key="frame" x="2" y="2" width="898" height="62"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1285">
+                                                    <textField verticalHuggingPriority="750" id="1285">
                                                         <rect key="frame" x="7" y="33" width="50" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Window" id="2272">
@@ -255,7 +255,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="nEe-B6-szr">
+                                                    <textField verticalHuggingPriority="750" id="nEe-B6-szr">
                                                         <rect key="frame" x="34" y="48" width="91" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="External Trigger" id="cPS-1f-UhQ">
@@ -264,7 +264,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1286">
+                                                    <textField verticalHuggingPriority="750" id="1286">
                                                         <rect key="frame" x="236" y="36" width="89" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Pileup Window" id="2273">
@@ -273,7 +273,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1288">
+                                                    <textField verticalHuggingPriority="750" id="1288">
                                                         <rect key="frame" x="86" y="33" width="48" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Length" id="2274">
@@ -282,7 +282,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1290">
+                                                    <textField verticalHuggingPriority="750" id="1290">
                                                         <rect key="frame" x="488" y="36" width="71" height="26"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Integration Time" id="2276">
@@ -291,7 +291,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1291">
+                                                    <textField verticalHuggingPriority="750" id="1291">
                                                         <rect key="frame" x="404" y="34" width="72" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Collection Time" id="2277">
@@ -300,7 +300,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2458">
+                                                    <textField verticalHuggingPriority="750" id="2458">
                                                         <rect key="frame" x="644" y="39" width="87" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Down Sample" id="2459">
@@ -309,7 +309,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1308">
+                                                    <textField verticalHuggingPriority="750" id="1308">
                                                         <rect key="frame" x="297" y="13" width="22" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="µs" id="2278">
@@ -318,7 +318,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="Jee-fe-Pgu">
+                                                    <textField verticalHuggingPriority="750" id="Jee-fe-Pgu">
                                                         <rect key="frame" x="384" y="13" width="22" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="µs" id="Ert-6q-2vf">
@@ -327,7 +327,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2540">
+                                                    <textField verticalHuggingPriority="750" id="2540">
                                                         <rect key="frame" x="50" y="13" width="22" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="µs" id="2541">
@@ -336,7 +336,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1310">
+                                                    <textField verticalHuggingPriority="750" id="1310">
                                                         <rect key="frame" x="127" y="13" width="22" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="µs" id="2280">
@@ -345,7 +345,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1311">
+                                                    <textField verticalHuggingPriority="750" id="1311">
                                                         <rect key="frame" x="458" y="13" width="22" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="µs" id="2281">
@@ -354,7 +354,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1312">
+                                                    <textField verticalHuggingPriority="750" id="1312">
                                                         <rect key="frame" x="539" y="13" width="22" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="µs" id="2282">
@@ -400,7 +400,7 @@
                                                             <action selector="clockSourceAction:" target="-2" id="3785"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2537">
+                                                    <textField verticalHuggingPriority="750" id="2537">
                                                         <rect key="frame" x="10" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="2538">
@@ -413,7 +413,7 @@
                                                             <action selector="externalWindowFieldAction:" target="-2" id="2560"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2542">
+                                                    <textField verticalHuggingPriority="750" id="2542">
                                                         <rect key="frame" x="254" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="2543">
@@ -426,7 +426,7 @@
                                                             <action selector="pileUpWindowFieldAction:" target="-2" id="2563"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3786">
+                                                    <textField verticalHuggingPriority="750" id="3786">
                                                         <rect key="frame" x="154" y="36" width="81" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Noise Window" id="3792">
@@ -435,7 +435,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3787">
+                                                    <textField verticalHuggingPriority="750" id="3787">
                                                         <rect key="frame" x="214" y="13" width="22" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="ns" id="3791">
@@ -444,7 +444,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3788">
+                                                    <textField verticalHuggingPriority="750" id="3788">
                                                         <rect key="frame" x="171" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="3789">
@@ -457,7 +457,7 @@
                                                             <action selector="noiseWindowAction:" target="-2" id="3797"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2545">
+                                                    <textField verticalHuggingPriority="750" id="2545">
                                                         <rect key="frame" x="87" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="2546">
@@ -470,7 +470,7 @@
                                                             <action selector="extTrigLengthFieldAction:" target="-2" id="2561"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="X9R-Tb-Hu3">
+                                                    <textField verticalHuggingPriority="750" id="X9R-Tb-Hu3">
                                                         <rect key="frame" x="329" y="34" width="68" height="28"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="BL Restore Delay" id="0CI-ve-7ab">
@@ -479,7 +479,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField toolTip="Baseline Restored Delay Time" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="g3B-6q-Y52">
+                                                    <textField toolTip="Baseline Restored Delay Time" verticalHuggingPriority="750" id="g3B-6q-Y52">
                                                         <rect key="frame" x="339" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="27T-C3-wqv">
@@ -492,7 +492,7 @@
                                                             <action selector="baselineRestoredDelayAction:" target="-2" id="0a4-xh-Ono"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2548">
+                                                    <textField verticalHuggingPriority="750" id="2548">
                                                         <rect key="frame" x="418" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="2549">
@@ -505,7 +505,7 @@
                                                             <action selector="collectionTimeFieldAction:" target="-2" id="2559"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2551">
+                                                    <textField verticalHuggingPriority="750" id="2551">
                                                         <rect key="frame" x="498" y="13" width="47" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="12.444" drawsBackground="YES" id="2552">
@@ -518,7 +518,7 @@
                                                             <action selector="integrateTimeFieldAction:" target="-2" id="2562"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3837">
+                                                    <textField verticalHuggingPriority="750" id="3837">
                                                         <rect key="frame" x="595" y="12" width="22" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" id="3841">
@@ -527,7 +527,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="tM3-6f-VT5">
+                                                    <textField verticalHuggingPriority="750" id="tM3-6f-VT5">
                                                         <rect key="frame" x="561" y="40" width="75" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Clock" id="vjK-Qf-Tf2">
@@ -536,9 +536,9 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="ift-sH-IFa">
+                                                    <textField verticalHuggingPriority="750" id="ift-sH-IFa">
                                                         <rect key="frame" x="557" y="32" width="87" height="11"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="mini" sendsActionOnEndEditing="YES" alignment="center" title=" " id="Vqh-yO-4Dw">
                                                             <font key="font" metaFont="miniSystem"/>
                                                             <color key="textColor" red="0.54891304350000003" green="0.054213633919999997" blue="0.054213633919999997" alpha="1" colorSpace="calibratedRGB"/>
@@ -575,7 +575,7 @@
                                                             <action selector="clockPhaseAction:" target="-2" id="BVh-A4-OUz"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="xcT-HR-11g">
+                                                    <textField verticalHuggingPriority="750" id="xcT-HR-11g">
                                                         <rect key="frame" x="729" y="38" width="87" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Clock Phase" id="Nec-kj-YiV">
@@ -589,12 +589,12 @@
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
                                         <imageView id="1307">
-                                            <rect key="frame" x="6" y="344" width="21" height="70"/>
+                                            <rect key="frame" x="6" y="348" width="21" height="70"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Gretina4Card" id="2283"/>
                                         </imageView>
                                         <box title="Channel Parameters" id="1703">
-                                            <rect key="frame" x="2" y="65" width="928" height="274"/>
+                                            <rect key="frame" x="2" y="69" width="928" height="274"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="G8R-kj-aQr">
                                                 <rect key="frame" x="2" y="2" width="924" height="258"/>
@@ -1117,7 +1117,7 @@
                                                             <action selector="postrecntAction:" target="-2" id="3669"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1707">
+                                                    <textField verticalHuggingPriority="750" id="1707">
                                                         <rect key="frame" x="20" y="218" width="24" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="EN" id="2300">
@@ -1126,7 +1126,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1709">
+                                                    <textField verticalHuggingPriority="750" id="1709">
                                                         <rect key="frame" x="57" y="214" width="24" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="PU" id="2302">
@@ -1193,7 +1193,7 @@
                                                             <action selector="presumEnabledAction:" target="-2" id="3766"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3753">
+                                                    <textField verticalHuggingPriority="750" id="3753">
                                                         <rect key="frame" x="38" y="216" width="24" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="PS" id="3754">
@@ -1202,7 +1202,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1713">
+                                                    <textField verticalHuggingPriority="750" id="1713">
                                                         <rect key="frame" x="199" y="217" width="59" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Polarity" id="2303">
@@ -1211,7 +1211,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1714">
+                                                    <textField verticalHuggingPriority="750" id="1714">
                                                         <rect key="frame" x="257" y="217" width="89" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Trigger Mode" id="2304">
@@ -1220,7 +1220,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1715">
+                                                    <textField verticalHuggingPriority="750" id="1715">
                                                         <rect key="frame" x="364" y="219" width="33" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="LED" id="2305">
@@ -1299,7 +1299,7 @@
                                                             <outlet property="formatter" destination="387" id="3812"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3799">
+                                                    <textField verticalHuggingPriority="750" id="3799">
                                                         <rect key="frame" x="429" y="216" width="68" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Trapezoid" id="3800">
@@ -1308,7 +1308,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3830">
+                                                    <textField verticalHuggingPriority="750" id="3830">
                                                         <rect key="frame" x="404" y="220" width="38" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="-&gt;" id="3831">
@@ -1317,7 +1317,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3827">
+                                                    <textField verticalHuggingPriority="750" id="3827">
                                                         <rect key="frame" x="352" y="235" width="144" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Descriminator Thresholds" id="3828">
@@ -1326,7 +1326,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1722">
+                                                    <textField verticalHuggingPriority="750" id="1722">
                                                         <rect key="frame" x="849" y="234" width="31" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Data" id="2312">
@@ -1335,7 +1335,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2613">
+                                                    <textField verticalHuggingPriority="750" id="2613">
                                                         <rect key="frame" x="812" y="218" width="38" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="FT" id="2614">
@@ -1344,7 +1344,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2615">
+                                                    <textField verticalHuggingPriority="750" id="2615">
                                                         <rect key="frame" x="492" y="219" width="56" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="MRPSRT" id="2616">
@@ -1353,7 +1353,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2617">
+                                                    <textField verticalHuggingPriority="750" id="2617">
                                                         <rect key="frame" x="551" y="219" width="56" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="MRPSDV" id="2618">
@@ -1366,7 +1366,7 @@
                                                         <rect key="frame" x="855" y="231" width="25" height="5"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </box>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3671">
+                                                    <textField verticalHuggingPriority="750" id="3671">
                                                         <rect key="frame" x="499" y="234" width="225" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Window Timing" id="3673">
@@ -1375,7 +1375,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3675">
+                                                    <textField verticalHuggingPriority="750" id="3675">
                                                         <rect key="frame" x="729" y="232" width="120" height="17"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Data Window" id="3676">
@@ -1454,7 +1454,7 @@
                                                             <action selector="poleZeroEnabledAction:" target="-2" id="1992"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1989">
+                                                    <textField verticalHuggingPriority="750" id="1989">
                                                         <rect key="frame" x="88" y="216" width="25" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="PZ" id="2318">
@@ -1521,7 +1521,7 @@
                                                             <action selector="baselineRestoreEnabledAction:" target="-2" id="XfK-EE-18S"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="jwv-ax-LVK">
+                                                    <textField verticalHuggingPriority="750" id="jwv-ax-LVK">
                                                         <rect key="frame" x="109" y="216" width="29" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="BLR" id="ZmO-FT-q1n">
@@ -1609,7 +1609,7 @@
                                                             <action selector="poleZeroTauAction:" target="-2" id="2486"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2471">
+                                                    <textField verticalHuggingPriority="750" id="2471">
                                                         <rect key="frame" x="139" y="216" width="58" height="15"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="PZ τ (µs)" id="2472">
@@ -1676,7 +1676,7 @@
                                                             <action selector="pzTraceEnabledAction:" target="-2" id="2502"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2488">
+                                                    <textField verticalHuggingPriority="750" id="2488">
                                                         <rect key="frame" x="851" y="219" width="30" height="12"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="PZT" id="2489">
@@ -1743,7 +1743,7 @@
                                                             <action selector="forceFullInitAction:" target="-2" id="PgK-PG-OhV"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2619">
+                                                    <textField verticalHuggingPriority="750" id="2619">
                                                         <rect key="frame" x="609" y="219" width="56" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="CHPSRT" id="2627">
@@ -1752,7 +1752,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2637">
+                                                    <textField verticalHuggingPriority="750" id="2637">
                                                         <rect key="frame" x="662" y="219" width="56" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="CHPSDV" id="2638">
@@ -1761,7 +1761,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2665">
+                                                    <textField verticalHuggingPriority="750" id="2665">
                                                         <rect key="frame" x="724" y="218" width="44" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="PRERE" id="2666">
@@ -1770,7 +1770,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2667">
+                                                    <textField verticalHuggingPriority="750" id="2667">
                                                         <rect key="frame" x="763" y="219" width="49" height="13"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="POSTRE" id="2668">
@@ -2630,7 +2630,7 @@
                                                             <action selector="chsrtAction:" target="-2" id="3665"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="oys-XV-c7b">
+                                                    <textField verticalHuggingPriority="750" id="oys-XV-c7b">
                                                         <rect key="frame" x="880" y="222" width="43" height="26"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Forced Init" id="UGy-wO-bhT">
@@ -2643,8 +2643,8 @@
                                             </view>
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1710">
-                                            <rect key="frame" x="4" y="40" width="515" height="28"/>
+                                        <textField verticalHuggingPriority="750" id="1710">
+                                            <rect key="frame" x="4" y="44" width="515" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="2319">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -2654,7 +2654,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" id="3892">
-                                            <rect key="frame" x="754" y="41" width="80" height="28"/>
+                                            <rect key="frame" x="754" y="45" width="80" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Easy Set..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3893">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2665,29 +2665,29 @@
                                             </connections>
                                         </button>
                                         <box verticalHuggingPriority="750" boxType="separator" id="3895">
-                                            <rect key="frame" x="831" y="53" width="17" height="5"/>
+                                            <rect key="frame" x="831" y="57" width="17" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
                                         <box horizontalHuggingPriority="750" boxType="separator" id="3896">
-                                            <rect key="frame" x="845" y="55" width="5" height="10"/>
+                                            <rect key="frame" x="845" y="59" width="5" height="10"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
                                         <box verticalHuggingPriority="750" boxType="separator" id="3897">
-                                            <rect key="frame" x="739" y="53" width="17" height="5"/>
+                                            <rect key="frame" x="739" y="57" width="17" height="5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
                                         <box horizontalHuggingPriority="750" boxType="separator" id="3898">
-                                            <rect key="frame" x="737" y="55" width="5" height="10"/>
+                                            <rect key="frame" x="737" y="59" width="5" height="10"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         </box>
                                         <box boxType="secondary" borderType="bezel" title="Integration Time (s)" titlePosition="noTitle" id="5h2-Z8-L2f">
-                                            <rect key="frame" x="582" y="37" width="141" height="34"/>
+                                            <rect key="frame" x="582" y="41" width="141" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="HCh-Ks-2Ca">
                                                 <rect key="frame" x="3" y="3" width="135" height="28"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1gZ-cc-SHh">
+                                                    <textField verticalHuggingPriority="750" id="1gZ-cc-SHh">
                                                         <rect key="frame" x="6" y="6" width="38" height="18"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="7Ju-r1-Oku">
@@ -2699,7 +2699,7 @@
                                                             <action selector="histEMultiplierAction:" target="-2" id="2SP-P5-4Ia"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="pes-tG-qNh">
+                                                    <textField verticalHuggingPriority="750" id="pes-tG-qNh">
                                                         <rect key="frame" x="49" y="-33" width="122" height="54"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="hist E multiplier" id="1jH-Gw-0lM">
@@ -2738,7 +2738,7 @@
                                                 <action selector="registerIndexPUAction:" target="-2" id="2415"/>
                                             </connections>
                                         </popUpButton>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2388">
+                                        <textField verticalHuggingPriority="750" id="2388">
                                             <rect key="frame" x="216" y="346" width="64" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="2389">
@@ -2773,7 +2773,7 @@
                                                 <action selector="writeRegisterAction:" target="-2" id="2399"/>
                                             </connections>
                                         </button>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2401">
+                                        <textField verticalHuggingPriority="750" id="2401">
                                             <rect key="frame" x="141" y="347" width="65" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Write Value" id="2402">
@@ -2782,7 +2782,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2514">
+                                        <textField verticalHuggingPriority="750" id="2514">
                                             <rect key="frame" x="216" y="268" width="64" height="19"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="2519">
@@ -2883,7 +2883,7 @@
                                                 <action selector="diagnosticsClearAction:" target="-2" id="6pD-zD-jvR"/>
                                             </connections>
                                         </button>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2516">
+                                        <textField verticalHuggingPriority="750" id="2516">
                                             <rect key="frame" x="141" y="269" width="65" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Write Value" id="2517">
@@ -2892,7 +2892,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2422">
+                                        <textField verticalHuggingPriority="750" id="2422">
                                             <rect key="frame" x="63" y="368" width="218" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Disabled Items must be set in Basic Ops" id="2423">
@@ -2901,7 +2901,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2520">
+                                        <textField verticalHuggingPriority="750" id="2520">
                                             <rect key="frame" x="173" y="286" width="150" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Aux IO Serial Interface" id="2521">
@@ -2915,7 +2915,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="Gretina4Card" id="2406"/>
                                         </imageView>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2419">
+                                        <textField verticalHuggingPriority="750" id="2419">
                                             <rect key="frame" x="108" y="320" width="175" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="2420">
@@ -2962,7 +2962,7 @@
                                                 <action selector="doHwCheckButtonAction:" target="-2" id="OS8-Yl-OmK"/>
                                             </connections>
                                         </button>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="sLj-c7-28U">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="sLj-c7-28U">
                                             <rect key="frame" x="74" y="32" width="35" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="State:" id="r4G-am-Bnr">
@@ -2971,7 +2971,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="quZ-bV-GZT">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="quZ-bV-GZT">
                                             <rect key="frame" x="113" y="32" width="297" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="eyq-lG-qEm">
@@ -2980,7 +2980,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="L0O-MK-b9n">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="L0O-MK-b9n">
                                             <rect key="frame" x="63" y="15" width="46" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Locked:" id="Qjs-dK-bc4">
@@ -2989,7 +2989,7 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="ucP-Su-UDE">
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="ucP-Su-UDE">
                                             <rect key="frame" x="113" y="15" width="35" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="I9z-Ja-l8Z">
@@ -3050,7 +3050,7 @@
                                                 <rect key="frame" x="3" y="3" width="88" height="28"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1345">
+                                                    <textField verticalHuggingPriority="750" id="1345">
                                                         <rect key="frame" x="6" y="5" width="29" height="18"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="2331">
@@ -3072,7 +3072,7 @@
                                                             <action selector="integrationAction:" target="-2" id="1471"/>
                                                         </connections>
                                                     </stepper>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1344">
+                                                    <textField verticalHuggingPriority="750" id="1344">
                                                         <rect key="frame" x="59" y="7" width="29" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="secs" id="2330">
@@ -3297,7 +3297,7 @@
                                                             </column>
                                                         </cells>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1386">
+                                                    <textField verticalHuggingPriority="750" id="1386">
                                                         <rect key="frame" x="4" y="235" width="40" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Chan" id="2338">
@@ -3306,7 +3306,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1352">
+                                                    <textField verticalHuggingPriority="750" id="1352">
                                                         <rect key="frame" x="190" y="232" width="87" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Counts/sec" id="2334">
@@ -3319,7 +3319,7 @@
                                                         <rect key="frame" x="12" y="230" width="376" height="5"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                     </box>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1353">
+                                                    <textField verticalHuggingPriority="750" id="1353">
                                                         <rect key="frame" x="34" y="29" width="35" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Total:" id="2335">
@@ -3328,7 +3328,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1378">
+                                                    <textField verticalHuggingPriority="750" id="1378">
                                                         <rect key="frame" x="71" y="24" width="69" height="19"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" id="2336">
@@ -3430,7 +3430,7 @@
                                                             <action selector="enabledAction:" target="-2" id="1734"/>
                                                         </connections>
                                                     </matrix>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1349">
+                                                    <textField verticalHuggingPriority="750" id="1349">
                                                         <rect key="frame" x="46" y="235" width="43" height="14"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Online" id="2333">
@@ -3468,7 +3468,7 @@
                                                 <action selector="setLogY:" target="2441" id="2469"/>
                                             </connections>
                                         </button>
-                                        <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1458">
+                                        <textField verticalHuggingPriority="750" id="1458">
                                             <rect key="frame" x="463" y="371" width="129" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Total Rate vs. Time" id="2340">
@@ -3510,7 +3510,7 @@
                                                             <action selector="downloadMainFPGAAction:" target="-2" id="2216"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2217">
+                                                    <textField verticalHuggingPriority="750" id="2217">
                                                         <rect key="frame" x="15" y="90" width="55" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="FPGA file:" id="2325">
@@ -3519,7 +3519,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2219">
+                                                    <textField verticalHuggingPriority="750" id="2219">
                                                         <rect key="frame" x="72" y="90" width="189" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="---" id="2326">
@@ -3543,7 +3543,7 @@
                                                             <action selector="stopLoadingMainFPGAAction:" target="-2" id="2232"/>
                                                         </connections>
                                                     </button>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="2227">
+                                                    <textField verticalHuggingPriority="750" id="2227">
                                                         <rect key="frame" x="81" y="41" width="98" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="---" id="2328">
@@ -3552,7 +3552,7 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="8Na-dz-qN1">
+                                                    <textField verticalHuggingPriority="750" id="8Na-dz-qN1">
                                                         <rect key="frame" x="16" y="8" width="245" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingMiddle" sendsActionOnEndEditing="YES" alignment="left" title="---" id="H9h-oB-q5B">
@@ -3601,7 +3601,7 @@
                             <action selector="findNoiseFloors:" target="-2" id="1492"/>
                         </connections>
                     </button>
-                    <textField toolTip="Value added to LED threshold when finished" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1486">
+                    <textField toolTip="Value added to LED threshold when finished" verticalHuggingPriority="750" id="1486">
                         <rect key="frame" x="31" y="20" width="39" height="19"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="2344">
@@ -3613,7 +3613,7 @@
                             <action selector="noiseFloorOffsetAction:" target="-2" id="1491"/>
                         </connections>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1487">
+                    <textField verticalHuggingPriority="750" id="1487">
                         <rect key="frame" x="34" y="75" width="322" height="21"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Try to set Thresholds on enabled channels" id="2345">
@@ -3622,7 +3622,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1488">
+                    <textField verticalHuggingPriority="750" id="1488">
                         <rect key="frame" x="75" y="22" width="71" height="14"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Final Offset" id="2346">
@@ -3646,7 +3646,7 @@
                         <rect key="frame" x="245" y="39" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </progressIndicator>
-                    <textField toolTip="Time spent waiting for events to accumulate" verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1505">
+                    <textField toolTip="Time spent waiting for events to accumulate" verticalHuggingPriority="750" id="1505">
                         <rect key="frame" x="31" y="48" width="39" height="19"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="2348">
@@ -3665,7 +3665,7 @@
                             <action selector="noiseFloorIntegrationAction:" target="-2" id="1507"/>
                         </connections>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="1506">
+                    <textField verticalHuggingPriority="750" id="1506">
                         <rect key="frame" x="75" y="50" width="102" height="14"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Integration Time" id="2349">
@@ -3861,7 +3861,7 @@
                             <rect key="frame" x="1" y="1" width="120" height="132"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3956">
+                                <textField verticalHuggingPriority="750" id="3956">
                                     <rect key="frame" x="33" y="115" width="54" height="14"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Pre Edge" id="3957">
@@ -3870,7 +3870,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3958">
+                                <textField verticalHuggingPriority="750" id="3958">
                                     <rect key="frame" x="32" y="75" width="56" height="14"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Post Edge" id="3959">
@@ -3879,7 +3879,7 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3960">
+                                <textField verticalHuggingPriority="750" id="3960">
                                     <rect key="frame" x="36" y="30" width="48" height="14"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Flat Top" id="3961">
@@ -3954,7 +3954,7 @@
                                         <action selector="tweakFlatTopCounts:" target="3846" id="3980"/>
                                     </connections>
                                 </button>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3992">
+                                <textField verticalHuggingPriority="750" id="3992">
                                     <rect key="frame" x="44" y="95" width="36" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="1024" drawsBackground="YES" id="3993">
@@ -3966,7 +3966,7 @@
                                         <action selector="preReCounts:" target="3846" id="4001"/>
                                     </connections>
                                 </textField>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3994">
+                                <textField verticalHuggingPriority="750" id="3994">
                                     <rect key="frame" x="44" y="54" width="36" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3995">
@@ -3978,7 +3978,7 @@
                                         <action selector="postReCounts:" target="3846" id="4000"/>
                                     </connections>
                                 </textField>
-                                <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3996">
+                                <textField verticalHuggingPriority="750" id="3996">
                                     <rect key="frame" x="42" y="10" width="38" height="19"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3997">
@@ -3993,7 +3993,7 @@
                             </subviews>
                         </view>
                     </box>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3963">
+                    <textField verticalHuggingPriority="750" id="3963">
                         <rect key="frame" x="57" y="46" width="22" height="11"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="0" id="3964">
@@ -4002,7 +4002,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="3965">
+                    <textField verticalHuggingPriority="750" id="3965">
                         <rect key="frame" x="289" y="46" width="27" height="11"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="2019" id="3966">
@@ -4011,7 +4011,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="NO" id="4007">
+                    <textField verticalHuggingPriority="750" id="4007">
                         <rect key="frame" x="139" y="46" width="106" height="11"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="mini" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Option-click moves  all" id="4008">
