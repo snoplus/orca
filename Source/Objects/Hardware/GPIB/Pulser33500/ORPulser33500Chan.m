@@ -545,7 +545,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([pulser isConnected]){
 		if (waveformData[selectedWaveform].builtInFunction) {
-        	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FM:INT:FUNC %@",channel,waveformData[selectedWaveform].storageName]];
+        	[pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FUNC %@",channel,waveformData[selectedWaveform].storageName]];
         	[pulser logSystemResponse];
 			
 		} else {
