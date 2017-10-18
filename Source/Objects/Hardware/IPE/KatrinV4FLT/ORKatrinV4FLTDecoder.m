@@ -212,18 +212,8 @@
 				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
     
-    unsigned long eventFlags    = ptr[7];
-    //seems to be a slight offset in the traceStart? Without this tweak the tail of the waveform overlaps to the front
-    unsigned long offsetTweak   = 7;
-    unsigned long traceStart16  = ShiftAndExtract(eventFlags,8,0x7ff) + offsetTweak;//start of trace in short array
-    unsigned long waveformLength = 2048; //shorts
     unsigned short* dataPtr     = (unsigned short*)&ptr[9];
-    unsigned short* startPtr    = dataPtr+traceStart16;
-    NSMutableData* waveformData = [NSMutableData dataWithLength:waveformLength];
-    
-    [waveformData replaceBytesInRange:NSMakeRange(0,(waveformLength-traceStart16)*2) withBytes:startPtr];
-    
-    [waveformData replaceBytesInRange:NSMakeRange((waveformLength-traceStart16)*2,(traceStart16-1)*2) withBytes:dataPtr];
+    NSData* waveformData = [NSData dataWithBytes:dataPtr length:4096];
     
 	[aDataSet loadWaveform: waveformData
 					offset: 0
