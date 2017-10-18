@@ -58,18 +58,19 @@
     BOOL            ignoreBreakdownCheckOnA;
     BOOL            ignoreBreakdownCheckOnB;
     unsigned long   runType;
-    ORMJDInterlocks*    mjdInterlocks[2];
-    ORMJDSource*        mjdSource[2];
     ORMJDHeaderRecordID* anObjForCouchID;
-    NSMutableDictionary* rateSpikes[2];
+    ORMJDInterlocks*     mjdInterlocks[2];
+    ORMJDSource*         mjdSource[2];
     NSDate*              rateSpikeTime[2];
     BOOL                 rateReportSent[2];
+    NSMutableDictionary* rateSpikes[2];
     NSMutableDictionary* baselineExcursions[2];
     float maxNonCalibrationRate;
     ORHighRateChecker*    highRateChecker;
     BOOL scheduledToRunCheckBreakdown;
     BOOL testfillingLN[2];
     BOOL verboseDiagnostics;
+    int  minNumDetsToAlertExperts;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -110,6 +111,12 @@
 - (NSString*) objectNameForCrate:(NSString*)aCrateName andCard:(NSString*)aCardName;
 - (float) maxNonCalibrationRate;
 - (void) setMaxNonCalibrationRate:(float)aValue;
+- (void) delayedRemoveBaselineExcursion:(NSString*)aBigKey;
+- (int) countCommonSpikes:(int)index;
+- (void) alertExperts:(int)index;
+- (void) resetSpikeDictionaries;
+- (int)  minNumDetsToAlertExperts;
+- (void)  setMinNumDetsToAlertExperts:(int)aValue;
 
 #pragma mark ¥¥¥Breakdown Methods
 - (BOOL) matchingRateAndBaselineIssues:(unsigned short)index;
@@ -196,6 +203,7 @@ extern NSString* ORMajoranaModelLastConstraintCheckChanged;
 extern NSString* ORMajoranaModelUpdateSpikeDisplay;
 extern NSString* ORMajoranaModelMaxNonCalibrationRate;
 extern NSString* ORMajoranaModelVerboseDiagnosticsChanged;
+extern NSString* ORMajoranaModelMinNumDetsToAlertExperts;
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;

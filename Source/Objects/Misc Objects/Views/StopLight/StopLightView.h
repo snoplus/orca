@@ -36,6 +36,7 @@ enum {
     ORDotImage* goLight;
     int state;
     ORDotImage* offLight;
+    BOOL hideCautionLight;
 }
 
 #pragma mark ***Accessors
@@ -49,5 +50,5 @@ enum {
 - (void) setCautionLight:(ORDotImage*)aCautionLight;
 - (ORDotImage*) stopLight;
 - (void) setStopLight:(ORDotImage*)aStopLight;
-
+- (void) hideCautionLight;
 @end

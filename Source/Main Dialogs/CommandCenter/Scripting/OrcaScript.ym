@@ -282,6 +282,7 @@ primary_expr
 | wait_statement			{ $$ = $1; }
 | makeObj                   { $$ = $1; }
 | time_statement            { $$ = $1; }
+| random_gen                { $$ = $1; }
 ;
 
 postfix_expr

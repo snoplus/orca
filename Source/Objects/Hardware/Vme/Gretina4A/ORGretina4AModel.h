@@ -46,6 +46,7 @@
     
     //registerValues
     unsigned long extDiscriminatorSrc;
+    unsigned long extDiscriminatorMode;
     unsigned long hardwareStatus;
     unsigned long userPackageData;
     unsigned short windowCompMin;
@@ -129,7 +130,6 @@
     short           dacAttenuation;
     
     unsigned short baselineDelay;
-    unsigned long  extDiscriminatorMode;
     unsigned short trackingSpeed;
     unsigned short baselineStatus;
     unsigned long  channelPulsedControl;
@@ -261,6 +261,8 @@
 - (void)            loadChannelDefaults:(unsigned short) aChan;
 - (unsigned long)   extDiscriminatorSrc;
 - (void)            setExtDiscriminatorSrc:(unsigned long)aValue;
+- (unsigned long)   extDiscriminatorMode;
+- (void)            setExtDiscriminatorMode:(unsigned long)aValue;
 - (unsigned long)   hardwareStatus;
 - (void)            setHardwareStatus:      (unsigned long)aValue;
 - (unsigned long)   userPackageData;
@@ -419,6 +421,8 @@
 - (void)            writeThresholds;
 - (unsigned long)   readExtDiscriminatorSrc;
 - (void)            writeExtDiscriminatorSrc;
+- (unsigned long)   readExtDiscriminatorMode;
+- (void)            writeExtDiscriminatorMode;
 - (unsigned long)   readHardwareStatus;
 - (unsigned long)   readUserPackageData;
 - (void)            writeUserPackageData;
@@ -489,13 +493,15 @@
 - (void)            dumpChannelControlDetails:  (unsigned long)aValue;
 - (void)            dumpHoldoffControlDetails:  (unsigned long)aValue;
 - (void)            dumpBaselineDelayDetails:   (unsigned long)aValue;
-- (void)            dumpExtDiscSelDetails:      (unsigned long)aValue;
+- (void)            dumpExtDiscModeDetails:     (unsigned long)aValue;
 - (void)            dumpMasterStatusDetails:    (unsigned long)aValue;
 
-- (void) setForceFullInitCard:(BOOL)aValue;
-- (void) setLedThreshold:(unsigned short)chan withValue:(unsigned short)aValue;
-- (void) writeLedThreshold:(unsigned short)aChan;
-- (BOOL) trapEnabled:(int)aChan;
+- (void)            setForceFullInitCard:(BOOL)aValue;
+- (void)            setLedThreshold:(unsigned short)chan withValue:(unsigned short)aValue;
+- (void)            writeLedThreshold:(unsigned short)aChan;
+- (BOOL)            trapEnabled:(int)aChan;
+
+- (void)            softwareTrigger;
 
 #pragma mark - Clock Sync
 - (short)           initState;
@@ -546,6 +552,7 @@
 - (NSArray*) autoTests;
 - (void) checkBoard:(BOOL)verbose;
 - (BOOL) checkExtDiscriminatorSrc:  (BOOL)verbose;
+- (BOOL) checkExtDiscriminatorMode:  (BOOL)verbose;
 - (BOOL) checkWindowCompMin:        (BOOL)verbose;
 - (BOOL) checkWindowCompMax:        (BOOL)verbose;
 - (BOOL) checkP2Window:             (BOOL)verbose;
@@ -607,7 +614,6 @@ extern NSString* ORGretina4ADiscCountModeChanged;
 extern NSString* ORGretina4AAHitCountModeChanged;
 extern NSString* ORGretina4AEventCountModeChanged;
 extern NSString* ORGretina4ADroppedEventCountModeChanged;
-//extern NSString* ORGretina4AWriteFlagChanged;
 extern NSString* ORGretina4ADecimationFactorChanged;
 extern NSString* ORGretina4ATriggerPolarityChanged;
 extern NSString* ORGretina4APileupModeChanged;

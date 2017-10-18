@@ -21,7 +21,8 @@
 
 NSString* ORPulser33500ChanVoltageChanged				= @"ORPulser33500ChanVoltageChanged";
 NSString* ORPulser33500ChanVoltageOffsetChanged			= @"ORPulser33500ChanVoltageOffsetChanged";
-NSString* ORPulser33500ChanFrequencyChanged				= @"ORPulser33500ChanFrequencyChanged";
+NSString* ORPulser33500ChanDutyCycleChanged             = @"ORPulser33500ChanDutyCycleChanged";
+NSString* ORPulser33500ChanFrequencyChanged             = @"ORPulser33500ChanFrequencyChanged";
 NSString* ORPulser33500ChanBurstRateChanged				= @"ORPulser33500ChanBurstRateChanged";
 NSString* ORPulser33500ChanBurstCountChanged			= @"ORPulser33500ChanBurstCountChanged";
 NSString* ORPulser33500ChanTriggerSourceChanged			= @"ORPulser33500ChanTriggerSourceChanged";
@@ -31,7 +32,8 @@ NSString* ORPulser33500ChanSelectedWaveformChanged		= @"ORPulser33500ChanSelecte
 NSString* ORPulser33500WaveformLoadingNonVoltile		= @"ORPulser33500WaveformLoadingNonVoltile";
 NSString* ORPulser33500WaveformLoadProgressing			= @"ORPulser33500WaveformLoadProgressing";
 NSString* ORPulser33500WaveformLoadFinished				= @"ORPulser33500WaveformLoadFinished";
-NSString* ORPulser33500NegativePulseChanged				= @"ORPulser33500NegativePulseChanged";
+NSString* ORPulser33500NegativePulseChanged             = @"ORPulser33500NegativePulseChanged";
+NSString* ORPulser33500BurstModeChanged                 = @"ORPulser33500BurstModeChanged";
 NSString* ORPulser33500WaveformLoadStarted				= @"ORPulser33500WaveformLoadStarted";
 NSString* ORPulser33500WaveformLoadingVoltile			= @"ORPulser33500WaveformLoadingVoltile";
 
@@ -124,6 +126,17 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33500NegativePulseChanged object:self];
 }
 
+- (BOOL) burstMode
+{
+    return burstMode;
+}
+
+- (void) setBurstMode:(BOOL)aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setBurstMode:burstMode];
+    burstMode = aFlag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORPulser33500BurstModeChanged object:self];
+}
 
 - (int) selectedWaveform
 {
@@ -175,6 +188,20 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	[[[self undoManager] prepareWithInvocationTarget: self] setFrequency:frequency];
 	frequency = aValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName: ORPulser33500ChanFrequencyChanged object: self];
+}
+
+- (float) dutyCycle;
+{
+    return dutyCycle;
+}
+
+- (void) setDutyCycle:(float)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget: self] setDutyCycle:dutyCycle];
+    if(aValue<0.01)       aValue = 0.01;
+    else if(aValue>99.99) aValue = 99.99;
+    dutyCycle = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName: ORPulser33500ChanDutyCycleChanged object: self];
 }
 
 - (float) burstRate;
@@ -250,7 +277,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
             [self writeVoltage:kCalibrationVoltage];
             [self writeBurstCount:1];
             [self writeBurstRate:kCalibrationBurstRate];
-			[self writeFrequency];
+            [self writeFrequency];
         }
         else {
             [self writeVoltage];
@@ -260,9 +287,13 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
             [self writeBurstRate];
         }
         
+        if(selectedWaveform == kBuiltInSquare){
+            [self writeDutyCycle];
+        }
+        
         [self writeBurstPhase];
         [self writeTriggerSource];
-        [self writeBurstState:YES];
+        [self writeBurstMode];
      	if(triggerSource == kTimerTrigger)[self writeTriggerTimer];
     }
 }
@@ -331,10 +362,18 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	NSLog(@"33500 Pulser Burst Count %d set to %d\n",channel,aValue);
 }
 
-- (void) writeBurstState:(BOOL)value
+- (void) writeBurstMode
 {
-   if(value) [pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:BURS:STAT ON",channel]];
-   else [pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:BURS:STAT OFF",channel]];
+   [pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:BURS:STAT %d",channel,burstMode]];
+    [pulser logSystemResponse];
+    NSLog(@"33500 Burst Mode %d set to %@\n",channel,burstMode?@"ON":@"OFF");
+
+}
+
+- (void) writeDutyCycle
+{
+    [pulser writeToDevice:[NSString stringWithFormat:@"SOUR%d:FUNC:SQU:DCYC %.2f",channel,dutyCycle]];
+    [pulser logSystemResponse];
 }
 
 - (void) writeTriggerSource
@@ -418,13 +457,15 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	channel =				[decoder decodeIntForKey:@"channel"];
 	[self setVoltage:		[decoder decodeFloatForKey:@"voltage"]];
 	[self setVoltageOffset:	[decoder decodeFloatForKey:@"voltageOffset"]];
-	[self setFrequency:		[decoder decodeFloatForKey:@"frequency"]];
+    [self setFrequency:     [decoder decodeFloatForKey:@"frequency"]];
+    [self setDutyCycle:     [decoder decodeFloatForKey:@"dutyCycle"]];
 	[self setBurstRate:		[decoder decodeFloatForKey:@"burstRate"]];
 	[self setBurstPhase:	[decoder decodeFloatForKey:@"burstPhase"]];
 	[self setBurstCount:	[decoder decodeIntForKey:@"burstCount"]];
 	[self setTriggerSource:	[decoder decodeIntForKey:@"triggerSource"]];
 	[self setTriggerTimer:	[decoder decodeFloatForKey:@"triggerTimer"]];
-    [self setSelectedWaveform:	 [decoder decodeIntForKey:@"selectedWaveform"]];
+    [self setSelectedWaveform:     [decoder decodeIntForKey:@"selectedWaveform"]];
+    [self setBurstMode:     [decoder decodeBoolForKey:@"burstMode"]];
 
 	if(voltage==0 && frequency==0 && burstCount==0 && burstPhase==0){
 		[self setVoltage:5];
@@ -446,13 +487,15 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	[encoder encodeInt:channel			forKey:@"channel"];
 	[encoder encodeFloat:voltage		forKey:@"voltage"];
 	[encoder encodeFloat:voltageOffset	forKey:@"voltageOffset"];
-	[encoder encodeFloat:frequency		forKey:@"frequency"];
+    [encoder encodeFloat:frequency      forKey:@"frequency"];
+    [encoder encodeFloat:dutyCycle      forKey:@"dutyCycle"];
 	[encoder encodeFloat:burstRate		forKey:@"burstRate"];
 	[encoder encodeFloat:burstPhase		forKey:@"burstPhase"];
 	[encoder encodeInt:burstCount		forKey:@"burstCount"];
 	[encoder encodeInt:triggerSource	forKey:@"triggerSource"];
 	[encoder encodeFloat:triggerTimer	forKey:@"triggerTimer"];
     [encoder encodeInt:selectedWaveform forKey:@"selectedWaveform"];
+    [encoder encodeBool:burstMode       forKey:@"burstMode"];
 }
 
 #pragma mark •••Waveform Loading

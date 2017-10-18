@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="11201"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <development version="5100" identifier="xcode"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="10117"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -44,6 +44,12 @@
                 <outlet property="loadedTellieOperationLabel" destination="syb-lx-DpA" id="xtf-30-SAG"/>
                 <outlet property="loadedTellieRunNameLabel" destination="FCg-q6-iyf" id="ukT-F4-he3"/>
                 <outlet property="loadedTellieRunTimeLabel" destination="lqW-Ew-72m" id="809-bM-1kF"/>
+                <outlet property="lockDBID" destination="uZ3-NW-Xqt" id="7ey-We-Maw"/>
+                <outlet property="lockDBIPAddress" destination="twq-b6-2jK" id="9Lv-80-brD"/>
+                <outlet property="lockDBName" destination="UeC-s7-JHc" id="3tF-gk-nOs"/>
+                <outlet property="lockDBPort" destination="MVZ-YX-g8u" id="Pvr-8N-o1S"/>
+                <outlet property="lockDBPswd" destination="xu0-2f-77h" id="1sT-0r-hdd"/>
+                <outlet property="lockDBUser" destination="DzY-Ca-542" id="at8-xj-Dpo"/>
                 <outlet property="lockStatusTextField" destination="Np3-DI-Iif" id="5ty-0b-EY4"/>
                 <outlet property="logHost" destination="KzD-He-2lG" id="LXs-Sy-EvF"/>
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
@@ -283,7 +289,8 @@
                                                     </textField>
                                                 </subviews>
                                             </view>
-                                        </box>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>                                        </box>
                                         <customView id="URf-Um-n84" customClass="StopLightView">
                                             <rect key="frame" x="5" y="144" width="30" height="98"/>
                                             <autoresizingMask key="autoresizingMask"/>
@@ -509,10 +516,16 @@
                                                     <box verticalHuggingPriority="750" boxType="separator" id="ZAc-Zq-koX">
                                                         <rect key="frame" x="7" y="416" width="133" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                    </box>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
+                                                    </box>
                                                     <box verticalHuggingPriority="750" boxType="separator" id="qca-QN-PXH">
                                                         <rect key="frame" x="7" y="256" width="135" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="V3X-8h-WXg">
                                                         <rect key="frame" x="4" y="601" width="44" height="14"/>
@@ -824,6 +837,8 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <textField verticalHuggingPriority="750" id="U7i-0O-XTw">
                                             <rect key="frame" x="102" y="451" width="4" height="17"/>
@@ -4817,6 +4832,9 @@
                                                     <box verticalHuggingPriority="750" boxType="separator" id="2717">
                                                         <rect key="frame" x="21" y="38" width="330" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
                                                     </box>
                                                     <comboBox focusRingType="none" verticalHuggingPriority="750" id="2683">
                                                         <rect key="frame" x="59" y="47" width="178" height="22"/>
@@ -4833,6 +4851,149 @@
                                                     </comboBox>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
+                                        <box autoresizesSubviews="NO" title="LockDB" borderType="line" id="D86-Ix-jxN">
+                                            <rect key="frame" x="14" y="79" width="371" height="114"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="369" height="98"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" id="Gvq-Qc-ZTU">
+                                                        <rect key="frame" x="14" y="13" width="40" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="IP#:" id="Fzw-xI-FpR">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" id="YST-iV-LYm">
+                                                        <rect key="frame" x="172" y="66" width="65" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="Password:" id="wT8-uX-3se">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" id="PH6-FT-nyB">
+                                                        <rect key="frame" x="14" y="66" width="40" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="User:" id="zU3-fu-IPn">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <secureTextField verticalHuggingPriority="750" id="xu0-2f-77h">
+                                                        <rect key="frame" x="255" y="68" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <secureTextFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" alignment="left" drawsBackground="YES" id="Ju2-ER-Nev">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            <allowedInputSourceLocales>
+                                                                <string>NSAllRomanInputSourcesLocaleIdentifier</string>
+                                                            </allowedInputSourceLocales>
+                                                        </secureTextFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lockDBPassword" id="Dbf-R5-xzl"/>
+                                                        </connections>
+                                                    </secureTextField>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" id="vjd-Nl-BYI">
+                                                        <rect key="frame" x="16" y="43" width="38" height="14"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="DB:" id="gHY-hy-66j">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="UeC-s7-JHc">
+                                                        <rect key="frame" x="59" y="41" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="QHN-SN-oBd">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lockDBName" id="ZxG-IO-dI4"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="twq-b6-2jK">
+                                                        <rect key="frame" x="59" y="14" width="142" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="CqE-Gj-8SU">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lockDBIPAddress" id="B63-1q-fOP"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" id="1MQ-Jl-xJA">
+                                                        <rect key="frame" x="197" y="40" width="40" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="Port:" id="V9N-Jw-eJd">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="MVZ-YX-g8u">
+                                                        <rect key="frame" x="255" y="41" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="5432" drawsBackground="YES" id="Ica-tu-v6K">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lockDBPort" id="BXK-2y-swJ"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField focusRingType="none" verticalHuggingPriority="750" id="l5e-0e-l6U">
+                                                        <rect key="frame" x="197" y="13" width="40" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" focusRingType="none" alignment="right" title="ID" id="EAd-ib-gv2">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="uZ3-NW-Xqt">
+                                                        <rect key="frame" x="255" y="14" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" title="2" drawsBackground="YES" id="mhE-VB-Pcz">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lockDBLockID" id="yrD-MH-8IJ"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="DzY-Ca-542">
+                                                        <rect key="frame" x="59" y="69" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="ffK-cF-o57">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.lockDBUserName" id="MnY-0t-7G0"/>
+                                                        </connections>
+                                                    </textField>
+                                                </subviews>
+                                            </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" borderType="line" title="DebugDB ECAL" id="2718">
                                             <rect key="frame" x="399" y="428" width="371" height="159"/>
@@ -4997,9 +5158,14 @@
                                                     <box verticalHuggingPriority="750" boxType="separator" id="2720">
                                                         <rect key="frame" x="21" y="46" width="330" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
                                                     </box>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" borderType="line" title="MTC Server" id="SIk-jq-Uyj">
                                             <rect key="frame" x="14" y="314" width="371" height="114"/>
@@ -5065,6 +5231,8 @@
                                                     </textField>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" borderType="line" title="XL3 Server" id="8rD-lN-zTL">
                                             <rect key="frame" x="399" y="314" width="371" height="114"/>
@@ -5130,6 +5298,8 @@
                                                     </button>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" borderType="line" title="Log Server" id="7Ol-yJ-YAc">
                                             <rect key="frame" x="399" y="196" width="371" height="114"/>
@@ -5195,6 +5365,8 @@
                                                     </button>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <box autoresizesSubviews="NO" borderType="line" title="Data Server" id="Vzf-gX-Lte">
                                             <rect key="frame" x="14" y="196" width="371" height="114"/>
@@ -5260,6 +5432,8 @@
                                                     </textField>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                     </subviews>
                                 </view>

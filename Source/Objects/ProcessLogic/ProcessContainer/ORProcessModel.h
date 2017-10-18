@@ -117,7 +117,7 @@
 - (void) startStopRun;
 - (BOOL) changesAllowed;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
-- (void)assignProcessID:(id)objToGetID;
+- (void)assignProcessID:(OrcaObject*)objToGetID;
 - (int) heartbeatSeconds;
 
 - (void) sendHeartbeatShutOffWarning;

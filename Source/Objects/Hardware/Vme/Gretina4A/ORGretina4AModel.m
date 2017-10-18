@@ -556,15 +556,15 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
         unsigned long theValue = [self readRegister:i channel:[self selectedChannel]];
         NSLogFont(aFont,@"0x%04x 0x%08x %10lu %@\n",[Gretina4ARegisters offsetforReg:i],theValue,theValue,[Gretina4ARegisters registerName:i]);
         snapShot[i] = theValue;
-        if(i == kBoardId)          [self dumpBoardIdDetails:theValue];
-        if(i == kProgrammingDone)  [self dumpProgrammingDoneDetails:theValue];
-        if(i == kHardwareStatus)   [self dumpHardwareStatusDetails:theValue];
-        if(i == kExternalDiscSrc)  [self dumpExternalDiscSrcDetails:theValue];
-        if(i == kChannelControl)   [self dumpChannelControlDetails:theValue];
-        if(i == kHoldoffControl)   [self dumpHoldoffControlDetails:theValue];
-        if(i == kBaselineDelay)    [self dumpBaselineDelayDetails:theValue];
-        if(i == kExtDiscSel)       [self dumpExtDiscSelDetails:theValue];
-        if(i == kMasterLogicStatus)[self dumpMasterStatusDetails:theValue];
+        if(i == kBoardId)           [self dumpBoardIdDetails:theValue];
+        if(i == kProgrammingDone)   [self dumpProgrammingDoneDetails:theValue];
+        if(i == kHardwareStatus)    [self dumpHardwareStatusDetails:theValue];
+        if(i == kExternalDiscSrc)   [self dumpExternalDiscSrcDetails:theValue];
+        if(i == kChannelControl)    [self dumpChannelControlDetails:theValue];
+        if(i == kHoldoffControl)    [self dumpHoldoffControlDetails:theValue];
+        if(i == kBaselineDelay)     [self dumpBaselineDelayDetails:theValue];
+        if(i == kExternalDiscMode)  [self dumpExtDiscModeDetails:theValue];
+        if(i == kMasterLogicStatus) [self dumpMasterStatusDetails:theValue];
         
     }
     NSLog(@"------------------------------------------------\n");
@@ -684,7 +684,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     NSLogFont(aFont,@"     Status         : %d\n", ((aValue>>(12+[self selectedChannel]))& 0x1));
 }
 
-- (void) dumpExtDiscSelDetails:(unsigned long)aValue
+- (void) dumpExtDiscModeDetails:(unsigned long)aValue
 {
     NSFont* aFont = [NSFont fontWithName:@"Monaco" size:10.0];
     NSString* descSel[4] = {
@@ -2042,8 +2042,8 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     }
 }
 
-//------------------------- Ext Discrim Mode Reg------------------------------------
-- (unsigned long) readExtDiscriminatorSrc { return [self readLongFromReg:kUserPackageData] & 0x1fffffff; }
+//------------------------- Ext Discrim Src Reg------------------------------------
+- (unsigned long) readExtDiscriminatorSrc { return [self readLongFromReg:kExternalDiscSrc] & 0x1fffffff; }
 - (void) writeExtDiscriminatorSrc
 {
     unsigned long theValue = (extDiscriminatorSrc & 0x3fffffff);
@@ -2361,6 +2361,19 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
               forceFullInit:forceFullCardInit];
 }
 
+//------------------------- Ext Discrim Mode Reg------------------------------------
+- (unsigned long) readExtDiscriminatorMode { return [self readLongFromReg:kExternalDiscMode] & 0xfffff; }
+- (void) writeExtDiscriminatorMode
+{
+    unsigned long theValue = (extDiscriminatorMode & 0xfffff);
+    [self writeAndCheckLong:theValue
+              addressOffset:[Gretina4ARegisters offsetforReg:kExternalDiscMode]
+                       mask:0xfffff
+                  reportKey:@"ExternalDiscMode"
+              forceFullInit:forceFullCardInit];
+}
+
+
 //-------------------------kHoldoffControl Reg----------------------------------------
 - (unsigned long) readHoldoffControl
 {
@@ -2551,6 +2564,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
         }
         //write the card level params
         [self writeExtDiscriminatorSrc];
+        [self writeExtDiscriminatorMode];
         [self writeWindowCompMin];
         [self writeWindowCompMax];
         [self writeP2Window];
@@ -2591,6 +2605,13 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGretina4ACardInited object:self];
 }
+
+- (void) softwareTrigger
+{
+    [self writeLong:0x1<<10 toReg:kChannelPulsedControl];
+}
+
+
 - (void) writeThresholds
 {
     int i;
@@ -2601,6 +2622,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 - (void) checkBoard:(BOOL)verbose
 {
     BOOL extDiscriminatorSrcResult   = [self checkExtDiscriminatorSrc:verbose];
+    BOOL extDiscriminatorModeResult  = [self checkExtDiscriminatorMode:verbose];
     BOOL windowCompMinResult         = [self checkWindowCompMin:verbose];
     BOOL windowCompMaxResult         = [self checkWindowCompMax:verbose];
     BOOL p2WindowResult              = [self checkP2Window:verbose];
@@ -2638,6 +2660,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     }
     if(verbose){
         if( extDiscriminatorSrcResult   &&
+            extDiscriminatorModeResult  &&
             windowCompMinResult         &&
             windowCompMaxResult         &&
             p2WindowResult              &&
@@ -2663,6 +2686,15 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     if(aValue == extDiscriminatorSrc)return YES;
     else {
         if(verbose)NSLog(@"extDiscriminatorSrc mismatch: 0x%x != 0x%x\n",aValue,extDiscriminatorSrc);
+        return NO;
+    }
+}
+- (BOOL) checkExtDiscriminatorMode:(BOOL)verbose
+{
+    unsigned long aValue = [self readRegister:kExternalDiscMode]& 0xfffff;
+    if(aValue == extDiscriminatorMode)return YES;
+    else {
+        if(verbose)NSLog(@"extDiscriminatorMode mismatch: 0x%x != 0x%x\n",aValue,extDiscriminatorMode);
         return NO;
     }
 }
@@ -3372,6 +3404,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     [self setSPIWriteValue:     		[decoder decodeInt32ForKey: @"spiWriteValue"]];
     [self setFpgaFilePath:				[decoder decodeObjectForKey:@"fpgaFilePath"]];
     [self setExtDiscriminatorSrc:       [decoder decodeInt32ForKey: @"extDiscriminatorSrc"]];
+    [self setExtDiscriminatorMode:      [decoder decodeInt32ForKey: @"extDiscriminatorMode"]];
     [self setUserPackageData:           [decoder decodeInt32ForKey: @"userPackageData"]];
     [self setWindowCompMin:             [decoder decodeIntForKey:   @"windowCompMin"]];
     [self setWindowCompMax:             [decoder decodeIntForKey:   @"windowCompMax"]];
@@ -3462,7 +3495,8 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     [encoder encodeInt32:registerWriteValue			forKey:@"registerWriteValue"];
     [encoder encodeInt32:spiWriteValue			    forKey:@"spiWriteValue"];
     [encoder encodeObject:fpgaFilePath				forKey:@"fpgaFilePath"];
-    [encoder encodeInt32:extDiscriminatorSrc        forKey:@"extDiscriminatorSrc"];
+    [encoder encodeInt32:extDiscriminatorSrc        forKey:@"extDiscriminatorMode"];
+    [encoder encodeInt32:extDiscriminatorMode       forKey:@"extDiscriminatorSrc"];
     [encoder encodeInt32:userPackageData            forKey:@"userPackageData"];
     [encoder encodeInt32:windowCompMin              forKey:@"windowCompMin"];
     [encoder encodeInt32:windowCompMax              forKey:@"windowCompMax"];

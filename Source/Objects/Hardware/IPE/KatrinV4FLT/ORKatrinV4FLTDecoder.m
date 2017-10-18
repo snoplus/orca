@@ -383,7 +383,7 @@
 	int i;
     NSMutableString* hrString;
     if(version==0x1){
-	    hrString = [NSMutableString stringWithFormat:@"SLTsecond     = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
+	    hrString = [NSMutableString stringWithFormat:@"\nSLTsecond  = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
 						  ut_time,hitRateLengthSec,newTotal];
         for(i=0; i<countHREnabledChans; i++){
         unsigned long chan	= ShiftAndExtract(ptr[5+i],20,0xff);
@@ -395,12 +395,12 @@
             else
                 [hrString appendString: [NSString stringWithFormat:@"Chan %2lu    = %lu\n", chan,hitrate] ];
             //[hrString appendString: [NSString stringWithFormat:@"PilUpCnt %2d    = %d\n", chan,  pileupcount] ];
-            [hrString appendString: [NSString stringWithFormat:    @"  PilUpCnt = %lu\n",   pileupcount] ];
+            [hrString appendString: [NSString stringWithFormat:    @"PilUpCnt   = %lu\n",   pileupcount] ];
         }
         
     }
     else{
-	    hrString = [NSMutableString stringWithFormat:@"UTTime     = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
+	    hrString = [NSMutableString stringWithFormat:@"\nUTTime     = %lu\nHitrateLen = %lu\nTotal HR   = %lu\n",
 						  ut_time,hitRateLengthSec,newTotal];
         for(i=0; i<length-5; i++){
         unsigned long chan	= ShiftAndExtract(ptr[5+i],20,0xff);

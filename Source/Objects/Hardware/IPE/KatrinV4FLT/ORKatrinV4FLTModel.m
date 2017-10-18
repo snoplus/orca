@@ -585,9 +585,6 @@ static double table[32]={
 
 - (void) setHitRateMode:(int)aMode
 {
-    if(aMode<0)aMode = 0;
-    if(aMode>1)aMode = 1;
-    
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateMode:hitRateMode];
     
     hitRateMode = aMode;
@@ -1427,10 +1424,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
-	[self writeReg: kFLTV4PostTrigger      value:postTriggerTime];
+	[self writeReg: kFLTV4PostTriggerReg      value:postTriggerTime];
 	[self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
 	[self loadThresholdsAndGains];
-	[self writeReg:kFLTV4AnalogOffset  value:analogOffset];
+	[self writeReg:kFLTV4AnalogOffsetReg  value:analogOffset];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	
@@ -1702,8 +1699,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     unsigned long sltSubSec     = 0;
     unsigned long sltSec        = 0;
+    unsigned long sltRunStartSec = 0;
+    
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
-	
 	@try {
         id slt      = [[self crate] adapter];
         if([slt sbcIsConnected]){
@@ -1735,6 +1733,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                         countHREnabledChans++;
                     }
                 }
+                
                 [self executeCommandList:aList];
                 
                 //pull out the result (same order as commands)
@@ -1775,16 +1774,20 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
                 }
                 
+                [slt readStatusReg];
+                
                 sltSec      =  [slt getSeconds];
                 sltSubSec   =  [slt readSubSecondsCounter];
-
-                if(dataIndex>0 && [gOrcaGlobals runInProgress]){
-                    time_t	ut_time;
-                    time(&ut_time);
-
+                
+                // Don't ship hitrate before the run has been started
+                sltRunStartSec = [slt getRunStartSecond];
+                
+                
+                if(dataIndex>0 && [gOrcaGlobals runInProgress] && (sltSec > sltRunStartSec) ){
+                    
                     data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
                     data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
-                    data[2] = sltSec;
+                    data[2] = sltSec - 1;
                     data[3] = hitRateLengthSec;	
                     data[4] = newTotal;
 
@@ -1892,20 +1895,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setShipSumHistogram:          [decoder decodeIntForKey:   @"shipSumHistogram"]];
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
-
-	if([decoder containsValueForKey:@"forceFLTReadout"]){
-        [self setForceFLTReadout:[decoder decodeBoolForKey:@"forceFLTReadout"]];
-    }
-    else {
-        [self setForceFLTReadout:true];//old file loaded with new Orca version -> before, we always had FLT readout, so use it now, too -tb- 2016-07
-    }
-    
-	if([decoder containsValueForKey:@"filterShapingLength"]){
-		[self setFilterShapingLength:[decoder decodeIntForKey:@"filterShapingLength"]];
-	}
-    else {
-        [self setFilterShapingLength:7];//use the default
-	}
+    [self setForceFLTReadout:           [decoder decodeBoolForKey:  @"forceFLTReadout"]];
+    [self setFilterShapingLength:       [decoder decodeIntForKey:   @"filterShapingLength"]];
 	
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
     
@@ -1923,8 +1914,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeBool:forceFLTReadout             forKey:@"forceFLTReadout"];
     [encoder encodeInt:skipFltEventReadout          forKey:@"skipFltEventReadout"];
     [encoder encodeInt32:bipolarEnergyThreshTest    forKey:@"bipolarEnergyThreshTest"];
-    //[encoder encodeInt:useBipolarEnergy           forKey:@"useBipolarEnergy"];
-    //[encoder encodeInt:useSLTtime                 forKey:@"useSLTtime"];
     [encoder encodeInt:boxcarLength                 forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead              forKey:@"useDmaBlockRead"];
     [encoder encodeInt:syncWithRunControl           forKey:@"syncWithRunControl"];
@@ -2364,7 +2353,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if(runMode == kKatrinV4Flt_EnergyDaqMode | runMode == kKatrinV4Flt_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;                           //bit 17 = "sync flt with slt timer" flag
     if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
-	if(forceFLTReadout) runFlagsMask |= kForceFltReadoutFlag;               //fast event readout (SLT fifo)  //2016-05 added
+    if(forceFLTReadout || (runMode == kKatrinV4Flt_EnergyTraceDaqMode) || (runMode == kKatrinV4Flt_BipolarEnergyTraceDaqMode)){
+        runFlagsMask |= kForceFltReadoutFlag;      
+    }
     
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;	
 	configStruct->card_info[index].deviceSpecificData[4] = triggerEnabledMask;
@@ -2576,9 +2567,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) testReadHisto
 {
 	unsigned long hControl = [self readReg:kFLTV4HistgrSettingsReg];
-	unsigned long pStatusA = [self readReg:kFLTV4pStatusA];
-	unsigned long pStatusB = [self readReg:kFLTV4pStatusB];
-	unsigned long pStatusC = [self readReg:kFLTV4pStatusC];
+	unsigned long pStatusA = [self readReg:kFLTV4pStatusAReg];
+	unsigned long pStatusB = [self readReg:kFLTV4pStatusBReg];
+	unsigned long pStatusC = [self readReg:kFLTV4pStatusCReg];
 	unsigned long f3	   = [self readReg:kFLTV4HistNumMeasReg];
 	NSLog(@"EMin: 0x%08x\n",  hControl & 0x7FFFF);
 	NSLog(@"EBin: 0x%08x\n",  (hControl>>20) & 0xF);
@@ -2641,9 +2632,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) printPStatusRegs
 {
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	unsigned long pAData = [self readReg:kFLTV4pStatusA];
-	unsigned long pBData = [self readReg:kFLTV4pStatusB];
-	unsigned long pCData = [self readReg:kFLTV4pStatusC];
+	unsigned long pAData = [self readReg:kFLTV4pStatusAReg];
+	unsigned long pBData = [self readReg:kFLTV4pStatusBReg];
+	unsigned long pCData = [self readReg:kFLTV4pStatusCReg];
 	NSLogFont(aFont,@"----------------------------------------\n");
 	NSLogFont(aFont,@"PStatus      A          B         C\n");
 	NSLogFont(aFont,@"----------------------------------------\n");
@@ -2797,6 +2788,20 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		case 3: return @"Finishing";
 		default: return @"?";
 	}	
+}
+- (NSString*) getRegisterName: (short) anIndex
+{
+    return [[ORKatrinV4FLTRegisters sharedRegSet] registerName:anIndex];
+}
+
+- (unsigned long) getAddressOffset: (short) anIndex
+{
+    return [[ORKatrinV4FLTRegisters sharedRegSet] addressOffset:anIndex];
+}
+
+- (short) getAccessType: (short) anIndex
+{
+    return [[ORKatrinV4FLTRegisters sharedRegSet] accessType:anIndex];
 }
 @end
 
@@ -2997,8 +3002,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 			unsigned long offsetPattern[4] = {0xfff,0x0,0xaaa,0x555};
 			for(testIndex = 0;testIndex<4;testIndex++){
 				unsigned short thePattern = offsetPattern[testIndex];
-				[self writeReg:kFLTV4AnalogOffset value:thePattern];
-				unsigned short theValue = [self readReg:kFLTV4AnalogOffset];
+				[self writeReg:kFLTV4AnalogOffsetReg value:thePattern];
+				unsigned short theValue = [self readReg:kFLTV4AnalogOffsetReg];
 				if(theValue != thePattern){
 					NSLog(@"Error: Offset (pattern: 0x%0x!=0x%0x) FLT %d does not work\n",thePattern,theValue,[self stationNumber]);
 					passed = NO;
@@ -3109,6 +3114,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	return n;
 }
 
+
+
 @end
 
 @implementation ORKatrinV4FLTModel (private)
@@ -3141,7 +3148,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				}
 				
 				[self initBoard];
-				[self writeControl];
 				
 				if(atLeastOne)	noiseFloorState = 1;
 				else			noiseFloorState = 4; //nothing to do
@@ -3162,7 +3168,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 					}
 				}
 				[self initBoard];
-				[self writeControl];
 				
 				if(hitRateEnabledMask)	noiseFloorState = 2;	//go check for data
 				else					noiseFloorState = 3;	//done
@@ -3185,7 +3190,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				}
 				
 				[self initBoard];
-				[self writeControl];
 				
 				noiseFloorState = 1;
 				break;
@@ -3197,7 +3201,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 					[self setThreshold:i withValue:newThreshold[i]];
 				}
 				[self initBoard];
-				[self writeControl];
 				noiseFloorRunning = NO;
 			break;
 		}
@@ -3216,7 +3219,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
             [self setThreshold:i withValue:oldThreshold[i]];
 			//[self reset];
 			[self initBoard];
-			[self writeControl];
         }
 		NSLog(@"FLT4 LED threshold finder quit because of exception\n");
     }

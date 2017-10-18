@@ -504,7 +504,6 @@ NSString* ORSLTV4cpuLock							= @"ORSLTV4cpuLock";
 - (void) writePageSelect:(unsigned long)aPageNum		{ [self writeReg:kSltV4PageSelectReg value:aPageNum]; }
 - (void) writeSetInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdSetInh]; }
 - (void) writeClrInhibit		{ [self writeReg:kSltV4CommandReg value:kCmdClrInh]; }
-- (void) writeSwTrigger			{ [self writeReg:kSltV4CommandReg value:kCmdSwTr];   }
 - (void) writeTpStart			{ [self writeReg:kSltV4CommandReg value:kCmdTpStart];   }
 - (void) writeFwCfg				{ [self writeReg:kSltV4CommandReg value:kCmdFwCfg];   }
 - (void) writeSltReset			{ [self writeReg:kSltV4CommandReg value:kCmdSltReset];   }

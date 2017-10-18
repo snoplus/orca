@@ -126,9 +126,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
-    [self setRunInProgress: [[[aNotification userInfo] objectForKey:ORRunStatusValue] intValue]];
+    [self setRunState: [[[aNotification userInfo] objectForKey:ORRunStatusValue] intValue]];
     [self setRunType: [[[aNotification userInfo] objectForKey:ORRunTypeMask] longValue]];
-    if(runInProgress == eRunStarting){
+    if(runState == eRunStarting){
         [[ORStatusController sharedStatusController] clearAllAction:nil];
     }
 }
@@ -188,8 +188,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (NSString*) runModeString
 {
-	if(runInProgress == eRunStopped)		return  @"";
-	else if(runInProgress == eRunStopping)	return  @"Run Stopping";
+	if(runState == eRunStopped)		return  @"";
+	else if(runState == eRunStopping)	return  @"Run Stopping";
 	else  switch(runMode){
         case kOfflineRun:
             return @"Running Offline.";
@@ -199,7 +199,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
         case kNormalRun:	
 		{
 			NSString* rs;
-			if(runInProgress == eRunBetweenSubRuns) rs= @"Between Sub Runs.";
+			if(runState == eRunBetweenSubRuns) rs= @"Between Sub Runs.";
 			else {
 				rs= @"Run In Progress.";
 			
@@ -267,20 +267,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (BOOL) runInProgress
 {
-    return runInProgress >= eRunInProgress;
+    return runState >= eRunInProgress;
 }
 - (BOOL) runStopped
 {
-    return runInProgress == eRunStopped;
+    return runState == eRunStopped;
 }
 - (BOOL) runRunning
 {
-    return runInProgress == eRunInProgress;
+    return runState == eRunInProgress;
 }
 
-- (void) setRunInProgress:(BOOL)state
+- (void) setRunState:(int)state
 {
-    runInProgress = state;
+    runState = state;
 	[[(ORAppDelegate*)[NSApp delegate] document] setStatusText:[self runModeString]];
 }
 

@@ -38,6 +38,7 @@ typedef struct Pulser33500CustomWaveformStruct {
 	float			burstRate;
 	float			burstPhase;
 	int				burstCount;
+    float           dutyCycle;
 	int             triggerSource;
 	float			triggerTimer;
 	int             selectedWaveform;
@@ -48,7 +49,8 @@ typedef struct Pulser33500CustomWaveformStruct {
 	int             downloadIndex;
 	int				savedTriggerSource;
 	BOOL			negativePulse;
-	
+    BOOL            burstMode;
+    
 	enum {
         kInternalTrigger,
         kExternalTrigger,
@@ -96,6 +98,8 @@ typedef struct Pulser33500CustomWaveformStruct {
 - (int)channel;
 - (id) pulser;
 - (void) setPulser:(id)aPulser;
+- (BOOL) burstMode;
+- (void) setBurstMode:(BOOL)aFlag;
 - (BOOL) negativePulse;
 - (void) setNegativePulse:(BOOL)aNegativePulse;
 - (float) voltage;
@@ -103,7 +107,9 @@ typedef struct Pulser33500CustomWaveformStruct {
 - (float) voltageOffset;
 - (void) setVoltageOffset:(float)aVoltage;
 - (float) frequency;
-- (void) setFrequency:(float)aFrequency; 
+- (void) setFrequency:(float)aFrequency;
+- (float) dutyCycle;
+- (void) setDutyCycle:(float)aFrequency;
 - (float) burstRate;
 - (void) setBurstRate:(float)aRate; 
 - (int) burstCount;
@@ -138,7 +144,8 @@ typedef struct Pulser33500CustomWaveformStruct {
 - (void) writeBurstPhase;
 - (void) writeTriggerSource;
 - (void) writeTriggerTimer;
-- (void) writeBurstState:(BOOL)aState;
+- (void) writeBurstMode;
+- (void) writeDutyCycle;
 - (void) trigger;
 - (void) emptyVolatileMemory;
 
@@ -196,5 +203,7 @@ extern NSString* ORPulser33500WaveformLoadingNonVoltile;
 extern NSString* ORPulser33500WaveformLoadProgressing;
 extern NSString* ORPulser33500WaveformLoadFinished;
 extern NSString* ORPulser33500NegativePulseChanged;
+extern NSString* ORPulser33500BurstModeChanged;
 extern NSString* ORPulser33500WaveformLoadStarted;
 extern NSString* ORPulser33500WaveformLoadingVoltile;
+extern NSString* ORPulser33500ChanDutyCycleChanged;

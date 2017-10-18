@@ -270,6 +270,13 @@
                          name : ORMajoranaModelVerboseDiagnosticsChanged
                        object : nil];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(minNumDetsToAlertExpertsChanged:)
+                         name : ORMajoranaModelMinNumDetsToAlertExperts
+                       object : nil];
+
+    
+    
 }
 
 
@@ -306,6 +313,7 @@
     [self breakdownDetectedChanged:nil];
     [self sourceStateChanged:nil];
     [self verboseDiagnosticsChanged:nil];
+    [self minNumDetsToAlertExpertsChanged:nil];
     
     //Source
     [self calibrationLockChanged:nil];
@@ -316,7 +324,10 @@
     [self sourceGatevalveChanged:nil];
     [self sourceIsInChanged:nil];
 }
-
+- (void) minNumDetsToAlertExpertsChanged:(NSNotification*)aNote
+{
+    [minNumDetsToAlertExpertsField setIntValue:[model minNumDetsToAlertExperts]];
+}
 - (void) verboseDiagnosticsChanged:(NSNotification*)aNote
 {
     [verboseDiagnosticsCB setState:[model verboseDiagnostics]];
@@ -950,6 +961,11 @@
     [[model mjdInterlocks:1] reset:YES];
     [model setPollTime:[model pollTime]];
 }
+- (IBAction) resetSpikeDictionariesAction:(id)sender
+{
+    [model resetSpikeDictionaries];
+}
+
 - (IBAction) printBreakDownReport:(id)sender    {[model printBreakDownReport];}
 
 - (IBAction) checkSourceGateValve0:(id)sender   {[model checkSourceGateValve:0];}
@@ -1030,6 +1046,10 @@
     [gSecurity tryToSetLock:[model calibrationLock] to:[sender intValue] forWindow:[self window]];
 }
 
+- (IBAction) minNumDetsToAlertExpertsAction:(id)sender
+{
+    [model setMinNumDetsToAlertExperts:[sender intValue]];
+}
 
 - (IBAction) readSecondaryMapFileAction:(id)sender
 {

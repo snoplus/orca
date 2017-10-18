@@ -287,14 +287,14 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	}
 }
 
-- (void)assignProcessID:(id)objToGetID
+- (void)assignProcessID:(OrcaObject*)objToGetID
 {
 	if(![objToGetID respondsToSelector:@selector(processID)])return;
 	if(![objToGetID processID]){
 		unsigned long anId = 1;
 		do {
 			BOOL idAlreadyUsed = NO;
-			for(id anObj in [self orcaObjects]){
+			for(OrcaObject* anObj in [self orcaObjects]){
 				if(anObj == objToGetID)continue;
 				if([anObj processID] == anId){
 					anId++;

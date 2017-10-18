@@ -139,8 +139,8 @@
 {
 	BOOL result = NO;
 	@synchronized(self){
-		PGresult *res = PQexec(mConnection,"");
-		if (PQresultStatus(res) == PGRES_COMMAND_OK) {
+		PGresult *res = PQexec(mConnection,"select 1 limit 0");
+		if (PQresultStatus(res) == PGRES_TUPLES_OK) {
 		    result = YES;
 		}
 	}

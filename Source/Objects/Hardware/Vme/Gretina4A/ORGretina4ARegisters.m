@@ -54,7 +54,7 @@ static gretina4ARegNamesStruct reg4A[kNumberOfGretina4ARegisters] = {
     { 0x0414,	@"Holdoff Control",         kReadWrite,            kHoldoffControl       },
     { 0x0418,	@"Baseline Delay",          kReadWrite,            kBaselineDelay        },
     { 0x041C,	@"Diag Channel Input",      kReadWrite,            kDiagChannelInput     },
-    { 0x0420,	@"Ext Discriminator Select",kReadWrite,            kExtDiscSel           },
+    { 0x0420,	@"Ext Discriminator Mode",  kReadWrite,            kExternalDiscMode     },
     { 0x0424,	@"Rj45 Spare Dout Control",	kReadWrite,            kRj45SpareDoutControl },
     { 0x0428,	@"Led Status",              kReadOnly,             kLedStatus            },
     { 0x0434,	@"Downsample Holdoff",      kReadWrite,            kDownSampleHoldOffTime},

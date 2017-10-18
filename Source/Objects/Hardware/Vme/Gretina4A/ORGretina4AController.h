@@ -96,6 +96,7 @@
     IBOutlet NSMatrix*		forceFullInitMatrix;
 
     IBOutlet NSMatrix*      extDiscrSrcMatrix;
+    IBOutlet NSMatrix*      extDiscrModeMatrix;
     IBOutlet NSTextField*   userPackageDataField;
     IBOutlet NSTextField*   windowCompMinField;
     IBOutlet NSTextField*   windowCompMaxField;
@@ -137,7 +138,6 @@
     IBOutlet NSPopUpButton* clockSourcePU;
     IBOutlet NSTextField*   clockLockedField;
 
-    
     NSView *blankView;
     NSSize settingSize;
     NSSize rateSize;
@@ -196,6 +196,7 @@
 - (void) forceFullCardInitChanged:(NSNotification*)aNote;
 - (void) forceFullInitChanged:(NSNotification*)aNote;
 - (void) extDiscrSrcChanged:(NSNotification*)aNote;
+- (void) extDiscrModeChanged:(NSNotification*)aNote;
 - (void) userPackageDataChanged:(NSNotification*)aNote;
 - (void) downSampleHoldOffTimeChanged:(NSNotification*)aNote;
 - (void) holdOffTimeChanged:(NSNotification*)aNote;
@@ -292,6 +293,7 @@
 #pragma mark - Register Actions
 - (IBAction) enabledAction:(id)sender;
 - (IBAction) extDiscrSrcAction:(id)sender;
+- (IBAction) extDiscrModeAction:(id)sender;
 - (IBAction) userPackageDataAction:(id)sender;
 
 
@@ -363,6 +365,7 @@
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) readCounters:(id)sender;
 - (IBAction) clearCounters:(id)sender;
+- (IBAction) softwareTriggerAction:(id)sender;
 
 #pragma mark - Data Source
 - (void)    tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;

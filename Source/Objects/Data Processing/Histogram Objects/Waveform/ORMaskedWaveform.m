@@ -142,7 +142,7 @@
 	firstBitMask = 0;
 	int i;
 	for(i=0;i<32;i++){
-		if(specialBitMask & (1L<<i)) {
+		if(specialBitMask & (1UL<<i)) {
 			numBits++;
 			if(firstBitMask==0)firstBitMask = (1L<<i);
 		}

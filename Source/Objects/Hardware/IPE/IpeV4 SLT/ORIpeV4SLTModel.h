@@ -84,7 +84,6 @@
 #define kCmdSltReset		(0x00000001 <<  5) //W - self cleared
 #define kCmdFwCfg			(0x00000001 <<  4) //W - self cleared
 #define kCmdTpStart			(0x00000001 <<  3) //W - self cleared
-#define kCmdSwTr			(0x00000001 <<  2) //W - self cleared
 #define kCmdClrInh			(0x00000001 <<  1) //W - self cleared
 #define kCmdSetInh			(0x00000001 <<  0) //W - self cleared
 
@@ -398,7 +397,6 @@ static IpeRegisterNamesStruct regSLTV4[kSltV4NumRegs] = {
 - (void)		  loadSecondsReg;
 - (void)		writeSetInhibit;
 - (void)		writeClrInhibit;
-- (void)		writeSwTrigger;
 - (void)		writeTpStart;
 - (void)		writeFwCfg;
 - (void)		writeSltReset;

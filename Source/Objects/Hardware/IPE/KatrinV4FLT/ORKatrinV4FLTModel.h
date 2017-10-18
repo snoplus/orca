@@ -369,6 +369,11 @@
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (BOOL) setFromDecodeStage:(short)aChan fifoFlags:(unsigned char)flags;
 
+- (NSString*) getRegisterName: (short) anIndex;
+- (short) getAccessType: (short) anIndex;
+- (unsigned long) getAddressOffset: (short) anIndex;
+
+
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
 - (void) initSumHistogramBuffers;

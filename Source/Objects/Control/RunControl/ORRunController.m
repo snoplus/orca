@@ -574,7 +574,7 @@
 	unsigned long runType = [model runType];
 	int i;
 	for(i=0;i<32;i++){
-		[[runTypeMatrix cellWithTag:i] setState:(runType &(1L<<i))!=0];
+		[[runTypeMatrix cellWithTag:i] setState:(runType &(1UL<<i))!=0];
 	}
 }
 
