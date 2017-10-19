@@ -42,7 +42,6 @@
         IBOutlet StopLightView* lightBoardView1;
 
 		//control reg
-		IBOutlet NSMatrix*		triggerEnableMatrix;
 		IBOutlet NSMatrix*		inhibitEnableMatrix;
 		IBOutlet NSMatrix*		testPatternEnableMatrix;
 		IBOutlet NSMatrix*		miscCntrlBitsMatrix;
@@ -55,8 +54,6 @@
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
-		IBOutlet NSButton*      displayTriggerButton;
-		IBOutlet NSButton*      displayEventLoopButton;
 		
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
@@ -80,9 +77,6 @@
 		IBOutlet NSButton*		definePatternFileButton;
 		IBOutlet NSTextField*	patternFilePathField;
 		IBOutlet NSButton*		loadPatternFileButton;
-
-		IBOutlet NSSlider*		nextPageDelaySlider;
-		IBOutlet NSTextField*	nextPageDelayField;
 		
 		//pulser
 		IBOutlet NSTextField*	pulserAmpField;
@@ -121,18 +115,13 @@
 - (void) runTimeChanged:(NSNotification*)aNote;
 - (void) vetoTimeChanged:(NSNotification*)aNote;
 - (void) deadTimeChanged:(NSNotification*)aNote;
+- (void) lostEventsChanged:(NSNotification*)aNote;
 - (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*) aNote;
-- (void) displayEventLoopChanged:(NSNotification*) aNote;
-- (void) displayTriggerChanged:(NSNotification*) aNote;
 - (void) patternFilePathChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
-- (void) nextPageDelayChanged:(NSNotification*)aNote;
-- (void) pageSizeChanged:(NSNotification*)aNote;
-- (void) displayEventLoopChanged:(NSNotification*)aNote;
-- (void) displayTriggerChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
 - (void) checkGlobalSecurity;
@@ -146,7 +135,6 @@
 - (void) pulserAmpChanged:(NSNotification*) aNote;
 - (void) pulserDelayChanged:(NSNotification*) aNote;
 - (void) pollRateChanged:(NSNotification*)aNote;
-- (void) pollRunningChanged:(NSNotification*)aNote;
 
 - (void) enableRegControls;
 
@@ -173,11 +161,8 @@
 - (IBAction) pollRateAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;
-- (IBAction) nextPageDelayAction:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
 - (IBAction) pageSizeAction:(id)sender;
-- (IBAction) displayTriggerAction:(id)sender;
-- (IBAction) displayEventLoopAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) selectRegisterAction:(id) sender;
 - (IBAction) writeValueAction:(id) sender;
@@ -204,7 +189,6 @@
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) sendCommandScript:(id)sender;
-
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
 - (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;

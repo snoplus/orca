@@ -41,14 +41,14 @@ typedef enum eKatriV4SLTEnum {
     kKatrinV4SLTHWRevisionReg,
     kKatrinV4SLTPixelBusErrorReg,
     kKatrinV4SLTPixelBusEnableReg,
-    kKatrinV4SLTVetoCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-    kKatrinV4SLTVetoCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-    kKatrinV4SLTDeadTimeCounterHiReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-    kKatrinV4SLTDeadTimeCounterLoReg,	//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-                                        //TODO: and dead time and veto time counter are confused, too -tb-
-    kKatrinV4SLTRunCounterHiReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-    kKatrinV4SLTRunCounterLoReg,		//TODO: the LSB and MSB part of this SLT registers is confused (according to the SLT doc 2.13/2010-May) -tb-
-    kKatrinV4SLTLostEventsCountReg,     //new v10
+    kKatrinV4SLTVetoCounterHiReg,
+    kKatrinV4SLTVetoCounterLoReg,
+    kKatrinV4SLTDeadTimeCounterHiReg,
+    kKatrinV4SLTDeadTimeCounterLoReg,
+    kKatrinV4SLTRunCounterHiReg,
+    kKatrinV4SLTRunCounterLoReg,
+    kKatrinV4SLTLostEventsCountHiReg,
+    kKatrinV4SLTLostEventsCountLoReg,
     kKatrinV4SLTSecondSetReg,
     kKatrinV4SLTSecondCounterReg,
     kKatrinV4SLTSubSecondCounterReg,

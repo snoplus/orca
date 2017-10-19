@@ -140,7 +140,6 @@
 		unsigned long	hwVersion;
 		NSString*		patternFilePath;
 		unsigned long	interruptMask;
-		unsigned long	nextPageDelay;
 		float			pulserAmp;
 		float			pulserDelay;
 		unsigned short  selectedRegIndex;
@@ -151,13 +150,10 @@
 		unsigned long	energyId;
 		unsigned long   eventCounter;
 		int				actualPageIndex;
-        TimedWorker*    poller;
-		BOOL			pollingWasRunning;
+        int             pollTime;
 		ORReadOutList*	readOutGroup;
 		NSArray*		dataTakers;			//cache of data takers.
 		BOOL			first;
-		BOOL            displayTrigger;    //< Display pixel and timing view of trigger data
-		BOOL            displayEventLoop;  //< Display the event loop parameter
         unsigned long   lastInhibitStatus; //< Saves inhibit state at run start
 		unsigned long   lastDisplaySec;
 		unsigned long   lastDisplayCounter;
@@ -165,7 +161,6 @@
         unsigned long   runStartSec;
 		
 		unsigned long   lastSimSec;
-		unsigned long   pageSize; //< Length of the ADC data (0..100us)
 
 		PMC_Link*		pmcLink;
         
@@ -174,7 +169,8 @@
 		unsigned long       secondsSet;
 		unsigned long long  deadTime;
 		unsigned long long  vetoTime;
-		unsigned long long  runTime;
+        unsigned long long  runTime;
+        unsigned long long  lostEvents;
 		unsigned long       clockTime;
 		BOOL                countersEnabled;
         NSString*           sltScriptArguments;
@@ -183,6 +179,8 @@
         unsigned long       pixelBusEnableReg;
         ORAlarm*            swInhibitDisabledAlarm;
         ORAlarm*            pixelTriggerDisabledAlarm;
+        ORAlarm*            noPPSAlarm;
+        ORAlarm*            badPPSStatusAlarm;
 }
 
 #pragma mark •••Initialization
@@ -218,6 +216,8 @@
 - (void) setVetoTime:(unsigned long long)aVetoTime;
 - (unsigned long long) deadTime;
 - (void) setDeadTime:(unsigned long long)aDeadTime;
+- (unsigned long long) lostEvents;
+- (void) setLostEvents:(unsigned long long)aDeadTime;
 - (unsigned long) secondsSet;
 - (void) setSecondsSet:(unsigned long)aSecondsSet;
 - (unsigned long) statusReg;
@@ -235,8 +235,6 @@
 - (NSString*) patternFilePath;
 - (void) setPatternFilePath:(NSString*)aPatternFilePath;
 
-- (unsigned long) nextPageDelay;
-- (void) setNextPageDelay:(unsigned long)aDelay;
 - (unsigned long) interruptMask;
 - (void) setInterruptMask:(unsigned long)aInterruptMask;
 - (float) pulserDelay;
@@ -255,12 +253,6 @@
 - (void)		setWriteValue: (unsigned long) anIndex;
 //- (void) loadPatternFile;
 
-- (BOOL) displayTrigger; //< Staus of dispaly of trigger information
-- (void) setDisplayTrigger:(BOOL) aState; 
-- (BOOL) displayEventLoop; //< Status of display of event loop performance information
-- (void) setDisplayEventLoop:(BOOL) aState;
-- (unsigned long) pageSize; //< Length of the ADC data (0..100us)
-- (void) setPageSize: (unsigned long) pageSize;   
 - (void) sendSimulationConfigScriptON;
 - (void) sendSimulationConfigScriptOFF;
 - (void) sendLinkWithDmaLibConfigScriptON;
@@ -268,15 +260,14 @@
 
 - (void) checkPixelTrigger;
 - (void) checkSoftwareInhibit;
-
+- (void) checkPPSEnabled;
+- (void) checkPPSStatus;
 
 - (void) sendPMCCommandScript: (NSString*)aString;
 
 #pragma mark ***Polling
-- (TimedWorker *) poller;
-- (void) setPoller: (TimedWorker *) aPoller;
-- (void) setPollingInterval:(float)anInterval;
-- (void) makePoller:(float)anInterval;
+- (int) pollTime;
+- (void) setPollTime:(int)aPollTime;
 
 #pragma mark ***HW Access
 //note that most of these method can raise 
@@ -284,7 +275,6 @@
 - (void)		  readAllStatus;
 - (void)		  checkPresence;
 - (unsigned long) readControlReg;
-- (unsigned long) readPageSelectReg;
 - (void)		  writeControlReg;
 - (void)		  writeControlRegRunFlagOn:(BOOL) aState;
 - (void)		  printControlReg;
@@ -313,7 +303,6 @@
 
 - (unsigned long long) readBoardID;
 
-- (void)		  writePageSelect:(unsigned long)aPageNum;
 - (void)		  writeInterruptMask;
 - (void)		  readInterruptMask;
 - (void)		  readInterruptRequest;
@@ -332,6 +321,8 @@
 - (unsigned long long) readDeadTime;
 - (unsigned long long) readVetoTime;
 - (unsigned long long) readRunTime;
+- (void) clearRunTime;
+
 - (unsigned long) readSecondsCounter;
 - (unsigned long) readSubSecondsCounter;
 - (unsigned long) getSeconds;
@@ -416,9 +407,6 @@ extern NSString* ORKatrinV4SLTModelHwVersionChanged;
 
 extern NSString* ORKatrinV4SLTModelPatternFilePathChanged;
 extern NSString* ORKatrinV4SLTModelInterruptMaskChanged;
-extern NSString* ORKatrinV4SLTModelPageSizeChanged;
-extern NSString* ORKatrinV4SLTModelDisplayEventLoopChanged;
-extern NSString* ORKatrinV4SLTModelDisplayTriggerChanged;
 extern NSString* ORKatrinV4SLTPulserDelayChanged;
 extern NSString* ORKatrinV4SLTPulserAmpChanged;
 extern NSString* ORKatrinV4SLTSelectedRegIndexChanged;
@@ -426,9 +414,8 @@ extern NSString* ORKatrinV4SLTWriteValueChanged;
 extern NSString* ORKatrinV4SLTSettingsLock;
 extern NSString* ORKatrinV4SLTStatusRegChanged;
 extern NSString* ORKatrinV4SLTControlRegChanged;
-extern NSString* ORKatrinV4SLTModelNextPageDelayChanged;
-extern NSString* ORKatrinV4SLTModelPollRateChanged;
+extern NSString* ORKatrinV4SLTPollTimeChanged;
 extern NSString* ORKatrinV4SLTModelReadAllChanged;
-
+extern NSString* ORKatrinV4SLTModelLostEventsChanged;
 extern NSString* ORKatrinV4SLTcpuLock;	
 

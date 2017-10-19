@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-//#import "ORIpeDefs.h"
 #import "ORGlobal.h"
 #import "ORCrate.h"
 #import "ORKatrinV4SLTModel.h"
@@ -47,6 +46,7 @@ NSString* ORKatrinV4SLTModelClockTimeChanged                = @"ORKatrinV4SLTMod
 NSString* ORKatrinV4SLTModelRunTimeChanged                  = @"ORKatrinV4SLTModelRunTimeChanged";
 NSString* ORKatrinV4SLTModelVetoTimeChanged                 = @"ORKatrinV4SLTModelVetoTimeChanged";
 NSString* ORKatrinV4SLTModelDeadTimeChanged                 = @"ORKatrinV4SLTModelDeadTimeChanged";
+NSString* ORKatrinV4SLTModelLostEventsChanged               = @"ORKatrinV4SLTModelLostEventsChanged";
 NSString* ORKatrinV4SLTModelSecondsSetChanged               = @"ORKatrinV4SLTModelSecondsSetChanged";
 NSString* ORKatrinV4SLTModelStatusRegChanged                = @"ORKatrinV4SLTModelStatusRegChanged";
 NSString* ORKatrinV4SLTModelControlRegChanged               = @"ORKatrinV4SLTModelControlRegChanged";
@@ -67,12 +67,8 @@ NSString* ORKatrinV4SLTStatusRegChanged                     = @"ORKatrinV4SLTSta
 NSString* ORKatrinV4SLTControlRegChanged                    = @"ORKatrinV4SLTControlRegChanged";
 NSString* ORKatrinV4SLTSelectedRegIndexChanged              = @"ORKatrinV4SLTSelectedRegIndexChanged";
 NSString* ORKatrinV4SLTWriteValueChanged                    = @"ORKatrinV4SLTWriteValueChanged";
-NSString* ORKatrinV4SLTModelNextPageDelayChanged            = @"ORKatrinV4SLTModelNextPageDelayChanged";
-NSString* ORKatrinV4SLTModelPollRateChanged                 = @"ORKatrinV4SLTModelPollRateChanged";
+NSString* ORKatrinV4SLTPollTimeChanged                      = @"ORKatrinV4SLTPollTimeChanged";
 
-NSString* ORKatrinV4SLTModelPageSizeChanged                 = @"ORKatrinV4SLTModelPageSizeChanged";
-NSString* ORKatrinV4SLTModelDisplayTriggerChanged           = @"ORKatrinV4SLTModelDisplayTrigerChanged";
-NSString* ORKatrinV4SLTModelDisplayEventLoopChanged         = @"ORKatrinV4SLTModelDisplayEventLoopChanged";
 NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpuLock";
 
 @interface ORKatrinV4SLTModel (private)
@@ -87,7 +83,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     self = [super init];
 	ORReadOutList* readList = [[ORReadOutList alloc] initWithIdentifier:@"ReadOut List"];	
 	[self setReadOutGroup:readList];
-    [self makePoller:0];
 	[readList release];
 	pmcLink = [[PMC_Link alloc] initWithDelegate:self];
 	[self setSecondsSetInitWithHost: YES];
@@ -103,14 +98,16 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [patternFilePath release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[readOutGroup release];
-    [poller stop];
-    [poller release];
 	[pmcLink setDelegate:nil];
 	[pmcLink release];
     [swInhibitDisabledAlarm clearAlarm];
     [swInhibitDisabledAlarm release];
     [pixelTriggerDisabledAlarm clearAlarm];
     [pixelTriggerDisabledAlarm release];
+    [noPPSAlarm clearAlarm];
+    [noPPSAlarm release];
+    [badPPSStatusAlarm clearAlarm];
+    [badPPSStatusAlarm release];
 
     
     [super dealloc];
@@ -121,16 +118,16 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     if([self aWake])return;
 	[pmcLink wakeUp];
     [super wakeUp];
-    if(![gOrcaGlobals runInProgress]){
-        [poller runWithTarget:self selector:@selector(readAllStatus)];
+    if(pollTime){
+        [self performSelector:@selector(readAllStatus) withObject:nil afterDelay:2];
     }
 }
 
 - (void) sleep
 {
     [super sleep];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[pmcLink sleep];
-    [poller stop];
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -316,9 +313,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (void) setRunTime:(unsigned long long)aRunTime
 {
     runTime = aRunTime;
-    //can be called from takedata and updates the gui, so must post on main thread
-    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORKatrinV4SLTModelRunTimeChanged object:nil userInfo:nil waitUntilDone:NO];
-// [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelRunTimeChanged object:self];
+    if([NSThread isMainThread]){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelRunTimeChanged object:self];
+    }
 }
 
 - (unsigned long long) vetoTime
@@ -344,6 +341,17 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelDeadTimeChanged object:self];
 }
+- (unsigned long long) lostEvents
+{
+    return lostEvents;
+
+}
+- (void) setLostEvents:(unsigned long long)aValue
+{
+    lostEvents = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelLostEventsChanged object:self];
+
+}
 
 
 - (unsigned long) secondsSet
@@ -368,12 +376,48 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     statusReg = aStatusReg;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelStatusRegChanged object:self];
+    [self checkPPSStatus];
 }
 
 - (unsigned long) controlReg
 {
     return controlReg;
 }
+
+- (void) checkPPSEnabled
+{
+    if((controlReg & kCtrlPPSMask) != kCtrlPPSMask){
+        if(!noPPSAlarm){
+            noPPSAlarm = [[ORAlarm alloc] initWithName:@"SLT PPS not Enabled" severity:kSetupAlarm];
+            [noPPSAlarm setSticky:YES];
+            [noPPSAlarm setHelpString:@"Check the 'PPS' option in the SLT Control Registor section. It should be enabled for normal running"];
+        }
+        [noPPSAlarm postAlarm];
+    }
+    else {
+        [noPPSAlarm clearAlarm];
+        [noPPSAlarm release];
+        noPPSAlarm = nil;
+    }
+}
+
+- (void) checkPPSStatus
+{
+    if((statusReg & kCtrlPPSMask) != kCtrlPPSMask){
+        if(!badPPSStatusAlarm){
+            badPPSStatusAlarm = [[ORAlarm alloc] initWithName:@"SLT Not Synced (bad PPS bit)" severity:kSetupAlarm];
+            [badPPSStatusAlarm setSticky:YES];
+            [badPPSStatusAlarm setHelpString:@"Check the 'PPS' status in the SLT status section. It indicates the crate is not synced"];
+        }
+        [badPPSStatusAlarm postAlarm];
+    }
+    else {
+        [badPPSStatusAlarm clearAlarm];
+        [badPPSStatusAlarm release];
+        badPPSStatusAlarm = nil;
+    }
+}
+
 
 - (void) checkPixelTrigger
 {
@@ -385,7 +429,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             aMask |= (0x1<<n);
         }
     }
-    
     
     if(((controlReg & kCtrlRunMask)==0) || (aMask != pixelBusEnableReg)){
         if(!pixelTriggerDisabledAlarm){
@@ -426,6 +469,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     [self checkSoftwareInhibit];
     [self checkPixelTrigger];
+    [self checkPPSEnabled];
     
 }
 
@@ -452,9 +496,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (void) clearAllStatusErrorBits{ [self writeReg:kKatrinV4SLTStatusReg  value:kStatusClearAllMask]; }
 - (void) writeFIFOcsrReset      { [self writeReg:kKatrinV4SLTFIFOCsrReg value:kFIFOcsrResetMask];   }
 
-- (void) writePageSelect:(unsigned long)aPageNum		{
-    //NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-}
 - (void) writeReleasePage		{
     NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 }
@@ -466,35 +507,24 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (id) controllerCard		{ return self;	  }
 - (SBC_Link*)sbcLink		{ return pmcLink; } 
 - (bool)sbcIsConnected      { return [pmcLink isConnected]; }
-- (TimedWorker *) poller	{ return poller;  }
 
-- (void) setPoller: (TimedWorker *) aPoller
+- (int) pollTime
 {
-    if(aPoller == nil){
-        [poller stop];
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:aPollTime];
+    pollTime = aPollTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTPollTimeChanged object:self];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readAllStatus) object:nil];
+    if(pollTime){
+        [self performSelector:@selector(readAllStatus) withObject:nil afterDelay:2];
+        NSLog(@"SLT new poll time %d seconds\n",pollTime);
     }
-    [aPoller retain];
-    [poller release];
-    poller = aPoller;
 }
 
-- (void) setPollingInterval:(float)anInterval
-{
-	[self readAllStatus];
-    if(!poller){
-        [self makePoller:(float)anInterval];
-    }
-    else [poller setTimeInterval:anInterval];
-    
-	[poller stop];
-    [poller runWithTarget:self selector:@selector(readAllStatus)];
-}
-
-
-- (void) makePoller:(float)anInterval
-{
-    [self setPoller:[TimedWorker TimeWorkerWithInterval:anInterval]];
-}
 
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
@@ -526,23 +556,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     patternFilePath = [aPatternFilePath copy];    
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelPatternFilePathChanged object:self];
-}
-
-- (unsigned long) nextPageDelay
-{
-	return nextPageDelay;
-}
-
-- (void) setNextPageDelay:(unsigned long)aDelay
-{	
-	if(aDelay>102400) aDelay = 102400;
-	
-    [[[self undoManager] prepareWithInvocationTarget:self] setNextPageDelay:nextPageDelay];
-    
-    nextPageDelay = aDelay;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelNextPageDelayChanged object:self];
-	
 }
 
 - (unsigned long) interruptMask
@@ -659,50 +672,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	 postNotificationName:ORKatrinV4SLTWriteValueChanged
 	 object:self];
 }
-
-
-- (BOOL) displayTrigger
-{
-	return displayTrigger;
-}
-
-- (void) setDisplayTrigger:(BOOL) aState
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayTrigger:displayTrigger];
-	displayTrigger = aState;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelDisplayTriggerChanged object:self];
-	
-}
-
-- (BOOL) displayEventLoop
-{
-	return displayEventLoop;
-}
-
-- (void) setDisplayEventLoop:(BOOL) aState
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setDisplayEventLoop:displayEventLoop];
-	
-	displayEventLoop = aState;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelDisplayEventLoopChanged object:self];
-	
-}
-
-- (unsigned long) pageSize
-{
-	return pageSize;
-}
-
-- (void) setPageSize: (unsigned long) aPageSize
-{
-	[[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
-	
-    if (aPageSize > 100) pageSize = 100;
-	else pageSize = aPageSize;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelPageSizeChanged object:self];
-}  
 
 /*! Send a script to the PrPMC which will configure the PrPMC.
  *
@@ -943,21 +912,20 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) readAllStatus
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readAllStatus) object:nil];
+
 	//[self readControlReg];
 	[self readStatusReg];
 	[self readDeadTime];
+    [self readLostEvents];
 	[self readVetoTime];
 	[self readRunTime];
 	[self getSeconds];
+    if(pollTime){
+        [self performSelector:@selector(readAllStatus) withObject:nil afterDelay:pollTime];
+    }
 }
 
-- (unsigned long) readPageSelectReg
-{
-	unsigned long data = 0;
-    //NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-	data = [self readReg:kKatrinV4SLTPageSelectReg];
-	return data;
-}
 
 - (unsigned long) readStatusReg
 {
@@ -1146,7 +1114,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     [self setHostTimeToFLTsAndSLT];
 return;
-    uint32_t i,sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
+    unsigned long i,sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
 
     //everything else moved to void setHostTimeToFLTsAndSLT(int32_t* args) on SBC called by [self setHostTimeToFLTsAndSLT]; ...
     //wait until we are not at the end of a second (<0.9 sec)
@@ -1171,12 +1139,12 @@ return;
 	
 	if(secondsSetSendToFLTs){
         #if 1 //TODO: broadcast to FLTs seems to nor work currently FIX IT -tb-
-	    uint32_t FLTV4SecondCounterRegAddr = (0x1f << 17) | (0x000044>>2);
+	    unsigned long FLTV4SecondCounterRegAddr = (0x1f << 17) | (0x000044>>2);
 	    [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
         #else
         int j;
         for(j=1;j<21;j++){
-	        uint32_t FLTV4SecondCounterRegAddr = ( j << 17) | (0x000044>>2);
+	        unsigned long FLTV4SecondCounterRegAddr = ( j << 17) | (0x000044>>2);
 	        [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
         }
         #endif
@@ -1261,7 +1229,13 @@ return;
 	}
 	return value;
 }
-
+- (unsigned long long) readLostEvents
+{
+    unsigned long high = [self readReg:kKatrinV4SLTLostEventsCountHiReg];
+    unsigned long low  = [self readReg:kKatrinV4SLTLostEventsCountLoReg];
+    [self setLostEvents:((unsigned long long)high << 32) | low];
+    return lostEvents;
+}
 - (unsigned long long) readDeadTime
 {
 	unsigned long low  = [self readReg:kKatrinV4SLTDeadTimeCounterLoReg];
@@ -1286,7 +1260,11 @@ return;
 	[self setRunTime:theTime];
 	return theTime;
 }
-
+- (void) clearRunTime
+{
+    [self writeReg:kKatrinV4SLTRunCounterLoReg value:0]; //clears hi and lo
+    [self setRunTime:0];
+}
 - (unsigned long) readSecondsCounter
 {
 	return [self readReg:kKatrinV4SLTSecondCounterReg];
@@ -1311,8 +1289,6 @@ return;
     
 - (void) initBoard
 {
-    if(countersEnabled) [self writeEnCnt];
-    else                [self writeDisCnt];
     
 	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
 		NSLogColor([NSColor redColor],@"WARNING: KATRIN-DAQ SLTv4: you used 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
@@ -1323,7 +1299,7 @@ return;
     [self clearAllStatusErrorBits];
     [self writePixelBusEnableReg];
     [self writeFIFOcsrReset];
-    
+    [self clearRunTime];
 	//-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];
@@ -1450,12 +1426,8 @@ return;
 	[self setInterruptMask:			[decoder decodeInt32ForKey:@"ORKatrinV4SLTModelInterruptMask"]];
 	[self setPulserDelay:			[decoder decodeFloatForKey:@"ORKatrinV4SLTModelPulserDelay"]];
 	[self setPulserAmp:				[decoder decodeFloatForKey:@"ORKatrinV4SLTModelPulserAmp"]];
-    [self setNextPageDelay:			[decoder decodeIntForKey:@"nextPageDelay"]]; // ak, 5.10.07
 	[self setReadOutGroup:			[decoder decodeObjectForKey:@"ReadoutGroup"]];
-    [self setPoller:				[decoder decodeObjectForKey:@"poller"]];
-    [self setPageSize:				[decoder decodeIntForKey:@"ORKatrinV4SLTPageSize"]]; // ak, 9.12.07
-    [self setDisplayTrigger:		[decoder decodeBoolForKey:@"ORKatrinV4SLTDisplayTrigger"]];
-    [self setDisplayEventLoop:		[decoder decodeBoolForKey:@"ORKatrinV4SLTDisplayEventLoop"]];
+    [self setPollTime:				[decoder decodeIntForKey:@"pollTime"]];
     
 	
 	//These were added when the object was already in the config and so might not availale if old config is read
@@ -1468,8 +1440,6 @@ return;
 		[self setReadOutGroup:readList];
 		[readList release];
 	}
-	
-    if (!poller)[self makePoller:0];
 
 	[[self undoManager] enableUndoRegistration];
     
@@ -1494,12 +1464,8 @@ return;
 	[encoder encodeInt32:interruptMask          forKey:@"ORKatrinV4SLTModelInterruptMask"];
 	[encoder encodeFloat:pulserDelay            forKey:@"ORKatrinV4SLTModelPulserDelay"];
 	[encoder encodeFloat:pulserAmp              forKey:@"ORKatrinV4SLTModelPulserAmp"];
-    [encoder encodeInt:nextPageDelay            forKey:@"nextPageDelay"];
 	[encoder encodeObject:readOutGroup          forKey:@"ReadoutGroup"];
-    [encoder encodeObject:poller                forKey:@"poller"];
-    [encoder encodeInt:pageSize                 forKey:@"ORKatrinV4SLTPageSize"];
-    [encoder encodeBool:displayTrigger          forKey:@"ORKatrinV4SLTDisplayTrigger"];
-    [encoder encodeBool:displayEventLoop        forKey:@"ORKatrinV4SLTDisplayEventLoop"];
+    [encoder encodeInt:pollTime                 forKey:@"pollTime"];
 		
 }
 
@@ -1612,10 +1578,7 @@ return;
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORKatrinV4SLTModel"];    
     //----------------------------------------------------------------------------------------	
-	
-	pollingWasRunning = [poller isRunning];
-	if(pollingWasRunning) [poller stop];
-	
+		
     // Stop crate
     lastInhibitStatus = [self readStatusReg] & kStatusInh;
     [self writeSetInhibit];
@@ -1647,9 +1610,8 @@ return;
     if (sltsubsec2 > 8000) {
         usleep(205000);
     }
-    
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
-        
+
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
     
     //check: are there FLTs in histogram mode?
@@ -1677,13 +1639,11 @@ return;
         }
         usleep(1000000);
 	}	
-        
-        
+    
     //if cold start (not 'quick start' in RunControl) ...
     //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
     [self initBoard];
 	
-
     //loop over Readout List
 	for(id obj in dataTakers){
         [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs (sets run mode for non-histo-FLTs), set histogramming FLTs to standby mode etc -tb-
@@ -1692,10 +1652,10 @@ return;
     //if there are FLTs in non-histogramming mode, the filter will start after next 1PPs - wait for it ... -tb-
     if(countNonHistoMode && [[userInfo objectForKey:@"doinit"]intValue]){
         //wait for next second strobe/1PPs
-		uint32_t i, subsec1 = 0;
-		uint32_t subsec0 = [self readSubSecondsCounter];
+		unsigned long i;
+		unsigned long subsec0 = [self readSubSecondsCounter];
         for(i=0; i<1000; i++){
-		    subsec1 = [self readSubSecondsCounter];
+		    unsigned long subsec1 = [self readSubSecondsCounter];
             //DEBUG 
             if(i==0) NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
             if(subsec1<subsec0) break;
@@ -1719,8 +1679,10 @@ return;
 	}	
 
 	
+    if(countersEnabled) [self writeEnCnt];
+    else                [self writeDisCnt];
 	if(countersEnabled)[self writeClrCnt];//If enabled run counter will be reset to 0 at run start -tb-
-	
+
 	[self readStatusReg];
 	actualPageIndex     = 0;
 	eventCounter        = 0;
@@ -1735,11 +1697,8 @@ return;
 	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
 
    
-    // Write run counters - should be alway zero
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-
-    
     
     // Check finally, if the inhibit soiurce has been deactivated during config upload
     lStatus = [self readStatusReg];
@@ -1752,7 +1711,6 @@ return;
     // Release inhibit with the next second strobe
     [self writeClrInhibit];
 
-    
     //
     // Save the first second of the run
     // Is used by hitrate readout to aviod too early storage
@@ -1773,11 +1731,9 @@ return;
         runStartSec = sltsec;
     }
     
-    
     // Write run start time; starts always with the second strobe
     [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
-    
-    
+
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1797,12 +1753,6 @@ return;
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    
-    int i;
-    unsigned long lStatus;
-    uint32_t sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
-    
-    
     //
     // Todo: Check if run time close to completion
     //
@@ -1811,17 +1761,16 @@ return;
     //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
     //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
     
-    
-    
     [self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
     
     // Wait for inhibit; changes state with the next second strobe
-    i = 0;
+    unsigned long lStatus;
+    int i = 0;
     do {
         lStatus = [self readStatusReg];
-        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-        sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+        //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
         
         //NSLog(@"waiting for inhibit %x i=%d t=%d %04d\n", lStatus, i, sltsec, sltsubsec2);
         usleep(100000);
@@ -1833,51 +1782,38 @@ return;
         // But continue anyway
     }
  
-    
     // Ship the run counter - it should be exactly like the run time specified in RunControl
-    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    unsigned long sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
     [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltsec low:0 ];
     
-    // Write run counter
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-    
     
     //
     // Todo: check if all events are already processed
     //
     
-    
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
     }
 	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
-    
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    
-    
     //TODO: set a run control 'wait', if we record the hitrate counter -> wait for final hitrate event (... in change state notification callback ...) -tb-
 
-    
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	
 	
 	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
-	
-	if(pollingWasRunning) {
-		[poller runWithTarget:self selector:@selector(readAllStatus)];
-	}
-	
+		
 	[dataTakers release];
 	dataTakers = nil;
 
     [self setIsPartOfRun: NO];
-    
+
     //
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
@@ -1931,60 +1867,6 @@ return;
 	return [pmcLink doneTakingData];
 }
 
-- (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj
-{ 
-	//temp----
-	int i, j, k;
-	int sltSize = pageSize * 20;	
-	
-	// Dislay the matrix of triggered pixel and timing
-	// The xy-Projection is needed to readout only the triggered pixel!!!
-	//unsigned long xyProj[20];
-	//unsigned long tyProj[100];
-	for (i=0;i<20;i++) xyProj[i] = 0;
-	for (k=0;k<100;k++) tyProj[k] = 0;
-	for (k=0;k<sltSize;k++){
-		xyProj[k%20] = xyProj[k%20] | (pMult[k] & 0x3fffff);
-	}  
-	for (k=0;k<sltSize;k++){
-		if (xyProj[k%20]) {
-			tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff);
-		}
-	}
-	
-	int nTriggered = 0;
-	for (i=0;i<20;i++){
-		for(j=0;j<22;j++){
-			if (((xyProj[i]>>j) & 0x1 ) == 0x1) nTriggered++;
-		}
-	}
-	
-	// Display trigger data
-	if (displayTrigger) {	
-		int i, j, k;
-		NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
-		
-		for(j=0;j<22;j++){
-			NSMutableString* s = [NSMutableString stringWithFormat:@"%2d: ",j];
-			//matrix of triggered pixel
-			for(i=0;i<20;i++){
-				if (((xyProj[i]>>j) & 0x1) == 0x1) [s appendFormat:@"X"];
-				else							   [s appendFormat:@"."];
-			}
-			[s appendFormat:@"  "];
-			
-			// trigger timing
-			for (k=0;k<pageSize;k++){
-				if (((tyProj[k]>>j) & 0x1) == 0x1 )[s appendFormat:@"="];
-				else							   [s appendFormat:@"."];
-			}
-			NSLogFont(aFont, @"%@\n", s);
-		}
-		
-		NSLogFont(aFont,@"\n");	
-	}		
-	return(nTriggered);
-}
 
 - (void) saveReadOutList:(NSFileHandle*)aFile
 {
@@ -1996,72 +1878,6 @@ return;
     [self setReadOutGroup:[[[ORReadOutList alloc] initWithIdentifier:@"cPCI"]autorelease]];
     [readOutGroup loadUsingFile:aFile];
 }
-/*
-- (void) dumpTriggerRAM:(int)aPageIndex
-{
-	
-	//read page start address
-	unsigned long lTimeL     = [self read: SLT_REG_ADDRESS(kSltLastTriggerTimeStamp) + aPageIndex];
-	int iPageStart = (((lTimeL >> 10) & 0x7fe)  + 20) % 2000;
-	
-	unsigned long timeStampH = [self read: SLT_REG_ADDRESS(kSltPageTimeStamp) + 2*aPageIndex];
-	unsigned long timeStampL = [self read: SLT_REG_ADDRESS(kSltPageTimeStamp) + 2*aPageIndex+1];
-	
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
-	NSLogFont(aFont,@"Reading event from page %d, start=%d:  %ds %dx100us\n", 
-			  aPageIndex+1, iPageStart, timeStampH, (timeStampL >> 11) & 0x3fff);
-	
-	//readout the SLT pixel trigger data
-	unsigned long buffer[2000];
-	unsigned long sltMemoryAddress = (SLTID << 24) | aPageIndex<<11;
-	[self readBlock:sltMemoryAddress dataBuffer:(unsigned long*)buffer length:20*100 increment:1];
-	unsigned long reorderBuffer[2000];
-	// Re-organize trigger data to get it in a continous data stream
-	unsigned long *pMult = reorderBuffer;
-	memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(unsigned long));  
-	memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(unsigned long));  
-	
-	int i;
-	int j;	
-	int k;	
-	
-	// Dislay the matrix of triggered pixel and timing
-	// The xy-Projection is needed to readout only the triggered pixel!!!
-	unsigned long xyProj[20];
-	unsigned long tyProj[100];
-	for (i=0;i<20;i++) xyProj[i] = 0;
-	for (k=0;k<100;k++) tyProj[k] = 0;
-	for (k=0;k<2000;k++){
-		xyProj[k%20] = xyProj[k%20] | (pMult[k] & 0x3fffff);
-	}  
-	for (k=0;k<2000;k++){
-		if (xyProj[k%20]) {
-			tyProj[k/20] = tyProj[k/20] | (pMult[k] & 0x3fffff);
-		}
-	}
-	
-	
-	for(j=0;j<22;j++){
-		NSMutableString* s = [NSMutableString stringWithFormat:@"%2d: ",j];
-		//matrix of triggered pixel
-		for(i=0;i<20;i++){
-			if (((xyProj[i]>>j) & 0x1) == 0x1) [s appendFormat:@"X"];
-			else							   [s appendFormat:@"."];
-		}
-		[s appendFormat:@"  "];
-		
-		// trigger timing
-		for (k=0;k<100;k++){
-			if (((tyProj[k]>>j) & 0x1) == 0x1 )[s appendFormat:@"="];
-			else							   [s appendFormat:@"."];
-		}
-		NSLogFont(aFont, @"%@\n", s);
-	}
-	
-	
-	NSLogFont(aFont,@"\n");
-}
-*/
 
 - (void) autoCalibrate
 {
