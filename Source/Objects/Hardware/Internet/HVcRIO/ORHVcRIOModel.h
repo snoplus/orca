@@ -44,6 +44,7 @@
         BOOL                zeusHasControl;
         BOOL                orcaHasControl;
         BOOL                isBusy;
+        BOOL                verbose;
 }
 
 #pragma mark ***Initialization
@@ -67,6 +68,8 @@
 - (void) writeCmdString:(NSString*)aCommand;
 - (void) parseString:(NSString*)theString;
 - (void) connect;
+- (void) setVerbose:(BOOL)aState;
+- (BOOL) verbose;
 
 - (NSString*) title;
 
@@ -110,4 +113,5 @@ extern NSString* ORHVcRIOModelIpAddressChanged;
 extern NSString* ORHVcRIOModelSetPointsChanged;
 extern NSString* ORHVcRIOModelMeasuredValuesChanged;
 extern NSString* ORHVcRIOModelSetPointFileChanged;
+extern NSString* ORHVcRIOModelVerboseChanged;
 

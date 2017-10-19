@@ -30,10 +30,11 @@ NSString* ORHVcRIOModelQueCountChanged          = @"ORHVcRIOModelQueCountChanged
 NSString* ORHVcRIOModelSetPointsChanged         = @"ORHVcRIOModelSetPointsChanged";
 NSString* ORHVcRIOModelMeasuredValuesChanged    = @"ORHVcRIOModelMeasuredValuesChanged";
 NSString* ORHVcRIOModelSetPointFileChanged      = @"ORHVcRIOModelSetPointFileChanged";
+NSString* ORHVcRIOModelVerboseChanged           = @"ORHVcRIOModelVerboseChanged";
+
 NSString* ORHVcRIOLock						    = @"ORHVcRIOLock";
 
 //new lists from 10/17/2017   -mah-
-
 static NSString* setPointList[] = {
     @"Zeitstempel",    @"-",
     @"Zeitstempel",    @"-",
@@ -1146,7 +1147,10 @@ static NSString* measuredValueList[] = {
     
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-        
+        if(verbose){
+            NSLog(@"HVcRIO received data:\n");
+            NSLog(@"%@\n",theString);
+        }
         [self parseString:theString];
     }
 }
@@ -1269,6 +1273,7 @@ static NSString* measuredValueList[] = {
 	[lastRequest release];
 	lastRequest = aRequest;    
 }
+
 - (NSString*) commonScriptMethods
 {
     NSArray* selectorArray = [NSArray arrayWithObjects:
@@ -1285,6 +1290,19 @@ static NSString* measuredValueList[] = {
     
     return [selectorArray componentsJoinedByString:@"\n"];
 }
+
+- (void) setVerbose:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setVerbose:verbose];
+    verbose = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelVerboseChanged object:self];
+}
+
+- (BOOL) verbose
+{
+    return verbose;
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -1294,8 +1312,9 @@ static NSString* measuredValueList[] = {
     
 	[self setWasConnected:      [decoder decodeBoolForKey:	 @"wasConnected"]];
     [self setIpAddress:         [decoder decodeObjectForKey: @"ORHVcRIOModelIpAddress"]];
-    [self setSetPointFile:      [decoder decodeObjectForKey:@"setPointFile"]];
+    [self setSetPointFile:      [decoder decodeObjectForKey: @"setPointFile"]];
     [self setSetPoints:         [decoder decodeObjectForKey: @"setPoints"]];
+    [self setVerbose:           [decoder decodeBoolForKey:   @"verbose"]];
     if(!setPoints)[self createSetPointArray];
     
     [self createMeasuredValueArray];
@@ -1311,7 +1330,8 @@ static NSString* measuredValueList[] = {
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:setPointFile   forKey:@"setPointFile"];
-    [encoder encodeBool:wasConnected	 forKey:@"wasConnected"];
+    [encoder encodeBool:  wasConnected     forKey:@"wasConnected"];
+    [encoder encodeBool:  verbose          forKey:@"verbose"];
     [encoder encodeObject:ipAddress      forKey:@"ORHVcRIOModelIpAddress"];
     [encoder encodeObject:setPoints      forKey:@"setPoints"];
 }
@@ -1351,6 +1371,7 @@ static NSString* measuredValueList[] = {
 {
 	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
     if(![aCommand hasSuffix:@"\n"])aCommand = [NSString stringWithFormat:@"%@\n",aCommand];
+    if(verbose)NSLog(@"HVcRIO enqueued cmd: %@\n",aCommand);
 	[cmdQueue enqueue:aCommand];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelQueCountChanged object: self];
 	[self processNextCommandFromQueue];
@@ -1396,6 +1417,7 @@ static NSString* measuredValueList[] = {
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelQueCountChanged object: self];
         [self setLastRequest:cmd];
         [socket writeString:cmd encoding:NSASCIIStringEncoding];
+        if(verbose)NSLog(@"HVcRIO sent cmd: %@\n",cmd);
         [self performSelector:@selector(timeout) withObject:nil afterDelay:100];//<----timeout !!!!!!!!!!!!!!!!!!!!
 	}
 }

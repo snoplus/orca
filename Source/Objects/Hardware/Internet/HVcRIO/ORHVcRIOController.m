@@ -89,9 +89,14 @@
 						object: model];
     
     [notifyCenter addObserver : self
-					 selector : @selector(queCountChanged:)
-						 name : ORHVcRIOModelQueCountChanged
-					   object : model];	
+                     selector : @selector(queCountChanged:)
+                         name : ORHVcRIOModelQueCountChanged
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(verboseChanged:)
+                         name : ORHVcRIOModelVerboseChanged
+                       object : model];
 
 }
 
@@ -112,7 +117,8 @@
 	[self setPointsReadBackChanged:nil];
 	[self queCountChanged:nil];
     
-	[self ipAddressChanged:nil];
+    [self ipAddressChanged:nil];
+    [self verboseChanged:nil];
 	[self isConnectedChanged:nil];
 }
 
@@ -121,7 +127,10 @@
 	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
     [ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
 }
-
+- (void) verboseChanged:(NSNotification*)aNote
+{
+    [verboseCB setIntValue: [model verbose]];
+}
 - (void) ipAddressChanged:(NSNotification*)aNote
 {
 	[ipAddressTextField setStringValue: [model ipAddress]];
@@ -277,9 +286,13 @@
     }];
 }
 
-- (IBAction) flushQueueAction: (id) aSender
+- (IBAction) flushQueueAction: (id) sender
 {
     [model flushQueue];
+}
+- (IBAction) verboseAction: (id) sender
+{
+    [model setVerbose:[sender intValue]];
 }
 
 - (IBAction) saveSetPointFile:(id)sender

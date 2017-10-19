@@ -42,7 +42,7 @@
     IBOutlet NSTextField* orcaHasControlField;
     
     IBOutlet ORValueBarGroupView*  queueValueBar;
-
+    IBOutlet NSButton*    verboseCB;
 }
 
 #pragma mark ***Initialization
@@ -61,6 +61,7 @@
 - (void) ipAddressChanged:(NSNotification*)aNote;
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) measuredValuesChanged:(NSNotification*)aNote;
+- (void) verboseChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
 
@@ -74,6 +75,7 @@
 - (IBAction) ipAddressFieldAction:(id)sender;
 - (IBAction) connectAction: (id) aSender;
 - (IBAction) flushQueueAction: (id) aSender;
+- (IBAction) verboseAction: (id) aSender;
 
 - (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
 @end

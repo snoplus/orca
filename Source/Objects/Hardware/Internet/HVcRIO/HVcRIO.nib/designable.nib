@@ -20,6 +20,7 @@
                 <outlet property="readSetPointFileButton" destination="Ymd-sD-4Jp" id="8c0-hj-HO4"/>
                 <outlet property="setPointFileField" destination="Pv7-wH-aAd" id="jP6-fx-hbx"/>
                 <outlet property="setPointTableView" destination="VQ0-Pu-OqC" id="qmh-As-C4k"/>
+                <outlet property="verboseCB" destination="emZ-mR-bhg" id="Xez-Yy-UC1"/>
                 <outlet property="window" destination="5" id="38"/>
                 <outlet property="writeAllSetPointsButton" destination="0u4-t1-GWK" id="rdQ-uh-Wuz"/>
                 <outlet property="writeSetPointFileButton" destination="H4X-Yt-oix" id="dRK-27-A7D"/>
@@ -31,14 +32,14 @@
         <window title="HV-cRIO-Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="142" y="159" width="1065" height="542"/>
+            <rect key="contentRect" x="142" y="159" width="1065" height="555"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="1065" height="542"/>
+                <rect key="frame" x="0.0" y="0.0" width="1065" height="555"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button misplaced="YES" id="2127">
-                        <rect key="frame" x="20" y="26" width="33" height="43"/>
+                        <rect key="frame" x="20" y="31" width="33" height="43"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="2555">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -49,14 +50,14 @@
                         </connections>
                     </button>
                     <customView misplaced="YES" id="3078" customClass="ORValueBarGroupView">
-                        <rect key="frame" x="113" y="20" width="285" height="35"/>
+                        <rect key="frame" x="113" y="38" width="285" height="35"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <connections>
                             <outlet property="dataSource" destination="2730" id="3079"/>
                         </connections>
                     </customView>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="2730">
-                        <rect key="frame" x="56" y="41" width="45" height="14"/>
+                        <rect key="frame" x="56" y="59" width="45" height="14"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="0" id="2731">
                             <font key="font" metaFont="smallSystem"/>
@@ -65,7 +66,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="3081">
-                        <rect key="frame" x="55" y="63" width="345" height="17"/>
+                        <rect key="frame" x="55" y="81" width="345" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="# Queued Commands" id="3082">
                             <font key="font" metaFont="smallSystem"/>
@@ -74,7 +75,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" misplaced="YES" id="Iso-3R-gKg">
-                        <rect key="frame" x="420" y="31" width="100" height="28"/>
+                        <rect key="frame" x="420" y="49" width="100" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="push" title="Reset Queue" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="w69-21-Na6">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -85,7 +86,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="3Qt-6g-eCE">
-                        <rect key="frame" x="15" y="394" width="504" height="40"/>
+                        <rect key="frame" x="15" y="407" width="504" height="40"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="SOLL/Setpoints" id="CRb-ba-5ql">
                             <font key="font" size="23" name="Papyrus"/>
@@ -94,7 +95,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" id="Ymd-sD-4Jp">
-                        <rect key="frame" x="476" y="489" width="132" height="28"/>
+                        <rect key="frame" x="476" y="502" width="132" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Read SetPoint File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4eW-pi-yma">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -105,7 +106,7 @@
                         </connections>
                     </button>
                     <button verticalHuggingPriority="750" misplaced="YES" id="H4X-Yt-oix">
-                        <rect key="frame" x="477" y="453" width="131" height="28"/>
+                        <rect key="frame" x="477" y="466" width="131" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Save SetPoint File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Mt1-e3-Hlo">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -116,7 +117,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" id="Pv7-wH-aAd">
-                        <rect key="frame" x="620" y="497" width="188" height="14"/>
+                        <rect key="frame" x="620" y="510" width="188" height="14"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="--" id="DAo-EC-0bJ">
                             <font key="font" metaFont="smallSystem"/>
@@ -125,7 +126,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="00F-Bs-MMl">
-                        <rect key="frame" x="529" y="394" width="504" height="40"/>
+                        <rect key="frame" x="529" y="407" width="504" height="40"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Measured Values" id="4Do-hN-9Gj">
                             <font key="font" size="23" name="Papyrus"/>
@@ -134,7 +135,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" misplaced="YES" tag="4" id="kyJ-3l-GgR">
-                        <rect key="frame" x="185" y="106" width="106" height="28"/>
+                        <rect key="frame" x="185" y="119" width="106" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Read Setpoints" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aQ5-3X-bAg">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -145,7 +146,7 @@
                         </connections>
                     </button>
                     <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="pB4-mE-paO">
-                        <rect key="frame" x="531" y="145" width="500" height="246"/>
+                        <rect key="frame" x="531" y="158" width="500" height="246"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="OhP-c4-dLC">
                             <rect key="frame" x="1" y="0.0" width="483" height="230"/>
@@ -233,7 +234,7 @@
                         </tableHeaderView>
                     </scrollView>
                     <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="1iW-3R-8Ck">
-                        <rect key="frame" x="17" y="145" width="500" height="246"/>
+                        <rect key="frame" x="17" y="158" width="500" height="246"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="E24-RG-mM8">
                             <rect key="frame" x="1" y="0.0" width="483" height="230"/>
@@ -334,12 +335,12 @@
                         </tableHeaderView>
                     </scrollView>
                     <imageView id="vEq-0B-NcC">
-                        <rect key="frame" x="13" y="446" width="91" height="77"/>
+                        <rect key="frame" x="13" y="459" width="91" height="77"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="HVcRIO" id="Nn3-o0-JCJ"/>
                     </imageView>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="5qs-rT-FIz">
-                        <rect key="frame" x="205" y="497" width="111" height="19"/>
+                        <rect key="frame" x="205" y="510" width="111" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="Y1r-n7-D1g">
                             <font key="font" metaFont="smallSystem"/>
@@ -351,7 +352,7 @@
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="swn-Hj-lmC">
-                        <rect key="frame" x="123" y="498" width="76" height="15"/>
+                        <rect key="frame" x="123" y="511" width="76" height="15"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="IP #:" id="i3A-Zf-gbR">
                             <font key="font" metaFont="smallSystem"/>
@@ -360,7 +361,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="gnQ-Cu-LmB">
-                        <rect key="frame" x="209" y="478" width="88" height="14"/>
+                        <rect key="frame" x="209" y="491" width="88" height="14"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Not Connected" id="3KT-15-Gew">
                             <font key="font" metaFont="smallSystem"/>
@@ -369,7 +370,7 @@
                         </textFieldCell>
                     </textField>
                     <button verticalHuggingPriority="750" misplaced="YES" id="Gio-Uk-g4q">
-                        <rect key="frame" x="319" y="491" width="100" height="28"/>
+                        <rect key="frame" x="319" y="504" width="100" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Connect" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="JTs-cU-gjl">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -380,15 +381,15 @@
                         </connections>
                     </button>
                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="qOr-Fs-WER">
-                        <rect key="frame" x="20" y="435" width="1011" height="5"/>
+                        <rect key="frame" x="20" y="448" width="1011" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="jzY-p7-ABZ">
-                        <rect key="frame" x="20" y="92" width="1011" height="5"/>
+                        <rect key="frame" x="20" y="105" width="1011" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <button verticalHuggingPriority="750" misplaced="YES" tag="4" id="eij-uj-eZO">
-                        <rect key="frame" x="526" y="105" width="146" height="28"/>
+                        <rect key="frame" x="526" y="118" width="146" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Read Measured Values" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Jrb-ig-bO2">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -399,11 +400,11 @@
                         </connections>
                     </button>
                     <box horizontalHuggingPriority="750" misplaced="YES" boxType="separator" id="4ZX-JM-BVf">
-                        <rect key="frame" x="522" y="12" width="5" height="426"/>
+                        <rect key="frame" x="522" y="25" width="5" height="426"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <button verticalHuggingPriority="750" misplaced="YES" tag="4" id="0u4-t1-GWK">
-                        <rect key="frame" x="12" y="105" width="107" height="28"/>
+                        <rect key="frame" x="12" y="118" width="107" height="28"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Write Setpoints" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="8le-9s-6vx">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -414,7 +415,7 @@
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="DQV-xl-B5H">
-                        <rect key="frame" x="531" y="66" width="421" height="20"/>
+                        <rect key="frame" x="531" y="79" width="421" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="6ym-VQ-7Ob">
                             <font key="font" size="15" name="Geneva"/>
@@ -423,7 +424,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="XIY-0Z-jwL">
-                        <rect key="frame" x="531" y="41" width="421" height="20"/>
+                        <rect key="frame" x="531" y="54" width="421" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="fz8-4S-PAs">
                             <font key="font" size="15" name="Geneva"/>
@@ -432,7 +433,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="V0H-WK-9WT">
-                        <rect key="frame" x="531" y="13" width="421" height="20"/>
+                        <rect key="frame" x="531" y="26" width="421" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="--" id="BoU-6X-nLi">
                             <font key="font" size="15" name="Geneva"/>
@@ -440,12 +441,23 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button misplaced="YES" id="emZ-mR-bhg">
+                        <rect key="frame" x="428" y="9" width="66" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Verbose" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="RqN-5P-Uzt">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="verboseAction:" target="-2" id="QqU-6T-QuH"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="2744"/>
             </connections>
-            <point key="canvasLocation" x="204.5" y="-58"/>
+            <point key="canvasLocation" x="204.5" y="-51.5"/>
         </window>
         <customObject id="2377" userLabel="Hex Formatter" customClass="OHexFormatter"/>
     </objects>
