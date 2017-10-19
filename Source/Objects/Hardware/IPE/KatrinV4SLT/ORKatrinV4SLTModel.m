@@ -405,7 +405,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     if((statusReg & kCtrlPPSMask) != kCtrlPPSMask){
         if(!badPPSStatusAlarm){
-            badPPSStatusAlarm = [[ORAlarm alloc] initWithName:@"SLT Not Synced (bad PPS bit)" severity:kSetupAlarm];
+            badPPSStatusAlarm = [[ORAlarm alloc] initWithName:@"SLT Not Synced (bad PPS bit)" severity:kHardwareAlarm];
             [badPPSStatusAlarm setSticky:YES];
             [badPPSStatusAlarm setHelpString:@"Check the 'PPS' status in the SLT status section. It indicates the crate is not synced"];
         }
