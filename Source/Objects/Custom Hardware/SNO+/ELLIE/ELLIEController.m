@@ -170,7 +170,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieGeneralTriggerDelayTf setDelegate:self];
     [tellieGeneralNoPulsesTf setDelegate:self];
     [tellieGeneralFreqTf setDelegate:self];
-    [tellieGeneralTriggerDelayTf setStringValue:@"650"];
+    [tellieGeneralTriggerDelayTf setStringValue:@"800"];
 
 
     [tellieChannelTf setDelegate:self];
@@ -182,7 +182,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [tellieNoPulsesTf setDelegate:self];
     [tellieExpertNodeTf setDelegate:self];
     [telliePhotonsTf setDelegate:self];
-    [tellieTriggerDelayTf setStringValue:@"650"];
+    [tellieTriggerDelayTf setStringValue:@"800"];
 
     // Build custom run tab
     [tellieBuildPushToDB setEnabled:NO];
