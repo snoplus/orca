@@ -8,11 +8,12 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ELLIEController">
             <connections>
+                <outlet property="amellieAngleSelectPb" destination="xYl-Nb-wgs" id="f1z-2S-APC"/>
                 <outlet property="amellieChannelTf" destination="xIR-8g-kUj" id="CyP-HV-mPj"/>
                 <outlet property="amellieFibreDelayTf" destination="jpW-DU-uVs" id="Pdr-k2-7Qu"/>
-                <outlet property="amellieFibreSelectPb" destination="XdP-Nd-jgU" id="VTi-ml-usI"/>
                 <outlet property="amellieFireButton" destination="abU-r8-e7G" id="UpT-zr-Rtl"/>
                 <outlet property="amellieNoPulsesTf" destination="qes-2y-uWu" id="Dnk-LE-Dlq"/>
+                <outlet property="amellieNodeSelectPb" destination="XdP-Nd-jgU" id="i5m-xz-Tbv"/>
                 <outlet property="amellieOperationModePb" destination="pKG-ed-AyM" id="dgy-bH-o9E"/>
                 <outlet property="amelliePulseFreqTf" destination="VW3-75-So6" id="a4g-5z-N5V"/>
                 <outlet property="amelliePulseHeightTf" destination="wtW-BL-y8h" id="OAO-qw-KXR"/>
@@ -1642,14 +1643,14 @@
                                             </textFieldCell>
                                         </textField>
                                         <box misplaced="YES" title="Select Fibre:" id="Mqv-b4-ovf">
-                                            <rect key="frame" x="194" y="505" width="201" height="62"/>
+                                            <rect key="frame" x="121" y="505" width="362" height="62"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jeO-Zh-9Np">
-                                                <rect key="frame" x="2" y="2" width="197" height="45"/>
+                                                <rect key="frame" x="2" y="2" width="358" height="45"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" id="XdP-Nd-jgU">
-                                                        <rect key="frame" x="80" y="9" width="95" height="26"/>
+                                                        <rect key="frame" x="76" y="9" width="95" height="26"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="MTo-Zx-NMW" id="B5y-ae-fbf">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -1666,12 +1667,36 @@
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="FH2-Kh-SnZ">
                                                         <rect key="frame" x="7" y="10" width="65" height="23"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Fibre:" id="CGw-Dz-4uf">
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Node:" id="CGw-Dz-4uf">
                                                             <font key="font" metaFont="system"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="uEO-zf-st1">
+                                                        <rect key="frame" x="174" y="10" width="65" height="23"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Angle:" id="KrY-1g-wcj">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="xYl-Nb-wgs">
+                                                        <rect key="frame" x="243" y="10" width="95" height="26"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="arn-hq-iyd" id="JNg-1V-fVf">
+                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="menu"/>
+                                                            <menu key="menu" id="58Q-1m-qkj">
+                                                                <items>
+                                                                    <menuItem title="Item 1" state="on" id="arn-hq-iyd"/>
+                                                                    <menuItem title="Item 2" id="v0E-na-qc0"/>
+                                                                    <menuItem title="Item 3" id="nn1-3d-fOz"/>
+                                                                </items>
+                                                            </menu>
+                                                        </popUpButtonCell>
+                                                    </popUpButton>
                                                 </subviews>
                                             </view>
                                         </box>

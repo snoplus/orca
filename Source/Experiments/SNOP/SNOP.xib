@@ -519,7 +519,7 @@
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                         <font key="titleFont" metaFont="system"/>
-                                                    </box>
+                                                    </box>
                                                     <box verticalHuggingPriority="750" boxType="separator" id="qca-QN-PXH">
                                                         <rect key="frame" x="7" y="256" width="135" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>

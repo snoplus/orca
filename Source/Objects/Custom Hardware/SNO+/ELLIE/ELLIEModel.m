@@ -48,8 +48,8 @@
 #define kTellieNodeRetrieved @"kTellieNodeRetrieved"
 #define kTellieRunPlansRetrieved @"kTellieRunPlansRetrieved"
 
-#define kAmellieParsRetrieved @"kAmellieParsRetrieved"
-#define kAmellieMapRetrieved @"kAmellieMapRetrieved"
+#define kAmellieFibresRetrieved @"kAmellieFibresRetrieved"
+#define kAmellieNodesRetrieved @"kAmellieNodesRetrieved"
 #define kAmellieRunDocumentAdded @"kAmellieRunDocumentAdded"
 #define kAmellieRunDocumentUpdated @"kAmellieRunDocumentUpdated"
 
@@ -102,7 +102,8 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 @synthesize amellieRunDoc = _amellieRunDoc;
 @synthesize amellieFireParameters = _amellieFireParameters;
 @synthesize amellieFibreMapping = _amellieFibreMapping;
-
+@synthesize amellieNodeMapping = _amellieNodeMapping;
+    
 @synthesize tellieHost = _tellieHost;
 @synthesize smellieHost = _smellieHost;
 @synthesize interlockHost = _interlockHost;
@@ -1512,12 +1513,12 @@ err:
     [self setAmellieFibreMapping:nil];
     
     
-    //NSString* parsString = [NSString stringWithFormat:@"_design/amellieQuery/_view/fetchFireParameters?descending=False&limit=1"];
-    NSString* mapString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchCurrentMapping?key=2147483647"];
+    NSString* fibreString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchFibreMapping?key=2147483647"];
+    NSString* nodeString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchNodeMapping?key=2147483647"];
     
     // Make requests
-    //[[self couchDBRef:self withDB:@"amellie"] getDocumentId:parsString tag:kAmellieParsRetrieved];
-    [[self couchDBRef:self withDB:@"amellie"] getDocumentId:mapString tag:kAmellieMapRetrieved];
+    [[self couchDBRef:self withDB:@"amellie"] getDocumentId:fibreString tag:kAmellieFibresRetrieved];
+    [[self couchDBRef:self withDB:@"amellie"] getDocumentId:nodeString tag:kAmellieNodesRetrieved];
 }
 
 -(void)parseAmellieFirePars:(id)aResult
@@ -1537,6 +1538,16 @@ err:
     });
 }
 
+-(void)parseAmellieNodeMap:(id)aResult
+{
+    NSMutableDictionary* mappingDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[AMELLIE_DATABASE]: mapping document sucessfully loaded\n");
+    [self setAmellieNodeMapping:mappingDoc];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIEMappingReceived object:self];
+    });
+}
+    
 /*********************************************************/
 /*                  Smellie Functions                    */
 /*********************************************************/
@@ -2601,10 +2612,10 @@ err:
                 [self parseTellieNodeMap:aResult];
             } else if ([aTag isEqualToString:kTellieRunPlansRetrieved]){
                 [self parseTellieRunPlans:aResult];
-            } else if ([aTag isEqualToString:kAmellieParsRetrieved]){
-                [self parseAmellieFirePars:aResult];
-            } else if ([aTag isEqualToString:kAmellieMapRetrieved]){
+            } else if ([aTag isEqualToString:kAmellieFibresRetrieved]){
                 [self parseAmellieFibreMap:aResult];
+            } else if ([aTag isEqualToString:kAmellieNodesRetrieved]){
+                [self parseAmellieNodeMap:aResult];
             }
 
             //If no tag is found for the query result

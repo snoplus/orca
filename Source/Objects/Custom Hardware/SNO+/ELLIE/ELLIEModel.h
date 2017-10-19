@@ -58,6 +58,7 @@
     //tellie settings
     NSMutableDictionary* _amellieFireParameters;
     NSMutableDictionary* _amellieFibreMapping;
+    NSMutableDictionary* _amellieNodeMapping;
     NSArray* _amellieRunNames;
 
     //smellie config mappings
@@ -78,6 +79,7 @@
 @property (nonatomic,retain) NSArray* tellieRunNames;
 @property (nonatomic,retain) NSMutableDictionary* amellieFireParameters;
 @property (nonatomic,retain) NSMutableDictionary* amellieFibreMapping;
+@property (nonatomic,retain) NSMutableDictionary* amellieNodeMapping;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToSepiaMapping;

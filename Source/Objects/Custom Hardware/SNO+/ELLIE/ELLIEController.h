@@ -90,7 +90,8 @@
     IBOutlet NSTextField *amellieNoPulsesTf;
     IBOutlet NSTextField *amellieChannelTf;
     
-    IBOutlet NSPopUpButton *amellieFibreSelectPb;
+    IBOutlet NSPopUpButton *amellieNodeSelectPb;
+    IBOutlet NSPopUpButton *amellieAngleSelectPb;
     IBOutlet NSPopUpButton *amellieOperationModePb; //Operation mode (master or slave)
     
     IBOutlet NSTextField *amellieValidationStatusTf;
@@ -182,8 +183,9 @@
 // Some extra's
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
--(void)displayAmellieFibres:(id)sender;
--(void)updateAmellieChannel:(NSMenuItem *)sender;
+-(void)displayAmellieNodes:(id)sender;
+-(void)displayAmellieAngles:(id)sender;
+-(void)updateAmellieChannel;
 
 
 //Build Custom sequence

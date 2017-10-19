@@ -107,7 +107,7 @@
                         object: nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(displayAmellieFibres:)
+                     selector : @selector(displayAmellieNodes:)
                          name : ORAMELLIEMappingReceived
                         object: nil];
     
@@ -161,7 +161,8 @@
     [amellieOperationModePb addItemsWithTitles:@[@"Slave", @"Master"]];
     [amellieOperationModePb selectItemAtIndex:0];
 
-    [amellieFibreSelectPb removeAllItems];
+    [amellieNodeSelectPb removeAllItems];
+    [amellieAngleSelectPb removeAllItems];
     
     //Grey out fibre until node is given
     [tellieGeneralFibreSelectPb setTarget:self];
@@ -206,7 +207,10 @@
     [amellieFibreDelayTf setDelegate:self];
     [amellieTriggerDelayTf setDelegate:self];
     [amellieNoPulsesTf setDelegate:self];
-    [amellieFibreSelectPb setAction:@selector(updateAmellieChannel:)];
+    [amellieNodeSelectPb setTarget:self];
+    [amellieAngleSelectPb setTarget:self];
+    [amellieNodeSelectPb setAction:@selector(updateAmellieAngles:)];
+    [amellieAngleSelectPb setAction:@selector(updateAmellieChannel)];
     [amellieTriggerDelayTf setStringValue:@"650"];
     [amelliePulseHeightTf setStringValue:@"16383"];
     
@@ -226,27 +230,66 @@
     }
 }
 
--(void)displayAmellieFibres:(id)sender
+-(NSString*)extractNumberFromText:(NSString *)text
+{
+    NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    return [[text componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
+}
+    
+-(void)displayAmellieNodes:(id)sender
 {
     // Fill the NSPopUpButton
-    [amellieFibreSelectPb setEnabled:YES];
-    // Once we get a note saying mapping is loaded, fill the push button
-    for(id fname in [[model amellieFibreMapping] objectForKey:@"fibres"]){
-        @try{
-            [amellieFibreSelectPb addItemWithTitle:fname];
-        } @catch(NSException * e){
-            NSLog(@"[AMELLIE]: Problem setting fibre select option : %@\n", [e reason]);
+    [amellieNodeSelectPb setEnabled:YES];
+
+    // Find panel (node) numbers
+    NSMutableArray* panels = [[NSMutableArray alloc] init];
+    for(id key in [model amellieNodeMapping]){
+        if ([key rangeOfString:@"panel"].location == NSNotFound) {
+            continue;
+        } else {
+            NSUInteger num = [[self extractNumberFromText:key] integerValue];
+            [panels addObject:[NSString stringWithFormat:@"%d",num]];
         }
     }
+    // Once we get a note saying mapping is loaded, fill the push button
+    for(id panel in panels){
+        @try{
+            [amellieNodeSelectPb addItemWithTitle:panel];
+        } @catch(NSException * e){
+            NSLog(@"[AMELLIE]: Problem setting panel select option : %@\n", [e reason]);
+        }
+    }
+    [panels release];
     // Select the first one and make sure the channel field gets set appropriately
-    [amellieFibreSelectPb selectItemAtIndex:0];
-    [self updateAmellieChannel:[amellieFibreSelectPb selectedItem]];
+    //[amellieNodeSelectPb selectItemAtIndex:0];
 }
 
--(void)updateAmellieChannel:(NSMenuItem *)sender
+-(void)updateAmellieAngles:(NSMenuItem *)sender
 {
+    [amellieAngleSelectPb removeAllItems];
+    [amellieAngleSelectPb setEnabled:YES];
+    
+    NSString* panel_name = [NSString stringWithFormat:@"panel_%@", [amellieNodeSelectPb titleOfSelectedItem]];
+    NSDictionary* angle_to_fibre = [[model amellieNodeMapping] objectForKey:panel_name];
+    for(id angle in angle_to_fibre){
+        @try{
+            [amellieAngleSelectPb addItemWithTitle:angle];
+        } @catch(NSException * e){
+            NSLog(@"[AMELLIE]: Problem setting angle select option : %@\n", [e reason]);
+        }
+    }
     // When someone changes the Fibre selection, automatically update the channel field
-    [amellieChannelTf setStringValue:[NSString stringWithFormat:@"%@",[model calcAmellieChannelForFibre:[sender title]]]];
+    [amellieAngleSelectPb selectItemAtIndex:0];
+    [self updateAmellieChannel];
+}
+    
+-(void)updateAmellieChannel
+{
+    NSString* panel_name = [NSString stringWithFormat:@"panel_%@", [amellieNodeSelectPb titleOfSelectedItem]];
+    NSDictionary* angle_to_fibre = [[model amellieNodeMapping] objectForKey:panel_name];
+    NSString* fibre = [angle_to_fibre objectForKey:[amellieAngleSelectPb titleOfSelectedItem]];
+    // When someone changes the Fibre selection, automatically update the channel field
+    [amellieChannelTf setStringValue:[NSString stringWithFormat:@"%@",[model calcAmellieChannelForFibre:fibre]]];
 }
 
 -(IBAction)tellieGeneralFireAction:(id)sender
@@ -819,7 +862,7 @@
     [amelliePulseHeightTf.window makeFirstResponder:nil];
     [amelliePulseFreqTf.window makeFirstResponder:nil];
     [amellieNoPulsesTf.window makeFirstResponder:nil];
-    [amellieFibreSelectPb.window makeFirstResponder:nil];
+    [amellieNodeSelectPb.window makeFirstResponder:nil];
     [amellieOperationModePb.window makeFirstResponder:nil];
     
     //Check if fibre mapping has been loaded from the amellieDB
@@ -898,9 +941,14 @@
         [amellieTriggerDelayTf setBackgroundColor:[NSColor whiteColor]];
         [amellieNoPulsesTf setBackgroundColor:[NSColor whiteColor]];
         // Make settings dict to pass to fire method
+        NSString* panel_name = [NSString stringWithFormat:@"panel_%@", [amellieNodeSelectPb titleOfSelectedItem]];
+        NSDictionary* angle_to_fibre = [[model amellieNodeMapping] objectForKey:panel_name];
+        NSString* fibre = [angle_to_fibre objectForKey:[amellieAngleSelectPb titleOfSelectedItem]];
+        // When someone changes the Fibre selection, automatically update the channel field
+        [amellieChannelTf setStringValue:[NSString stringWithFormat:@"%@",[model calcAmellieChannelForFibre:fibre]]];
         float pulseSeparation = 1000.*(1./[amelliePulseFreqTf floatValue]); // TELLIE accepts pulse rate in ms
         NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
-        [settingsDict setValue:[amellieFibreSelectPb titleOfSelectedItem] forKey:@"fibre"];
+        [settingsDict setValue:fibre forKey:@"fibre"];
         [settingsDict setValue:[NSNumber numberWithInteger:[amellieChannelTf integerValue]] forKey:@"channel"];
         [settingsDict setValue:[amellieOperationModePb titleOfSelectedItem] forKey:@"run_mode"];
         [settingsDict setValue:[NSNumber numberWithInteger:[amelliePulseWidthTf integerValue]] forKey:@"pulse_width"];
