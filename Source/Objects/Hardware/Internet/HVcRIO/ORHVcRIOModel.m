@@ -1196,7 +1196,7 @@ static NSString* measuredValueList[] = {
     for(NSString* aLine in lines){
         if([aLine length]==0)       continue;
         
-        if([lastRequest hasPrefix:@"write sp"]) {
+        if([lastRequest hasPrefix:@"write sp"] || [lastRequest hasPrefix:@"+write sp"]) {
             aLine = [aLine substringFromIndex:8];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i;
@@ -1213,8 +1213,8 @@ static NSString* measuredValueList[] = {
             [self setLastRequest:nil];
         }
         
-        else if([lastRequest hasPrefix:@"read sp"]) {
-            aLine = [aLine substringFromIndex:10];
+        else if([lastRequest hasPrefix:@"read sp"] || [lastRequest hasPrefix:@"+read sp"]) {
+            aLine = [aLine substringFromIndex:7];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(i=0;i<[theParts count];i++){
@@ -1227,8 +1227,8 @@ static NSString* measuredValueList[] = {
             [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointsChanged object: self];
         }
         
-        else if([lastRequest hasPrefix:@"read mv"]) {
-            aLine = [aLine substringFromIndex:10];
+        else if([lastRequest hasPrefix:@"read mv"] || [lastRequest hasPrefix:@"+read mv"]) {
+            aLine = [aLine substringFromIndex:7];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i;
             for(i=0;i<[theParts count];i++){
