@@ -391,10 +391,11 @@
 
 +(NSInvocation*)invocationWithTarget:(id)target
                             selector:(SEL)aSelector
-                     retainArguments:(BOOL)retainArguments, ...;
+                     retainArguments:(BOOL)retainArguments
+                     args:(id)firstArg,  ...;
 {
     va_list ap;
-    va_start(ap, retainArguments);
+    va_start(ap, firstArg);
     char* args = (char*)ap;
     NSMethodSignature* signature = [target methodSignatureForSelector:aSelector];
     NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
@@ -404,7 +405,7 @@
     [invocation setTarget:target];
     [invocation setSelector:aSelector];
     int index;
-    for (index = 2; index < [signature numberOfArguments]; index++) {
+    for (index = 3; index < [signature numberOfArguments]; index++) {
         const char *type = [signature getArgumentTypeAtIndex:index];
         NSUInteger size, align;
         NSGetSizeAndAlignment(type, &size, &align);
