@@ -392,7 +392,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             [noPPSAlarm setSticky:YES];
             [noPPSAlarm setHelpString:@"Check the 'PPS' option in the SLT Control Registor section. It should be enabled for normal running"];
         }
-        [noPPSAlarm postAlarm];
+         if(![noPPSAlarm isPosted])[noPPSAlarm postAlarm];
     }
     else {
         [noPPSAlarm clearAlarm];
@@ -409,7 +409,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             [badPPSStatusAlarm setSticky:YES];
             [badPPSStatusAlarm setHelpString:@"Check the 'PPS' status in the SLT status section. It indicates the crate is not synced"];
         }
-        [badPPSStatusAlarm postAlarm];
+        if(![badPPSStatusAlarm isPosted])[badPPSStatusAlarm postAlarm];
     }
     else {
         [badPPSStatusAlarm clearAlarm];
@@ -435,7 +435,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             pixelTriggerDisabledAlarm = [[ORAlarm alloc] initWithName:@"Pixel Trigger (partially) Deactivated" severity:kSetupAlarm];
             [pixelTriggerDisabledAlarm setSticky:YES];
             [pixelTriggerDisabledAlarm setHelpString:@"Check the 'Run' check box in the SLT Misc Ctrl Flags section and/or the Pixelbus setup for the available FLTs"];
-            [pixelTriggerDisabledAlarm postAlarm];
+            if(![pixelTriggerDisabledAlarm isPosted])[pixelTriggerDisabledAlarm postAlarm];
         }
     }
     else {
@@ -451,8 +451,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         if(!swInhibitDisabledAlarm){
             swInhibitDisabledAlarm = [[ORAlarm alloc] initWithName:@"SLT Software Inhibit Deactivated" severity:kSetupAlarm];
             [swInhibitDisabledAlarm setSticky:YES];
-            [swInhibitDisabledAlarm postAlarm];
+            
         }
+        if(![swInhibitDisabledAlarm isPosted])[swInhibitDisabledAlarm postAlarm];
     }
     else {
         [swInhibitDisabledAlarm clearAlarm];
