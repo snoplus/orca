@@ -1239,9 +1239,9 @@ static NSString* measuredValueList[] = {
             
             [self setLastRequest:nil];
             
-            expertPCControlOnly = [[measuredValues objectAtIndex:146] boolValue];
-            zeusHasControl      = [[measuredValues objectAtIndex:147] boolValue];
-            orcaHasControl      = [[measuredValues objectAtIndex:148] boolValue];
+            expertPCControlOnly = [[[measuredValues objectAtIndex:146] objectForKey:@"value"] boolValue];
+            zeusHasControl      = [[[measuredValues objectAtIndex:147] objectForKey:@"value"] boolValue];
+            orcaHasControl      = [[[measuredValues objectAtIndex:148] objectForKey:@"value"] boolValue];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelMeasuredValuesChanged object: self];
         }
