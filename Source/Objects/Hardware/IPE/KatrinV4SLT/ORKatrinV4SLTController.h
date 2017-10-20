@@ -150,7 +150,6 @@
 - (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
 - (IBAction) enableDisableCounterAction:(id)sender;
 - (IBAction) secondsSetAction:(id)sender;
-- (IBAction) triggerEnableAction:(id)sender;
 - (IBAction) inhibitEnableAction:(id)sender;
 - (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
@@ -162,7 +161,6 @@
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
-- (IBAction) pageSizeAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) selectRegisterAction:(id) sender;
 - (IBAction) writeValueAction:(id) sender;

@@ -376,7 +376,6 @@
 - (ORReadOutList*)	readOutGroup;
 - (void)			setReadOutGroup:(ORReadOutList*)newReadOutGroup;
 - (NSMutableArray*) children;
-- (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj;
 
 #pragma mark •••SBC_Linking Protocol
 - (NSString*) driverScriptName;
