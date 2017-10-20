@@ -45,6 +45,7 @@
         BOOL                orcaHasControl;
         BOOL                isBusy;
         BOOL                verbose;
+        NSMutableString*    stringBuffer;
 }
 
 #pragma mark ***Initialization

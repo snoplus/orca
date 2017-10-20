@@ -892,7 +892,8 @@ static NSString* measuredValueList[] = {
     @"IST_PXI_CHANNEL#EastCh23",    @"Warnung",
     @"IST_PXI_CHANNEL#EastCh23",    @"Fehler",
     @"IST_EHV#postReg",    @"U_IST",
-    @"IST_EHV#postRegInhibit",    @"Status",
+    @"IST_EHV#postRegInhibit",    @"Inh_IST",
+    @"IST_EHV#postRegStatus",    @"Status",
     @"", @""
 };
 
@@ -1147,11 +1148,21 @@ static NSString* measuredValueList[] = {
     
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
-        if(verbose){
-            NSLog(@"HVcRIO received data:\n");
-            NSLog(@"%@\n",theString);
+
+        if(!stringBuffer) stringBuffer = [[NSMutableString stringWithString:theString] retain];
+        else [stringBuffer appendString:theString];
+        if([stringBuffer rangeOfString:@":done\n"].location != NSNotFound){
+            if(verbose){
+                NSLog(@"HVcRIO received data:\n");
+                NSLog(@"%@\n",stringBuffer);
+            }
+            [stringBuffer replaceOccurrencesOfString:@"\n"    withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+            [stringBuffer replaceOccurrencesOfString:@":done" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+
+            [self parseString:stringBuffer];
+            [stringBuffer release];
+            stringBuffer = nil;
         }
-        [self parseString:theString];
     }
 }
 
@@ -1190,13 +1201,15 @@ static NSString* measuredValueList[] = {
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i;
             for(i=0;i<[theParts count];i++){
-                float new = [[theParts objectAtIndex:i] floatValue];
-                float old  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
-                float diff = fabsf([[theParts objectAtIndex:i] floatValue]-new);
-                if(diff > 0.00001){
-                    NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,new,old);
+                if(i<[setPoints count]){
+                    float new = [[theParts objectAtIndex:i] floatValue];
+                    float old  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
+                    float diff = fabsf([[theParts objectAtIndex:i] floatValue]-new);
+                    if(diff > 0.00001){
+                        NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,new,old);
+                    }
                 }
-             }
+            }
             [self setLastRequest:nil];
         }
         
@@ -1204,11 +1217,11 @@ static NSString* measuredValueList[] = {
             aLine = [aLine substringFromIndex:10];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
-            int maxIndex = [setPoints count];
-            for(id aValue in theParts){
-                [self setSetPointReadback:i withValue:[aValue floatValue]];
-                i++;
-                if(i>maxIndex) break;
+            for(i=0;i<[theParts count];i++){
+                if(i<[setPoints count]){
+                    float aValue = [[theParts objectAtIndex:i]floatValue];
+                    [self setSetPointReadback:i withValue:aValue];
+                }
             }
             [self setLastRequest:nil];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointsChanged object: self];
@@ -1219,7 +1232,9 @@ static NSString* measuredValueList[] = {
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i;
             for(i=0;i<[theParts count];i++){
-                [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i] floatValue]];
+                if(i<[measuredValues count]){
+                    [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i] floatValue]];
+                }
             }
             
             [self setLastRequest:nil];
@@ -1370,7 +1385,7 @@ static NSString* measuredValueList[] = {
 - (void) writeCmdString:(NSString*)aCommand
 {
 	if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
-    if(![aCommand hasSuffix:@"\n"])aCommand = [NSString stringWithFormat:@"%@\n",aCommand];
+    aCommand = [aCommand removeNLandCRs]; //no LF or CR as per KIT request
     if(verbose)NSLog(@"HVcRIO enqueued cmd: %@\n",aCommand);
 	[cmdQueue enqueue:aCommand];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelQueCountChanged object: self];
