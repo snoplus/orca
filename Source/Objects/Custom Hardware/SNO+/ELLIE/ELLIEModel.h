@@ -69,6 +69,9 @@
     // Run threads
     NSThread* _tellieThread;
     NSThread* _smellieThread;
+    
+    NSThread* _tellieTransitionThread;
+    NSThread* _smellieTransitionThread;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
@@ -104,6 +107,8 @@
 @property (nonatomic,retain) XmlrpcClient* interlockClient;
 @property (nonatomic,retain) NSThread* tellieThread;
 @property (nonatomic,retain) NSThread* smellieThread;
+@property (nonatomic,retain) NSThread* tellieTransitionThread;
+@property (nonatomic,retain) NSThread* smellieTransitionThread;
 @property (nonatomic,assign) BOOL maintenanceRollOver;
 @property (nonatomic,assign) BOOL smellieStopButton;
 
@@ -209,3 +214,4 @@ extern NSString* ORSMELLIERunFinished;
 extern NSString* ORTELLIERunFinished;
 extern NSString* ORSMELLIEInterlockKilled;
 extern NSString* ORELLIEFlashing;
+extern NSString* SMELLIEEmergencyStop;

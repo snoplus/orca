@@ -64,6 +64,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
 NSString* ORELLIEFlashing = @"ORELLIEFlashing";
+NSString* SMELLIEEmergencyStop = @"SMELLIEEmergencyStop";
 
 
 ///////////////////////////////
@@ -120,6 +121,8 @@ NSString* ORELLIEFlashing = @"ORELLIEFlashing";
 
 @synthesize tellieThread = _tellieThread;
 @synthesize smellieThread = _smellieThread;
+@synthesize tellieTransitionThread = _tellieTransitionThread;
+@synthesize smellieTransitionThread = _smellieTransitionThread;
 
 @synthesize maintenanceRollOver = _maintenanceRollOver;
 @synthesize smellieStopButton = _smellieStopButton;
@@ -279,7 +282,7 @@ NSString* ORELLIEFlashing = @"ORELLIEFlashing";
     
     [notifyCenter addObserver : self
                      selector : @selector(killKeepAlive:)
-                         name : @"SMELLIEEmergencyStop"
+                         name : SMELLIEEmergencyStop
                         object: nil];
 }
 
@@ -1186,9 +1189,14 @@ err:
 
         [[self tellieThread] cancel];
 
-        // Detatch thread and transition runs once the TELLIE thread has stopped executing
-        [NSThread detachNewThreadSelector:@selector(tellieRunTransition) toTarget:self withObject:nil];
-
+        ///////////////////////////////////////
+        // If a run transition thread isn't yet running, run one.
+        // Doing it this way avoids multiple transition behaviours.
+        if(![_tellieTransitionThread isExecuting]){
+            NSLog(@"[SMELLIE]: Waiting for SMELLIE server to release blocking trigger function...\n");
+            [self setTellieTransitionThread:[[NSThread alloc] initWithTarget:self selector:@selector(tellieRunTransition) object:nil]];
+            [[self tellieTransitionThread] start];
+        }
     } else {
         // Tell run control it can stop waiting
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -1402,6 +1410,7 @@ err:{
                           userInfo:nil];
         [e raise];
     }
+    NSLog(@"[SMELLIE]: Lasers deactivated\n");
 }
 
 -(void) CancelSmellieTriggers
@@ -1553,9 +1562,9 @@ err:{
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
     
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIEInterlockKilled object:self];
-    });
+    //dispatch_sync(dispatch_get_main_queue(), ^{
+    //    [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIEInterlockKilled object:self];
+    //});
     NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
     [pool release];
 }
@@ -1790,7 +1799,7 @@ err:{
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     [self setMaintenanceRollOver:YES]; // Asssume we roll over by default.
-    [self setSmellieStopButton:YES]; // Had the stop button been pressed?
+    [self setSmellieStopButton:NO]; // Had the stop button been pressed?
     
     //////////////
     //   GET TUBii & RunControl MODELS
@@ -2157,16 +2166,15 @@ err:
     
     //Release dict holding sub-run info
     [valuesToFillPerSubRun release];
-    [pool release];
-    
+    [[NSThread currentThread] cancel];
+
     //////////////////////////////////////////
     //Post a note. on the main thread to request a call to handle run rollover stuff
     [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
     });
-
-    [[NSThread currentThread] cancel];
+    [pool release];
 }
 }
 
@@ -2187,10 +2195,10 @@ err:
     NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for smellie run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
-    // Cancel the smellie thread
     if([[self smellieThread] isExecuting]){
+        // Cancel the SMELLIE thread
         [[self smellieThread] cancel];
-    
+
         // Tell SMELLIE hardware to stop generating triggers
         @try{
             // Use a second SMELLIE client (which is not being blocked by the current fire sequence) to set
@@ -2199,9 +2207,16 @@ err:
         } @catch(NSException *e) {
             NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
         }
-        // Detatch thread to monitor smellie run thread
-        NSLog(@"[SMELLIE]: Waiting for SMELLIE server to release blocking trigger function...\n");
-        [NSThread detachNewThreadSelector:@selector(smellieRunTransition) toTarget:self withObject:nil];
+        
+        ///////////////////////////////////////
+        // If a run transition thread isn't yet running, run one.
+        // Doing it this way avoids multiple transition behaviours.
+        if(![_smellieTransitionThread isExecuting]){
+            // Detatch thread to monitor smellie run thread
+            NSLog(@"[SMELLIE]: Waiting for SMELLIE server to release blocking trigger function...\n");
+            [self setSmellieTransitionThread:[[NSThread alloc] initWithTarget:self selector:@selector(smellieRunTransition) object:nil]];
+            [[self smellieTransitionThread] start];
+        }
     } else {
         // Tell run control it can stop waiting
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -2219,8 +2234,9 @@ err:
     /////////////////////////////////////////////
     // Wait for smellie thread to stop executing
     while ([[self smellieThread] isExecuting]) {
-        [NSThread sleepForTimeInterval:0.1];
+        [NSThread sleepForTimeInterval:0.2];
     }
+    NSLog(@"[SMELLIE]: Blocking function released\n");
 
     ////////////////////////////////////////////
     // Tell run control it can stop waiting
@@ -2231,7 +2247,6 @@ err:
     //////////////////////////////////////////
     // HANDLE RUN ROLLOVERS
     //
-    
     // If the sequence finished without external influence, move into a maintenance run.
     if([self maintenanceRollOver]){
         NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
@@ -2258,7 +2273,7 @@ err:
             goto err;
         }
         ORRunModel* runControl = [runModels objectAtIndex:0];
-        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
     }
     
     [pool release];

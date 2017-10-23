@@ -1531,21 +1531,10 @@ snopGreenColor;
     // Start smellie thread
     [theELLIEModel startInterlockThread];
     [theELLIEModel startSmellieRunThread:smellieRunFile];
-
 }
 
 - (IBAction) stopSmellieRunAction:(id)sender
 {
-    if(![sender isKindOfClass:[NSNotification class]]){
-        NSLog(@"#############################################\n");
-        NSLog(@"[SMELLIE]\n");
-        NSLog(@"\t\tRun stop button recongnised.\n");
-        NSLog(@"\t\tEXTA triggers will stop within the next 5s.\n");
-        NSLog(@"\t\tPutting the lasers to safe state may take\n");
-        NSLog(@"\t\tupto 2 minutes.\n");
-        NSLog(@"#############################################\n");
-    }
-    
     [smellieLoadRunFile setEnabled:YES];
     [smellieRunFileNameField setEnabled:YES];
     [smellieStopRunButton setEnabled:NO];
@@ -1559,6 +1548,30 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
  
+    /////////////////////////
+    // If this call is from a button press push an acknowledgement
+    // to the logs. Seeing as SMELLIE takes so long to shut down, it
+    // is important to let the user know whats going on.
+    if(![sender isKindOfClass:[NSNotification class]]){
+        NSLog(@"#############################################\n");
+        NSLog(@"[SMELLIE]\n");
+        NSLog(@"\t\tRun stop button recongnised.\n");
+        NSLog(@"\t\tEXTA triggers will stop within the next 10s.\n");
+        NSLog(@"\t\tPutting the lasers to safe state may take\n");
+        NSLog(@"\t\tup to 2 minutes.\n");
+        NSLog(@"#############################################\n");
+        ////////////////////////
+        // In the case of a button push we also want to set a couple
+        // of flags in the ELLIEModel to define how it will handle
+        // run tansitions.
+        //
+        // In this case it will simply roll over into a new
+        // SMELLIE run so the flash sequence can be easily
+        // re-started.
+        [theELLIEModel setMaintenanceRollOver:NO];
+        [theELLIEModel setSmellieStopButton:YES];
+    }
+    
     //Call stop smellie run method to tidy up SMELLIE's hardware state
     @try{
         [theELLIEModel stopSmellieRun];
@@ -1570,16 +1583,39 @@ snopGreenColor;
 
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
+    [smellieStartRunButton setEnabled:NO];
+    [smellieStopRunButton setEnabled:YES];
+    ///////////////////////
+    // Get the ELLIEModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+ 
     NSLog(@"#############################################\n");
     NSLog(@"[SMELLIE]\n");
     NSLog(@"\t\tEmergency run stop button recongnised.\n");
-    NSLog(@"\t\tEXTA triggers will stop within the next [5s].\n");
+    NSLog(@"\t\tEXTA triggers will stop within the next [10s].\n");
     NSLog(@"\t\tPutting the lasers to safe state may take\n");
-    NSLog(@"\t\tupto [2 minutes].\n");
+    NSLog(@"\t\tup to [2 minutes].\n");
     NSLog(@"#############################################\n");
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SMELLIEEmergencyStop" object:self];
-    [smellieStartRunButton setEnabled:NO];
+    ////////////////////////
+    // Set a couple of flags in the ELLIEModel to tell
+    // it how to handle run transitions when this button
+    // has been activated.
+    //
+    // In this case it will simply roll over into a new
+    // SMELLIE run so the flash sequence can be easily
+    // re-started.
+    [theELLIEModel setMaintenanceRollOver:NO];
+    [theELLIEModel setSmellieStopButton:YES];
+
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:SMELLIEEmergencyStop object:self];
+    });
 }
 
 -(IBAction)loadTellieRunAction:(id)sender
