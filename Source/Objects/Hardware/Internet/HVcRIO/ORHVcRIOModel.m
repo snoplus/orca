@@ -1138,9 +1138,7 @@ static NSString* measuredValueList[] = {
 - (BOOL) orcaHasControl         {return orcaHasControl;}
 
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
-{
-   // if(!lastRequest)return;
-    
+{    
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
         
@@ -1153,14 +1151,15 @@ static NSString* measuredValueList[] = {
         else [stringBuffer appendString:theString];
         if([stringBuffer rangeOfString:@":done\n" options:NSCaseInsensitiveSearch].location != NSNotFound){
             if(verbose){
-                NSLog(@"HVcRIO and end of string delimiter and will now parse the incoming string.\n");
+                NSLog(@"HVcRIO got end of string delimiter and will now parse the incoming string.\n");
             }
             [stringBuffer replaceOccurrencesOfString:@"+"         withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,1)];//remove leading '+' if there
             [stringBuffer replaceOccurrencesOfString:@"readssps"  withString:@"read sp " options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
             [stringBuffer replaceOccurrencesOfString:@"readsmvs"  withString:@"read mv " options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
             [stringBuffer replaceOccurrencesOfString:@"writessps" withString:@"write sp " options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
             [stringBuffer replaceOccurrencesOfString:@"s:done"    withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
-            [stringBuffer replaceOccurrencesOfString:@":done"     withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+            [stringBuffer replaceOccurrencesOfString:@":done"     withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];       
+            [stringBuffer replaceOccurrencesOfString:@"\n"     withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
             [self parseString:stringBuffer];
             [stringBuffer release];
             stringBuffer = nil;
@@ -1187,67 +1186,63 @@ static NSString* measuredValueList[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelQueCountChanged object: self];
 }
 
-- (void) parseString:(NSString*)theString
+- (void) parseString:(NSString*)aLine
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
     
-    theString = [theString trimSpacesFromEnds];
-    theString = [theString lowercaseString];
-    NSArray* lines = [theString componentsSeparatedByString:@"\n"];
-    for(NSString* aLine in lines){
-        if([aLine length]==0)       continue;
-        if([theString hasPrefix:@"write sp"]) {
-            aLine = [aLine substringFromIndex:8];
-            NSArray* theParts = [aLine componentsSeparatedByString:@","];
-            int i;
-            for(i=0;i<[theParts count];i++){
-                if(i<[setPoints count]){
-                    float aValue = [[theParts objectAtIndex:i] floatValue];
-                    [self setSetPoint:i withValue:aValue];
-                }
+    aLine = [aLine trimSpacesFromEnds];
+    aLine = [aLine lowercaseString];
+    if([aLine hasPrefix:@"write sp"]) {
+        aLine = [aLine substringFromIndex:8];
+        NSArray* theParts = [aLine componentsSeparatedByString:@","];
+        int i;
+        for(i=0;i<[theParts count];i++){
+            if(i<[setPoints count]){
+                float aValue = [[theParts objectAtIndex:i] floatValue];
+                [self setSetPoint:i withValue:aValue];
             }
-            [self setLastRequest:nil];
         }
-        else if([theString hasPrefix:@"read sp"]) {
-            aLine = [aLine substringFromIndex:7];
-            NSArray* theParts = [aLine componentsSeparatedByString:@","];
-            int i=0;
-            for(i=0;i<[theParts count];i++){
-                if(i<[setPoints count]){
-                    float readBack = [[theParts objectAtIndex:i]floatValue];
-                    [self setSetPointReadback:i withValue:readBack];
-                    
-                    float setValue  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
-                    float diff = fabsf(setValue-readBack);
-                    if(diff > 0.00001){
-                        NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,setValue,readBack);
-                    }
-
-                    
+        [self setLastRequest:nil];
+    }
+    else if([aLine hasPrefix:@"read sp"]) {
+        aLine = [aLine substringFromIndex:7];
+        NSArray* theParts = [aLine componentsSeparatedByString:@","];
+        int i=0;
+        for(i=0;i<[theParts count];i++){
+            if(i<[setPoints count]){
+                float readBack = [[theParts objectAtIndex:i]floatValue];
+                [self setSetPointReadback:i withValue:readBack];
+                
+                float setValue  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
+                float diff = fabsf(setValue-readBack);
+                if(diff > 0.00001){
+                    NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,setValue,readBack);
                 }
+
+                
             }
-            [self setLastRequest:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointsChanged object: self];
+        }
+        [self setLastRequest:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointsChanged object: self];
+    }
+    
+    else if([aLine hasPrefix:@"read mv"]) {
+        aLine = [aLine substringFromIndex:7];
+        NSArray* theParts = [aLine componentsSeparatedByString:@","];
+        int i;
+        for(i=0;i<[theParts count];i++){
+            if(i<[measuredValues count]){
+                [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i] floatValue]];
+            }
         }
         
-        else if([theString hasPrefix:@"read mv"]) {
-            aLine = [aLine substringFromIndex:7];
-            NSArray* theParts = [aLine componentsSeparatedByString:@","];
-            int i;
-            for(i=0;i<[theParts count];i++){
-                if(i<[measuredValues count]){
-                    [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i] floatValue]];
-                }
-            }
-            
-            [self setLastRequest:nil];
-            
-            expertPCControlOnly = [[[measuredValues objectAtIndex:146] objectForKey:@"value"] boolValue];
-            zeusHasControl      = [[[measuredValues objectAtIndex:147] objectForKey:@"value"] boolValue];
-            orcaHasControl      = [[[measuredValues objectAtIndex:148] objectForKey:@"value"] boolValue];
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelMeasuredValuesChanged object: self];
-        }
+        [self setLastRequest:nil];
+        
+        expertPCControlOnly = [[[measuredValues objectAtIndex:146] objectForKey:@"value"] boolValue];
+        zeusHasControl      = [[[measuredValues objectAtIndex:147] objectForKey:@"value"] boolValue];
+        orcaHasControl      = [[[measuredValues objectAtIndex:148] objectForKey:@"value"] boolValue];
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelMeasuredValuesChanged object: self];
     }
     [self processNextCommandFromQueue];
 }
