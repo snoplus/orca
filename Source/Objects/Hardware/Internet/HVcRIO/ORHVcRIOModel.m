@@ -943,24 +943,19 @@ static NSString* measuredValueList[] = {
 {
     NSNumber* oldValue = [[setPoints objectAtIndex:aIndex] objectForKey:@"setPoint"];
     [[[self undoManager] prepareWithInvocationTarget:self] setSetPoint:aIndex withValue:[oldValue floatValue]];
-    [[setPoints objectAtIndex:aIndex] setObject:[NSNumber numberWithFloat:value] forKey:@"setPoint"];
+    [[setPoints objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.6f",value] forKey:@"setPoint"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
 }
 
 - (void) setSetPointReadback: (int)aIndex withValue: (float)value
 {
-    NSString* oldValue = [[setPoints objectAtIndex:aIndex] objectForKey:@"readBack"];
-    [[[self undoManager] prepareWithInvocationTarget:self] setSetPointReadback:aIndex withValue:[oldValue floatValue]];
-
-    [[setPoints objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.3f",value] forKey:@"readBack"];
-
+    [[setPoints objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.6f",value] forKey:@"readBack"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
-
 }
 
 - (void) setMeasuredValue: (int)aIndex withValue: (float)value
 {
-    [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.3f",value] forKey:@"value"];
+    [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.6f",value] forKey:@"value"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
     
 }
@@ -1144,21 +1139,28 @@ static NSString* measuredValueList[] = {
 
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
 {
-    if(!lastRequest)return;
+   // if(!lastRequest)return;
     
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
+        
+        if(verbose){
+            NSLog(@"HVcRIO received data:\n");
+            NSLog(@"%@\n",theString);
+        }
 
         if(!stringBuffer) stringBuffer = [[NSMutableString stringWithString:theString] retain];
         else [stringBuffer appendString:theString];
-        if([stringBuffer rangeOfString:@":done\n"].location != NSNotFound){
+        if([stringBuffer rangeOfString:@":done\n" options:NSCaseInsensitiveSearch].location != NSNotFound){
             if(verbose){
-                NSLog(@"HVcRIO received data:\n");
-                NSLog(@"%@\n",stringBuffer);
+                NSLog(@"HVcRIO and end of string delimiter and will now parse the incoming string.\n");
             }
-            [stringBuffer replaceOccurrencesOfString:@"\n"    withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
-            [stringBuffer replaceOccurrencesOfString:@":done" withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
-
+            [stringBuffer replaceOccurrencesOfString:@"+"         withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,1)];//remove leading '+' if there
+            [stringBuffer replaceOccurrencesOfString:@"readssps"  withString:@"read sp " options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+            [stringBuffer replaceOccurrencesOfString:@"readsmvs"  withString:@"read mv " options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+            [stringBuffer replaceOccurrencesOfString:@"writessps" withString:@"write sp " options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+            [stringBuffer replaceOccurrencesOfString:@"s:done"    withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
+            [stringBuffer replaceOccurrencesOfString:@":done"     withString:@"" options:NSCaseInsensitiveSearch range:NSMakeRange(0,[stringBuffer length])];
             [self parseString:stringBuffer];
             [stringBuffer release];
             stringBuffer = nil;
@@ -1191,43 +1193,44 @@ static NSString* measuredValueList[] = {
     
     theString = [theString trimSpacesFromEnds];
     theString = [theString lowercaseString];
-    
     NSArray* lines = [theString componentsSeparatedByString:@"\n"];
     for(NSString* aLine in lines){
         if([aLine length]==0)       continue;
-        
-        if([lastRequest hasPrefix:@"write sp"] || [lastRequest hasPrefix:@"+write sp"]) {
+        if([theString hasPrefix:@"write sp"]) {
             aLine = [aLine substringFromIndex:8];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i;
             for(i=0;i<[theParts count];i++){
                 if(i<[setPoints count]){
-                    float new = [[theParts objectAtIndex:i] floatValue];
-                    float old  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
-                    float diff = fabsf([[theParts objectAtIndex:i] floatValue]-new);
-                    if(diff > 0.00001){
-                        NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,new,old);
-                    }
+                    float aValue = [[theParts objectAtIndex:i] floatValue];
+                    [self setSetPoint:i withValue:aValue];
                 }
             }
             [self setLastRequest:nil];
         }
-        
-        else if([lastRequest hasPrefix:@"read sp"] || [lastRequest hasPrefix:@"+read sp"]) {
+        else if([theString hasPrefix:@"read sp"]) {
             aLine = [aLine substringFromIndex:7];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i=0;
             for(i=0;i<[theParts count];i++){
                 if(i<[setPoints count]){
-                    float aValue = [[theParts objectAtIndex:i]floatValue];
-                    [self setSetPointReadback:i withValue:aValue];
+                    float readBack = [[theParts objectAtIndex:i]floatValue];
+                    [self setSetPointReadback:i withValue:readBack];
+                    
+                    float setValue  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
+                    float diff = fabsf(setValue-readBack);
+                    if(diff > 0.00001){
+                        NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,setValue,readBack);
+                    }
+
+                    
                 }
             }
             [self setLastRequest:nil];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointsChanged object: self];
         }
         
-        else if([lastRequest hasPrefix:@"read mv"] || [lastRequest hasPrefix:@"+read mv"]) {
+        else if([theString hasPrefix:@"read mv"]) {
             aLine = [aLine substringFromIndex:7];
             NSArray* theParts = [aLine componentsSeparatedByString:@","];
             int i;
@@ -1244,12 +1247,6 @@ static NSString* measuredValueList[] = {
             orcaHasControl      = [[[measuredValues objectAtIndex:148] objectForKey:@"value"] boolValue];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelMeasuredValuesChanged object: self];
-        }
-        
-        else if([lastRequest hasPrefix:@"select"]){//we await the command echo, but we don't await a response, so clear lastRequest after echo -tb-
-            aLine = [aLine substringFromIndex:0];
-            NSLog(@"   echo is:  %@ \n",aLine);
-            [self setLastRequest:nil];
         }
     }
     [self processNextCommandFromQueue];
