@@ -1216,10 +1216,8 @@ static NSString* measuredValueList[] = {
                 float setValue  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
                 float diff = fabsf(setValue-readBack);
                 if(diff > 0.00001){
-                    NSLog(@"HVcRIO WARNING: index %i: diff is not 0: %f ( abs(%f-%f)  \n",i,diff,setValue,readBack);
+                    NSLog(@"HVcRIO WARNING: index %i: setPoint-readBack > 0.00001 (abs(%f-%f) = %f)\n",i,setValue,readBack,diff);
                 }
-
-                
             }
         }
         [self setLastRequest:nil];
