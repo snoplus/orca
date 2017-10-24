@@ -1047,11 +1047,6 @@ err:
         goto err;
     }
 
-    /* Load the ECA settings if it's an ECA run
-     * This will set MTC settings for correct ECA running, so 
-     * we want this to be done before loading settings in HW. */
-    [[self anECARun] setECASettings];
-
     switch (startMode) {
     case COLD_START:
         @try {
@@ -2842,6 +2837,11 @@ err:
         [caenModel loadFromSerialization:runSettings];
         //Load TUBii settings
         [tubiiModel loadFromSerialization:runSettings];
+
+        /* Load the ECA settings if it's an ECA run
+         * This will set MTC settings for correct ECA running, so
+         * we want this to be done before loading settings in HW. */
+        [[self anECARun] setECASettings];
 
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;

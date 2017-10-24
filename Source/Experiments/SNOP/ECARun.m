@@ -102,113 +102,109 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     /* Set ECA parameters based on the run type word and
      * harcoded settings needed for the ECA algorithm */
 
-    NSException* ECAException = [NSException
-                                exceptionWithName:@"ECASettings"
-                                reason:@"ECA settings not set"
-                                userInfo:nil];
-    
-    @try{
-        isFinished = NO;
-        start_eca_run = NO;
-        isFinishing = NO;
+    isFinished = NO;
+    start_eca_run = NO;
+    isFinishing = NO;
 
-        NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
-        if (![objs count]) {
-            NSLogColor([NSColor redColor], @"setECASettings: SNO+ control not found.\n");
-            @throw ECAException;
-        }
-        aSNOPModel = [objs objectAtIndex:0];
+    NSArray* objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"setECASettings: SNO+ control not found.\n");
+        goto err;
+    }
+    aSNOPModel = [objs objectAtIndex:0];
 
-        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-        if (![objs count]) {
-            NSLogColor([NSColor redColor], @"setECASettings: Run control not found.\n");
-            @throw ECAException;
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"setECASettings: Run control not found.\n");
+        goto err;
+    }
+    ORRunModel *aRunModel = [objs objectAtIndex:0];
+    unsigned long runTypeWord = [aRunModel runType];
+    //Load hardcoded values if requested
+    if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_PDST_STANDARD"]){
+        //Pedestal run
+        [self setECA_type:ECA_PDST_TYPE];
+        [self setECA_rate:[NSNumber numberWithInt:ECA_PDST_RATE]];
+        [self setECA_pattern:ECA_PDST_PATTERN];
+        [self setECA_nevents:ECA_PDST_NEVENTS];
+    }
+    else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_TSLP_STANDARD"]){
+        //Time Slope run
+        [self setECA_type:ECA_TSLP_TYPE];
+        [self setECA_rate:[NSNumber numberWithInt:ECA_TSLP_RATE]];
+        [self setECA_pattern:ECA_TSLP_PATTERN];
+        [self setECA_nevents:ECA_TSLP_NEVENTS];
+    }
+    else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_USER_SETTINGS"]){
+        if ([ECA_type isEqualToString:@"PDST"]) {
+            runTypeWord = ~(~runTypeWord | kECATSlopeRun);
+            runTypeWord |= kECAPedestalRun;
+            [aRunModel setRunType:runTypeWord];
         }
-        ORRunModel *aRunModel = [objs objectAtIndex:0];
-        unsigned long runTypeWord = [aRunModel runType];
-        //Load hardcoded values if requested
-        if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_PDST_STANDARD"]){
-            //Pedestal run
-            [self setECA_type:ECA_PDST_TYPE];
-            [self setECA_rate:[NSNumber numberWithInt:ECA_PDST_RATE]];
-            [self setECA_pattern:ECA_PDST_PATTERN];
-            [self setECA_nevents:ECA_PDST_NEVENTS];
+        else if([ECA_type isEqualToString:@"TSLP"]) {
+            runTypeWord =~(~runTypeWord | kECAPedestalRun);
+            runTypeWord |= kECATSlopeRun;
+            [aRunModel setRunType:runTypeWord];
         }
-        else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_TSLP_STANDARD"]){
-            //Time Slope run
-            [self setECA_type:ECA_TSLP_TYPE];
-            [self setECA_rate:[NSNumber numberWithInt:ECA_TSLP_RATE]];
-            [self setECA_pattern:ECA_TSLP_PATTERN];
-            [self setECA_nevents:ECA_TSLP_NEVENTS];
-        }
-        else if([[aSNOPModel standardRunVersion] isEqualToString:@"ECA_USER_SETTINGS"]){
-            if ([ECA_type isEqualToString:@"PDST"]) {
-                runTypeWord = ~(~runTypeWord | kECATSlopeRun);
-                runTypeWord |= kECAPedestalRun;
-                [aRunModel setRunType:runTypeWord];
-            }
-            else if([ECA_type isEqualToString:@"TSLP"]) {
-                runTypeWord =~(~runTypeWord | kECAPedestalRun);
-                runTypeWord |= kECATSlopeRun;
-                [aRunModel setRunType:runTypeWord];
-            }
-        }
-        else{
-            NSLogColor([NSColor redColor], @"setECASettings: Unknown standard run version.\n");
-            @throw ECAException;
-        }
-        
-        /* Check run type word and set parameters accordingly */
-        if( (runTypeWord & kECAPedestalRun) && (runTypeWord & kECATSlopeRun) ){
-            NSLogColor([NSColor redColor], @"setECAsettings: Both PDST and TSLP bits checked in the run type word. Don't know what to do!.\n");
-            @throw ECAException;
-        }
-        else if( runTypeWord & (kECAPedestalRun) ){
-            [self setECA_type:@"PDST"];
-        }
-        else if( runTypeWord & (kECATSlopeRun) ){
-            [self setECA_type:@"TSLP"];
-        }
-        else{
-            //Not an ECA run
-            @throw ECAException;
-        }
-        //Set mode
-        if( runTypeWord & (kECARun) ){
-            [self setECA_mode:ECAMODE_DEDICATED];
-        }
-        else if( runTypeWord & (kSupernovaRun) ){
-            [self setECA_mode:ECAMODE_SUPERNOVA];
-        }
-        else if( runTypeWord & (kPhysicsRun) ){
-            [self setECA_mode:ECAMODE_PHYSICS];
-        }
-        else{
-            NSLogColor([NSColor redColor], @"setECAsettings: Not a valid run for ECA_mode.\n");
-            @throw ECAException;
-        }
+    }
+    else{
+        NSLogColor([NSColor redColor], @"setECASettings: Unknown standard run version.\n");
+        goto err;
+    }
 
-        // If we are here, that means this is an ECA run. Do the thing:
-        // Start a maintenance run with previous settings after ECAs are done
-        prev_gtmask = [anMTCModel GTCrateMask];
-        prev_pedmask = [anMTCModel pedCrateMask];
-        prev_coarsedelay = [anMTCModel coarseDelay];
-        prev_finedelay = [anMTCModel fineDelay];
-        prev_pedwidth = [anMTCModel pedestalWidth];
-        
-        /* Set pulser rate:
-         * If we starting an ECA run we have to set the pulser
-         * rate enter by the operator, not the standard run one */
-        objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-        if (![objs count]) {
-            NSLogColor([NSColor redColor], @"setECASettings: MTC not found.\n");
-            @throw ECAException;
-        }
+    /* Check run type word and set parameters accordingly */
+    if( (runTypeWord & kECAPedestalRun) && (runTypeWord & kECATSlopeRun) ){
+        NSLogColor([NSColor redColor], @"setECAsettings: Both PDST and TSLP bits checked in the run type word. Don't know what to do!.\n");
+        goto err;
+    }
+    else if( runTypeWord & (kECAPedestalRun) ){
+        [self setECA_type:@"PDST"];
+    }
+    else if( runTypeWord & (kECATSlopeRun) ){
+        [self setECA_type:@"TSLP"];
+    }
+    else{
+        //Not an ECA run
+        goto err;
+    }
+    //Set mode
+    if( runTypeWord & (kECARun) ){
+        [self setECA_mode:ECAMODE_DEDICATED];
+    }
+    else if( runTypeWord & (kSupernovaRun) ){
+        [self setECA_mode:ECAMODE_SUPERNOVA];
+    }
+    else if( runTypeWord & (kPhysicsRun) ){
+        [self setECA_mode:ECAMODE_PHYSICS];
+    }
+    else{
+        NSLogColor([NSColor redColor], @"setECAsettings: Not a valid run for ECA_mode.\n");
+        goto err;
+    }
+
+    // If we are here, that means this is an ECA run. Do the thing:
+    // Start a maintenance run with previous settings after ECAs are done
+    prev_gtmask = [anMTCModel GTCrateMask];
+    prev_pedmask = [anMTCModel pedCrateMask];
+    prev_coarsedelay = [anMTCModel coarseDelay];
+    prev_finedelay = [anMTCModel fineDelay];
+    prev_pedwidth = [anMTCModel pedestalWidth];
+
+    /* Set pulser rate:
+     * If we starting an ECA run we have to set the pulser
+     * rate enter by the operator, not the standard run one */
+    objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"setECASettings: MTC not found.\n");
+        goto err;
+    }
+
+    @try {
         anMTCModel = [objs objectAtIndex:0];
         [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
-#ifndef __TESTING__
-        [anMTCModel loadPulserRateToHardware];
-#endif
+//#ifndef __TESTING__
+//        [anMTCModel loadPulserRateToHardware];
+//#endif
 
         /* Enable Pedestals */
         [anMTCModel setIsPedestalEnabledInCSR:TRUE];
@@ -216,18 +212,24 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         /* Enable Pedestal and GT crate mask for all the crates */
         [anMTCModel setGTCrateMask: (prev_gtmask | 0x7FFFF) ];
         [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF) ];
-#ifndef __TESTING__
-        [anMTCModel loadGTCrateMaskToHardware];
-        [anMTCModel loadPedestalCrateMaskToHardware];
-#endif
+//#ifndef __TESTING__
+//        [anMTCModel loadGTCrateMaskToHardware];
+//        [anMTCModel loadPedestalCrateMaskToHardware];
+//#endif
+    }
+    @catch (...) {
+        goto err;
+    }
 
-        start_eca_run = YES;
-        return true;
-    }
-    @catch(...){
-        isFinished = YES;
-        return false;
-    }
+    start_eca_run = YES;
+    return true;
+
+err:
+{
+    isFinished = YES;
+    return false;
+}
+
 }
 
 - (void) launchECAThread:(NSNotification*)aNote
