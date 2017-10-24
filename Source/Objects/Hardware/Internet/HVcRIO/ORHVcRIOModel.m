@@ -1138,7 +1138,7 @@ static NSString* measuredValueList[] = {
 - (BOOL) orcaHasControl         {return orcaHasControl;}
 
 - (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
-{    
+{
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
         
@@ -1411,6 +1411,8 @@ static NSString* measuredValueList[] = {
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
 		NSLogError(@"command timeout",@"HVcRIO",nil);
 		[self setLastRequest:nil];
+        [stringBuffer release];
+        stringBuffer = nil;
 		[cmdQueue removeAllObjects]; //if we timeout we just flush the queue
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelQueCountChanged object: self];
 	}
@@ -1425,7 +1427,7 @@ static NSString* measuredValueList[] = {
         [self setLastRequest:cmd];
         [socket writeString:cmd encoding:NSASCIIStringEncoding];
         if(verbose)NSLog(@"HVcRIO sent cmd: %@\n",cmd);
-        [self performSelector:@selector(timeout) withObject:nil afterDelay:100];//<----timeout !!!!!!!!!!!!!!!!!!!!
+        [self performSelector:@selector(timeout) withObject:nil afterDelay:10];//<----timeout !!!!!!!!!!!!!!!!!!!!
 	}
 }
 @end
