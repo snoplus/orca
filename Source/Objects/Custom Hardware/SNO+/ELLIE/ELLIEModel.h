@@ -214,4 +214,4 @@ extern NSString* ORSMELLIERunFinished;
 extern NSString* ORTELLIERunFinished;
 extern NSString* ORSMELLIEInterlockKilled;
 extern NSString* ORELLIEFlashing;
-extern NSString* SMELLIEEmergencyStop;
+extern NSString* ORSMELLIEEmergencyStop;

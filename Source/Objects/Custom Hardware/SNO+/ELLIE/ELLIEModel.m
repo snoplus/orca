@@ -64,7 +64,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
 NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
 NSString* ORELLIEFlashing = @"ORELLIEFlashing";
-NSString* SMELLIEEmergencyStop = @"SMELLIEEmergencyStop";
+NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 
 
 ///////////////////////////////
@@ -262,7 +262,7 @@ NSString* SMELLIEEmergencyStop = @"SMELLIEEmergencyStop";
     [_tellieNodeMapping release];
     [_smelliePort release];
     [_interlockHost release];
-    
+
     [super dealloc];
 }
 
@@ -282,7 +282,7 @@ NSString* SMELLIEEmergencyStop = @"SMELLIEEmergencyStop";
     
     [notifyCenter addObserver : self
                      selector : @selector(killKeepAlive:)
-                         name : SMELLIEEmergencyStop
+                         name : ORSMELLIEEmergencyStop
                         object: nil];
 }
 
@@ -1561,13 +1561,14 @@ err:{
     @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
-    
+/*
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIEInterlockKilled object:self];
     });
     NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
+*/
     [pool release];
-}
+ }
 
 -(void)pulseKeepAlive:(id)passed
 {
@@ -1820,7 +1821,7 @@ err:{
         goto err;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
-
+    
     ///////////////
     // RUN CONTROL
     ///////////////////////
@@ -2090,14 +2091,12 @@ err:{
                                     goto err;
                                 }
                             } else {
-
                                 @try{
                                     [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
                                 } @catch(NSException* e) {
                                     NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
                                     goto err;
                                 }
-
                                 @try{
                                     [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
                                 } @catch(NSException* e){

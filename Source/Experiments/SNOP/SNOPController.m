@@ -1512,7 +1512,7 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"[SMELLIE]: A Smellie fire sequence is already on going. Cannot launch a new one until current sequence has finished\n");
         return;
     }
-
+/*
     //////////////////
     // Check if we're in the correct
     // standard run type
@@ -1520,7 +1520,7 @@ snopGreenColor;
         ORRunAlertPanel(@"The SMELLIE standard run is not loaded.",@"You must load a SMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
-
+*/
     [smellieLoadRunFile setEnabled:NO];
     [smellieRunFileNameField setEnabled:NO];
     [smellieStopRunButton setEnabled:YES];
@@ -1584,7 +1584,6 @@ snopGreenColor;
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
     [smellieStartRunButton setEnabled:NO];
-    [smellieStopRunButton setEnabled:YES];
     ///////////////////////
     // Get the ELLIEModel
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
@@ -1594,6 +1593,12 @@ snopGreenColor;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
  
+    // Check if we need to do anything
+    if(![[theELLIEModel smellieThread] isExecuting]){
+        NSLog(@"[SMELLIE]: A Smellie fire sequence does not appear to be running\n");
+        return;
+    }
+    
     NSLog(@"#############################################\n");
     NSLog(@"[SMELLIE]\n");
     NSLog(@"\t\tEmergency run stop button recongnised.\n");
@@ -1613,9 +1618,12 @@ snopGreenColor;
     [theELLIEModel setMaintenanceRollOver:NO];
     [theELLIEModel setSmellieStopButton:YES];
 
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:SMELLIEEmergencyStop object:self];
-    });
+    @try{
+        [theELLIEModel killKeepAlive:nil];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
+        return;
+    }
 }
 
 -(IBAction)loadTellieRunAction:(id)sender
