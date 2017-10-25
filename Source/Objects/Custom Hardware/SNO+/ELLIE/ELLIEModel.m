@@ -1561,12 +1561,6 @@ err:{
     @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
-/*
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIEInterlockKilled object:self];
-    });
-    NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
-*/
     [pool release];
  }
 
