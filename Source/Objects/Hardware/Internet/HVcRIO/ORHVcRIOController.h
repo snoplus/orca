@@ -43,6 +43,7 @@
     
     IBOutlet ORValueBarGroupView*  queueValueBar;
     IBOutlet NSButton*    verboseCB;
+    IBOutlet NSButton*    showFormattedDatesCB;
 }
 
 #pragma mark ***Initialization
@@ -68,6 +69,7 @@
 //HVcRIO
 - (IBAction) writeSetpointsAction:(id)sender;
 - (IBAction) readBackSetpointsAction:(id)sender;
+- (IBAction) pushReadBacksToSetPointsAction:(id)sender;
 - (IBAction) readMeasuredValuesAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) readSetPointFile:(id)sender;

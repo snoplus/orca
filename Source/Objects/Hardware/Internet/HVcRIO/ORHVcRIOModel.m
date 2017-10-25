@@ -31,6 +31,7 @@ NSString* ORHVcRIOModelSetPointsChanged         = @"ORHVcRIOModelSetPointsChange
 NSString* ORHVcRIOModelMeasuredValuesChanged    = @"ORHVcRIOModelMeasuredValuesChanged";
 NSString* ORHVcRIOModelSetPointFileChanged      = @"ORHVcRIOModelSetPointFileChanged";
 NSString* ORHVcRIOModelVerboseChanged           = @"ORHVcRIOModelVerboseChanged";
+NSString* ORHVcRIOModelShowFormattedDatesChanged= @"ORHVcRIOModelShowFormattedDatesChanged";
 
 NSString* ORHVcRIOLock						    = @"ORHVcRIOLock";
 
@@ -1215,7 +1216,7 @@ static NSString* measuredValueList[] = {
                 
                 float setValue  =    [[[setPoints objectAtIndex:i] objectForKey:@"setPoint"] floatValue];
                 float diff = fabsf(setValue-readBack);
-                if(diff > 0.00001){
+                if((i>=2) && (diff > 0.00001)){
                     NSLog(@"HVcRIO WARNING: index %i: setPoint-readBack > 0.00001 (abs(%f-%f) = %f)\n",i,setValue,readBack,diff);
                 }
             }
@@ -1291,6 +1292,7 @@ static NSString* measuredValueList[] = {
                               @"setPointAtIndex:(int)",
                               @"setPointReadBackAtIndex:(int)",
                               @"measuredValueAtIndex:(int)",
+                              @"pushReadBacksToSetPoints",
                               nil];
     
     return [selectorArray componentsJoinedByString:@"\n"];
@@ -1303,9 +1305,29 @@ static NSString* measuredValueList[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelVerboseChanged object:self];
 }
 
+- (BOOL) showFormattedDates
+{
+    return showFormattedDates;
+}
+- (void) setShowFormattedDates:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setShowFormattedDates:showFormattedDates];
+    showFormattedDates = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelShowFormattedDatesChanged object:self];
+}
+
 - (BOOL) verbose
 {
     return verbose;
+}
+
+- (void) pushReadBacksToSetPoints
+{
+    int i;
+    for(i=0;i<[setPoints count];i++){
+        float theReadBack = [[self setPointReadBackAtIndex:i] floatValue];
+        [self setSetPoint:i withValue:theReadBack];
+    }
 }
 
 #pragma mark ***Archival
@@ -1320,6 +1342,8 @@ static NSString* measuredValueList[] = {
     [self setSetPointFile:      [decoder decodeObjectForKey: @"setPointFile"]];
     [self setSetPoints:         [decoder decodeObjectForKey: @"setPoints"]];
     [self setVerbose:           [decoder decodeBoolForKey:   @"verbose"]];
+    [self setShowFormattedDates:[decoder decodeBoolForKey:   @"showFormattedDates"]];
+    
     if(!setPoints)[self createSetPointArray];
     
     [self createMeasuredValueArray];
@@ -1334,11 +1358,13 @@ static NSString* measuredValueList[] = {
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:setPointFile   forKey:@"setPointFile"];
-    [encoder encodeBool:  wasConnected     forKey:@"wasConnected"];
-    [encoder encodeBool:  verbose          forKey:@"verbose"];
-    [encoder encodeObject:ipAddress      forKey:@"ORHVcRIOModelIpAddress"];
-    [encoder encodeObject:setPoints      forKey:@"setPoints"];
+    [encoder encodeObject:setPointFile       forKey:@"setPointFile"];
+    [encoder encodeBool:  wasConnected       forKey:@"wasConnected"];
+    [encoder encodeBool:  verbose            forKey:@"verbose"];
+    [encoder encodeObject:ipAddress          forKey:@"ORHVcRIOModelIpAddress"];
+    [encoder encodeObject:setPoints          forKey:@"setPoints"];
+    [encoder encodeBool:showFormattedDates forKey:@"showFormattedDates"];
+    
 }
 
 #pragma mark *** Commands

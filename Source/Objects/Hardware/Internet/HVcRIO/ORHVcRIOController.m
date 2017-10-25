@@ -97,6 +97,11 @@
                      selector : @selector(verboseChanged:)
                          name : ORHVcRIOModelVerboseChanged
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(showFormattedDatesChanged:)
+                         name : ORHVcRIOModelShowFormattedDatesChanged
+                       object : model];
 
 }
 
@@ -120,12 +125,21 @@
     [self ipAddressChanged:nil];
     [self verboseChanged:nil];
 	[self isConnectedChanged:nil];
+    [self showFormattedDatesChanged:nil];
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote
 {
 	[ipConnectedTextField setStringValue: [model isConnected]?@"Connected":@"Not Connected"];
     [ipConnectButton setTitle:[model isConnected]?@"Disconnect":@"Connect"];
+}
+
+- (void) showFormattedDatesChanged:(NSNotification*)aNote
+{
+    [showFormattedDatesCB setIntValue: [model showFormattedDates]];
+    [setPointTableView reloadData];
+    [measuredValueTableView reloadData];
+
 }
 - (void) verboseChanged:(NSNotification*)aNote
 {
@@ -225,14 +239,41 @@
         if([[aTableColumn identifier] isEqualToString:@"index"]){
             return  [NSNumber numberWithInt:rowIndex];
         }
-        else return [model setPointItem:rowIndex forKey:[aTableColumn identifier]];
+        else {
+            if([model showFormattedDates] &&
+               ([[aTableColumn identifier] isEqualToString:@"readBack"] && [[model setPointItem:rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"])){
+                
+                NSTimeInterval s = [[model setPointItem:rowIndex forKey:@"readBack"]doubleValue];
+                if(s<1)return @"?";
+                NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:s];
+                NSDateFormatter* dateFormat = [[[NSDateFormatter alloc] init] autorelease];
+                [dateFormat setDateFormat:@"dd/MM HH:mm:ss"];
+                
+                return [dateFormat stringFromDate:theDate];
+            }
+            else return [model setPointItem:rowIndex forKey:[aTableColumn identifier]];
+        }
     }
     else if(measuredValueTableView == aTableView){
 
         if([[aTableColumn identifier] isEqualToString:@"index"]){
             return  [NSNumber numberWithInt:rowIndex];
         }
-        else return [model measuredValueItem:rowIndex forKey:[aTableColumn identifier]];
+        else {
+            if([model showFormattedDates] &&
+               ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"]) ||
+               ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:rowIndex forKey:@"data"] isEqualToString:@"Zeitstempel"])){
+                NSTimeInterval s = [[model measuredValueItem:rowIndex forKey:@"value"]doubleValue];
+                if(s<1)return @"?";
+
+                NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:s];
+                NSDateFormatter* dateFormat = [[[NSDateFormatter alloc] init] autorelease];
+                [dateFormat setDateFormat:@"dd/MM HH:mm:ss"];
+                return [dateFormat stringFromDate:theDate];
+            }
+
+            else return [model measuredValueItem:rowIndex forKey:[aTableColumn identifier]];
+        }
     }
 
     else return nil;
@@ -295,6 +336,11 @@
     [model setVerbose:[sender intValue]];
 }
 
+- (IBAction) showFormatedDatedAction: (id) sender
+{
+    [model setShowFormattedDates:[sender intValue]];
+}
+
 - (IBAction) saveSetPointFile:(id)sender
 {
     NSSavePanel *savePanel = [NSSavePanel savePanel];
@@ -321,6 +367,10 @@
             [model saveSetPointsFile:[[savePanel URL]path]];
         }
     }];
+}
+- (IBAction) pushReadBacksToSetPointsAction:(id)sender
+{
+    [model pushReadBacksToSetPoints];
 }
 
 #pragma  mark ***Delegate Responsiblities

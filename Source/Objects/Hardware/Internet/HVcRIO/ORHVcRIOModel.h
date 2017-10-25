@@ -46,6 +46,7 @@
         BOOL                isBusy;
         BOOL                verbose;
         NSMutableString*    stringBuffer;
+        BOOL                showFormattedDates;
 }
 
 #pragma mark ***Initialization
@@ -71,6 +72,8 @@
 - (void) connect;
 - (void) setVerbose:(BOOL)aState;
 - (BOOL) verbose;
+- (void) setShowFormattedDates:(BOOL)aState;
+- (BOOL) showFormattedDates;
 
 - (NSString*) title;
 
@@ -98,6 +101,7 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 - (void) readSetPointsFile:(NSString*) aPath;
 - (void) saveSetPointsFile:(NSString*) aPath;
+- (void) pushReadBacksToSetPoints;
 
 @end
 
@@ -115,4 +119,5 @@ extern NSString* ORHVcRIOModelSetPointsChanged;
 extern NSString* ORHVcRIOModelMeasuredValuesChanged;
 extern NSString* ORHVcRIOModelSetPointFileChanged;
 extern NSString* ORHVcRIOModelVerboseChanged;
+extern NSString* ORHVcRIOModelShowFormattedDatesChanged;
 
