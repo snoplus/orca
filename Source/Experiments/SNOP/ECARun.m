@@ -202,9 +202,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
     @try {
         anMTCModel = [objs objectAtIndex:0];
         [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
-//#ifndef __TESTING__
-//        [anMTCModel loadPulserRateToHardware];
-//#endif
 
         /* Enable Pedestals */
         [anMTCModel setIsPedestalEnabledInCSR:TRUE];
@@ -212,10 +209,6 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         /* Enable Pedestal and GT crate mask for all the crates */
         [anMTCModel setGTCrateMask: (prev_gtmask | 0x7FFFF) ];
         [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF) ];
-//#ifndef __TESTING__
-//        [anMTCModel loadGTCrateMaskToHardware];
-//        [anMTCModel loadPedestalCrateMaskToHardware];
-//#endif
     }
     @catch (...) {
         goto err;
