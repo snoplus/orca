@@ -23,6 +23,8 @@
 #import "ORValueBarGroupView.h"
 #import "ORAxis.h"
 
+#define kSecsBetween1904and1070 2082844800
+
 @implementation ORHVcRIOController
 
 #pragma mark ***Initialization
@@ -243,7 +245,7 @@
             if([model showFormattedDates] &&
                ([[aTableColumn identifier] isEqualToString:@"readBack"] && [[model setPointItem:rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"])){
                 
-                NSTimeInterval s = [[model setPointItem:rowIndex forKey:@"readBack"]doubleValue];
+                NSTimeInterval s = [[model setPointItem:rowIndex forKey:@"readBack"]doubleValue] - kSecsBetween1904and1070;
                 if(s<1)return @"?";
                 NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:s];
                 NSDateFormatter* dateFormat = [[[NSDateFormatter alloc] init] autorelease];
@@ -263,7 +265,7 @@
             if([model showFormattedDates] &&
                ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"]) ||
                ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:rowIndex forKey:@"data"] isEqualToString:@"Zeitstempel"])){
-                NSTimeInterval s = [[model measuredValueItem:rowIndex forKey:@"value"]doubleValue];
+                NSTimeInterval s = [[model measuredValueItem:rowIndex forKey:@"value"]doubleValue] - kSecsBetween1904and1070;
                 if(s<1)return @"?";
 
                 NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:s];
