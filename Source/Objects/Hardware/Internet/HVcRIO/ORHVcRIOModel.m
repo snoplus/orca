@@ -940,7 +940,7 @@ static NSString* measuredValueList[] = {
 }
 
 #pragma mark ***Accessors
-- (void) setSetPoint: (int)aIndex withValue: (float)value
+- (void) setSetPoint: (int)aIndex withValue: (double)value
 {
     NSNumber* oldValue = [[setPoints objectAtIndex:aIndex] objectForKey:@"setPoint"];
     [[[self undoManager] prepareWithInvocationTarget:self] setSetPoint:aIndex withValue:[oldValue floatValue]];
@@ -948,13 +948,13 @@ static NSString* measuredValueList[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
 }
 
-- (void) setSetPointReadback: (int)aIndex withValue: (float)value
+- (void) setSetPointReadback: (int)aIndex withValue: (double)value
 {
     [[setPoints objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.6f",value] forKey:@"readBack"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
 }
 
-- (void) setMeasuredValue: (int)aIndex withValue: (float)value
+- (void) setMeasuredValue: (int)aIndex withValue: (double)value
 {
     [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.6f",value] forKey:@"value"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
@@ -1231,7 +1231,7 @@ static NSString* measuredValueList[] = {
         int i;
         for(i=0;i<[theParts count];i++){
             if(i<[measuredValues count]){
-                [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i] floatValue]];
+                [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i]doubleValue]];
             }
         }
         

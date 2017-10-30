@@ -56,11 +56,12 @@
 #pragma mark ***Accessors
 - (id) setPointItem:(int)i forKey:(NSString*)aKey;
 - (id) measuredValueItem:(int)i forKey:(NSString*)aKey;
-- (void) setSetPoint: (int)aIndex withValue: (float)value;
-- (void) setSetPointReadback: (int)aIndex withValue: (float)value;
+- (void) setSetPoint: (int)aIndex withValue: (double)value;
+- (void) setSetPointReadback: (int)aIndex withValue: (double)value;
 - (id) setPointAtIndex:(int)i;
 - (id) setPointReadBackAtIndex:(int)i;
 - (id) measuredValueAtIndex:(int)i;
+- (void) setMeasuredValue: (int)aIndex withValue: (double)value;
 - (NetSocket*) socket;
 - (void) setSocket:(NetSocket*)aSocket;
 - (NSString*) ipAddress;
