@@ -334,8 +334,6 @@ BOOL isNotRunningOrIsInMaintenance();
 // ECA
 -(ECARun*) anECARun;
 
--(void) startECARunInParallel;
-
 // Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;
 -(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;

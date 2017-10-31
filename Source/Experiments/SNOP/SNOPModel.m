@@ -963,7 +963,7 @@ err:
                                 @"", @"Reason",
                                 @"", @"Details",
                                 nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
 }
@@ -1081,7 +1081,7 @@ err:
                                 @"", @"Reason",
                                 @"", @"Details",
                                 nil];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStartupAbort object: self userInfo: userInfo];
 
     state = STOPPED;
 }
@@ -1110,14 +1110,20 @@ err:
     if (start != ROLLOVER_START) {
         [self setLastStandardRunType:[self standardRunType]];
         [self setLastStandardRunVersion:[self standardRunVersion]];
-        [self setLastRunTypeWord:[self runTypeWord]];
-        NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)[self runTypeWord]];
+        [self setLastRunTypeWord:run_type];
+        NSString* _lastRunTypeWord = [NSString stringWithFormat:@"0x%X",(int)run_type];
         [self setLastRunTypeWordHex:_lastRunTypeWord]; //FIXME: revisit if we go over 32 bits
     }
 
-    if ([gOrcaGlobals runType] & kPhysicsRun) {
-        /* If this is a physics run, we ping each slot in the detector once at
-         * the beginning of the run to look for any trigger issues. */
+    if(run_type & (kECAPedestalRun | kECATSlopeRun)){
+        /* Launch the ECA routine if this is an ECA run, as in
+         * the PDST or TSLP bits are enabled */
+        [[self anECARun] launchECAThread:NULL];
+    }
+    else if (run_type & kPhysicsRun) {
+        /* If this is a physics run with no ECAs, we ping each slot in the
+         * detector once at the beginning of the run to look for any trigger
+         * issues. */
         [self pingCratesAtRunStart];
     }
 
@@ -1261,6 +1267,7 @@ err:
         state = STOPPED;
         break;
     }
+
 }
 
 - (void) subRunStarted:(NSNotification*)aNote
@@ -2572,13 +2579,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     return anECARun;
 }
 
-- (void) startECARunInParallel
-{
-    [anECARun start];
-}
-
 - (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion
 {
+    /* Load settings into GUI from DB. The start run logic will take care of
+     * shipping those to HW. */
     SNOCaenModel* caen;
 
     /* Get RC model */
@@ -2835,6 +2839,11 @@ err:
         [caenModel loadFromSerialization:runSettings];
         //Load TUBii settings
         [tubiiModel loadFromSerialization:runSettings];
+
+        /* Load the ECA settings if it's an ECA run
+         * This will set MTC settings for correct ECA running, so
+         * we want this to be done before loading settings in HW. */
+        [[self anECARun] setECASettings];
 
         NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
         return true;
