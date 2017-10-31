@@ -34,16 +34,13 @@
 		ORSafeQueue*		cmdQueue;
 		NSMutableString*    buffer;
 
-		unsigned long		readCount;
 		NSString*			setPointFile;
-        BOOL                readOnce;
         NSMutableArray*     measuredValues;
         NSMutableArray*     setPoints;
     
         BOOL                expertPCControlOnly;
         BOOL                zeusHasControl;
         BOOL                orcaHasControl;
-        BOOL                isBusy;
         BOOL                verbose;
         NSMutableString*    stringBuffer;
         BOOL                showFormattedDates;
