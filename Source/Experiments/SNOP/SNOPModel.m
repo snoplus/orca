@@ -203,8 +203,7 @@ tellieRunFiles = _tellieRunFiles;
         key = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"key"];
         NSLog(@"Session: hostname: %s, orca: %s, os: %@, key: %@\n",
               hostname, SNOP_ORCA_VERSION, osxVersion, key);
-    }
-    @catch (NSException* e) {
+    } @catch (NSException* e) {
         NSLogColor([NSColor redColor], @"Error posting session start to DB: \"%@\"\n", e.reason);
     }
 
@@ -225,8 +224,7 @@ tellieRunFiles = _tellieRunFiles;
         NSString* query = [NSString stringWithFormat:@"update orca_sessions set end_timestamp = now() where key = %@", [self sessionKey]];
         @try {
             [dbLockConnection queryString:query];
-        }
-        @catch (NSException* e) {
+        } @catch (NSException* e) {
             NSLogColor([NSColor redColor], @"Error posting session end to DB: \"%@\"\n", e.reason);
         }
     }
@@ -248,8 +246,7 @@ tellieRunFiles = _tellieRunFiles;
         @try {
             ORPQResult* result = [dbLockConnection queryString:[NSString stringWithFormat:@"select pg_try_advisory_lock(%i);", _lockDBLockID]];
             gotLock = [[result fetchRowAsType:MCPTypeDictionary row:0] valueForKey:@"pg_try_advisory_lock"];
-        }
-        @catch (NSException* e) {
+        } @catch (NSException* e) {
             NSLogColor([NSColor redColor], @"Unable to obtain database lock: \"%@\"\n", e.reason);
         }
 
@@ -257,8 +254,7 @@ tellieRunFiles = _tellieRunFiles;
             NSLogColor([NSColor redColor], @"Unable to obtain database lock: %@ on %@:%u/%@ ID %u\n",
                        _lockDBUserName, _lockDBIPAddress, _lockDBPort, _lockDBName, _lockDBLockID);
         }
-    }
-    else {
+    } else {
         NSLogColor([NSColor redColor], @"Unable to obtain database lock: DB not connected.\n");
     }
 
@@ -309,16 +305,13 @@ tellieRunFiles = _tellieRunFiles;
         ORAppDelegate* delegate = [NSApp delegate];
         [alert release];
         [delegate terminate:self];
-    }
-    else if (modalAction == NSAlertSecondButtonReturn) {  // Retry Now
+    } else if (modalAction == NSAlertSecondButtonReturn) {  // Retry Now
         [alert release];
         [self checkDatabaseLock:true];
-    }
-    else if (modalAction == NSAlertThirdButtonReturn) {  // Hostile Takeover
+    } else if (modalAction == NSAlertThirdButtonReturn) {  // Hostile Takeover
         [alert release];
         ignoreDBLock = YES;
-    }
-    else {
+    } else {
         [alert release];
     }
 
@@ -345,7 +338,8 @@ tellieRunFiles = _tellieRunFiles;
     dbLockConnection = conn;
 }
 
-- (ORPQConnection*) dbLockConnection {
+- (ORPQConnection*) dbLockConnection
+{
     return dbLockConnection;
 }
 
@@ -607,8 +601,8 @@ tellieRunFiles = _tellieRunFiles;
     [[self connectors] setObject:aConnector forKey:SNOPDbConnector];
     [aConnector setOffColor:[NSColor brownColor]];
     [aConnector setOnColor:[NSColor magentaColor]];
-	[ aConnector setConnectorType: 'DB O' ];
-	[ aConnector addRestrictedConnectionType: 'DB I' ]; //can only connect to DB outputs
+    [aConnector setConnectorType: 'DB O'];
+    [aConnector addRestrictedConnectionType: 'DB I']; //can only connect to DB outputs
     [aConnector release];
 }
 
@@ -672,28 +666,32 @@ tellieRunFiles = _tellieRunFiles;
 
 - (void) initOrcaDBConnectionHistory
 {
-	self.orcaDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
-	if(!self.orcaDBConnectionHistory){
-		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey:
-                        [NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
+    self.orcaDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
+
+    if (!self.orcaDBConnectionHistory) {
+        NSArray *his = [[NSUserDefaults standardUserDefaults] objectForKey:
+                [NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
 
         self.orcaDBConnectionHistory = [[his mutableCopy] autorelease];
-	}
-	if(!self.orcaDBConnectionHistory) {
+    }
+
+    if (!self.orcaDBConnectionHistory) {
         self.orcaDBConnectionHistory = [NSMutableArray array];
     }
 }
 
 - (void) initDebugDBConnectionHistory
 {
-	self.debugDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
-	if(!self.debugDBConnectionHistory){
-		NSArray* his = [[NSUserDefaults standardUserDefaults] objectForKey:
-                        [NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
+    self.debugDBIPNumberIndex = [[NSUserDefaults standardUserDefaults] integerForKey: [NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
+
+    if (!self.debugDBConnectionHistory) {
+        NSArray *his = [[NSUserDefaults standardUserDefaults] objectForKey:
+                [NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
         
-		self.debugDBConnectionHistory = [[his mutableCopy] autorelease];
-	}
-	if(!self.debugDBConnectionHistory) {
+        self.debugDBConnectionHistory = [[his mutableCopy] autorelease];
+    }
+
+    if (!self.debugDBConnectionHistory) {
         self.debugDBConnectionHistory = [NSMutableArray array];
     }
 }
@@ -1878,6 +1876,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
      * run. */
     static int last_crate = -1;
     int i, crate = -1;
+
     if ([gOrcaGlobals runInProgress]) {
         if ([gOrcaGlobals runType] & nhitMonitorRunType) {
             /* Run the nhit monitor on the next crate in the crate mask. */
@@ -2071,30 +2070,32 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) clearOrcaDBConnectionHistory
 {
-	self.orcaDBConnectionHistory = nil;
+    self.orcaDBConnectionHistory = nil;
     [self setOrcaDBIPAddress:[self orcaDBIPAddress]];
 }
 
 - (void) clearDebugDBConnectionHistory
 {
-	self.debugDBConnectionHistory = nil;
-	[self setDebugDBIPAddress:[self debugDBIPAddress]];
+    self.debugDBConnectionHistory = nil;
+    [self setDebugDBIPAddress:[self debugDBIPAddress]];
 }
 
 - (id) orcaDBConnectionHistoryItem:(unsigned int)index
 {
-	if(self.orcaDBConnectionHistory && index < [self.orcaDBConnectionHistory count]) {
+    if (self.orcaDBConnectionHistory && index < [self.orcaDBConnectionHistory count]) {
         return [self.orcaDBConnectionHistory objectAtIndex:index];
+    } else {
+        return nil;
     }
-	else return nil;
 }
 
 - (id) debugDBConnectionHistoryItem:(unsigned int)index
 {
-	if(self.debugDBConnectionHistory && index < [self.debugDBConnectionHistory count]) {
+    if (self.debugDBConnectionHistory && index < [self.debugDBConnectionHistory count]) {
         return [self.debugDBConnectionHistory objectAtIndex:index];
+    } else {
+        return nil;
     }
-	else return nil;
 }
 
 - (NSString*) orcaDBIPAddress
@@ -2109,24 +2110,23 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) setOrcaDBIPAddress:(NSString*)orcaIPAddress
 {
-	if([orcaIPAddress length] && orcaIPAddress != self.orcaDBIPAddress) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setOrcaDBIPAddress:self.orcaDBIPAddress];
-		
-		if (self.orcaDBIPAddress) [_orcaDBIPAddress autorelease];
-		if (orcaIPAddress) _orcaDBIPAddress = [orcaIPAddress copy];
-		
-		if(!self.orcaDBConnectionHistory) self.orcaDBConnectionHistory = [NSMutableArray arrayWithCapacity:4];
-		if(![self.orcaDBConnectionHistory containsObject:self.orcaDBIPAddress]){
-			[self.orcaDBConnectionHistory addObject:self.orcaDBIPAddress];
-		}
-		self.orcaDBIPNumberIndex = [self.orcaDBConnectionHistory indexOfObject:self.orcaDBIPAddress];
-		
-		[[NSUserDefaults standardUserDefaults] setObject:self.orcaDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
-		[[NSUserDefaults standardUserDefaults] setInteger:self.orcaDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
-		[[NSUserDefaults standardUserDefaults] synchronize];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelOrcaDBIPAddressChanged object:self];
+    if ([orcaIPAddress length] && orcaIPAddress != self.orcaDBIPAddress) {
+        [[[self undoManager] prepareWithInvocationTarget:self] setOrcaDBIPAddress:self.orcaDBIPAddress];
 
-	}
+        if (self.orcaDBIPAddress) [_orcaDBIPAddress autorelease];
+        if (orcaIPAddress) _orcaDBIPAddress = [orcaIPAddress copy];
+
+        if (!self.orcaDBConnectionHistory) self.orcaDBConnectionHistory = [NSMutableArray arrayWithCapacity:4];
+        if (![self.orcaDBConnectionHistory containsObject:self.orcaDBIPAddress]){
+            [self.orcaDBConnectionHistory addObject:self.orcaDBIPAddress];
+        }
+        self.orcaDBIPNumberIndex = [self.orcaDBConnectionHistory indexOfObject:self.orcaDBIPAddress];
+
+        [[NSUserDefaults standardUserDefaults] setObject:self.orcaDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.orcaDBConnectionHistory",[self className]]];
+        [[NSUserDefaults standardUserDefaults] setInteger:self.orcaDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.orcaDBIPNumberIndex",[self className]]];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelOrcaDBIPAddressChanged object:self];
+    }
 }
 
 - (NSString*) debugDBIPAddress
@@ -2141,28 +2141,28 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 - (void) setDebugDBIPAddress:(NSString*)debugIPAddress
 {
-	if([debugIPAddress length] && debugIPAddress != self.debugDBIPAddress) {
-		[[[self undoManager] prepareWithInvocationTarget:self] setDebugDBIPAddress:self.debugDBIPAddress];
+    if ([debugIPAddress length] && debugIPAddress != self.debugDBIPAddress) {
+        [[[self undoManager] prepareWithInvocationTarget:self] setDebugDBIPAddress:self.debugDBIPAddress];
 
         if (self.debugDBIPAddress) [_debugDBIPAddress autorelease];
-		if (debugIPAddress) _debugDBIPAddress = [debugIPAddress copy];
+        if (debugIPAddress) _debugDBIPAddress = [debugIPAddress copy];
 
-		if(!self.debugDBConnectionHistory) self.debugDBConnectionHistory = [NSMutableArray arrayWithCapacity:4];
-		if(![self.debugDBConnectionHistory containsObject:self.debugDBIPAddress]){
-			[self.debugDBConnectionHistory addObject:self.debugDBIPAddress];
-		}
-		self.debugDBIPNumberIndex = [self.debugDBConnectionHistory indexOfObject:self.debugDBIPAddress];
-		
-		[[NSUserDefaults standardUserDefaults] setObject:self.debugDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
-		[[NSUserDefaults standardUserDefaults] setInteger:self.debugDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
-		[[NSUserDefaults standardUserDefaults] synchronize];
+        if (!self.debugDBConnectionHistory) self.debugDBConnectionHistory = [NSMutableArray arrayWithCapacity:4];
+        if (![self.debugDBConnectionHistory containsObject:self.debugDBIPAddress]) {
+            [self.debugDBConnectionHistory addObject:self.debugDBIPAddress];
+        }
+        self.debugDBIPNumberIndex = [self.debugDBConnectionHistory indexOfObject:self.debugDBIPAddress];
+
+        [[NSUserDefaults standardUserDefaults] setObject:self.debugDBConnectionHistory forKey:[NSString stringWithFormat:@"orca.%@.debugDBConnectionHistory",[self className]]];
+        [[NSUserDefaults standardUserDefaults] setInteger:self.debugDBIPNumberIndex forKey:[NSString stringWithFormat:@"orca.%@.debugDBIPNumberIndex",[self className]]];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelDebugDBIPAddressChanged object:self];
-	}
+    }
 }
 
 - (void) orcaDBPing
 {
-    if(!self.orcaDBPingTask){
+    if (!self.orcaDBPingTask) {
         self.orcaDBPingTask = [ORPingTask pingTaskWithDelegate:self];
         
         self.orcaDBPingTask.launchPath      = @"/sbin/ping";
@@ -2171,12 +2171,12 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         self.orcaDBPingTask.verbose         = YES;
         self.orcaDBPingTask.textToDelegate  = YES;
         [self.orcaDBPingTask ping];
-	}
+    }
 }
 
 - (void) debugDBPing
 {
-    if(!self.debugDBPingTask){
+    if (!self.debugDBPingTask) {
         self.debugDBPingTask = [ORPingTask pingTaskWithDelegate:self];
         
         self.debugDBPingTask.launchPath     = @"/sbin/ping";
@@ -2185,22 +2185,21 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         self.debugDBPingTask.verbose        = YES;
         self.debugDBPingTask.textToDelegate = YES;
         [self.debugDBPingTask ping];
-	}
+    }
 }
 
 - (void) taskFinished:(ORPingTask*)aTask
 {
-	if(aTask == self.orcaDBPingTask){
-		self.orcaDBPingTask = nil;
-	}
-	else if(aTask == self.debugDBPingTask){
-		self.debugDBPingTask = nil;
-	}
+    if (aTask == self.orcaDBPingTask) {
+        self.orcaDBPingTask = nil;
+    } else if (aTask == self.debugDBPingTask) {
+	self.debugDBPingTask = nil;
+    }
 }
 
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp
 {
-	@synchronized(self) {
+    @synchronized(self) {
         if ([aResult isKindOfClass:[NSDictionary class]]) {
             NSString* message = [aResult objectForKey:@"Message"];
             if (message) {
@@ -2208,12 +2207,9 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                 return;
             } else if ([aTag isEqualToString:@"kSmellieRunHeaderRetrieved"]) {
                 [self parseSmellieRunFileDocs:aResult];
-            }
-            else if ([aTag isEqualToString:@"kTellieRunHeaderRetrieved"])
-            {
+            } else if ([aTag isEqualToString:@"kTellieRunHeaderRetrieved"]) {
                 [self parseTellieRunFileDocs:aResult];
-            }
-            else if ([aTag isEqualToString:@"Message"]) {
+            } else if ([aTag isEqualToString:@"Message"]) {
                 [aResult prettyPrint:@"CouchDB Message:"];
             } else if ([aTag isEqualToString:@"kStandardRunPosted"]) {
                 /* Standard run was successfully posted. */
@@ -2232,7 +2228,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         } else {
             NSLog(@"%@\n",aResult);
         }
-	} // synchronized
+    } // synchronized
 }
 
 #pragma mark ¥¥¥Specific Dialog Lock Methods
@@ -2383,8 +2379,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [self setSmellieRunFiles:nil];
     
     // Check there is an ELLIE model in the current configuration
-    NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if(![ellieModels count]){
+    NSArray *ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![ellieModels count]) {
         NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
         return;
     }
@@ -2402,14 +2398,12 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
 -(void) parseSmellieRunFileDocs:(id)aResult
 {
-    /*
-    Use the result returned from the smellie database query to fill a dictionary with all the available
-    run file documents.
-    */
+    /* Use the result returned from the smellie database query to fill a
+     * dictionary with all the available run file documents. */
     unsigned int nFiles = [[aResult objectForKey:@"rows"] count];
     NSMutableDictionary *runFiles = [[NSMutableDictionary alloc] init];
 
-    for(int i=0;i<nFiles;i++){
+    for (int i = 0; i < nFiles; i++) {
         NSMutableDictionary* smellieRunFileIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
         NSString *keyForSmellieDocs = [NSString stringWithFormat:@"%u",i];
         [runFiles setObject:smellieRunFileIterator forKey:keyForSmellieDocs];
@@ -2419,9 +2413,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [runFiles release];
     
     [self setSmellieDocUploaded:YES];
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"SmellieRunFilesLoaded" object:self];
-    });
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:@"SmellieRunFilesLoaded" object:self];
 }
 
 - (void) getTellieRunFiles
@@ -2430,8 +2422,8 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [self setTellieRunFiles:nil];
 
     // Check there is an ELLIE model in the current configuration
-    NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if(![ellieModels count]){
+    NSArray *ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![ellieModels count]) {
         NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
         return;
     }
@@ -2451,7 +2443,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     unsigned int nFiles = [[aResult objectForKey:@"rows"] count];
     NSMutableDictionary *runFiles = [[NSMutableDictionary alloc] init];
 
-    for(int i=0;i<nFiles;i++){
+    for (int i = 0; i < nFiles; i++) {
         NSMutableDictionary* tellieRunFileIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
         NSString *keyForTellieDocs = [NSString stringWithFormat:@"%u",i];
         [runFiles setObject:tellieRunFileIterator forKey:keyForTellieDocs];
@@ -2512,20 +2504,19 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     /* Update standard run version */
     //Check if DB is empty
-    if([[standardRunCollection objectForKey:standardRunType] count] == 0){
+    if ([[standardRunCollection objectForKey:standardRunType] count] == 0) {
         [self setStandardRunVersion:@""];
     }
+
     //Check if previous selected run version exists
-    if([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil){
+    if ([[standardRunCollection objectForKey:standardRunType] objectForKey:standardRunVersion] == nil) {
         //If not, select DEFAULT
         [self setStandardRunVersion:@"DEFAULT"];
-    }
-    else{
+    } else {
         [self setStandardRunVersion:[self standardRunVersion]];
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSNOPModelSRChangedNotification object:self];
-
 }
 
 - (NSString*)standardRunVersion
@@ -2587,7 +2578,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 
     /* Get RC model */
     ORRunModel *aRunModel = nil;
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if ([objs count]) {
         aRunModel = [objs objectAtIndex:0];
     } else {
@@ -2602,7 +2593,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     [self setStandardRunVersion:_standardRunVersion];
 
     /* If we are not going to maintenance we shouldn't be polling */
-    NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:[self standardRunType]] objectForKey:[self standardRunVersion]];
+    NSMutableDictionary *runSettings = [[[self standardRunCollection] objectForKey:[self standardRunType]] objectForKey:[self standardRunVersion]];
 
     if (runSettings == nil) {
         NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n", [self standardRunType], [self standardRunVersion]);
@@ -2630,7 +2621,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     //Load the standard run and stop run initialization if failed
-    if(![self loadStandardRun:_standardRun withVersion:_standardRunVersion]) return NO;
+    if (![self loadStandardRun:_standardRun withVersion:_standardRunVersion]) return NO;
 
     //Start or restart the run
     if ([aRunModel isRunning]) {
@@ -2658,7 +2649,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (void) stopRun
 {
     ORRunModel *aRunModel = nil;
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if ([objs count]) {
         aRunModel = [objs objectAtIndex:0];
     } else {
@@ -2873,8 +2864,8 @@ err:
     }
 
     // Get RC model
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    ORRunModel* runControlModel;
+    NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    ORRunModel *runControlModel;
     if ([objs count]) {
         runControlModel = [objs objectAtIndex:0];
     } else {
@@ -2894,7 +2885,7 @@ err:
 
     // Get TUBii model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    TUBiiModel* tubiiModel;
+    TUBiiModel *tubiiModel;
     if ([objs count]) {
         tubiiModel = [objs objectAtIndex:0];
     } else {
@@ -2904,14 +2895,13 @@ err:
 
     // Get CAEN model
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
-    SNOCaenModel* caenModel;
+    SNOCaenModel *caenModel;
     if ([objs count]) {
         caenModel = [objs objectAtIndex:0];
     } else {
         NSLogColor([NSColor redColor], @"couldn't find CAEN model. Please add it to the experiment and restart the run.\n");
         return false;
     }
-
 
     // Build run table
     NSMutableDictionary *detectorSettings = [NSMutableDictionary dictionaryWithCapacity:200];
@@ -2933,12 +2923,12 @@ err:
 
     // Save TUBii settings
     NSMutableDictionary* tubii_serial = [tubiiModel serializeToDictionary];
-    if(tubii_serial != NULL) [detectorSettings addEntriesFromDictionary:tubii_serial];
+    if (tubii_serial != NULL) [detectorSettings addEntriesFromDictionary:tubii_serial];
     else return false;
 
     // Save CAEN settings
     NSMutableDictionary* caen_serial = [caenModel serializeToDictionary];
-    if(caen_serial != NULL) [detectorSettings addEntriesFromDictionary:caen_serial];
+    if (caen_serial != NULL) [detectorSettings addEntriesFromDictionary:caen_serial];
     else return false;
 
     NSLog(@"Saving settings for Standard Run %@ - Version %@: \n %@ \n",runTypeName,runVersion,detectorSettings);
@@ -2951,8 +2941,8 @@ err:
 //Ship GUI settings to hardware
 - (void) loadSettingsInHW
 {
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    ORMTCModel* mtc;
+    NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    ORMTCModel *mtc;
     if ([objs count]) {
         mtc = [objs objectAtIndex:0];
     } else {
@@ -2961,7 +2951,7 @@ err:
     }
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOCaenModel")];
-    SNOCaenModel* caen;
+    SNOCaenModel *caen;
     if ([objs count]) {
         caen = [objs objectAtIndex:0];
     } else {
@@ -2970,7 +2960,7 @@ err:
     }
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    TUBiiModel* tubii;
+    TUBiiModel *tubii;
     if ([objs count]) {
         tubii = [objs objectAtIndex:0];
     } else {
@@ -2978,7 +2968,7 @@ err:
         return;
     }
 
-    @try{
+    @try {
         //Load TUBii settings
         [tubii sendCurrentModelStateToHW];
 
@@ -2989,8 +2979,7 @@ err:
         [mtc loadTheMTCADacs];
         [mtc setGlobalTriggerWordMask];
         [mtc loadPulserRateToHardware];
-    }
-    @catch(NSException *e){
+    } @catch(NSException *e) {
         NSLogColor([NSColor redColor], @"Problem loading settings into Hardware: %@\n",[e reason]);
         return;
     }
