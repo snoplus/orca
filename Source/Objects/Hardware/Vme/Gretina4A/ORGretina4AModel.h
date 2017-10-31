@@ -148,8 +148,6 @@
     unsigned long   rj45SpareIoMuxSel;
     BOOL            rj45SpareIoDir;
     unsigned long   ledStatus;
-    unsigned long   liveTimestampLsb;
-    unsigned long   liveTimestampMsb;
     BOOL            diagIsync;
     BOOL            serdesSmLostLock;
     BOOL            overflowFlagChan[kNumGretina4AChannels];
