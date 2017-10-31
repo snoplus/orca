@@ -2776,14 +2776,14 @@ err:
 // Load Detector Settings from the DB into the Models
 - (BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion
 {
-    NSMutableDictionary* runSettings = [[[self standardRunCollection] objectForKey:runTypeName] objectForKey:runVersion];
-    if(runSettings == nil){
-        NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB. \n",runTypeName, runVersion);
+    NSMutableDictionary *runSettings = [[[self standardRunCollection] objectForKey:runTypeName] objectForKey:runVersion];
+    if (runSettings == nil) {
+        NSLogColor([NSColor redColor], @"Standard run %@(%@) does NOT exists in DB.\n",runTypeName, runVersion);
         return false;
     }
 
     /* Get models */
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
+    NSArray *objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     ORMTCModel* mtcModel;
     if ([objs count]) {
         mtcModel = [objs objectAtIndex:0];
@@ -2819,9 +2819,8 @@ err:
         return false;
     }
 
-
     //Load values
-    @try{
+    @try {
         //Load run type word
         unsigned long nextruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
         unsigned long currentruntypeword = [runControlModel runType];
@@ -2840,15 +2839,16 @@ err:
         //Load TUBii settings
         [tubiiModel loadFromSerialization:runSettings];
 
-        /* Load the ECA settings if it's an ECA run
-         * This will set MTC settings for correct ECA running, so
-         * we want this to be done before loading settings in HW. */
-        [[self anECARun] setECASettings];
+        if (nextruntypeword & (kECARun | kECAPedestalRun | kECATSlopeRun)) {
+            /* Load the ECA settings if it's an ECA run. This will set MTC
+             * settings for correct ECA running, so we want this to be done
+             * before loading settings in HW. */
+            [[self anECARun] setECASettings];
+        }
 
-        NSLog(@"Standard run %@ (%@) settings loaded. \n",runTypeName,runVersion);
+        NSLog(@"Standard run %@ (%@) settings loaded.\n",runTypeName,runVersion);
         return true;
-    }
-    @catch (NSException *e) {
+    } @catch (NSException *e) {
         NSLog(@"Error retrieving Standard Runs information: \n %@ \n", e);
         return false;
     }
