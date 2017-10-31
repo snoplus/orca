@@ -16,8 +16,6 @@
 #import "ORRunModel.h"
 #import "ORCouchDB.h"
 
-NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
-
 @implementation ELLIEController
 
 @synthesize nodeMapWC = _nodeMapWC;
@@ -92,6 +90,7 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [model setInterlockHost:[interlockHostTf stringValue]];
 }
 
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -108,11 +107,6 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     [notifyCenter addObserver : self
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
-                        object: nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(killInterlock:)
-                         name : @"SMELLIEEmergencyStop"
                         object: nil];
 }
 
@@ -1276,8 +1270,4 @@ NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
     return;
 }
 
--(void)killInterlock:(NSNotification *)aNote
-{
-    [model killKeepAlive];
-}
 @end

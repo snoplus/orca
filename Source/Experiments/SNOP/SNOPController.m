@@ -765,25 +765,7 @@ snopGreenColor;
 - (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
-
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
-        goto err; // If error fall through and just stop the run.
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-
-    if([[theELLIEModel tellieThread] isExecuting]){
-        [theELLIEModel stopTellieRun];
-    }
-    if([[theELLIEModel smellieThread] isExecuting]){
-        [theELLIEModel stopSmellieRun];
-    }
-
-err:
-    {
-        [model stopRun];
-    }
+    [model stopRun];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -1400,6 +1382,7 @@ err:
     [smellieLoadRunFile setEnabled:YES];
     
     [self setSmellieRunFileList:runFileDict];
+    NSLog(@"[SMELLIE] %i run plan documents sucessfully loaded\n", [runFileDict count]);
     [runFileDict release];
 }
 
@@ -1547,6 +1530,7 @@ err:
 
     //////////////////////
     // Start smellie thread
+    [theELLIEModel startInterlockThread];
     [theELLIEModel startSmellieRunThread:smellieRunFile];
 }
 
@@ -1565,6 +1549,30 @@ err:
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
+    /////////////////////////
+    // If this call is from a button press push an acknowledgement
+    // to the logs. Seeing as SMELLIE takes so long to shut down, it
+    // is important to let the user know whats going on.
+    if(![sender isKindOfClass:[NSNotification class]]){
+        NSLog(@"#############################################\n");
+        NSLog(@"[SMELLIE]\n");
+        NSLog(@"\t\tRun stop button recongnised.\n");
+        NSLog(@"\t\tEXTA triggers will stop within the next 10s.\n");
+        NSLog(@"\t\tPutting the lasers to safe state may take\n");
+        NSLog(@"\t\tup to 2 minutes.\n");
+        NSLog(@"#############################################\n");
+        ////////////////////////
+        // In the case of a button push we also want to set a couple
+        // of flags in the ELLIEModel to define how it will handle
+        // run tansitions.
+        //
+        // In this case it will simply roll over into a new
+        // SMELLIE run so the flash sequence can be easily
+        // re-started.
+        [theELLIEModel setMaintenanceRollOver:NO];
+        [theELLIEModel setSmellieStopButton:YES];
+    }
+
     //Call stop smellie run method to tidy up SMELLIE's hardware state
     @try{
         [theELLIEModel stopSmellieRun];
@@ -1572,21 +1580,51 @@ err:
         NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
         return;
     }
-
-    ////////////
-    // Roll over into maintenance run
-    if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-    }
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SMELLIEEmergencyStop" object:self];
-    [smellieLoadRunFile setEnabled:NO];
-    [smellieRunFileNameField setEnabled:NO];
     [smellieStartRunButton setEnabled:NO];
-    [smellieStopRunButton setEnabled:YES];
+    ///////////////////////
+    // Get the ELLIEModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
+    // Check if we need to do anything
+    if(![[theELLIEModel smellieThread] isExecuting]){
+        NSLog(@"[SMELLIE]: A Smellie fire sequence does not appear to be running\n");
+        return;
+    }
+
+    NSLog(@"#############################################\n");
+    NSLog(@"[SMELLIE]\n");
+    NSLog(@"\t\tEmergency run stop button recongnised.\n");
+    NSLog(@"\t\tEXTA triggers will stop within the next [10s].\n");
+    NSLog(@"\t\tPutting the lasers to safe state may take\n");
+    NSLog(@"\t\tup to [2 minutes].\n");
+    NSLog(@"#############################################\n");
+
+    ////////////////////////
+    // Set a couple of flags in the ELLIEModel to tell
+    // it how to handle run transitions when this button
+    // has been activated.
+    //
+    // In this case it will simply roll over into a new
+    // SMELLIE run so the flash sequence can be easily
+    // re-started.
+    [theELLIEModel setMaintenanceRollOver:NO];
+    [theELLIEModel setSmellieStopButton:YES];
+
+    @try {
+        [theELLIEModel killKeepAlive:nil];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
+        return;
+    }
 }
 
 -(IBAction)loadTellieRunAction:(id)sender
@@ -1765,26 +1803,12 @@ err:
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
-    //Call stop smellie run method to tidy up TELLIE's hardware state
+    //Call stop tellie run method to tidy up TELLIE's hardware state
     @try{
         [theELLIEModel stopTellieRun];
     } @catch(NSException* e){
         NSLogColor([NSColor redColor], @"Problem stopping tellie run: %@\n", [e reason]);
         return;
-    }
-
-    ////////////
-    // Handle end of run sequencing
-    if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
-        // If user was running a TELLIE standard sequence, roll over into maintinance run
-        if([self tellieStandardSequenceFlag]){
-            [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-        // If user is using the ellie gui simply start a new run as they'll likely need to run
-        // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
-        // will dictate the user should start a new standard run manualy when they're finished
-        } else {
-            [self startRunAction:self];
-        }
     }
 
     [self setTellieFireSettings:nil];
