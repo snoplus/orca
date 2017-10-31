@@ -39,7 +39,8 @@
 	NSString*			 functionName;
     BOOL                 userResponded;
     id                   userResult;
-    NSWindowController* userDialogController;
+    NSWindowController*  userDialogController;
+    NSMutableDictionary* variableCheckDictionary;
 }
 
 #pragma mark •••Initialization
@@ -83,6 +84,8 @@
 - (void)	printAll:(NSArray*)someNodes;
 - (id)		sciString:(id) p precision:(id)thePrecision;
 - (id)		fixedString:(id) p precision:(id)thePrecision;
+- (void)    checkForCaseIssues;
+
 @end
 
 @interface ORSysCall : NSObject

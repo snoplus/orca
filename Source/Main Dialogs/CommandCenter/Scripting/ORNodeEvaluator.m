@@ -133,6 +133,7 @@
 	[sysCallTable release];
 	[symbolTableLock release];
 	[functionName release];
+    [variableCheckDictionary release];
 	[super dealloc];
 }
 
@@ -530,11 +531,29 @@
 
 - (void) printAll:(NSArray*)someNodes
 {
+    [variableCheckDictionary release];
+    variableCheckDictionary = nil;
 	id aNode;
 	NSEnumerator* e = [someNodes objectEnumerator];
 	while(aNode = [e nextObject]){
 		[self printNode:aNode];
 	}
+    [self checkForCaseIssues];
+}
+
+- (void) checkForCaseIssues
+{
+    int firstOne = YES;
+    for(NSString* aKey in [variableCheckDictionary allKeys]){
+        NSArray* vars = [variableCheckDictionary objectForKey:aKey];
+        if([vars count] > 1){
+            if(firstOne){
+                firstOne = NO;
+                NSLog(@"The following variables differ only in case:\n");
+            }
+            NSLog(@"%@\n",vars);
+        }
+    }
 }
 
 - (BOOL) exitNow
@@ -548,6 +567,7 @@
     NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@",[self finalPass:[self printNode:p atLevel:level lastOne:NO]]);
     return _zero;
 }
+
 - (ORNodeEvaluator*) functionEvaluator
 {
 	if(functionEvaluator)return [functionEvaluator functionEvaluator];
@@ -1785,14 +1805,32 @@
 @implementation ORNodeEvaluator (Graph_Private)
 - (id) printNode:(id)p atLevel:(int)aLevel lastOne:(BOOL)lastChild
 {
-	
     if (!p) return @"";
 	
 	NSMutableString* line = [NSMutableString stringWithString:@"?"];
 	
     switch([(Node*)p type]) {
-        case typeCon:				line = [NSMutableString stringWithFormat:@"c(%@)",		[p nodeData]];	break;
-        case typeId:				line = [NSMutableString stringWithFormat:@"ident(%s)",	[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
+        case typeId:
+        {
+            line = [NSMutableString stringWithFormat:@"ident(%s)",    [[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];
+            if(!variableCheckDictionary)variableCheckDictionary= [[NSMutableDictionary dictionary]retain];
+            NSString* aVariable = [p nodeData];
+            NSString* aKey = [aVariable uppercaseString];
+            NSMutableArray* allLikeThis = [variableCheckDictionary objectForKey:aKey];
+            if(!allLikeThis)allLikeThis = [NSMutableArray array];
+            BOOL exists = NO;
+            for(NSString* anEntry in allLikeThis){
+                if([anEntry isEqualToString:aVariable]){
+                    exists = YES;
+                    break;
+                }
+            }
+            if(!exists) [allLikeThis addObject:aVariable];
+            
+            [variableCheckDictionary setObject:allLikeThis forKey:aKey];
+        }
+            break;
+        case typeCon:               line = [NSMutableString stringWithFormat:@"c(%@)",		[p nodeData]];	break;
         case typeSelVar:			line = [NSMutableString stringWithFormat:@"selVar(%s)", [[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
         case typeStr:				line = [NSMutableString stringWithFormat:@"\"%s\"",		[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
 		case typeOperationSymbol:	line = [NSMutableString stringWithFormat:@"oper(%s)",	[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
@@ -1900,6 +1938,7 @@
             }
             break;
     }
+    
 	NSString* prependString = @"";
 	int i;
 	for(i=0;i<aLevel;i++){
