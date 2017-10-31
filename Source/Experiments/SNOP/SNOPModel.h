@@ -141,7 +141,7 @@ BOOL isNotRunningOrIsInMaintenance();
     RedisClient *xl3_server;
 
     int state;
-    int start;
+    int startMode;
     bool resync;
     bool waitingForBuffers;     // flag indicates we are waiting for our buffers to empty
 
@@ -333,8 +333,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 // ECA
 -(ECARun*) anECARun;
-
--(void) startECARunInParallel;
 
 // Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;

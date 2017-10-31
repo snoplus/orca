@@ -341,8 +341,7 @@ snopGreenColor;
                      selector : @selector(startTellieRunNotification:)
                          name : ORTELLIERunStart
                         object: nil];
-    
-    
+
     [notifyCenter addObserver :self
                      selector : @selector(stopTellieRunAction:)
                          name : ORTELLIERunFinished
@@ -372,7 +371,12 @@ snopGreenColor;
                      selector :@selector(runTypeWordChanged:)
                          name :ORRunTypeChangedNotification
                        object :nil];
-    
+
+    [notifyCenter addObserver :self
+                     selector :@selector(runTypeWordChanged:)
+                         name :ORSNOPRunTypeWordChangedNotification
+                       object :nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
                          name : ORSecurityNumberLockPagesChanged
@@ -401,6 +405,11 @@ snopGreenColor;
     [notifyCenter addObserver : self
                      selector : @selector(runsECAChanged:)
                          name : ORECARunFinishedNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ECAStatusChanged:)
+                         name : ORECAStatusChangedNotification
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -722,6 +731,8 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
+    [self endEditing];
+
     /* Action when the user clicks on the Start or Restart Button. */
     unsigned long dbruntypeword = 0;
 
@@ -1950,8 +1961,54 @@ snopGreenColor;
     [ecaNEventsTextField setIntValue:integ];
     [ecaPulserRate setObjectValue:[[model anECARun] ECA_rate]];
 
-    if([[aNotification name] isEqualTo:ORECARunStartedNotification]) [startSingleECAButton setEnabled:false];
-    else if([[aNotification name] isEqualTo:ORECARunFinishedNotification]) [startSingleECAButton setEnabled:true];
+    if([[aNotification name] isEqualTo:ORECARunStartedNotification]) {
+        [ECApatternPopUpButton setEnabled:false];
+        [ECAtypePopUpButton setEnabled:false];
+        [ecaNEventsTextField setEnabled:false];
+        [ecaPulserRate setEnabled:false];
+    }
+    else if([[aNotification name] isEqualTo:ORECARunFinishedNotification]){
+        [ECApatternPopUpButton setEnabled:true];
+        [ECAtypePopUpButton setEnabled:true];
+        [ecaNEventsTextField setEnabled:true];
+        [ecaPulserRate setEnabled:true];
+    }
+
+}
+
+- (void) ECAStatusChanged:(NSNotification*)aNotification
+{
+
+    ECARun *theECARun = [model anECARun];
+
+    //Status
+    NSString * ecaStatusLabel = @"Not running";
+    if ([theECARun isFinished]){
+        ecaStatusLabel = @"Not running";
+    }
+    else if ([theECARun isExecuting]){
+        ecaStatusLabel = @"Running";
+    }
+    [[ecaStatusMatrix cellAtRow:0 column:0] setStringValue:ecaStatusLabel];
+    //Mode
+    [[ecaStatusMatrix cellAtRow:1 column:0] setStringValue:[theECARun ECA_mode_string]];
+    //Pattern
+    [[ecaStatusMatrix cellAtRow:2 column:0] setStringValue:[theECARun ECA_pattern_string]];
+    //Type
+    [[ecaStatusMatrix cellAtRow:3 column:0] setStringValue:[theECARun ECA_type]];
+    //Number of events
+    [[ecaStatusMatrix cellAtRow:4 column:0] setIntValue:[theECARun ECA_nevents]];
+    //Rate
+    [[ecaStatusMatrix cellAtRow:5 column:0] setObjectValue:[theECARun ECA_rate]];
+    //Step
+    NSString * ecaStepLabel = [NSString stringWithFormat:@"%d/%d",[theECARun ECA_currentStep],[theECARun ECA_nsteps] ];
+    [[ecaStatusMatrix cellAtRow:6 column:0] setStringValue:ecaStepLabel];
+    //TSlope point
+    NSString * ecaPointLabel = [NSString stringWithFormat:@"%d/%d",[theECARun ECA_currentPoint],[theECARun ECA_tslope_pattern] ];
+    if([[theECARun ECA_type] isEqualToString:@"PDST"]) ecaPointLabel = @"--";
+    [[ecaStatusMatrix cellAtRow:7 column:0] setStringValue:ecaPointLabel];
+    //Delay
+    [[ecaStatusMatrix cellAtRow:8 column:0] setDoubleValue:[theECARun ECA_currentDelay]];
 
 }
 
@@ -1983,22 +2040,6 @@ snopGreenColor;
 {
     [[model anECARun] setECA_rate:[ecaPulserRate objectValue]];
 }
-
-
-- (IBAction)startECAStandardRunAction:(id)sender
-{
-
-    NSLogColor([NSColor redColor],@"Not implemented yet. Use the Start Single ECA Run button below. \n");
-
-}
-
-- (IBAction)startECASingleRunAction:(id)sender
-{
-    
-    [model startECARunInParallel];
-
-}
-
 
 //STANDARD RUNS
 - (IBAction)standardRunNewValueAction:(id)sender
@@ -2319,15 +2360,17 @@ snopGreenColor;
 }
 
 //Run Type Word
--(void) runTypeWordChanged:(NSNotification*)aNote
+- (void) runTypeWordChanged:(NSNotification*)aNote
 {
-    
-    unsigned long currentRunWord = [runControl runType];
 
-    [model setRunTypeWord:currentRunWord];
+    if ([[aNote name] isEqualTo:ORRunTypeChangedNotification]) {
+        unsigned long currentRunWord = [runControl runType];
+        [model setRunTypeWord:currentRunWord];
+    }
+
     //Update display
     for(int i=0;i<32;i++){
-        [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
+        [[runTypeWordMatrix cellAtRow:i column:0] setState:([model runTypeWord] &(1L<<i))!=0];
     }
     
 }
