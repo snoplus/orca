@@ -90,9 +90,6 @@
 - (id)      genRandom:(id) p;
 - (id)      valueArray:(id)p;
 - (id)      addNodes:(id)p;
-- (id)      sortObject:(id) p;
-- (id)      sortObjectR:(id) p;
-- (id)      sortObject:(id)p ascending:(BOOL)ascending;
 
 
 - (NSMutableDictionary*) makeSymbolTable;
