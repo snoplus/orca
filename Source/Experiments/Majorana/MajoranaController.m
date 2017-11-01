@@ -331,7 +331,7 @@
 
 - (void) calibrationStatusChanged:(NSNotification*)aNote
 {
-    [calibrationStatusField setTimeOut:3];
+    [calibrationStatusField setTimeOut:10];
     [calibrationStatusField setStringValue:[model calibrationStatus]];
 }
 
