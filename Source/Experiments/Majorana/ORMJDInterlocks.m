@@ -578,7 +578,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if(!sentCmds){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
-                                            [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot],
+                                            [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",[self vacSystem]],
                                             @"pollTime = [ORAmi286Model,2 pollTime];",
                                             nil];
 
