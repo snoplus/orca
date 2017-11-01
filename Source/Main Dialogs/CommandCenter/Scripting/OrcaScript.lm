@@ -91,7 +91,9 @@ E			[Ee][+-]?{D}+
 "printfile"     return PRINTFILE;
 "display"       return DISPLAY;
 "find"			return FIND;
-"make"			return MAKE;
+"make"          return MAKE;
+"sort"          return SORT;
+"sortRev"       return SORTR;
 "break"			return BREAK;
 "exit"			return EXIT;
 "continue"		return CONTINUE;

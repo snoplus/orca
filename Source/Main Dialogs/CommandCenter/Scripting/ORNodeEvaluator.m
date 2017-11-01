@@ -90,6 +90,9 @@
 - (id)      genRandom:(id) p;
 - (id)      valueArray:(id)p;
 - (id)      addNodes:(id)p;
+- (id)      sortObject:(id) p;
+- (id)      sortObjectR:(id) p;
+- (id)      sortObject:(id)p ascending:(BOOL)ascending;
 
 
 - (NSMutableDictionary*) makeSymbolTable;
@@ -383,6 +386,33 @@
 - (id) makeObject:(id) p
 {
 	return [ObjectFactory makeObject:VARIABLENAME(0)];
+}
+
+- (id) sortObject:(id) p
+{
+    return [self sortObject:p ascending:YES];
+
+}
+- (id) sortObjectR:(id) p
+{
+    return [self sortObject:p ascending:NO];
+}
+- (id) sortObject:(id)p ascending:(BOOL)ascending
+{
+    id  collectionObj = NodeValue(0);
+    if([collectionObj isKindOfClass:NSClassFromString(@"NSDictionary")]){
+        //convert to an array of the keys and sort the keys
+        collectionObj = [collectionObj allKeys];
+    }
+    
+    if([collectionObj isKindOfClass:NSClassFromString(@"NSArray")]){
+        NSSortDescriptor* sortOrder = [NSSortDescriptor sortDescriptorWithKey: @"self" ascending: ascending];
+        return [collectionObj sortedArrayUsingDescriptors: [NSArray arrayWithObject: sortOrder]];
+    }
+    else if([collectionObj isKindOfClass:NSClassFromString(@"NSString")]){
+        return collectionObj;
+    }
+    else return collectionObj;
 }
 
 - (id) findObject:(id) p
@@ -686,8 +716,10 @@
 		case kObjList:		return [NodeValue(0) stringByAppendingFormat:@"%@",NodeValue(1)];
 		case kSelName:		return [self processSelectName:p];
 		case FIND:			return [self findObject:p];
-		case MAKE:			return [self makeObject:p];
-			
+        case MAKE:          return [self makeObject:p];
+        case SORT:          return [self sortObject:p];
+        case SORTR:         return [self sortObjectR:p];
+
 			//math ops
 		case '=':			return [self setValue: NodeValue(1) forSymbol:[[[p nodeData] objectAtIndex:0] nodeData]];
 		case UMINUS:		return [[NSDecimalNumber decimalNumberWithString:@"-1"] decimalNumberByMultiplyingBy:NodeValue(0)];
@@ -1929,7 +1961,8 @@
 				case REQUEST:			line = [NSMutableString stringWithString:@"[request]"];		break;
 				case CONFIRM:			line = [NSMutableString stringWithString:@"[confirm]"];		break;
 				case SEEDRANDOM:		line = [NSMutableString stringWithString:@"[seedRandom]"];	break;
-				case RANDOM:            line = [NSMutableString stringWithString:@"[random]"];		break;
+                case RANDOM:            line = [NSMutableString stringWithString:@"[random]"];        break;
+                case SORT:              line = [NSMutableString stringWithString:@"[sort]"];        break;
 				case kConfirmTimeOut:	line = [NSMutableString stringWithString:@"[confirmtimeout]"];	break;
                 case '#':				line = [NSMutableString stringWithString:@"[#]"];			break;
                 case '$':				line = [NSMutableString stringWithString:@"[$]"];			break;
@@ -2344,4 +2377,5 @@
         }
     }
 }
+
 @end
