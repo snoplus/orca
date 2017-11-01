@@ -71,6 +71,7 @@
     BOOL testfillingLN[2];
     BOOL verboseDiagnostics;
     int  minNumDetsToAlertExperts;
+    NSString* calibrationStatus;
 }
 
 #pragma mark ¥¥¥Accessors
@@ -183,6 +184,8 @@
 - (void) retractSource:(int)index;
 - (void) stopSource:(int)index;
 - (void) checkSourceGateValve:(int)index;
+- (NSString*) calibrationStatus;
+- (void) setCalibrationStatus:(NSString*)aString;
 
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -204,6 +207,7 @@ extern NSString* ORMajoranaModelUpdateSpikeDisplay;
 extern NSString* ORMajoranaModelMaxNonCalibrationRate;
 extern NSString* ORMajoranaModelVerboseDiagnosticsChanged;
 extern NSString* ORMajoranaModelMinNumDetsToAlertExperts;
+extern NSString* ORMajoranaModelCalibrationStatusChanged;
 
 @interface ORMJDHeaderRecordID : NSObject
 - (NSString*) fullID;

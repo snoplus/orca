@@ -23,6 +23,7 @@
 
 @class ORColorScale;
 @class ORSegmentGroup;
+@class ORTimedTextField;
 
 @interface MajoranaController : ORExperimentController {
  
@@ -115,6 +116,7 @@
 
     IBOutlet NSButton*      verboseDiagnosticsCB;
     IBOutlet NSButton*      calibrationLockButton;
+    IBOutlet ORTimedTextField*   calibrationStatusField;
     
 	NSView *blankView;
     NSSize detectorSize;
@@ -128,6 +130,7 @@
 #pragma mark ¥¥¥Initialization
 - (void) registerNotificationObservers;
 - (void) updateWindow;
+- (void) calibrationStatusChanged:(NSNotification*)aNote;
 - (void) verboseDiagnosticsChanged:(NSNotification*)aNote;
 - (void) updateLastConstraintCheck:(NSNotification*)aNote;
 - (void) secondaryColorAxisAttributesChanged:(NSNotification*)aNote;
@@ -155,7 +158,6 @@
 - (NSString*) sourceIsInState:(int)index;
 - (void) maxNonCalibrationRateChanged:(NSNotification*)aNote;
 - (void) minNumDetsToAlertExpertsChanged:(NSNotification*)aNote;
-
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) confirmDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;

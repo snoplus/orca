@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -14,6 +14,7 @@
                 <outlet property="breakdown1Field" destination="530-PD-H7v" id="JFk-2M-aQo"/>
                 <outlet property="breakdown2Field" destination="uip-ce-gJe" id="qEE-xV-IBl"/>
                 <outlet property="calibrationLockButton" destination="mfV-7Q-mrw" id="X8L-kO-2q9"/>
+                <outlet property="calibrationStatusField" destination="sWW-FU-3Ub" id="eNr-Nb-PHe"/>
                 <outlet property="captureDateField" destination="423" id="424"/>
                 <outlet property="captureStateButton" destination="383" id="416"/>
                 <outlet property="cardCheckView" destination="1000" id="1002"/>
@@ -2557,8 +2558,8 @@
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Module 2 Source" id="CXJ-fs-9WU">
-                                            <rect key="frame" x="66" y="446" width="491" height="125"/>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Module 2 Source" id="CXJ-fs-9WU">
+                                            <rect key="frame" x="66" y="453" width="491" height="125"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="ZCy-PQ-NzG">
                                                 <rect key="frame" x="1" y="1" width="489" height="109"/>
@@ -2743,8 +2744,8 @@
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <button id="mfV-7Q-mrw">
-                                            <rect key="frame" x="17" y="450" width="36" height="33"/>
+                                        <button misplaced="YES" id="mfV-7Q-mrw">
+                                            <rect key="frame" x="17" y="457" width="36" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="uct-Mi-Esj">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -2754,6 +2755,15 @@
                                                 <action selector="calibrationLockAction:" target="-2" id="Eus-pA-C4T"/>
                                             </connections>
                                         </button>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="sWW-FU-3Ub" customClass="ORTimedTextField">
+                                            <rect key="frame" x="74" y="425" width="482" height="24"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="-" id="fmS-me-jsn">
+                                                <font key="font" metaFont="system" size="20"/>
+                                                <color key="textColor" red="0.07067819023732258" green="0.22414571697350139" blue="1" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                 </view>
                             </tabViewItem>

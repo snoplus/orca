@@ -54,6 +54,7 @@ NSString* ORMajoranaModelUpdateSpikeDisplay             = @"ORMajoranaModelUpdat
 NSString* ORMajoranaModelMaxNonCalibrationRate          = @"ORMajoranaModelMaxNonCalibrationRate";
 NSString* ORMajoranaModelVerboseDiagnosticsChanged      = @"ORMajoranaModelVerboseDiagnosticsChanged";
 NSString* ORMajoranaModelMinNumDetsToAlertExperts       = @"ORMajoranaModelMinNumDetsToAlertExperts";
+NSString* ORMajoranaModelCalibrationStatusChanged       = @"ORMajoranaModelCalibrationStatusChanged";
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
@@ -97,6 +98,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [anObjForCouchID release];
     [stringMap release];
     [specialMap release];
+    [calibrationStatus release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
 }
@@ -305,7 +307,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     verboseDiagnostics = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelVerboseDiagnosticsChanged" object:self];
 }
-
+- (NSString*) calibrationStatus {return calibrationStatus;}
+- (void) setCalibrationStatus:(NSString*)aString;
+{
+    [calibrationStatus autorelease];
+    calibrationStatus = [aString copy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelCalibrationStatusChanged" object:self];
+}
 - (void) hvInfoRequest:(NSNotification*)aNote
 {
     if([[aNote object] isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
