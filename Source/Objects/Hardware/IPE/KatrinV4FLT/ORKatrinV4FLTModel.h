@@ -116,6 +116,7 @@
     int energyOffset;
     unsigned long lastInhibitStatus;
     unsigned long lastRunStatus;
+    BOOL initializing;
 }
 
 #pragma mark •••Initialization
@@ -177,8 +178,8 @@
 - (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
-- (int) histMaxEnergy;
-- (void) setHistMaxEnergy:(int)aHistMaxEnergy;
+- (int) histEMax;
+- (void) setHistEMax:(int)aHistMaxEnergy;
 - (int) histPageAB;
 - (void) setHistPageAB:(int)aHistPageAB;
 - (int) runMode;

@@ -748,12 +748,12 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelTargetRateChanged object:self];
 }
 
-- (int) histMaxEnergy { return histMaxEnergy; }
+- (int) histEMax { return histEMax; }
 //!< A argument -1 will auto-recalculate the maximum energy which fits still into the histogram. -tb-
-- (void) setHistMaxEnergy:(int)aHistMaxEnergy
+- (void) setHistEMax:(int)aHistMaxEnergy
 {
-    if(aHistMaxEnergy<0) histMaxEnergy = histEMin + 2048*(1<<histEBin);
-    else histMaxEnergy = aHistMaxEnergy;
+    if(aHistMaxEnergy<0) histEMax = histEMin + 2048*(1<<histEBin);
+    else histEMax = aHistMaxEnergy;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistMaxEnergyChanged object:self];
 }
 
@@ -871,7 +871,7 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistEBinChanged object:self];
     
     //recalc max energy
-    [self setHistMaxEnergy: -1];
+    [self setHistEMax: -1];
 }
 
 - (unsigned long) histEMin { return histEMin;} 
@@ -882,7 +882,7 @@ static double table[32]={
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistEMinChanged object:self];
 
     //recalc max energy
-    [self setHistMaxEnergy: -1];
+    [self setHistEMax: -1];
 }
 
 //! This is number of cycles (internal FLT counter)
@@ -929,21 +929,33 @@ static double table[32]={
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
     int newValue = [self restrictIntValue:aFilterShapingLength min:2 max:8];
-    if(filterShapingLength!=0 && newValue!=filterShapingLength){
-        float old = 1<<filterShapingLength;
-        float new = 1<<newValue;
-        float ratio = new/old;
-        int chan;
-        for(chan=0;chan<kNumV4FLTChannels;chan++){
-            unsigned long currentThreshold = [self threshold:chan];
-            [self setThreshold:chan withValue:currentThreshold*ratio];
-        }
+    
+    float old = 1<<filterShapingLength;
+    float new = 1<<newValue;
+    float ratio = new/old;
+    int chan;
+    for(chan=0;chan<kNumV4FLTChannels;chan++){
+        unsigned long currentThreshold = [self threshold:chan];
+        [self setThreshold:chan withValue:currentThreshold*ratio];
     }
+    
     filterShapingLength = newValue;
 	if(filterShapingLength == 8 && gapLength>0){
 		[self setGapLength:0];
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
+    
+    //----------------------------------------------
+    // Normalize the histogram settings -- take old settings if called during initialization
+    if(!initializing){
+        [self setHistEMin: [self histEMin] * ratio];            //set the new energy values first
+        [self setHistEMax: [self histEMax] * ratio];
+        int binWidth = (histEMax - histEMin)/2048;              //then the bin width
+        binWidth = pow(2,(int)(log2(binWidth-1)/log2(2))+1);    //should be a power of 2 -- force it!
+        [self setHistEBin:log2(binWidth)];                      //the value stored in ORCA is the exponent
+    }
+    //----------------------------------------------
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFilterShapingLengthChanged object:self];
 }
 
@@ -1903,7 +1915,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     self = [super initWithCoder:decoder];
 
-    
+    initializing = YES;
     [[self undoManager] disableUndoRegistration];
 	
     [self setEnergyOffset:              [decoder decodeIntForKey:   @"energyOffset"]];
@@ -1928,7 +1940,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
-	
+    initializing = NO;
+
     return self;
 }
 
