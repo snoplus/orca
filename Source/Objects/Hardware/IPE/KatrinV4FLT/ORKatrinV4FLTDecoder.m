@@ -476,6 +476,41 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];
     
+    int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
+	unsigned long filterDiv = 1L << filterShapingLength;
+    unsigned long binSize   = 1L << ptr[8];
+    unsigned long energyMin = ptr[9];
+    
+    // Copy the histogram and normalize the energy values
+    int eMin = energyMin / filterDiv;
+    int eMax = (energyMin + 2047 * binSize) / filterDiv;
+
+    NSLog(@"Normalize histogram to min %i, max %i \n", eMin, eMax);
+   
+/*
+    // Todo: consider first energy bin
+    if (filterDiv == binSize){
+        for (int i=0; i<2048;i++){
+            histoNorm[i] = ptrData[i];
+        }
+    }
+    if (filterDiv < binSize){
+        for (int i=0; i<4096;i++){
+            iNorm = i * binSize / filterDiv;
+            if (iNorm < 2048)
+              histoNorm[i] = ptrData[iNorm];
+        }
+    }
+    if (filterDiv > binSize){
+        for (int i=0; i<4096;i++){
+            iNorm = i * binSize / filterDiv;
+            if (iNorm < 2048)
+                histoNorm[i] = ptrData[iNorm];
+        }
+    }
+*/
+    
+    
 	int isSumHistogram = ptr[11] & 0x2; //the bit1 marks the Sum Histograms
     // this counts one histogram as one event in data monitor -tb-
 	if(!isSumHistogram) {

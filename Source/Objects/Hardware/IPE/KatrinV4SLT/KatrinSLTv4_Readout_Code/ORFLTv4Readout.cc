@@ -1160,7 +1160,8 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
     
     
     hw4::FltKatrin *currentFlt = srack->theFlt[col];
-    if(runFlags && firstTime){// firstTime
+    //if(runFlags && firstTime){// firstTime
+    if(firstTime){// firstTime
         firstTime = false;
         currentFlt->histogramSettings->read();//read to cache
         if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
@@ -1173,6 +1174,8 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
         histoRefreshTime    = currentFlt->histMeasTime->read();
         histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
         histoShipSumOnly    = runFlags & kShipSumOnlyHistogramFlag;
+        
+        printf("Histogram parameter: min %d bin %d\n", histoEnergyOffset, histoBinWidth);
         
         //clear the buffers for the sum histogram
         ClearSumHistogramBuffer();
