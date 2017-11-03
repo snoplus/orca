@@ -15,6 +15,8 @@
 
 //init static members and globals
 uint32_t histoShipSumHistogram = 0;
+uint32_t histoShipSumOnly = 0;
+
 
 
 #if !PMC_COMPILE_IN_SIMULATION_MODE
@@ -59,7 +61,6 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
     //uint32_t eventType            = GetDeviceSpecificData()[1];
     uint32_t fltRunMode             = GetDeviceSpecificData()[2];
     uint32_t runFlags               = GetDeviceSpecificData()[3];       //this is runFlagsMask of ORKatrinV4FLTModel.m, load_HW_Config_Structure:index:
-    uint32_t forceFltReadoutFlag    = runFlags & kForceFltReadoutFlag;  //kForceFltReadoutFlag is 0x200000
     
     uint32_t triggerEnabledMask     = GetDeviceSpecificData()[4];
     uint32_t daqRunMode             = GetDeviceSpecificData()[5];
@@ -891,7 +892,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
         //===================================================================================================================
         // 2013-11-14 bipolar energy update - changes in SLT registers (for versionCFPGA  >= 0x20010300  &&  versionFPGA8 >= 0x20010300) -tb-
         //===================================================================================================================
-        if(srack->theFlt[col]->isPresent()  && (forceFltReadoutFlag==kForceFltReadoutFlag)){
+        if(srack->theFlt[col]->isPresent()){
             
             ////////////////////////////////////////////////////
             //READOUT MODES (energy, energy+trace, histogram)
@@ -902,184 +903,25 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                (daqRunMode == kKatrinV4Flt_VetoEnergyDaqMode)   ||
                (daqRunMode == kKatrinV4Flt_BipolarEnergyDaqMode)   ){
                 
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = srack->theFlt[col]->eventFIFOStatus;
-                eventFIFOStatus->read();//reads once..important!!! Other calls below get values from this read using a cache.
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                //MAH 6/29/17 removed a 0 - 10 loop here.. found the speed was the same because the loop is already implicit in the readout loop. code is simpler this way
-                if(!fifoEmptyFlag){
-                    uint32_t readptr   = eventFIFOStatus->readPointer->getCache();
-                    uint32_t fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
-                                         (eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
-                                         (eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
-                                         (eventFIFOStatus->emptyFlag->getCache());
-                    
-                    hw4::FltKatrinEventFIFO1* eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                    hw4::FltKatrinEventFIFO2* eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                    uint32_t f1          = eventFIFO1->read();
-                    uint32_t f2          = eventFIFO2->read();
-                    uint32_t eventSec    = srack->theFlt[col]->eventFIFO4->read(0);
-                    uint32_t channelmap  = eventFIFO1->channelMap->getCache();
-                    uint32_t fifoEventID = ((f1&0xff)<<4) | (f2>>28);
-                    uint32_t eventSubsec = eventFIFO2->subSec->getCache();
-                    uint32_t precision   = eventFIFO2->timePrecision->getCache();
-                    uint32_t eventchan;
-                    for(eventchan=0;eventchan<kNumChan;eventchan++){
-                        uint32_t eventchanmask = (0x1L << eventchan);
-                        if((channelmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                            uint32_t f3        = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                            uint32_t pagenr    = (f3 >> 24) & 0x3f;
-                            uint32_t energy    = f3 & 0xfffff;
-                            
-                            ensureDataCanHold(7); 
-                            data[dataIndex++] = dataId   | 7;
-                            data[dataIndex++] = location | eventchan<<8;
-                            data[dataIndex++] = eventSec;
-                            data[dataIndex++] = eventSubsec;
-                            data[dataIndex++] = channelmap;
-                            data[dataIndex++] = (readptr      & 0x3ff)        |
-                                                ((pagenr      & 0x03f) << 10) |
-                                                ((precision   & 0x003) << 16) |
-                                                ((fifoFlags   & 0x00f) << 20) |
-                                                ((fltRunMode  & 0x00f) << 24);
-                            data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
-                        }
-                    }
-                }
+                ReadoutEnergyV31(lamData);
+                
             }
             // --- 'ENERGY+TRACE' MODE -------------------------tb-------   2013-05-29: THIS MODE NOW replaces 'ENERGY+TRACE' and 'ENERGY+TRACE (SYNC)'!!-tb-
             else if((daqRunMode == kKatrinV4Flt_EnergyTraceDaqMode)     ||
                     (daqRunMode == kKatrinV4Flt_VetoEnergyTraceDaqMode) ||
                     (daqRunMode == kKatrinV4Flt_BipolarEnergyTraceDaqMode)){
-                
-                hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = srack->theFlt[col]->eventFIFOStatus;
-                eventFIFOStatus->read();//reads once..important!!! Other calls below get values from this read using a cache.
-                uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
-                if(!fifoEmptyFlag){
-
-                    uint32_t readptr   = eventFIFOStatus->readPointer->getCache();
-                    uint32_t fifoFlags = (eventFIFOStatus->fullFlag->getCache()        << 3) |
-                                         (eventFIFOStatus->almostFullFlag->getCache()  << 2) |
-                                         (eventFIFOStatus->almostEmptyFlag->getCache() << 1) |
-                                         (eventFIFOStatus->emptyFlag->getCache());
-
-                    hw4::FltKatrinEventFIFO1* eventFIFO1 = srack->theFlt[col]->eventFIFO1;
-                    hw4::FltKatrinEventFIFO2* eventFIFO2 = srack->theFlt[col]->eventFIFO2;
-                    uint32_t f1                 = eventFIFO1->read();
-                    uint32_t f2                 = eventFIFO2->read();
-     
-                    uint32_t eventSec           = srack->theFlt[col]->eventFIFO4->read(0);
-                    uint32_t channelMap         = eventFIFO1->channelMap->getCache();
-                    uint32_t fifoEventID        = ((f1&0xff)<<4) | (f2>>28);
-                    uint32_t eventSubsec        = eventFIFO2->subSec->getCache();
-                    uint32_t adcoffset          = eventSubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)
-                    uint32_t traceStart16       = (adcoffset + postTriggerTime) % 2048;   //TODO: take this as standard from FW 2.1.1.4 on -tb-
-                    uint32_t precision          = eventFIFO2->timePrecision->getCache();
-                    uint32_t waveformLength     = 2048;               //in shorts
-                    uint32_t waveformLength32   = waveformLength/2;   //in longs
-                    uint32_t wfRecordVersion    = 0x2;
-                    uint32_t eventchan;
-                    for(eventchan=0;eventchan<kNumChan;eventchan++){
-                        uint32_t eventchanmask = (0x1L << eventchan);
-                        if((channelMap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
-                            uint32_t f3     = srack->theFlt[col]->eventFIFO3->read(eventchan);
-                            uint32_t pagenr = (f3 >> 24) & 0x3f;
-                            uint32_t energy = f3 & 0xfffff;
-
-                            ensureDataCanHold(9 + waveformLength/2);
-                            data[dataIndex++] = waveformId | (9 + waveformLength32);
-                            data[dataIndex++] = location   | eventchan<<8;
-                            data[dataIndex++] = eventSec;
-                            data[dataIndex++] = eventSubsec;
-                            data[dataIndex++] = channelMap;
-                            data[dataIndex++] = (readptr     & 0x3ff)       |
-                                               ((pagenr     & 0x03f)<<10)  |
-                                               ((precision  & 0x003)<<16)  |
-                                               ((fifoFlags  & 0x00f)<<20)  |
-                                               ((fltRunMode & 0x00f)<<24);
-                            data[dataIndex++] = ((fifoEventID  & 0xfff) << 20) | energy;
-                            data[dataIndex++] = ((traceStart16 & 0x7ff) << 8)  | (wfRecordVersion & 0xf);
-                            data[dataIndex++] = 0; //spare
-
-                            //select the page and dma the waveform into the data buffer ... should have a safety check here in case need to dump record
-                            srack->theSlt->pageSelect->write(0x100 | pagenr);
-                            
-                            
-                            // Warning: This command does only work in DMA block readout and
-                            //          will fail, if the command is splitt in a sequence of single
-                            //          read operations !!!
-                            
-                            srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)&data[dataIndex],(traceStart16/2)%1024,1024);
-                            dataIndex+=1024;
-                        }
-                    }
-                    
-                }
+ 
+                ReadoutTraceV31(lamData);
+ 
             }
   
             // --- HISTOGRAM MODE ------------------------------
             else if(daqRunMode == kKatrinV4Flt_Histogram_DaqMode) {
-                hw4::FltKatrin *currentFlt = srack->theFlt[col];
-                 if(runFlags & firstTime){// firstTime
-                     firstTime = false;
-                    currentFlt->histogramSettings->read();//read to cache
-                    if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
-                       currentFlt->histogramSettings->histClearModeManual->getCache()){
-                        fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
-                        fflush(stdout);
-                    }
-                    histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
-                    histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
-                    histoRefreshTime    = currentFlt->histMeasTime->read();
-                    histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
-
-                    //clear the buffers for the sum histogram
-                    //ClearSumHistogramBuffer();
                 
-                    //set page manager to automatic mode
-                    //srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
-                     srack->theSlt->pageSelect->write((long unsigned int)0x0);
-                    //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
-                    //TODO: srack->theFlt[col]->command->resetPointers->write(1);
-                    //clear histogram (probably not really necessary with "automatic clear" -tb-) 
-                    srack->theFlt[col]->command->resetPages->write(1);
-                    pageAB    = srack->theFlt[col]->status->histPageAB->read();
-                    oldPageAB = pageAB;
-                }
-                else {
-                    pageAB = srack->theFlt[col]->status->histPageAB->read();
-                    if(oldPageAB != pageAB){
-                        oldPageAB = pageAB;
-                        uint32_t fpgaHistogramID     = currentFlt->histNofMeas->read();
-                        uint32_t chan;
-                        for(chan=0;chan<kNumChan;chan++) {
-                            if((triggerEnabledMask & (0x1L << chan)) ){
-                                //currentFlt->histLastFirst->read(chan);  //read to cache ... Must do!!!
-                                //uint32_t first       = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
-                                // uint32_t last        = currentFlt->histLastFirst->histLastEntry->getCache(chan);
-                                uint32_t readoutSec  = currentFlt->secondCounter->read();
-
-                                uint32_t totalLength = 12 + 2048;
-                                ensureDataCanHold(totalLength); 
-                                data[dataIndex++] = histogramId | totalLength;    
-                                data[dataIndex++] = location | chan<<8;
-                                data[dataIndex++] = readoutSec;
-                                data[dataIndex++] = histoRefreshTime;
-                                data[dataIndex++] = 0;                  //first bin
-                                data[dataIndex++] = 2047;               //last bin
-                                data[dataIndex++] = 2048;               //histo len
-                                data[dataIndex++] = 2048;               //max histo len
-                                data[dataIndex++] = histoBinWidth;
-                                data[dataIndex++] = histoEnergyOffset;
-                                data[dataIndex++] = fpgaHistogramID;    //from HW
-                                data[dataIndex++] = pageAB & 0x1;
-                                srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)&data[dataIndex], 0, 2048);
-                                dataIndex += 2048;
-                            }
-                        }
-                    } 
-                }
+                ReadoutHistogramV31(lamData);
+          
             }
-
+                
         }
     }
     return true;
@@ -1087,39 +929,47 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
 bool ORFLTv4Readout::Stop()
 {
+    
+    // Energy mode - nothing to do
+    
+    // Trace mode - nothing to do
+
+    
+    //
+    // Histogram mode - ship the sum histogram
+    //
+    
     uint32_t daqRunMode         = GetDeviceSpecificData()[5];
     if(daqRunMode == kKatrinV4Flt_Histogram_DaqMode){
-        uint32_t histogramId        = GetHardwareMask()[2];
-        uint32_t crate              = GetCrate();
-        uint32_t col                = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
-        uint32_t location           = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
-        uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
-        srack->theSlt->pageSelect->write((long unsigned int)0x0); //flip the page so we get the last bit of data
-        hw4::FltKatrin* currentFlt  = srack->theFlt[col];
-        uint32_t readoutSec         = currentFlt->secondCounter->read();
-        uint32_t histoBinWidth      = currentFlt->histogramSettings->histEBin->getCache();
-        uint32_t histoEnergyOffset  = currentFlt->histogramSettings->histEMin->getCache();
-        uint32_t histoRefreshTime   = currentFlt->histMeasTime->read();
-        uint32_t chan;
-        for(chan=0; chan < kNumChan ; chan++) {
-            if((triggerEnabledMask & (0x1L << chan)) ){
-                unsigned long totalLength = 12 + 2048;
-                ensureDataCanHold(totalLength); 
-                data[dataIndex++] = histogramId | totalLength;    
-                data[dataIndex++] = location | chan<<8;
-                data[dataIndex++] = readoutSec;
-                data[dataIndex++] = histoRefreshTime;
-                data[dataIndex++] = 0;                  //first bin
-                data[dataIndex++] = 2047;               //last bin
-                data[dataIndex++] = 2048;               //histo len
-                data[dataIndex++] = 2048;               //max histo len
-                data[dataIndex++] = histoBinWidth;
-                data[dataIndex++] = histoEnergyOffset;
-                data[dataIndex++] = (col+1)*100+chan;   //histo 'tag' number
-                data[dataIndex++] = 0x2;                //a 'sum' histo
-
-                srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)&data[dataIndex], 0, 2048);
-                dataIndex += 2048;
+        
+        if (histoShipSumHistogram || histoShipSumOnly ){
+            uint32_t histogramId        = GetHardwareMask()[2];
+            uint32_t crate              = GetCrate();
+            uint32_t col                = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
+            uint32_t location           = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
+            uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
+            srack->theSlt->pageSelect->write((long unsigned int)0x0); //flip the page so we get the last bit of data
+            
+            uint32_t chan;
+            for(chan=0; chan < kNumChan ; chan++) {
+                if((triggerEnabledMask & (0x1L << chan)) ){
+                    unsigned long totalLength = 12 + 2048;
+                    ensureDataCanHold(totalLength);
+                    data[dataIndex++] = histogramId | totalLength;
+                    data[dataIndex++] = location | chan<<8;
+                    data[dataIndex++] = histoReadoutSec;
+                    data[dataIndex++] = recordingTimeSum[chan];
+                    data[dataIndex++] = 0;                  //first bin
+                    data[dataIndex++] = 2047;               //last bin
+                    data[dataIndex++] = 2048;               //histo len
+                    data[dataIndex++] = 2048;               //max histo len
+                    data[dataIndex++] = histoBinWidth;
+                    data[dataIndex++] = histoEnergyOffset;
+                    data[dataIndex++] = (col+1)*100+chan;   //histo 'tag' number
+                    data[dataIndex++] = 0x2;                //a 'sum' histo
+                    for (int i=0; i<2048; i++)
+                        data[dataIndex++] = sumHistogram[chan][i];
+                }
             }
         }
 		
@@ -1127,6 +977,277 @@ bool ORFLTv4Readout::Stop()
 	
 	return true;
 }
+
+
+bool ORFLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data*){
+
+    uint32_t crate                  = GetCrate();
+    uint32_t col                    = GetSlot() - 1;
+
+    uint32_t fltRunMode             = GetDeviceSpecificData()[2];
+    uint32_t runFlags               = GetDeviceSpecificData()[3];  //this is runFlagsMask of ORKatrinV4FLTModel.m,
+    uint32_t triggerEnabledMask     = GetDeviceSpecificData()[4];
+    uint32_t filterShapingLength    = GetDeviceSpecificData()[9];       //TODO: need to change in the code below! -tb-
+    uint32_t boxcarLen              = GetDeviceSpecificData()[11];
+    
+    uint32_t dataId                 = GetHardwareMask()[0];             //this is energy record
+    
+    uint32_t forceFltReadoutFlag    = runFlags & kForceFltReadoutFlag;  //kForceFltReadoutFlag is 0x200000
+    uint32_t location   =   ((crate     & 0x0000001e)<<21) |
+                            (((col+1)   & 0x0000001f)<<16) |
+                            ((boxcarLen & 0x00000003)<<4)  |
+                            (filterShapingLength & 0xf);  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+
+    
+    if (forceFltReadoutFlag==kForceFltReadoutFlag) {
+        
+        hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = srack->theFlt[col]->eventFIFOStatus;
+        eventFIFOStatus->read();//reads once..important!!! Other calls below get values from this read using a cache.
+        uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
+        //MAH 6/29/17 removed a 0 - 10 loop here.. found the speed was the same because the loop is already implicit in the readout loop. code is simpler this way
+        if(!fifoEmptyFlag){
+            uint32_t readptr   = eventFIFOStatus->readPointer->getCache();
+            uint32_t fifoFlags = (eventFIFOStatus->fullFlag->getCache()			<< 3) |
+            (eventFIFOStatus->almostFullFlag->getCache()	<< 2) |
+            (eventFIFOStatus->almostEmptyFlag->getCache()	<< 1) |
+            (eventFIFOStatus->emptyFlag->getCache());
+            
+            hw4::FltKatrinEventFIFO1* eventFIFO1 = srack->theFlt[col]->eventFIFO1;
+            hw4::FltKatrinEventFIFO2* eventFIFO2 = srack->theFlt[col]->eventFIFO2;
+            uint32_t f1          = eventFIFO1->read();
+            uint32_t f2          = eventFIFO2->read();
+            uint32_t eventSec    = srack->theFlt[col]->eventFIFO4->read(0);
+            uint32_t channelmap  = eventFIFO1->channelMap->getCache();
+            uint32_t fifoEventID = ((f1&0xff)<<4) | (f2>>28);
+            uint32_t eventSubsec = eventFIFO2->subSec->getCache();
+            uint32_t precision   = eventFIFO2->timePrecision->getCache();
+            uint32_t eventchan;
+            for(eventchan=0;eventchan<kNumChan;eventchan++){
+                uint32_t eventchanmask = (0x1L << eventchan);
+                if((channelmap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
+                    uint32_t f3        = srack->theFlt[col]->eventFIFO3->read(eventchan);
+                    uint32_t pagenr    = (f3 >> 24) & 0x3f;
+                    uint32_t energy    = f3 & 0xfffff;
+                    
+                    ensureDataCanHold(7);
+                    data[dataIndex++] = dataId   | 7;
+                    data[dataIndex++] = location | eventchan<<8;
+                    data[dataIndex++] = eventSec;
+                    data[dataIndex++] = eventSubsec;
+                    data[dataIndex++] = channelmap;
+                    data[dataIndex++] = (readptr      & 0x3ff)        |
+                    ((pagenr      & 0x03f) << 10) |
+                    ((precision   & 0x003) << 16) |
+                    ((fifoFlags   & 0x00f) << 20) |
+                    ((fltRunMode  & 0x00f) << 24);
+                    data[dataIndex++] = ((fifoEventID & 0xfff) << 20) | energy;
+                }
+            }
+        }
+    }
+    
+    return true;
+}
+
+
+bool ORFLTv4Readout::ReadoutTraceV31(SBC_LAM_Data*){
+
+    uint32_t crate                  = GetCrate();
+    uint32_t col                    = GetSlot() - 1;
+
+    uint32_t postTriggerTime        = GetDeviceSpecificData()[0];
+    uint32_t fltRunMode             = GetDeviceSpecificData()[2];
+    uint32_t triggerEnabledMask     = GetDeviceSpecificData()[4];
+    uint32_t filterShapingLength    = GetDeviceSpecificData()[9];       //TODO: need to change in the code below! -tb-
+    uint32_t boxcarLen              = GetDeviceSpecificData()[11];
+    
+    uint32_t waveformId             = GetHardwareMask()[1];
+
+    uint32_t location   =   ((crate     & 0x0000001e)<<21) |
+                            (((col+1)   & 0x0000001f)<<16) |
+                            ((boxcarLen & 0x00000003)<<4)  |
+                            (filterShapingLength & 0xf);  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+    
+    
+    hw4::FltKatrinEventFIFOStatus* eventFIFOStatus = srack->theFlt[col]->eventFIFOStatus;
+    eventFIFOStatus->read();//reads once..important!!! Other calls below get values from this read using a cache.
+    uint32_t fifoEmptyFlag = eventFIFOStatus->emptyFlag->getCache();
+    if(!fifoEmptyFlag){
+        
+        uint32_t readptr   = eventFIFOStatus->readPointer->getCache();
+        uint32_t fifoFlags = (eventFIFOStatus->fullFlag->getCache()        << 3) |
+        (eventFIFOStatus->almostFullFlag->getCache()  << 2) |
+        (eventFIFOStatus->almostEmptyFlag->getCache() << 1) |
+        (eventFIFOStatus->emptyFlag->getCache());
+        
+        hw4::FltKatrinEventFIFO1* eventFIFO1 = srack->theFlt[col]->eventFIFO1;
+        hw4::FltKatrinEventFIFO2* eventFIFO2 = srack->theFlt[col]->eventFIFO2;
+        uint32_t f1                 = eventFIFO1->read();
+        uint32_t f2                 = eventFIFO2->read();
+        
+        uint32_t eventSec           = srack->theFlt[col]->eventFIFO4->read(0);
+        uint32_t channelMap         = eventFIFO1->channelMap->getCache();
+        uint32_t fifoEventID        = ((f1&0xff)<<4) | (f2>>28);
+        uint32_t eventSubsec        = eventFIFO2->subSec->getCache();
+        uint32_t adcoffset          = eventSubsec & 0x7ff; // cut 11 ls bits (equal to % 2048)
+        uint32_t traceStart16       = (adcoffset + postTriggerTime) % 2048;   //TODO: take this as standard from FW 2.1.1.4 on -tb-
+        uint32_t precision          = eventFIFO2->timePrecision->getCache();
+        uint32_t waveformLength     = 2048;               //in shorts
+        uint32_t waveformLength32   = waveformLength/2;   //in longs
+        uint32_t wfRecordVersion    = 0x2;
+        uint32_t eventchan;
+        for(eventchan=0;eventchan<kNumChan;eventchan++){
+            uint32_t eventchanmask = (0x1L << eventchan);
+            if((channelMap & eventchanmask) && (triggerEnabledMask & eventchanmask)){
+                uint32_t f3     = srack->theFlt[col]->eventFIFO3->read(eventchan);
+                uint32_t pagenr = (f3 >> 24) & 0x3f;
+                uint32_t energy = f3 & 0xfffff;
+                
+                ensureDataCanHold(9 + waveformLength/2);
+                data[dataIndex++] = waveformId | (9 + waveformLength32);
+                data[dataIndex++] = location   | eventchan<<8;
+                data[dataIndex++] = eventSec;
+                data[dataIndex++] = eventSubsec;
+                data[dataIndex++] = channelMap;
+                data[dataIndex++] = (readptr     & 0x3ff)       |
+                ((pagenr     & 0x03f)<<10)  |
+                ((precision  & 0x003)<<16)  |
+                ((fifoFlags  & 0x00f)<<20)  |
+                ((fltRunMode & 0x00f)<<24);
+                data[dataIndex++] = ((fifoEventID  & 0xfff) << 20) | energy;
+                data[dataIndex++] = ((traceStart16 & 0x7ff) << 8)  | (wfRecordVersion & 0xf);
+                data[dataIndex++] = 0; //spare
+                
+                //select the page and dma the waveform into the data buffer ... should have a safety check here in case need to dump record
+                srack->theSlt->pageSelect->write(0x100 | pagenr);
+                
+                
+                // Warning: This command does only work in DMA block readout and
+                //          will fail, if the command is splitt in a sequence of single
+                //          read operations !!!
+                
+                srack->theFlt[col]->ramData->readBlock(eventchan,(long unsigned int*)&data[dataIndex],(traceStart16/2)%1024,1024);
+                dataIndex+=1024;
+            }
+        }
+        
+    }
+
+    return true;
+    
+}
+
+
+bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
+    
+    uint32_t crate                  = GetCrate();
+    uint32_t col                    = GetSlot() - 1;
+    
+    uint32_t runFlags               = GetDeviceSpecificData()[3];  //this is runFlagsMask of ORKatrinV4FLTModel.m,
+    uint32_t triggerEnabledMask     = GetDeviceSpecificData()[4];
+    uint32_t filterShapingLength    = GetDeviceSpecificData()[9];       //TODO: need to change in the code below! -tb-
+    uint32_t boxcarLen              = GetDeviceSpecificData()[11];
+    
+    uint32_t histogramId            = GetHardwareMask()[2];
+    
+    uint32_t location   =   ((crate     & 0x0000001e)<<21) |
+                            (((col+1)   & 0x0000001f)<<16) |
+                            ((boxcarLen & 0x00000003)<<4)  |
+                            (filterShapingLength & 0xf);  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+    
+    uint32_t  histoBuffer[2048];
+    uint32_t  *ptrHistoBuffer;
+    
+    
+    hw4::FltKatrin *currentFlt = srack->theFlt[col];
+    if(runFlags && firstTime){// firstTime
+        firstTime = false;
+        currentFlt->histogramSettings->read();//read to cache
+        if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
+           currentFlt->histogramSettings->histClearModeManual->getCache()){
+            fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
+            fflush(stdout);
+        }
+        histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
+        histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
+        histoRefreshTime    = currentFlt->histMeasTime->read();
+        histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
+        histoShipSumOnly    = runFlags & kShipSumOnlyHistogramFlag;
+        
+        //clear the buffers for the sum histogram
+        ClearSumHistogramBuffer();
+        
+        //set page manager to automatic mode
+        //srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
+        srack->theSlt->pageSelect->write((long unsigned int)0x0);
+        //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
+        //TODO: srack->theFlt[col]->command->resetPointers->write(1);
+        //clear histogram (probably not really necessary with "automatic clear" -tb-)
+        srack->theFlt[col]->command->resetPages->write(1);
+        pageAB    = srack->theFlt[col]->status->histPageAB->read();
+        oldPageAB = pageAB;
+    }
+    else {
+        pageAB = srack->theFlt[col]->status->histPageAB->read();
+        
+        if(oldPageAB != pageAB){
+            oldPageAB = pageAB;
+            uint32_t fpgaHistogramID     = currentFlt->histNofMeas->read();
+            histoReadoutSec  = currentFlt->secondCounter->read();
+            
+            
+            
+            for(int chan=0;chan<kNumChan;chan++) {
+                if((triggerEnabledMask & (0x1L << chan)) ){
+                    //currentFlt->histLastFirst->read(chan);  //read to cache ... Must do!!!
+                    //uint32_t first       = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
+                    // uint32_t last        = currentFlt->histLastFirst->histLastEntry->getCache(chan);
+                
+                    if( !histoShipSumOnly ){
+    
+                    uint32_t totalLength = 12 + 2048;
+                    ensureDataCanHold(totalLength);
+                    data[dataIndex++] = histogramId | totalLength;
+                    data[dataIndex++] = location | chan<<8;
+                    data[dataIndex++] = histoReadoutSec;
+                    data[dataIndex++] = histoRefreshTime;
+                    data[dataIndex++] = 0;                  //first bin
+                    data[dataIndex++] = 2047;               //last bin
+                    data[dataIndex++] = 2048;               //histo len
+                    data[dataIndex++] = 2048;               //max histo len
+                    data[dataIndex++] = histoBinWidth;
+                    data[dataIndex++] = histoEnergyOffset;
+                    data[dataIndex++] = fpgaHistogramID;    //from HW
+                    data[dataIndex++] = pageAB & 0x1;
+                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)&data[dataIndex], 0, 2048);
+                    ptrHistoBuffer = (uint32_t *) &data[dataIndex];
+                    dataIndex += 2048;
+                    } else {
+                        srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) histoBuffer, 0, 2048);
+                        ptrHistoBuffer = histoBuffer;
+                        
+                    }
+                        
+                    // Add histogram to sum histogram
+                    if( histoShipSumHistogram || histoShipSumOnly ){
+                        recordingTimeSum[chan] += histoRefreshTime;
+                        for(int i=0; i<2048;i++){//TODO: need to use firstBin...lastBin for parts of histograms -tb-
+                            sumHistogram[chan][i] += ptrHistoBuffer[i];
+                        }
+                    }
+                    
+                }
+            }
+            
+            
+        }
+    }
+
+    return true;
+    
+}
+
+
 
 
 #if (0)
@@ -1147,7 +1268,7 @@ bool ORFLTv4Readout::Stop()
         }
     }
 
-    return true; 
+    return true;
 }
 #endif
 
@@ -1251,10 +1372,15 @@ void ORFLTv4Readout::ClearSumHistogramBuffer()
 {
 	int i,j;
 	for(i=0; i<kNumChan; i++){
-		for(j=0; j<kMaxHistoLength; j++) sumHistogram[i][j] = 0;// i*1000 +j;
-		recordingTimeSum[i] = 0;//i;
+        recordingTimeSum[i] = 0;
+        for(j=0; j<kMaxHistoLength; j++) {
+            sumHistogram[i][j] = 0;
+        }
 	}
+
+    return;
 }
+
 
 
 #if 0  //till's saved code

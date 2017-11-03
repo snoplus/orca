@@ -36,6 +36,10 @@
 #import "ORFileMover.h"
 #import "ORAlarm.h"
 
+#import "ORRunModel.h"
+#import <objc/runtime.h>
+
+
 #pragma mark ***Notification Strings
 NSString* ORKatrinV4SLTModelPixelBusEnableRegChanged        = @"ORKatrinV4SLTModelPixelBusEnableRegChanged";
 NSString* ORKatrinV4SLTModelSecondsSetSendToFLTsChanged     = @"ORKatrinV4SLTModelSecondsSetSendToFLTsChanged";
@@ -1112,58 +1116,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) loadSecondsReg
 {
-    
     [self setHostTimeToFLTsAndSLT];
-return;
-    unsigned long i,sltsec,sltsubsec,sltsubsec2,sltsubsec1,sltsubsecreg;
-
-    //everything else moved to void setHostTimeToFLTsAndSLT(int32_t* args) on SBC called by [self setHostTimeToFLTsAndSLT]; ...
-    //wait until we are not at the end of a second (<0.9 sec)
-	for(i=0;i<1000;i++){
-	    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];//first read subsec counter!
-	    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-        sltsubsec1 = sltsubsecreg & 0x7ff  ;
-        sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff  ; //100 usec counter
-        sltsubsec = sltsubsec2 * 2000 + sltsubsec1;
-	    NSLog(@"%@::%@!   sec %u, sltsubsec2 %u, sltsubsec1 %u, subsec %u\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd), sltsec, sltsubsec2, sltsubsec1, sltsubsec);//TODO: DEBUG -tb-
-        if(sltsubsec<18000000) break; //full second is 20000000 clocks
-        usleep(1000);//this loop needs 3-8 milli seconds (with usleep(1000) and two register reads)
-    }
-
-    // add option to set system time of PrPMC/crate computer? -tb- DONE.
-	unsigned long secSetpoint = secondsSet;
-	if(secondsSetInitWithHost){ 
-		struct timeval t;//    call with struct timezone tz; is obsolete ... -tb-
-		gettimeofday(&t,NULL);
-		secSetpoint = t.tv_sec;  
-	}
-	
-	if(secondsSetSendToFLTs){
-        #if 1 //TODO: broadcast to FLTs seems to nor work currently FIX IT -tb-
-	    unsigned long FLTV4SecondCounterRegAddr = (0x1f << 17) | (0x000044>>2);
-	    [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
-        #else
-        int j;
-        for(j=1;j<21;j++){
-	        unsigned long FLTV4SecondCounterRegAddr = ( j << 17) | (0x000044>>2);
-	        [self write: FLTV4SecondCounterRegAddr  value:secSetpoint];//(0x1f << 17) is broadcast to all FLTs -tb-
-        }
-        #endif
-    }
-	
-	secSetpoint += 1;  //value will be taken after the NEXT second strobe, so we need the NEXT second
-	[self writeReg:kKatrinV4SLTSecondSetReg value:secSetpoint];
     
-    //read back and check value:
-    //Wait until next second srobe!
-    for(i=0;i<10000;i++){// when the time already was set, this will leave the loop immediately
-        usleep(100);
-	    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];//first read subsec counter!
-	    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-        if(sltsec==secSetpoint) break;
-    }
-    if(i==10000) NSLog(@"ORKatrinV4SLTModel::loadSecondsReg: ERROR: could not read back SLT time %i (is %i)!\n",secSetpoint,sltsec);
-    //NSLog(@"ORKatrinV4SLTModel::loadSecondsReg:  setpoint SLT time %i (is %i) loops %i!\n",secSetpoint,sltsec,i);
+    return;
 }
 
 - (void) writeInterruptMask
@@ -1565,6 +1520,10 @@ return;
 #pragma mark •••Data Taker
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    unsigned long sltsubsecreg;
+    unsigned long sltsec;
+    unsigned long sltsubsec2;
+    
     
     [self setIsPartOfRun: YES];
 
@@ -1579,7 +1538,13 @@ return;
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORKatrinV4SLTModel"];    
     //----------------------------------------------------------------------------------------	
-		
+	
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - Prepare for run\n", sltsec, sltsubsec2/10);
+    
+          
     // Stop crate
     lastInhibitStatus = [self readStatusReg] & kStatusInh;
     [self writeSetInhibit];
@@ -1604,9 +1569,10 @@ return;
     }
 
     // Make sure we start not at the very end of the secons
-    unsigned long sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    unsigned long sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    unsigned long sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - Crate has stopped\n", sltsec, sltsubsec2/10);
     
     if (sltsubsec2 > 8000) {
         usleep(205000);
@@ -1614,6 +1580,16 @@ return;
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
 
 	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
+
+    
+    //
+    //THIS IS A WORKAROUND FOR THE start-histo FLT BUG
+    //
+    
+    //   (start-histo FLT BUG is: the FIRST histogram already starts recording BEFORE the next second strobe/1PPS, if the 'set standby mode' command was within this second)
+    //   (workaround: I set standby mode for all FLTs in histo-mode, then I will wait for the next second strobe  ---> this will produce a additional gap/delay of 1 second at beginning of run)
+    // -tb- 2013-05-24
+    //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
     
     //check: are there FLTs in histogram mode?
 	int runMode=0, countHistoMode=0, countNonHistoMode=0;
@@ -1624,12 +1600,7 @@ return;
             else                                            countNonHistoMode++;
         }
     }
-        
-    //THIS IS A WORKAROUND FOR THE start-histo FLT BUG
-    //   (start-histo FLT BUG is: the FIRST histogram already starts recording BEFORE the next second strobe/1PPS, if the 'set standby mode' command was within this second)
-    //   (workaround: I set standby mode for all FLTs in histo-mode, then I will wait for the next second strobe  ---> this will produce a additional gap/delay of 1 second at beginning of run)
-    // -tb- 2013-05-24
-    //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
+    
     if(countHistoMode){
 	    for(id obj in dataTakers){
             if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
@@ -1638,35 +1609,33 @@ return;
                 if(runMode == kKatrinV4Flt_Histogram_DaqMode) [obj writeControlWithStandbyMode];// -> set the run mode
             }
         }
-        usleep(1000000);
+        //usleep(1000000);
 	}	
+ 
     
     //if cold start (not 'quick start' in RunControl) ...
     //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
     [self initBoard];
+    
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - Boards initialized for run\n", sltsec, sltsubsec2/10);
+  
 	
     //loop over Readout List
 	for(id obj in dataTakers){
         [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs (sets run mode for non-histo-FLTs), set histogramming FLTs to standby mode etc -tb-
     }
 
-    //if there are FLTs in non-histogramming mode, the filter will start after next 1PPs - wait for it ... -tb-
-    if(countNonHistoMode && [[userInfo objectForKey:@"doinit"]intValue]){
-        //wait for next second strobe/1PPs
-		unsigned long i;
-		unsigned long subsec0 = [self readSubSecondsCounter];
-        for(i=0; i<1000; i++){
-		    unsigned long subsec1 = [self readSubSecondsCounter];
-            //DEBUG 
-            if(i==0) NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
-            if(subsec1<subsec0) break;
-            usleep(1000);
-        }				
-        //DEBUG
-        //NSLog(@"%@::%@ waiting for second strobe: i:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),i,subsec1);//DEBUG -tb-
-	}	
-    
-        //DEBUG         [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
+
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - Data takers started\n", sltsec, sltsubsec2/10);
+
+
+    //DEBUG         [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
         
     //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
     if(countHistoMode){
@@ -1718,6 +1687,7 @@ return;
     //
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     
     runStartSec = sltsec + 1;
 
@@ -1728,13 +1698,42 @@ return;
         
         sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
         sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
         
         runStartSec = sltsec;
     }
     
+    NSLog(@"SLT %i.%03i - Crate his ready for data taking, run start at %i run time %i\n",
+          sltsec, sltsubsec2/10, runStartSec);
+
+    
     // Write run start time; starts always with the second strobe
     [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
 
+    
+    // There is a smaller problem, if we pospone the start time until shortly before the
+    // second strobe - in this case also the run is stoped later !!!
+    // Todo: Calculate the delay and do a sleep
+
+    lStatus = [self readStatusReg];
+    if ((lStatus & kStatusInh)) {
+ 
+        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+        
+        double delay = (10000. - sltsubsec2)/10000. - 0.050;
+        if (delay > 0) [ORTimer delay:delay];
+        //if (delay > 0) usleep((int) (delay * 1000000));
+        
+        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+        
+        NSLog(@"SLT %i.%03i - Start run after delay of %f (subsec2 %d) \n",
+              sltsec, sltsubsec2/10, delay, sltsubsec2);
+        
+    }
+    
 }
 
 -(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1754,13 +1753,20 @@ return;
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    unsigned long sltsubsecreg;
+    unsigned long sltsec;
+    unsigned long sltsubsec2;
+    
     //
     // Todo: Check if run time close to completion
     //
     
-    //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
+    
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - Stopping run; set inhibit\n", sltsec, sltsubsec2/10);
+
     
     [self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
     
@@ -1769,12 +1775,10 @@ return;
     int i = 0;
     do {
         lStatus = [self readStatusReg];
-        //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-        //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-        //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
         
-        //NSLog(@"waiting for inhibit %x i=%d t=%d %04d\n", lStatus, i, sltsec, sltsubsec2);
-        usleep(100000);
+        //sleep(100000);
+        [ORTimer delay:0.1];
+
         i++;
     } while(((lStatus & kStatusInh) == 0) && (i<15));
     
@@ -1784,7 +1788,16 @@ return;
     }
  
     // Ship the run counter - it should be exactly like the run time specified in RunControl
-    unsigned long sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    //
+    // Warning:
+    // Even, if not necessary here, the sub second counter need to be read berfore the
+    // second counter in order to get the right values. Subsec + sec readout is coupled in the firmware !!!
+    //
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - Crate stopoed; run stop %i\n", sltsec, sltsubsec2/10, sltsec);
+    
     [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltsec low:0 ];
     
     unsigned long long runcount = [self readRunTime];
@@ -1802,6 +1815,10 @@ return;
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    unsigned long sltsubsecreg;
+    unsigned long sltsec;
+    unsigned long sltsubsec2;
+    
     //TODO: set a run control 'wait', if we record the hitrate counter -> wait for final hitrate event (... in change state notification callback ...) -tb-
 
     for(id obj in dataTakers){
@@ -1815,6 +1832,13 @@ return;
 
     [self setIsPartOfRun: NO];
 
+    
+    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - End of run\n", sltsec, sltsubsec2/10);
+
+    
     //
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
