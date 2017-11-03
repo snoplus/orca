@@ -1225,8 +1225,9 @@
 
 - (IBAction) shipSumHistogramPUAction:(id)sender
 {
-	//[model setShipSumHistogram:[sender intValue]];	
-	[model setShipSumHistogram:[[shipSumHistogramPU selectedItem] tag]];
+	//[model setShipSumHistogram:[sender intValue]];
+    [model setShipSumHistogram:[sender indexOfSelectedItem]];
+
 }
 
 - (IBAction) targetRateAction:(id)sender

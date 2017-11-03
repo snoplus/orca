@@ -124,6 +124,9 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 	histMeasTime = 5;
     [self registerNotificationObservers];
     return self;
+    
+    lastInhibitStatus = 0;
+    lastRunStatus = 0;
 }
 
 - (void) dealloc
@@ -312,7 +315,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 {
     if(syncWithRunControlCounterFlag >= receivedHistoCounter){//the notification 'runAboutToChangeState' seems to be called every second, if a wait is active, so we need to check for >= (not ==) -tb-
         //this is the sum histogram facility - see - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
-        [self shipSumHistograms];
+        //[self shipSumHistograms]; // REMOVE (ak)
         //clear waits for run control
 	    [self releaseRunWait]; 
 	    syncWithRunControlCounterFlag=0;
@@ -896,7 +899,7 @@ static double table[32]={
 - (void) setHistMeasTime:(unsigned long)aHistMeasTime
 {
 	if(aHistMeasTime<2){
-		NSLog(@"%@:: Warning: tried to set refresh time to %i (minimum is 2)\n",NSStringFromClass([self class]),aHistMeasTime); 
+		NSLog(@"%@:: Warning: tried to set refresh time to %i (minimum is 2)\n",NSStringFromClass([self class]),aHistMeasTime);
 		aHistMeasTime=2;
 	}
     histMeasTime = aHistMeasTime;
@@ -1700,6 +1703,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     unsigned long sltSubSec     = 0;
     unsigned long sltSec        = 0;
     unsigned long sltRunStartSec = 0;
+    unsigned long sltSubSec2    = 0;
+    unsigned long inhibit;
+    unsigned long runStatus;
     
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 	@try {
@@ -1773,17 +1779,26 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 if(	dataIndex != countHREnabledChans){
                     NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
                 }
+
                 
-                [slt readStatusReg];
+                //
+                // Ship the data, if during the öast second inhibit was released and run was active
+                //
+                inhibit = [slt readStatusReg] & kStatusInh;
+                runStatus = [gOrcaGlobals runInProgress];
                 
                 sltSec      =  [slt getSeconds];
                 sltSubSec   =  [slt readSubSecondsCounter];
+                sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
+                
+                // if (runStatus) NSLog(@"FLT %i.%03i - Reading hitrates\n", sltSec, sltSubSec2/20);
+                
                 
                 // Don't ship hitrate before the run has been started
                 sltRunStartSec = [slt getRunStartSecond];
                 
                 
-                if(dataIndex>0 && [gOrcaGlobals runInProgress] && (sltSec > sltRunStartSec) ){
+                if( (dataIndex>0) && (!lastInhibitStatus) && (lastRunStatus) && (sltSec > sltRunStartSec) ){
                     
                     data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
                     data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
@@ -1794,6 +1809,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
                                                                         object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
                 }
+                
+                // Keep the inhibit status for the next call
+                lastInhibitStatus = inhibit;
+                lastRunStatus = runStatus;
                 
                 [self setHitRateTotal:newTotal];
                 
@@ -1811,10 +1830,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         NSLogError(@"",@"Hit Rate Exception",[self fullID],nil);
 	}
 
-    //try to read always between two second strobes -> sec = fullSec+0.4
-    double delay      = 1<<[self hitRateLength];
-    double deltadelay = 0.4 - 0.00000005*sltSubSec;
+    
+    
+    // Synchronize the hitrate readout to the Slt second counter
+    // If the hardware is not accible the counter runs free but not less than a second
+
+    double delay      = (1<<[self hitRateLength]) -1;
+    double deltadelay = 0.010 + (10000. - sltSubSec2)/10000.;
     delay += deltadelay;
+    
+    //if (runStatus) NSLog(@"FLT %i.%03i - Reading hitrates - delay %f %f \n", sltSec, sltSubSec2/10, delay, deltadelay);
+    
     [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 }
 
@@ -2076,6 +2102,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     return YES;
 }
 
+/*
+// REMOVE - sum histograms are calculated at the crate PC (ak)
+ 
 - (void) initSumHistogramBuffers
 {
         //clear histogram buffers
@@ -2105,8 +2134,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 //2013: this is called from the decoder! -tb-
 - (void) addToSumHistogram:(void*)someData
 {
-
+    
     if(!shipSumHistogram) return;
+
     
     unsigned long* ptr = (unsigned long*)someData;
 
@@ -2118,12 +2148,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     //ptr + (sizeof(katrinV4FltHistogramDataStruct)/sizeof(long));// points now to the histogram data -tb-
    	int isSumHistogram = ePtr->histogramInfo & 0x2; //the bit1 marks the Sum Histograms
 
+    
     if(isSumHistogram){ //avoid adding the already shipped histograms
         return;
     }
-    
+
     int i, firstBin = ePtr->firstBin;//first bin should always be 0 ... -tb-
-    for(i=0; i<ePtr->histogramLength;i++){ 
+    for(i=0; i<ePtr->histogramLength;i++){
         histoBuf[chan].h[firstBin+i] += histoData[i];
     }
     histoBuf[chan].refreshTimeSec += ePtr->refreshTimeSec;
@@ -2133,8 +2164,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) shipSumHistograms
 {
-    if(shipSumHistogram){
     
+    if(shipSumHistogram){
         int chan;
         for(chan=0; chan<kNumV4FLTChannels; chan++){
             if(triggerEnabledMask & (0x1<<chan)){//if this channel is active, ship histogram, then clear
@@ -2150,21 +2181,21 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 histoBuf[chan].readoutSec      =  0;
                 histoBuf[chan].refreshTimeSec  =  0;
                 bzero(&(histoBuf[chan].h[0]), sizeof(uint32_t)*2048);
-                /*
-                histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
-                histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
-                histoBuf[chan].firstBin =  0;
-                histoBuf[chan].lastBin =   2048;
-                histoBuf[chan].histogramLength =   2048;
-                histoBuf[chan].maxHistogramLength =   2048;
-                histoBuf[chan].binSize    =   histEBin;
-                histoBuf[chan].offsetEMin =   histEMin;
-                */
+ 
+                //histoBuf[chan].orcaHeader = histogramId | (sizeof(katrinV4FullHistogramDataStruct)/sizeof(int32_t));
+                //histoBuf[chan].location =    ((crate & 0x01e)<<21) | (((station) & 0x1f)<<16) | ((boxcarLength & 0x3)<<4)  | (filterShapingLength & 0xf)      |    (chan<<8);
+                //histoBuf[chan].firstBin =  0;
+                //histoBuf[chan].lastBin =   2048;
+                //histoBuf[chan].histogramLength =   2048;
+                //histoBuf[chan].maxHistogramLength =   2048;
+                //histoBuf[chan].binSize    =   histEBin;
+                //histoBuf[chan].offsetEMin =   histEMin;
+ 
             }
         }
     }
 }
-
+*/
 
 
 - (BOOL) bumpRateFromDecodeStage:(short)channel
@@ -2291,7 +2322,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		
 	if(runMode == kKatrinV4Flt_Histogram_DaqMode){
         //clear histogram buffers
-        [self initSumHistogramBuffers];
+        //[self initSumHistogramBuffers]; // REMOVE - sum histograms are calculated at the crate PC (ak)
 		//start polling histogramming mode status
 		[self performSelector:@selector(readHistogrammingStatus) 
 				   withObject:nil
@@ -2353,6 +2384,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if(runMode == kKatrinV4Flt_EnergyDaqMode | runMode == kKatrinV4Flt_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;                           //bit 17 = "sync flt with slt timer" flag
     if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
+    if((shipSumHistogram == 2) && (!syncWithRunControl)) runFlagsMask |= kShipSumOnlyHistogramFlag;
     if(forceFLTReadout || (runMode == kKatrinV4Flt_EnergyTraceDaqMode) || (runMode == kKatrinV4Flt_BipolarEnergyTraceDaqMode)){
         runFlagsMask |= kForceFltReadoutFlag;      
     }
@@ -2542,7 +2574,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     else if([param isEqualToString:@"Refresh Time"])		return [cardDictionary objectForKey:@"histMeasTime"];
     else if([param isEqualToString:@"Energy Offset"])		return [cardDictionary objectForKey:@"histEMin"];
     else if([param isEqualToString:@"Bin Width"])			return [cardDictionary objectForKey:@"histEBin"];
-    else if([param isEqualToString:@"Ship Sum Histo"])		return [cardDictionary objectForKey:@"sumHistogram"];
+    else if([param isEqualToString:@"Ship Sum Histo"])		return [cardDictionary objectForKey:@"shipSumHistogram"];
     else if([param isEqualToString:@"Histo Mode"])			return [cardDictionary objectForKey:@"histMode"];
     else if([param isEqualToString:@"Histo Clr Mode"])		return [cardDictionary objectForKey:@"histClrMode"];
 	//------------------

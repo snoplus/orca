@@ -107,13 +107,15 @@
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     unsigned short lastHitRateLength;
     //buffer for summed histograms
-    katrinV4FltFullHistogramDataStruct histoBuf[24];
+    //katrinV4FltFullHistogramDataStruct histoBuf[24]; // REMOVE - sum histograms are calculated at the crate PC (ak)
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
     int skipFltEventReadout;
     BOOL forceFLTReadout;  //new for bipolar firmware (SLT readout is now recommended) 2016-07 -tb-
     int energyOffset;
+    unsigned long lastInhibitStatus;
+    unsigned long lastRunStatus;
 }
 
 #pragma mark •••Initialization
@@ -376,9 +378,11 @@
 
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
-- (void) initSumHistogramBuffers;
-- (void) addToSumHistogram:(void*)someData;
-- (void) shipSumHistograms;
+
+// REMOVE - sum histograms are calculated at the crate PC (ak) 
+//- (void) initSumHistogramBuffers;
+//- (void) addToSumHistogram:(void*)someData;
+//- (void) shipSumHistograms;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
