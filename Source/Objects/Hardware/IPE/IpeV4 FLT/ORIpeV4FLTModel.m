@@ -239,12 +239,12 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelTargetRateChanged object:self];
 }
 
-- (int) histMaxEnergy { return histMaxEnergy; }
+- (int) histEMax { return histEMax; }
 //!< A argument -1 will auto-recalculate the maximum energy which fits still into the histogram. -tb-
-- (void) setHistMaxEnergy:(int)aHistMaxEnergy
+- (void) setHistEMax:(int)aHistMaxEnergy
 {
-    if(aHistMaxEnergy<0) histMaxEnergy = histEMin + 2048*(1<<histEBin);
-    else histMaxEnergy = aHistMaxEnergy;
+    if(aHistMaxEnergy<0) histEMax = histEMin + 2048*(1<<histEBin);
+    else histEMax = aHistMaxEnergy;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistMaxEnergyChanged object:self];
 }
 
@@ -338,7 +338,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistEBinChanged object:self];
     
     //recalc max energy
-    [self setHistMaxEnergy: -1];
+    [self setHistEMax: -1];
 }
 
 - (unsigned long) histEMin { return histEMin;} 
@@ -349,7 +349,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeV4FLTModelHistEMinChanged object:self];
 
     //recalc max energy
-    [self setHistMaxEnergy: -1];
+    [self setHistEMax: -1];
 }
 
 - (unsigned long) histNofMeas { return histNofMeas; }

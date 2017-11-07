@@ -123,7 +123,6 @@
     unsigned long histEMin;     //!< the energy offset of the histogram
     unsigned long histEBin;     //!<the bin size setting (histBinWidth = 2^histEBin)
     int histEMax;
-    int histMaxEnergy;
     int histMode;
     int histClrMode;
     unsigned long histFirstEntry;
@@ -154,8 +153,8 @@
 #pragma mark •••Accessors
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
-- (int) histMaxEnergy;
-- (void) setHistMaxEnergy:(int)aHistMaxEnergy;
+- (int) histEMax;
+- (void) setHistEMax:(int)aHistMaxEnergy;
 - (int) histPageAB;
 - (void) setHistPageAB:(int)aHistPageAB;
 - (int) runMode;

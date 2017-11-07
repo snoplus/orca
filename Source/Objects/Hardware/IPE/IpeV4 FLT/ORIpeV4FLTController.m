@@ -317,7 +317,7 @@
 
 - (void) histMaxEnergyChanged:(NSNotification*)aNote
 {
-	[histMaxEnergyTextField setIntValue: [model histMaxEnergy]];
+	[histMaxEnergyTextField setIntValue: [model histEMax]];
 }
 
 - (void) histPageABChanged:(NSNotification*)aNote
