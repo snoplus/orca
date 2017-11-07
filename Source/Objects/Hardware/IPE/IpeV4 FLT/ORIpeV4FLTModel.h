@@ -122,6 +122,7 @@
     unsigned long histNofMeas;  //!<number of histo measurement cycles (0..63)
     unsigned long histEMin;     //!< the energy offset of the histogram
     unsigned long histEBin;     //!<the bin size setting (histBinWidth = 2^histEBin)
+    int histEMax;
     int histMaxEnergy;
     int histMode;
     int histClrMode;
