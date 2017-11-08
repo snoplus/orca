@@ -69,7 +69,6 @@
     // Run threads
     NSThread* _tellieThread;
     NSThread* _smellieThread;
-
     NSThread* _tellieTransitionThread;
     NSThread* _smellieTransitionThread;
 }
@@ -173,11 +172,6 @@
 
 -(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain;
 
--(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
--(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
--(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
 -(void) startInterlockThread;
 -(void) killKeepAlive:(NSNotification*)aNote;
@@ -190,7 +184,7 @@
 
 // SMELLIE database interactions
 -(void) pushInitialSmellieRunDocument;
--(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) updateSmellieRunDocument:(NSArray*)subRunArray;
 -(void) fetchCurrentSmellieConfig;
 -(void) parseCurrentConfigVersion:(id)aResult;
 -(void) fetchConfigurationFile:(NSNumber*)currentVersion;
