@@ -49,8 +49,10 @@ record type = 2 = kStopRunType:		the timestamp is a run stop timestamp
 record type = 3 = kStartSubRunType: the timestamp is a subrun start timestamp
 record type = 4 = kStopSubRunType:	the timestamp is a subrun stop timestamp
 
-counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCounterType
-1:
+
+counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCounterType,
+                kLostFltEventCounterType, kLostSltEventCounterType
+
 **/
 //-------------------------------------------------------------
 
@@ -87,6 +89,8 @@ counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCoun
             case kVetoCounterType:		counterString    = [NSString stringWithFormat:@"Veto Counter\n"]; break;
             case kDeadCounterType:		counterString    = [NSString stringWithFormat:@"Deadtime Counter\n"]; break;
             case kRunCounterType:		counterString    = [NSString stringWithFormat:@"Run  Counter\n"]; break;
+            case kLostFltEventCounterType: counterString = [NSString stringWithFormat:@"Lost Flt Events\n"]; break;
+            case kLostSltEventCounterType: counterString = [NSString stringWithFormat:@"Lost Slt Events\n"]; break;
             default:					counterString    = [NSString stringWithFormat:@"Unknown Counter\n"]; break;
         }
         NSString* typeString;
