@@ -476,33 +476,40 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];
     
-    //int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
-	//unsigned long filterDiv = 1L << filterShapingLength;
-    //unsigned long binSize   = 1L << ptr[8];
-   // unsigned long energyMin = ptr[9];
+    int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
+	unsigned long filterLen = 1L << filterShapingLength;
+    unsigned long histoEBinSize = 1L << ptr[8];
+    unsigned long histoEOffset = ptr[9];
     
-/*
-    // Todo: consider first energy bin
-    if (filterDiv == binSize){
-        for (int i=0; i<2048;i++){
-            histoNorm[i] = ptrData[i];
+    
+    // Normalize the histogram to the full ADC range from 0 .. 4095
+    // Todo: Avoid comb structure when scaling up !!!
+    
+    unsigned long *ptrData;
+    int normE;
+    int spacing;
+    
+    ptrData = &ptr[12];
+    for (int i=0;i<4095;i++) normHisto[i] = 0;
+    
+    // Spacing 2 should be considered, anything larger does not make sense
+    spacing = histoEBinSize / filterLen;
+    for (int i=0; i<2048;i++) {
+        if (spacing < 2) {
+           normE = (histoEOffset + i * histoEBinSize) / filterLen;
+           if (normE > 4095) normE = 4095;
+        
+           normHisto[normE] += ptrData[i];
+            
+        } else {
+            for (int j=0; j<spacing; j++){
+                normE = (histoEOffset + i * histoEBinSize) / filterLen + j;
+                if (normE > 4095) normE = 4095;
+                normHisto[normE] = ptrData[i] / spacing;
+            }
+            
         }
     }
-    if (filterDiv < binSize){
-        for (int i=0; i<4096;i++){
-            iNorm = i * binSize / filterDiv;
-            if (iNorm < 2048)
-              histoNorm[i] = ptrData[iNorm];
-        }
-    }
-    if (filterDiv > binSize){
-        for (int i=0; i<4096;i++){
-            iNorm = i * binSize / filterDiv;
-            if (iNorm < 2048)
-                histoNorm[i] = ptrData[iNorm];
-        }
-    }
-*/
     
     
 	int isSumHistogram = ptr[11] & 0x2; //the bit1 marks the Sum Histograms
@@ -510,14 +517,14 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	if(!isSumHistogram) {
         NSArray*  keyArray = [NSArray arrayWithObjects:@"FLT",@"HW Histogram",crateKey,stationKey,channelKey, nil];
         
-        [aDataSet mergeHistogram:  &ptr[12]
-                         numBins:  ptr[6]  // is fixed in the current FPGA version -tb- 2008-03-13
+        [aDataSet mergeHistogram:  normHisto
+                         numBins:  4096
                     withKeyArray:  keyArray];
     }
     else {
         NSArray*  keyArray = [NSArray arrayWithObjects:@"FLT",@"HW Histogram (sum)",crateKey,stationKey,channelKey, nil];
-        [aDataSet mergeHistogram:  &ptr[12]
-                         numBins:  ptr[6]  // is fixed in the current FPGA version -tb- 2008-03-13
+        [aDataSet mergeHistogram:  normHisto
+                         numBins:  4096
                     withKeyArray:  keyArray];
     }
     
