@@ -98,6 +98,9 @@ NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged = @"ORKatrinV4FLTMo
 NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTModeFifoFlagsChanged";
 NSString* ORKatrinV4FLTModelHitRateModeChanged              = @"ORKatrinV4FLTModelHitRateModeChanged";
 
+NSString* ORKatrinV4FLTModelLostEventsChanged               = @"ORKatrinV4FLTModelLostEventsChanged";
+
+
 static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 	@"Run Mode",
 	@"Ram",
@@ -125,8 +128,8 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
     [self registerNotificationObservers];
     return self;
     
-    lastInhibitStatus = 0;
-    lastRunStatus = 0;
+    inhibitDuringLastHitrateReading = 0;
+    runStatusDuringLastHitrateReading = 0;
 }
 
 - (void) dealloc
@@ -723,6 +726,7 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelVetoOverlapTimeChanged object:self];
 }
 
+
 /** This is the setting of the 'Ship Sum Histogram' popup button; tag values are:
   * - 0 NO, don't ship sum histogram
   * - 1 YES, ship sum histogram
@@ -768,19 +772,21 @@ static double table[32]={
 - (int) runMode { return runMode; }
 - (void) setRunMode:(int)aRunMode
 {
-
     [[[self undoManager] prepareWithInvocationTarget:self] setRunMode:runMode];
     runMode = aRunMode;
+    id slt = [[self crate] adapter];
 		
 	switch (runMode) {
 		case kKatrinV4Flt_EnergyDaqMode:
 			[self setFltRunMode:kKatrinV4FLT_Run_Mode];
             readWaveforms = NO;
+            [slt enablePixelBus:[self stationNumber]];
 			break;
             
         case kKatrinV4Flt_EnergyTraceDaqMode:
             [self setFltRunMode:kKatrinV4FLT_Run_Mode];
             readWaveforms = YES;
+            [slt disablePixelBus:[self stationNumber]];
             break;
             
         case kKatrinV4Flt_Histogram_DaqMode:
@@ -793,26 +799,30 @@ static double table[32]={
                 [self setFifoBehaviour: kFifoEnableOverFlow];
             }
             readWaveforms = NO;
-           break;
+            [slt disablePixelBus:[self stationNumber]];
+            break;
             
         case kKatrinV4Flt_VetoEnergyDaqMode:
             [self setFltRunMode:kKatrinV4FLT_Veto_Mode];
+            [slt enablePixelBus:[self stationNumber]];
             break;
             
         case kKatrinV4Flt_VetoEnergyTraceDaqMode:
             [self setFltRunMode:kKatrinV4FLT_Veto_Mode];
             readWaveforms = YES;
+            [slt disablePixelBus:[self stationNumber]];
             break;
-            
 
 		case kKatrinV4Flt_BipolarEnergyDaqMode:  //new since 2016-07 -tb-
 			[self setFltRunMode:kKatrinV4FLT_Bipolar_Mode];
             readWaveforms = NO;
+            [slt enablePixelBus:[self stationNumber]];
 			break;
 			
 		case kKatrinV4Flt_BipolarEnergyTraceDaqMode:  //new since 2016-07 -tb-
 			[self setFltRunMode:kKatrinV4FLT_Bipolar_Mode];
 			readWaveforms = YES;
+            [slt disablePixelBus:[self stationNumber]];
 			break;
 			
 		default:
@@ -874,7 +884,7 @@ static double table[32]={
     [self setHistEMax: -1];
 }
 
-- (unsigned long) histEMin { return histEMin;} 
+- (unsigned long) histEMin { return histEMin;}
 - (void) setHistEMin:(unsigned long)aHistEMin
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setHistEMin:histEMin];
@@ -898,9 +908,9 @@ static double table[32]={
 - (unsigned long) histMeasTime { return histMeasTime; }
 - (void) setHistMeasTime:(unsigned long)aHistMeasTime
 {
-	if(aHistMeasTime<2){
-		NSLog(@"%@:: Warning: tried to set refresh time to %i (minimum is 2)\n",NSStringFromClass([self class]),aHistMeasTime);
-		aHistMeasTime=2;
+	if(aHistMeasTime<1){
+		NSLog(@"%@:: Warning: tried to set refresh time to %i (minimum is 1)\n",NSStringFromClass([self class]),aHistMeasTime);
+		aHistMeasTime=1;
 	}
     histMeasTime = aHistMeasTime;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHistMeasTimeChanged object:self];
@@ -925,15 +935,30 @@ static double table[32]={
 }
 
 - (int) filterShapingLength { return filterShapingLength; }
+- (int) filterShapingLengthInBins { return ( 0x1 << filterShapingLength ); }
+- (void) setFilterShapingLengthOnInit:(int)aFilterShapingLength
+{
+    filterShapingLength = [self restrictIntValue:aFilterShapingLength min:2 max:8];
+    if(filterShapingLength == 8 && gapLength>0){
+        [self setGapLength:0];
+        NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
+    }
+}
+
 - (void) setFilterShapingLength:(int)aFilterShapingLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFilterShapingLength:filterShapingLength];
     int newValue = [self restrictIntValue:aFilterShapingLength min:2 max:8];
     
+    int oldLength = filterShapingLength;
+    int newLength = newValue;
+    int diff = newLength - oldLength;
+
     float old = 1<<filterShapingLength;
     float new = 1<<newValue;
     float ratio = new/old;
     int chan;
+    
     for(chan=0;chan<kNumV4FLTChannels;chan++){
         unsigned long currentThreshold = [self threshold:chan];
         [self setThreshold:chan withValue:currentThreshold*ratio];
@@ -949,10 +974,8 @@ static double table[32]={
     // Normalize the histogram settings -- take old settings if called during initialization
     if(!initializing){
         [self setHistEMin: [self histEMin] * ratio];            //set the new energy values first
-        [self setHistEMax: [self histEMax] * ratio];
-        int binWidth = (histEMax - histEMin)/2048;              //then the bin width
-        binWidth = pow(2,(int)(log2(binWidth-1)/log2(2))+1);    //should be a power of 2 -- force it!
-        [self setHistEBin:log2(binWidth)];                      //the value stored in ORCA is the exponent
+        [self setHistEMax: [self histEMax] * ratio];            // or recalculate?! (-1)
+        [self setHistEBin: [self histEBin] + diff];
     }
     //----------------------------------------------
 
@@ -1188,14 +1211,26 @@ static double table[32]={
 	else                        return 0.0;
 }
 
-
-
 - (float) rate:(int)aChan { return [self hitRate:aChan]; }
 - (BOOL) hitRateOverFlow:(unsigned short)aChan
 {
 	if(aChan<kNumV4FLTChannels)return hitRateOverFlow[aChan];
 	else return NO;
 }
+
+- (unsigned long long) lostEvents
+{
+    return lostEvents;
+    
+}
+- (void) setLostEvents:(unsigned long long)aValue
+{
+    lostEvents = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelLostEventsChanged object:self];
+    
+}
+
+
 
 - (unsigned short) selectedChannelValue { return selectedChannelValue; }
 - (void) setSelectedChannelValue:(unsigned short) aValue
@@ -1437,6 +1472,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) initBoard
 {
+    
+    [self writeReg: kFLTV4FIFOLostCounterLsbReg value: 1]; // Clear
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
 	[self writeReg: kFLTV4PostTriggerReg      value:postTriggerTime];
@@ -1447,6 +1484,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[self writeHitRateMask];			//set hitRage control mask
 	
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
+        
+        // Crate clears one second too early
+        // As workaround OrcaReadout clears after reading each histogram
+        // Might be removed if the options should be kept?! -ak-
+        
+        [self setHistClrMode:1];
+        
 		[self writeHistogramControl];
 	}
     [self writeRunControl:YES];
@@ -1810,7 +1854,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 sltRunStartSec = [slt getRunStartSecond];
                 
                 
-                if( (dataIndex>0) && (!lastInhibitStatus) && (lastRunStatus) && (sltSec > sltRunStartSec) ){
+                if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
                     
                     data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
                     data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
@@ -1823,8 +1867,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 }
                 
                 // Keep the inhibit status for the next call
-                lastInhibitStatus = inhibit;
-                lastRunStatus = runStatus;
+                inhibitDuringLastHitrateReading = inhibit;
+                runStatusDuringLastHitrateReading = runStatus;
                 
                 [self setHitRateTotal:newTotal];
                 
@@ -1855,6 +1899,19 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
 }
+
+
+- (unsigned long long) readLostEvents
+{
+    unsigned long low = [self readReg:kFLTV4FIFOLostCounterLsbReg];
+    unsigned long high  = [self readReg:kFLTV4FIFOLostCounterMsbReg];
+    [self setLostEvents:((unsigned long long)high << 32) | low];
+    
+    NSLog(@"LostEvents %i %i %i\n", low, high, lostEvents);
+    
+    return lostEvents;
+}
+
 
 //------------------
 //command Lists
@@ -1934,7 +1991,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
     [self setForceFLTReadout:           [decoder decodeBoolForKey:  @"forceFLTReadout"]];
-    [self setFilterShapingLength:       [decoder decodeIntForKey:   @"filterShapingLength"]];
+    [self setFilterShapingLengthOnInit: [decoder decodeIntForKey:   @"filterShapingLength"]];
 	
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
     
@@ -2282,6 +2339,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     
+
     if(histClrMode || histClrMode){
         NSLogColor([NSColor redColor],@"%@ WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n",[self fullID]);
     }
@@ -2816,9 +2874,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		noiseFloorRunning = NO;
 	}
 	else {
-		noiseFloorState = 0;
-		noiseFloorRunning = YES;
-		[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
+        
+        if ([gOrcaGlobals runInProgress]){
+            NSLog(@"Error: Can't run threshold finder during run\n");
+            
+        } else {
+            noiseFloorState = 0;
+            noiseFloorRunning = YES;
+            [self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
+        }
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTNoiseFloorChanged object:self];
 }
@@ -3171,9 +3235,18 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	int i;
 	BOOL atLeastOne;
 	unsigned long maxThreshold = 0xfffff;
+    
+    id slt = [[self crate] adapter];
+    
     @try {
 		switch(noiseFloorState){
 			case 0:
+                // Save inhibit state
+                inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
+                // Release inhibit
+                [slt writeClrInhibit];
+                
+                
 				//disable all channels
 				for(i=0;i<kNumV4FLTChannels;i++){
 					oldEnabled[i]   = [self hitRateEnabled:i];
@@ -3206,7 +3279,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 							
 						}
 						else {
-							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset);
+							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset * [self filterShapingLengthInBins]);
 							[self setThreshold:i withValue:maxThreshold];
 							hitRateEnabledMask &= ~(1L<<i);
 						}
@@ -3247,6 +3320,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				}
 				[self initBoard];
 				noiseFloorRunning = NO;
+                
+                // Restore inhibit state
+                if (inhibitBeforeThresholdFinder > 0)
+                    [slt writeSetInhibit];
+                
 			break;
 		}
 		if(noiseFloorRunning){

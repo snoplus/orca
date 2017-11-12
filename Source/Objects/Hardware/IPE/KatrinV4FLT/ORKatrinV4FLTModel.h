@@ -104,6 +104,8 @@
     int useDmaBlockRead;
     int boxcarLength;
     int hitRateMode;
+    unsigned long long  lostEvents;
+
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     unsigned short lastHitRateLength;
     //buffer for summed histograms
@@ -114,9 +116,11 @@
     int skipFltEventReadout;
     BOOL forceFLTReadout;  //new for bipolar firmware (SLT readout is now recommended) 2016-07 -tb-
     int energyOffset;
-    unsigned long lastInhibitStatus;
-    unsigned long lastRunStatus;
+    unsigned long inhibitDuringLastHitrateReading;
+    unsigned long runStatusDuringLastHitrateReading;
     BOOL initializing;
+
+    unsigned long inhibitBeforeThresholdFinder; //< used the threshold finder
 }
 
 #pragma mark •••Initialization
@@ -188,6 +192,8 @@
 - (BOOL) storeDataInRam;
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
 - (int) filterShapingLength;
+- (int) filterShapingLengthInBins;
+- (void) setFilterShapingLengthOnInit:(int)aFilterShapingLength;
 - (void) setFilterShapingLength:(int)aFilterShapingLength;
 - (int) gapLength;
 - (void) setGapLength:(int)aGapLength;
@@ -276,6 +282,9 @@
 
 - (ORTimeRate*) totalRate;
 - (void) setTotalRate:(ORTimeRate*)newTimeRate;
+- (unsigned long long) lostEvents;
+- (void) setLostEvents:(unsigned long long)aDeadTime;
+
 
 - (unsigned short) selectedRegIndex;
 - (void) setSelectedRegIndex:(unsigned short) anIndex;
@@ -486,6 +495,7 @@ extern NSString* ORKatrinV4FLTNoiseFloorChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
+extern NSString* ORKatrinV4FLTModelLostEventsChanged;
 
 extern NSString* ORIpeSLTModelName;
 
