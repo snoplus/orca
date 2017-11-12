@@ -424,6 +424,11 @@
                          name : ORKatrinV4FLTModelHitRateModeChanged
                         object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lostEventsChanged:)
+                         name : ORKatrinV4FLTModelLostEventsChanged
+                        object: model];
+
     
 }
 
@@ -545,7 +550,7 @@
 
 - (void) histMaxEnergyChanged:(NSNotification*)aNote
 {
-	[histMaxEnergyTextField setIntValue: [model histEMax]];
+	[histMaxEnergyTextField setIntValue: [model histEMax] / [model filterShapingLengthInBins] ];
 }
 
 - (void) histPageABChanged:(NSNotification*)aNote
@@ -580,7 +585,7 @@
 
 - (void) histEMinChanged:(NSNotification*)aNote
 {
-	[histEMinTextField setIntValue: [model histEMin]];
+	[histEMinTextField setIntValue: [model histEMin] / [model filterShapingLengthInBins] ];
 }
 
 - (void) storeDataInRamChanged:(NSNotification*)aNote
@@ -733,6 +738,7 @@
 	[self forceFLTReadoutChanged:nil];
 	[self energyOffsetChanged:nil];
     [self hitRateModeChanged:nil];
+    [self lostEventsChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -816,8 +822,7 @@
 	else s = @"";
 	[vetoActiveField setStringValue:s];
 							  
-
-	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
+    [startNoiseFloorButton setEnabled: !runInProgress];
 	
  	[self enableRegControls];
 }
@@ -990,8 +995,8 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
-	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
+	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
+	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
 }
 
 
@@ -1017,8 +1022,8 @@
 {
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
-		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
+		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
+		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
 	}
 }
 
@@ -1080,6 +1085,12 @@
 		[timeRatePlot setNeedsDisplay:YES];
 	}
 }
+     
+- (void) lostEventsChanged:(NSNotification*)aNote
+{
+    [lostEventField setIntValue: [model lostEvents]];
+}
+     
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
@@ -1291,7 +1302,7 @@
 
 - (IBAction) histEMinAction:(id)sender
 {
-	[model setHistEMin:[sender intValue]];	
+	[model setHistEMin: ([sender intValue] * [model filterShapingLengthInBins] ) ];
 }
 
 
@@ -1455,7 +1466,7 @@
 {
 	if([sender intValue] != [(ORKatrinV4FLTModel*)model threshold:[[sender selectedCell] tag]]){
 		[[self undoManager] setActionName: @"Set Threshold"];
-		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
+		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue] ];
 	}
 }
 

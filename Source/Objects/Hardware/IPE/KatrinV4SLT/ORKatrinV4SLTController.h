@@ -116,6 +116,7 @@
 - (void) vetoTimeChanged:(NSNotification*)aNote;
 - (void) deadTimeChanged:(NSNotification*)aNote;
 - (void) lostEventsChanged:(NSNotification*)aNote;
+- (void) lostFltEventsChanged:(NSNotification*)aNote;
 - (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;

@@ -177,12 +177,15 @@
                          name : ORKatrinV4SLTModelPixelBusEnableRegChanged
 						object: model];
     
-    
     [notifyCenter addObserver : self
                      selector : @selector(lostEventsChanged:)
                          name : ORKatrinV4SLTModelLostEventsChanged
                         object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lostFltEventsChanged:)
+                         name : ORKatrinV4SLTModelLostFltEventsChanged
+                        object: model];
     
 
 }
@@ -228,26 +231,33 @@
 - (void) runTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model runTime];
-	[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
+	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model vetoTime];
-	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
+	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model deadTime];
-	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
+	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) lostEventsChanged:(NSNotification*)aNote
 {
     unsigned long long t=[model lostEvents];
+    [[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+}
+
+- (void) lostFltEventsChanged:(NSNotification*)aNote
+{
+    unsigned long long t=[model lostFltEvents];
     [[countersMatrix cellWithTag:3] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 }
+
 
 - (void) secondsSetChanged:(NSNotification*)aNote
 {
@@ -337,6 +347,7 @@
 	[self secondsSetChanged:nil];
     [self deadTimeChanged:nil];
     [self lostEventsChanged:nil];
+    [self lostFltEventsChanged:nil];
 	[self vetoTimeChanged:nil];
 	[self runTimeChanged:nil];
 	[self clockTimeChanged:nil];

@@ -114,6 +114,7 @@
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
 		IBOutlet NSView*		totalView;
+        IBOutlet NSTextField*	lostEventField;
 		
 		//test page
 		IBOutlet NSButton*		testButton;
@@ -231,6 +232,7 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 - (void) hitRateModeChanged:(NSNotification*)aNote;
+- (void) lostEventsChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) hitRateModeAction:(id)sender;
