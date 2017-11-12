@@ -5,9 +5,10 @@
 	#define PMC_COMPILE_IN_SIMULATION_MODE 0
 #endif
 
+#include <sys/time.h> // for gettimeofday on MAC OSX -tb-
+
 #if PMC_COMPILE_IN_SIMULATION_MODE
     #warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 1
-    #include <sys/time.h> // for gettimeofday on MAC OSX -tb-
 #else
     //#warning MESSAGE: ORFLTv4Readout - PMC_COMPILE_IN_SIMULATION_MODE is 0
 	#include "katrinhw4/subrackkatrin.h"
@@ -28,6 +29,13 @@ extern hw4::SubrackKatrin* srack;
 bool ORFLTv4Readout::Start() {
     firstTime = true;
     return true;
+    
+    
+    // Histogram - clear buffers !!!
+    // Read histogramm parameters here !!!
+    
+    
+    
 }
 
 bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
@@ -941,13 +949,40 @@ bool ORFLTv4Readout::Stop()
     
     uint32_t daqRunMode         = GetDeviceSpecificData()[5];
     if(daqRunMode == kKatrinV4Flt_Histogram_DaqMode){
+    
+        
+        // Todo: -ak-
+        /// Wait for the last histogram to get finished if necessary !!!
+        // Slepp - or return with false ???
+        
+        // Alternative: Read the last histogram from the other page if histogram is not ready at the end of the run
+        // Add to sum of histograms
+        // Ship data
+        
+        
         
         if (histoShipSumHistogram || histoShipSumOnly ){
-            uint32_t histogramId        = GetHardwareMask()[2];
-            uint32_t crate              = GetCrate();
-            uint32_t col                = GetSlot() - 1; //GetSlot() is in fact stationNumber, which goes from 1 to 24 (slots go from 0-9, 11-20)
-            uint32_t location           = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16);
-            uint32_t triggerEnabledMask = GetDeviceSpecificData()[4];
+            
+            uint32_t crate                  = GetCrate();
+            uint32_t col                    = GetSlot() - 1;
+            
+            // Todo: Use the run flags tofind out if automatic clear is deactivated?
+            //       In this case the sum histogram can be read from hardware at the end of the run !! -ak-
+            
+            //uint32_t runFlags               = GetDeviceSpecificData()[3];  //this is runFlagsMask of ORKatrinV4FLTModel.m,
+        
+            uint32_t triggerEnabledMask     = GetDeviceSpecificData()[4];
+            uint32_t filterShapingLength    = GetDeviceSpecificData()[9];       //TODO: need to change in the code below! -tb-
+            uint32_t boxcarLen              = GetDeviceSpecificData()[11];
+            
+            uint32_t histogramId            = GetHardwareMask()[2];
+            
+            uint32_t location   =   ((crate     & 0x0000001e)<<21) |
+            (((col+1)   & 0x0000001f)<<16) |
+            ((boxcarLen & 0x00000003)<<4)  |
+            (filterShapingLength & 0xf);  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+
+            
             srack->theSlt->pageSelect->write((long unsigned int)0x0); //flip the page so we get the last bit of data
             
             uint32_t chan;
@@ -1161,6 +1196,9 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
     
     hw4::FltKatrin *currentFlt = srack->theFlt[col];
     //if(runFlags && firstTime){// firstTime
+    
+    // Move to start procedure !!!
+    
     if(firstTime){// firstTime
         firstTime = false;
         currentFlt->histogramSettings->read();//read to cache
@@ -1186,19 +1224,27 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
         //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
         //TODO: srack->theFlt[col]->command->resetPointers->write(1);
         //clear histogram (probably not really necessary with "automatic clear" -tb-)
+        
+        //
+        // Todo Move to intialization sequence !!!
+        // Needs to be done before starting the readout !!!
+        //
         srack->theFlt[col]->command->resetPages->write(1);
+        
+        
         pageAB    = srack->theFlt[col]->status->histPageAB->read();
         oldPageAB = pageAB;
     }
+    
     else {
         pageAB = srack->theFlt[col]->status->histPageAB->read();
         
         if(oldPageAB != pageAB){
             oldPageAB = pageAB;
-            uint32_t fpgaHistogramID     = currentFlt->histNofMeas->read();
+            
+            uint32_t fpgaHistogramID = currentFlt->histNofMeas->read();
             histoReadoutSec  = currentFlt->secondCounter->read();
-            
-            
+
             
             for(int chan=0;chan<kNumChan;chan++) {
                 if((triggerEnabledMask & (0x1L << chan)) ){
@@ -1222,15 +1268,19 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
                     data[dataIndex++] = histoEnergyOffset;
                     data[dataIndex++] = fpgaHistogramID;    //from HW
                     data[dataIndex++] = pageAB & 0x1;
-                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)&data[dataIndex], 0, 2048);
                     ptrHistoBuffer = (uint32_t *) &data[dataIndex];
+                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) ptrHistoBuffer, 0, 2048);
                     dataIndex += 2048;
+                        
                     } else {
                         srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) histoBuffer, 0, 2048);
                         ptrHistoBuffer = histoBuffer;
                         
                     }
-                        
+                    
+                    // Clear the current page after readout
+                    srack->theFlt[col]->command->resetPages->write(1);
+                    
                     // Add histogram to sum histogram
                     if( histoShipSumHistogram || histoShipSumOnly ){
                         recordingTimeSum[chan] += histoRefreshTime;
@@ -1244,6 +1294,8 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
             
             
         }
+
+    
     }
 
     return true;
