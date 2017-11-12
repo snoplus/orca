@@ -152,14 +152,17 @@
 		int				actualPageIndex;
         int             pollTime;
 		ORReadOutList*	readOutGroup;
-		NSArray*		dataTakers;			//cache of data takers.
+		NSArray*		dataTakers;			//< cache of data takers.
 		BOOL			first;
-        unsigned long   lastInhibitStatus; //< Saves inhibit state at run start
+        unsigned long   inhibitBeforeRun; //< Saves inhibit state at run start
 		unsigned long   lastDisplaySec;
 		unsigned long   lastDisplayCounter;
 		double          lastDisplayRate;
         unsigned long   runStartSec;
-		
+        unsigned long   inhibitLastCheck; //< used in doneTakingData
+        bool            callRunIsStopping;
+        unsigned long   sltSecondRunStop;
+    
 		unsigned long   lastSimSec;
 
 		PMC_Link*		pmcLink;
@@ -171,6 +174,7 @@
 		unsigned long long  vetoTime;
         unsigned long long  runTime;
         unsigned long long  lostEvents;
+        unsigned long long  lostFltEvents;
 		unsigned long       clockTime;
 		BOOL                countersEnabled;
         NSString*           sltScriptArguments;
@@ -200,6 +204,8 @@
 #pragma mark •••Accessors
 - (unsigned long) pixelBusEnableReg;
 - (void) setPixelBusEnableReg:(unsigned long)aMask;
+- (void) enablePixelBus:(int)aStationNumber;
+- (void) disablePixelBus:(int)aStationNumber;
 - (bool) secondsSetSendToFLTs;
 - (void) setSecondsSetSendToFLTs:(bool)aSecondsSetSendToFLTs;
 - (BOOL) secondsSetInitWithHost;
@@ -218,6 +224,8 @@
 - (void) setDeadTime:(unsigned long long)aDeadTime;
 - (unsigned long long) lostEvents;
 - (void) setLostEvents:(unsigned long long)aDeadTime;
+- (unsigned long long) lostFltEvents;
+- (void) setLostFltEvents:(unsigned long long)aDeadTime;
 - (unsigned long) secondsSet;
 - (void) setSecondsSet:(unsigned long)aSecondsSet;
 - (unsigned long) statusReg;
@@ -416,5 +424,6 @@ extern NSString* ORKatrinV4SLTControlRegChanged;
 extern NSString* ORKatrinV4SLTPollTimeChanged;
 extern NSString* ORKatrinV4SLTModelReadAllChanged;
 extern NSString* ORKatrinV4SLTModelLostEventsChanged;
-extern NSString* ORKatrinV4SLTcpuLock;	
+extern NSString* ORKatrinV4SLTModelLostFltEventsChanged;
+extern NSString* ORKatrinV4SLTcpuLock;
 

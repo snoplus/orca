@@ -51,6 +51,7 @@ NSString* ORKatrinV4SLTModelRunTimeChanged                  = @"ORKatrinV4SLTMod
 NSString* ORKatrinV4SLTModelVetoTimeChanged                 = @"ORKatrinV4SLTModelVetoTimeChanged";
 NSString* ORKatrinV4SLTModelDeadTimeChanged                 = @"ORKatrinV4SLTModelDeadTimeChanged";
 NSString* ORKatrinV4SLTModelLostEventsChanged               = @"ORKatrinV4SLTModelLostEventsChanged";
+NSString* ORKatrinV4SLTModelLostFltEventsChanged            = @"ORKatrinV4SLTModelLostFltEventsChanged";
 NSString* ORKatrinV4SLTModelSecondsSetChanged               = @"ORKatrinV4SLTModelSecondsSetChanged";
 NSString* ORKatrinV4SLTModelStatusRegChanged                = @"ORKatrinV4SLTModelStatusRegChanged";
 NSString* ORKatrinV4SLTModelControlRegChanged               = @"ORKatrinV4SLTModelControlRegChanged";
@@ -233,6 +234,20 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 }
 
+- (void) enablePixelBus:(int)aStationNumber
+{
+    unsigned pixelBus = [self pixelBusEnableReg];
+    pixelBus = pixelBus | (0x1 << (aStationNumber -1));
+    [self setPixelBusEnableReg: pixelBus];
+}
+
+- (void) disablePixelBus:(int)aStationNumber
+{
+    unsigned pixelBus = [self pixelBusEnableReg];
+    pixelBus = pixelBus & ( 0xfffff ^ (0x1 << (aStationNumber -1)));
+    [self setPixelBusEnableReg: pixelBus];
+}
+
 - (bool) secondsSetSendToFLTs
 {
     return secondsSetSendToFLTs;
@@ -345,6 +360,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelDeadTimeChanged object:self];
 }
+
 - (unsigned long long) lostEvents
 {
     return lostEvents;
@@ -354,9 +370,18 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     lostEvents = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelLostEventsChanged object:self];
-
 }
 
+- (unsigned long long) lostFltEvents
+{
+    return lostFltEvents;
+    
+}
+- (void) setLostFltEvents:(unsigned long long)aValue
+{
+    lostFltEvents = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelLostFltEventsChanged object:self];
+}
 
 - (unsigned long) secondsSet
 {
@@ -425,12 +450,20 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) checkPixelTrigger
 {
+    // The pixel mode should be enabled in all energy modes
+    // but not in trace and especially not in histogram mode.
+    // This would spoil the readout performance
+    
     NSArray* allCards = [[self guardian] children];
     unsigned long aMask = 0x0;
     for(id aCard in allCards){
         if(![[aCard className] isEqualToString:[self className]]){
             int n = [aCard stationNumber]-1;
-            aMask |= (0x1<<n);
+            int runMode = [aCard runMode];
+            if ((runMode == kKatrinV4Flt_EnergyDaqMode)
+                    || (runMode == kKatrinV4Flt_VetoEnergyDaqMode)
+                    || (runMode == kKatrinV4Flt_BipolarEnergyDaqMode))
+                aMask |= (0x1<<n);
         }
     }
     
@@ -447,6 +480,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         [pixelTriggerDisabledAlarm release];
         pixelTriggerDisabledAlarm = nil;
     }
+    
 }
 
 - (void) checkSoftwareInhibit
@@ -1534,6 +1568,23 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 		[NSException raise:@"Not Connected" format:@"Check the SLT connection"];
 	}
 	
+    dataTakers = [[readOutGroup allObjects] retain];//cache of data takers.
+    
+    
+    // Check if any of the Flts is using the threshold finder
+    for(id obj in dataTakers){
+        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
+            
+            NSLog(@"FLT %i threshold finder %i\n", [obj stationNumber], [obj noiseFloorRunning]);
+        
+            if([obj noiseFloorRunning]){
+                NSLog(@"Wait for threshold finder to finish\n");
+                [NSException raise:@"SLT error" format:@"Threshold finder blocks run"];
+            }
+        }
+    }
+    
+    
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORKatrinV4SLTModel"];    
@@ -1546,7 +1597,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
           
     // Stop crate
-    lastInhibitStatus = [self readStatusReg] & kStatusInh;
+    inhibitBeforeRun = [self readStatusReg] & kStatusInh;
     [self writeSetInhibit];
     
     // Wait for inhibit; changes state with the next second strobe
@@ -1554,11 +1605,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     int i = 0;
     do {
         lStatus = [self readStatusReg];
-        //sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-        //sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-        //sltsubsec2 = (sltsubsecreg >> 11) & 0x3fff;
-        
-        //NSLog(@"waiting for inhibit %x i=%d t=%d %04d\n", lStatus, i, sltsec, sltsubsec2);
         usleep(100000);
         i++;
     } while(((lStatus & kStatusInh) == 0) && (i<15));
@@ -1579,7 +1625,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     }
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
 
-	dataTakers = [[readOutGroup allObjects] retain];		//cache of data takers.
+
 
     
     //
@@ -1602,6 +1648,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     }
     
     if(countHistoMode){
+        NSLog(@"Go to standby\n");
 	    for(id obj in dataTakers){
             if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
             //if([obj respondsToSelector:@selector(runMode)]){
@@ -1616,6 +1663,10 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     //if cold start (not 'quick start' in RunControl) ...
     //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
     [self initBoard];
+    for(id obj in dataTakers){
+        [obj initBoard];
+    }
+    
     
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
@@ -1634,11 +1685,10 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Data takers started\n", sltsec, sltsubsec2/10);
 
-
-    //DEBUG         [self dumpSltSecondCounter:@"histoFLT-writeControl:"];
-        
+    
     //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
     if(countHistoMode){
+        NSLog(@"Back to run mode\n");
 	    for(id obj in dataTakers){
             if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
             //if([obj respondsToSelector:@selector(runMode)]){
@@ -1711,44 +1761,32 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
 
     
-    // There is a smaller problem, if we pospone the start time until shortly before the
-    // second strobe - in this case also the run is stoped later !!!
-    // Todo: Calculate the delay and do a sleep
+    callRunIsStopping = false;
 
-    lStatus = [self readStatusReg];
-    if ((lStatus & kStatusInh)) {
- 
-        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
-        
-        double delay = (10000. - sltsubsec2)/10000. - 0.050;
-        if (delay > 0) [ORTimer delay:delay];
-        //if (delay > 0) usleep((int) (delay * 1000000));
-        
-        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
-        
-        NSLog(@"SLT %i.%03i - Start run after delay of %f (subsec2 %d) \n",
-              sltsec, sltsubsec2/10, delay, sltsubsec2);
-        
-    }
     
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-	if(first){
-		//TODO: -tb- [self writePageManagerReset];
-		//TODO: -tb- [self writeClrCnt];
-                
-        first = NO;
-	}
-    else {
-        //event readout controlled by the SLT cpu now. ORCA reads out
-        //the resulting data from a generic circular buffer in the pmc code.
-        [pmcLink takeData:aDataPacket userInfo:userInfo];
+
+    //event readout controlled by the SLT cpu now. ORCA reads out
+    //the resulting data from a generic circular buffer in the pmc code.
+    [pmcLink takeData:aDataPacket userInfo:userInfo];
+
+    
+    // The flag is set in doneTakingData
+    // There the argument userInfo is missing
+    if (callRunIsStopping){
+        
+        callRunIsStopping = false;
+        
+        for(id obj in dataTakers){
+            [obj runIsStopping:aDataPacket userInfo:userInfo];
+        }
+        [pmcLink runIsStopping:aDataPacket userInfo:userInfo];
+        
     }
+
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1756,10 +1794,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long sltsubsecreg;
     unsigned long sltsec;
     unsigned long sltsubsec2;
-    
-    //
-    // Todo: Check if run time close to completion
-    //
     
     
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
@@ -1769,49 +1803,59 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     
     [self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
-    
-    // Wait for inhibit; changes state with the next second strobe
-    unsigned long lStatus;
-    int i = 0;
-    do {
-        lStatus = [self readStatusReg];
-        
-        //sleep(100000);
-        [ORTimer delay:0.1];
-
-        i++;
-    } while(((lStatus & kStatusInh) == 0) && (i<15));
-    
-    if (i>= 15){
-        NSLog(@"Set inhibit failed\n");
-        // But continue anyway
-    }
- 
-    // Ship the run counter - it should be exactly like the run time specified in RunControl
-    //
-    // Warning:
-    // Even, if not necessary here, the sub second counter need to be read berfore the
-    // second counter in order to get the right values. Subsec + sec readout is coupled in the firmware !!!
-    //
-    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
-    NSLog(@"SLT %i.%03i - Crate stopoed; run stop %i\n", sltsec, sltsubsec2/10, sltsec);
-    
-    [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltsec low:0 ];
-    
-    unsigned long long runcount = [self readRunTime];
-    [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
-    
-    //
-    // Todo: check if all events are already processed
-    //
-    
-    for(id obj in dataTakers){
-        [obj runIsStopping:aDataPacket userInfo:userInfo];
-    }
-	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
+    inhibitLastCheck = 0;
 }
+
+- (BOOL) doneTakingData
+{
+ 
+
+    unsigned long sltsubsecreg;
+    unsigned long sltsec;
+    unsigned long sltsubsec2;
+
+    unsigned long lStatus;
+    lStatus = [self readStatusReg];
+    
+    
+    if ((lStatus & kStatusInh) == 0) {
+        
+        // Step 1: Wait for inhibit to become active here
+        return false;
+        
+    } else if (inhibitLastCheck == 0) {
+
+        // Step 2: Inhibit has been detected
+        //
+        
+        // Save the last inhibit status
+        inhibitLastCheck = lStatus & kStatusInh;
+        
+        
+        // Keep the run stop second
+        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+        NSLog(@"SLT %i.%03i - Inhibit detected\n", sltsec, sltsubsec2/10);
+
+        sltSecondRunStop = sltsec;
+        
+ 
+        // Call pmcLink runIsStopping in next takeData call
+        callRunIsStopping = true;
+
+        return false;
+        
+    } else {
+
+    
+        // Step 3: Clear readout buffers    
+        return [pmcLink doneTakingData];
+    }
+
+    
+}
+
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1819,31 +1863,55 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long sltsec;
     unsigned long sltsubsec2;
     
-    //TODO: set a run control 'wait', if we record the hitrate counter -> wait for final hitrate event (... in change state notification callback ...) -tb-
-
     for(id obj in dataTakers){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	
 	
-	[pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
-		
-	[dataTakers release];
-	dataTakers = nil;
 
-    [self setIsPartOfRun: NO];
-
-    
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - End of run\n", sltsec, sltsubsec2/10);
 
     
+    // Ship counters
+    [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltSecondRunStop low:0 ];
+    
+    unsigned long long runcount = [self readRunTime];
+    [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
+    
+    // Todo: Lost event counters
+    
+    [self readLostEvents];
+    NSLog(@"Slt lost events %i\n", lostEvents);
+    unsigned long long sum = 0;
+    for(id flt in dataTakers){
+        sum += [flt readLostEvents];
+        NSLog(@"Flt %02i lost events %i\n", [flt stationNumber], [flt lostEvents]);
+    }
+    [self setLostFltEvents:sum];
+    
+    [self shipSltEvent:kLostSltEventCounterType withType:kStopRunType eventCt:0 high: (lostEvents>>32)&0xffffffff low:(lostEvents)&0xffffffff ];
+    
+    [self shipSltEvent:kLostFltEventCounterType withType:kStopRunType eventCt:0 high: (lostFltEvents>>32)&0xffffffff low:(lostFltEvents)&0xffffffff ];
+    
+   
+    
+    // Delete unused structures
+    [pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
+    
+    [dataTakers release];
+    dataTakers = nil;
+    
+    [self setIsPartOfRun: NO];
+    
+    
+    
     //
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
     //
-    if (lastInhibitStatus == 0){
+    if (inhibitBeforeRun == 0){
         [self writeClrInhibit];
     }
     
@@ -1886,12 +1954,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																object:[NSData dataWithBytes:data length:sizeof(long)*(5)]];
 }
-
-- (BOOL) doneTakingData
-{
-	return [pmcLink doneTakingData];
-}
-
 
 - (void) saveReadOutList:(NSFileHandle*)aFile
 {
