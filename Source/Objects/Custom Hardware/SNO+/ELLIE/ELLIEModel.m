@@ -1973,9 +1973,7 @@ err:
 
     ////////////////////////////////////////////
     // Tell run control it can stop waiting (this is a spawned thread so use dispatch_sync)
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
-    });
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object:self];
     
     //////////////////////////////////////////
     // HANDLE RUN ROLLOVERS
@@ -2011,7 +2009,7 @@ err:
 
     [pool release];
     return;
-        
+
 err:
 {
     // Tell run control it can stop waiting
