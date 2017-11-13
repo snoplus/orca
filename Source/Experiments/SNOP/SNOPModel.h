@@ -43,7 +43,7 @@
 #define kNumTubes	20 //XL3s
 #define kNumOfCrates 19 //number of Crates in SNO+
 #define STANDARD_RUN_VERSION 2 //Increase if Standard Runs table structure is changed
-#define SNOP_ORCA_VERSION "0.11.1" //The current Orca release
+#define SNOP_ORCA_VERSION "0.12.0" //The current Orca release
 
 BOOL isNotRunningOrIsInMaintenance();
 
