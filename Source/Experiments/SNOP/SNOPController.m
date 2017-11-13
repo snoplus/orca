@@ -761,7 +761,6 @@ snopGreenColor;
     // Start the standard run
     [model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
 }
-
 - (IBAction) resyncRunAction:(id)sender
 {
     /* A resync run does a hard stop and start without the user having to hit
@@ -1383,7 +1382,11 @@ snopGreenColor;
     NSMutableArray* runNames = [NSMutableArray array];
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
-        [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+        @try {
+            [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+        } @catch(NSException* e) {
+            NSLog(@"[SMELLIE]: Problem loading run plan documents, reason : %@\n", [e reason]);
+        }
     }
 
     // Fill the combo box with alphabetically sorted information
@@ -1464,24 +1467,17 @@ snopGreenColor;
                 // Set some gui labels straight from the settings dict
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
-                [loadedSmellieOperationModeLabel setStringValue:[smellieRunFile objectForKey:@"operation_mode"]];
 
-                // Set fibres and Lasers labels
-                NSArray* smellieLaserArray = [theELLIEModel getSmellieRunLaserArray:[self smellieRunFile]];
-                NSArray* smellieFibreArray = [theELLIEModel getSmellieRunFibreArray:[self smellieRunFile]];
+                // Set Lasers, Fibres and wavelength labels
+                NSArray* smellieLaserArray = [smellieRunFile objectForKey:@"lasers"];
+                NSArray* smellieFibreArray = [smellieRunFile objectForKey:@"fibres"];
+                NSArray* smellieWavelengthsArray = [smellieRunFile objectForKey:@"central_wavelengths"];
                 NSString* laserString = [smellieLaserArray componentsJoinedByString:@", "];
                 NSString* fibreString = [smellieFibreArray componentsJoinedByString:@", "];
+                NSString* wavelengthString = [smellieWavelengthsArray componentsJoinedByString:@", "];
                 [loadedSmellieLasersLabel setStringValue:laserString];
                 [loadedSmellieFibresLabel setStringValue:fibreString];
-
-                // Set wavelength labels
-                NSArray* wavelengthsArray = [theELLIEModel getSmellieLowEdgeWavelengthArray:[self smellieRunFile]];
-                NSString* wavelengthString = @"";
-                for(NSNumber* wave in wavelengthsArray){
-                    NSString* w = [NSString stringWithFormat:@"%i, ",([wave intValue]/10)];
-                    wavelengthString = [wavelengthString stringByAppendingString:w];
-                }
-                [loadedSmellieSuperKwavelengths setStringValue:[wavelengthString substringToIndex:([wavelengthString length]-2)]];
+                [loadedSmellieSuperKwavelengths setStringValue:wavelengthString];
 
                 // Set time estimate label
                 NSNumber* totalTime = [theELLIEModel estimateSmellieRunTime:[self smellieRunFile]];
@@ -1591,6 +1587,13 @@ snopGreenColor;
         NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
         return;
     }
+
+    [loadedSmellieRunNameLabel setStringValue:@""];
+    [loadedSmellieTriggerFrequencyLabel setStringValue:@""];
+    [loadedSmellieLasersLabel setStringValue:@""];
+    [loadedSmellieFibresLabel setStringValue:@""];
+    [loadedSmellieSuperKwavelengths setStringValue:@""];
+    [loadedSmellieApproxTimeLabel setStringValue:@""];
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender
