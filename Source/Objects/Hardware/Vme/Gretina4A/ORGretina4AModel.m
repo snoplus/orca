@@ -2614,6 +2614,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 
 - (void) writeThresholds
 {
+    NSLog(@"%@ Manual load of thresholds\n",[self fullID]);
     int i;
     for(i=0;i<kNumGretina4AChannels;i++) {
         [self writeLedThreshold:i];
