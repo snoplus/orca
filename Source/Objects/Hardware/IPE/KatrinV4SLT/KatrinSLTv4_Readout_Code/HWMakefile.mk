@@ -2,4 +2,4 @@
 #
 
 UCFLAGS =  -g -Wall
-LFLAGS  =  -fexceptions -lPbusPCIDMA  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
+LFLAGS  =  -fexceptions -lPbusPCI  -lkatrinhw4 -lhw4 -lakutil -lpthread -lstdc++
