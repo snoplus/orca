@@ -54,6 +54,7 @@ class ORFLTv4Readout : public ORVCard
     
     uint32_t histoBinWidth;
     uint32_t histoEnergyOffset;
+    uint32_t histoClearByUser;
     uint32_t histoRefreshTime;
     uint32_t histoReadoutSec;
     
