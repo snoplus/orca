@@ -40,7 +40,6 @@ NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged         = @"ORKatrinV4FLTMod
 NSString* ORKatrinV4FLTModelUseSLTtimeChanged               = @"ORKatrinV4FLTModelUseSLTtimeChanged";
 NSString* ORKatrinV4FLTModelBoxcarLengthChanged             = @"ORKatrinV4FLTModelBoxcarLengthChanged";
 NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged          = @"ORKatrinV4FLTModelUseDmaBlockReadChanged";
-NSString* ORKatrinV4FLTModelSyncWithRunControlChanged       = @"ORKatrinV4FLTModelSyncWithRunControlChanged";
 NSString* ORKatrinV4FLTModelDecayTimeChanged                = @"ORKatrinV4FLTModelDecayTimeChanged";
 NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged       = @"ORKatrinV4FLTModelPoleZeroCorrectionChanged";
 NSString* ORKatrinV4FLTModelCustomVariableChanged           = @"ORKatrinV4FLTModelCustomVariableChanged";
@@ -227,7 +226,6 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 - (void) runIsAboutToStop:(NSNotification*)aNote
 {
 	runControlState               = eRunStopping;
-	syncWithRunControlCounterFlag = 0;
 }
 
 - (void) runIsAboutToChangeState:(NSNotification*)aNote
@@ -237,9 +235,6 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
     //is FLT  in data taker list of data task manager?
     if(![self isPartOfRun]) return;
     
-    //from here: histogram mode sync option handling
-    if(!syncWithRunControl) return;//nothing to care about ... Sync with run control not enabled in dialog ...
-    if(syncWithRunControl && (runMode != kKatrinV4FLT_Histo_Mode)) return;//nothing to care about ... Sync with run control not enabled in dialog ...
 	
 	//we need to care about the following cases:
 	// 1. no run active, system going to start run:
@@ -295,37 +290,15 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 		    NSLog(@" %@::%@   Case 2: ERROR - runControlState==eRunStarting && lastState==eRunStarting\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 		    return;
 		}
-	    if(syncWithRunControlCounterFlag>0){//should not happen! bug? -tb-
-		    NSLog(@" %@::%@   Case 2: WARNING - syncWithRunControlCounterFlag>0 (%i) - did you send multiple stopRun commands?\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),syncWithRunControlCounterFlag);//DEBUG -tb-
-		    return;
-		}
         if(lastState==eRunBetweenSubRuns) isBetweenSubruns=1; else isBetweenSubruns=0;
 	    // case 2. (all other cases)
 		//NSLog(@"   Case 2: wait for 1 histogram\n");//DEBUG -tb-
         if([self receivedHistoChanMap]){
 		    NSLog(@" %@::%@    WARNING - some of the single histograms already rceived, for others still awaiting: check that sum histograms all added the same amount of histograms. ([self receivedHistoChanMap]:%i) WARNING\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self receivedHistoChanMap]);//DEBUG -tb-
         }
-		[self syncWithRunControlStart: 1];
 	}
 }
 
-- (void) syncWithRunControlStart:(int)numHistograms
-{
-	[self clearReceivedHistoCounter];
-	syncWithRunControlCounterFlag = numHistograms; //we set syncWithRunControlCounterFlag to the number of histograms we yet need to receive
-	[self addRunWaitWithReason:@"FLTv4: wait for next histogram."];
-}
-
-- (void) syncWithRunControlCheckStopCondition
-{
-    if(syncWithRunControlCounterFlag >= receivedHistoCounter){//the notification 'runAboutToChangeState' seems to be called every second, if a wait is active, so we need to check for >= (not ==) -tb-
-        //this is the sum histogram facility - see - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan
-        //[self shipSumHistograms]; // REMOVE (ak)
-        //clear waits for run control
-	    [self releaseRunWait]; 
-	    syncWithRunControlCounterFlag=0;
-	}
-}
 
 #pragma mark •••Accessors
 
@@ -449,18 +422,6 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
     useDmaBlockRead = aUseDmaBlockRead;
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelUseDmaBlockReadChanged object:self];
-}
-
-- (int) syncWithRunControl
-{
-    return syncWithRunControl;
-}
-
-- (void) setSyncWithRunControl:(int)aSyncWithRunControl
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSyncWithRunControl:syncWithRunControl];
-    syncWithRunControl = aSyncWithRunControl;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelSyncWithRunControlChanged object:self];
 }
 
 - (double) decayTime
@@ -653,7 +614,6 @@ static double table[32]={
     //DEBUG                 NSLog(@"%@::%@   FLT #%i<------------- aReceivedHistoCounter: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[self stationNumber],aReceivedHistoCounter);//DEBUG -tb-
     receivedHistoCounter = aReceivedHistoCounter;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelReceivedHistoCounterChanged object:self];
-	if(syncWithRunControl && syncWithRunControlCounterFlag>0) [self syncWithRunControlCheckStopCondition];
 }
 
 - (void) clearReceivedHistoCounter
@@ -2029,7 +1989,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setBipolarEnergyThreshTest:   [decoder decodeInt32ForKey: @"bipolarEnergyThreshTest"]];
     [self setBoxcarLength:              [decoder decodeIntForKey:   @"boxcarLength"]];
     [self setUseDmaBlockRead:           [decoder decodeIntForKey:   @"useDmaBlockRead"]];
-    [self setSyncWithRunControl:        [decoder decodeIntForKey:   @"syncWithRunControl"]];
     [self setDecayTime:                 [decoder decodeDoubleForKey:@"decayTime"]];
     [self setPoleZeroCorrection:        [decoder decodeIntForKey:   @"poleZeroCorrection"]];
     [self setCustomVariable:            [decoder decodeIntForKey:   @"customVariable"]];
@@ -2061,7 +2020,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt32:bipolarEnergyThreshTest    forKey:@"bipolarEnergyThreshTest"];
     [encoder encodeInt:boxcarLength                 forKey:@"boxcarLength"];
     [encoder encodeInt:useDmaBlockRead              forKey:@"useDmaBlockRead"];
-    [encoder encodeInt:syncWithRunControl           forKey:@"syncWithRunControl"];
     [encoder encodeDouble:decayTime                 forKey:@"decayTime"];
     [encoder encodeInt:poleZeroCorrection           forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable               forKey:@"customVariable"];
@@ -2503,8 +2461,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	unsigned long runFlagsMask = 0;                                         //bit 16 = "first time" flag
     if(runMode == kKatrinV4Flt_EnergyDaqMode | runMode == kKatrinV4Flt_EnergyTraceDaqMode)
         runFlagsMask |= kSyncFltWithSltTimerFlag;                           //bit 17 = "sync flt with slt timer" flag
-    if((shipSumHistogram == 1) && (!syncWithRunControl)) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
-    if((shipSumHistogram == 2) && (!syncWithRunControl)) runFlagsMask |= kShipSumOnlyHistogramFlag;
+    if(shipSumHistogram == 1) runFlagsMask |= kShipSumHistogramFlag;//bit 18 = "ship sum histogram" flag   //2013-06 added (!syncWithRunControl) - if syncWithRunControl is set, this 'facility' will produce sum histograms (using the decoder) -tb-
+    if(shipSumHistogram == 2) runFlagsMask |= kShipSumOnlyHistogramFlag;
     if(forceFLTReadout || (runMode == kKatrinV4Flt_EnergyTraceDaqMode) || (runMode == kKatrinV4Flt_BipolarEnergyTraceDaqMode)){
         runFlagsMask |= kForceFltReadoutFlag;      
     }
