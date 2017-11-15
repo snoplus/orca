@@ -1487,12 +1487,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
         
+/*
         // Crate clears one second too early
         // As workaround OrcaReadout clears after reading each histogram
         // Might be removed if the options should be kept?! -ak-
         
         [self setHistClrMode:1];
-        
+*/
 		[self writeHistogramControl];
 	}
     [self writeRunControl:YES];
