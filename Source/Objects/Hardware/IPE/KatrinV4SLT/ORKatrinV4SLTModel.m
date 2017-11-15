@@ -1647,18 +1647,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         }
     }
     
-    if(countHistoMode){
-        NSLog(@"Go to standby\n");
-	    for(id obj in dataTakers){
-            if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
-            //if([obj respondsToSelector:@selector(runMode)]){
-                runMode=[obj runMode];
-                if(runMode == kKatrinV4Flt_Histogram_DaqMode) [obj writeControlWithStandbyMode];// -> set the run mode
-            }
-        }
-        //usleep(1000000);
-	}	
- 
     
     //if cold start (not 'quick start' in RunControl) ...
     //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
@@ -1688,15 +1676,28 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
     if(countHistoMode){
-        NSLog(@"Back to run mode\n");
-	    for(id obj in dataTakers){
+        // In auto clear mode - no startup time is required
+        // In user clear two seconds are required
+        
+        bool needToSleep = false;
+        for(id obj in dataTakers){
             if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
-            //if([obj respondsToSelector:@selector(runMode)]){
+                //if([obj respondsToSelector:@selector(runMode)]){
                 runMode=[obj runMode];
-                if(runMode == kKatrinV4Flt_Histogram_DaqMode) [obj writeControl];// -> set the run mode
+                if(runMode == kKatrinV4Flt_Histogram_DaqMode) {
+                    unsigned long lastReset;
+                    lastReset = [obj getLastHistReset];
+                    NSLog(@"SLT %i.%03i - Last reset at %d\n", sltsec, sltsubsec2/10, lastReset);
+                    if (sltsec - lastReset < 2) {
+                        NSLog(@"SLT %i.%03i - Histogram mode has been updated - need extra sleep\n", sltsec, sltsubsec2/10);
+                        needToSleep = true;
+                    }
+                }
             }
         }
-	}	
+        
+        if (needToSleep) usleep(2000000);
+	}
 
 	
     if(countersEnabled) [self writeEnCnt];

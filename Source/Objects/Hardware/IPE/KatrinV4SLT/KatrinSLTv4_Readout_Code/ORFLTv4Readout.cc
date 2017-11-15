@@ -423,7 +423,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 }
                                 else{
                                     //read histogram block
-                                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
+                                    srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
                                     theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
                                     theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
                                     theEventData.histogramLength =2048;
@@ -840,7 +840,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 }
                                 else{
                                     //read histogram block
-                                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
+                                    srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
                                     theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
                                     theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
                                     theEventData.histogramLength =2048;
@@ -1258,7 +1258,7 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
                     ensureDataCanHold(totalLength);
                     data[dataIndex++] = histogramId | totalLength;
                     data[dataIndex++] = location | chan<<8;
-                    data[dataIndex++] = histoReadoutSec;
+                    data[dataIndex++] = histoReadoutSec - histoRefreshTime;
                     data[dataIndex++] = histoRefreshTime;
                     data[dataIndex++] = 0;                  //first bin
                     data[dataIndex++] = 2047;               //last bin
@@ -1269,11 +1269,11 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
                     data[dataIndex++] = fpgaHistogramID;    //from HW
                     data[dataIndex++] = pageAB & 0x1;
                     ptrHistoBuffer = (uint32_t *) &data[dataIndex];
-                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) ptrHistoBuffer, 0, 2048);
+                    srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) ptrHistoBuffer, 0, 2048);
                     dataIndex += 2048;
                         
                     } else {
-                        srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) histoBuffer, 0, 2048);
+                        srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) histoBuffer, 0, 2048);
                         ptrHistoBuffer = histoBuffer;
                         
                     }

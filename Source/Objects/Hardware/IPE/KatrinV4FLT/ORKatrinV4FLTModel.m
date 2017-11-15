@@ -130,6 +130,8 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
     
     inhibitDuringLastHitrateReading = 0;
     runStatusDuringLastHitrateReading = 0;
+    
+    lastHistReset = 0;
 }
 
 - (void) dealloc
@@ -1567,12 +1569,58 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) writeHistogramControl
 {
-	[self writeReg:kFLTV4HistMeasTimeReg value:histMeasTime];
-	unsigned long aValue =  ((histClrMode & 0x1)<<29) |
-                            ((histMode    & 0x1)<<28) |
-                            ((histEBin    & 0xF)<<20) |
-                            histEMin & 0xFFFFF;
-	[self writeReg:kFLTV4HistgrSettingsReg value:aValue];
+    bool needUpdate = false;
+    unsigned long settings;
+    
+    // Check if update is necessary
+    if ([self readReg:kFLTV4HistMeasTimeReg] != histMeasTime) needUpdate = true;
+    
+    settings =  ((histClrMode & 0x1)<<29) |
+                ((histMode    & 0x1)<<28) |
+                ((histEBin    & 0xF)<<20) |
+                histEMin & 0xFFFFF;
+
+    if ([self readReg:kFLTV4HistgrSettingsReg] != settings) needUpdate = true;
+    
+    
+    if (needUpdate) {
+        NSLog(@"Update histogram settings\n");
+        
+	   [self writeReg:kFLTV4HistMeasTimeReg value:histMeasTime];
+	   [self writeReg:kFLTV4HistgrSettingsReg value:settings];
+    
+       [self resetHistogramMode];
+    }
+}
+
+- (void) resetHistogramMode
+{
+    // Histogram mode is started when the mode flags in bit 28 or 29 are changed
+    // or if the run mode is changed to histogram mode
+
+/*
+    unsigned settings;
+    
+    settings = [self readReg:kFLTV4HistgrSettingsReg];
+    
+    settings ^= 0x1 << 28;
+    [self writeReg:kFLTV4HistgrSettingsReg value: settings];
+    
+    settings ^= 0x1 << 28;
+    [self writeReg:kFLTV4HistgrSettingsReg value: settings];
+*/
+
+    // Alternative
+    [self writeControlWithStandbyMode];
+    [self writeControl];
+    
+    lastHistReset = [self readReg:kFLTV4SecondCounterReg];
+    
+}
+
+- (unsigned long) getLastHistReset
+{
+    return (lastHistReset);
 }
 
 - (unsigned long) regAddress:(int)aReg channel:(int)aChannel

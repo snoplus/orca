@@ -121,6 +121,8 @@
     BOOL initializing;
 
     unsigned long inhibitBeforeThresholdFinder; //< used the threshold finder
+    unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
+    
 }
 
 #pragma mark •••Initialization
@@ -233,6 +235,8 @@
 - (void) setHistEBin:(unsigned long)aHistEBin;
 - (unsigned long) histEMin;
 - (void) setHistEMin:(unsigned long)aHistEMin;
+- (unsigned long) getLastHistReset;
+
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long)aDataId;
@@ -356,6 +360,7 @@
 - (void) printValueTable;
 - (void) printEventFIFOs;
 - (void) writeHistogramControl;
+- (void) resetHistogramMode;
 
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;
