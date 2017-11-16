@@ -3375,6 +3375,12 @@
 		B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */; };
 		B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4614E02B40003914FF /* ORADVME1314Model.h */; };
 		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
+		C6FAAAEC1FBDD5320069E81C /* ORWG1220PulserModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */; };
+		C6FAAAED1FBDD5320069E81C /* WG1220Pulser.tif in Resources */ = {isa = PBXBuildFile; fileRef = C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */; };
+		C6FAAAEE1FBDD5320069E81C /* ORWG1220PulserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */; };
+		C6FAAAEF1FBDD5320069E81C /* ORWG1220PulserController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6FAAAE91FBDD5310069E81C /* ORWG1220PulserController.m */; };
+		C6FAAAF01FBDD5320069E81C /* ORWG1220PulserController.h in Headers */ = {isa = PBXBuildFile; fileRef = C6FAAAEA1FBDD5310069E81C /* ORWG1220PulserController.h */; };
+		C6FAAAF11FBDD5320069E81C /* WG1220Pulser.nib in Resources */ = {isa = PBXBuildFile; fileRef = C6FAAAEB1FBDD5310069E81C /* WG1220Pulser.nib */; };
 		CE0216BC1512139A00456EB7 /* nEDMCoil.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE0216B71512139A00456EB7 /* nEDMCoil.nib */; };
 		CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */; };
 		CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */; };
@@ -7030,6 +7036,12 @@
 		B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Controller.m; sourceTree = "<group>"; };
 		B38DEE4614E02B40003914FF /* ORADVME1314Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Model.h; sourceTree = "<group>"; };
 		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
+		C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWG1220PulserModel.h; sourceTree = "<group>"; };
+		C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = WG1220Pulser.tif; sourceTree = "<group>"; };
+		C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWG1220PulserModel.m; sourceTree = "<group>"; };
+		C6FAAAE91FBDD5310069E81C /* ORWG1220PulserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWG1220PulserController.m; sourceTree = "<group>"; };
+		C6FAAAEA1FBDD5310069E81C /* ORWG1220PulserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWG1220PulserController.h; sourceTree = "<group>"; };
+		C6FAAAEB1FBDD5310069E81C /* WG1220Pulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = WG1220Pulser.nib; sourceTree = "<group>"; };
 		CE0216B71512139A00456EB7 /* nEDMCoil.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = nEDMCoil.nib; sourceTree = "<group>"; };
 		CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORnEDMCoilController.h; sourceTree = "<group>"; };
 		CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORnEDMCoilController.m; sourceTree = "<group>"; };
@@ -9715,6 +9727,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				C6FAAAE51FBDD5310069E81C /* WG1220Pulser */,
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
 				847D308417FF0B3000D2D8BC /* NeutonMonitor5085 */,
 				84DF4C96162F1B2100261144 /* Arduino */,
@@ -14367,6 +14380,19 @@
 			path = Advanet;
 			sourceTree = "<group>";
 		};
+		C6FAAAE51FBDD5310069E81C /* WG1220Pulser */ = {
+			isa = PBXGroup;
+			children = (
+				C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */,
+				C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */,
+				C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */,
+				C6FAAAE91FBDD5310069E81C /* ORWG1220PulserController.m */,
+				C6FAAAEA1FBDD5310069E81C /* ORWG1220PulserController.h */,
+				C6FAAAEB1FBDD5310069E81C /* WG1220Pulser.nib */,
+			);
+			path = WG1220Pulser;
+			sourceTree = "<group>";
+		};
 		CE0216B51512139A00456EB7 /* nEDM */ = {
 			isa = PBXGroup;
 			children = (
@@ -15341,6 +15367,7 @@
 				848648820975C1F6001C459D /* ORProcessInConnector.h in Headers */,
 				362020291CBD390A0089296E /* WPXMLRPCDecoderDelegate.h in Headers */,
 				848648960975C415001C459D /* ORProcessOutConnector.h in Headers */,
+				C6FAAAF01FBDD5320069E81C /* ORWG1220PulserController.h in Headers */,
 				848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */,
 				84B63C000978299E005B20A5 /* ORCountController.h in Headers */,
 				84B63C020978299E005B20A5 /* ORCountModel.h in Headers */,
@@ -16005,6 +16032,7 @@
 				8402B5B714C708A1007999C1 /* ORMJDPreAmpModel.h in Headers */,
 				848F6CAA14C75F690093E502 /* ORSIS3150Controller.h in Headers */,
 				848F6CAC14C75F690093E502 /* ORSIS3150Model.h in Headers */,
+				C6FAAAEC1FBDD5320069E81C /* ORWG1220PulserModel.h in Headers */,
 				8407398214CDD91F00BAD105 /* ORMet637Controller.h in Headers */,
 				8407398414CDD91F00BAD105 /* ORMet637Model.h in Headers */,
 				B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */,
@@ -16563,6 +16591,7 @@
 				0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */,
 				84AC14DF1B70E2460071C4EF /* MjdDataScanner.nib in Resources */,
 				840E00270944B29000049827 /* AndGate.tif in Resources */,
+				C6FAAAED1FBDD5320069E81C /* WG1220Pulser.tif in Resources */,
 				840E002F0944B29000049827 /* ORGate.tif in Resources */,
 				84F16AF718900D530074B787 /* XTR6.nib in Resources */,
 				840E00360944B29000049827 /* RSFlipFlop.tif in Resources */,
@@ -16980,6 +17009,7 @@
 				84E966CF11848BEF008D9119 /* Majorana.nib in Resources */,
 				84E966D011848BEF008D9119 /* Majorana.tif in Resources */,
 				848822A11D2413910030B398 /* DT5725.nib in Resources */,
+				C6FAAAF11FBDD5320069E81C /* WG1220Pulser.nib in Resources */,
 				84BF43CC118793FA00F55216 /* Caen1785.gif in Resources */,
 				84BF43CD118793FA00F55216 /* Caen1785.nib in Resources */,
 				8476200E118CD53D00016A8D /* 1dFit.nib in Resources */,
@@ -17302,6 +17332,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6FAAAEF1FBDD5320069E81C /* ORWG1220PulserController.m in Sources */,
 				8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */,
 				8434A2A7055B3287002D3102 /* main.m in Sources */,
 				8434A2A8055B3287002D3102 /* ORAppDelegate.m in Sources */,
@@ -17638,6 +17669,7 @@
 				840E00130944B29000049827 /* ORProcessHwAccessorController.m in Sources */,
 				840E00150944B29000049827 /* ORProcessNub.m in Sources */,
 				840E00170944B29000049827 /* ORInputElement.m in Sources */,
+				C6FAAAEE1FBDD5320069E81C /* ORWG1220PulserModel.m in Sources */,
 				840E00190944B29000049827 /* ORSPDTRelayController.m in Sources */,
 				0F16E3551C493AD7003C9EC9 /* net.c in Sources */,
 				840E001B0944B29000049827 /* ORSPDTRelayModel.m in Sources */,
