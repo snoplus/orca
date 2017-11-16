@@ -236,7 +236,7 @@
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
-	unsigned long long t=[model vetoTime];
+	//unsigned long long t=[model vetoTime];
 	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 

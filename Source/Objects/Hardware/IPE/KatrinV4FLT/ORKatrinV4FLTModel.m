@@ -921,17 +921,18 @@ static double table[32]={
     float ratio = new/old;
     int chan;
     
-    for(chan=0;chan<kNumV4FLTChannels;chan++){
-        unsigned long currentThreshold = [self threshold:chan];
-        [self setThreshold:chan withValue:currentThreshold*ratio];
-    }
-    
     filterShapingLength = newValue;
 	if(filterShapingLength == 8 && gapLength>0){
 		[self setGapLength:0];
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
+
+    for(chan=0;chan<kNumV4FLTChannels;chan++){
+        unsigned long currentThreshold = [self threshold:chan];
+        [self setThreshold:chan withValue:currentThreshold*ratio];
+    }
     
+
     //----------------------------------------------
     // Normalize the histogram settings -- take old settings if called during initialization
     if(!initializing){
