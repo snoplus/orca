@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -118,7 +118,7 @@
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" id="1284" userLabel="Amplitude Stepper">
                                     <rect key="frame" x="156" y="102" width="19" height="27"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <stepperCell key="cell" continuous="YES" alignment="left" maxValue="5000" valueWraps="YES" id="1290"/>
+                                    <stepperCell key="cell" continuous="YES" alignment="left" maxValue="5000" doubleValue="1" valueWraps="YES" id="1290"/>
                                     <connections>
                                         <action selector="amplitudeAction:" target="-2" id="ggW-XT-Vz5"/>
                                     </connections>
@@ -150,7 +150,7 @@
                                 <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" id="1291">
                                     <rect key="frame" x="156" y="43" width="19" height="27"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <stepperCell key="cell" continuous="YES" state="on" alignment="left" maxValue="5000" doubleValue="1" valueWraps="YES" id="1297"/>
+                                    <stepperCell key="cell" continuous="YES" state="on" alignment="left" maxValue="5000" valueWraps="YES" id="1297"/>
                                     <connections>
                                         <action selector="dutyCycleAction:" target="-2" id="1330"/>
                                     </connections>
@@ -302,6 +302,6 @@
     <resources>
         <image name="Locked" width="33" height="36"/>
         <image name="Unlocked" width="33" height="36"/>
-        <image name="WG1220Pulser" width="100" height="65"/>
+        <image name="WG1220Pulser" width="98" height="59"/>
     </resources>
 </document>

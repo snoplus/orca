@@ -78,10 +78,10 @@
 						object: model];
 
 		[notifyCenter addObserver : self
-											selector : @selector(signalFormChangedArb:)
-													name : ORWG1220PulserModelSignalFormArbitrary
-						object: model];
-
+                         selector : @selector(signalFormChangedArb:)
+                             name : ORWG1220PulserModelSignalFormArbitrary
+                            object: model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(amplitudeChanged:)
                          name : ORWG1220PulserModelAmplitudeChanged
@@ -124,17 +124,19 @@
 
 - (void) frequencyChanged:(NSNotification*)aNote
 {
+    [self updateStepper:frequencyStepper setting:[model frequency]];
 	[frequencyField setFloatValue: [model frequency]];
-	// todo: internal value frequencyStepper; when the value is changed in the text field, the stepper continues with the value that was last set with the stepper
 }
 
 - (void) dutyCycleChanged:(NSNotification*)aNote
 {
+    [self updateStepper:dutyCycleStepper setting:[model dutyCycle]];
 	[dutyCycleField setIntValue: [model dutyCycle]];
 }
 
 - (void) amplitudeChanged:(NSNotification*)aNote
 {
+    [self updateStepper:amplitudeStepper setting:[model amplitude]];
 	[amplitudeField setFloatValue: [model amplitude]];
 }
 
