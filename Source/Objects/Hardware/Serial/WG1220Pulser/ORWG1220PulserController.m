@@ -124,20 +124,20 @@
 
 - (void) frequencyChanged:(NSNotification*)aNote
 {
-    [self updateStepper:frequencyStepper setting:[model frequency]];
-	[frequencyField setFloatValue: [model frequency]];
+    [frequencyStepper setFloatValue: [model frequency]];
+	[frequencyField   setFloatValue: [model frequency]];
 }
 
 - (void) dutyCycleChanged:(NSNotification*)aNote
 {
-    [self updateStepper:dutyCycleStepper setting:[model dutyCycle]];
-	[dutyCycleField setIntValue: [model dutyCycle]];
+    [dutyCycleStepper setIntValue: [model dutyCycle]];
+	[dutyCycleField   setIntValue: [model dutyCycle]];
 }
 
 - (void) amplitudeChanged:(NSNotification*)aNote
 {
-    [self updateStepper:amplitudeStepper setting:[model amplitude]];
-	[amplitudeField setFloatValue: [model amplitude]];
+    [amplitudeStepper setFloatValue: [model amplitude]];
+	[amplitudeField   setFloatValue: [model amplitude]];
 }
 
 - (void) signalFormChanged:(NSNotification*)aNote
