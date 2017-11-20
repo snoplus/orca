@@ -278,14 +278,14 @@ tellieRunFiles = _tellieRunFiles;
         return;
     }
 
-    /* We don't have the lock. Open a modal dialog asking whether to quit Orca, retry immediately, or ignore the lock (hostile takeover). */
+    /* We don't have the lock. Open a modal dialog asking whether to quit Orca, retry immediately, or ignore the lock. */
     [(ORAppDelegate*)[NSApp delegate] closeSplashWindow];
 
     NSAlert* alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:@"Quit Orca"];
     [alert addButtonWithTitle:@"Retry Now"];
-    [alert addButtonWithTitle:@"Hostile Takeover"];
-    [alert setInformativeText:@"Cannot start Orca when another copy is already running.\n\nWaiting to acquire lock..."];
+    [alert addButtonWithTitle:@"Ignore Locking"];
+    [alert setInformativeText:@"Unable to obtain exclusive lock. (Is another copy of Orca running?)\n\nWaiting to acquire lock..."];
     [alert setAlertStyle:NSWarningAlertStyle];
 
     /* A timer to check the lock every 5 seconds, and close the window/proceed if we can obtain it. */
@@ -308,7 +308,7 @@ tellieRunFiles = _tellieRunFiles;
     } else if (modalAction == NSAlertSecondButtonReturn) {  // Retry Now
         [alert release];
         [self checkDatabaseLock:true];
-    } else if (modalAction == NSAlertThirdButtonReturn) {  // Hostile Takeover
+    } else if (modalAction == NSAlertThirdButtonReturn) {  // Ignore Locking
         [alert release];
         ignoreDBLock = YES;
     } else {
