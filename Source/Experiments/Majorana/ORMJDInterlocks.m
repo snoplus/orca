@@ -47,7 +47,6 @@ static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
 #define kAllowedResponseRetry   5
 
 #define kScmSlot 2
-NSString* scmIpNumber = @"151.150.226.70";
 
 @implementation ORMJDInterlocks
 
