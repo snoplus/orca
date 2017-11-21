@@ -3375,6 +3375,8 @@
 		B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */; };
 		B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4614E02B40003914FF /* ORADVME1314Model.h */; };
 		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
+		B8FCBD0C1FC39C5000209933 /* SessionDB.h in Headers */ = {isa = PBXBuildFile; fileRef = B8FCBD0A1FC39C5000209933 /* SessionDB.h */; };
+		B8FCBD0D1FC39C5000209933 /* SessionDB.m in Sources */ = {isa = PBXBuildFile; fileRef = B8FCBD0B1FC39C5000209933 /* SessionDB.m */; };
 		CE0216BC1512139A00456EB7 /* nEDMCoil.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE0216B71512139A00456EB7 /* nEDMCoil.nib */; };
 		CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */; };
 		CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */; };
@@ -7030,6 +7032,8 @@
 		B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Controller.m; sourceTree = "<group>"; };
 		B38DEE4614E02B40003914FF /* ORADVME1314Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Model.h; sourceTree = "<group>"; };
 		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
+		B8FCBD0A1FC39C5000209933 /* SessionDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionDB.h; sourceTree = "<group>"; };
+		B8FCBD0B1FC39C5000209933 /* SessionDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionDB.m; sourceTree = "<group>"; };
 		CE0216B71512139A00456EB7 /* nEDMCoil.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = nEDMCoil.nib; sourceTree = "<group>"; };
 		CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORnEDMCoilController.h; sourceTree = "<group>"; };
 		CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORnEDMCoilController.m; sourceTree = "<group>"; };
@@ -14464,6 +14468,8 @@
 				364124EB1EA04EB00041BAA3 /* record_info.h */,
 				364124E71EA04E8A0041BAA3 /* NHitMonitor.h */,
 				364124E81EA04E8A0041BAA3 /* NHitMonitor.m */,
+				B8FCBD0A1FC39C5000209933 /* SessionDB.h */,
+				B8FCBD0B1FC39C5000209933 /* SessionDB.m */,
 				1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */,
 				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
@@ -15574,6 +15580,7 @@
 				846B8F140E15972A00C41F9D /* ORICS8065Model.h in Headers */,
 				362020271CBD390A0089296E /* WPXMLRPCDecoder.h in Headers */,
 				9C8846860E2D8D960099B98E /* ORHP4405AController.h in Headers */,
+				B8FCBD0C1FC39C5000209933 /* SessionDB.h in Headers */,
 				9C88468A0E2D8D960099B98E /* ORHP4405AModel.h in Headers */,
 				9C7CE7E60E2FC22500F63679 /* ORCaen260Controller.h in Headers */,
 				9C7CE7E80E2FC22500F63679 /* ORCaen260Decoders.h in Headers */,
@@ -18086,6 +18093,7 @@
 				84F50A31116B7151000275F2 /* ORCmdLabelModel.m in Sources */,
 				8490D2991177532C00D25B1F /* ORIpeV4MiniCrateController.m in Sources */,
 				849951771D5CE50700A6FA40 /* ORMJDBiasWatcherController.m in Sources */,
+				B8FCBD0D1FC39C5000209933 /* SessionDB.m in Sources */,
 				8490D29B1177532C00D25B1F /* ORIpeV4MiniCrateModel.m in Sources */,
 				EFCC4547117FD45E008DC12C /* ORSNOCrateDecoders.m in Sources */,
 				84B94F151EE73434001BB201 /* ORKatrinV4SLTRegisters.m in Sources */,
