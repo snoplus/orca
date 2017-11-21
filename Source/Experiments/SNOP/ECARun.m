@@ -204,7 +204,7 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         [anMTCModel setIsPedestalEnabledInCSR:TRUE];
 
         /* Enable Pedestal mask for all the crates */
-        [anMTCModel setPedCrateMask: 0x7FFFF];
+        [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF)];
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"setECASettings: error setting MTC model settings. name: %@ reason: %@.\n", [e name], [e reason]);
         goto err;
