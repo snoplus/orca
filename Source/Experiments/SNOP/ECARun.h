@@ -34,7 +34,6 @@
     int prev_coarsedelay;
     int prev_finedelay;
     uint16_t prev_pedwidth;
-    uint32_t prev_gtmask;
     uint32_t prev_pedmask;
 
     //ECA thread
