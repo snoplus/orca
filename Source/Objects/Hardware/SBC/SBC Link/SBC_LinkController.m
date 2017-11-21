@@ -334,6 +334,12 @@
                      selector : @selector(timeSkewChanged:)
                          name : SBC_LinkTimeSkewChanged
                        object : [model sbcLink]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(disableThrottleChanged:)
+                         name : SBC_LinkSbcDisableThrottleChanged
+                       object : [model sbcLink]];
+    
 }
 
 - (void) updateWindow
@@ -372,6 +378,12 @@
 	[self codeVersionChanged:nil];
 	[self sbcPollingTimeChanged:nil];
     [self timeSkewChanged:nil];
+    [self disableThrottleChanged:nil];
+}
+
+- (void) disableThrottleChanged:(NSNotification*)aNote
+{
+    [self updateRadioCluster:disableThrottleMatrix setting:[[model sbcLink] disableThrottle]];
 }
 
 - (void) sbcPollingTimeChanged:(NSNotification*)aNote
@@ -574,7 +586,8 @@
     [verboseButton setEnabled:!locked && !runInProgress];
 	[shutdownRebootButton setEnabled:!locked && !runInProgress];
     [errorTimeOutPU setEnabled:!locked];
-	[checkVersionButton setEnabled:connected];
+    [checkVersionButton setEnabled:connected];
+    [disableThrottleMatrix setEnabled:!runInProgress];
 
 	[self setToggleCrateButtonState];
 }
@@ -764,6 +777,10 @@
 }
 
 #pragma mark ¥¥¥Actions
+- (IBAction) disableThrottleAction:(id)sender
+{
+    [[model sbcLink] setDisableThrottle:[[sender selectedCell] tag]];
+}
 - (IBAction) sbcPollingTimeAction:(id)sender
 {
     [[model sbcLink] setSbcPollingRate:[[sender selectedItem]tag]];
