@@ -182,35 +182,31 @@ NSString* ORECARunFinishedNotification = @"ORECARunFinishedNotification";
         goto err;
     }
 
-    // If we are here, that means this is an ECA run. Do the thing:
-    // Start a maintenance run with previous settings after ECAs are done
-    prev_gtmask = [anMTCModel GTCrateMask];
-    prev_pedmask = [anMTCModel pedCrateMask];
-    prev_coarsedelay = [anMTCModel coarseDelay];
-    prev_finedelay = [anMTCModel fineDelay];
-    prev_pedwidth = [anMTCModel pedestalWidth];
-
-    /* Set pulser rate:
-     * If we starting an ECA run we have to set the pulser
-     * rate enter by the operator, not the standard run one */
     objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
     if (![objs count]) {
         NSLogColor([NSColor redColor], @"setECASettings: MTC not found.\n");
         goto err;
     }
 
+    anMTCModel = [objs objectAtIndex:0];
+
+    /* Get current MTC settings which aren't loaded by the standard run so we
+     * can set them back after the ECA run is finished. */
+    prev_pedmask = [anMTCModel pedCrateMask];
+    prev_coarsedelay = [anMTCModel coarseDelay];
+    prev_finedelay = [anMTCModel fineDelay];
+    prev_pedwidth = [anMTCModel pedestalWidth];
+
     @try {
-        anMTCModel = [objs objectAtIndex:0];
         [anMTCModel setPgtRate:[[self ECA_rate] floatValue]];
 
         /* Enable Pedestals */
         [anMTCModel setIsPedestalEnabledInCSR:TRUE];
 
-        /* Enable Pedestal and GT crate mask for all the crates */
-        [anMTCModel setGTCrateMask: (prev_gtmask | 0x7FFFF) ];
-        [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF) ];
-    }
-    @catch (...) {
+        /* Enable Pedestal mask for all the crates */
+        [anMTCModel setPedCrateMask: (prev_pedmask | 0x7FFFF)];
+    } @catch (NSException *e) {
+        NSLogColor([NSColor redColor], @"setECASettings: error setting MTC model settings. name: %@ reason: %@.\n", [e name], [e reason]);
         goto err;
     }
 
@@ -357,7 +353,6 @@ err:
         dispatch_sync(dispatch_get_main_queue(), ^{
             [aSNOPModel zeroPedestalMasks];
             [anMTCModel setPedestalWidth:prev_pedwidth];
-            [anMTCModel setGTCrateMask:prev_gtmask];
             [anMTCModel setPedCrateMask:prev_pedmask];
             [anMTCModel setCoarseDelay:prev_coarsedelay];
             [anMTCModel setFineDelay:prev_finedelay];
