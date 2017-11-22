@@ -45,12 +45,6 @@
                 <outlet property="loadedTellieOperationLabel" destination="syb-lx-DpA" id="xtf-30-SAG"/>
                 <outlet property="loadedTellieRunNameLabel" destination="FCg-q6-iyf" id="ukT-F4-he3"/>
                 <outlet property="loadedTellieRunTimeLabel" destination="lqW-Ew-72m" id="809-bM-1kF"/>
-                <outlet property="lockDBID" destination="uZ3-NW-Xqt" id="7ey-We-Maw"/>
-                <outlet property="lockDBIPAddress" destination="twq-b6-2jK" id="9Lv-80-brD"/>
-                <outlet property="lockDBName" destination="UeC-s7-JHc" id="3tF-gk-nOs"/>
-                <outlet property="lockDBPort" destination="MVZ-YX-g8u" id="Pvr-8N-o1S"/>
-                <outlet property="lockDBPswd" destination="xu0-2f-77h" id="1sT-0r-hdd"/>
-                <outlet property="lockDBUser" destination="DzY-Ca-542" id="at8-xj-Dpo"/>
                 <outlet property="lockStatusTextField" destination="Np3-DI-Iif" id="5ty-0b-EY4"/>
                 <outlet property="logHost" destination="KzD-He-2lG" id="LXs-Sy-EvF"/>
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
@@ -87,6 +81,12 @@
                 <outlet property="runTypeWordMatrix" destination="3935" id="GbT-ZR-J8S"/>
                 <outlet property="runTypeWordSRMatrix" destination="zuQ-GY-eWY" id="e1l-GQ-cUd"/>
                 <outlet property="runsLockButton" destination="URx-nh-GMP" id="E2u-gI-0d3"/>
+                <outlet property="sessionDBAddress" destination="twq-b6-2jK" id="Wto-Rx-LcC"/>
+                <outlet property="sessionDBLockID" destination="uZ3-NW-Xqt" id="FXV-S3-IQX"/>
+                <outlet property="sessionDBName" destination="UeC-s7-JHc" id="nAj-kA-B7V"/>
+                <outlet property="sessionDBPassword" destination="xu0-2f-77h" id="pA2-hN-4hV"/>
+                <outlet property="sessionDBPort" destination="MVZ-YX-g8u" id="w4s-eW-bPv"/>
+                <outlet property="sessionDBUser" destination="DzY-Ca-542" id="KpO-P1-Fdq"/>
                 <outlet property="smellieEmergencyStop" destination="uhs-DN-ePI" id="MPy-Ac-3Gi"/>
                 <outlet property="smellieLoadRunFile" destination="wQo-rL-aDD" id="7t3-LC-Ad3"/>
                 <outlet property="smellieRunFileNameField" destination="3cW-2R-0PG" id="deA-fT-6xF"/>
@@ -4883,7 +4883,7 @@
                                                             </allowedInputSourceLocales>
                                                         </secureTextFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBPassword" id="Dbf-R5-xzl"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBPassword" id="fpF-40-27C"/>
                                                         </connections>
                                                     </secureTextField>
                                                     <textField focusRingType="none" verticalHuggingPriority="750" id="vjd-Nl-BYI">
@@ -4895,18 +4895,6 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" id="UeC-s7-JHc">
-                                                        <rect key="frame" x="59" y="41" width="96" height="19"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="QHN-SN-oBd">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBName" id="ZxG-IO-dI4"/>
-                                                        </connections>
-                                                    </textField>
                                                     <textField verticalHuggingPriority="750" id="twq-b6-2jK">
                                                         <rect key="frame" x="59" y="14" width="142" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -4916,7 +4904,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBIPAddress" id="B63-1q-fOP"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBAddress" id="Fwv-iC-HK4"/>
                                                         </connections>
                                                     </textField>
                                                     <textField focusRingType="none" verticalHuggingPriority="750" id="1MQ-Jl-xJA">
@@ -4937,7 +4925,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBPort" id="BXK-2y-swJ"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBPort" id="BKv-WW-aP2"/>
                                                         </connections>
                                                     </textField>
                                                     <textField focusRingType="none" verticalHuggingPriority="750" id="l5e-0e-l6U">
@@ -4958,7 +4946,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBLockID" id="yrD-MH-8IJ"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBLockID" id="Qez-nT-mGJ"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="DzY-Ca-542">
@@ -4970,7 +4958,19 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBUserName" id="MnY-0t-7G0"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBUsername" id="j1c-RN-YOQ"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="UeC-s7-JHc">
+                                                        <rect key="frame" x="59" y="42" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="QHN-SN-oBd">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBName" id="2RR-u9-mBa"/>
                                                         </connections>
                                                     </textField>
                                                 </subviews>
