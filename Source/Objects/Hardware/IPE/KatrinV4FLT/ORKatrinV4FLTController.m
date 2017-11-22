@@ -1010,8 +1010,8 @@
 {
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] << [model filterShapingLength]];
-		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] << [model filterShapingLength]];
+		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
 	}
 }
 
