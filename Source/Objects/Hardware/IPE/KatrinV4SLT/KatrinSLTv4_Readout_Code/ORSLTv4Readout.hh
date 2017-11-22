@@ -2,7 +2,13 @@
 #define _ORSLTv4Readout_hh_
 #include "ORVCard.hh"
 #include <iostream>
+#include <sys/time.h> 
 
+typedef enum readoutModeType {
+    kStandard,
+    kLocal,
+    kSimulation
+} readoutMode;
 
 /** For each IPE4 crate in the Orca configuration one instance of ORSLTv4Readout is constructed.
   *
@@ -13,15 +19,61 @@
   * 'kCodeVersion' in HW_Readout.cc should be increased!
   *
   *
-  */ //-tb-
+  */
 class ORSLTv4Readout : public ORVCard
 {
   public:
-    ORSLTv4Readout(SBC_card_info* ci) : ORVCard(ci) {} 
-    virtual ~ORSLTv4Readout() {} 
+    ORSLTv4Readout(SBC_card_info* ci);
+    virtual ~ORSLTv4Readout() {}
+    virtual bool Start();
     virtual bool Readout(SBC_LAM_Data*);
+
+    virtual bool Stop();
+    
+    /** Readout energy mode with firmware 3.1 */
+    bool ReadoutEnergyV31(SBC_LAM_Data*);
+    
+    /** Readout energies and write to local disk */
+    bool LocalReadoutEnergyV31(SBC_LAM_Data*);
+
+    /** Open readout file */
+    void LocalReadoutInit();
+
+    /** Open readout file */
+    void LocalReadoutClose();
+
+    /** Simulate readout for performnace tests.
+      * Parameter: block size, data rate 
+      */
+    bool SimulationReadoutEnergyV31(SBC_LAM_Data*);
+    
+    /** Generate a template readout block */
+    void SimulationInit();
+    
+    
    private:
     bool firstTime;
+    unsigned long long int nNoData; //< Number of loops where no data was read
+    
+    struct timeval t0;
+    struct timeval t1;
+    uint32_t numWordsToRead; //< Number of word read in the last cycle
+    unsigned long long int nWords; //< Number of raw bytes recorded
+    unsigned long long int nLoops; //< Number of calls to the readout function
+    unsigned long long int nReadout; //< Number of calls with readout of data
+    unsigned long long int nReducedSize; //< Number of calls and readout of less than maximum block size
+    unsigned long long int nNoReadout; //<  Number of loops without readout
+    unsigned long long int maxLoopsPerSec; //< Speed of the readout loop; used for analysis
+    
+    readoutMode mode; //< control the readout function (standard, local storage, simulation)
+
+    int filePtr; //< File pointer
+    uint32_t dataBuffer[8192]; //< maximal DMA block size
+   
+    
+    uint32_t simBlockSize; //< block size used in simulation (6 words)
+    uint32_t simDataRate; // < desired data in simulation (MB/s)
+    
 };
 
 #endif /* _ORSLTv4Readout_hh_*/
