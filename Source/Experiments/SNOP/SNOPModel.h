@@ -25,6 +25,7 @@
 #import "RedisClient.h"
 #import "ECARun.h"
 #import "NHitMonitor.h"
+#import "SessionDB.h"
 
 @class ORCouchDB;
 @class ORRunModel;
@@ -49,15 +50,7 @@ BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
-    ORPQConnection* dbLockConnection;
-    BOOL ignoreDBLock;
-    NSString* _lockDBUserName;
-    NSString* _lockDBPassword;
-    NSString* _lockDBName;
-    NSString* _lockDBIPAddress;
-    unsigned int _lockDBPort;
-    unsigned int _lockDBLockID;
-    NSNumber* _sessionKey;
+    SessionDB* sessionDB;
 
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
@@ -125,6 +118,7 @@ BOOL isNotRunningOrIsInMaintenance();
     int nhitMonitorPulserRate;
     int nhitMonitorNumPulses;
     int nhitMonitorMaxNhit;
+
     /* Settings for running the nhit monitor automatically during runs. */
     BOOL nhitMonitorAutoRun;
     int nhitMonitorAutoPulserRate;
@@ -155,14 +149,6 @@ BOOL isNotRunningOrIsInMaintenance();
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunFiles;
-
-@property (nonatomic,copy) NSString* lockDBUserName;
-@property (nonatomic,copy) NSString* lockDBPassword;
-@property (nonatomic,copy) NSString* lockDBName;
-@property (nonatomic,copy) NSString* lockDBIPAddress;
-@property (nonatomic,assign) unsigned int lockDBPort;
-@property (nonatomic,assign) unsigned int lockDBLockID;
-@property (nonatomic,copy) NSNumber* sessionKey;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -197,12 +183,18 @@ BOOL isNotRunningOrIsInMaintenance();
 - (id) init;
 - (void) awakeAfterDocumentLoaded;
 
-- (bool) initOrcaSessionDBConnection;
-- (void) postSessionStart;
-- (bool) acquireDatabaseLock : (bool) connect;
-- (void) checkDatabaseLock : (bool) connect;
-- (void) timerCheckDatabaseLockModal : (NSTimer*) timer;
-- (void) timerCheckDatabaseLock : (NSTimer*) timer;
+- (void) setSessionDBUsername: (NSString *) username;
+- (NSString *) sessionDBUsername;
+- (void) setSessionDBPassword: (NSString *) password;
+- (NSString *) sessionDBPassword;
+- (void) setSessionDBName: (NSString *) dbname;
+- (NSString *) sessionDBName;
+- (void) setSessionDBAddress: (NSString *) address;
+- (NSString *) sessionDBAddress;
+- (void) setSessionDBPort: (unsigned int) port;
+- (unsigned int) sessionDBPort;
+- (void) setSessionDBLockID: (unsigned int) lockID;
+- (unsigned int) sessionDBLockID;
 
 - (void) setMTCPort: (int) port;
 - (int) mtcPort;
@@ -254,7 +246,6 @@ BOOL isNotRunningOrIsInMaintenance();
 - (void) subRunStarted:(NSNotification*)aNote;
 - (void) subRunEnded:(NSNotification*)aNote;
 - (void) detectorStateChanged:(NSNotification*)aNote;
-- (void) postSessionEnd: (NSNotification*) aNote;
 
 - (void) enableGlobalSecurity;
 

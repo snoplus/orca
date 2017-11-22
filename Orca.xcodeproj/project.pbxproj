@@ -3375,6 +3375,8 @@
 		B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */; };
 		B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4614E02B40003914FF /* ORADVME1314Model.h */; };
 		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
+		B86F08771FC517DE0076A269 /* SessionDB.h in Headers */ = {isa = PBXBuildFile; fileRef = B86F08751FC517DE0076A269 /* SessionDB.h */; };
+		B86F08781FC517DE0076A269 /* SessionDB.m in Sources */ = {isa = PBXBuildFile; fileRef = B86F08761FC517DE0076A269 /* SessionDB.m */; };
 		C6FAAAEC1FBDD5320069E81C /* ORWG1220PulserModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */; };
 		C6FAAAED1FBDD5320069E81C /* WG1220Pulser.tif in Resources */ = {isa = PBXBuildFile; fileRef = C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */; };
 		C6FAAAEE1FBDD5320069E81C /* ORWG1220PulserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */; };
@@ -7036,6 +7038,8 @@
 		B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Controller.m; sourceTree = "<group>"; };
 		B38DEE4614E02B40003914FF /* ORADVME1314Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Model.h; sourceTree = "<group>"; };
 		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
+		B86F08751FC517DE0076A269 /* SessionDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionDB.h; sourceTree = "<group>"; };
+		B86F08761FC517DE0076A269 /* SessionDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionDB.m; sourceTree = "<group>"; };
 		C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWG1220PulserModel.h; sourceTree = "<group>"; };
 		C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = WG1220Pulser.tif; sourceTree = "<group>"; };
 		C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWG1220PulserModel.m; sourceTree = "<group>"; };
@@ -14490,6 +14494,8 @@
 				364124EB1EA04EB00041BAA3 /* record_info.h */,
 				364124E71EA04E8A0041BAA3 /* NHitMonitor.h */,
 				364124E81EA04E8A0041BAA3 /* NHitMonitor.m */,
+				B86F08751FC517DE0076A269 /* SessionDB.h */,
+				B86F08761FC517DE0076A269 /* SessionDB.m */,
 				1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */,
 				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
@@ -16016,6 +16022,7 @@
 				8475EC3D1475A66F003A165D /* ORLabJackController.h in Headers */,
 				8475EC3F1475A66F003A165D /* ORLabJackDecoders.h in Headers */,
 				8475EC411475A66F003A165D /* ORLabJackModel.h in Headers */,
+				B86F08771FC517DE0076A269 /* SessionDB.h in Headers */,
 				8475EC461475A66F003A165D /* ORLabJackUE9Controller.h in Headers */,
 				8475EC481475A66F003A165D /* ORLabJackUE9Decoders.h in Headers */,
 				8475EC4A1475A66F003A165D /* ORLabJackUE9Model.h in Headers */,
@@ -17824,6 +17831,7 @@
 				84F46F420CA44255007EFADA /* ORIpeCrateModel.m in Sources */,
 				84F46F480CA44255007EFADA /* ORIpeFLTController.m in Sources */,
 				84F46F4A0CA44255007EFADA /* ORIpeFLTDecoder.m in Sources */,
+				B86F08781FC517DE0076A269 /* SessionDB.m in Sources */,
 				84F46F4D0CA44255007EFADA /* ORIpeFLTModel.m in Sources */,
 				84F46F520CA44255007EFADA /* ORIpeSLTController.m in Sources */,
 				84F46F550CA44255007EFADA /* ORIpeSLTModel.m in Sources */,
