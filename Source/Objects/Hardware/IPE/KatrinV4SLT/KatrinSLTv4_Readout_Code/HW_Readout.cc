@@ -159,6 +159,11 @@ void FindHardware(void)
         printf("  ->register name is %s, addr 0x%08lx\n", reg->getName(),reg->getAddr());
         fflush(stdout);
     }
+    
+    //
+    // Todo: Check the hardware; read serial numbers and versions -ak-
+    //
+    
 #endif
 }
 

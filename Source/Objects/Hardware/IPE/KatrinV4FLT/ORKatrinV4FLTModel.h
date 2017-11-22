@@ -97,8 +97,6 @@
     int customVariable;
     int poleZeroCorrection;
     double decayTime;
-    int syncWithRunControl;
-    int syncWithRunControlCounterFlag;
     int runControlState;
 	ORAlarm* fltV4useDmaBlockReadAlarm;
     int useDmaBlockRead;
@@ -121,6 +119,8 @@
     BOOL initializing;
 
     unsigned long inhibitBeforeThresholdFinder; //< used the threshold finder
+    unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
+    
 }
 
 #pragma mark •••Initialization
@@ -134,8 +134,6 @@
 - (void) registerNotificationObservers;
 - (void) runIsAboutToStop:(NSNotification*)aNote;
 - (void) runIsAboutToChangeState:(NSNotification*)aNote;
-- (void) syncWithRunControlStart:(int)numHistograms;
-- (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
 - (int) energyOffset;
@@ -155,8 +153,6 @@
 - (void) setBoxcarLength:(int)aBoxcarLength;
 - (int) useDmaBlockRead;
 - (void) setUseDmaBlockRead:(int)aUseDmaBlockRead;
-- (int) syncWithRunControl;
-- (void) setSyncWithRunControl:(int)aSyncWithRunControl;
 - (double) decayTime;
 - (void) setDecayTime:(double)aDecayTime;
 - (int) poleZeroCorrection;
@@ -233,6 +229,8 @@
 - (void) setHistEBin:(unsigned long)aHistEBin;
 - (unsigned long) histEMin;
 - (void) setHistEMin:(unsigned long)aHistEMin;
+- (unsigned long) getLastHistReset;
+
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long)aDataId;
@@ -356,6 +354,7 @@
 - (void) printValueTable;
 - (void) printEventFIFOs;
 - (void) writeHistogramControl;
+- (void) resetHistogramMode;
 
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;
@@ -446,7 +445,6 @@ extern NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged;
 extern NSString* ORKatrinV4FLTModelUseSLTtimeChanged;
 extern NSString* ORKatrinV4FLTModelBoxcarLengthChanged;
 extern NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged;
-extern NSString* ORKatrinV4FLTModelSyncWithRunControlChanged;
 extern NSString* ORKatrinV4FLTModelDecayTimeChanged;
 extern NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged;
 extern NSString* ORKatrinV4FLTModelCustomVariableChanged;

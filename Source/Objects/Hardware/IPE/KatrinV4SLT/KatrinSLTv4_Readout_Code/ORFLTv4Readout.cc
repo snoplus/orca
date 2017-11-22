@@ -423,7 +423,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 }
                                 else{
                                     //read histogram block
-                                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
+                                    srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
                                     theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
                                     theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
                                     theEventData.histogramLength =2048;
@@ -840,7 +840,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
                                 }
                                 else{
                                     //read histogram block
-                                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
+                                    srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*)shipHistogramBuffer32, 0, 2048);
                                     theEventData.firstBin  = 0;//histogramDataFirstBin[chan];//read in readHistogramDataForChan ... [self readFirstBinForChan: chan];
                                     theEventData.lastBin   = 2047;//histogramDataLastBin[chan]; //                "                ... [self readLastBinForChan:  chan];
                                     theEventData.histogramLength =2048;
@@ -949,18 +949,101 @@ bool ORFLTv4Readout::Stop()
     
     uint32_t daqRunMode         = GetDeviceSpecificData()[5];
     if(daqRunMode == kKatrinV4Flt_Histogram_DaqMode){
-    
+   
+        //
+        // Readout active page if necessary
+        //
+        uint32_t crate                  = GetCrate();
+        uint32_t col                    = GetSlot() - 1;
         
-        // Todo: -ak-
-        /// Wait for the last histogram to get finished if necessary !!!
-        // Slepp - or return with false ???
+        //uint32_t runFlags               = GetDeviceSpecificData()[3];  //this is runFlagsMask of ORKatrinV4FLTModel.m,
         
-        // Alternative: Read the last histogram from the other page if histogram is not ready at the end of the run
-        // Add to sum of histograms
-        // Ship data
+        uint32_t triggerEnabledMask     = GetDeviceSpecificData()[4];
+        uint32_t filterShapingLength    = GetDeviceSpecificData()[9];       //TODO: need to change in the code below! -tb-
+        uint32_t boxcarLen              = GetDeviceSpecificData()[11];
+        
+        uint32_t histogramId            = GetHardwareMask()[2];
+        
+        uint32_t location   =   ((crate     & 0x0000001e)<<21) |
+        (((col+1)   & 0x0000001f)<<16) |
+        ((boxcarLen & 0x00000003)<<4)  |
+        (filterShapingLength & 0xf);  //TODO:  remove filterIndex (remove in decoders, too!) -tb-
+        
+        uint32_t tRec;
+        uint32_t histoRefreshTime;
+        uint32_t fpgaHistogramID;
+        uint32_t pageAB;
+        uint32_t histoBuffer[2048];
+        uint32_t *ptrHistoBuffer;
         
         
+        histoRefreshTime    = srack->theFlt[col]->histMeasTime->read();
+        tRec = srack->theFlt[col]->histRecTime->read();
         
+        //printf("Rec time %d / %d sec \n", tRec, histoRefreshTime);
+        
+        if (tRec > 0) {
+            
+            pageAB    = srack->theFlt[col]->status->histPageAB->read();
+            fpgaHistogramID = srack->theFlt[col]->histNofMeas->read();
+            histoReadoutSec  = srack->theFlt[col]->secondCounter->read();
+
+            for(int chan=0;chan<kNumChan;chan++) {
+                if((triggerEnabledMask & (0x1L << chan)) ){
+                    //currentFlt->histLastFirst->read(chan);  //read to cache ... Must do!!!
+                    //uint32_t first       = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
+                    // uint32_t last        = currentFlt->histLastFirst->histLastEntry->getCache(chan);
+                    
+                    if( !histoShipSumOnly ){
+                        
+                        uint32_t totalLength = 12 + 2048;
+                        ensureDataCanHold(totalLength);
+                        data[dataIndex++] = histogramId | totalLength;
+                        data[dataIndex++] = location | chan<<8;
+                        data[dataIndex++] = histoReadoutSec - tRec;
+                        data[dataIndex++] = tRec;
+                        data[dataIndex++] = 0;                  //first bin
+                        data[dataIndex++] = 2047;               //last bin
+                        data[dataIndex++] = 2048;               //histo len
+                        data[dataIndex++] = 2048;               //max histo len
+                        data[dataIndex++] = histoBinWidth;
+                        data[dataIndex++] = histoEnergyOffset;
+                        data[dataIndex++] = fpgaHistogramID;    //from HW
+                        data[dataIndex++] = pageAB & 0x1;
+
+                        // Select page before readout
+                        srack->theSlt->pageSelect->write(0x100 | (pageAB << 1));
+                        
+                        ptrHistoBuffer = (uint32_t *) &data[dataIndex];
+                        srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) ptrHistoBuffer, 0, 2048);
+                        dataIndex += 2048;
+                        
+                    } else {
+                        srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) histoBuffer, 0, 2048);
+                        ptrHistoBuffer = histoBuffer;
+                        
+                    }
+
+                    //printf("%d: t %d histogram counts %lld final\n", histoReadoutSec, tRec, Counts(ptrHistoBuffer));
+
+                    
+                    // Add histogram to sum histogram
+                    if( histoShipSumHistogram || histoShipSumOnly ){
+                        recordingTimeSum[chan] += histoRefreshTime;
+                        for(int i=0; i<2048;i++){//TODO: need to use firstBin...lastBin for parts of histograms -tb-
+                            sumHistogram[chan][i] += ptrHistoBuffer[i];
+                        }
+                    }
+
+                }
+        
+            }
+        }
+        
+        
+        //
+        // Ship sum histogram
+        //
         if (histoShipSumHistogram || histoShipSumOnly ){
             
             uint32_t crate                  = GetCrate();
@@ -992,7 +1075,7 @@ bool ORFLTv4Readout::Stop()
                     ensureDataCanHold(totalLength);
                     data[dataIndex++] = histogramId | totalLength;
                     data[dataIndex++] = location | chan<<8;
-                    data[dataIndex++] = histoReadoutSec;
+                    data[dataIndex++] = histoReadoutSec - recordingTimeSum[chan];
                     data[dataIndex++] = recordingTimeSum[chan];
                     data[dataIndex++] = 0;                  //first bin
                     data[dataIndex++] = 2047;               //last bin
@@ -1192,7 +1275,7 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
     
     uint32_t  histoBuffer[2048];
     uint32_t  *ptrHistoBuffer;
-    
+    uint32_t  pageReadout;
     
     hw4::FltKatrin *currentFlt = srack->theFlt[col];
     //if(runFlags && firstTime){// firstTime
@@ -1209,31 +1292,25 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
         }
         histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
         histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
+        histoClearByUser    = currentFlt->histogramSettings->histClearModeManual->getCache();
         histoRefreshTime    = currentFlt->histMeasTime->read();
         histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
         histoShipSumOnly    = runFlags & kShipSumOnlyHistogramFlag;
         
-        printf("Histogram parameter: min %d bin %d\n", histoEnergyOffset, histoBinWidth);
-        
         //clear the buffers for the sum histogram
         ClearSumHistogramBuffer();
-        
-        //set page manager to automatic mode
-        //srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
-        srack->theSlt->pageSelect->write((long unsigned int)0x0);
-        //reset histogram time counters (=histRecTime=refresh time -tb-) //TODO: unfortunately there is no such command for the histogramming -tb- 2010-07-28
-        //TODO: srack->theFlt[col]->command->resetPointers->write(1);
-        //clear histogram (probably not really necessary with "automatic clear" -tb-)
-        
-        //
-        // Todo Move to intialization sequence !!!
-        // Needs to be done before starting the readout !!!
-        //
-        srack->theFlt[col]->command->resetPages->write(1);
         
         
         pageAB    = srack->theFlt[col]->status->histPageAB->read();
         oldPageAB = pageAB;
+  
+        // Clear page - might not be necessary when starting with reset ?!
+        if (histoClearByUser) {
+            pageReadout = ((pageAB+1)%2) *2;
+            srack->theSlt->pageSelect->write(0x100 | pageReadout);
+            srack->theFlt[col]->command->resetPages->write(1);
+        }
+        
     }
     
     else {
@@ -1251,35 +1328,45 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
                     //currentFlt->histLastFirst->read(chan);  //read to cache ... Must do!!!
                     //uint32_t first       = currentFlt->histLastFirst->histFirstEntry->getCache(chan);
                     // uint32_t last        = currentFlt->histLastFirst->histLastEntry->getCache(chan);
-                
+
+                    // Select readout page
+                    pageReadout = ((pageAB+1)%2);
+                    srack->theSlt->pageSelect->write(0x100 | (pageReadout << 1));
+                    
                     if( !histoShipSumOnly ){
-    
-                    uint32_t totalLength = 12 + 2048;
-                    ensureDataCanHold(totalLength);
-                    data[dataIndex++] = histogramId | totalLength;
-                    data[dataIndex++] = location | chan<<8;
-                    data[dataIndex++] = histoReadoutSec;
-                    data[dataIndex++] = histoRefreshTime;
-                    data[dataIndex++] = 0;                  //first bin
-                    data[dataIndex++] = 2047;               //last bin
-                    data[dataIndex++] = 2048;               //histo len
-                    data[dataIndex++] = 2048;               //max histo len
-                    data[dataIndex++] = histoBinWidth;
-                    data[dataIndex++] = histoEnergyOffset;
-                    data[dataIndex++] = fpgaHistogramID;    //from HW
-                    data[dataIndex++] = pageAB & 0x1;
-                    ptrHistoBuffer = (uint32_t *) &data[dataIndex];
-                    srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) ptrHistoBuffer, 0, 2048);
-                    dataIndex += 2048;
+                        
+                        uint32_t totalLength = 12 + 2048;
+                        ensureDataCanHold(totalLength);
+                        data[dataIndex++] = histogramId | totalLength;
+                        data[dataIndex++] = location | chan<<8;
+                        data[dataIndex++] = histoReadoutSec - histoRefreshTime;
+                        data[dataIndex++] = histoRefreshTime;
+                        data[dataIndex++] = 0;                  //first bin
+                        data[dataIndex++] = 2047;               //last bin
+                        data[dataIndex++] = 2048;               //histo len
+                        data[dataIndex++] = 2048;               //max histo len
+                        data[dataIndex++] = histoBinWidth;
+                        data[dataIndex++] = histoEnergyOffset;
+                        data[dataIndex++] = fpgaHistogramID;    //from HW
+                        data[dataIndex++] = pageReadout;
+                        ptrHistoBuffer = (uint32_t *) &data[dataIndex];
+                            
+                        srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) ptrHistoBuffer, 0, 2048);
+                        dataIndex += 2048;
                         
                     } else {
-                        srack->theFlt[col]->histogramData->readBlockAutoInc(chan,  (long unsigned int*) histoBuffer, 0, 2048);
+                        srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) histoBuffer, 0, 2048);
                         ptrHistoBuffer = histoBuffer;
                         
                     }
                     
+                    //printf("%d: t %d histogram id %d counts %lld\n", histoReadoutSec,
+                    //      histoRefreshTime, fpgaHistogramID, Counts(ptrHistoBuffer));
+                    
+                    
                     // Clear the current page after readout
-                    srack->theFlt[col]->command->resetPages->write(1);
+                    if (histoClearByUser) srack->theFlt[col]->command->resetPages->write(1);
+                    
                     
                     // Add histogram to sum histogram
                     if( histoShipSumHistogram || histoShipSumOnly ){
@@ -1300,6 +1387,19 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
 
     return true;
     
+}
+
+
+unsigned long long ORFLTv4Readout::Counts(uint32_t *histogram)
+{
+    int i;
+    unsigned long long sum;
+
+    sum = 0;
+    for (i=0;i<2048;i++)
+        sum = sum + histogram[i];
+    
+    return(sum);
 }
 
 

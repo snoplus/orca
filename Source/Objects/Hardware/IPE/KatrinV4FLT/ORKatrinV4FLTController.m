@@ -375,11 +375,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(syncWithRunControlChanged:)
-                         name : ORKatrinV4FLTModelSyncWithRunControlChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(useDmaBlockReadChanged:)
                          name : ORKatrinV4FLTModelUseDmaBlockReadChanged
 						object: model];
@@ -475,11 +470,6 @@
 {
 	[useDmaBlockReadPU selectItemWithTag: [model useDmaBlockRead]];
 	//[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];//obsolete -tb-
-}
-
-- (void) syncWithRunControlChanged:(NSNotification*)aNote
-{
-	[syncWithRunControlButton setIntValue: [model syncWithRunControl]];
 }
 
 - (void) recommendedPZCChanged:(NSNotification*)aNote
@@ -728,7 +718,6 @@
 	[self poleZeroCorrectionChanged:nil];
 	[self decayTimeChanged:nil];
 	[self recommendedPZCChanged:nil];
-	[self syncWithRunControlChanged:nil];
 	[self useDmaBlockReadChanged:nil];
 	[self boxcarLengthChanged:nil];
 	[self useSLTtimeChanged:nil];
@@ -810,7 +799,6 @@
 	[histMeasTimeField setEnabled:               !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEMinTextField setEnabled:               !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEBinPU setEnabled:                      !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[syncWithRunControlButton setEnabled:        !runInProgress              & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[shipSumHistogramPU setEnabled:              !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histModePU setEnabled:                      !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histClrModePU setEnabled:                   !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
@@ -995,8 +983,8 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
-	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
+	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
 }
 
 
@@ -1022,8 +1010,8 @@
 {
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
-		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] ];
+		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] << [model filterShapingLength]];
+		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] << [model filterShapingLength]];
 	}
 }
 
@@ -1179,11 +1167,6 @@
 - (IBAction) useDmaBlockReadButtonAction:(id)sender
 {
 	[model setUseDmaBlockRead:[sender intValue]];	
-}
-
-- (IBAction) syncWithRunControlButtonAction:(id)sender
-{
-	[model setSyncWithRunControl:[sender intValue]];	
 }
 
 - (IBAction) decayTimeTextFieldAction:(id)sender
@@ -1464,10 +1447,11 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	if([sender intValue] != [(ORKatrinV4FLTModel*)model threshold:[[sender selectedCell] tag]]){
+	if([sender intValue] != [(ORKatrinV4FLTModel*)model threshold:[[sender selectedCell] tag]] >> [model filterShapingLength] ){
 		[[self undoManager] setActionName: @"Set Threshold"];
-		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue] ];
+		[model setThreshold:[[sender selectedCell] tag] withValue: ([sender intValue] << [model filterShapingLength])];
 	}
+
 }
 
 

@@ -92,6 +92,7 @@ NSString* SBC_LinkSbcPollingRateChanged     = @"SBC_LinkSbcPollingRateChanged";
 NSString* SBC_LinkErrorInfoChanged          = @"SBC_LinkErrorInfoChanged";
 NSString* SBC_LinkMacAddressChanged         = @"SBC_LinkMacAddressChanged";
 NSString* SBC_LinkTimeSkewChanged           = @"SBC_LinkTimeSkewChanged";
+NSString* SBC_LinkSbcDisableThrottleChanged = @"SBC_LinkSbcDisableThrottleChanged";
 
 @interface SBCPacketWrapper : NSObject {
     NSMutableData* data;
@@ -909,7 +910,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 	[self setInfoType:		[decoder decodeIntForKey:   @"infoType"]];
 	[self setLoadMode:		[decoder decodeIntForKey:   @"loadMode"]];
-	[self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
+    [self setInitAfterConnect:[decoder decodeBoolForKey:@"InitAfterConnect"]];
+    [self setDisableThrottle:[decoder decodeBoolForKey: @"disableThrottle"]];
 	[self setWriteValue:	[decoder decodeInt32ForKey: @"WriteValue"]];
 	[self setWriteAddress:	[decoder decodeInt32ForKey: @"WriteAddress"]];
 	[self setFilePath:		[decoder decodeObjectForKey:@"FilePath"]];
@@ -937,7 +939,8 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt32:payloadSize	forKey:@"payloadSize"];
+    [encoder encodeBool:disableThrottle    forKey:@"disableThrottle"];
+    [encoder encodeInt32:payloadSize    forKey:@"payloadSize"];
     [encoder encodeInt:numTestPoints	forKey:@"numTestPoints"];
     [encoder encodeInt:infoType			forKey:@"infoType"];
     [encoder encodeInt:range			forKey:@"Range"];
@@ -1095,6 +1098,18 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 - (unsigned long) throttle
 {
 	return throttle;
+}
+
+- (BOOL) disableThrottle
+{
+    return disableThrottle;
+}
+
+- (void) setDisableThrottle:(BOOL) aFlag
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setDisableThrottle:disableThrottle];
+    disableThrottle = aFlag;
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkSbcDisableThrottleChanged object:self];
 }
 
 - (unsigned long) sbcPollingRate
@@ -1885,7 +1900,10 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 
 	throttleCount = 0;
 	missedHeartBeat = 0;
-	throttle = 1000;
+    
+	if(disableThrottle)throttle = 0;
+    else               throttle = 1000;
+    
 	[self tellClientToStartRun];
     [self clearRates];
     [self update];

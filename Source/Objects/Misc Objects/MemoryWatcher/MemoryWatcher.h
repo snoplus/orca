@@ -33,8 +33,11 @@
     NSTimeInterval       taskInterval;
     NSDate*              launchTime;
     NSTimeInterval       upTime;
-    NSOperationQueue*   opQueue;
-
+    NSOperationQueue*    opQueue;
+    unsigned long        totalMemory;
+    unsigned long        freeMemory;
+    unsigned long        pageSize;
+    unsigned long        orcaMemory;
 }
 
 #pragma mark ***Initialization
@@ -54,7 +57,14 @@
 - (float) timeRate:(int)rateIndex value:(int)valueIndex;
 - (void) setUpQueue;
 
-- (void) launchTop;
+- (void) launchTask;
+- (void) processTopResult:(NSString*)taskResult;
+- (void) processVmStatResult:(NSString*)taskResult;
+
+- (void) postUpdate;
+- (void) postCouchDBRecord;
+- (NSString*) fullID; //so couchdb posting works
+
 @end
 
 extern NSString* MemoryWatcherUpTimeChanged;
@@ -72,5 +82,8 @@ extern NSString* MemoryWatcherTaskIntervalNotification;
 }
 - (id) initWithDelegate:(id)aDelegate;
 - (void) main;
+- (void) runTop;
+- (void) runVmStat;
+
 @end
 

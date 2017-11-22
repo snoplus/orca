@@ -61,7 +61,6 @@
 		IBOutlet NSPopUpButton* histClrModePU;
 		IBOutlet NSPopUpButton* histModePU;
 		IBOutlet NSPopUpButton* histEBinPU;
-	    IBOutlet NSButton*      syncWithRunControlButton;
 		IBOutlet NSTextField*	histEMinTextField;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSPopUpButton*	filterShapingLengthPU;
@@ -171,7 +170,6 @@
 - (void) useBipolarEnergyChanged:(NSNotification*)aNote;
 - (void) useSLTtimeChanged:(NSNotification*)aNote;
 - (void) useDmaBlockReadChanged:(NSNotification*)aNote;
-- (void) syncWithRunControlChanged:(NSNotification*)aNote;
 - (void) recommendedPZCChanged:(NSNotification*)aNote;
 - (void) decayTimeChanged:(NSNotification*)aNote;
 - (void) poleZeroCorrectionChanged:(NSNotification*)aNote;
@@ -244,7 +242,6 @@
 - (IBAction) useSLTtimePUAction:(id)sender;
 - (IBAction) useDmaBlockReadButtonAction:(id)sender;
 - (IBAction) useDmaBlockReadPUAction:(id)sender;
-- (IBAction) syncWithRunControlButtonAction:(id)sender;
 - (IBAction) decayTimeTextFieldAction:(id)sender;
 - (IBAction) poleZeroCorrectionPUAction:(id)sender;
 - (IBAction) customVariableTextFieldAction:(id)sender;

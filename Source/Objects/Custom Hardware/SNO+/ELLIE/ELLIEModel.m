@@ -1984,7 +1984,10 @@ err:
             goto err;
         }
         SNOPModel* snopModel = [snopModels objectAtIndex:0];
-        [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+        });
+        [pool release];
         return;
     }
 

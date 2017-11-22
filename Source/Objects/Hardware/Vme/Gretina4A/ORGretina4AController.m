@@ -779,9 +779,8 @@
     [loadMainFPGAButton     setEnabled:!locked && !downloading];
     [stopFPGALoadButton     setEnabled:!locked && downloading];
     
-    [downSampleHoldOffTimeField setEnabled:!locked && !runInProgress && !downloading && [model downSamplePauseEnable]];
-    [downSamplePauseEnableCB setEnabled:!locked && !runInProgress && !downloading];
-
+    [downSampleHoldOffTimeField setEnabled:!lockedOrRunningMaintenance && !downloading && [model downSamplePauseEnable]];
+    [downSamplePauseEnableCB setEnabled:!lockedOrRunningMaintenance && !downloading];
     
     [diagnosticsReportButton setEnabled:[model diagnosticsEnabled]];
     [diagnosticsClearButton  setEnabled:[model diagnosticsEnabled]];

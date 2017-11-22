@@ -322,7 +322,7 @@ sessionKey = _sessionKey;
     
     if (modalAction == NSAlertFirstButtonReturn) {  // Quit Orca
         [alert release];
-        [[NSApp delegate] terminate:self];
+        [(ORAppDelegate*)[NSApp delegate] terminate:self];
     }
     else if (modalAction == NSAlertSecondButtonReturn) {  // Start Anyway
         [alert release];
