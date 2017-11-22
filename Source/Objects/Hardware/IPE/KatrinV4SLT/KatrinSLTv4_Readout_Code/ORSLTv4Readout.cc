@@ -170,6 +170,8 @@ bool ORSLTv4Readout::Stop()
     float loopsPerSec;
     unsigned long long int tDeadTicks;
     float tNoReadout;
+    uint32_t meanBlockSize;
+    float load;
     //float tReadout;
     
     struct timezone tz;
@@ -211,10 +213,17 @@ bool ORSLTv4Readout::Stop()
     
     // Estimation of readout time
     tDeadTicks = ((1000000 - t0.tv_usec) + t1.tv_usec );
-    tNoReadout = (float) (nLoops - nReadout) / maxLoopsPerSec ;
+    tNoReadout = 0;
+    if (maxLoopsPerSec >0) tNoReadout = (float) (nLoops - nReadout) / maxLoopsPerSec ;
     
-    printf("%17s: dead time %0.3f us no readout %.3f s, mean block size %lld, load %lld%s\n", "",
-           (float) tDeadTicks / 1000000, tNoReadout, nWords / nReadout, 100 * nWords / nReadout / 8160, "%");
+    load = 0;
+    if (nReadout > 0) {
+        meanBlockSize =  nWords / nReadout;
+        load = 100 * nWords / nReadout / 8160;
+    }
+    
+    printf("%17s: dead time %0.3f us no readout %.3f s, mean block size %d, load %f %s\n", "",
+           (float) tDeadTicks / 1000000, tNoReadout, meanBlockSize, load, "%");
     
     return true;
 }
@@ -234,43 +243,43 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
     uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
     
     
-    if (numWordsToRead > 0){
-        if ( (numWordsToRead >= 8160) || (nNoReadout > 10) ){
-            nNoReadout = 0; // Clear no readout
-            nReadout = nReadout + 1;
-            if (numWordsToRead < 8160) nReducedSize = nReducedSize + 1;
-            
-            if(numWordsToRead > 8160) numWordsToRead = 8160;    //8160 is 170*48, smallest multiple of 48 smaller than 8192 (8192=max.readout block)
-            numWordsToRead = (numWordsToRead/6)*6;              //make sure we are on event boundary
-            
-            uint32_t firstIndex = dataIndex; //so we can insert the length
-            
-            ensureDataCanHold(numWordsToRead + headerLen);
-            data[dataIndex++] = energyId | 0; //fill in the length below
-            data[dataIndex++] = location  ;
-            data[dataIndex++] = 0; //spare
-            data[dataIndex++] = 0; //spare
-            
-            //if more than 8 Events (48 words) -> use DMA
-            if(numWordsToRead < 48) {
-                for(i=0;i<numWordsToRead; i++){
-                    data[dataIndex++] = pbus->read(FIFO0Addr);
-                }
+    if ((numWordsToRead > 0) &&  ( (numWordsToRead >= 8160) || (nNoReadout > 10)) ){
+        nNoReadout = 0; // Clear no readout
+        nReadout = nReadout + 1;
+        if (numWordsToRead < 8160) nReducedSize = nReducedSize + 1;
+        
+        if(numWordsToRead > 8160) numWordsToRead = 8160;    //8160 is 170*48, smallest multiple of 48 smaller than 8192 (8192=max.readout block)
+        numWordsToRead = (numWordsToRead/6)*6;              //make sure we are on event boundary
+        
+        uint32_t firstIndex = dataIndex; //so we can insert the length
+        
+        ensureDataCanHold(numWordsToRead + headerLen);
+        data[dataIndex++] = energyId | 0; //fill in the length below
+        data[dataIndex++] = location  ;
+        data[dataIndex++] = 0; //spare
+        data[dataIndex++] = 0; //spare
+        
+        //if more than 8 Events (48 words) -> use DMA
+        if(numWordsToRead < 48) {
+            for(i=0;i<numWordsToRead; i++){
+                data[dataIndex++] = pbus->read(FIFO0Addr);
             }
-            else {
-                numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
-                pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
-                dataIndex += numWordsToRead;
-            }
-            data[firstIndex] |=  (numWordsToRead+headerLen); //fill in the record length
-          
-            nWords = nWords + numWordsToRead+headerLen;
-            
-        } else {
-            nNoReadout = nNoReadout + 1;
         }
+        else {
+            numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
+            pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
+            dataIndex += numWordsToRead;
+        }
+        data[firstIndex] |=  (numWordsToRead+headerLen); //fill in the record length
+      
+        nWords = nWords + numWordsToRead+headerLen;
+        
+    } else {
+        
+        nNoReadout = nNoReadout + 1;
     }
     
+   
     return true;
 }
 
