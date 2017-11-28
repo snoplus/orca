@@ -417,9 +417,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     if((controlReg & kCtrlPPSMask) != kCtrlPPSMask){
         if(!noPPSAlarm){
-            noPPSAlarm = [[ORAlarm alloc] initWithName:@"SLT PPS not Enabled" severity:kSetupAlarm];
+            noPPSAlarm = [[ORAlarm alloc] initWithName:@"External clock diaabled (enable Slt ext PPS if clock is available)" severity:kSetupAlarm];
             [noPPSAlarm setSticky:YES];
-            [noPPSAlarm setHelpString:@"Check the 'PPS' option in the SLT Control Registor section. It should be enabled for normal running"];
+            [noPPSAlarm setHelpString:@"Check the 'PPS' option in the SLT Control Registor section. It should be enabled for synchronized runs"];
         }
          if(![noPPSAlarm isPosted])[noPPSAlarm postAlarm];
     }
@@ -432,6 +432,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) checkPPSStatus
 {
+    // Todo: Implement test of time shift between Slt colock and Mac instead
+    
+/*
     if((statusReg & kCtrlPPSMask) != kCtrlPPSMask){
         if(!badPPSStatusAlarm){
             badPPSStatusAlarm = [[ORAlarm alloc] initWithName:@"SLT Not Synced (bad PPS bit)" severity:kHardwareAlarm];
@@ -445,6 +448,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         [badPPSStatusAlarm release];
         badPPSStatusAlarm = nil;
     }
+ */
 }
 
 
