@@ -98,6 +98,7 @@ NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTMod
 NSString* ORKatrinV4FLTModelHitRateModeChanged              = @"ORKatrinV4FLTModelHitRateModeChanged";
 
 NSString* ORKatrinV4FLTModelLostEventsChanged               = @"ORKatrinV4FLTModelLostEventsChanged";
+NSString* ORKatrinV4FLTModelLostEventsTrChanged             = @"ORKatrinV4FLTModelLostEventsTrChanged";
 
 
 static NSString* fltTestName[kNumKatrinV4FLTTests]= {
@@ -1193,6 +1194,18 @@ static double table[32]={
     
 }
 
+- (unsigned long long) lostEventsTr
+{
+    return lostEventsTr;
+    
+}
+- (void) setLostEventsTr:(unsigned long long)aValue
+{
+    lostEventsTr = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelLostEventsTrChanged object:self];
+    
+}
+
 
 
 - (unsigned short) selectedChannelValue { return selectedChannelValue; }
@@ -1436,7 +1449,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) initBoard
 {
     
-    [self writeReg: kFLTV4FIFOLostCounterLsbReg value: 1]; // Clear
+    [self writeClrCnt]; // Clear lost event counters
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
 	[self writeReg: kFLTV4PostTriggerReg      value:postTriggerTime];
@@ -1913,13 +1926,37 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (unsigned long long) readLostEvents
 {
-    unsigned long low = [self readReg:kFLTV4FIFOLostCounterLsbReg];
-    unsigned long high  = [self readReg:kFLTV4FIFOLostCounterMsbReg];
-    [self setLostEvents:((unsigned long long)high << 32) | low];
+    unsigned long low;
+    unsigned long high;
     
-    NSLog(@"LostEvents %i %i %i\n", low, high, lostEvents);
+    low = [self readReg:kFLTV4FIFOLostCounterLsbReg];
+    high  = [self readReg:kFLTV4FIFOLostCounterMsbReg];
+    [self setLostEvents:((unsigned long long)high << 32) | low];
+
+    NSLog(@"LostEvents FIFO overflow %i (lsb %i msb %i)\n", lostEvents, low, high);
     
     return lostEvents;
+}
+
+- (unsigned long long) readLostEventsTr
+{
+    unsigned long low;
+    unsigned long high;
+    
+    low = [self readReg:kFLTV4FIFOLostCounterTrLsbReg];
+    high  = [self readReg:kFLTV4FIFOLostCounterTrMsbReg];
+    [self setLostEventsTr:((unsigned long long)high << 32) | low];
+    
+    NSLog(@"LostEvents FPGA-FPGA transmission %i (lsb %i msb %i)\n", lostEventsTr, low, high);
+    
+    return lostEvents;
+}
+
+
+- (void) writeClrCnt
+{
+    [self writeReg: kFLTV4FIFOLostCounterLsbReg value: 1]; // Clear
+    [self writeReg: kFLTV4FIFOLostCounterTrLsbReg value: 1]; // Clear
 }
 
 

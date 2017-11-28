@@ -51,6 +51,8 @@ static katrinv4FLTRegNamesStruct regKatrinV4FLT[kFLTV4NumRegs] = {
     {@"EnergyOffset",	 0x005C, kReadWrite,              kFLTV4EnergyOffsetReg    },
     {@"LostEventsLSB",   0x0060, kReadWrite,              kFLTV4FIFOLostCounterLsbReg },
     {@"LostEventsMSB",   0x0064, kReadWrite,              kFLTV4FIFOLostCounterMsbReg },
+    {@"LostEventsTrLSB", 0x0068, kReadWrite,              kFLTV4FIFOLostCounterTrLsbReg },
+    {@"LostEventsTrMSB", 0x006C, kReadWrite,              kFLTV4FIFOLostCounterTrMsbReg },
     {@"Threshold",       0x2080, kReadWrite | kChanReg,   kFLTV4ThresholdReg       },
     {@"pStatusA",        0x2000, kReadWrite | kChanReg,   kFLTV4pStatusAReg        },
     {@"pStatusB",        0x12000,kReadOnly,               kFLTV4pStatusBReg        },

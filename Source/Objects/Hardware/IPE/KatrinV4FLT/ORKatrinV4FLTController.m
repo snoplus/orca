@@ -424,6 +424,11 @@
                          name : ORKatrinV4FLTModelLostEventsChanged
                         object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lostEventsTrChanged:)
+                         name : ORKatrinV4FLTModelLostEventsTrChanged
+                        object: model];
+
     
 }
 
@@ -728,6 +733,7 @@
 	[self energyOffsetChanged:nil];
     [self hitRateModeChanged:nil];
     [self lostEventsChanged:nil];
+    [self lostEventsTrChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -1078,7 +1084,12 @@
 {
     [lostEventField setIntValue: [model lostEvents]];
 }
-     
+
+- (void) lostEventsTrChanged:(NSNotification*)aNote
+{
+    [lostEventTrField setIntValue: [model lostEventsTr]];
+}
+
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {

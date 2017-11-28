@@ -103,6 +103,7 @@
     int boxcarLength;
     int hitRateMode;
     unsigned long long  lostEvents;
+    unsigned long long  lostEventsTr;
 
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     unsigned short lastHitRateLength;
@@ -281,7 +282,9 @@
 - (ORTimeRate*) totalRate;
 - (void) setTotalRate:(ORTimeRate*)newTimeRate;
 - (unsigned long long) lostEvents;
-- (void) setLostEvents:(unsigned long long)aDeadTime;
+- (void) setLostEvents:(unsigned long long)aCounter;
+- (unsigned long long) lostEventsTr;
+- (void) setLostTrEvents:(unsigned long long)aCounter;
 
 
 - (unsigned short) selectedRegIndex;
@@ -332,6 +335,7 @@
 
 - (int)		readMode;
 
+- (void) writeClrCnt;
 - (void) loadThresholdsAndGains;
 - (void) initBoard;
 - (void) writeHitRateMask;
@@ -494,6 +498,7 @@ extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsChanged;
+extern NSString* ORKatrinV4FLTModelLostEventsTrChanged;
 
 extern NSString* ORIpeSLTModelName;
 

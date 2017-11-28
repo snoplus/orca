@@ -114,6 +114,7 @@
 		IBOutlet NSTextField*	totalHitRateField;
 		IBOutlet NSView*		totalView;
         IBOutlet NSTextField*	lostEventField;
+        IBOutlet NSTextField*	lostEventTrField;
 		
 		//test page
 		IBOutlet NSButton*		testButton;
@@ -231,6 +232,7 @@
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 - (void) hitRateModeChanged:(NSNotification*)aNote;
 - (void) lostEventsChanged:(NSNotification*)aNote;
+- (void) lostEventsTrChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) hitRateModeAction:(id)sender;

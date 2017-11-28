@@ -57,6 +57,8 @@ typedef enum eKatrinV4FLTRegEnum {
     kFLTV4EnergyOffsetReg,
     kFLTV4FIFOLostCounterLsbReg,
     kFLTV4FIFOLostCounterMsbReg,
+    kFLTV4FIFOLostCounterTrLsbReg,
+    kFLTV4FIFOLostCounterTrMsbReg,
     kFLTV4ThresholdReg,
     kFLTV4pStatusAReg,
     kFLTV4pStatusBReg,
