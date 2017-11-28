@@ -1294,12 +1294,7 @@ bool ORFLTv4Readout::ReadoutLegacy(SBC_LAM_Data* lamData)
                     histoRefreshTime    = currentFlt->histMeasTime->read();
                     histoShipSumHistogram = runFlags & kShipSumHistogramFlag;
                     
-                    printf("%d: (%02d/%02d) t %d histogram id %d counts %lld\n", histoReadoutSec, col+1, chan+1,
-                          histoRefreshTime, fpgaHistogramID, Counts(ptrHistoBuffer));
-                    
-                    
-                    // Clear the current page after readout
-                    if (histoClearByUser) srack->theFlt[col]->command->resetPages->write(1);
+                    ClearSumHistogramBuffer();
                     
                     //set page manager to automatic mode
                     //srack->theSlt->pageSelect->write(0x100 | 3); //TODO: this flips the two parts of the histogram - FPGA bug? -tb-
