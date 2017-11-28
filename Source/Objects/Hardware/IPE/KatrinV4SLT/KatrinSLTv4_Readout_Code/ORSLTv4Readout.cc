@@ -79,78 +79,50 @@ bool ORSLTv4Readout::Start()
     gettimeofday(&t0, &tz);
     printf("%ld.%06ld: Start readout loop\n", t0.tv_sec, t0.tv_usec);
     
-    return true;
-}
-
-bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
-{
-    uint32_t i;
-    
-    //init
-    uint32_t eventFifoId = GetHardwareMask()[2];
-    //uint32_t energyId    = GetHardwareMask()[3];
-    //uint32_t runFlags    = GetDeviceSpecificData()[3];
-    uint32_t sltRevision = GetDeviceSpecificData()[6];
-
+    // Prepare the header
+    uint32_t energyId   = GetHardwareMask()[3];
     uint32_t col        = GetSlot() - 1; //(1-24)
     uint32_t crate      = GetCrate();
-	uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) ; 
+    uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) ;
     
-    //SLT read out
-    //  
-    //extern Pbus *pbus;              //for register access with fdhwlib
-    //pbus = srack->theSlt->version;
-    //uint32_t sltversion=sltRevision;
+    header[0] = energyId | 8164; // id + length
+    header[1] = location;
+    header[2] = 0; //spare
+    header[3] = 0; //spare
+    
+    //printf("Header: %08x %08x %08x %08x\n", header[0], header[1], header[2], header[3]);
     
     
-    if(sltRevision==0x3010003){//we have SLT event FIFO since this revision -> read FIFO (one event = 4 words)
-        uint32_t headerLen  = 4;
-        uint32_t numWordsToRead = pbus->read(FIFO0ModeReg) & 0x3fffff;
-        if(numWordsToRead>8192) numWordsToRead=8192;
-        if(numWordsToRead % 4)  numWordsToRead = (numWordsToRead>>2)<<2;//always read multiple of 4 word32s
-        if(numWordsToRead>0){
-            uint32_t firstIndex   = dataIndex; //so we can insert the length
-            ensureDataCanHold(numWordsToRead+headerLen);
-            
-            data[dataIndex++] = eventFifoId | 0;//fill in the length below
-            data[dataIndex++] = location  ;
-            data[dataIndex++] = 0; //spare
-            data[dataIndex++] = 0; //spare
-
-            //there are more than 48 words -> use DMA
-            if(numWordsToRead<48) {
-                for(i=0;i<numWordsToRead; i++){
-                    data[dataIndex++]=pbus->read(FIFO0Addr);
-                }
-            }
-            else {
-                numWordsToRead = (numWordsToRead>>3)<<3;//always read multiple of 8 word32s
-                pbus->readBlock(FIFO0Addr, (unsigned long *)(&data[dataIndex]), numWordsToRead);//read 2048 word32s
-                dataIndex += numWordsToRead;
-            }
-            data[firstIndex] |=  (numWordsToRead+headerLen); //fill in the record length
-
-         }
-    }
-    
-    else if(sltRevision>=0x3010004){
-
-        
-        nLoops = nLoops + 1;
+    // Select the readoutfunction depending on the mode
+    uint32_t sltRevision = GetDeviceSpecificData()[6];
+    if(sltRevision>=0x3010004){
         
         switch (mode){
             case kStandard:
-                ReadoutEnergyV31(lamData);
+                readoutCall = &ORSLTv4Readout::ReadoutEnergyV31;
                 break;
             case kLocal:
-                LocalReadoutEnergyV31(lamData);
+                readoutCall = &ORSLTv4Readout::LocalReadoutEnergyV31;
                 break;
             case kSimulation:
-                SimulationReadoutEnergyV31(lamData);
+                readoutCall = &ORSLTv4Readout::SimulationReadoutEnergyV31;
                 break;
         }
         
+    } else {
+    
+        readoutCall = &ORSLTv4Readout::ReadoutLegacyCode;
     }
+    
+    return true;
+}
+
+
+bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
+{
+    nLoops = nLoops + 1;
+
+    (*this.*readoutCall)(lamData);
 
     if ((mode == kStandard) && (nNoReadout > 1)){
         // Read out the children flts that are in the readout list
@@ -231,37 +203,38 @@ bool ORSLTv4Readout::Stop()
 
 bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
 {
-    uint32_t i;
-    
-    uint32_t energyId   = GetHardwareMask()[3];
-    uint32_t col        = GetSlot() - 1; //(1-24)
-    uint32_t crate      = GetCrate();
-    uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) ;
-
-    
     uint32_t headerLen  = 4;
     uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
     
-    
-    if ((numWordsToRead > 0) &&  ( (numWordsToRead >= 8160) || (nNoReadout > 10)) ){
+    if (numWordsToRead >= 8160){ // full block readout
         nNoReadout = 0; // Clear no readout
         nReadout = nReadout + 1;
-        if (numWordsToRead < 8160) nReducedSize = nReducedSize + 1;
         
-        if(numWordsToRead > 8160) numWordsToRead = 8160;    //8160 is 170*48, smallest multiple of 48 smaller than 8192 (8192=max.readout block)
-        numWordsToRead = (numWordsToRead/6)*6;              //make sure we are on event boundary
+        numWordsToRead = 8160;
+        ensureDataCanHold(numWordsToRead + headerLen);
+
+        memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
+        dataIndex += headerLen;
+        
+        pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
+        dataIndex += numWordsToRead;
+        
+        nWords = nWords + numWordsToRead+headerLen;
+
+    } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
+        nNoReadout = 0; // Clear no readout
+        nReadout = nReadout + 1;
+        nReducedSize = nReducedSize + 1;
         
         uint32_t firstIndex = dataIndex; //so we can insert the length
-        
         ensureDataCanHold(numWordsToRead + headerLen);
-        data[dataIndex++] = energyId | 0; //fill in the length below
-        data[dataIndex++] = location  ;
-        data[dataIndex++] = 0; //spare
-        data[dataIndex++] = 0; //spare
         
-        //if more than 8 Events (48 words) -> use DMA
-        if(numWordsToRead < 48) {
-            for(i=0;i<numWordsToRead; i++){
+        memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
+        dataIndex += headerLen;
+        
+        if (numWordsToRead < 48) {
+            numWordsToRead = (numWordsToRead/6)*6; //make sure we are on event boundary
+            for(uint32_t i=0;i<numWordsToRead; i++){
                 data[dataIndex++] = pbus->read(FIFO0Addr);
             }
         }
@@ -270,12 +243,13 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
             pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
             dataIndex += numWordsToRead;
         }
-        data[firstIndex] |=  (numWordsToRead+headerLen); //fill in the record length
-      
+    
+        data[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
+        
+        
         nWords = nWords + numWordsToRead+headerLen;
         
-    } else {
-        
+    } else { // no readout
         nNoReadout = nNoReadout + 1;
     }
     
@@ -428,6 +402,61 @@ void ORSLTv4Readout::SimulationInit()
     dataBuffer[firstIndex] |=  (simBlockSize*6 + headerLen); //fill in the record length
     
     return;
+}
+
+
+bool ORSLTv4Readout::ReadoutLegacyCode(SBC_LAM_Data* lamData)
+{
+    uint32_t i;
+    
+    //init
+    uint32_t eventFifoId = GetHardwareMask()[2];
+    //uint32_t energyId    = GetHardwareMask()[3];
+    //uint32_t runFlags    = GetDeviceSpecificData()[3];
+    uint32_t sltRevision = GetDeviceSpecificData()[6];
+    
+    uint32_t col        = GetSlot() - 1; //(1-24)
+    uint32_t crate      = GetCrate();
+    uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) ;
+    
+    //SLT read out
+    //
+    //extern Pbus *pbus;              //for register access with fdhwlib
+    //pbus = srack->theSlt->version;
+    //uint32_t sltversion=sltRevision;
+    
+    
+    if(sltRevision==0x3010003){//we have SLT event FIFO since this revision -> read FIFO (one event = 4 words)
+        uint32_t headerLen  = 4;
+        uint32_t numWordsToRead = pbus->read(FIFO0ModeReg) & 0x3fffff;
+        if(numWordsToRead>8192) numWordsToRead=8192;
+        if(numWordsToRead % 4)  numWordsToRead = (numWordsToRead>>2)<<2;//always read multiple of 4 word32s
+        if(numWordsToRead>0){
+            uint32_t firstIndex   = dataIndex; //so we can insert the length
+            ensureDataCanHold(numWordsToRead+headerLen);
+            
+            data[dataIndex++] = eventFifoId | 0;//fill in the length below
+            data[dataIndex++] = location  ;
+            data[dataIndex++] = 0; //spare
+            data[dataIndex++] = 0; //spare
+            
+            //there are more than 48 words -> use DMA
+            if(numWordsToRead<48) {
+                for(i=0;i<numWordsToRead; i++){
+                    data[dataIndex++]=pbus->read(FIFO0Addr);
+                }
+            }
+            else {
+                numWordsToRead = (numWordsToRead>>3)<<3;//always read multiple of 8 word32s
+                pbus->readBlock(FIFO0Addr, (unsigned long *)(&data[dataIndex]), numWordsToRead);//read 2048 word32s
+                dataIndex += numWordsToRead;
+            }
+            data[firstIndex] |=  (numWordsToRead+headerLen); //fill in the record length
+            
+        }
+    }
+    
+    return true;
 }
 
 

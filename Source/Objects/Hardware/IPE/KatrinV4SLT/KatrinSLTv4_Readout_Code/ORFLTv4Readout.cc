@@ -1360,8 +1360,8 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
                         
                     }
                     
-                    //printf("%d: t %d histogram id %d counts %lld\n", histoReadoutSec,
-                    //      histoRefreshTime, fpgaHistogramID, Counts(ptrHistoBuffer));
+                    printf("%d: (%02d/%02d) t %d histogram id %d counts %lld\n", histoReadoutSec, col+1, chan+1,
+                          histoRefreshTime, fpgaHistogramID, Counts(ptrHistoBuffer));
                     
                     
                     // Clear the current page after readout

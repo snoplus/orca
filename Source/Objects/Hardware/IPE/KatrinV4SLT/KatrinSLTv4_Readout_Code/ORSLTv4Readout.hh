@@ -33,6 +33,9 @@ class ORSLTv4Readout : public ORVCard
     /** Readout energy mode with firmware 3.1 */
     bool ReadoutEnergyV31(SBC_LAM_Data*);
     
+    /** Code for older firmaware version */
+    bool ReadoutLegacyCode(SBC_LAM_Data*);
+    
     /** Readout energies and write to local disk */
     bool LocalReadoutEnergyV31(SBC_LAM_Data*);
 
@@ -69,11 +72,13 @@ class ORSLTv4Readout : public ORVCard
 
     int filePtr; //< File pointer
     uint32_t dataBuffer[8192]; //< maximal DMA block size
-   
+    uint32_t header[4]; //< precompiled header
     
     uint32_t simBlockSize; //< block size used in simulation (6 words)
-    uint32_t simDataRate; // < desired data in simulation (MB/s)
+    uint32_t simDataRate; //< desired data in simulation (MB/s)
     
+    bool (ORSLTv4Readout::*readoutCall)(SBC_LAM_Data*); //< pointer to the readout code
+
 };
 
 #endif /* _ORSLTv4Readout_hh_*/
