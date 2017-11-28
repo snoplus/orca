@@ -37,6 +37,8 @@ class ORFLTv4Readout : public ORVCard
     /** Readout in histogram mode with firmware 3.1  */
     bool ReadoutHistogramV31(SBC_LAM_Data*);
 
+    /** Readout functions for older firmware versions */
+    bool ReadoutLegacy(SBC_LAM_Data*);
     
     // Helper variables for histogram mode
     
