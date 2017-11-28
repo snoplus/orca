@@ -187,6 +187,11 @@
                          name : ORKatrinV4SLTModelLostFltEventsChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(lostFltEventsTrChanged:)
+                         name : ORKatrinV4SLTModelLostFltEventsTrChanged
+                        object: model];
+
 
 }
 
@@ -225,7 +230,7 @@
 
 - (void) clockTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:4] setIntValue:[model clockTime]];
+	[[countersMatrix cellWithTag:5] setIntValue:[model clockTime]];
 }
 
 - (void) runTimeChanged:(NSNotification*)aNote
@@ -255,6 +260,12 @@
 - (void) lostFltEventsChanged:(NSNotification*)aNote
 {
     unsigned long long t=[model lostFltEvents];
+    [[countersMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+}
+
+- (void) lostFltEventsTrChanged:(NSNotification*)aNote
+{
+    unsigned long long t=[model lostFltEventsTr];
     [[countersMatrix cellWithTag:3] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 }
 
@@ -348,6 +359,7 @@
     [self deadTimeChanged:nil];
     [self lostEventsChanged:nil];
     [self lostFltEventsChanged:nil];
+    [self lostFltEventsTrChanged:nil];
 	[self vetoTimeChanged:nil];
 	[self runTimeChanged:nil];
 	[self clockTimeChanged:nil];

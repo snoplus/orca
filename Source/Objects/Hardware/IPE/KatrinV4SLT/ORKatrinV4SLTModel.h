@@ -175,6 +175,7 @@
         unsigned long long  runTime;
         unsigned long long  lostEvents;
         unsigned long long  lostFltEvents;
+        unsigned long long  lostFltEventsTr;
 		unsigned long       clockTime;
 		BOOL                countersEnabled;
         NSString*           sltScriptArguments;
@@ -226,6 +227,8 @@
 - (void) setLostEvents:(unsigned long long)aDeadTime;
 - (unsigned long long) lostFltEvents;
 - (void) setLostFltEvents:(unsigned long long)aDeadTime;
+- (unsigned long long) lostFltEventsTr;
+- (void) setLostFltEventsTr:(unsigned long long)aDeadTime;
 - (unsigned long) secondsSet;
 - (void) setSecondsSet:(unsigned long)aSecondsSet;
 - (unsigned long) statusReg;
@@ -350,6 +353,10 @@
 - (long)		getSltkGetIsLinkedWithPCIDMALib;
 - (void)		setHostTimeToFLTsAndSLT;
 
+- (unsigned long long) readLostFltEvents;
+- (unsigned long long) readLostFltEventsTr;
+
+
 #pragma mark •••Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -425,5 +432,6 @@ extern NSString* ORKatrinV4SLTPollTimeChanged;
 extern NSString* ORKatrinV4SLTModelReadAllChanged;
 extern NSString* ORKatrinV4SLTModelLostEventsChanged;
 extern NSString* ORKatrinV4SLTModelLostFltEventsChanged;
+extern NSString* ORKatrinV4SLTModelLostFltEventsTrChanged;
 extern NSString* ORKatrinV4SLTcpuLock;
 

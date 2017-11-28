@@ -134,6 +134,7 @@
 #define kRunCounterType		4
 #define kLostFltEventCounterType 5
 #define kLostSltEventCounterType 6
+#define kLostFltEventTrCounterType 7
 
 
 /*  Time Stamp Record Types used with the

@@ -52,6 +52,7 @@ NSString* ORKatrinV4SLTModelVetoTimeChanged                 = @"ORKatrinV4SLTMod
 NSString* ORKatrinV4SLTModelDeadTimeChanged                 = @"ORKatrinV4SLTModelDeadTimeChanged";
 NSString* ORKatrinV4SLTModelLostEventsChanged               = @"ORKatrinV4SLTModelLostEventsChanged";
 NSString* ORKatrinV4SLTModelLostFltEventsChanged            = @"ORKatrinV4SLTModelLostFltEventsChanged";
+NSString* ORKatrinV4SLTModelLostFltEventsTrChanged            = @"ORKatrinV4SLTModelLostFltEventsTrChanged";
 NSString* ORKatrinV4SLTModelSecondsSetChanged               = @"ORKatrinV4SLTModelSecondsSetChanged";
 NSString* ORKatrinV4SLTModelStatusRegChanged                = @"ORKatrinV4SLTModelStatusRegChanged";
 NSString* ORKatrinV4SLTModelControlRegChanged               = @"ORKatrinV4SLTModelControlRegChanged";
@@ -200,11 +201,18 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         unsigned long aMask = 0x0;
         for(id aCard in allCards){
             if(![[aCard className] isEqualToString:[self className]]){
-                int n = [aCard stationNumber]-1;
-                aMask |= (0x1<<n);
+                // Energy mode requires pixel bus
+                if ([aCard runMode] == kKatrinV4Flt_EnergyDaqMode){
+                    int n = [aCard stationNumber]-1;
+                    aMask |= (0x1<<n);
+                }
             }
         }
         [[self undoManager] disableUndoRegistration];
+        //
+        // Warning: This overwrites the settings saved in the configuration
+        //      The advantage is, that standard configuration is active at startup
+        //
         [self setPixelBusEnableReg:aMask];
         [[self undoManager] enableUndoRegistration];
     }
@@ -366,6 +374,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     return lostEvents;
 
 }
+
 - (void) setLostEvents:(unsigned long long)aValue
 {
     lostEvents = aValue;
@@ -377,10 +386,23 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     return lostFltEvents;
     
 }
+
 - (void) setLostFltEvents:(unsigned long long)aValue
 {
     lostFltEvents = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelLostFltEventsChanged object:self];
+}
+
+- (unsigned long long) lostFltEventsTr
+{
+    return lostFltEventsTr;
+    
+}
+
+- (void) setLostFltEventsTr:(unsigned long long)aValue
+{
+    lostFltEventsTr = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelLostFltEventsTrChanged object:self];
 }
 
 - (unsigned long) secondsSet
@@ -417,7 +439,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     if((controlReg & kCtrlPPSMask) != kCtrlPPSMask){
         if(!noPPSAlarm){
-            noPPSAlarm = [[ORAlarm alloc] initWithName:@"External clock diaabled (enable Slt ext PPS if clock is available)" severity:kSetupAlarm];
+            noPPSAlarm = [[ORAlarm alloc] initWithName:@"External clock disabled (enable Slt ext PPS if clock is available)" severity:kSetupAlarm];
             [noPPSAlarm setSticky:YES];
             [noPPSAlarm setHelpString:@"Check the 'PPS' option in the SLT Control Registor section. It should be enabled for synchronized runs"];
         }
@@ -977,6 +999,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[self readStatusReg];
 	[self readDeadTime];
     [self readLostEvents];
+    [self readLostFltEvents];
+    [self readLostFltEventsTr];
 	[self readVetoTime];
 	[self readRunTime];
 	[self getSeconds];
@@ -1246,6 +1270,30 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self setLostEvents:((unsigned long long)high << 32) | low];
     return lostEvents;
 }
+
+- (unsigned long long) readLostFltEvents
+{
+    unsigned long long sum = 0;
+    unsigned long long sumTr = 0;
+    for(id flt in dataTakers){
+        sum += [flt readLostEvents];
+    }
+    [self setLostFltEvents:sum];
+
+    return(sum);
+}
+
+- (unsigned long long) readLostFltEventsTr
+{
+    unsigned long long sum = 0;
+    for(id flt in dataTakers){
+        sum += [flt readLostEventsTr];
+    }
+    [self setLostFltEventsTr:sum];
+    
+    return(sum);
+}
+
 - (unsigned long long) readDeadTime
 {
 	unsigned long low  = [self readReg:kKatrinV4SLTDeadTimeCounterLoReg];
@@ -1869,25 +1917,23 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     NSLog(@"SLT %i.%03i - End of run\n", sltsec, sltsubsec2/10);
 
     
-    // Ship counters
+    // Ship run counter
     [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltSecondRunStop low:0 ];
     
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStopRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
     
-    // Todo: Lost event counters
-    
+    // LShip lost event counters
     [self readLostEvents];
-    NSLog(@"Slt lost events %i\n", lostEvents);
-    unsigned long long sum = 0;
-    for(id flt in dataTakers){
-        sum += [flt readLostEvents];
-        NSLog(@"Flt %02i lost events %i\n", [flt stationNumber], [flt lostEvents]);
-    }
-    [self setLostFltEvents:sum];
-    
+    [self readLostFltEvents];
+    [self readLostFltEventsTr];
+    NSLog(@"Lost events flt tr %i flt fifo %i slt fifo %i\n",
+          lostFltEventsTr, lostFltEvents, lostEvents);
+
     [self shipSltEvent:kLostSltEventCounterType withType:kStopRunType eventCt:0 high: (lostEvents>>32)&0xffffffff low:(lostEvents)&0xffffffff ];
-    
+
+    [self shipSltEvent:kLostFltEventTrCounterType withType:kStopRunType eventCt:0 high: (lostFltEventsTr>>32)&0xffffffff low:(lostFltEventsTr)&0xffffffff ];
+
     [self shipSltEvent:kLostFltEventCounterType withType:kStopRunType eventCt:0 high: (lostFltEvents>>32)&0xffffffff low:(lostFltEvents)&0xffffffff ];
     
    

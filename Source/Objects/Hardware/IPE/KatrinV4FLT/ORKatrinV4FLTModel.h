@@ -388,6 +388,7 @@
 - (short) getAccessType: (short) anIndex;
 - (unsigned long) getAddressOffset: (short) anIndex;
 
+- (unsigned long long ) readLostEventsTr;
 
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
