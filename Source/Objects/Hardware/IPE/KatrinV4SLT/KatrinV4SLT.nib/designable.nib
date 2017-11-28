@@ -829,7 +829,7 @@
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                     </textFieldCell>
-                                                    <textFieldCell sendsActionOnEndEditing="YES" tag="-1" title="--" id="rus-mz-Wr2">
+                                                    <textFieldCell sendsActionOnEndEditing="YES" tag="5" title="--" id="rus-mz-Wr2">
                                                         <font key="font" metaFont="smallSystem"/>
                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
