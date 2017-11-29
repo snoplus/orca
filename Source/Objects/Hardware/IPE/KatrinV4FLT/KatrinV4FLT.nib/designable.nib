@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -170,19 +170,19 @@
                         <tabViewItems>
                             <tabViewItem label="Settings" identifier="" id="1185">
                                 <view key="view" id="1187">
-                                    <rect key="frame" x="10" y="25" width="613" height="706"/>
+                                    <rect key="frame" x="10" y="29" width="613" height="702"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Control Register" id="595">
-                                            <rect key="frame" x="-1" y="590" width="280" height="112"/>
+                                            <rect key="frame" x="-1" y="571" width="280" height="128"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="iWR-qe-1Lq">
-                                                <rect key="frame" x="2" y="2" width="276" height="95"/>
+                                                <rect key="frame" x="2" y="2" width="276" height="111"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="4240">
-                                                        <rect key="frame" x="6" y="28" width="121" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <rect key="frame" x="6" y="36" width="121" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Event FIFO Length:" id="4241">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -190,7 +190,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3883">
-                                                        <rect key="frame" x="5" y="6" width="105" height="22"/>
+                                                        <rect key="frame" x="1" y="14" width="105" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="512" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3893" id="3884">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -206,23 +206,12 @@
                                                             <action selector="fifoLengthPUAction:" target="-2" id="3896"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <box verticalHuggingPriority="750" boxType="separator" id="4245">
-                                                        <rect key="frame" x="16" y="62" width="247" height="5"/>
+                                                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="4245">
+                                                        <rect key="frame" x="8" y="56" width="255" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                     </box>
-                                                    <button toolTip="Read ou tevents additionally through FLT fifo. Recommended: Use SLT Fifo readout." imageHugsTitle="YES" id="4275">
-                                                        <rect key="frame" x="128" y="48" width="153" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Force FLT Readout" bezelStyle="regularSquare" imagePosition="leading" alignment="left" controlSize="small" inset="2" id="4276">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="forceFLTReadoutCBAction:" target="-2" id="4283"/>
-                                                        </connections>
-                                                    </button>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" id="aR7-SJ-Rb2">
-                                                        <rect key="frame" x="63" y="68" width="196" height="22"/>
+                                                        <rect key="frame" x="63" y="84" width="196" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Energy" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="Po3-f0-sda" id="Yuz-Wx-Yil">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -244,8 +233,8 @@
                                                         </connections>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="4242">
-                                                        <rect key="frame" x="2" y="68" width="63" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <rect key="frame" x="2" y="84" width="63" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Run Mode:" id="4243">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -253,7 +242,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="2736">
-                                                        <rect key="frame" x="133" y="8" width="109" height="35"/>
+                                                        <rect key="frame" x="128" y="8" width="109" height="35"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="109" height="18"/>
@@ -278,11 +267,22 @@
                                                             <action selector="fifoBehaviourAction:" target="-2" id="2743"/>
                                                         </connections>
                                                     </matrix>
+                                                    <button toolTip="Read ou tevents additionally through FLT fifo. Recommended: Use SLT Fifo readout." misplaced="YES" imageHugsTitle="YES" id="4275">
+                                                        <rect key="frame" x="125" y="63" width="153" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Force FLT Readout" bezelStyle="regularSquare" imagePosition="leading" alignment="left" controlSize="small" inset="2" id="4276">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="forceFLTReadoutCBAction:" target="-2" id="4283"/>
+                                                        </connections>
+                                                    </button>
                                                 </subviews>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc HW Settings" id="2907">
-                                            <rect key="frame" x="452" y="121" width="147" height="144"/>
+                                            <rect key="frame" x="452" y="117" width="147" height="144"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="KKy-KN-lvH">
                                                 <rect key="frame" x="1" y="1" width="145" height="128"/>
@@ -302,7 +302,7 @@
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="2731">
                                                         <rect key="frame" x="20" y="62" width="69" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="ADC Offset" id="2841">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -386,7 +386,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc Requests" id="2988">
-                                            <rect key="frame" x="452" y="554" width="147" height="148"/>
+                                            <rect key="frame" x="452" y="550" width="147" height="148"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="FPb-hv-qb4">
                                                 <rect key="frame" x="1" y="1" width="145" height="132"/>
@@ -451,7 +451,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Thresold Finder" id="3255">
-                                            <rect key="frame" x="452" y="351" width="147" height="82"/>
+                                            <rect key="frame" x="452" y="347" width="147" height="82"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Ykk-NE-LQe">
                                                 <rect key="frame" x="1" y="1" width="145" height="66"/>
@@ -480,8 +480,8 @@
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <tabView drawsBackground="NO" controlSize="small" type="noTabsNoBorder" id="3343">
-                                            <rect key="frame" x="-4" y="38" width="458" height="553"/>
+                                        <tabView misplaced="YES" drawsBackground="NO" controlSize="small" type="noTabsNoBorder" id="3343">
+                                            <rect key="frame" x="-4" y="8" width="458" height="553"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Tab" identifier="1" id="3344">
@@ -1714,7 +1714,7 @@ Enable</string>
                                                                     <subviews>
                                                                         <textField verticalHuggingPriority="750" id="1807">
                                                                             <rect key="frame" x="85" y="66" width="62" height="11"/>
-                                                                            <autoresizingMask key="autoresizingMask"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Hit Rate" id="2830">
                                                                                 <font key="font" metaFont="miniSystem"/>
                                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2773,30 +2773,9 @@ Enable</string>
                                                 </tabViewItem>
                                             </tabViewItems>
                                         </tabView>
-                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Debug Displays" id="3901">
-                                            <rect key="frame" x="452" y="392" width="147" height="54"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                            <view key="contentView" id="bmV-YY-lEt">
-                                                <rect key="frame" x="1" y="1" width="145" height="38"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button imageHugsTitle="YES" id="3898">
-                                                        <rect key="frame" x="15" y="12" width="95" height="18"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="leading" alignment="left" controlSize="small" inset="2" id="3899">
-                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                        </buttonCell>
-                                                        <connections>
-                                                            <action selector="activateDebuggingDisplayAction:" target="-2" id="3958"/>
-                                                        </connections>
-                                                    </button>
-                                                </subviews>
-                                            </view>
-                                        </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Init Event Time with" id="4220">
-                                            <rect key="frame" x="452" y="451" width="147" height="54"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <rect key="frame" x="452" y="492" width="147" height="54"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="TLv-J0-iyv">
                                                 <rect key="frame" x="1" y="1" width="145" height="38"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -2823,15 +2802,15 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Filter Parameters" id="3006">
-                                            <rect key="frame" x="279" y="590" width="164" height="112"/>
+                                            <rect key="frame" x="279" y="571" width="164" height="127"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="enX-Fg-qYe">
-                                                <rect key="frame" x="1" y="1" width="162" height="96"/>
+                                                <rect key="frame" x="1" y="1" width="162" height="111"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="3011">
-                                                        <rect key="frame" x="1" y="38" width="47" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <rect key="frame" x="1" y="53" width="47" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Shaping" id="3014">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2839,8 +2818,8 @@ Enable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="3010">
-                                                        <rect key="frame" x="14" y="66" width="34" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <rect key="frame" x="14" y="81" width="34" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Gap" id="3015">
                                                             <font key="font" metaFont="label"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2848,7 +2827,7 @@ Enable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton verticalHuggingPriority="750" imageHugsTitle="YES" id="3112">
-                                                        <rect key="frame" x="49" y="65" width="105" height="22"/>
+                                                        <rect key="frame" x="49" y="80" width="105" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="0 ns" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="3115" id="3113">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2871,7 +2850,7 @@ Enable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3118">
-                                                        <rect key="frame" x="50" y="37" width="105" height="22"/>
+                                                        <rect key="frame" x="50" y="49" width="105" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="200 ns" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="2" imageScaling="proportionallyDown" inset="2" selectedItem="3959" id="3119">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2893,8 +2872,8 @@ Enable</string>
                                                         </connections>
                                                     </popUpButton>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="4202">
-                                                        <rect key="frame" x="6" y="9" width="42" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <rect key="frame" x="6" y="24" width="42" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="right" title="Boxcar" id="4215">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -2902,7 +2881,7 @@ Enable</string>
                                                         </textFieldCell>
                                                     </textField>
                                                     <popUpButton toolTip="For pre-2016 firmware only (0)-(3) available." verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="4203">
-                                                        <rect key="frame" x="51" y="8" width="104" height="22"/>
+                                                        <rect key="frame" x="51" y="15" width="104" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="50 ns (0)" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4209" id="4204">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -2928,7 +2907,7 @@ Enable</string>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Hit Rate Polling" id="3035">
-                                            <rect key="frame" x="449" y="269" width="150" height="78"/>
+                                            <rect key="frame" x="449" y="265" width="150" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="XBP-b6-1Ty">
                                                 <rect key="frame" x="1" y="1" width="148" height="62"/>
@@ -2969,7 +2948,7 @@ Enable</string>
                                                     </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="9Lg-ce-QCB">
                                                         <rect key="frame" x="3" y="32" width="135" height="22"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="During Run Only" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Les-sL-xzU" id="0gg-UO-DMj">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
@@ -3022,6 +3001,27 @@ Enable</string>
                                                 <action selector="testButtonAction:" target="-2" id="2727"/>
                                             </connections>
                                         </button>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Debug Displays" id="3901">
+                                            <rect key="frame" x="452" y="433" width="147" height="54"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="bmV-YY-lEt">
+                                                <rect key="frame" x="1" y="1" width="145" height="38"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button misplaced="YES" imageHugsTitle="YES" id="3898">
+                                                        <rect key="frame" x="15" y="11" width="95" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="check" title="Enable" bezelStyle="regularSquare" imagePosition="leading" alignment="left" controlSize="small" inset="2" id="3899">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="activateDebuggingDisplayAction:" target="-2" id="3958"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>
