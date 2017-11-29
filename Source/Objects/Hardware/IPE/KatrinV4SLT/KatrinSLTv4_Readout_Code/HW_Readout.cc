@@ -106,6 +106,7 @@ extern "C" {
 	#include "katrinhw4/subrackkatrin.h"
 	#include "katrinhw4/sltkatrin.h"
 	#include "katrinhw4/fltkatrin.h"
+        #include <akutil/akinifile.h>
 #endif
 
 #include "HW_Readout.h"
@@ -141,7 +142,7 @@ void processHWCommand(SBC_Packet* aPacket)
 void FindHardware(void)
 {
     //open device driver(s), get device driver handles
-    const char* name = "FE.ini";
+    const char* name = "kashell.ini";
 #if USE_PBUS
     pbusInit((char*)name);
 #else
@@ -161,9 +162,49 @@ void FindHardware(void)
     }
     
     //
-    // Todo: Check the hardware; read serial numbers and versions -ak-
+    // Check the hardware; read serial numbers and versions
     //
-    
+    int res, resArray[21];
+    akInifile *ini;
+    Inifile::result error;
+    std::string configDir;
+
+    // Get path to configuration database 
+    ini = new akInifile(name, 0, "$HOME");
+    if (ini->Status()==Inifile::kSUCCESS){
+       ini->SpecifyGroup("kashell");
+       configDir = ini->GetFirstString("configdir","",&error);
+    }
+    delete ini;
+ 
+    res = srack->readExpectedConfig("hardware.ini", configDir.c_str());
+    if (res == 3) {
+        printf("-----------------------------------------------------\n");
+        printf("Warning: Configuration database fdhwlib-config not found\n");
+	printf("   Use the inifile %s to specify where to find hardware.ini\n", name);
+        printf("   e.g. configdir = /home/katrin/etc/fdhwlib-config/fpd/\n");
+        printf("-----------------------------------------------------\n");
+
+    } else {
+
+      res = srack->checkConfig(resArray);
+      if (res > 0){
+        res = 0; 
+        printf("-----------------------------------------------------\n");
+        printf("  Warning: Hardware configuration has changed\n"); 
+        srack->displayHardwareCheck(stdout, resArray, "  ");
+        printf("-----------------------------------------------------\n");
+
+        res = srack->saveConfig(configDir.c_str());
+        if (res == 0){
+          printf("Saved configuration to  %s\n", configDir.c_str());
+        } else {
+          printf("Error saving hardware configuration (err = %d)\n", res);
+        }
+  
+      }
+    }
+
 #endif
 }
 
