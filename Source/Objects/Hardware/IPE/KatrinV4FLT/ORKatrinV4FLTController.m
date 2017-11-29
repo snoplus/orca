@@ -57,8 +57,8 @@
 	//[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	//[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	
-    settingSize			= NSMakeSize(690,720);
-    rateSize			= NSMakeSize(500,690);
+    settingSize			= NSMakeSize(690,740);
+    rateSize			= NSMakeSize(500,710);
     testSize			= NSMakeSize(610,510);
     lowlevelSize		= NSMakeSize(610,510);
 	
@@ -729,7 +729,7 @@
 	[self useBipolarEnergyChanged:nil];
 	[self bipolarEnergyThreshTestChanged:nil];
 	[self skipFltEventReadoutChanged:nil];
-	[self forceFLTReadoutChanged:nil];
+    [self forceFLTReadoutChanged:nil];
 	[self energyOffsetChanged:nil];
     [self hitRateModeChanged:nil];
     [self lostEventsChanged:nil];
@@ -989,8 +989,8 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
-	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+    [[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+    [[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
 }
 
 
@@ -1133,32 +1133,32 @@
 
 #pragma mark •••Actions
 
-- (void) energyOffsetTextFieldAction:(id)sender
+- (IBAction) energyOffsetTextFieldAction:(id)sender
 {
 	[model setEnergyOffset:[sender intValue]];	
 }
 
-- (void) forceFLTReadoutCBAction:(id)sender
+- (IBAction) forceFLTReadoutCBAction:(id)sender
 {
 	[model setForceFLTReadout:[sender intValue]];	
 }
 
-- (void) skipFltEventReadoutCBAction:(id)sender
+- (IBAction) skipFltEventReadoutCBAction:(id)sender
 {
 	[model setSkipFltEventReadout:[sender intValue]];	
 }
 
-- (void) bipolarEnergyThreshTestTextFieldAction:(id)sender
+- (IBAction) bipolarEnergyThreshTestTextFieldAction:(id)sender
 {
 	[model setBipolarEnergyThreshTest:[sender intValue]];	
 }
 
-- (void) useBipolarEnergyCBAction:(id)sender
+- (IBAction) useBipolarEnergyCBAction:(id)sender
 {
 	[model setUseBipolarEnergy:[sender intValue]];	
 }
 
-- (void) useSLTtimePUAction:(id)sender
+- (IBAction) useSLTtimePUAction:(id)sender
 {
 	//DEBUG -tb-    	NSLog(@"Called %@::%@! selected %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG -tb-
 	//[model setUseSLTtime:[sender intValue]];	
