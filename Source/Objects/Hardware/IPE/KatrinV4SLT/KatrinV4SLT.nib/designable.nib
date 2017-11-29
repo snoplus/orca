@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -44,6 +44,7 @@
                 <outlet property="lightBoardView1" destination="Ifu-WN-hyQ" id="N2K-2S-goe"/>
                 <outlet property="loadModeMatrix" destination="3060" id="3430"/>
                 <outlet property="lockButton" destination="2711" id="3382"/>
+                <outlet property="minimumDecodingMatrix" destination="jvc-l9-85d" id="IB7-84-Xje"/>
                 <outlet property="miscCntrlBitsMatrix" destination="5060" id="5068"/>
                 <outlet property="numErrorsField" destination="3124" id="3400"/>
                 <outlet property="numRecordsField" destination="3122" id="3399"/>
@@ -114,11 +115,11 @@
                         <tabViewItems>
                             <tabViewItem label="Control" identifier="" id="2718">
                                 <view key="view" id="2719">
-                                    <rect key="frame" x="10" y="25" width="487" height="408"/>
+                                    <rect key="frame" x="10" y="29" width="487" height="404"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Hw Version" id="2725">
-                                            <rect key="frame" x="263" y="340" width="214" height="56"/>
+                                            <rect key="frame" x="263" y="336" width="214" height="56"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="6f7-cA-GcV">
                                                 <rect key="frame" x="2" y="2" width="210" height="39"/>
@@ -148,7 +149,7 @@
                                             </view>
                                         </box>
                                         <box title="Control Register" id="2724">
-                                            <rect key="frame" x="14" y="179" width="240" height="217"/>
+                                            <rect key="frame" x="14" y="175" width="240" height="217"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="VEK-6Z-wbd">
                                                 <rect key="frame" x="2" y="2" width="236" height="200"/>
@@ -322,7 +323,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Counters" id="5092">
-                                            <rect key="frame" x="262" y="280" width="215" height="57"/>
+                                            <rect key="frame" x="262" y="276" width="215" height="57"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jeV-5h-6CK">
                                                 <rect key="frame" x="1" y="1" width="213" height="41"/>
@@ -371,7 +372,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Seconds" id="5408">
-                                            <rect key="frame" x="263" y="179" width="216" height="97"/>
+                                            <rect key="frame" x="263" y="175" width="216" height="97"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="rsy-SM-YnW">
                                                 <rect key="frame" x="1" y="1" width="214" height="81"/>
@@ -435,7 +436,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Pixelbus Enable Register" id="5719">
-                                            <rect key="frame" x="14" y="12" width="240" height="163"/>
+                                            <rect key="frame" x="14" y="8" width="240" height="163"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="p14-Gf-dge">
                                                 <rect key="frame" x="2" y="2" width="236" height="146"/>
@@ -614,7 +615,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2722">
-                                            <rect key="frame" x="279" y="10" width="63" height="28"/>
+                                            <rect key="frame" x="279" y="6" width="63" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Report" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5534">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -625,7 +626,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2721">
-                                            <rect key="frame" x="376" y="10" width="87" height="28"/>
+                                            <rect key="frame" x="376" y="6" width="87" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5533">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -636,14 +637,14 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Performance" id="VzC-pa-AYf">
-                                            <rect key="frame" x="263" y="98" width="214" height="77"/>
+                                            <rect key="frame" x="263" y="45" width="214" height="126"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="usB-R0-jcL">
-                                                <rect key="frame" x="1" y="1" width="212" height="61"/>
+                                                <rect key="frame" x="1" y="1" width="212" height="110"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <matrix verticalHuggingPriority="750" misplaced="YES" allowsEmptySelection="NO" id="nVK-4u-8Tw">
-                                                        <rect key="frame" x="20" y="13" width="182" height="36"/>
+                                                        <rect key="frame" x="20" y="62" width="182" height="36"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         <size key="cellSize" width="182" height="18"/>
@@ -666,6 +667,32 @@
                                                         </cells>
                                                         <connections>
                                                             <action selector="disableThrottleAction:" target="-2" id="PCt-75-mWk"/>
+                                                        </connections>
+                                                    </matrix>
+                                                    <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" id="jvc-l9-85d">
+                                                        <rect key="frame" x="20" y="12" width="182" height="36"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        <size key="cellSize" width="182" height="18"/>
+                                                        <size key="intercellSpacing" width="4" height="0.0"/>
+                                                        <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="WAV-Mb-T76">
+                                                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <cells>
+                                                            <column>
+                                                                <buttonCell type="radio" title="Full Decoding" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="niQ-cW-aBj">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <buttonCell type="radio" title="Decimated Decoding " imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="hnj-IF-Pq5">
+                                                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                            </column>
+                                                        </cells>
+                                                        <connections>
+                                                            <action selector="minimumDecodingAction:" target="-2" id="eOx-Pa-yID"/>
                                                         </connections>
                                                     </matrix>
                                                 </subviews>

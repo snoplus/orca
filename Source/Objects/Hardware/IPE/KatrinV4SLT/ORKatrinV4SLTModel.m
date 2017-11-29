@@ -74,6 +74,7 @@ NSString* ORKatrinV4SLTControlRegChanged                    = @"ORKatrinV4SLTCon
 NSString* ORKatrinV4SLTSelectedRegIndexChanged              = @"ORKatrinV4SLTSelectedRegIndexChanged";
 NSString* ORKatrinV4SLTWriteValueChanged                    = @"ORKatrinV4SLTWriteValueChanged";
 NSString* ORKatrinV4SLTPollTimeChanged                      = @"ORKatrinV4SLTPollTimeChanged";
+NSString* ORKatrinV4SLTModelMinimizeDecodingChanged         = @"ORKatrinV4SLTModelMinimizeDecodingChanged";
 
 NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpuLock";
 
@@ -190,8 +191,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                      selector : @selector(cardsChanged:)
                          name : ORGroupObjectsAdded
                        object : [self guardian]];
-
-    
 }
 
 - (void) cardsChanged:(NSNotification*) aNote
@@ -227,7 +226,16 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 }
 
 #pragma mark •••Accessors
-
+- (BOOL) minimizeDecoding
+{
+    return minimizeDecoding;
+}
+- (void) setMinimizeDecoding:(BOOL)aState
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setMinimizeDecoding:minimizeDecoding];
+    minimizeDecoding = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4SLTModelMinimizeDecodingChanged object:self];
+}
 - (unsigned long) pixelBusEnableReg
 {
     return pixelBusEnableReg;
@@ -1474,6 +1482,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     else                  [pmcLink setDelegate:self];
 
     
+    [self setMinimizeDecoding:       [decoder decodeBoolForKey:  @"minimizeDecoding"]];
 	//[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
 	[self setSltScriptArguments:    [decoder decodeObjectForKey:@"sltScriptArguments"]];
 	[self setControlReg:            [decoder decodeInt32ForKey:@"controlReg"]];
@@ -1511,6 +1520,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[super encodeWithCoder:encoder];
 	
 	//[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
+    [encoder encodeBool:minimizeDecoding        forKey:@"minimizeDecoding"];
 	[encoder encodeBool:secondsSetSendToFLTs    forKey:@"secondsSetSendToFLTs"];
 	[encoder encodeBool:secondsSetInitWithHost  forKey:@"secondsSetInitWithHost"];
 	[encoder encodeObject:sltScriptArguments    forKey:@"sltScriptArguments"];

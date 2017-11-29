@@ -186,6 +186,9 @@
         ORAlarm*            pixelTriggerDisabledAlarm;
         ORAlarm*            noPPSAlarm;
         ORAlarm*            badPPSStatusAlarm;
+    
+        BOOL                 minimizeDecoding;
+
 }
 
 #pragma mark •••Initialization
@@ -203,6 +206,8 @@
 - (void) cardsChanged:(NSNotification*) aNote;
 
 #pragma mark •••Accessors
+- (BOOL) minimizeDecoding;
+- (void) setMinimizeDecoding:(BOOL)aState;
 - (unsigned long) pixelBusEnableReg;
 - (void) setPixelBusEnableReg:(unsigned long)aMask;
 - (void) enablePixelBus:(int)aStationNumber;
@@ -418,6 +423,7 @@ extern NSString* ORKatrinV4SLTModelSecondsSetChanged;
 extern NSString* ORKatrinV4SLTModelStatusRegChanged;
 extern NSString* ORKatrinV4SLTModelControlRegChanged;
 extern NSString* ORKatrinV4SLTModelHwVersionChanged;
+extern NSString* ORKatrinV4SLTModelMinimizeDecodingChanged;
 
 extern NSString* ORKatrinV4SLTModelPatternFilePathChanged;
 extern NSString* ORKatrinV4SLTModelInterruptMaskChanged;

@@ -21,6 +21,7 @@
 
 #import "ORKatrinV4SLTDecoder.h"
 #import "ORKatrinV4FLTModel.h"
+#import "ORKatrinV4SLTModel.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
 #import "ORKatrinV4SLTDefs.h"
@@ -229,8 +230,8 @@ static NSString* kFLTChanKey[24] = {
 - (id) init {
     self = [super init];
     //preload all the filters
-    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
-    for(ORKatrinV4FLTModel* aCard in listOfCards){
+    NSArray* listOfFlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4FLTModel")];
+    for(ORKatrinV4FLTModel* aCard in listOfFlts){
         int filterShapingLength = [aCard filterShapingLength];
         unsigned long filterDiv = 1L << filterShapingLength;
         if(filterShapingLength==0){
@@ -240,6 +241,13 @@ static NSString* kFLTChanKey[24] = {
         int index   = [aCard stationNumber];
         filter[index] = filterDiv;
     }
+    NSArray* listOfSlts = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORKatrinV4SLTModel")];
+    BOOL minimizeDecoding = NO;
+    for(ORKatrinV4SLTModel* aCard in listOfSlts){
+         minimizeDecoding = [aCard minimizeDecoding];
+        if( minimizeDecoding)break;
+    }
+    useMinimizedDecoding = minimizeDecoding;
     return self;
 }
 - (void) dealloc
@@ -283,7 +291,11 @@ static NSString* kFLTChanKey[24] = {
 
         int aFilter = filter[card];
         if(aFilter==0)aFilter = 4096;
-        [aDataSet histogram:energy/aFilter
+        BOOL decode = YES;
+        if(useMinimizedDecoding && card<22 && chan<24){
+            decode = (decimationCount[card][chan]++ % 1000) == 0;
+        }
+        if(decode)[aDataSet histogram:energy/aFilter
                     numBins:4*4096 sender:self
                    withKeys: crateKey,stationKey,channelKey,nil];
         

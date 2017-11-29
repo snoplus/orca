@@ -46,7 +46,8 @@
 		IBOutlet NSMatrix*		testPatternEnableMatrix;
 		IBOutlet NSMatrix*		miscCntrlBitsMatrix;
 		IBOutlet NSMatrix*		enableDisableCountersMatrix;
-	
+        IBOutlet NSMatrix*      minimumDecodingMatrix;
+
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
@@ -106,6 +107,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) minimumDecodingChanged:(NSNotification*)aNote;
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
 - (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote;
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
@@ -141,6 +143,7 @@
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) minimumDecodingAction:(id)sender;
 - (IBAction) readSLTEventFifoButtonAction:(id)sender;
 - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;

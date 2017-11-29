@@ -192,10 +192,17 @@
                          name : ORKatrinV4SLTModelLostFltEventsTrChanged
                         object: model];
 
-
+    [notifyCenter addObserver : self
+                     selector : @selector(minimumDecodingChanged:)
+                         name : ORKatrinV4SLTModelMinimizeDecodingChanged
+                        object: model];
 }
 
 #pragma mark •••Interface Management
+- (void) minimumDecodingChanged:(NSNotification*)aNote
+{
+    [minimumDecodingMatrix selectCellWithTag:[model minimizeDecoding]];
+}
 
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote
 {
@@ -387,8 +394,10 @@
 	
 	
     [inhibitEnableMatrix setEnabled:!lockedOrRunningMaintenance];
-	[hwVersionButton setEnabled:!isRunning];
-	[enableDisableCountersMatrix setEnabled:!isRunning];
+    [pixelBusEnableRegMatrix setEnabled:!isRunning];
+    [hwVersionButton setEnabled:!isRunning];
+    [enableDisableCountersMatrix setEnabled:!isRunning];
+    [minimumDecodingMatrix setEnabled:!isRunning];
 
 	[loadPatternFileButton setEnabled:!lockedOrRunningMaintenance];
 	[definePatternFileButton setEnabled:!lockedOrRunningMaintenance];
@@ -460,12 +469,11 @@
 - (void) controlRegChanged:(NSNotification*)aNote
 {
 	unsigned long value = [model controlReg];
-	unsigned long aMask = (value & kCtrlTrgEnMask)>>kCtrlTrgEnShift;
-	int i;
-	aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
+	unsigned long aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
+    int i;
 	for(i=0;i<4;i++)[[inhibitEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
 	
-	aMask = (value & kCtrlTpEnMask)>>kCtrlTpEnEnShift;
+	//aMask = (value & kCtrlTpEnMask)>>kCtrlTpEnEnShift;
 	[testPatternEnableMatrix selectCellWithTag:aMask];
 	
 	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlPPSMask];
@@ -497,6 +505,11 @@
 }
 
 #pragma mark ***Actions
+- (IBAction) minimumDecodingAction:(id)sender
+{
+    [model setMinimizeDecoding:[[sender selectedCell]tag]];
+}
+
 - (IBAction) readSLTEventFifoButtonAction:(id)sender
 {
 	[model readSLTEventFifoSingleEvent];	
