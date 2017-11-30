@@ -447,9 +447,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     if((controlReg & kCtrlPPSMask) != kCtrlPPSMask){
         if(!noPPSAlarm){
-            noPPSAlarm = [[ORAlarm alloc] initWithName:@"External clock disabled (enable Slt ext PPS if clock is available)" severity:kSetupAlarm];
+            noPPSAlarm = [[ORAlarm alloc] initWithName:@"External PPS DISABLED" severity:kSetupAlarm];
             [noPPSAlarm setSticky:YES];
-            [noPPSAlarm setHelpString:@"Check the 'PPS' option in the SLT Control Registor section. It should be enabled for synchronized runs"];
+            [noPPSAlarm setHelpString:@"Check the 'Ext PPS' option in the SLT Control Registor section. It should be enabled for synchronized runs"];
         }
          if(![noPPSAlarm isPosted])[noPPSAlarm postAlarm];
     }
