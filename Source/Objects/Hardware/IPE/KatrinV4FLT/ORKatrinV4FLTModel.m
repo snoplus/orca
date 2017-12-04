@@ -1131,7 +1131,7 @@ static double table[32]={
     [[[self undoManager] prepareWithInvocationTarget:self] setHitRateEnabled:aChan withValue:(hitRateEnabledMask>>aChan)&0x1];
 	if(aState) hitRateEnabledMask |= (1L<<aChan);
 	else hitRateEnabledMask &= ~(1L<<aChan);
-	
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateEnabledMaskChanged object:self];
 }
 
@@ -1849,6 +1849,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                             newTotal += hitRate[chan];
                         }
                         dataIndex++;
+                    } else {
+                        
+                        if (0 != hitRate[chan]) {
+                            hitRate[chan] = 0;
+                            oneChanged = YES;
+                        }
                     }
                 }
                 [aList release];
