@@ -187,7 +187,8 @@
         ORAlarm*            noPPSAlarm;
         ORAlarm*            badPPSStatusAlarm;
     
-        BOOL                 minimizeDecoding;
+        BOOL                minimizeDecoding;
+        bool                activateFltReadout;
 
 }
 

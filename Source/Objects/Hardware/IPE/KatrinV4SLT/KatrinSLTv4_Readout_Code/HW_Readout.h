@@ -30,6 +30,8 @@ class Pbus;
 Pbus *pbus=0;
 hw4::SubrackKatrin *srack=0;
 
+int debug = 0;
+
 void readSltSecSubsec(uint32_t & sec, uint32_t & subsec);
 #endif
 

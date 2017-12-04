@@ -1282,7 +1282,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (unsigned long long) readLostFltEvents
 {
     unsigned long long sum = 0;
-    unsigned long long sumTr = 0;
     for(id flt in dataTakers){
         sum += [flt readLostEvents];
     }
@@ -1704,27 +1703,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
 
 
-
-/*
-    //
-    //THIS IS A WORKAROUND FOR THE start-histo FLT BUG
-    //
-    
-    //   (start-histo FLT BUG is: the FIRST histogram already starts recording BEFORE the next second strobe/1PPS, if the 'set standby mode' command was within this second)
-    //   (workaround: I set standby mode for all FLTs in histo-mode, then I will wait for the next second strobe  ---> this will produce a additional gap/delay of 1 second at beginning of run)
-    // -tb- 2013-05-24
-    //if there are FLTs in histogramming mode, I start them right before releasing inhibit -> now -tb-
-    
-    //check: are there FLTs in histogram mode?
-	int runMode=0, countHistoMode=0, countNonHistoMode=0;
-	for(id obj in dataTakers){
-        if([obj respondsToSelector:@selector(runMode)]){
-            runMode=[obj runMode];
-            if(runMode == kKatrinV4Flt_Histogram_DaqMode)   countHistoMode++;
-            else                                            countNonHistoMode++;
-        }
-    }
-*/
     
     //if cold start (not 'quick start' in RunControl) ...
     //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
@@ -1732,6 +1710,22 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     for(id obj in dataTakers){
         [obj initBoard];
     }
+    
+    //
+    // Check run mode of the Flts - is Flt readout necessary?
+    // Condition: ForcFlt  OR runmode == Trace OR runmode == Histogram
+    //
+    activateFltReadout = false;
+    for(id obj in dataTakers){
+        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){
+            //NSLog(@"FLT %i mode %i forceFlt %i\n", [obj stationNumber], [obj runMode], [obj forceFLTReadout]);
+            if  ((int) [obj runMode] == kKatrinV4Flt_EnergyTraceDaqMode) activateFltReadout = true;
+            if  ((int) [obj runMode] == kKatrinV4Flt_Histogram_DaqMode)  activateFltReadout = true;
+            if (((int) [obj runMode] == kKatrinV4Flt_EnergyDaqMode) && [obj forceFLTReadout]) activateFltReadout = true;
+        }
+    }
+    //NSLog(@"Flt readout %i\n", activateFltReadout);
+    
     
     
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
@@ -2082,7 +2076,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     //"first time" flag (needed for histogram mode)
     unsigned long            runFlagsMask = 0;
-    if(secondsSetSendToFLTs) runFlagsMask |= kSecondsSetSendToFLTsFlag;
+    if (secondsSetSendToFLTs) runFlagsMask |= kSecondsSetSendToFLTsFlag;
+    if (activateFltReadout)   runFlagsMask |= kActivateFltReadoutFlag;
 	configStruct->card_info[index].deviceSpecificData[3] = runFlagsMask;
 	configStruct->card_info[index].deviceSpecificData[6] = [self readReg: kKatrinV4SLTHWRevisionReg];
     

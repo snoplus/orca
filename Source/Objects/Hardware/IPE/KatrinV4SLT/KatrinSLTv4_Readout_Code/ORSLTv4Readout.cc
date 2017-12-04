@@ -22,11 +22,14 @@
 // (this is the standard code accessing the v4 crate-tb-)
 //----------------------------------------------------------------
 extern hw4::SubrackKatrin* srack; 
-extern Pbus* pbus; 
+extern Pbus* pbus;
 
 static const uint32_t FIFO0Addr         = 0xd00000 >> 2;
 static const uint32_t FIFO0ModeReg      = 0xe00000 >> 2;//obsolete 2012-10
 static const uint32_t FIFO0StatusReg    = 0xe00004 >> 2;//obsolete 2012-10  
+
+extern int debug;
+
 
 ORSLTv4Readout::ORSLTv4Readout(SBC_card_info* ci) : ORVCard(ci)
 {
@@ -47,7 +50,7 @@ ORSLTv4Readout::ORSLTv4Readout(SBC_card_info* ci) : ORVCard(ci)
     //mode = lSimulation;
     
     // Start message
-    printf("ORSLTv4Readout: %s\n", sMode[mode%3]);
+    if (debug) printf("ORSLTv4Readout: %s\n", sMode[mode%3]);
     
     // Initiolize analysis variables
     maxLoopsPerSec = 0;
@@ -57,6 +60,7 @@ ORSLTv4Readout::ORSLTv4Readout(SBC_card_info* ci) : ORVCard(ci)
 bool ORSLTv4Readout::Start()
 {
     struct timezone tz;
+    const char *sEnable[] = {"no", "yes"};
     
     switch (mode){
         case kStandard:
@@ -77,7 +81,6 @@ bool ORSLTv4Readout::Start()
     nNoReadout = 0;
     
     gettimeofday(&t0, &tz);
-    printf("%ld.%06ld: Start readout loop\n", t0.tv_sec, t0.tv_usec);
     
     // Prepare the header
     uint32_t energyId   = GetHardwareMask()[3];
@@ -94,6 +97,9 @@ bool ORSLTv4Readout::Start()
     
     
     // Select the readoutfunction depending on the mode
+    uint32_t runFlags    = GetDeviceSpecificData()[3];
+    activateFltReadout   = runFlags & kActivateFltReadoutFlag;
+    
     uint32_t sltRevision = GetDeviceSpecificData()[6];
     if(sltRevision>=0x3010004){
         
@@ -114,6 +120,10 @@ bool ORSLTv4Readout::Start()
         readoutCall = &ORSLTv4Readout::ReadoutLegacyCode;
     }
     
+    if (debug) printf("%ld.%06ld: Start readout loop, Flt readout = %s, debug = %d\n",
+           t0.tv_sec, t0.tv_usec, sEnable[activateFltReadout%2], debug);
+
+    
     return true;
 }
 
@@ -124,7 +134,7 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
     (*this.*readoutCall)(lamData);
 
-    if ((mode == kStandard) && (nNoReadout > 1)){
+    if (activateFltReadout){
         // Read out the children flts that are in the readout list
         // Leave out for the high rate tests
         int32_t leaf_index = GetNextTriggerIndex()[0];
@@ -140,11 +150,9 @@ bool ORSLTv4Readout::Stop()
 {
     float runTime;
     float loopsPerSec;
-    unsigned long long int tDeadTicks;
-    float tNoReadout;
+    unsigned long long int tReadoutTime;
     uint32_t meanBlockSize;
     float load;
-    //float tReadout;
     
     struct timezone tz;
     unsigned long long int t0Ticks, t1Ticks;
@@ -160,42 +168,49 @@ bool ORSLTv4Readout::Stop()
             break;
     }
 
-    // Measure readout time
-    gettimeofday(&t1, &tz);
-    t0Ticks = (long long int) t0.tv_sec * 1000000 + t0.tv_usec;
-    t1Ticks = (long long int) t1.tv_sec * 1000000 + t1.tv_usec;
-    runTime = (float) (t1Ticks - t0Ticks) / 1000000;
-    rate = (float) nWords * 4 / (t1Ticks - t0Ticks); // MB/s
+    
+    if (debug) {
+        
+        // Measure readout time
+        gettimeofday(&t1, &tz);
+        t0Ticks = (long long int) t0.tv_sec * 1000000 + t0.tv_usec;
+        t1Ticks = (long long int) t1.tv_sec * 1000000 + t1.tv_usec;
+        runTime = (float) (t1Ticks - t0Ticks) / 1000000;
+        
 
-    
-    
-    printf("%ld.%06ld: Stop readout loop, recording %.3f sec, data %.1f MB rate %.1f MB/s\n",
-        t1.tv_sec, t1.tv_usec, runTime,
-        (float) nWords * 4 / 1024 / 1024, rate);
-    
-    // Readout loops
-    
-    // For performance testing always run the first run without signal, to measure the loop time
-    loopsPerSec = (float) nLoops / runTime;
-    if ((unsigned ) loopsPerSec > maxLoopsPerSec) maxLoopsPerSec = (unsigned) loopsPerSec;
-    
-    printf("%17s: loops %lld, readout %lld, red size %lld loop time %.3f us (max loops %lld)\n", "",
-           nLoops, nReadout, nReducedSize,
-           (float) (t1Ticks - t0Ticks) / nLoops,  maxLoopsPerSec);
-    
-    // Estimation of readout time
-    tDeadTicks = ((1000000 - t0.tv_usec) + t1.tv_usec );
-    tNoReadout = 0;
-    if (maxLoopsPerSec >0) tNoReadout = (float) (nLoops - nReadout) / maxLoopsPerSec ;
-    
-    load = 0;
-    if (nReadout > 0) {
-        meanBlockSize =  nWords / nReadout;
-        load = 100 * nWords / nReadout / 8160;
-    }
-    
-    printf("%17s: dead time %0.3f us no readout %.3f s, mean block size %d, load %f %s\n", "",
-           (float) tDeadTicks / 1000000, tNoReadout, meanBlockSize, load, "%");
+        tReadoutTime = srack->theSlt->runTime->read();
+        rate = 0;
+        if (tReadoutTime>0) rate = (float) nWords * 40 / tReadoutTime; // MB/s
+        
+        printf("%ld.%06ld: Stop readout loop, run %.3f s, readout %lld s, data %.1f MB, rate %.1f MB/s\n",
+            t1.tv_sec, t1.tv_usec, runTime, tReadoutTime / 10000000,
+            (float) nWords * 4 / 1024 / 1024, rate);
+        
+        // Readout loops
+        
+        // For performance testing always run the first run without signal, to measure the loop time
+        loopsPerSec = 0;
+        if (runTime > 0) loopsPerSec = (float) nLoops / runTime;
+        if ((unsigned ) loopsPerSec > maxLoopsPerSec) maxLoopsPerSec = (unsigned) loopsPerSec;
+        
+        printf("%17s: loops totel %lld, readout %lld, red size %lld, loop time %.3f us (max loops/s %lld)\n", "",
+               nLoops, nReadout, nReducedSize,
+               (float) (t1Ticks - t0Ticks) / nLoops,  maxLoopsPerSec);
+        
+        // Estimation of readout load
+        // Todo: Add time measurements
+        
+        load = 0;
+        meanBlockSize = 0;
+        if (nReadout > 0) {
+            meanBlockSize =  nWords / nReadout;
+            load = (float) 100 * nWords / nReadout / 8160;
+        }
+        
+        printf("%17s: mean block size %d, load %.2f %s\n", "",
+               meanBlockSize, load, "%");
+
+        }
     
     return true;
 }

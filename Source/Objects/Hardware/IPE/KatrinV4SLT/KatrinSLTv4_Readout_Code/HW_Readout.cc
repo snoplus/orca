@@ -162,7 +162,7 @@ void FindHardware(void)
     }
     
     //
-    // Check the hardware; read serial numbers and versions
+        // Check the hardware; read serial numbers and versions
     //
     int res, resArray[21];
     akInifile *ini;
@@ -172,35 +172,49 @@ void FindHardware(void)
     // Get path to configuration database 
     ini = new akInifile(name, 0, "$HOME");
     if (ini->Status()==Inifile::kSUCCESS){
-       ini->SpecifyGroup("kashell");
-       configDir = ini->GetFirstString("configdir","",&error);
+        ini->SpecifyGroup("OrcaReadout");
+        debug = ini->GetFirstValue("debug", 0, &error);
+        ini->SpecifyGroup("kashell");
+        configDir = ini->GetFirstString("configdir","",&error);
     }
     delete ini;
  
-    res = srack->readExpectedConfig("hardware.ini", configDir.c_str());
-    if (res == 3) {
-        printf("-----------------------------------------------------\n");
-        printf("Warning: Configuration database fdhwlib-config not found\n");
-	printf("   Use the inifile %s to specify where to find hardware.ini\n", name);
-        printf("   e.g. configdir = /home/katrin/etc/fdhwlib-config/fpd/\n");
-        printf("-----------------------------------------------------\n");
 
+    res = srack->readExpectedConfig("hardware.ini", configDir.c_str());
+    
+    
+    if (res == 3) {
+        
+        if (debug){
+            printf("-----------------------------------------------------\n");
+            printf("Warning: Configuration database fdhwlib-config not found\n");
+            printf("   Use the inifile %s to specify where to find hardware.ini\n", name);
+            printf("   e.g. configdir = /home/katrin/etc/fdhwlib-config/fpd/\n");
+            printf("-----------------------------------------------------\n");
+        }
+        
     } else {
 
       res = srack->checkConfig(resArray);
       if (res > 0){
-        res = 0; 
-        printf("-----------------------------------------------------\n");
-        printf("  Warning: Hardware configuration has changed\n"); 
-        srack->displayHardwareCheck(stdout, resArray, "  ");
-        printf("-----------------------------------------------------\n");
-
-        res = srack->saveConfig(configDir.c_str());
-        if (res == 0){
-          printf("Saved configuration to  %s\n", configDir.c_str());
-        } else {
-          printf("Error saving hardware configuration (err = %d)\n", res);
-        }
+          res = 0;
+          
+          if (debug){
+              printf("-----------------------------------------------------\n");
+              printf("  Warning: Hardware configuration has changed\n");
+              srack->displayHardwareCheck(stdout, resArray, "  ");
+              printf("-----------------------------------------------------\n");
+          }
+          
+          res = srack->saveConfig(configDir.c_str());
+          
+          if (debug) {
+              if (res == 0){
+                printf("Saved configuration to  %s\n", configDir.c_str());
+              } else {
+                printf("Error saving hardware configuration (err = %d)\n", res);
+              }
+          }
   
       }
     }
@@ -646,11 +660,12 @@ void setHostTimeToFLTsAndSLT(int32_t* args)
     
     time = srack->setSecondCounter();
     
-    if (time > 0)
-        printf("Set second counter to %lds\n", time);
-    else
-        printf("The timer was not set properly - repeat!\n");
-
+    if (debug) {
+        if (time > 0)
+            printf("Set second counter to %lds\n", time);
+        else
+            printf("The timer was not set properly - repeat!\n");
+    }
     
     /*
    

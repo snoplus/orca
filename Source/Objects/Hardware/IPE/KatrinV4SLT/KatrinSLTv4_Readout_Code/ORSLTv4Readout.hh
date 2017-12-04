@@ -68,6 +68,8 @@ class ORSLTv4Readout : public ORVCard
     unsigned long long int nNoReadout; //<  Number of loops without readout
     unsigned long long int maxLoopsPerSec; //< Speed of the readout loop; used for analysis
     
+    bool activateFltReadout; //< Loop over Flts only trace and histogram mode
+    
     readoutMode mode; //< control the readout function (standard, local storage, simulation)
 
     int filePtr; //< File pointer
