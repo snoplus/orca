@@ -2883,14 +2883,6 @@ Relay</string>
                                                         <rect key="frame" x="10" y="7" width="817" height="209"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <button toolTip="KatrinModel" id="26778" customClass="ObjectFactory">
-                                                                <rect key="frame" x="17" y="93" width="260" height="101"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" title="Katrin" bezelStyle="regularSquare" image="katrin" imagePosition="above" alignment="center" state="on" inset="2" id="26779">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="system" size="10"/>
-                                                                </buttonCell>
-                                                            </button>
                                                             <button toolTip="OReGunModel" id="26780" customClass="ObjectFactory">
                                                                 <rect key="frame" x="292" y="88" width="106" height="101"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -2947,6 +2939,14 @@ Relay</string>
                                                                 <buttonCell key="cell" type="bevel" title="HVcRIO" bezelStyle="regularSquare" image="HVcRIO" imagePosition="above" alignment="center" controlSize="mini" state="on" imageScaling="proportionallyDown" inset="2" id="dyf-7p-7Hk">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="miniSystem"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="KatrinModel" misplaced="YES" id="26778" customClass="ObjectFactory">
+                                                                <rect key="frame" x="39" y="93" width="110" height="115"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" title="Katrin" bezelStyle="regularSquare" image="katrin" imagePosition="above" alignment="center" state="on" inset="2" id="26779">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
                                                             </button>
                                                         </subviews>
@@ -3479,7 +3479,7 @@ Relay</string>
         <image name="eGun" width="100" height="86"/>
         <image name="ellie" width="59" height="72"/>
         <image name="fixedValue" width="83" height="16"/>
-        <image name="katrin" width="250" height="71"/>
+        <image name="katrin" width="100" height="100"/>
         <image name="monspectrometer" width="79.578948974609375" height="40.872180938720703"/>
         <image name="nEDMCoil" width="150" height="136"/>
         <image name="prespectrometer" width="72" height="48"/>
