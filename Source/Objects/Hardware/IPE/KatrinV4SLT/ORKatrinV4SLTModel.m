@@ -1842,12 +1842,15 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long sltsec;
     unsigned long sltsubsec2;
     
-    
-    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
-    NSLog(@"SLT %i.%03i - Stopping run; set inhibit\n", sltsec, sltsubsec2/10);
-
+    @try {
+        sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
+        sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
+        sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
+        NSLog(@"SLT %i.%03i - Stopping run; set inhibit\n", sltsec, sltsubsec2/10);
+    }
+    @catch(NSException* e){
+        NSLog(@"SLT - runIsStopping Method: Exception reading one of the second counters. %@\n", e);
+    }
     
     [self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
     inhibitLastCheck = 0;
