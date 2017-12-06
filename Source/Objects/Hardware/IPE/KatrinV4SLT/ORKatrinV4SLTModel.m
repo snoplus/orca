@@ -1850,6 +1850,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     }
     @catch(NSException* e){
         NSLog(@"SLT - runIsStopping Method: Exception reading one of the second counters. %@\n", e);
+        [e raise]; //this will also be caught in Run Control
     }
     
     [self writeSetInhibit]; //TODO: maybe move to readout loop to avoid dead time -tb-
