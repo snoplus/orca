@@ -33,9 +33,13 @@
 	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
 	    IBOutlet NSTextField*   pixelBusEnableRegTextField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
+        IBOutlet NSButton*      pixelBusWriteButton;
+        IBOutlet NSButton*      pixelBusReadButton;
+
 		IBOutlet NSMatrix*		countersMatrix;
 		IBOutlet NSTextField*	secondsSetField;
-		IBOutlet NSButton*		secondsSetInitWithHostButton;
+        IBOutlet NSButton*      secondsSetInitWithHostButton;
+        IBOutlet NSButton*      secondsSetNowButton;
 	    IBOutlet NSButton*      secondsSetSendToFLTsCB;
 		IBOutlet NSButton*		hwVersionButton;
         IBOutlet StopLightView* lightBoardView;
@@ -55,7 +59,10 @@
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
-		
+        IBOutlet NSButton*      haltSBCButton;
+        IBOutlet NSButton*      initOnConnectButton;
+        IBOutlet NSButton*      setCodeLocationButton;
+
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
 		IBOutlet NSButton*		resetPageManagerButton;
@@ -73,6 +80,8 @@
 		IBOutlet NSButton*		setSWInhibit1Button;
 		IBOutlet NSButton*		relSWInhibit1Button;
 		IBOutlet NSButton*		forceTrigger1Button;
+        IBOutlet NSButton*      resetSLTButton;
+        IBOutlet NSButton*      resetFLTButton;
 
 		IBOutlet NSButton*		resetHWButton;
 		IBOutlet NSButton*		definePatternFileButton;

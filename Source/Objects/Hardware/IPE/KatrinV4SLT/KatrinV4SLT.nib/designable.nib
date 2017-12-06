@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1070" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -29,6 +29,7 @@
                 <outlet property="enableDisableCountersMatrix" destination="5399" id="5410"/>
                 <outlet property="filePathField" destination="3051" id="3378"/>
                 <outlet property="forceReloadButton" destination="3052" id="3375"/>
+                <outlet property="haltSBCButton" destination="4467" id="rHM-Ym-hmp"/>
                 <outlet property="histogram" destination="5676" id="5689"/>
                 <outlet property="hwVersionButton" destination="2726" id="5071"/>
                 <outlet property="hwVersionField" destination="2729" id="5072"/>
@@ -37,6 +38,7 @@
                 <outlet property="initAfterConnectButton" destination="3076" id="3371"/>
                 <outlet property="initBoard1Button" destination="3008" id="3405"/>
                 <outlet property="initBoardButton" destination="2721" id="3413"/>
+                <outlet property="initOnConnectButton" destination="3076" id="eix-Ne-gxw"/>
                 <outlet property="interruptMaskMatrix" destination="3016" id="3344"/>
                 <outlet property="ipNumberComboBox" destination="4463" id="4465"/>
                 <outlet property="killCrateButton" destination="3054" id="4138"/>
@@ -57,6 +59,8 @@
                 <outlet property="pingTaskProgress" destination="3074" id="3439"/>
                 <outlet property="pixelBusEnableRegMatrix" destination="5720" id="lBO-fz-XKG"/>
                 <outlet property="pixelBusEnableRegTextField" destination="5723" id="cyq-Z3-3OG"/>
+                <outlet property="pixelBusReadButton" destination="5721" id="hCQ-4d-oyc"/>
+                <outlet property="pixelBusWriteButton" destination="5722" id="hFz-94-XFh"/>
                 <outlet property="plotter" destination="5675" id="5690"/>
                 <outlet property="pollRatePopup" destination="2867" id="3353"/>
                 <outlet property="pollRunningIndicator" destination="2865" id="3366"/>
@@ -69,12 +73,16 @@
                 <outlet property="regWriteValueStepper" destination="3031" id="3348"/>
                 <outlet property="regWriteValueTextField" destination="3030" id="3347"/>
                 <outlet property="registerPopUp" destination="3027" id="3342"/>
+                <outlet property="resetFLTButton" destination="6NU-gN-Nf2" id="88J-fl-zoo"/>
                 <outlet property="resetPageManagerButton" destination="5608" id="5611"/>
+                <outlet property="resetSLTButton" destination="lPh-c4-5Ov" id="KvO-zk-wV4"/>
                 <outlet property="rootPassWordField" destination="4478" id="4491"/>
                 <outlet property="runInfoField" destination="2836" id="3365"/>
                 <outlet property="secondsSetField" destination="5086" id="5094"/>
                 <outlet property="secondsSetInitWithHostButton" destination="5651" id="5654"/>
+                <outlet property="secondsSetNowButton" destination="5708" id="I3W-T8-vR3"/>
                 <outlet property="secondsSetSendToFLTsCB" destination="5703" id="5707"/>
+                <outlet property="setCodeLocationButton" destination="3058" id="zSq-Mc-S5f"/>
                 <outlet property="setFilePathButton" destination="3058" id="3374"/>
                 <outlet property="shutdown1Field" destination="4476" id="5602"/>
                 <outlet property="shutdown2Field" destination="4479" id="5603"/>
@@ -115,11 +123,11 @@
                         <tabViewItems>
                             <tabViewItem label="Control" identifier="" id="2718">
                                 <view key="view" id="2719">
-                                    <rect key="frame" x="10" y="29" width="487" height="404"/>
+                                    <rect key="frame" x="10" y="25" width="487" height="408"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Hw Version" id="2725">
-                                            <rect key="frame" x="263" y="336" width="214" height="56"/>
+                                            <rect key="frame" x="263" y="340" width="214" height="56"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="6f7-cA-GcV">
                                                 <rect key="frame" x="2" y="2" width="210" height="39"/>
@@ -149,7 +157,7 @@
                                             </view>
                                         </box>
                                         <box title="Control Register" id="2724">
-                                            <rect key="frame" x="14" y="175" width="240" height="217"/>
+                                            <rect key="frame" x="14" y="179" width="240" height="217"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="VEK-6Z-wbd">
                                                 <rect key="frame" x="2" y="2" width="236" height="200"/>
@@ -323,7 +331,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Counters" id="5092">
-                                            <rect key="frame" x="262" y="276" width="215" height="57"/>
+                                            <rect key="frame" x="262" y="280" width="215" height="57"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jeV-5h-6CK">
                                                 <rect key="frame" x="1" y="1" width="213" height="41"/>
@@ -372,7 +380,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Seconds" id="5408">
-                                            <rect key="frame" x="263" y="175" width="216" height="97"/>
+                                            <rect key="frame" x="263" y="179" width="216" height="97"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="rsy-SM-YnW">
                                                 <rect key="frame" x="1" y="1" width="214" height="81"/>
@@ -436,7 +444,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Pixelbus Enable Register" id="5719">
-                                            <rect key="frame" x="14" y="8" width="240" height="163"/>
+                                            <rect key="frame" x="14" y="12" width="240" height="163"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="p14-Gf-dge">
                                                 <rect key="frame" x="2" y="2" width="236" height="146"/>
@@ -615,7 +623,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2722">
-                                            <rect key="frame" x="279" y="6" width="63" height="28"/>
+                                            <rect key="frame" x="279" y="10" width="63" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Report" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5534">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -626,7 +634,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2721">
-                                            <rect key="frame" x="376" y="6" width="87" height="28"/>
+                                            <rect key="frame" x="376" y="10" width="87" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5533">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -637,7 +645,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Performance" id="VzC-pa-AYf">
-                                            <rect key="frame" x="263" y="45" width="214" height="126"/>
+                                            <rect key="frame" x="263" y="49" width="214" height="126"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="usB-R0-jcL">
                                                 <rect key="frame" x="1" y="1" width="212" height="110"/>
@@ -1285,14 +1293,6 @@
                                                 <action selector="resetPageManagerAction:" target="-2" id="5610"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="5758">
-                                            <rect key="frame" x="24" y="37" width="122" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Read SLT Ev.FIFO" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5759">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                        </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Debugging &amp; Simulation" id="5620">
                                             <rect key="frame" x="231" y="261" width="232" height="137"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1522,7 +1522,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="lPh-c4-5Ov">
-                                            <rect key="frame" x="24" y="-13" width="59" height="28"/>
+                                            <rect key="frame" x="24" y="-2" width="59" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="ZgO-3j-KGv">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1533,7 +1533,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="6NU-gN-Nf2">
-                                            <rect key="frame" x="88" y="-13" width="59" height="28"/>
+                                            <rect key="frame" x="88" y="-2" width="59" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="SxA-te-SC3">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1544,7 +1544,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" id="qBG-Pa-OYz">
-                                            <rect key="frame" x="27" y="12" width="117" height="17"/>
+                                            <rect key="frame" x="27" y="23" width="117" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Reset" id="v9r-K1-YuL">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -1553,7 +1553,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="7Xf-hI-pVe">
-                                            <rect key="frame" x="174" y="-13" width="59" height="28"/>
+                                            <rect key="frame" x="174" y="-2" width="59" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Set" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="Tyl-FF-aFq">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1564,7 +1564,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="m8X-6f-Xg9">
-                                            <rect key="frame" x="238" y="-13" width="59" height="28"/>
+                                            <rect key="frame" x="238" y="-2" width="59" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Clr" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="v8F-6g-6Sv">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1575,7 +1575,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" misplaced="YES" id="Ikm-zV-25B">
-                                            <rect key="frame" x="177" y="12" width="117" height="17"/>
+                                            <rect key="frame" x="177" y="23" width="117" height="17"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Inhibit Flag" id="gTV-u6-aaW">
                                                 <font key="font" metaFont="smallSystem"/>

@@ -53,7 +53,7 @@
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(555,530);
+	controlSize			= NSMakeSize(555,480);
     statusSize			= NSMakeSize(555,480);
     lowLevelSize		= NSMakeSize(555,490);
     cpuManagementSize	= NSMakeSize(485,450);
@@ -392,27 +392,41 @@
     BOOL locked = [gSecurity isLocked:ORKatrinV4SLTSettingsLock];
 	BOOL isRunning = [gOrcaGlobals runInProgress];
 	
-	
-    [inhibitEnableMatrix setEnabled:!lockedOrRunningMaintenance];
-    [pixelBusEnableRegMatrix setEnabled:!isRunning];
-    [hwVersionButton setEnabled:!isRunning];
+    [initOnConnectButton        setEnabled:!lockedOrRunningMaintenance];
+    [setCodeLocationButton      setEnabled:!lockedOrRunningMaintenance];
+    [haltSBCButton              setEnabled:!lockedOrRunningMaintenance];
+    [inhibitEnableMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusEnableRegMatrix    setEnabled:!isRunning];
+    [hwVersionButton            setEnabled:!isRunning];
     [enableDisableCountersMatrix setEnabled:!isRunning];
-    [minimumDecodingMatrix setEnabled:!isRunning];
-
-	[loadPatternFileButton setEnabled:!lockedOrRunningMaintenance];
-	[definePatternFileButton setEnabled:!lockedOrRunningMaintenance];
-	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[resetPageManagerButton setEnabled:!lockedOrRunningMaintenance];
-	[forceTriggerButton setEnabled:!lockedOrRunningMaintenance];
-	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
-	[initBoard1Button setEnabled:!lockedOrRunningMaintenance];
-	[readBoardButton setEnabled:!lockedOrRunningMaintenance];
-	[secStrobeSrcPU setEnabled:!lockedOrRunningMaintenance]; 
+    [minimumDecodingMatrix      setEnabled:!isRunning];
+    
+    [secondsSetInitWithHostButton setEnabled:!lockedOrRunningMaintenance];
+    [secondsSetSendToFLTsCB     setEnabled:!lockedOrRunningMaintenance];
+    [secondsSetNowButton        setEnabled:!lockedOrRunningMaintenance];
+    [secondsSetField            setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusReadButton         setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusWriteButton        setEnabled:!lockedOrRunningMaintenance];
+    [miscCntrlBitsMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [testPatternEnableMatrix    setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusEnableRegTextField setEnabled:!lockedOrRunningMaintenance];
+    [loadPatternFileButton      setEnabled:!lockedOrRunningMaintenance];
+	[definePatternFileButton    setEnabled:!lockedOrRunningMaintenance];
+	[setSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[resetPageManagerButton     setEnabled:!lockedOrRunningMaintenance];
+	[forceTriggerButton         setEnabled:!lockedOrRunningMaintenance];
+	[initBoardButton            setEnabled:!lockedOrRunningMaintenance];
+	[initBoard1Button           setEnabled:!lockedOrRunningMaintenance];
+	[readBoardButton            setEnabled:!lockedOrRunningMaintenance];
+	[secStrobeSrcPU             setEnabled:!lockedOrRunningMaintenance];
 	
-	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[forceTrigger1Button setEnabled:!lockedOrRunningMaintenance];
+    [interruptMaskMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [resetFLTButton             setEnabled:!lockedOrRunningMaintenance];
+    [resetSLTButton             setEnabled:!lockedOrRunningMaintenance];
+    [setSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[forceTrigger1Button        setEnabled:!lockedOrRunningMaintenance];
     
 	[clearAllStatusErrorBitsButton setEnabled:!lockedOrRunningMaintenance];
 
