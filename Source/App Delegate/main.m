@@ -30,7 +30,10 @@ int main(int argc, const char *argv[])
                                                    reason:@"Real-time control/DAQ"];
 #endif
 	//NSZombieEnabled = YES;
-
+    signal(SIGPIPE,SIG_IGN); //even with this line, Xcode will hit an automatic break point here
+                            //put a breakpoint on this above line and edit the breakpoint to add the following debugger command
+                            //process handle SIGPIPE -n false -s false
+                            //and select the option to automatically continue
 	[NetSocket ignoreBrokenPipes];
 	return  NSApplicationMain(argc, argv);
 }
