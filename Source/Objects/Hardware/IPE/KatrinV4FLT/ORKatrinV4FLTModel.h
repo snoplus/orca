@@ -284,7 +284,7 @@
 - (unsigned long long) lostEvents;
 - (void) setLostEvents:(unsigned long long)aCounter;
 - (unsigned long long) lostEventsTr;
-- (void) setLostTrEvents:(unsigned long long)aCounter;
+//- (void) setLostTrEvents:(unsigned long long)aCounter;
 
 
 - (unsigned short) selectedRegIndex;
