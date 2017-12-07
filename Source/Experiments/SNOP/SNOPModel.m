@@ -707,7 +707,6 @@ tellieRunFiles = _tellieRunFiles;
         /* Load the TUBii settings to hardware. */
         if ([tubii sendCurrentModelStateToHW]) {
             NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
-            goto err;
         }
 
         /* Load the XL3 hardware. */
@@ -755,7 +754,6 @@ tellieRunFiles = _tellieRunFiles;
         /* Load the TUBii settings to hardware. */
         if ([tubii sendCurrentModelStateToHW]) {
             NSLogColor([NSColor redColor], @"error initializing TUBii.\n");
-            goto err;
         }
 
         /* Load the MTC hardware. */
