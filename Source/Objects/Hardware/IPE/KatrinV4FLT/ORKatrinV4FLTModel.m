@@ -926,12 +926,15 @@ static double table[32]={
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
 
+    // Adjust all ADC related parameters according to the filter length
     for(chan=0;chan<kNumV4FLTChannels;chan++){
         unsigned long currentThreshold = [self threshold:chan];
         [self setThreshold:chan withValue:currentThreshold*ratio];
     }
     
-
+    unsigned long currentOffset = [self energyOffset];
+    [self setEnergyOffset:currentOffset*ratio];
+    
     //----------------------------------------------
     // Normalize the histogram settings -- take old settings if called during initialization
     if(!initializing){

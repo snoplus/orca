@@ -441,7 +441,7 @@
 
 - (void) energyOffsetChanged:(NSNotification*)aNote
 {
-	[energyOffsetTextField setIntValue: [model energyOffset]];
+	[energyOffsetTextField setIntValue: [model energyOffset] >> [model filterShapingLength]];
 }
 
 - (void) forceFLTReadoutChanged:(NSNotification*)aNote
@@ -1135,7 +1135,7 @@
 
 - (IBAction) energyOffsetTextFieldAction:(id)sender
 {
-	[model setEnergyOffset:[sender intValue]];	
+	[model setEnergyOffset:[sender intValue] << [model filterShapingLength]];
 }
 
 - (IBAction) forceFLTReadoutCBAction:(id)sender
@@ -1150,7 +1150,7 @@
 
 - (IBAction) bipolarEnergyThreshTestTextFieldAction:(id)sender
 {
-	[model setBipolarEnergyThreshTest:[sender intValue]];	
+	[model setBipolarEnergyThreshTest:[sender intValue]];
 }
 
 - (IBAction) useBipolarEnergyCBAction:(id)sender
