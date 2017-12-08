@@ -1937,7 +1937,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     high  = [self readReg:kFLTV4FIFOLostCounterMsbReg];
     [self setLostEvents:((unsigned long long)high << 32) | low];
 
-    NSLog(@"LostEvents FIFO overflow %i (lsb %i msb %i)\n", lostEvents, low, high);
+    //NSLog(@"LostEvents FIFO overflow %i (lsb %i msb %i)\n", lostEvents, low, high);
     
     return lostEvents;
 }
@@ -1951,9 +1951,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     high  = [self readReg:kFLTV4FIFOLostCounterTrMsbReg];
     [self setLostEventsTr:((unsigned long long)high << 32) | low];
     
-    NSLog(@"LostEvents FPGA-FPGA transmission %i (lsb %i msb %i)\n", lostEventsTr, low, high);
+    //NSLog(@"LostEvents FPGA-FPGA transmission %i (lsb %i msb %i)\n", lostEventsTr, low, high);
     
-    return lostEvents;
+    return lostEventsTr;
 }
 
 
@@ -2393,13 +2393,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    
-
-    if(histClrMode || histClrMode){
-        NSLogColor([NSColor redColor],@"%@ WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n",[self fullID]);
-    }
-
-    
     [self setIsPartOfRun: YES];
 
     //NOTE: during this function the whole crate is set to 'INHIBIT' by the SLT -tb-

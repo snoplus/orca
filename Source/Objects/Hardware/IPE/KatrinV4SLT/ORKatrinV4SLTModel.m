@@ -1005,13 +1005,18 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 	//[self readControlReg];
 	[self readStatusReg];
-	[self readDeadTime];
-    [self readLostEvents];
-    [self readLostFltEvents];
-    [self readLostFltEventsTr];
-	[self readVetoTime];
-	[self readRunTime];
-	[self getSeconds];
+    [self getSeconds];
+
+    // Read only during run
+    if ([gOrcaGlobals runInProgress]) {
+        [self readDeadTime];
+        [self readLostEvents];
+        [self readLostFltEvents];
+        [self readLostFltEventsTr];
+        [self readVetoTime];
+        [self readRunTime];
+    }
+    
     if(pollTime){
         [self performSelector:@selector(readAllStatus) withObject:nil afterDelay:pollTime];
     }
@@ -1745,10 +1750,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Data takers started\n", sltsec, sltsubsec2/10);
 
-	
-    if(countersEnabled) [self writeEnCnt];
-    else                [self writeDisCnt];
-	if(countersEnabled)[self writeClrCnt];//If enabled run counter will be reset to 0 at run start -tb-
+    
+    // Clear counter and update display
+    [self writeClrCnt];
+    [self readLostEvents];
+    [self readLostFltEvents];
+    [self readLostFltEventsTr];
 
 	[self readStatusReg];
 	actualPageIndex     = 0;
@@ -1810,7 +1817,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     callRunIsStopping = false;
 
-    
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
