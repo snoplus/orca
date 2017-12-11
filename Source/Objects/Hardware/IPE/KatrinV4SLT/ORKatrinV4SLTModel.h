@@ -189,6 +189,8 @@
     
         BOOL                minimizeDecoding;
         bool                activateFltReadout;
+    
+        unsigned long       savedInhibitStatus;
 
 }
 
@@ -281,6 +283,10 @@
 - (void) checkPPSStatus;
 
 - (void) sendPMCCommandScript: (NSString*)aString;
+
+- (int) numberOfActiveThresholdFinder;
+- (void) restoreInhibitStatus;
+- (void) saveInhibitStatus;
 
 #pragma mark ***Polling
 - (int) pollTime;

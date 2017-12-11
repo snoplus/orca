@@ -119,7 +119,6 @@
     unsigned long runStatusDuringLastHitrateReading;
     BOOL initializing;
 
-    unsigned long inhibitBeforeThresholdFinder; //< used the threshold finder
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
     
 }

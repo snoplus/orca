@@ -843,6 +843,40 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 }
 
+
+- (int) numberOfActiveThresholdFinder
+{
+    int nActive;
+    
+    dataTakers = [[readOutGroup allObjects] retain];//cache of data takers.
+    
+    nActive = 0;
+    for(id obj in dataTakers){
+        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
+            //NSLog(@"FLT %i threshold finder %i\n", [obj stationNumber], [obj noiseFloorRunning]);
+            if([obj noiseFloorRunning]) nActive = nActive + 1;
+        }
+    }
+
+    return(nActive);
+}
+
+- (void) restoreInhibitStatus
+{
+    //NSLog(@"Restore inhibit status %i\n", savedInhibitStatus);
+    if (savedInhibitStatus == 0){
+         [self writeClrInhibit];
+    } else {
+         [self writeSetInhibit];
+    }
+}
+
+- (void) saveInhibitStatus
+{
+    savedInhibitStatus = [self readStatusReg] & kStatusInh;
+}
+
+
 #pragma mark ***HW Access
 - (void) checkPresence
 {
@@ -1654,18 +1688,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     
     // Check if any of the Flts is using the threshold finder
-    for(id obj in dataTakers){
-        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
-            
-            NSLog(@"FLT %i threshold finder %i\n", [obj stationNumber], [obj noiseFloorRunning]);
-        
-            if([obj noiseFloorRunning]){
-                NSLog(@"Wait for threshold finder to finish\n");
-                [NSException raise:@"SLT error" format:@"Threshold finder blocks run"];
-            }
-        }
+    if ([self numberOfActiveThresholdFinder] > 0){
+        NSLog(@"Wait for threshold finder to finish\n");
+        [NSException raise:@"SLT error" format:@"Threshold finder blocks run"];
     }
-    
+
     
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
@@ -1679,7 +1706,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
           
     // Stop crate
-    inhibitBeforeRun = [self readStatusReg] & kStatusInh;
+    [self saveInhibitStatus];
     [self writeSetInhibit];
     
     // Wait for inhibit; changes state with the next second strobe
@@ -1966,10 +1993,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
     //
-    if (inhibitBeforeRun == 0){
-        [self writeClrInhibit];
-    }
-    
+    [self restoreInhibitStatus];
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text

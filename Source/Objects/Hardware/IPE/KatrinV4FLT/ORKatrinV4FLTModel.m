@@ -2921,8 +2921,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) findNoiseFloors
 {
+    id slt = [[self crate] adapter];
+    
 	if(noiseFloorRunning){
+        // Terminate threshold finder (stop buton)
 		noiseFloorRunning = NO;
+        
+        // Restore inhibit state
+        if ([slt numberOfActiveThresholdFinder] == 0){
+            [slt restoreInhibitStatus];
+        }
+        
 	}
 	else {
         
@@ -3293,7 +3302,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		switch(noiseFloorState){
 			case 0:
                 // Save inhibit state
-                inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
+                if ([slt numberOfActiveThresholdFinder] == 1) // this one is the first one
+                {
+                    //inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
+                    [slt saveInhibitStatus];
+                }
                 // Release inhibit
                 [slt writeClrInhibit];
                 
@@ -3373,9 +3386,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				noiseFloorRunning = NO;
                 
                 // Restore inhibit state
-                if (inhibitBeforeThresholdFinder > 0)
-                    [slt writeSetInhibit];
-                
+                if ([slt numberOfActiveThresholdFinder] == 0){
+                    [slt restoreInhibitStatus];
+                }
 			break;
 		}
 		if(noiseFloorRunning){
