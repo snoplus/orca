@@ -928,8 +928,8 @@ static double table[32]={
 
     // Adjust all ADC related parameters according to the filter length
     for(chan=0;chan<kNumV4FLTChannels;chan++){
-        unsigned long currentThreshold = [self threshold:chan];
-        [self setThreshold:chan withValue:currentThreshold*ratio];
+        float currentThreshold = [self threshold:chan];
+        [self setFloatThreshold:chan withValue:currentThreshold*ratio];
     }
     
     unsigned long currentOffset = [self energyOffset];
@@ -1058,18 +1058,18 @@ static double table[32]={
 }
 
 //for HardwareWizard access
-- (void) setScaledThreshold:(short)aChan withValue:(unsigned long)aValue
+- (void) setScaledThreshold:(short)aChan withValue:(float)aValue
 {
-    [self setThreshold:aChan withValue:aValue << [self filterShapingLength]];
+    [self setFloatThreshold:aChan withValue:aValue * powf(2.,[self filterShapingLength])];
 }
-- (unsigned long) scaledThreshold:(short)aChan
+- (float) scaledThreshold:(short)aChan
 {
-    return [self threshold:aChan] >> [self filterShapingLength];
+    return [self threshold:aChan] / powf(2.,[self filterShapingLength]);
 }
 
--(unsigned long) threshold:(unsigned short) aChan
+-(float) threshold:(unsigned short) aChan
 {
-    return [[thresholds objectAtIndex:aChan] intValue];
+    return [[thresholds objectAtIndex:aChan] floatValue];
 }
 
 -(unsigned short) gain:(unsigned short) aChan
@@ -1077,11 +1077,12 @@ static double table[32]={
     return [[gains objectAtIndex:aChan] shortValue];
 }
 
--(void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold
+-(void) setFloatThreshold:(unsigned short) aChan withValue:(float) aThreshold
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
-	aThreshold = [self restrictIntValue:aThreshold min:0 max:0xfffff];
-    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aThreshold]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setFloatThreshold:aChan withValue:[self threshold:aChan]];
+    if(aThreshold<=0)aThreshold=0;
+    else if(aThreshold>0xfffff)aThreshold = 0xfffff;
+    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinV4FLTChan];
@@ -1248,7 +1249,7 @@ static double table[32]={
 {
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
-		[self setThreshold:i withValue:17000];
+		[self setFloatThreshold:i withValue:17000];
 		[self setGain:i withValue:0];
 	}
 	[self setGapLength:0];
@@ -2567,7 +2568,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@"raw"];
+    [p setFormat:@"##0.00" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@""];
     [p setSetMethod:@selector(setScaledThreshold:withValue:) getMethod:@selector(scaledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
@@ -3325,7 +3326,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				for(i=0;i<kNumV4FLTChannels;i++){
 					oldEnabled[i]   = [self hitRateEnabled:i];
 					oldThreshold[i] = [self threshold:i];
-					[self setThreshold:i withValue:maxThreshold];
+					[self setFloatThreshold:i withValue:maxThreshold];
 					newThreshold[i] = maxThreshold;
 				}
 				atLeastOne = NO;
@@ -3334,7 +3335,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 						noiseFloorLow[i]			= 0;
 						noiseFloorHigh[i]		= maxThreshold;
 						noiseFloorTestValue[i]	= maxThreshold/2;              //Initial probe position
-						[self setThreshold:i withValue:noiseFloorHigh[i]];
+						[self setFloatThreshold:i withValue:noiseFloorHigh[i]];
 						atLeastOne = YES;
 					}
 				}
@@ -3349,12 +3350,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
 						if(noiseFloorLow[i] <= noiseFloorHigh[i]) {
-							[self setThreshold:i withValue:noiseFloorTestValue[i]];
+							[self setFloatThreshold:i withValue:noiseFloorTestValue[i]];
 							
 						}
 						else {
 							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset * [self filterShapingLengthInBins]);
-							[self setThreshold:i withValue:maxThreshold];
+							[self setFloatThreshold:i withValue:maxThreshold];
 							hitRateEnabledMask &= ~(1L<<i);
 						}
 					}
@@ -3373,7 +3374,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 					if([self hitRateEnabled:i]){
 						if([self hitRate:i] > targetRate){
 							//the rate is too high, bump the threshold up
-							[self setThreshold:i withValue:maxThreshold];
+							[self setFloatThreshold:i withValue:maxThreshold];
 							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
 						}
 						else noiseFloorHigh[i] = noiseFloorTestValue[i] - 1;									//no data so continue lowering threshold
@@ -3390,7 +3391,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				//load new results
 				for(i=0;i<kNumV4FLTChannels;i++){
 					[self setHitRateEnabled:i withValue:oldEnabled[i]];
-					[self setThreshold:i withValue:newThreshold[i]];
+					[self setFloatThreshold:i withValue:newThreshold[i]];
 				}
 				[self initBoard];
 				noiseFloorRunning = NO;
@@ -3413,7 +3414,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         int i;
         for(i=0;i<kNumV4FLTChannels;i++){
             [self setHitRateEnabled:i withValue:oldEnabled[i]];
-            [self setThreshold:i withValue:oldThreshold[i]];
+            [self setFloatThreshold:i withValue:oldThreshold[i]];
 			//[self reset];
 			[self initBoard];
         }
