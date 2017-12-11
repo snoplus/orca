@@ -37,6 +37,7 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
+#import "ORDataFileModel.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
@@ -338,6 +339,22 @@ tellieRunFiles = _tellieRunFiles;
     return xl3Host;
 }
 
+- (void) setLogPrefix
+{
+    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    if (![dataFileModels count]) {
+        NSLogColor([NSColor redColor], @"Must have a DataFileModel object in the configuration\n");
+        return;
+    }
+    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
+    
+    // Get hostname of operator machine
+    char hostname[255];
+    gethostname(hostname, 255);
+    
+    [aDataFileModel setFilePrefix:[NSString stringWithFormat:@"%s_Run",hostname]];
+}
+
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -450,6 +467,9 @@ tellieRunFiles = _tellieRunFiles;
 
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
+
+    /* Add hostname as prefix to logs */
+    [self setLogPrefix];
 
     return self;
 }
