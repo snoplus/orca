@@ -413,6 +413,8 @@
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
+- (void) setScaledThreshold:(short)aChan withValue:(unsigned long)aValue;
+- (unsigned long) scaledThreshold:(short)aChan;
 
 
 - (void) testReadHisto;

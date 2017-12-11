@@ -1057,6 +1057,16 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelThresholdsChanged object:self];
 }
 
+//for HardwareWizard access
+- (void) setScaledThreshold:(short)aChan withValue:(unsigned long)aValue
+{
+    [self setThreshold:aChan withValue:aValue << [self filterShapingLength]];
+}
+- (unsigned long) scaledThreshold:(short)aChan
+{
+    return [self threshold:aChan] >> [self filterShapingLength];
+}
+
 -(unsigned long) threshold:(unsigned short) aChan
 {
     return [[thresholds objectAtIndex:aChan] intValue];
@@ -2558,7 +2568,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
     [p setFormat:@"##0" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@"raw"];
-    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
+    [p setSetMethod:@selector(setScaledThreshold:withValue:) getMethod:@selector(scaledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
 	

@@ -989,10 +989,9 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-    [[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
-    [[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+    [[thresholdTextFields cellWithTag:chan] setIntValue: [model scaledThreshold:chan]];
+    [[vetoThresholdMatrix cellWithTag:chan] setIntValue: [model scaledThreshold:chan]];
 }
-
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
