@@ -341,7 +341,8 @@ tellieRunFiles = _tellieRunFiles;
 
 - (void) setLogPrefix
 {
-    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    NSArray* dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document]
+                                collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
     if (![dataFileModels count]) {
         NSLogColor([NSColor redColor], @"Must have a DataFileModel object in the configuration\n");
         return;
@@ -468,9 +469,6 @@ tellieRunFiles = _tellieRunFiles;
     /* initialize our connection to the XL3 server */
     xl3_server = [[RedisClient alloc] initWithHostName:xl3Host withPort:xl3Port];
 
-    /* Add hostname as prefix to logs */
-    [self setLogPrefix];
-
     return self;
 }
 
@@ -541,6 +539,9 @@ tellieRunFiles = _tellieRunFiles;
      * information to the database. This will either block or quit.
      */
     [[self sessionDB] startSession];
+
+    /* Add hostname as prefix to logs */
+    [self setLogPrefix];
 
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
