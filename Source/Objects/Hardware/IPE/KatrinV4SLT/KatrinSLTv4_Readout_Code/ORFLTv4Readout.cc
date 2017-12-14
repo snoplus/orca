@@ -439,11 +439,7 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
     if(firstTime){// firstTime
         firstTime = false;
         currentFlt->histogramSettings->read();//read to cache
-        if(currentFlt->histogramSettings->histModeStopUncleared->getCache() ||
-           currentFlt->histogramSettings->histClearModeManual->getCache()){
-            fprintf(stdout,"ORFLTv4Readout.cc: WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n");
-            fflush(stdout);
-        }
+
         histoBinWidth       = currentFlt->histogramSettings->histEBin->getCache();
         histoEnergyOffset   = currentFlt->histogramSettings->histEMin->getCache();
         histoClearByUser    = currentFlt->histogramSettings->histClearModeManual->getCache();

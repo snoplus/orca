@@ -119,7 +119,6 @@
     unsigned long runStatusDuringLastHitrateReading;
     BOOL initializing;
 
-    unsigned long inhibitBeforeThresholdFinder; //< used the threshold finder
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
     
 }
@@ -262,10 +261,10 @@
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
-- (unsigned long)threshold:(unsigned short) aChan;
+- (float)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
 - (BOOL) triggerEnabled:(unsigned short) aChan;
-- (void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold;
+- (void) setFloatThreshold:(unsigned short) aChan withValue:(float) aThreshold;
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
 - (void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
@@ -414,6 +413,8 @@
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
+- (void) setScaledThreshold:(short)aChan withValue:(float)aValue;
+- (float) scaledThreshold:(short)aChan;
 
 
 - (void) testReadHisto;

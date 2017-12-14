@@ -926,12 +926,15 @@ static double table[32]={
 		NSLog(@"Warning: setFilterShapingLength: FLTv4: maximum filter length allows only gap length of 0. Gap length reset to 0!\n");
 	}
 
+    // Adjust all ADC related parameters according to the filter length
     for(chan=0;chan<kNumV4FLTChannels;chan++){
-        unsigned long currentThreshold = [self threshold:chan];
-        [self setThreshold:chan withValue:currentThreshold*ratio];
+        float currentThreshold = [self threshold:chan];
+        [self setFloatThreshold:chan withValue:currentThreshold*ratio];
     }
     
-
+    unsigned long currentOffset = [self energyOffset];
+    [self setEnergyOffset:currentOffset*ratio];
+    
     //----------------------------------------------
     // Normalize the histogram settings -- take old settings if called during initialization
     if(!initializing){
@@ -1054,9 +1057,19 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelThresholdsChanged object:self];
 }
 
--(unsigned long) threshold:(unsigned short) aChan
+//for HardwareWizard access
+- (void) setScaledThreshold:(short)aChan withValue:(float)aValue
 {
-    return [[thresholds objectAtIndex:aChan] intValue];
+    [self setFloatThreshold:aChan withValue:aValue * powf(2.,[self filterShapingLength])];
+}
+- (float) scaledThreshold:(short)aChan
+{
+    return [self threshold:aChan] / powf(2.,[self filterShapingLength]);
+}
+
+-(float) threshold:(unsigned short) aChan
+{
+    return [[thresholds objectAtIndex:aChan] floatValue];
 }
 
 -(unsigned short) gain:(unsigned short) aChan
@@ -1064,11 +1077,12 @@ static double table[32]={
     return [[gains objectAtIndex:aChan] shortValue];
 }
 
--(void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold
+-(void) setFloatThreshold:(unsigned short) aChan withValue:(float) aThreshold
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:[self threshold:aChan]];
-	aThreshold = [self restrictIntValue:aThreshold min:0 max:0xfffff];
-    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aThreshold]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setFloatThreshold:aChan withValue:[self threshold:aChan]];
+    if(aThreshold<=0)aThreshold=0;
+    else if(aThreshold>0xfffff)aThreshold = 0xfffff;
+    [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: ORKatrinV4FLTChan];
@@ -1235,7 +1249,7 @@ static double table[32]={
 {
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
-		[self setThreshold:i withValue:17000];
+		[self setFloatThreshold:i withValue:17000];
 		[self setGain:i withValue:0];
 	}
 	[self setGapLength:0];
@@ -1937,7 +1951,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     high  = [self readReg:kFLTV4FIFOLostCounterMsbReg];
     [self setLostEvents:((unsigned long long)high << 32) | low];
 
-    NSLog(@"LostEvents FIFO overflow %i (lsb %i msb %i)\n", lostEvents, low, high);
+    //NSLog(@"LostEvents FIFO overflow %i (lsb %i msb %i)\n", lostEvents, low, high);
     
     return lostEvents;
 }
@@ -1951,9 +1965,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     high  = [self readReg:kFLTV4FIFOLostCounterTrMsbReg];
     [self setLostEventsTr:((unsigned long long)high << 32) | low];
     
-    NSLog(@"LostEvents FPGA-FPGA transmission %i (lsb %i msb %i)\n", lostEventsTr, low, high);
+    //NSLog(@"LostEvents FPGA-FPGA transmission %i (lsb %i msb %i)\n", lostEventsTr, low, high);
     
-    return lostEvents;
+    return lostEventsTr;
 }
 
 
@@ -2393,13 +2407,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    
-
-    if(histClrMode || histClrMode){
-        NSLogColor([NSColor redColor],@"%@ WARNING: histogram readout is designed for continous and auto-clear mode only! Change your FLTv4 settings!\n",[self fullID]);
-    }
-
-    
     [self setIsPartOfRun: YES];
 
     //NOTE: during this function the whole crate is set to 'INHIBIT' by the SLT -tb-
@@ -2561,8 +2568,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setName:@"Threshold"];
-    [p setFormat:@"##0" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@"raw"];
-    [p setSetMethod:@selector(setThreshold:withValue:) getMethod:@selector(threshold:)];
+    [p setFormat:@"##0.00" upperLimit:0xfffff lowerLimit:0 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setScaledThreshold:withValue:) getMethod:@selector(scaledThreshold:)];
 	[p setCanBeRamped:YES];
     [a addObject:p];
 	
@@ -2925,8 +2932,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) findNoiseFloors
 {
+    id slt = [[self crate] adapter];
+    
 	if(noiseFloorRunning){
+        // Terminate threshold finder (stop buton)
 		noiseFloorRunning = NO;
+        
+        // Restore inhibit state
+        if ([slt numberOfActiveThresholdFinder] == 0){
+            [slt restoreInhibitStatus];
+        }
+        
 	}
 	else {
         
@@ -3297,7 +3313,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		switch(noiseFloorState){
 			case 0:
                 // Save inhibit state
-                inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
+                if ([slt numberOfActiveThresholdFinder] == 1) // this one is the first one
+                {
+                    //inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
+                    [slt saveInhibitStatus];
+                }
                 // Release inhibit
                 [slt writeClrInhibit];
                 
@@ -3306,7 +3326,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				for(i=0;i<kNumV4FLTChannels;i++){
 					oldEnabled[i]   = [self hitRateEnabled:i];
 					oldThreshold[i] = [self threshold:i];
-					[self setThreshold:i withValue:maxThreshold];
+					[self setFloatThreshold:i withValue:maxThreshold];
 					newThreshold[i] = maxThreshold;
 				}
 				atLeastOne = NO;
@@ -3315,7 +3335,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 						noiseFloorLow[i]			= 0;
 						noiseFloorHigh[i]		= maxThreshold;
 						noiseFloorTestValue[i]	= maxThreshold/2;              //Initial probe position
-						[self setThreshold:i withValue:noiseFloorHigh[i]];
+						[self setFloatThreshold:i withValue:noiseFloorHigh[i]];
 						atLeastOne = YES;
 					}
 				}
@@ -3330,12 +3350,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
 						if(noiseFloorLow[i] <= noiseFloorHigh[i]) {
-							[self setThreshold:i withValue:noiseFloorTestValue[i]];
+							[self setFloatThreshold:i withValue:noiseFloorTestValue[i]];
 							
 						}
 						else {
 							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset * [self filterShapingLengthInBins]);
-							[self setThreshold:i withValue:maxThreshold];
+							[self setFloatThreshold:i withValue:maxThreshold];
 							hitRateEnabledMask &= ~(1L<<i);
 						}
 					}
@@ -3354,7 +3374,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 					if([self hitRateEnabled:i]){
 						if([self hitRate:i] > targetRate){
 							//the rate is too high, bump the threshold up
-							[self setThreshold:i withValue:maxThreshold];
+							[self setFloatThreshold:i withValue:maxThreshold];
 							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
 						}
 						else noiseFloorHigh[i] = noiseFloorTestValue[i] - 1;									//no data so continue lowering threshold
@@ -3371,15 +3391,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				//load new results
 				for(i=0;i<kNumV4FLTChannels;i++){
 					[self setHitRateEnabled:i withValue:oldEnabled[i]];
-					[self setThreshold:i withValue:newThreshold[i]];
+					[self setFloatThreshold:i withValue:newThreshold[i]];
 				}
 				[self initBoard];
 				noiseFloorRunning = NO;
                 
                 // Restore inhibit state
-                if (inhibitBeforeThresholdFinder > 0)
-                    [slt writeSetInhibit];
-                
+                if ([slt numberOfActiveThresholdFinder] == 0){
+                    [slt restoreInhibitStatus];
+                }
 			break;
 		}
 		if(noiseFloorRunning){
@@ -3394,7 +3414,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         int i;
         for(i=0;i<kNumV4FLTChannels;i++){
             [self setHitRateEnabled:i withValue:oldEnabled[i]];
-            [self setThreshold:i withValue:oldThreshold[i]];
+            [self setFloatThreshold:i withValue:oldThreshold[i]];
 			//[self reset];
 			[self initBoard];
         }

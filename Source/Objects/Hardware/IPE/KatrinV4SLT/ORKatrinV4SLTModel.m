@@ -843,6 +843,40 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 }
 
+
+- (int) numberOfActiveThresholdFinder
+{
+    int nActive;
+    
+    dataTakers = [[readOutGroup allObjects] retain];//cache of data takers.
+    
+    nActive = 0;
+    for(id obj in dataTakers){
+        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
+            //NSLog(@"FLT %i threshold finder %i\n", [obj stationNumber], [obj noiseFloorRunning]);
+            if([obj noiseFloorRunning]) nActive = nActive + 1;
+        }
+    }
+
+    return(nActive);
+}
+
+- (void) restoreInhibitStatus
+{
+    //NSLog(@"Restore inhibit status %i\n", savedInhibitStatus);
+    if (savedInhibitStatus == 0){
+         [self writeClrInhibit];
+    } else {
+         [self writeSetInhibit];
+    }
+}
+
+- (void) saveInhibitStatus
+{
+    savedInhibitStatus = [self readStatusReg] & kStatusInh;
+}
+
+
 #pragma mark ***HW Access
 - (void) checkPresence
 {
@@ -1005,13 +1039,18 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 	//[self readControlReg];
 	[self readStatusReg];
-	[self readDeadTime];
-    [self readLostEvents];
-    [self readLostFltEvents];
-    [self readLostFltEventsTr];
-	[self readVetoTime];
-	[self readRunTime];
-	[self getSeconds];
+    [self getSeconds];
+
+    // Read only during run
+    if ([gOrcaGlobals runInProgress]) {
+        [self readDeadTime];
+        [self readLostEvents];
+        [self readLostFltEvents];
+        [self readLostFltEventsTr];
+        [self readVetoTime];
+        [self readRunTime];
+    }
+    
     if(pollTime){
         [self performSelector:@selector(readAllStatus) withObject:nil afterDelay:pollTime];
     }
@@ -1649,18 +1688,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     
     // Check if any of the Flts is using the threshold finder
-    for(id obj in dataTakers){
-        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){//or ORIpeV4FLTModel
-            
-            NSLog(@"FLT %i threshold finder %i\n", [obj stationNumber], [obj noiseFloorRunning]);
-        
-            if([obj noiseFloorRunning]){
-                NSLog(@"Wait for threshold finder to finish\n");
-                [NSException raise:@"SLT error" format:@"Threshold finder blocks run"];
-            }
-        }
+    if ([self numberOfActiveThresholdFinder] > 0){
+        NSLog(@"Wait for threshold finder to finish\n");
+        [NSException raise:@"SLT error" format:@"Threshold finder blocks run"];
     }
-    
+
     
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
@@ -1674,7 +1706,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
           
     // Stop crate
-    inhibitBeforeRun = [self readStatusReg] & kStatusInh;
+    [self saveInhibitStatus];
     [self writeSetInhibit];
     
     // Wait for inhibit; changes state with the next second strobe
@@ -1745,10 +1777,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Data takers started\n", sltsec, sltsubsec2/10);
 
-	
-    if(countersEnabled) [self writeEnCnt];
-    else                [self writeDisCnt];
-	if(countersEnabled)[self writeClrCnt];//If enabled run counter will be reset to 0 at run start -tb-
+    
+    // Clear counter and update display
+    [self writeClrCnt];
+    [self readLostEvents];
+    [self readLostFltEvents];
+    [self readLostFltEventsTr];
 
 	[self readStatusReg];
 	actualPageIndex     = 0;
@@ -1810,7 +1844,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     callRunIsStopping = false;
 
-    
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1960,10 +1993,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
     //
-    if (inhibitBeforeRun == 0){
-        [self writeClrInhibit];
-    }
-    
+    [self restoreInhibitStatus];
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text

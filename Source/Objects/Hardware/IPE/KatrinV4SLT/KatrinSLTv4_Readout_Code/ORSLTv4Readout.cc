@@ -78,6 +78,8 @@ bool ORSLTv4Readout::Start()
     nLoops = 0;
     nReadout = 0;
     nReducedSize = 0;
+    nWaitingForReadout = 0;
+    nInhibit = 0;
     nNoReadout = 0;
     
     gettimeofday(&t0, &tz);
@@ -157,6 +159,7 @@ bool ORSLTv4Readout::Stop()
     struct timezone tz;
     unsigned long long int t0Ticks, t1Ticks;
     float rate;
+    float tLoop;
     
     switch (mode){
         case kStandard:
@@ -184,7 +187,7 @@ bool ORSLTv4Readout::Stop()
         
         printf("%ld.%06ld: Stop readout loop, run %.3f s, readout %lld s, data %.1f MB, rate %.1f MB/s\n",
             t1.tv_sec, t1.tv_usec, runTime, tReadoutTime / 10000000,
-            (float) nWords * 4 / 1024 / 1024, rate);
+            (float) nWords * 4 / 1000 / 1000, rate);
         
         // Readout loops
         
@@ -193,9 +196,11 @@ bool ORSLTv4Readout::Stop()
         if (runTime > 0) loopsPerSec = (float) nLoops / runTime;
         if ((unsigned ) loopsPerSec > maxLoopsPerSec) maxLoopsPerSec = (unsigned) loopsPerSec;
         
-        printf("%17s: loops totel %lld, readout %lld, red size %lld, loop time %.3f us (max loops/s %lld)\n", "",
-               nLoops, nReadout, nReducedSize,
-               (float) (t1Ticks - t0Ticks) / nLoops,  maxLoopsPerSec);
+        tLoop = 0;
+        if (nLoops > 0) tLoop = (float) (t1Ticks - t0Ticks) / nLoops;
+        
+        printf("%17s: loops total %lld, readout %lld, red size %lld, wait %lld, inhibit %lld, loop time %.3f us\n", "",
+               nLoops, nReadout, nReducedSize, nWaitingForReadout, nInhibit, tLoop);
         
         // Estimation of readout load
         // Todo: Add time measurements
@@ -207,8 +212,8 @@ bool ORSLTv4Readout::Stop()
             load = (float) 100 * nWords / nReadout / 8160;
         }
         
-        printf("%17s: mean block size %d, load %.2f %s\n", "",
-               meanBlockSize, load, "%");
+        printf("%17s: mean block size %d, load %.2f %s, loops/s %lld\n", "",
+               meanBlockSize, load, "%", maxLoopsPerSec);
 
         }
     
@@ -234,7 +239,7 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
         pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
         dataIndex += numWordsToRead;
         
-        nWords = nWords + numWordsToRead+headerLen;
+        nWords = nWords + numWordsToRead;
 
     } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
         nNoReadout = 0; // Clear no readout
@@ -262,10 +267,16 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
         data[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
         
         
-        nWords = nWords + numWordsToRead+headerLen;
+        nWords = nWords + numWordsToRead;
         
     } else { // no readout
         nNoReadout = nNoReadout + 1;
+        
+        // Todo: Better check for inhibit here?! Are these the same values???
+        if (numWordsToRead > 0) nWaitingForReadout = nWaitingForReadout + 1;
+        
+        if (srack->theSlt->status->inhibit->read()) nInhibit = nInhibit + 1;
+        
     }
     
    

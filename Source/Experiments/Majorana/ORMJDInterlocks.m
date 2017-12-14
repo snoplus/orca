@@ -547,8 +547,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         fillingLN = NO;
                         fillString = @"Not Filling";
                         fillColor = normalColor;
-
                     }
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+
                     [self setState:kMJDInterlocks_CheckLNFill status:fillString color:fillColor];
                     [self setCurrentState:kMJDInterlocks_CheckForBreakdown];
                 }

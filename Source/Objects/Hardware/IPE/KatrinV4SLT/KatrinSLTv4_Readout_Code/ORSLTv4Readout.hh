@@ -65,6 +65,8 @@ class ORSLTv4Readout : public ORVCard
     unsigned long long int nLoops; //< Number of calls to the readout function
     unsigned long long int nReadout; //< Number of calls with readout of data
     unsigned long long int nReducedSize; //< Number of calls and readout of less than maximum block size
+    unsigned long long int nWaitingForReadout; //< Number of loops waiting for data
+    unsigned long long int nInhibit; //< Number of loops with inhibit active
     unsigned long long int nNoReadout; //<  Number of loops without readout
     unsigned long long int maxLoopsPerSec; //< Speed of the readout loop; used for analysis
     

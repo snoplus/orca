@@ -84,10 +84,13 @@
     [[rate0 xAxis] setRngLimitsLow:0 withHigh:1000000 withMinRng:5];
     
     [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
-
+    NSNumberFormatter* valueFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [valueFormatter setFormat:@"#0.00;0;-#0.00"];
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
+        [[thresholdTextFields cellWithTag:i] setFormatter:valueFormatter ];
+        [[vetoThresholdMatrix cellWithTag:i] setFormatter:valueFormatter ];
 	}
 	[self populatePullDown];
 	
@@ -441,7 +444,7 @@
 
 - (void) energyOffsetChanged:(NSNotification*)aNote
 {
-	[energyOffsetTextField setIntValue: [model energyOffset]];
+	[energyOffsetTextField setIntValue: [model energyOffset] >> [model filterShapingLength]];
 }
 
 - (void) forceFLTReadoutChanged:(NSNotification*)aNote
@@ -989,10 +992,9 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-    [[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
-    [[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+    [[thresholdTextFields cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
+    [[vetoThresholdMatrix cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
 }
-
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
@@ -1016,8 +1018,8 @@
 {
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
-		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan] >> [model filterShapingLength]];
+		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
+		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
 	}
 }
 
@@ -1135,7 +1137,7 @@
 
 - (IBAction) energyOffsetTextFieldAction:(id)sender
 {
-	[model setEnergyOffset:[sender intValue]];	
+	[model setEnergyOffset:[sender intValue] << [model filterShapingLength]];
 }
 
 - (IBAction) forceFLTReadoutCBAction:(id)sender
@@ -1150,7 +1152,7 @@
 
 - (IBAction) bipolarEnergyThreshTestTextFieldAction:(id)sender
 {
-	[model setBipolarEnergyThreshTest:[sender intValue]];	
+	[model setBipolarEnergyThreshTest:[sender intValue]];
 }
 
 - (IBAction) useBipolarEnergyCBAction:(id)sender
@@ -1458,11 +1460,8 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	if([sender intValue] != [(ORKatrinV4FLTModel*)model threshold:[[sender selectedCell] tag]] >> [model filterShapingLength] ){
-		[[self undoManager] setActionName: @"Set Threshold"];
-		[model setThreshold:[[sender selectedCell] tag] withValue: ([sender intValue] << [model filterShapingLength])];
-	}
-
+    [[self undoManager] setActionName: @"Set Threshold"];
+    [model setFloatThreshold:[[sender selectedCell] tag] withValue: [sender floatValue] * powf(2., [model filterShapingLength])];
 }
 
 
