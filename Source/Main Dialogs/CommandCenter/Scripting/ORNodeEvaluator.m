@@ -34,7 +34,7 @@
 @interface ORNodeEvaluator (Interpret_private)
 - (id)		processStatements:(id) p;
 - (id)		doOperation:(id) p container:(id)aContainer;
-- (id)		print:(id) p;
+- (id)      print:(id) p;
 - (id)		printFile:(id) p;
 - (id)		openLogFile:(id) p;
 - (id)		arrayList:(id) p;
@@ -52,6 +52,7 @@
 - (id)		processThrow:(id) p;
 - (id)      makeException:(id) p;
 - (id)      makeDictionary:(id) p;
+- (id)      processGlobalBranches:(id)p;
 - (id)      makeArray:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
@@ -90,7 +91,8 @@
 - (id)      genRandom:(id) p;
 - (id)      valueArray:(id)p;
 - (id)      addNodes:(id)p;
-
+- (id)      setUpGlobalTable:(id)p;
+- (void)    addGlobalSymbol:(NSString*)aVariableName;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -116,7 +118,10 @@
 		functionName = [aFunctionName copy];
 		[self setUpSysCallTable];
 		symbolTableLock = [[NSLock alloc] init];
-	}  
+        if([aFunctionName isEqualToString:@"main"]){
+            [self setGlobalSymbolTable:[NSMutableDictionary dictionary]];
+        }
+	}
 	return self;  
 }
 
@@ -126,6 +131,7 @@
 	[logFileHandle release];
 	[functionTable release];
 	[symbolTable release];
+    [globalSymbolTable release];
 	[_two release];
 	[_one release];
 	[_zero release];
@@ -141,7 +147,6 @@
 {
 	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
-
 
 #pragma mark •••Accessors
 - (void) setUserResult:(int)aResult
@@ -290,6 +295,13 @@
 	return [minSymbolTable autorelease];
 }
 
+- (void) setGlobalSymbolTable:(NSMutableDictionary*)aDict;
+{
+    [aDict retain];
+    [globalSymbolTable release];
+    globalSymbolTable = aDict;
+}
+
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable
 {
 	if(!aSymbolTable){
@@ -302,28 +314,35 @@
 	[symbolTable addEntriesFromDictionary:aSymbolTable];
 }
 
-
 - (id) valueForSymbol:(NSString*) aKey
 {
-    
-    if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
-	id aValue  = [symbolTable threadSafeObjectForKey:aKey usingLock:symbolTableLock];
-	if(!aValue){
-		aValue = _zero;
-		[self setValue:aValue forSymbol:aKey];
-	}
+    id aValue = nil;
+    if([globalSymbolTable objectForKey:aKey]){
+        aValue  = [globalSymbolTable threadSafeObjectForKey:aKey usingLock:symbolTableLock];
+    }
+    else {
+        if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
+        aValue  = [symbolTable threadSafeObjectForKey:aKey usingLock:symbolTableLock];
+        if(!aValue){
+            aValue = _zero;
+            [self setValue:aValue forSymbol:aKey];
+        }
+    }
 	return aValue;
 }
 
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol
 {
-	if(!aSymbol){
-		NSLog(@"Warning: <%@> used before initialized... was set to zero\n",aSymbol);
-		aValue = _zero;
-	}
-	if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
-	if(!aValue)aValue = _zero;
-	[symbolTable threadSafeSetObject:aValue forKey:aSymbol usingLock:symbolTableLock];
+	if(!aSymbol)aValue = _zero; //shouldn't happen, but can't put a nil into the dictionary
+	
+    if([globalSymbolTable objectForKey:aSymbol]){
+        [globalSymbolTable threadSafeSetObject:aValue forKey:aSymbol usingLock:symbolTableLock];
+    }
+    else {
+        if(!symbolTable)symbolTable = [[self makeSymbolTable] retain];
+        if(!aValue)aValue = _zero;
+        [symbolTable threadSafeSetObject:aValue forKey:aSymbol usingLock:symbolTableLock];
+    }
 	return aValue;
 }
 
@@ -618,9 +637,10 @@
         case '$':               return [self typeArray:p];
 		case kMakeArgList:		return [self doValueAppend:p container:aContainer];
 		case ',':				return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@"," stringByAppendingFormat:@"%@",NodeValue(1)]];
-			
+        case kGlobal:           return [self processGlobalBranches:p];
+
 			//array stuff
-		case kDefineArray:		return [self defineArray:p];
+        case kDefineArray:        return [self defineArray:p];
 		case kLeftArray:		return [self processLeftArray:p];
 		case kArrayAssign:		return [self arrayAssignment:p leftBranch:[[p nodeData] objectAtIndex:0] withValue:NodeValue(1)];
 		case kArrayListAssign:	return [self arrayList:p];
@@ -695,7 +715,8 @@
 		case SHELL:			return [self runShellCmd:p];
 			
 			//printing
-		case PRINT:			return [self print:p];
+        case PRINT:         return [self print:p];
+        case GLOBAL:        return [self setUpGlobalTable:p];
 		case PRINTFILE:		return [self printFile:p];
 		case LOGFILE:		return [self openLogFile:p];
 		case kAppend:		return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@" " stringByAppendingFormat:@"%@",NodeValue(1)]];
@@ -898,14 +919,19 @@
 	int i;
 	for(i=0;i<numNodes;i++)NodeValue(i);
 	return nil;
-}					
+}
+
+- (id) setUpGlobalTable:(id) p
+{
+    NodeValue(0);
+    return nil;
+}
 
 - (id) print:(id) p
 {
 	NSString* s = [[delegate scriptName] length]?[delegate scriptName]:@"OrcaScript";
 	id output = NodeValue(0);
 	NSLog(@"[%@] %@\n",s, output);
-
 	return nil;
 }	
 
@@ -1155,11 +1181,11 @@
 	
 	id someNodes = [functionTable objectForKey:aFunctionName];
 	if(someNodes){
-		functionEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:aFunctionName];	
+        functionEvaluator = [[ORNodeEvaluator alloc] initWithFunctionTable:functionTable functionName:aFunctionName];
 		[functionEvaluator setDelegate:delegate];
 		[functionEvaluator setFunctionLevel:functionLevel+1];
 		[functionEvaluator setSymbolTable:[self makeSymbolTableFor:aFunctionName args:argObject]];
-		
+        [functionEvaluator setGlobalSymbolTable:globalSymbolTable];
 		@try {
 			unsigned i;
 			unsigned numNodes = [someNodes count];
@@ -1343,6 +1369,41 @@
     }
     return nil;
 }
+
+- (id) processGlobalBranches:(id)p
+{
+    if(![functionName isEqualToString:@"main"]){
+        NSException* e = [NSException exceptionWithName:@"global def outside of main"
+                                                 reason:[NSString stringWithFormat:@"The keyword 'global' can only be in the main function"]
+                                               userInfo:nil];
+        [e raise];
+}
+        
+    if([[p nodeData] count] == 1){
+        NSString* s = [[[p nodeData] objectAtIndex:0] nodeData];
+        [self addGlobalSymbol:s];
+        NodeValue(0);
+    }
+    else {
+        if ([(Node*)p type] != typeOpr){
+            NSString* s = [[[p nodeData] objectAtIndex:0] nodeData];
+            [self addGlobalSymbol:s];
+        }
+        NodeValue(0);
+        NSString* s = [[[p nodeData] objectAtIndex:1] nodeData];
+        [self addGlobalSymbol:s];
+        NodeValue(1);
+    }
+    return nil;
+}
+
+- (void) addGlobalSymbol:(NSString*)aVariableName
+{
+    //if(!globalSymbolTable)globalSymbolTable = [[NSMutableDictionary dictionary]retain];
+    [globalSymbolTable setValue:_zero forKey:aVariableName];
+}
+
+
 - (id) makeArray:(id) p
 {
     if([[p nodeData] count] == 0) return [NSMutableArray array];
@@ -1884,7 +1945,8 @@
                 case SWITCH:			line = [NSMutableString stringWithString:@"[switch]"];		break;
                 case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
                 case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
-                case PRINT:				line = [NSMutableString stringWithString:@"[print]"];		break;
+                case GLOBAL:            line = [NSMutableString stringWithString:@"[GLOBAL]"];      break;
+                case PRINT:             line = [NSMutableString stringWithString:@"[print]"];       break;
                 case PRINTFILE:			line = [NSMutableString stringWithString:@"[printFile]"];	break;
                 case DISPLAY:			line = [NSMutableString stringWithString:@"[display]"];		break;
                 case LOGFILE:			line = [NSMutableString stringWithString:@"[logFile]"];		break;
@@ -1895,7 +1957,8 @@
                 case kPostDec:			line = [NSMutableString stringWithString:@"[postDec]"];		break;
                 case kPreDec:			line = [NSMutableString stringWithString:@"[prdDec]"];		break;
                 case kAppend:			line = [NSMutableString stringWithString:@"[append]"];		break;
-                case kTightAppend:		line = [NSMutableString stringWithString:@"[append(tight)]"];break;
+                case kTightAppend:      line = [NSMutableString stringWithString:@"[append(tight)]"];break;
+                case kGlobal:           line = [NSMutableString stringWithString:@"[globalVar]"];   break;
                 case ';':				line = [NSMutableString stringWithString:@"[;]"];			break;
                 case '=':				line = [NSMutableString stringWithString:@"[=]"];			break;
                 case UMINUS:			line = [NSMutableString stringWithString:@"[-]"];			break;

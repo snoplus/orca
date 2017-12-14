@@ -21,7 +21,8 @@
 @class ORScriptUserConfirmController;
 
 @interface ORNodeEvaluator : NSObject {
-	NSMutableDictionary* symbolTable;
+    NSMutableDictionary* symbolTable;
+    NSMutableDictionary* globalSymbolTable;
 	NSArray*			 parsedNodes;
 	NSDecimalNumber*	 _one;
 	NSDecimalNumber*	 _zero;
@@ -66,6 +67,7 @@
 - (NSMutableDictionary*) minSymbolTable;
 - (NSDictionary*) makeSymbolTableFor:(NSString*)aFunctionName args:(id)argObject;
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable;
+- (void) setGlobalSymbolTable:(NSMutableDictionary*)aSymbolTable;
 - (void) setArgs:(id)someArgs;
 - (id) valueForSymbol:(NSString*) aSymbol;
 - (id) setValue:(id)aValue forSymbol:(id) aSymbol;

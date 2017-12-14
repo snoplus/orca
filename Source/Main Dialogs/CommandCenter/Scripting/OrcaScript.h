@@ -23,5 +23,6 @@ enum {
 	kArrayListAssign,
 	kArrayAssign,
 	kWaitTimeOut,
-    kConfirmTimeOut
+    kConfirmTimeOut,
+    kGlobal
 };
