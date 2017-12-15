@@ -87,6 +87,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     [self setTimeLimit:3600];
     [self setDirName:@"~"];
+    [self setFileSuffix:@""];
 	[self registerNotificationObservers];
 
     [[self undoManager] enableUndoRegistration];
@@ -117,6 +118,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
     [dataPacket release];
 	[runInfo release];
+    [fileSuffix release];
     [dirName release];
     [startTime release];
     [definitionsFilePath release];
@@ -678,6 +680,19 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (NSString*)dirName
 {
     return dirName;
+}
+
+- (void) setFileSuffix:(NSString *)aFileSuffx
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFileSuffix:[self fileSuffix]];
+    
+    [fileSuffix autorelease];
+    fileSuffix = [aFileSuffx copy];
+}
+
+- (NSString*)fileSuffix
+{
+    return fileSuffix;
 }
 
 - (unsigned long)	runType
@@ -1761,6 +1776,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							  [NSNumber numberWithLong:runNumber],kRunNumber,
 							  [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
 							  [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                              [self fileSuffix], kFileSuffix,
 							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
 							  nil] retain];
     

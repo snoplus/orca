@@ -341,19 +341,18 @@ tellieRunFiles = _tellieRunFiles;
 
 - (void) setLogPrefix
 {
-    NSArray* dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document]
-                                collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
-    if (![dataFileModels count]) {
-        NSLogColor([NSColor redColor], @"Must have a DataFileModel object in the configuration\n");
-        return;
+    NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
+        return;     // (should never happen)
     }
-    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
     
     // Get hostname of operator machine
     char hostname[255];
     gethostname(hostname, 255);
     
-    [aDataFileModel setFilePrefix:[NSString stringWithFormat:@"%s_Run",hostname]];
+    [runControl setFileSuffix:[NSString stringWithFormat:@"%s",hostname]];
 }
 
 - (id) initWithCoder:(NSCoder*)decoder

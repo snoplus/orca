@@ -59,7 +59,8 @@
         unsigned long	userClearedRunTypes;
         BOOL            remoteControl;
         unsigned long   dataId;
-       
+    
+        NSString*       fileSuffix;
         NSString*		definitionsFilePath;
         NSString* 		dirName;
         id              client;
@@ -165,6 +166,8 @@
 - (void)	setDataPacket:(ORDataPacket*)aDataPacket;
 - (void)	setDirName:(NSString*)aFileName;
 - (NSString*)   dirName;
+- (void)	setFileSuffix:(NSString*)aFileSuffix;
+- (NSString*)   fileSuffix;
 - (unsigned long)exceptionCount;
 - (void)	incExceptionCount;
 - (void)	clearExceptionCount;
