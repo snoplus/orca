@@ -309,7 +309,7 @@
 - (void)startTellieRunNotification:(NSNotification *)aNote;
 - (IBAction)emergencyTellieStopAction:(id)sender;
 
-//tellie functions ---------------------
+//amellie functions ---------------------
 - (IBAction) loadAmellieRunAction:(id)sender;
 - (IBAction) fetchAmellieRunFiles:(id)sender;
 - (void) fetchAmellieRunFilesFinish:(NSNotification *)aNote;

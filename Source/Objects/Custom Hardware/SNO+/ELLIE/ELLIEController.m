@@ -326,12 +326,12 @@
 
 -(IBAction)tellieGeneralStopAction:(id)sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:nil];
+    [model stopTellieRun];
 }
 
 -(IBAction)tellieExpertStopAction:(id)sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:nil];
+    [model stopTellieRun];
 }
 
 -(void)tellieRunFinished:(NSNotification *)aNote
