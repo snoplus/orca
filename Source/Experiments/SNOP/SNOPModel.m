@@ -339,8 +339,16 @@ tellieRunFiles = _tellieRunFiles;
     return xl3Host;
 }
 
-- (void) setLogPrefix
+- (void) setLogNameFormat
 {
+    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    if (![dataFileModels count]) {
+        NSLogColor([NSColor redColor], @"Must have a DataFileModel object in the configuration\n");
+        return;
+    }
+    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
+    [aDataFileModel setFilePrefix:@""];
+    
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
         NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
@@ -540,7 +548,7 @@ tellieRunFiles = _tellieRunFiles;
     [[self sessionDB] startSession];
 
     /* Add hostname as prefix to logs */
-    [self setLogPrefix];
+    [self setLogNameFormat];
 
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
