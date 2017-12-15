@@ -295,14 +295,20 @@
 	 
 	return [minSymbolTable autorelease];
 }
-
+- (NSDictionary*) globalSymbolTable
+{
+    return globalSymbolTable;
+}
 - (void) setGlobalSymbolTable:(NSMutableDictionary*)aDict;
 {
     [aDict retain];
     [globalSymbolTable release];
     globalSymbolTable = aDict;
 }
-
+- (NSDictionary*) symbolTable
+{
+    return symbolTable;
+}
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable
 {
 	if(!aSymbolTable){
@@ -642,6 +648,9 @@
         case kGlobal:           return [self processGlobalBranches:p];
         case kGlobalVar:        return [self doGlobalVar:p];
         case kGlobalAssign:     return [self doGlobalAssign:p];
+        case SELFFUNCTION:      return [self functionName];
+        case SYMBOLS:           return [self symbolTable];
+        case GLOBALS:           return [self globalSymbolTable];
         case kDefineArray:      return [self defineArray:p];
 		case kLeftArray:		return [self processLeftArray:p];
 		case kArrayAssign:		return [self arrayAssignment:p leftBranch:[[p nodeData] objectAtIndex:0] withValue:NodeValue(1)];
@@ -1962,6 +1971,9 @@
 				case MAKESTRING:		line = [NSMutableString stringWithString:@"[makeString]"];	break;
 				case CATSTRING:			line = [NSMutableString stringWithString:@"[catString]"];	break;
                 case GLOBAL:            line = [NSMutableString stringWithString:@"[GLOBAL]"];      break;
+                case SELFFUNCTION:      line = [NSMutableString stringWithString:@"[SELFFunction]"];break;
+                case SYMBOLS:           line = [NSMutableString stringWithString:@"[SYMBOLS]"];     break;
+                case GLOBALS:           line = [NSMutableString stringWithString:@"[GLOBALS]"];     break;
                 case kGlobal:           line = [NSMutableString stringWithString:@"[globalList]"];  break;
                 case kGlobalVar:        line = [NSMutableString stringWithString:@"[globalVar]"];   break;
                 case kGlobalAssign:     line = [NSMutableString stringWithString:@"[globalAssign]"];break;

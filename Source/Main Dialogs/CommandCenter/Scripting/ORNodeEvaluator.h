@@ -67,6 +67,9 @@
 - (NSMutableDictionary*) minSymbolTable;
 - (NSDictionary*) makeSymbolTableFor:(NSString*)aFunctionName args:(id)argObject;
 - (void) setSymbolTable:(NSDictionary*)aSymbolTable;
+- (NSDictionary*) symbolTable;
+- (NSDictionary*) globalSymbolTable;
+
 - (void) setGlobalSymbolTable:(NSMutableDictionary*)aSymbolTable;
 - (void) setArgs:(id)someArgs;
 - (id) valueForSymbol:(NSString*) aSymbol;

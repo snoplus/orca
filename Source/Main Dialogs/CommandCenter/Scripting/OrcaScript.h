@@ -26,5 +26,6 @@ enum {
     kConfirmTimeOut,
     kGlobal,
     kGlobalVar,
-    kGlobalAssign
+    kGlobalAssign,
+    kSelfFunction
 };
