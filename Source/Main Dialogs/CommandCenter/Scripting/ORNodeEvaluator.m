@@ -53,6 +53,8 @@
 - (id)      makeException:(id) p;
 - (id)      makeDictionary:(id) p;
 - (id)      processGlobalBranches:(id)p;
+- (id)      doGlobalVar:(id)p;
+- (id)      doGlobalAssign:(id)p;
 - (id)      makeArray:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
@@ -92,7 +94,6 @@
 - (id)      valueArray:(id)p;
 - (id)      addNodes:(id)p;
 - (id)      setUpGlobalTable:(id)p;
-- (void)    addGlobalSymbol:(NSString*)aVariableName;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -638,9 +639,9 @@
 		case kMakeArgList:		return [self doValueAppend:p container:aContainer];
 		case ',':				return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@"," stringByAppendingFormat:@"%@",NodeValue(1)]];
         case kGlobal:           return [self processGlobalBranches:p];
-
-			//array stuff
-        case kDefineArray:        return [self defineArray:p];
+        case kGlobalVar:        return [self doGlobalVar:p];
+        case kGlobalAssign:     return [self doGlobalAssign:p];
+        case kDefineArray:      return [self defineArray:p];
 		case kLeftArray:		return [self processLeftArray:p];
 		case kArrayAssign:		return [self arrayAssignment:p leftBranch:[[p nodeData] objectAtIndex:0] withValue:NodeValue(1)];
 		case kArrayListAssign:	return [self arrayList:p];
@@ -1377,32 +1378,27 @@
                                                  reason:[NSString stringWithFormat:@"The keyword 'global' can only be in the main function"]
                                                userInfo:nil];
         [e raise];
+    }
+    NodeValue(0);
+    if([[p nodeData] count]==2)NodeValue(1);
+    return nil;
 }
-        
-    if([[p nodeData] count] == 1){
-        NSString* s = [[[p nodeData] objectAtIndex:0] nodeData];
-        [self addGlobalSymbol:s];
-        NodeValue(0);
-    }
-    else {
-        if ([(Node*)p type] != typeOpr){
-            NSString* s = [[[p nodeData] objectAtIndex:0] nodeData];
-            [self addGlobalSymbol:s];
-        }
-        NodeValue(0);
-        NSString* s = [[[p nodeData] objectAtIndex:1] nodeData];
-        [self addGlobalSymbol:s];
-        NodeValue(1);
-    }
+
+- (id) doGlobalVar:(id)p
+{
+    [globalSymbolTable setValue:_zero forKey:VARIABLENAME(0)];
+    return nil;
+}
+- (id) doGlobalAssign:(id)p
+{
+    [globalSymbolTable setValue:NodeValue(1) forKey:VARIABLENAME(0)];
     return nil;
 }
 
 - (void) addGlobalSymbol:(NSString*)aVariableName
 {
-    //if(!globalSymbolTable)globalSymbolTable = [[NSMutableDictionary dictionary]retain];
     [globalSymbolTable setValue:_zero forKey:aVariableName];
 }
-
 
 - (id) makeArray:(id) p
 {
@@ -1945,20 +1941,22 @@
                 case SWITCH:			line = [NSMutableString stringWithString:@"[switch]"];		break;
                 case CASE:				line = [NSMutableString stringWithString:@"[case]"];		break;
                 case DEFAULT:			line = [NSMutableString stringWithString:@"[default]"];		break;
-                case GLOBAL:            line = [NSMutableString stringWithString:@"[GLOBAL]"];      break;
                 case PRINT:             line = [NSMutableString stringWithString:@"[print]"];       break;
                 case PRINTFILE:			line = [NSMutableString stringWithString:@"[printFile]"];	break;
                 case DISPLAY:			line = [NSMutableString stringWithString:@"[display]"];		break;
                 case LOGFILE:			line = [NSMutableString stringWithString:@"[logFile]"];		break;
 				case MAKESTRING:		line = [NSMutableString stringWithString:@"[makeString]"];	break;
 				case CATSTRING:			line = [NSMutableString stringWithString:@"[catString]"];	break;
+                case GLOBAL:            line = [NSMutableString stringWithString:@"[GLOBAL]"];      break;
+                case kGlobal:           line = [NSMutableString stringWithString:@"[globalList]"];  break;
+                case kGlobalVar:        line = [NSMutableString stringWithString:@"[globalVar]"];   break;
+                case kGlobalAssign:     line = [NSMutableString stringWithString:@"[globalAssign]"];break;
                 case kPostInc:			line = [NSMutableString stringWithString:@"[postInc]"];		break;
                 case kPreInc:			line = [NSMutableString stringWithString:@"[preInc]"];		break;
                 case kPostDec:			line = [NSMutableString stringWithString:@"[postDec]"];		break;
                 case kPreDec:			line = [NSMutableString stringWithString:@"[prdDec]"];		break;
                 case kAppend:			line = [NSMutableString stringWithString:@"[append]"];		break;
                 case kTightAppend:      line = [NSMutableString stringWithString:@"[append(tight)]"];break;
-                case kGlobal:           line = [NSMutableString stringWithString:@"[globalVar]"];   break;
                 case ';':				line = [NSMutableString stringWithString:@"[;]"];			break;
                 case '=':				line = [NSMutableString stringWithString:@"[=]"];			break;
                 case UMINUS:			line = [NSMutableString stringWithString:@"[-]"];			break;

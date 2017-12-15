@@ -45,11 +45,11 @@
 
 %type <nPtr> program  functionCall statement arrayElement make_string  cat_string break_statement 
 %type <nPtr> hex_str expr statement_list objC findObj makeObj sortSomething sortSomethingR selection_statement iteration_statement printfile_statement try_statement throw_statement
-%type <nPtr> objVar objVar_list print_list log_list print_statement global_statement log_statement arg_list argName_list clear_statement keyObjectPairs objListForArray
+%type <nPtr> objVar objVar_list print_list log_list print_statement  log_statement arg_list argName_list clear_statement keyObjectPairs objListForArray
 %type <nPtr> compound_statement expression_statement jump_statement special_statement ns_object sci_statement fixed_statement
 %type <nPtr> case_statement case_list constant_expr point_str rect_str size_str wait_statement alarm_statement
 %type <nPtr> primary_expr multiplicative_expr postfix_expr unary_expr  additive_expr time_statement confirm_statement
-%type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr shell_statement global_list
+%type <nPtr> shift_expr relational_expr equality_expr and_expr exclusive_or_expr inclusive_or_expr shell_statement global_statement global_list global_expr
 %type <nPtr> logical_and_expr logical_or_expr conditional_expr assignment_expr leftArrayElement objectPtr rng_str file_str writeLineToFile_statement request_statement show_statement random_gen
 
 %start program
@@ -418,9 +418,13 @@ global_statement
 ;
 
 global_list
-: assignment_expr                    { $$ = executionNode(kGlobal, $1, nil); }
-| global_list ',' assignment_expr    { $$ = executionNode(kGlobal, $1, $3,nil); }
+: global_expr                    { $$ = $1; }
+| global_list ',' global_expr    { $$ = executionNode(kGlobal, $1, $3,nil); }
 ;
+
+global_expr
+: VARIABLE                       { $$ = executionNode(kGlobalVar, identifierNode($1),nil); }
+| VARIABLE '=' assignment_expr   { $$ = executionNode(kGlobalAssign,identifierNode($1),$3,nil);}
 
 //---print stuff-----------------------------------------------------------
 //ex: print "test:",i;

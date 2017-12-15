@@ -24,5 +24,7 @@ enum {
 	kArrayAssign,
 	kWaitTimeOut,
     kConfirmTimeOut,
-    kGlobal
+    kGlobal,
+    kGlobalVar,
+    kGlobalAssign
 };
