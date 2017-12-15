@@ -88,9 +88,14 @@
 
 - (void) deferredAxisSetup
 {
-	[[plotView xAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
-	[[plotView xAxis] setRngDefaultsLow:-5E9 withHigh:5E9];
-	[[plotView xAxis] setAllowNegativeValues:YES];
+    [[plotView xAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:25];
+    [[plotView xAxis] setRngDefaultsLow:-5E9 withHigh:5E9];
+    [[plotView xAxis] setAllowNegativeValues:YES];
+    
+    [[plotView yAxis] setRngLimitsLow:-5E9 withHigh:5E9 withMinRng:1E-3];
+    [[plotView yAxis] setRngDefaultsLow:-5E9 withHigh:5E9];
+    [[plotView yAxis] setInteger:NO];
+    [[plotView yAxis] setAllowNegativeValues:YES];
 }
 
 - (void) registerNotificationObservers

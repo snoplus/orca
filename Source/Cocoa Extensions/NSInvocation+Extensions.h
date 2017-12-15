@@ -29,7 +29,8 @@
 + (id) invoke:(NSString*)args withTarget:(id)aTarget;
 + (NSInvocation*) invocationWithTarget:(id)target
                               selector:(SEL)aSelector
-                       retainArguments:(BOOL)retainArguments, ...;
+                       retainArguments:(BOOL)retainArguments
+                                  args:(id)firstArg, ...;
 
 - (BOOL) setArgument:(int)argIndex to:(id)aVal;
 - (id) returnValue;

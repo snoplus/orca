@@ -2140,9 +2140,7 @@ return;
 
 - (void) tasksCompleted: (NSNotification*)aNote
 {
-        //DEBUG
-                 NSLog(@"%@::%@ Called tasksCompleted --- SLT <-------------------------\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-	//nothing to do... this just removes a run-time exception
+ 	//nothing to do... this just removes a run-time exception
 }
 
 #pragma mark •••SBC_Linking protocol

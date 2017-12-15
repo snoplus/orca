@@ -164,7 +164,9 @@
         [theTask launch];
     }
     else {
-        [delegate tasksCompleted:self];
+        if([delegate respondsToSelector:@selector(tasksCompleted:)]){
+            [delegate tasksCompleted:self];
+        }
         [delegate release];
         delegate = nil;
         [self autorelease];

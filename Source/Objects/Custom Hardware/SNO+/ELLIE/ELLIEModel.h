@@ -10,6 +10,7 @@
 
 #import <Foundation/Foundation.h>
 #import "ELLIEController.h"
+#import "OrcaObject.h"
 #import "XmlrpcClient.h"
 
 @class ORCouchDB;
@@ -45,6 +46,7 @@
 
     XmlrpcClient* _tellieClient;
     XmlrpcClient* _smellieClient;
+    XmlrpcClient* _smellieFlaggingClient;
     XmlrpcClient* _interlockClient;
 
     //tellie settings
@@ -54,6 +56,8 @@
     NSArray* _tellieRunNames;
     BOOL _ellieFireFlag;
     BOOL _tellieMultiFlag;
+    BOOL _maintenanceRollOver;
+    BOOL _smellieStopButton;
 
     //tellie settings
     NSMutableDictionary* _amellieFireParameters;
@@ -71,6 +75,8 @@
     // Run threads
     NSThread* _tellieThread;
     NSThread* _smellieThread;
+    NSThread* _tellieTransitionThread;
+    NSThread* _smellieTransitionThread;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* tellieFireParameters;
@@ -105,9 +111,14 @@
 @property (nonatomic,retain) NSString* interlockPort;
 @property (nonatomic,retain) XmlrpcClient* tellieClient;
 @property (nonatomic,retain) XmlrpcClient* smellieClient;
+@property (nonatomic,retain) XmlrpcClient* smellieFlaggingClient;
 @property (nonatomic,retain) XmlrpcClient* interlockClient;
 @property (nonatomic,retain) NSThread* tellieThread;
 @property (nonatomic,retain) NSThread* smellieThread;
+@property (nonatomic,retain) NSThread* tellieTransitionThread;
+@property (nonatomic,retain) NSThread* smellieTransitionThread;
+@property (nonatomic,assign) BOOL maintenanceRollOver;
+@property (nonatomic,assign) BOOL smellieStopButton;
 
 
 -(id) init;
@@ -151,6 +162,7 @@
 -(NSString*) calcTellieFibreForChannel:(NSUInteger)channel;
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave;
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
+<<<<<<< HEAD
 -(void)startTellieRunThread:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieMultiRunThread:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieMultiRun:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
@@ -159,6 +171,14 @@
 -(void)stopTellieRun;
 -(void)waitForTellieRunToFinish;
 -(void)tellieTidyUp;
+=======
+-(void) startTellieRunThread:(NSDictionary*)fireCommands;
+-(void)startTellieMultiRunThread:(NSArray*)fireCommandArray;
+-(void) startTellieMultiRun:(NSArray*)fireCommandArray;
+-(void) startTellieRun:(NSDictionary*)fireCommands;
+-(void) stopTellieRun;
+-(void) tellieRunTransition;
+>>>>>>> upstream/master
 
 // TELLIE database interactions
 -(void)pushInitialTellieRunDocument;
@@ -190,33 +210,27 @@
 
 //SMELLIE Control Functions
 -(void) setSmellieNewRun:(NSNumber *)runNumber;
--(void) deactivateSmellie;
-
+-(void) deactivateSmellieLasers;
+-(void) CancelSmellieTriggers;
 -(void) setSmellieLaserHeadMasterMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withRepRate:(NSNumber*)rate withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber*)gain;
 
 -(void) setSmellieLaserHeadSlaveMode:(NSNumber*)laserSwitchChan withIntensity:(NSNumber*)intensity withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withTime:(NSNumber*)time withGainVoltage:(NSNumber*)gain;
 
 -(void)setSmellieSuperkMasterMode:(NSNumber*)intensity withRepRate:(NSNumber*)rate withWavelengthLow:(NSNumber*)wavelengthLow withWavelengthHi:(NSNumber*)wavelengthHi withFibreInput:(NSNumber*)fibreInChan withFibreOutput:(NSNumber*)fibreOutChan withNPulses:(NSNumber*)noPulses withGainVoltage:(NSNumber *)gain;
 
--(NSMutableArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings;
--(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
--(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString*)laser;
--(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings;
 -(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings;
--(void) activateKeepAlive:(NSNumber *)runNumber;
--(void) killKeepAlive;
+-(void) startInterlockThread;
+-(void) killKeepAlive:(NSNotification*)aNote;
 -(void) pulseKeepAlive:(id)passed;
 -(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
 -(void) startSmellieRun:(NSDictionary*)smellieSettings;
 -(void) stopSmellieRun;
--(void) waitForSmellieRunToFinish;
--(void) smellieTidyUp;
+-(void) smellieRunTransition;
 -(NSNumber*)estimateSmellieRunTime:(NSDictionary*)smellieSettings;
 
 // SMELLIE database interactions
 -(void) pushInitialSmellieRunDocument;
--(void) updateSmellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) updateSmellieRunDocument:(NSArray*)subRunArray;
 -(void) fetchCurrentSmellieConfig;
 -(void) parseCurrentConfigVersion:(id)aResult;
 -(void) fetchConfigurationFile:(NSNumber*)currentVersion;
@@ -236,4 +250,12 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
+<<<<<<< HEAD
 extern NSString* ORAMELLIEMappingReceived;
+=======
+extern NSString* ORSMELLIERunFinished;
+extern NSString* ORTELLIERunFinished;
+extern NSString* ORSMELLIEInterlockKilled;
+extern NSString* ORELLIEFlashing;
+extern NSString* ORSMELLIEEmergencyStop;
+>>>>>>> upstream/master

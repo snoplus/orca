@@ -93,6 +93,7 @@
     [model setInterlockHost:[interlockHostTf stringValue]];
 }
 
+#pragma mark •••Notifications
 - (void) registerNotificationObservers
 {
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -115,6 +116,7 @@
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
                         object: nil];
+<<<<<<< HEAD
 
     [notifyCenter addObserver : self
                      selector : @selector(killInterlock:)
@@ -125,6 +127,8 @@
                      selector : @selector(tubiiDied:)
                          name : @"TUBiiKeepAliveDied"
                        object : nil];
+=======
+>>>>>>> upstream/master
 }
 
 -(void)fetchConfigurationFile:(NSNotification *)aNote{
@@ -187,7 +191,7 @@
     [tellieGeneralTriggerDelayTf setDelegate:self];
     [tellieGeneralNoPulsesTf setDelegate:self];
     [tellieGeneralFreqTf setDelegate:self];
-    [tellieGeneralTriggerDelayTf setStringValue:@"650"];
+    [tellieGeneralTriggerDelayTf setStringValue:@"800"];
 
     [tellieChannelTf setDelegate:self];
     [telliePulseWidthTf setDelegate:self];
@@ -198,8 +202,12 @@
     [tellieNoPulsesTf setDelegate:self];
     [tellieExpertNodeTf setDelegate:self];
     [telliePhotonsTf setDelegate:self];
+<<<<<<< HEAD
     [tellieTriggerDelayTf setStringValue:@"650"];
     [telliePulseHeightTf setStringValue:@"16383"];
+=======
+    [tellieTriggerDelayTf setStringValue:@"800"];
+>>>>>>> upstream/master
 
     [amelliePulseWidthTf setDelegate:self];
     [amelliePulseFreqTf setDelegate:self];
@@ -1558,6 +1566,7 @@
     return;
 }
 
+<<<<<<< HEAD
 -(void)killInterlock:(NSNotification *)aNote
 {
     [model killKeepAlive];
@@ -1615,4 +1624,6 @@
 }
 
 
+=======
+>>>>>>> upstream/master
 @end

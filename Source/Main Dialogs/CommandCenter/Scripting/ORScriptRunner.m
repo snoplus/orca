@@ -245,6 +245,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	// yacc has a number of global variables so it is NOT thread safe
 	// Acquire the lock to ensure one parse processing at a time
 	@synchronized((ORAppDelegate*)[NSApp delegate]){
+        [self setFunctionTable:nil]; //clear out out tables, start fresh.
 		if([theString length]){
 			parsedOK = NO;
 			scriptExists = YES;

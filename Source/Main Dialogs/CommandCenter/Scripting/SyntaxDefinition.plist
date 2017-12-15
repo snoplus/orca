@@ -76,6 +76,8 @@
 		<string>show</string>
 		<string>seedRandom</string>
 		<string>random</string>
+		<string>sort</string>
+		<string>sortRev</string>
 	</array>
 	<key>Constants</key>
 	<array>

@@ -54,6 +54,7 @@ NSString* ORMajoranaModelUpdateSpikeDisplay             = @"ORMajoranaModelUpdat
 NSString* ORMajoranaModelMaxNonCalibrationRate          = @"ORMajoranaModelMaxNonCalibrationRate";
 NSString* ORMajoranaModelVerboseDiagnosticsChanged      = @"ORMajoranaModelVerboseDiagnosticsChanged";
 NSString* ORMajoranaModelMinNumDetsToAlertExperts       = @"ORMajoranaModelMinNumDetsToAlertExperts";
+NSString* ORMajoranaModelCalibrationStatusChanged       = @"ORMajoranaModelCalibrationStatusChanged";
 
 static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
@@ -97,6 +98,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     [anObjForCouchID release];
     [stringMap release];
     [specialMap release];
+    [calibrationStatus release];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [super dealloc];
 }
@@ -305,7 +307,13 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     verboseDiagnostics = aState;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelVerboseDiagnosticsChanged" object:self];
 }
-
+- (NSString*) calibrationStatus {return calibrationStatus;}
+- (void) setCalibrationStatus:(NSString*)aString;
+{
+    [calibrationStatus autorelease];
+    calibrationStatus = [aString copy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelCalibrationStatusChanged" object:self];
+}
 - (void) hvInfoRequest:(NSNotification*)aNote
 {
     if([[aNote object] isKindOfClass:NSClassFromString(@"ORiSegHVCard")]){
@@ -557,7 +565,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(pollTime){
         if(!scheduledToRunCheckBreakdown){
             scheduledToRunCheckBreakdown = YES;
-            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:[self pollingTimeForLN:0] + 10];
+            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:[self pollingTimeForLN:0]];
         }
     }
 }
@@ -601,7 +609,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
 
 - (NSTimeInterval) pollingTimeForLN:(unsigned short)index
 {
-    if(index<2)return (NSTimeInterval)[[self mjdInterlocks:index] pollingTimeForLN];
+    if(index<2)return 1.5*(NSTimeInterval)[[self mjdInterlocks:index] pollingTimeForLN];
     else return 0;
 }
 

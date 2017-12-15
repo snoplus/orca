@@ -149,8 +149,9 @@
     IBOutlet NSTextField *TSlopePatternTextField;
     IBOutlet NSTextField *ecaNEventsTextField;
     IBOutlet NSTextField *ecaPulserRate;
-    IBOutlet NSButton *startSingleECAButton;
-    
+    IBOutlet NSMatrix *ecaStatusMatrix;
+
+
     //Server settings
     IBOutlet NSComboBox *orcaDBIPAddressPU;
     IBOutlet NSComboBox *debugDBIPAddressPU;
@@ -162,12 +163,12 @@
     IBOutlet NSTextField *dataHost;
     IBOutlet NSTextField *logPort;
     IBOutlet NSTextField *logHost;
-    IBOutlet NSTextField *lockDBIPAddress;
-    IBOutlet NSTextField *lockDBUser;
-    IBOutlet NSTextField *lockDBPswd;
-    IBOutlet NSTextField *lockDBName;
-    IBOutlet NSTextField *lockDBPort;
-    IBOutlet NSTextField *lockDBID;
+    IBOutlet NSTextField *sessionDBAddress;
+    IBOutlet NSTextField *sessionDBUser;
+    IBOutlet NSTextField *sessionDBPassword;
+    IBOutlet NSTextField *sessionDBName;
+    IBOutlet NSTextField *sessionDBPort;
+    IBOutlet NSTextField *sessionDBLockID;
     IBOutlet NSTextField *orcaDBUser;
     IBOutlet NSTextField *orcaDBPswd;
     IBOutlet NSTextField *orcaDBName;

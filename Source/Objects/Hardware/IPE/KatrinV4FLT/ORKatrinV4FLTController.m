@@ -57,8 +57,8 @@
 	//[[filterShapingLengthPU itemAtIndex:0] setHidden: YES];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	//[[filterShapingLengthPU itemAtIndex:0] setEnabled: NO];//TODO: remove this line to enable 100 nsec filter shaping length setting -tb-
 	
-    settingSize			= NSMakeSize(690,720);
-    rateSize			= NSMakeSize(500,690);
+    settingSize			= NSMakeSize(690,740);
+    rateSize			= NSMakeSize(500,710);
     testSize			= NSMakeSize(610,510);
     lowlevelSize		= NSMakeSize(610,510);
 	
@@ -84,10 +84,13 @@
     [[rate0 xAxis] setRngLimitsLow:0 withHigh:1000000 withMinRng:5];
     
     [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
-
+    NSNumberFormatter* valueFormatter = [[[NSNumberFormatter alloc] init] autorelease];
+    [valueFormatter setFormat:@"#0.00;0;-#0.00"];
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
+        [[thresholdTextFields cellWithTag:i] setFormatter:valueFormatter ];
+        [[vetoThresholdMatrix cellWithTag:i] setFormatter:valueFormatter ];
 	}
 	[self populatePullDown];
 	
@@ -375,11 +378,6 @@
 						object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(syncWithRunControlChanged:)
-                         name : ORKatrinV4FLTModelSyncWithRunControlChanged
-						object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(useDmaBlockReadChanged:)
                          name : ORKatrinV4FLTModelUseDmaBlockReadChanged
 						object: model];
@@ -424,6 +422,16 @@
                          name : ORKatrinV4FLTModelHitRateModeChanged
                         object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lostEventsChanged:)
+                         name : ORKatrinV4FLTModelLostEventsChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lostEventsTrChanged:)
+                         name : ORKatrinV4FLTModelLostEventsTrChanged
+                        object: model];
+
     
 }
 
@@ -436,7 +444,7 @@
 
 - (void) energyOffsetChanged:(NSNotification*)aNote
 {
-	[energyOffsetTextField setIntValue: [model energyOffset]];
+	[energyOffsetTextField setIntValue: [model energyOffset] >> [model filterShapingLength]];
 }
 
 - (void) forceFLTReadoutChanged:(NSNotification*)aNote
@@ -470,11 +478,6 @@
 {
 	[useDmaBlockReadPU selectItemWithTag: [model useDmaBlockRead]];
 	//[useDmaBlockReadButton setIntValue: [model useDmaBlockRead]];//obsolete -tb-
-}
-
-- (void) syncWithRunControlChanged:(NSNotification*)aNote
-{
-	[syncWithRunControlButton setIntValue: [model syncWithRunControl]];
 }
 
 - (void) recommendedPZCChanged:(NSNotification*)aNote
@@ -545,7 +548,7 @@
 
 - (void) histMaxEnergyChanged:(NSNotification*)aNote
 {
-	[histMaxEnergyTextField setIntValue: [model histMaxEnergy]];
+	[histMaxEnergyTextField setIntValue: [model histEMax] / [model filterShapingLengthInBins] ];
 }
 
 - (void) histPageABChanged:(NSNotification*)aNote
@@ -580,7 +583,7 @@
 
 - (void) histEMinChanged:(NSNotification*)aNote
 {
-	[histEMinTextField setIntValue: [model histEMin]];
+	[histEMinTextField setIntValue: [model histEMin] / [model filterShapingLengthInBins] ];
 }
 
 - (void) storeDataInRamChanged:(NSNotification*)aNote
@@ -723,16 +726,17 @@
 	[self poleZeroCorrectionChanged:nil];
 	[self decayTimeChanged:nil];
 	[self recommendedPZCChanged:nil];
-	[self syncWithRunControlChanged:nil];
 	[self useDmaBlockReadChanged:nil];
 	[self boxcarLengthChanged:nil];
 	[self useSLTtimeChanged:nil];
 	[self useBipolarEnergyChanged:nil];
 	[self bipolarEnergyThreshTestChanged:nil];
 	[self skipFltEventReadoutChanged:nil];
-	[self forceFLTReadoutChanged:nil];
+    [self forceFLTReadoutChanged:nil];
 	[self energyOffsetChanged:nil];
     [self hitRateModeChanged:nil];
+    [self lostEventsChanged:nil];
+    [self lostEventsTrChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -804,7 +808,6 @@
 	[histMeasTimeField setEnabled:               !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEMinTextField setEnabled:               !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histEBinPU setEnabled:                      !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
-	[syncWithRunControlButton setEnabled:        !runInProgress              & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[shipSumHistogramPU setEnabled:              !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histModePU setEnabled:                      !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[histClrModePU setEnabled:                   !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
@@ -816,8 +819,7 @@
 	else s = @"";
 	[vetoActiveField setStringValue:s];
 							  
-
-	[startNoiseFloorButton setEnabled: runInProgress || [model noiseFloorRunning]];
+    [startNoiseFloorButton setEnabled: !runInProgress];
 	
  	[self enableRegControls];
 }
@@ -990,10 +992,9 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-	[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
-	[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
+    [[thresholdTextFields cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
+    [[vetoThresholdMatrix cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
 }
-
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
@@ -1017,8 +1018,8 @@
 {
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
-		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
-		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model threshold:chan]];
+		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
+		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
 	}
 }
 
@@ -1080,6 +1081,17 @@
 		[timeRatePlot setNeedsDisplay:YES];
 	}
 }
+     
+- (void) lostEventsChanged:(NSNotification*)aNote
+{
+    [lostEventField setIntValue: [model lostEvents]];
+}
+
+- (void) lostEventsTrChanged:(NSNotification*)aNote
+{
+    [lostEventTrField setIntValue: [model lostEventsTr]];
+}
+
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
@@ -1123,32 +1135,32 @@
 
 #pragma mark •••Actions
 
-- (void) energyOffsetTextFieldAction:(id)sender
+- (IBAction) energyOffsetTextFieldAction:(id)sender
 {
-	[model setEnergyOffset:[sender intValue]];	
+	[model setEnergyOffset:[sender intValue] << [model filterShapingLength]];
 }
 
-- (void) forceFLTReadoutCBAction:(id)sender
+- (IBAction) forceFLTReadoutCBAction:(id)sender
 {
 	[model setForceFLTReadout:[sender intValue]];	
 }
 
-- (void) skipFltEventReadoutCBAction:(id)sender
+- (IBAction) skipFltEventReadoutCBAction:(id)sender
 {
 	[model setSkipFltEventReadout:[sender intValue]];	
 }
 
-- (void) bipolarEnergyThreshTestTextFieldAction:(id)sender
+- (IBAction) bipolarEnergyThreshTestTextFieldAction:(id)sender
 {
-	[model setBipolarEnergyThreshTest:[sender intValue]];	
+	[model setBipolarEnergyThreshTest:[sender intValue]];
 }
 
-- (void) useBipolarEnergyCBAction:(id)sender
+- (IBAction) useBipolarEnergyCBAction:(id)sender
 {
 	[model setUseBipolarEnergy:[sender intValue]];	
 }
 
-- (void) useSLTtimePUAction:(id)sender
+- (IBAction) useSLTtimePUAction:(id)sender
 {
 	//DEBUG -tb-    	NSLog(@"Called %@::%@! selected %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[sender indexOfSelectedItem]);//TODO: DEBUG -tb-
 	//[model setUseSLTtime:[sender intValue]];	
@@ -1168,11 +1180,6 @@
 - (IBAction) useDmaBlockReadButtonAction:(id)sender
 {
 	[model setUseDmaBlockRead:[sender intValue]];	
-}
-
-- (IBAction) syncWithRunControlButtonAction:(id)sender
-{
-	[model setSyncWithRunControl:[sender intValue]];	
 }
 
 - (IBAction) decayTimeTextFieldAction:(id)sender
@@ -1225,8 +1232,9 @@
 
 - (IBAction) shipSumHistogramPUAction:(id)sender
 {
-	//[model setShipSumHistogram:[sender intValue]];	
-	[model setShipSumHistogram:[[shipSumHistogramPU selectedItem] tag]];
+	//[model setShipSumHistogram:[sender intValue]];
+    [model setShipSumHistogram:[sender indexOfSelectedItem]];
+
 }
 
 - (IBAction) targetRateAction:(id)sender
@@ -1290,7 +1298,7 @@
 
 - (IBAction) histEMinAction:(id)sender
 {
-	[model setHistEMin:[sender intValue]];	
+	[model setHistEMin: ([sender intValue] * [model filterShapingLengthInBins] ) ];
 }
 
 
@@ -1452,10 +1460,8 @@
 
 - (IBAction) thresholdAction:(id)sender
 {
-	if([sender intValue] != [(ORKatrinV4FLTModel*)model threshold:[[sender selectedCell] tag]]){
-		[[self undoManager] setActionName: @"Set Threshold"];
-		[model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
+    [[self undoManager] setActionName: @"Set Threshold"];
+    [model setFloatThreshold:[[sender selectedCell] tag] withValue: [sender floatValue] * powf(2., [model filterShapingLength])];
 }
 
 

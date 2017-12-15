@@ -107,6 +107,7 @@ typedef enum eSBC_ThrottleConsts{
     int				loadMode;
 	unsigned long	throttleCount;
     long            throttle;
+    BOOL            disableThrottle;
 	unsigned int	readWriteType;
 	BOOL			doRange;
 	unsigned short	range;
@@ -343,6 +344,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
 - (void) load_HW_Config:(SBC_crate_config*)aConfig;
 - (unsigned long) throttle;
+- (BOOL) disableThrottle;
+- (void) setDisableThrottle:(BOOL)aFlag;
 - (void)reportErrorsByCard;
 
 - (NSString*) sbcLockName;
@@ -460,4 +463,5 @@ extern NSString* SBC_LinkSbcPollingRateChanged;
 extern NSString* SBC_LinkErrorInfoChanged;
 extern NSString* SBC_LinkMacAddressChanged;
 extern NSString* SBC_LinkTimeSkewChanged;
+extern NSString* SBC_LinkSbcDisableThrottleChanged;
 

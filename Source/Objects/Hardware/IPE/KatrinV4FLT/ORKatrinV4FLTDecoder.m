@@ -212,16 +212,8 @@
 				numBins:histoLen sender:self  
 			   withKeys:@"FLT", @"Energy", crateKey,stationKey,channelKey,nil];
     
-    unsigned long eventFlags    = ptr[7];
-    unsigned long traceStart16  = ShiftAndExtract(eventFlags,8,0x7ff);//start of trace in short array
-    
     unsigned short* dataPtr     = (unsigned short*)&ptr[9];
-    unsigned short* startPtr    = dataPtr+traceStart16;
-    NSMutableData* waveformData = [NSMutableData dataWithLength:4096];
-
-    [waveformData replaceBytesInRange:NSMakeRange(0,4096-traceStart16*2) withBytes:startPtr];
-    
-    [waveformData replaceBytesInRange:NSMakeRange(4096-traceStart16*2,traceStart16*2) withBytes:dataPtr];
+    NSData* waveformData = [NSData dataWithBytes:dataPtr length:4096];
     
 	[aDataSet loadWaveform: waveformData
 					offset: 0
@@ -484,19 +476,55 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 	NSString* stationKey	= [self getStationKey: card];	
 	NSString* channelKey	= [self getChannelKey: chan];
     
+    int filterShapingLength = ShiftAndExtract(ptr[1],0,0xf);
+	unsigned long filterLen = 1L << filterShapingLength;
+    unsigned long histoEBinSize = 1L << ptr[8];
+    unsigned long histoEOffset = ptr[9];
+    
+    
+    // Normalize the histogram to the full ADC range from 0 .. 4095
+    // Todo: Avoid comb structure when scaling up !!!
+    
+    unsigned long *ptrData;
+    int normE;
+    int spacing;
+    
+    ptrData = &ptr[12];
+    for (int i=0;i<4095;i++) normHisto[i] = 0;
+    
+    // Spacing 2 should be considered, anything larger does not make sense
+    spacing = histoEBinSize / filterLen;
+    for (int i=0; i<2048;i++) {
+        if (spacing < 2) {
+           normE = (histoEOffset + i * histoEBinSize) / filterLen;
+           if (normE > 4095) normE = 4095;
+        
+           normHisto[normE] += ptrData[i];
+            
+        } else {
+            for (int j=0; j<spacing; j++){
+                normE = (histoEOffset + i * histoEBinSize) / filterLen + j;
+                if (normE > 4095) normE = 4095;
+                normHisto[normE] = ptrData[i] / spacing;
+            }
+            
+        }
+    }
+    
+    
 	int isSumHistogram = ptr[11] & 0x2; //the bit1 marks the Sum Histograms
     // this counts one histogram as one event in data monitor -tb-
 	if(!isSumHistogram) {
         NSArray*  keyArray = [NSArray arrayWithObjects:@"FLT",@"HW Histogram",crateKey,stationKey,channelKey, nil];
         
-        [aDataSet mergeHistogram:  &ptr[12]
-                         numBins:  ptr[6]  // is fixed in the current FPGA version -tb- 2008-03-13
+        [aDataSet mergeHistogram:  normHisto
+                         numBins:  4096
                     withKeyArray:  keyArray];
     }
     else {
         NSArray*  keyArray = [NSArray arrayWithObjects:@"FLT",@"HW Histogram (sum)",crateKey,stationKey,channelKey, nil];
-        [aDataSet mergeHistogram:  &ptr[12]
-                         numBins:  ptr[6]  // is fixed in the current FPGA version -tb- 2008-03-13
+        [aDataSet mergeHistogram:  normHisto
+                         numBins:  4096
                     withKeyArray:  keyArray];
     }
     
@@ -516,7 +544,7 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
 				}
 			}
 		}
-		if(getHistoReceivedNoteFromDecodeStage)    [obj addToSumHistogram: someData];
+		//if(getHistoReceivedNoteFromDecodeStage)    [obj addToSumHistogram: someData];
 		if(getHistoReceivedNoteFromDecodeStage)    getHistoReceivedNoteFromDecodeStage  =  [obj setFromDecodeStageReceivedHistoForChan:chan ];
     }
     

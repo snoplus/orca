@@ -201,16 +201,23 @@
 - (IBAction)telliePing:(id)sender;
 - (IBAction)smelliePing:(id)sender;
 - (IBAction)interlockPing:(id)sender;
+<<<<<<< HEAD
 - (IBAction)tubiiPing:(id)sender;
 - (IBAction)tubiiRestart:(id)sender;
 - (IBAction)serverSettingsChanged:(id)sender;
 -(void)killInterlock:(NSNotification *)aNote;
+=======
+- (IBAction) serverSettingsChanged:(id)sender;
+>>>>>>> upstream/master
 
 @end
 
 extern NSString* ORTELLIERunStart;
+<<<<<<< HEAD
 extern NSString* ORAMELLIERunStart;
 extern NSString* ORSMELLIERunFinished;
+=======
+>>>>>>> upstream/master
 extern NSString* ORTELLIERunFinished;
 extern NSString* ORAMELLIERunFinished;
 

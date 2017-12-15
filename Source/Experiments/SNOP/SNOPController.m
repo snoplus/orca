@@ -351,8 +351,7 @@ snopGreenColor;
                      selector : @selector(startTellieRunNotification:)
                          name : ORTELLIERunStart
                         object: nil];
-    
-    
+
     [notifyCenter addObserver :self
                      selector : @selector(stopTellieRunAction:)
                          name : ORTELLIERunFinished
@@ -392,7 +391,12 @@ snopGreenColor;
                      selector :@selector(runTypeWordChanged:)
                          name :ORRunTypeChangedNotification
                        object :nil];
-    
+
+    [notifyCenter addObserver :self
+                     selector :@selector(runTypeWordChanged:)
+                         name :ORSNOPRunTypeWordChangedNotification
+                       object :nil];
+
     [notifyCenter addObserver : self
                      selector : @selector(runsLockChanged:)
                          name : ORSecurityNumberLockPagesChanged
@@ -421,6 +425,11 @@ snopGreenColor;
     [notifyCenter addObserver : self
                      selector : @selector(runsECAChanged:)
                          name : ORECARunFinishedNotification
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(ECAStatusChanged:)
+                         name : ORECAStatusChangedNotification
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -747,6 +756,8 @@ snopGreenColor;
 
 - (IBAction) startRunAction:(id)sender
 {
+    [self endEditing];
+
     /* Action when the user clicks on the Start or Restart Button. */
     unsigned long dbruntypeword = 0;
 
@@ -775,7 +786,6 @@ snopGreenColor;
     // Start the standard run
     [model startStandardRun:[model standardRunType] withVersion:[model standardRunVersion]];
 }
-
 - (IBAction) resyncRunAction:(id)sender
 {
     /* A resync run does a hard stop and start without the user having to hit
@@ -790,25 +800,7 @@ snopGreenColor;
 - (IBAction) stopRunAction:(id)sender
 {
     [self endEditing];
-
-    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
-    if (![objs count]) {
-        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
-        goto err; // If error fall through and just stop the run.
-    }
-    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-
-    if([[theELLIEModel tellieThread] isExecuting]){
-        [theELLIEModel stopTellieRun];
-    }
-    if([[theELLIEModel smellieThread] isExecuting]){
-        [theELLIEModel stopSmellieRun];
-    }
-
-err:
-    {
-        [model stopRun];
-    }
+    [model stopRun];
 }
 
 - (void) runStatusChanged:(NSNotification*)aNotification
@@ -1415,7 +1407,11 @@ err:
     NSMutableArray* runNames = [NSMutableArray array];
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
-        [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+        @try {
+            [runNames addObject:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"run_name"]]];
+        } @catch(NSException* e) {
+            NSLog(@"[SMELLIE]: Problem loading run plan documents, reason : %@\n", [e reason]);
+        }
     }
 
     // Fill the combo box with alphabetically sorted information
@@ -1425,6 +1421,7 @@ err:
     [smellieLoadRunFile setEnabled:YES];
     
     [self setSmellieRunFileList:runFileDict];
+    NSLog(@"[SMELLIE] %i run plan documents sucessfully loaded\n", [runFileDict count]);
     [runFileDict release];
 }
 
@@ -1531,24 +1528,17 @@ err:
                 // Set some gui labels straight from the settings dict
                 [loadedSmellieRunNameLabel setStringValue:[smellieRunFile objectForKey:@"run_name"]];
                 [loadedSmellieTriggerFrequencyLabel setStringValue:[smellieRunFile objectForKey:@"trigger_frequency"]];
-                [loadedSmellieOperationModeLabel setStringValue:[smellieRunFile objectForKey:@"operation_mode"]];
 
-                // Set fibres and Lasers labels
-                NSArray* smellieLaserArray = [theELLIEModel getSmellieRunLaserArray:[self smellieRunFile]];
-                NSArray* smellieFibreArray = [theELLIEModel getSmellieRunFibreArray:[self smellieRunFile]];
+                // Set Lasers, Fibres and wavelength labels
+                NSArray* smellieLaserArray = [smellieRunFile objectForKey:@"lasers"];
+                NSArray* smellieFibreArray = [smellieRunFile objectForKey:@"fibres"];
+                NSArray* smellieWavelengthsArray = [smellieRunFile objectForKey:@"central_wavelengths"];
                 NSString* laserString = [smellieLaserArray componentsJoinedByString:@", "];
                 NSString* fibreString = [smellieFibreArray componentsJoinedByString:@", "];
+                NSString* wavelengthString = [smellieWavelengthsArray componentsJoinedByString:@", "];
                 [loadedSmellieLasersLabel setStringValue:laserString];
                 [loadedSmellieFibresLabel setStringValue:fibreString];
-
-                // Set wavelength labels
-                NSArray* wavelengthsArray = [theELLIEModel getSmellieLowEdgeWavelengthArray:[self smellieRunFile]];
-                NSString* wavelengthString = @"";
-                for(NSNumber* wave in wavelengthsArray){
-                    NSString* w = [NSString stringWithFormat:@"%i, ",([wave intValue]/10)];
-                    wavelengthString = [wavelengthString stringByAppendingString:w];
-                }
-                [loadedSmellieSuperKwavelengths setStringValue:[wavelengthString substringToIndex:([wavelengthString length]-2)]];
+                [loadedSmellieSuperKwavelengths setStringValue:wavelengthString];
 
                 // Set time estimate label
                 NSNumber* totalTime = [theELLIEModel estimateSmellieRunTime:[self smellieRunFile]];
@@ -1606,6 +1596,7 @@ err:
 
     //////////////////////
     // Start smellie thread
+    [theELLIEModel startInterlockThread];
     [theELLIEModel startSmellieRunThread:smellieRunFile];
 }
 
@@ -1624,6 +1615,30 @@ err:
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
+    /////////////////////////
+    // If this call is from a button press push an acknowledgement
+    // to the logs. Seeing as SMELLIE takes so long to shut down, it
+    // is important to let the user know whats going on.
+    if(![sender isKindOfClass:[NSNotification class]]){
+        NSLog(@"#############################################\n");
+        NSLog(@"[SMELLIE]\n");
+        NSLog(@"\t\tRun stop button recongnised.\n");
+        NSLog(@"\t\tEXTA triggers will stop within the next 10s.\n");
+        NSLog(@"\t\tPutting the lasers to safe state may take\n");
+        NSLog(@"\t\tup to 2 minutes.\n");
+        NSLog(@"#############################################\n");
+        ////////////////////////
+        // In the case of a button push we also want to set a couple
+        // of flags in the ELLIEModel to define how it will handle
+        // run tansitions.
+        //
+        // In this case it will simply roll over into a new
+        // SMELLIE run so the flash sequence can be easily
+        // re-started.
+        [theELLIEModel setMaintenanceRollOver:NO];
+        [theELLIEModel setSmellieStopButton:YES];
+    }
+
     //Call stop smellie run method to tidy up SMELLIE's hardware state
     @try{
         [theELLIEModel stopSmellieRun];
@@ -1632,20 +1647,57 @@ err:
         return;
     }
 
-    ////////////
-    // Roll over into maintenance run
-    if([[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
-        [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-    }
+    [loadedSmellieRunNameLabel setStringValue:@""];
+    [loadedSmellieTriggerFrequencyLabel setStringValue:@""];
+    [loadedSmellieLasersLabel setStringValue:@""];
+    [loadedSmellieFibresLabel setStringValue:@""];
+    [loadedSmellieSuperKwavelengths setStringValue:@""];
+    [loadedSmellieApproxTimeLabel setStringValue:@""];
 }
 
 - (IBAction) emergencySmellieStopAction:(id)sender
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SMELLIEEmergencyStop" object:self];
-    [smellieLoadRunFile setEnabled:NO];
-    [smellieRunFileNameField setEnabled:NO];
     [smellieStartRunButton setEnabled:NO];
-    [smellieStopRunButton setEnabled:YES];
+    ///////////////////////
+    // Get the ELLIEModel
+    NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
+    if (![objs count]) {
+        NSLogColor([NSColor redColor], @"ELLIE model not available, add an ELLIE model to your experiment\n");
+        return;
+    }
+    ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
+
+    // Check if we need to do anything
+    if(![[theELLIEModel smellieThread] isExecuting]){
+        NSLog(@"[SMELLIE]: A Smellie fire sequence does not appear to be running\n");
+        return;
+    }
+
+    NSLog(@"#############################################\n");
+    NSLog(@"[SMELLIE]\n");
+    NSLog(@"\t\tEmergency run stop button recongnised.\n");
+    NSLog(@"\t\tEXTA triggers will stop within the next [10s].\n");
+    NSLog(@"\t\tPutting the lasers to safe state may take\n");
+    NSLog(@"\t\tup to [2 minutes].\n");
+    NSLog(@"#############################################\n");
+
+    ////////////////////////
+    // Set a couple of flags in the ELLIEModel to tell
+    // it how to handle run transitions when this button
+    // has been activated.
+    //
+    // In this case it will simply roll over into a new
+    // SMELLIE run so the flash sequence can be easily
+    // re-started.
+    [theELLIEModel setMaintenanceRollOver:NO];
+    [theELLIEModel setSmellieStopButton:YES];
+
+    @try {
+        [theELLIEModel killKeepAlive:nil];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"Problem stopping smellie run: %@\n", [e reason]);
+        return;
+    }
 }
 
 -(IBAction)loadTellieRunAction:(id)sender
@@ -1823,26 +1875,12 @@ err:
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
 
-    //Call stop smellie run method to tidy up TELLIE's hardware state
+    //Call stop tellie run method to tidy up TELLIE's hardware state
     @try{
         [theELLIEModel stopTellieRun];
     } @catch(NSException* e){
         NSLogColor([NSColor redColor], @"Problem stopping tellie run: %@\n", [e reason]);
         return;
-    }
-
-    ////////////
-    // Handle end of run sequencing
-    if([[model lastStandardRunType] isEqualToString:@"TELLIE"]){
-        // If user was running a TELLIE standard sequence, roll over into maintinance run
-        if([self tellieStandardSequenceFlag]){
-            [model startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
-        // If user is using the ellie gui simply start a new run as they'll likely need to run
-        // more sequences. Reasonable as this is an 'expert' level operation. Proceedures
-        // will dictate the user should start a new standard run manualy when they're finished
-        } else {
-            [self startRunAction:self];
-        }
     }
 
     [self setTellieFireSettings:nil];
@@ -2102,12 +2140,12 @@ err:
     [dataHost setEnabled:!locked];
     [logPort setEnabled:!locked];
     [logHost setEnabled:!locked];
-    [lockDBUser setEnabled:!locked];
-    [lockDBPswd setEnabled:!locked];
-    [lockDBName setEnabled:!locked];
-    [lockDBIPAddress setEnabled:!locked];
-    [lockDBPort setEnabled:!locked];
-    [lockDBID setEnabled:!locked];
+    [sessionDBUser setEnabled:!locked];
+    [sessionDBPassword setEnabled:!locked];
+    [sessionDBName setEnabled:!locked];
+    [sessionDBAddress setEnabled:!locked];
+    [sessionDBPort setEnabled:!locked];
+    [sessionDBLockID setEnabled:!locked];
     [orcaDBUser setEnabled:!locked];
     [orcaDBPswd setEnabled:!locked];
     [orcaDBName setEnabled:!locked];
@@ -2176,8 +2214,54 @@ err:
     [ecaNEventsTextField setIntValue:integ];
     [ecaPulserRate setObjectValue:[[model anECARun] ECA_rate]];
 
-    if([[aNotification name] isEqualTo:ORECARunStartedNotification]) [startSingleECAButton setEnabled:false];
-    else if([[aNotification name] isEqualTo:ORECARunFinishedNotification]) [startSingleECAButton setEnabled:true];
+    if([[aNotification name] isEqualTo:ORECARunStartedNotification]) {
+        [ECApatternPopUpButton setEnabled:false];
+        [ECAtypePopUpButton setEnabled:false];
+        [ecaNEventsTextField setEnabled:false];
+        [ecaPulserRate setEnabled:false];
+    }
+    else if([[aNotification name] isEqualTo:ORECARunFinishedNotification]){
+        [ECApatternPopUpButton setEnabled:true];
+        [ECAtypePopUpButton setEnabled:true];
+        [ecaNEventsTextField setEnabled:true];
+        [ecaPulserRate setEnabled:true];
+    }
+
+}
+
+- (void) ECAStatusChanged:(NSNotification*)aNotification
+{
+
+    ECARun *theECARun = [model anECARun];
+
+    //Status
+    NSString * ecaStatusLabel = @"Not running";
+    if ([theECARun isFinished]){
+        ecaStatusLabel = @"Not running";
+    }
+    else if ([theECARun isExecuting]){
+        ecaStatusLabel = @"Running";
+    }
+    [[ecaStatusMatrix cellAtRow:0 column:0] setStringValue:ecaStatusLabel];
+    //Mode
+    [[ecaStatusMatrix cellAtRow:1 column:0] setStringValue:[theECARun ECA_mode_string]];
+    //Pattern
+    [[ecaStatusMatrix cellAtRow:2 column:0] setStringValue:[theECARun ECA_pattern_string]];
+    //Type
+    [[ecaStatusMatrix cellAtRow:3 column:0] setStringValue:[theECARun ECA_type]];
+    //Number of events
+    [[ecaStatusMatrix cellAtRow:4 column:0] setIntValue:[theECARun ECA_nevents]];
+    //Rate
+    [[ecaStatusMatrix cellAtRow:5 column:0] setObjectValue:[theECARun ECA_rate]];
+    //Step
+    NSString * ecaStepLabel = [NSString stringWithFormat:@"%d/%d",[theECARun ECA_currentStep],[theECARun ECA_nsteps] ];
+    [[ecaStatusMatrix cellAtRow:6 column:0] setStringValue:ecaStepLabel];
+    //TSlope point
+    NSString * ecaPointLabel = [NSString stringWithFormat:@"%d/%d",[theECARun ECA_currentPoint],[theECARun ECA_tslope_pattern] ];
+    if([[theECARun ECA_type] isEqualToString:@"PDST"]) ecaPointLabel = @"--";
+    [[ecaStatusMatrix cellAtRow:7 column:0] setStringValue:ecaPointLabel];
+    //Delay
+    [[ecaStatusMatrix cellAtRow:8 column:0] setDoubleValue:[theECARun ECA_currentDelay]];
 
 }
 
@@ -2209,22 +2293,6 @@ err:
 {
     [[model anECARun] setECA_rate:[ecaPulserRate objectValue]];
 }
-
-
-- (IBAction)startECAStandardRunAction:(id)sender
-{
-
-    NSLogColor([NSColor redColor],@"Not implemented yet. Use the Start Single ECA Run button below. \n");
-
-}
-
-- (IBAction)startECASingleRunAction:(id)sender
-{
-    
-    [model startECARunInParallel];
-
-}
-
 
 //STANDARD RUNS
 - (IBAction)standardRunNewValueAction:(id)sender
@@ -2545,15 +2613,17 @@ err:
 }
 
 //Run Type Word
--(void) runTypeWordChanged:(NSNotification*)aNote
+- (void) runTypeWordChanged:(NSNotification*)aNote
 {
-    
-    unsigned long currentRunWord = [runControl runType];
 
-    [model setRunTypeWord:currentRunWord];
+    if ([[aNote name] isEqualTo:ORRunTypeChangedNotification]) {
+        unsigned long currentRunWord = [runControl runType];
+        [model setRunTypeWord:currentRunWord];
+    }
+
     //Update display
     for(int i=0;i<32;i++){
-        [[runTypeWordMatrix cellAtRow:i column:0] setState:(currentRunWord &(1L<<i))!=0];
+        [[runTypeWordMatrix cellAtRow:i column:0] setState:([model runTypeWord] &(1L<<i))!=0];
     }
     
 }

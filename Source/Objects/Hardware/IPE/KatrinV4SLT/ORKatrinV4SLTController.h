@@ -33,21 +33,25 @@
 	    IBOutlet NSMatrix*		pixelBusEnableRegMatrix;
 	    IBOutlet NSTextField*   pixelBusEnableRegTextField;
 		IBOutlet NSTextField*	sltScriptArgumentsTextField;
+        IBOutlet NSButton*      pixelBusWriteButton;
+        IBOutlet NSButton*      pixelBusReadButton;
+
 		IBOutlet NSMatrix*		countersMatrix;
 		IBOutlet NSTextField*	secondsSetField;
-		IBOutlet NSButton*		secondsSetInitWithHostButton;
+        IBOutlet NSButton*      secondsSetInitWithHostButton;
+        IBOutlet NSButton*      secondsSetNowButton;
 	    IBOutlet NSButton*      secondsSetSendToFLTsCB;
 		IBOutlet NSButton*		hwVersionButton;
         IBOutlet StopLightView* lightBoardView;
         IBOutlet StopLightView* lightBoardView1;
 
 		//control reg
-		IBOutlet NSMatrix*		triggerEnableMatrix;
 		IBOutlet NSMatrix*		inhibitEnableMatrix;
 		IBOutlet NSMatrix*		testPatternEnableMatrix;
 		IBOutlet NSMatrix*		miscCntrlBitsMatrix;
 		IBOutlet NSMatrix*		enableDisableCountersMatrix;
-	
+        IBOutlet NSMatrix*      minimumDecodingMatrix;
+
 		IBOutlet NSButton*		initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
@@ -55,9 +59,10 @@
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
 		IBOutlet NSTextField*   pageSizeField;
 		IBOutlet NSStepper*     pageSizeStepper;
-		IBOutlet NSButton*      displayTriggerButton;
-		IBOutlet NSButton*      displayEventLoopButton;
-		
+        IBOutlet NSButton*      haltSBCButton;
+        IBOutlet NSButton*      initOnConnectButton;
+        IBOutlet NSButton*      setCodeLocationButton;
+
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
 		IBOutlet NSButton*		resetPageManagerButton;
@@ -75,14 +80,13 @@
 		IBOutlet NSButton*		setSWInhibit1Button;
 		IBOutlet NSButton*		relSWInhibit1Button;
 		IBOutlet NSButton*		forceTrigger1Button;
+        IBOutlet NSButton*      resetSLTButton;
+        IBOutlet NSButton*      resetFLTButton;
 
 		IBOutlet NSButton*		resetHWButton;
 		IBOutlet NSButton*		definePatternFileButton;
 		IBOutlet NSTextField*	patternFilePathField;
 		IBOutlet NSButton*		loadPatternFileButton;
-
-		IBOutlet NSSlider*		nextPageDelaySlider;
-		IBOutlet NSTextField*	nextPageDelayField;
 		
 		//pulser
 		IBOutlet NSTextField*	pulserAmpField;
@@ -112,6 +116,7 @@
 - (void) registerNotificationObservers;
 
 #pragma mark •••Interface Management
+- (void) minimumDecodingChanged:(NSNotification*)aNote;
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote;
 - (void) secondsSetSendToFLTsChanged:(NSNotification*)aNote;
 - (void) secondsSetInitWithHostChanged:(NSNotification*)aNote;
@@ -121,18 +126,15 @@
 - (void) runTimeChanged:(NSNotification*)aNote;
 - (void) vetoTimeChanged:(NSNotification*)aNote;
 - (void) deadTimeChanged:(NSNotification*)aNote;
+- (void) lostEventsChanged:(NSNotification*)aNote;
+- (void) lostFltEventsChanged:(NSNotification*)aNote;
+- (void) lostFltEventsTrChanged:(NSNotification*)aNote;
 - (void) secondsSetChanged:(NSNotification*)aNote;
 - (void) statusRegChanged:(NSNotification*)aNote;
 - (void) controlRegChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*) aNote;
-- (void) displayEventLoopChanged:(NSNotification*) aNote;
-- (void) displayTriggerChanged:(NSNotification*) aNote;
 - (void) patternFilePathChanged:(NSNotification*)aNote;
 - (void) interruptMaskChanged:(NSNotification*)aNote;
-- (void) nextPageDelayChanged:(NSNotification*)aNote;
-- (void) pageSizeChanged:(NSNotification*)aNote;
-- (void) displayEventLoopChanged:(NSNotification*)aNote;
-- (void) displayTriggerChanged:(NSNotification*)aNote;
 - (void) populatePullDown;
 - (void) updateWindow;
 - (void) checkGlobalSecurity;
@@ -146,11 +148,11 @@
 - (void) pulserAmpChanged:(NSNotification*) aNote;
 - (void) pulserDelayChanged:(NSNotification*) aNote;
 - (void) pollRateChanged:(NSNotification*)aNote;
-- (void) pollRunningChanged:(NSNotification*)aNote;
 
 - (void) enableRegControls;
 
 #pragma mark •••Actions
+- (IBAction) minimumDecodingAction:(id)sender;
 - (IBAction) readSLTEventFifoButtonAction:(id)sender;
 - (IBAction) pixelBusEnableRegTextFieldAction:(id)sender;
 - (IBAction) pixelBusEnableRegMatrixAction:(id)sender;
@@ -162,7 +164,6 @@
 - (IBAction) sltScriptArgumentsTextFieldAction:(id)sender;
 - (IBAction) enableDisableCounterAction:(id)sender;
 - (IBAction) secondsSetAction:(id)sender;
-- (IBAction) triggerEnableAction:(id)sender;
 - (IBAction) inhibitEnableAction:(id)sender;
 - (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
@@ -173,11 +174,7 @@
 - (IBAction) pollRateAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;
-- (IBAction) nextPageDelayAction:(id)sender;
 - (IBAction) interruptMaskAction:(id)sender;
-- (IBAction) pageSizeAction:(id)sender;
-- (IBAction) displayTriggerAction:(id)sender;
-- (IBAction) displayEventLoopAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) selectRegisterAction:(id) sender;
 - (IBAction) writeValueAction:(id) sender;
@@ -204,7 +201,6 @@
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) sendCommandScript:(id)sender;
-
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
 - (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;

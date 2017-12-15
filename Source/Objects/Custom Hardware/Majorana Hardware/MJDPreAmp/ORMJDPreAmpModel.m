@@ -1530,11 +1530,11 @@ struct {
     if(anIndex != 5 && anIndex!=6 && anIndex!= 13 && anIndex!= 14)return;
     float aValue = [self adc:anIndex];
     BOOL postAlarm = NO;
-    NSString* alarmName = nil;
+   // NSString* alarmName = nil;
     switch(anIndex){
         case 5:
             if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
-                alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
+               // alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
             [self checkSupplyError:0 postAlarm:postAlarm];
@@ -1542,7 +1542,7 @@ struct {
             
         case 6:
             if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
-                alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
+               // alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
             [self checkSupplyError:1 postAlarm:postAlarm];
@@ -1550,7 +1550,7 @@ struct {
             
         case 13:
             if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
-                alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
+             //   alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
             [self checkSupplyError:2 postAlarm:postAlarm];
@@ -1558,7 +1558,7 @@ struct {
             
         case 14:
             if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
-                alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
+             //   alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
            }
            [self checkSupplyError:3 postAlarm:postAlarm];

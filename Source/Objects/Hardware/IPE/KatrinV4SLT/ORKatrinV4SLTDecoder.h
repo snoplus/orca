@@ -33,6 +33,8 @@
 
 @interface ORKatrinV4SLTDecoderForEnergy : ORIpeCardDecoder {
     int filter[21];
+    BOOL useMinimizedDecoding; //only one crate for now
+    unsigned long decimationCount[22][24];
 }
 - (int) filterShapingLength;
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;

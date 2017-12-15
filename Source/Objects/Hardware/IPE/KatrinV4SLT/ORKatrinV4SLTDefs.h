@@ -132,6 +132,10 @@
 #define kVetoCounterType	2
 #define kDeadCounterType	3
 #define kRunCounterType		4
+#define kLostFltEventCounterType 5
+#define kLostSltEventCounterType 6
+#define kLostFltEventTrCounterType 7
+
 
 /*  Time Stamp Record Types used with the
   * Slt time stamps (see shipSltTimestamp). Used with the Counter Type above ...

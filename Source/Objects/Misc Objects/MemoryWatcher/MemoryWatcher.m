@@ -24,6 +24,10 @@
 #import "MemoryWatcher.h"
 #import "ORTimeRate.h"
 #import "NSString+Extensions.h"
+#import <mach/host_info.h>
+#import <mach/mach_host.h>
+#import <mach/task_info.h>
+#import <mach/task.h>
 
 @interface MemoryWatcher (private)
 - (void) processResult;
@@ -46,7 +50,7 @@ enum {
     self = [super init];
     [self setTaskInterval:3*60];
     [self setLaunchTime:[NSDate date]];
-    [self launchTop];
+    [self launchTask];
     return self;
 }
 
@@ -130,7 +134,7 @@ enum {
     else return 0;
 }
 
-- (void) launchTop
+- (void) launchTask
 {
     [self setUpQueue];
     [opQueue cancelAllOperations];
@@ -145,8 +149,8 @@ enum {
     
     [self setUpTime:[[NSDate date] timeIntervalSinceDate:launchTime]];
     
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(launchTop) object:nil];
-    [self performSelector:@selector(launchTop) withObject:nil afterDelay:taskInterval];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(launchTask) object:nil];
+    [self performSelector:@selector(launchTask) withObject:nil afterDelay:taskInterval];
 
 }
 
@@ -158,18 +162,14 @@ enum {
     else return aValue/1000000.;
 }
 
-- (void) processResult:(NSString*)taskResult
+- (void) processTopResult:(NSString*)taskResult
 {
     NSArray* lines = [taskResult componentsSeparatedByString:@"\n"];
     NSString* goodLine = @"";
     for(id aLine in [lines reverseObjectEnumerator]){
         if([aLine rangeOfString:@"Orca "].location != NSNotFound){
-            //aLine = [aLine removeExtraSpaces];
-            //NSArray* parts = [aLine componentsSeparatedByString:@" "];
-           // if([parts count]==3){
-                goodLine = aLine;
-                break;
-            //}
+            goodLine = aLine;
+            break;
         }
     }
     if([goodLine length]){
@@ -186,23 +186,63 @@ enum {
             [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
             [scanner scanFloat:&value];
             if([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&multiplier]){
-                [timeRate[kRSize] addDataToTimeAverage:[self convertValue:value withMultiplier:multiplier]];
+                orcaMemory = [self convertValue:value withMultiplier:multiplier];
+                [timeRate[kRSize] addDataToTimeAverage:orcaMemory];
             }
-            
-//            //scan in VSIZE
-//            [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
-//            [scanner scanFloat:&value];
-//            if([scanner scanUpToCharactersFromSet:[NSCharacterSet whitespaceCharacterSet] intoString:&multiplier]){
-//                [timeRate[kVSize] addDataToTimeAverage:[self convertValue:value withMultiplier:multiplier]];
-//            }
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:MemoryWatcherChangedNotification object:self];
         }
         [scanner release];
     }
-
 }
 
+- (void) processVmStatResult:(NSString*)taskResult
+{
+    NSMutableDictionary* resultDict = [NSMutableDictionary dictionary];
+    NSScanner* scanner = [[NSScanner alloc] initWithString:taskResult];
+    NSString* aKey;
+    while([scanner scanUpToString:@":" intoString:&aKey]){
+        [scanner scanUpToCharactersFromSet:[NSCharacterSet decimalDigitCharacterSet] intoString:nil];
+        double value;
+        if([scanner scanDouble:&value]){
+            [resultDict setObject:[NSNumber numberWithDouble:value] forKey:aKey];
+        }
+    }
+    [scanner release];
+
+    pageSize    = [[resultDict objectForKey: @"Mach Virtual Memory Statistics"] unsignedLongValue];
+    
+    totalMemory = [[resultDict objectForKey: @"free"]        unsignedLongValue] +
+                   [[resultDict objectForKey: @"active"]      unsignedLongValue] +
+                   [[resultDict objectForKey: @"wired down"]  unsignedLongValue] +
+                   [[resultDict objectForKey: @"inactive"]    unsignedLongValue];
+    
+    freeMemory  = [[resultDict objectForKey: @"free"]        unsignedLongValue] +
+                   [[resultDict objectForKey: @"inactive"]    unsignedLongValue] +
+                   [[resultDict objectForKey: @"speculative"] unsignedLongValue];
+
+    
+}
+
+- (void) postUpdate
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:MemoryWatcherChangedNotification object:self];
+}
+
+- (void) postCouchDBRecord
+{
+ 
+    NSDictionary* aRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [NSNumber numberWithUnsignedLong: pageSize],     @"pageSize",
+                                [NSNumber numberWithUnsignedLong: totalMemory], @"totalMemory",
+                                [NSNumber numberWithUnsignedLong: freeMemory],  @"freeMemory",
+                                [NSNumber numberWithUnsignedLong: orcaMemory],  @"orcaMB",
+                                   nil];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord"     object:self userInfo:aRecord];
+}
+- (NSString*) fullID
+{
+    return @"MemoryWatcher";
+}
 @end
 
 //--------------------------------------------------
@@ -222,28 +262,15 @@ enum {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     @try {
         if(![self isCancelled]){
-            NSTask* task = [[NSTask alloc] init];
-            [task setLaunchPath:@"/usr/bin/top"];
-            
-            [task setArguments: [NSArray arrayWithObjects:@"-l",@"2",@"-i",@"1",@"-stats",@"command,cpu,rsize",nil]];
-            
-            NSPipe* pipe = [NSPipe pipe];
-            [task setStandardOutput: pipe];
-            
-            NSFileHandle* file = [pipe fileHandleForReading];
-            [task launch];
-            
-            NSData* data = [file readDataToEndOfFile];
-            if(data){
-                NSString* result = [[[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding] autorelease];
-                if([result length]){
-                    if([delegate respondsToSelector:@selector(processResult:)]){
-                        [delegate performSelectorOnMainThread:@selector(processResult:) withObject:result waitUntilDone:YES];
-                    }
-                }
+            [self runTop];
+            [self runVmStat];
+            if([delegate respondsToSelector:@selector(postUpdate)]){
+                [delegate performSelectorOnMainThread:@selector(postUpdate) withObject:nil waitUntilDone:YES];
             }
-            [task release];
-            [file closeFile];
+            
+            if([delegate respondsToSelector:@selector(postCouchDBRecord)]){
+                [delegate performSelectorOnMainThread:@selector(postCouchDBRecord) withObject:nil waitUntilDone:YES];
+            }
         }
     }
     @catch(NSException* e){
@@ -252,6 +279,55 @@ enum {
         [pool release];
     }
 }
-
+- (void) runTop
+{
+    NSTask* task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/top"];
+    
+    [task setArguments: [NSArray arrayWithObjects:@"-l",@"2",@"-i",@"1",@"-stats",@"command,cpu,rsize",nil]];
+    
+    NSPipe* pipe = [NSPipe pipe];
+    [task setStandardOutput: pipe];
+    
+    NSFileHandle* file = [pipe fileHandleForReading];
+    [task launch];
+    
+    NSData* data = [file readDataToEndOfFile];
+    if(data){
+        NSString* result = [[[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding] autorelease];
+        if([result length]){
+            if([delegate respondsToSelector:@selector(processTopResult:)]){
+                [delegate performSelectorOnMainThread:@selector(processTopResult:) withObject:result waitUntilDone:YES];
+            }
+        }
+    }
+    [task release];
+    [file closeFile];
+}
+- (void) runVmStat
+{
+    NSTask* task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/usr/bin/vm_stat"];
+    
+    NSPipe* pipe = [NSPipe pipe];
+    [task setStandardOutput: pipe];
+    
+    NSFileHandle* file = [pipe fileHandleForReading];
+    [task launch];
+    
+    NSData* data = [file readDataToEndOfFile];
+    if(data){
+        NSString* result = [[[NSString alloc] initWithData: data encoding: NSASCIIStringEncoding] autorelease];
+        result = [result stringByReplacingOccurrencesOfString:@"Pages " withString:@""];
+        result = [result stringByReplacingOccurrencesOfString:@" bytes)" withString:@""];
+        if([result length]){
+            if([delegate respondsToSelector:@selector(processVmStatResult:)]){
+                [delegate performSelectorOnMainThread:@selector(processVmStatResult:) withObject:result waitUntilDone:YES];
+            }
+        }
+    }
+    [task release];
+    [file closeFile];
+}
 @end
 

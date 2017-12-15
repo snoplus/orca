@@ -62,9 +62,17 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
 NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORAMELLIERunStart = @"ORAMELLIERunStarted";
 NSString* ORSMELLIERunFinished = @"ORSMELLIERunFinished";
+NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
+<<<<<<< HEAD
 NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
 NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
+=======
+NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
+NSString* ORELLIEFlashing = @"ORELLIEFlashing";
+NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
+
+>>>>>>> upstream/master
 
 ///////////////////////////////
 // Define private methods
@@ -113,6 +121,7 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 
 @synthesize tellieClient = _tellieClient;
 @synthesize smellieClient = _smellieClient;
+@synthesize smellieFlaggingClient = _smellieFlaggingClient;
 @synthesize interlockClient = _interlockClient;
 
 @synthesize ellieFireFlag = _ellieFireFlag;
@@ -123,6 +132,11 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 
 @synthesize tellieThread = _tellieThread;
 @synthesize smellieThread = _smellieThread;
+@synthesize tellieTransitionThread = _tellieTransitionThread;
+@synthesize smellieTransitionThread = _smellieTransitionThread;
+
+@synthesize maintenanceRollOver = _maintenanceRollOver;
+@synthesize smellieStopButton = _smellieStopButton;
 
 /*********************************************************/
 /*                  Class control methods                */
@@ -137,6 +151,8 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 {
     self = [super initWithCoder:decoder];
     if (self){
+        [self registerNotificationObservers];
+
         //Settings
         [self setTellieHost:[decoder decodeObjectForKey:@"tellieHost"]];
         [self setTelliePort:[decoder decodeObjectForKey:@"telliePort"]];
@@ -160,13 +176,17 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 
         XmlrpcClient* tellieCli = [[XmlrpcClient alloc] initWithHostName:[self tellieHost] withPort:[self telliePort]];
         XmlrpcClient* smellieCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
+        XmlrpcClient* smellieFlaggingCli = [[XmlrpcClient alloc] initWithHostName:[self smellieHost] withPort:[self smelliePort]];
         XmlrpcClient* interlockCli = [[XmlrpcClient alloc] initWithHostName:[self interlockHost] withPort:[self interlockPort]];
 
         [self setTellieClient:tellieCli];
         [self setSmellieClient:smellieCli];
+        [self setSmellieFlaggingClient:smellieFlaggingCli];
         [self setInterlockClient:interlockCli];
-        [[self tellieClient] setTimeout:100];
-        [[self smellieClient] setTimeout:360];
+
+        [[self tellieClient] setTimeout:100]; // Sometimes TELLIE calls can take longer than expected due to network speeds on the logging calls.
+        [[self smellieClient] setTimeout:1200]; // Smellie server calls are flagging. This sets the max time of single a flash sequence to 20 mins
+        [[self smellieFlaggingClient] setTimeout:60]; // Use this client for getting run flags and calling deactivate functions
         [[self interlockClient] setTimeout:10];
 
         [tellieCli release];
@@ -229,6 +249,7 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
     // Server Clients
     [_tellieClient release];
     [_smellieClient release];
+    [_smellieFlaggingClient release];
     
     // tellie settings
     [_tellieFireParameters release];
@@ -256,8 +277,44 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
     [_tellieNodeMapping release];
     [_smelliePort release];
     [_interlockHost release];
-    
+
     [super dealloc];
+}
+
+- (void) registerNotificationObservers
+{
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(checkAndTidyELLIEThreads:)
+                         name : ORRunAboutToStopNotification
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(checkAndTidyELLIEThreads:)
+                         name : OROrcaAboutToQuitNotice
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(killKeepAlive:)
+                         name : ORSMELLIEEmergencyStop
+                        object: nil];
+}
+
+-(void) checkAndTidyELLIEThreads:(NSNotification *)aNote
+{
+    /*
+     Check to see if an ELLIE fire sequence has been running. If so, the stop*ellieRun methods of
+     the ellieModel will post the run wait notification and launch a thread that waits for the smellieThread
+     to stop executing before tidying up and, finally, releasing the run wait.
+     */
+    [self setMaintenanceRollOver:NO];
+    if([[self tellieThread] isExecuting]){
+        [self stopTellieRun];
+    }
+    if([[self smellieThread] isExecuting]){
+        [self stopSmellieRun];
+    }
 }
 
 /*********************************************************/
@@ -754,17 +811,35 @@ NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
     //////////////////////////////
     // Loop over all objects in
     // passed array
+<<<<<<< HEAD
     int noLoops = [fireCommandArray count];
     int counter = 0;
+=======
+    int count = 0;
+    NSUInteger nloops = [fireCommandArray count];
+>>>>>>> upstream/master
     for(NSDictionary* fireCommands in fireCommandArray){
         if([[NSThread currentThread] isCancelled]){
             goto err;
         }
+<<<<<<< HEAD
         counter = counter + 1;
         if(counter == noLoops){
             [self setTellieMultiFlag:NO];
         }
         [self startTellieRun:fireCommands forTELLIE:forTELLIE];
+=======
+
+        // Check if we're at the end of a sequence. If we are, set the multiFlag to NO.
+        // This will mean all shutdown stuff will be performed at the end of flashing.
+        count = count + 1;
+        if(count == nloops){
+            [self setTellieMultiFlag:NO];
+        }
+
+        // Run flash sequence
+        [self startTellieRun:fireCommands];
+>>>>>>> upstream/master
     }
 
 err:
@@ -887,32 +962,25 @@ err:
     
     //////////////
     // TUBii has two possible slave mode configurations.
-    // 0 [@NO]:  Trigger path = TUBii->TELLIE->TUBii->MTC/D
-    // 1 [@YES]: Trigger path = TUBii->TELLIE
-    //                          TUBii->MTC/D
+    // 0 [@NO]:  Master mode : Trigger path = TELLIE->TUBii->MTC/D
+    // 1 [@YES]: Slave mode  : Trigger path = TUBii->TELLIE
+    //                                        TUBii->MTC/D
     //
-    // In the first case a single signal propagates in sequence through the entire chain of hardware. This
-    // has a disadvantage that significant attenuation can be picked up on the long paths between TUBii
-    // and tellie (approx 20m each).
-    // In the second case TUBii first sends a trigger to TELLIE, then independently, after some delay, sends
+    // In master mode TELLIE generates internal triggers which then get piped down a 20m cable to TUBii.
+    //
+    // In slave mode TUBii first sends a trigger to TELLIE, then independently, after some delay, sends
     // a trigger onto the MTC/D in anticipation that the TELLIE trigger would have been properly received.
-    // This has the advantage that the trigger paths are much better controlled.
     //
-    // The second case was added as the trigger efficiency of the first arrangement proved to be extremely
-    // poor (<50%). Hence we want to force this method to be used by default.
-    if(isSlave){
-        BOOL mode = YES;
-        if([fireCommands objectForKey:@"TUBii_slave_setting"]){
-            mode = [[fireCommands objectForKey:@"TUBii_slave_setting"] boolValue];
-        }
-        @try{
-            [theTubiiModel setTellieMode:mode];
-        } @catch(NSException* e){
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct slave mode behaviour at TUBii, reason: %@\n", [e reason]);
-            goto err;
-        }
+    // These two modalities require significantly different trigger delays to be set in order to centre
+    // TELLIE light in the event window.
+
+    @try{
+        [theTubiiModel setTellieMode:isSlave];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct master/ slave mode behaviour at TUBii, reason: %@\n", [e reason]);
+        goto err;
     }
-    
+
     /////////////
     // Final settings check
     NSNumber* photonOutput = [self calcPhotonsForIPW:[[fireCommands objectForKey:@"pulse_width"] integerValue] forChannel:[[fireCommands objectForKey:@"channel"] integerValue] inSlave:isSlave];
@@ -940,7 +1008,7 @@ err:
         NSLogColor([NSColor redColor], @"%@: The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n",  prefix, [photonOutput integerValue], rate);
         goto err;
     }
-    
+
     /////////////
     // TELLIE pin readout is an average measurement of the passed "number_of_shots".
     // If a large number of shots are requested it is useful to split the data into smaller chunks,
@@ -957,7 +1025,7 @@ err:
             loops =[NSNumber numberWithInteger:iLoops];
         }
     }
-    
+
     ///////////////
     // Now set-up is done, push initial run document
     if([runControl isRunning]){
@@ -972,7 +1040,11 @@ err:
             goto err;
         }
     }
-    
+
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIEFlashing object:self];
+    });
+
     ///////////////
     // Fire loop! Pass variables to the tellie server.
     for(int i = 0; i<[loops integerValue]; i++){
@@ -1020,7 +1092,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-            
+
             @try{
                 [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
             } @catch(NSException* e) {
@@ -1028,13 +1100,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-            
         }
-
-        //////////////////
-        // Start a new subrun
-        [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         
         ////////////////////
         // Init can take a while. Make sure no-one hit
@@ -1076,6 +1142,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
+
             ////////////
             // Set the tubii model aand ask it to fire
             @try{
@@ -1085,6 +1152,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
+
         //////////////
         // MASTER MODE
         } else {
@@ -1140,52 +1208,93 @@ err:
                 NSLogColor([NSColor redColor],@"%@: Problem updating run description document: %@\n", prefix, [e reason]);
                 goto err;
             }
+
+            //////////////////
+            // Start a new subrun
+            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
         }
     }
 
-    ////////////
-    // Release pooled memory
-    [pool release];
+    // Set fire flag
     [self setEllieFireFlag:NO];
 
+<<<<<<< HEAD
     NSLog(@"%@: TELLIE fire sequence completed\n", prefix);
+=======
+    ////////////
+    // Make sure hardware is put back into safe state
+>>>>>>> upstream/master
     if(![self tellieMultiFlag]){
-        ////////////
-        // Finish and tidy up
-        [[NSThread currentThread] cancel];
+
+        // TELLIE
+        @try{
+            NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
+            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+        } @catch(NSException* e){
+            // This should only ever be called from the main thread so can raise
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+        }
+
+        // TUBii
+        @try{
+            [theTubiiModel stopTelliePulser];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+        }
+
         dispatch_sync(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
         });
-
+        [[NSThread currentThread] cancel];
     }
+
+    [pool release];
+
     return;
 
 err:
     {
-        [pool release];
         [self setEllieFireFlag:NO];
         [self setTellieMultiFlag:NO];
-        
+
         //Resetting the mtcd to settings before the smellie run
+<<<<<<< HEAD
         NSLog(@"%@: Killing requested flash sequence\n", prefix);
         
         //Make a dictionary to push into sub-run array to indicate error.
         //NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:10];
         //[errorDict setObject:errorString forKey:@"tellie_error"];
         //[self updateTellieRunDocument:errorDict];
+=======
+        NSLog(@"[TELLIE]: Killing requested flash sequence\n");
+
+        // TELLIE
+        @try{
+            NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
+            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+        } @catch(NSException* e){
+            // This should only ever be called from the main thread so can raise
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+        }
+
+        // TUBii
+        @try{
+            [theTubiiModel stopTelliePulser];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+        }
+>>>>>>> upstream/master
 
         ////////////
-        // If thread errored we need to post a note to
-        // call the formal stop proceedure. If the thread
-        // was canelled we must already be in a 'stop'
-        // button push, so don't need to post.
+        // Post a note saying we've jumped out of the run sequence
         if(![[NSThread currentThread] isCancelled]){
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
             });
         }
         [[NSThread currentThread] cancel];
-
+        [pool release];
     }
 }
 
@@ -1208,34 +1317,38 @@ err:
     NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for tellie run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
-    // Detatch thread to monitor smellie run thread
-    [NSThread detachNewThreadSelector:@selector(waitForTellieRunToFinish) toTarget:self withObject:nil];
-}
-
--(void)waitForTellieRunToFinish
-{
-    @autoreleasepool {
-        while ([[self tellieThread] isExecuting]) {
-            [NSThread sleepForTimeInterval:0.1];
-        }
-        [self tellieTidyUp];
-    }
-}
-
--(void) tellieTidyUp
-{
-    /*
-     Stop TELLIE firing, tidy up and ensure system is in a well defined state.
-     */
-
     //////////////////////
     // Set fire flag to no. If a run sequence is currently underway, this will stop
     [self setEllieFireFlag:NO];
     [self setTellieMultiFlag:NO];
 
+    if([[self tellieThread] isExecuting]){
+
+        [[self tellieThread] cancel];
+
+        ///////////////////////////////////////
+        // If a run transition thread isn't yet running, run one.
+        // Doing it this way avoids multiple transition behaviours.
+        if(![_tellieTransitionThread isExecuting]){
+            NSLog(@"[TELLIE]: Waiting for TELLIE server to release blocking trigger function...\n");
+            [self setTellieTransitionThread:[[NSThread alloc] initWithTarget:self selector:@selector(tellieRunTransition) object:nil]];
+            [[self tellieTransitionThread] start];
+        } else {
+            // Release the wait request posted at the start of this function - one is already queued.
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
+        }
+    } else {
+        // Tell run control it can stop waiting
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
+    }
+  }
+
+-(void)tellieRunTransition
+{
     /////////////
-    // This may run in a thread so add release pool
+    // This will run in a thread so add release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+<<<<<<< HEAD
     
     //////////////////////
     // Send stop command to tellie hardware
@@ -1264,8 +1377,27 @@ err:
         NSLogColor([NSColor redColor], @"[ELLIE]: Problem stopping TUBii pulser!\n");
         [pool release];
         return;
+=======
+
+    ///////////////////////////////////////////
+    // Wait for thread to stop
+    while ([[self tellieThread] isExecuting]) {
+        [NSThread sleepForTimeInterval:0.1];
     }
 
+    ///////////////
+    //Add run control object
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
+        goto err;
+>>>>>>> upstream/master
+    }
+    ORRunModel* runControl = [runModels objectAtIndex:0];
+    // Roll over the run.
+    [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
+
+err:{
     // Tell run control it can stop the run.
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
@@ -1273,6 +1405,7 @@ err:
 
     NSLog(@"[ELLIE]: Stop commands sucessfully sent to ELLIE and TUBii\n");
     [pool release];
+}
 }
 
 /*****************************/
@@ -1563,9 +1696,22 @@ err:
     }
 }
 
--(void) deactivateSmellie
+-(void) deactivateSmellieLasers
 {
-    id result = [[self smellieClient] command:@"deactivate"];
+    id result = [[self smellieFlaggingClient] command:@"deactivate"];
+    if([result isKindOfClass:[NSString class]]){
+        NSException* e = [NSException
+                          exceptionWithName:@"SMELLIE EXCEPTION"
+                          reason:result
+                          userInfo:nil];
+        [e raise];
+    }
+    NSLog(@"[SMELLIE]: Lasers deactivated\n");
+}
+
+-(void) CancelSmellieTriggers
+{
+    id result = [[self smellieFlaggingClient] command:@"set_run_flag_false"];
     if([result isKindOfClass:[NSString class]]){
         NSException* e = [NSException
                           exceptionWithName:@"SMELLIE EXCEPTION"
@@ -1648,47 +1794,70 @@ err:
     }
 }
 
--(void)activateKeepAlive:(NSNumber *)runNumber
+-(void) startInterlockThread;
 {
     /*
-     Start a thread to constantly send a keep alive signal to the smellie interlock server
+     Launch a thread to host the keep alive pulsing.
      */
+
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSArray* args = @[runNumber];
+    //////////////
+    //Get the run controller
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
+        return;
+    }
+    ORRunModel* runControl = [runModels objectAtIndex:0];
+
+    NSArray* args = @[[NSNumber numberWithInteger:[runControl runNumber]]];
     @try {
         [[self interlockClient] command:@"new_run" withArgs:args];
         [[self interlockClient] command:@"set_arm"];
-    }
-    @catch (NSException *e) {
+    } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server, reason: %@\n", [e reason]);
         [self setEllieFireFlag:NO];
         [pool release];
         return;
     }
+
+    //////////////////////
+    // Start interlock thread
     interlockThread = [[NSThread alloc] initWithTarget:self selector:@selector(pulseKeepAlive:) object:nil];
     [interlockThread start];
     [pool release];
 }
 
--(void)killKeepAlive
+-(void) killKeepAlive:(NSNotification*)aNote
 {
     /*
      Stop pulsing the keep alive and disarm the interlock
     */
+
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    // Cancel the SMELLIE run threads - If we've killed the interlock, we will never want to keep running
     [interlockThread cancel];
+    [[self smellieThread] cancel];
+    [self setEllieFireFlag:NO];
+
+    // Tell SMELLIE to stop generating triggers. This sets a flag in the server functions to tell them to jump out early
+    @try{
+        [self CancelSmellieTriggers];
+    } @catch(NSException *e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
+    }
+
+    // Additionally send an explicit disarm command to the interlock.
     @try {
         [[self interlockClient] command:@"set_disarm"];
-    }
-    @catch (NSException *e) {
+    } @catch (NSException *e) {
         NSLogColor([NSColor redColor], @"[SMELLIE]: Problem disarming interlock server, reason: %@\n", [e reason]);
     }
-    [self setEllieFireFlag:NO];
-    NSLog(@"[SMELLIE]: Smellie laser interlock server disarmed\n");
     [pool release];
-}
+ }
 
--(void)pulseKeepAlive:(id)passed
+-(void) pulseKeepAlive:(id)passed
 {
     /*
      A fuction to be run in a thread, continually sending keep alive pulses to the interlock server
@@ -1706,7 +1875,7 @@ err:
     NSLog(@"[SMELLIE]: Stopped sending keep-alive to interlock server\n");
 }
 
--(void)startSmellieRunInBackground:(NSDictionary*)smellieSettings
+-(void) startSmellieRunInBackground:(NSDictionary*)smellieSettings
 {
     [self performSelectorOnMainThread:@selector(startSmellieRun:) withObject:smellieSettings waitUntilDone:NO];
 }
@@ -1726,39 +1895,12 @@ err:
     // Fixed wavelength pars and time calc
 
     // Get laser / fibre arrays
-    NSArray* smellieLaserArray = [self getSmellieRunLaserArray:smellieSettings];
-    NSArray* smellieFibreArray = [self getSmellieRunFibreArray:smellieSettings];
+    NSArray* smellieLaserArray = [smellieSettings objectForKey:@"lasers"];
+    NSArray* smellieFibreArray = [smellieSettings objectForKey:@"fibres"];
+    NSArray* smellieWavelegnthsArray = [smellieSettings objectForKey:@"central_wavelengths"];
+    NSUInteger nSubRuns = [smellieSettings objectForKey:@"total_sub_runs"];
 
-    int numberIntensityLoops = 0;
-    for(NSString* laser in smellieLaserArray){
-        NSString* intensityString = [NSString stringWithFormat:@"%@_intensity_no_steps", laser];
-        numberIntensityLoops = numberIntensityLoops + [[smellieSettings objectForKey:intensityString] intValue];
-    }
-
-    int numberGainLoops = 0;
-    for(NSString* laser in smellieLaserArray){
-        NSString* gainString = [NSString stringWithFormat:@"%@_gain_no_steps", laser];
-        numberGainLoops = numberGainLoops + [[smellieSettings objectForKey:gainString] intValue];
-    }
-
-    int numberFixedLasers = 0;
-    for(NSString* laser in smellieLaserArray){
-        if([laser isEqualToString:@"superK"]){
-            continue;
-        }
-        NSString* laserString = [NSString stringWithFormat:@"%@_laser_on", laser];
-        numberFixedLasers = numberFixedLasers + [[smellieSettings objectForKey:laserString] intValue];
-    }
-
-    // Fixed wavelength laser time
-    int fibreCounter = [smellieFibreArray count];
-    float fixedTimeScale = (numberFixedLasers * fibreCounter * numberIntensityLoops * numberGainLoops);
-
-    ///////////////////
-    // superK time
-    float superKTimeScale = (1 * fibreCounter * [[smellieSettings objectForKey:@"superK_wavelength_no_steps"] intValue] *
-                             [[smellieSettings objectForKey:@"superK_intensity_no_steps"] intValue] *
-                             [[smellieSettings objectForKey:@"superK_gain_no_steps"] intValue]);
+    float fireTime = (numberTriggersPerLoop * nSubRuns) / (triggerFrequency);
 
     //////////////////////
     // Define some parameters for overheads calculation
@@ -1768,130 +1910,15 @@ err:
     float changeSKWavelength = 1;
     float changeGain = 0.5;
 
-    float laserOverhead = numberFixedLasers*changeFixedLaser;
-    float fibreOverhead = fibreCounter*changeFibre;
-    float wavelengthOverhead = [[smellieSettings objectForKey:@"superK_gain_no_steps"] intValue]*changeSKWavelength;
-    float intensityOverhead = numberIntensityLoops*changeIntensity;
-    float gainOverhead = numberGainLoops*changeGain;
+    float laserOverhead = [smellieLaserArray count]*changeFixedLaser;
+    float fibreOverhead = [smellieLaserArray count]*changeFibre;
+    float wavelengthOverhead = [smellieFibreArray count]*[smellieWavelegnthsArray count]*changeSKWavelength;
+    float intensityOverhead = nSubRuns*changeIntensity;
+    float gainOverhead = nSubRuns*changeGain;
     float totalOverhead = laserOverhead + fibreOverhead + wavelengthOverhead + intensityOverhead + gainOverhead;
 
-    float totalTime = (((superKTimeScale + fixedTimeScale)*numberTriggersPerLoop) + totalOverhead)/ (triggerFrequency*60);
+    float totalTime = (fireTime + totalOverhead) / 60.;
     return [NSNumber numberWithFloat:totalTime];
-}
-
--(NSArray*)getSmellieRunLaserArray:(NSDictionary*)smellieSettings
-{
-    //Extract the lasers to be fired into an array
-    NSMutableArray* laserArray = [NSMutableArray arrayWithCapacity:5];
-    if([[smellieSettings objectForKey:@"PQ375_laser_on"] intValue] == 1){
-        [laserArray addObject:@"PQ375"];
-    } if([[smellieSettings objectForKey:@"PQ405_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"PQ405"];
-    } if([[smellieSettings objectForKey:@"PQ440_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"PQ440"];
-    } if([[smellieSettings objectForKey:@"PQ495_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"PQ495"];
-    } if([[smellieSettings objectForKey:@"superK_laser_on"] intValue] == 1) {
-        [laserArray addObject:@"superK"];
-    }
-    return laserArray;
-};
-
--(NSMutableArray*)getSmellieRunFibreArray:(NSDictionary*)smellieSettings
-{
-    //Extract the fibres to be fired into an array
-    NSMutableArray* fibreArray = [NSMutableArray arrayWithCapacity:12];
-    if ([[smellieSettings objectForKey:@"FS007"] intValue] == 1){
-        [fibreArray addObject:@"FS007"];
-    } if ([[smellieSettings objectForKey:@"FS107"] intValue] == 1){
-        [fibreArray addObject:@"FS107"];
-    } if ([[smellieSettings objectForKey:@"FS207"] intValue] == 1){
-        [fibreArray addObject:@"FS207"];
-    } if ([[smellieSettings objectForKey:@"FS025"] intValue] == 1){
-        [fibreArray addObject:@"FS025"];
-    } if ([[smellieSettings objectForKey:@"FS125"] intValue] == 1){
-        [fibreArray addObject:@"FS125"];
-    } if ([[smellieSettings objectForKey:@"FS225"] intValue] == 1){
-        [fibreArray addObject:@"FS225"];
-    } if ([[smellieSettings objectForKey:@"FS037"] intValue] == 1){
-        [fibreArray addObject:@"FS037"];
-    } if ([[smellieSettings objectForKey:@"FS137"] intValue] == 1){
-        [fibreArray addObject:@"FS137"];
-    } if ([[smellieSettings objectForKey:@"FS237"] intValue] == 1){
-        [fibreArray addObject:@"FS237"];
-    } if ([[smellieSettings objectForKey:@"FS055"] intValue] == 1){
-        [fibreArray addObject:@"FS055"];
-    } if ([[smellieSettings objectForKey:@"FS155"] intValue] == 1){
-        [fibreArray addObject:@"FS155"];
-    } if ([[smellieSettings objectForKey:@"FS255"] intValue] == 1){
-        [fibreArray addObject:@"FS255"];
-    } if ([[smellieSettings objectForKey:@"FS093"] intValue] == 1){
-        [fibreArray addObject:@"FS093"];
-    } if ([[smellieSettings objectForKey:@"FS193"] intValue] == 1){
-        [fibreArray addObject:@"FS193"];
-    } if ([[smellieSettings objectForKey:@"FS293"] intValue] == 1){
-        [fibreArray addObject:@"FS293"];
-    } if ([[smellieSettings objectForKey:@"powerMeter"] intValue] == 1){
-        [fibreArray addObject:@"powerMeter"];
-    }
-    return fibreArray;
-}
-
--(NSMutableArray*)getSmellieLowEdgeWavelengthArray:(NSDictionary*)smellieSettings
-{
-    //Read data
-    int wavelengthLow = [[smellieSettings objectForKey:@"superK_wavelength_start"] intValue];
-    int stepSize = [[smellieSettings objectForKey:@"superK_wavelength_step_length"] intValue];
-    float noSteps = [[smellieSettings objectForKey:@"superK_wavelength_no_steps"] floatValue];
-    
-    NSMutableArray* lowEdges = [NSMutableArray arrayWithCapacity:noSteps];
-    if(wavelengthLow == 0 || noSteps == 0){
-        [lowEdges addObject:[NSNumber numberWithInteger:wavelengthLow]];
-        return lowEdges;
-    }
-    
-    //Create array
-    for(int i=0;i<noSteps;i++){
-        int edge = wavelengthLow + i*stepSize;
-        [lowEdges addObject:[NSNumber numberWithInt:edge]];
-    }
-    return lowEdges;
-}
-
--(NSMutableArray*)getSmellieRunIntensityArray:(NSDictionary*)smellieSettings forLaser:(NSString *)laser
-{
-    //Extract bounds
-    int minIntensity = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_intensity_minimum",laser]] intValue];
-    int increment = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_intensity_increment",laser]] intValue];
-    int noSteps = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_intensity_no_steps",laser]] intValue];
-
-    //Check to see if the maximum intensity is the same as the minimum intensity
-    NSMutableArray* intensities = [NSMutableArray arrayWithCapacity:noSteps];
-
-    //Create intensities array
-    for(int i=0; i < noSteps; i++){
-        [intensities addObject:[NSNumber numberWithInt:(minIntensity + increment*i)]];
-    }
-    
-    return intensities;
-}
-
--(NSMutableArray*)getSmellieRunGainArray:(NSDictionary*)smellieSettings forLaser:(NSString *)laser
-{
-    //Extract bounds
-    float minIntensity = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_minimum",laser]] floatValue];
-    float increment = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_increment",laser]] floatValue];
-    int noSteps = [[smellieSettings objectForKey:[NSString stringWithFormat:@"%@_gain_no_steps",laser]] intValue];
-    
-    //Check to see if the maximum intensity is the same as the minimum intensity
-    NSMutableArray* gains = [NSMutableArray arrayWithCapacity:noSteps];
-    
-    //Create intensities array
-    for(int i=0; i < noSteps; i++){
-        [gains addObject:[NSNumber numberWithFloat:(minIntensity + increment*i)]];
-    }
-    
-    return gains;
 }
 
 -(void) startSmellieRunThread:(NSDictionary*)smellieSettings;
@@ -1911,11 +1938,14 @@ err:
     /*
      Form a smellie run using the passed smellie run file, stored in smellieSettings dictionary.
     */
-    NSLog(@"[SMELLIE]:Setting up a SMELLIE Run\n");
+    NSLog(@"[SMELLIE]: Setting up a SMELLIE Run\n");
 
     //////////////
     // This will likely run in thread so make an auto release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+    [self setMaintenanceRollOver:YES]; // Asssume we roll over by default.
+    [self setSmellieStopButton:NO]; // Had the stop button been pressed?
 
     //////////////
     //   GET TUBii & RunControl MODELS
@@ -1928,7 +1958,7 @@ err:
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
 
-    ///////////////
+    //////////////
     //Get the run controller
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1946,7 +1976,7 @@ err:
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please load the SMELLIE standard run type.\n");
         goto err;
     }
-    
+
     ///////////////////////
     // Check trigger is being sent to asyncronus port (EXT_A)
     NSUInteger asyncTrigMask;
@@ -1962,51 +1992,11 @@ err:
         goto err;
     }
 
-    ////////////////////////
-    // SET MASTER / SLAVE MODE
-    NSString *operationMode = [NSString stringWithFormat:@"%@",[smellieSettings objectForKey:@"operation_mode"]];
-    if([operationMode isEqualToString:@"Slave Mode"]){
-        [self setSmellieSlaveMode:YES];
-        NSLog(@"[SMELLIE]: Running in SLAVE mode\n");
-    }else if([operationMode isEqualToString:@"Master Mode"]){
-        [self setSmellieSlaveMode:NO];
-        NSLog(@"[SMELLIE]: Running in MASTER mode\n");
-    }else{
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Slave / master mode could not be read in run plan file.\n");
-        goto err;
-    }
-    
-    /////////////////////
-    // GET SMELLIE LASERS AND FIBRES TO LOOP OVER
-    // Wavelengths, intensities and gains variables
-    // for each fibre are generated within the laser
-    // loop.
-    //
-    NSMutableArray* laserArray = [self getSmellieRunLaserArray:smellieSettings];
-    NSMutableArray* fibreArray = [self getSmellieRunFibreArray:smellieSettings];
-
-    // Make a dictionary to hold settings for pushing upto database
-    NSMutableDictionary *valuesToFillPerSubRun = [[NSMutableDictionary alloc] initWithCapacity:100];
-    
-    //////////////////////
-    // Define some parameters for overheads calculation
-    NSNumber* changeIntensity = [NSNumber numberWithFloat:0.5];
-    NSNumber* changeFibre = [NSNumber numberWithFloat:0.1];
-    NSNumber* changeFixedLaser = [NSNumber numberWithFloat:45];
-    NSNumber* changeSKWavelength = [NSNumber numberWithFloat:1];
-    NSNumber* changeGain = [NSNumber numberWithFloat:0.5];
-    
     /////////////////////
     // Create and push initial smellie run doc and tell smellie which run we're in
     [self setEllieFireFlag:YES];
 
     if([runControl isRunning]){
-        @try{
-            [self activateKeepAlive:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
-        } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem activating interlock server: %@\n", [e reason]);
-            goto err;
-        }
         @try{
             [self setSmellieNewRun:[NSNumber numberWithUnsignedLong:[runControl runNumber]]];
         } @catch(NSException* e) {
@@ -2021,268 +2011,205 @@ err:
             goto err;
         }
     }
-    
-    // ***********************
+    /////////////////////
+    // Tell gui we're about to flash
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIEFlashing object:self];
+    });
+
+    /////////////////////
+    // Define some static variables
+    int counter=0;
+    NSString* laser;
+    NSString* fibre;
+    NSNumber* wavelengthLowEdge;
+    NSNumber* wavelengthHighEdge;
+    NSNumber* intensity;
+    NSNumber* gain;
+    NSNumber* rate = [NSNumber numberWithInt:[[smellieSettings objectForKey:@"trigger_frequency"] integerValue]];
+    NSNumber* nTriggers = [NSNumber numberWithInt:[[smellieSettings objectForKey:@"triggers_per_loop"] integerValue]];
+    NSMutableArray* fireSettingsArray = [NSMutableArray arrayWithCapacity:51];
+
+    //////////////////////
     // BEGIN LOOPING!
-    // laser loop
     //
-    for(NSString* laserKey in laserArray){
+    for(NSDictionary* subRun in [smellieSettings objectForKey:@"sub_runs"]){
+        ////////////////////////
+        // Check if thread has been canceled
         if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
             NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
             goto err;
         }
-        NSLog(@"[SMELLIE]: Fire sequence requested for laser: %@\n", laserKey);
         
-        // Add laser to the subrun file
-        [valuesToFillPerSubRun setObject:laserKey forKey:@"laser"];
- 
-        ////////////////////////////
-        // Do some additional array
-        // building to define the
-        // inner loops for this laser
-        
-        // Create wavelength, intensity and gain arrays for this laser
-        NSMutableArray* intensityArray = [self getSmellieRunIntensityArray:smellieSettings forLaser:laserKey];
-        NSMutableArray* gainArray = [self getSmellieRunGainArray:smellieSettings forLaser:laserKey];
-        NSMutableArray* lowEdgeWavelengthArray = [NSMutableArray arrayWithObject:[NSNumber numberWithInt:0]]; // Make an array with single entry
-        if([laserKey isEqual:@"superK"]){
-            lowEdgeWavelengthArray = [self getSmellieLowEdgeWavelengthArray:smellieSettings];
+        ///////////////////////
+        // Loop settings
+        @try{
+            laser = [subRun objectForKey:@"laser"];
+            fibre = [subRun objectForKey:@"fibre"];
+            wavelengthLowEdge = [NSNumber numberWithInt:[[subRun objectForKey:@"wavelength_low"] integerValue]];
+            wavelengthHighEdge  = [NSNumber numberWithInt:[[subRun objectForKey:@"wavelength_hi"] integerValue]];
+            intensity = [NSNumber numberWithInt:[[subRun objectForKey:@"intensity"] integerValue]];
+            gain = [NSNumber numberWithFloat:[[subRun objectForKey:@"gain"] floatValue]];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Sub run settings could not be properly read, reason : %@.\n", [e reason]);
+            goto err;
         }
-        NSNumber* rate = [smellieSettings objectForKey:@"trigger_frequency"];
 
-        // ***********
-        // Fibre loop
-        //
-        for(NSString* fibreKey in fibreArray){
-            if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
-                NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
+        ///////////////////////
+        // Loop settings to be passed to couchdb
+        NSMutableDictionary* valuesToFillPerSubRun = [NSMutableDictionary dictionaryWithCapacity:10];
+        [valuesToFillPerSubRun setObject:laser forKey:@"laser"];
+        [valuesToFillPerSubRun setObject:fibre forKey:@"fibre"];
+        [valuesToFillPerSubRun setObject:nTriggers forKey:@"number_of_shots"];
+        [valuesToFillPerSubRun setObject:intensity forKey:@"intensity"];
+        [valuesToFillPerSubRun setObject:gain forKey:@"gain"];
+        [valuesToFillPerSubRun setObject:rate forKey:@"pulse_rate"];
+        [valuesToFillPerSubRun setObject:wavelengthHighEdge forKey:@"wavelength_high_edge"];
+        [valuesToFillPerSubRun setObject:wavelengthLowEdge forKey:@"wavelength_low_edge"];
+        [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+        [fireSettingsArray insertObject:valuesToFillPerSubRun atIndex:counter];
+
+        ///////////////////////
+        // Fibre switch stuff
+        NSNumber* laserSwitchChannel;
+        NSNumber* fibreInputSwitchChannel;
+        NSNumber* fibreOutputSwitchChannel;
+        @try{
+            laserSwitchChannel = [[self smellieLaserHeadToSepiaMapping] objectForKey:laser];
+            fibreInputSwitchChannel = [[self smellieLaserToInputFibreMapping] objectForKey:laser];
+            fibreOutputSwitchChannel = [[self smellieFibreSwitchToFibreMapping] objectForKey:fibre];
+        } @catch(NSException* e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Could not map laser and / or fibre switch, reason : %@\n", [e reason]);
+        }
+
+        //////////////////////
+        // Print sub-run settings
+        NSLog(@"--------------  Settings summary : Sub Run %d\n", [[valuesToFillPerSubRun objectForKey:@"sub_run_number"] integerValue]);
+        NSLog(@"[SMELLIE]: Laser \t\t: %@\n", laser);
+        NSLog(@"[SMELLIE]: Fibre \t\t: %@\n", fibre);
+        NSLog(@"[SMELLIE]: Wavelength \t: %d\n", [wavelengthLowEdge integerValue]);
+        NSLog(@"[SMELLIE]: Intensity\t\t: %1.1f\n", [intensity floatValue]);
+        NSLog(@"[SMELLIE]: PMT Gain \t\t: %1.2f\n", [gain floatValue]);
+        NSLog(@"[SMELLIE]: No. triggers\t: %d\n", [nTriggers integerValue]);
+        NSLog(@"[SMELLIE]: Rate\t\t\t: %1.1f Hz\n", [rate floatValue]);
+
+        ///////////////////////
+        // Tell the hardware what to do
+        if([laser isEqualTo:@"superK"]){
+
+            @try{
+                [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_superK"] intValue]];
+            } @catch(NSException* e) {
+                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
                 goto err;
             }
-            NSLog(@"[SMELLIE]: Fire sequence requested for fibre: %@\n", fibreKey);
 
-            // Add fibre to the subRun file
-            [valuesToFillPerSubRun setObject:fibreKey forKey:@"fibre"];
-            
-            // ***************
-            // Wavelength loop
-            //
-            for(NSNumber* wavelength in lowEdgeWavelengthArray){
-                if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
-                    NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
+            @try{
+                [self setSmellieSuperkMasterMode:intensity withRepRate:rate withWavelengthLow:wavelengthLowEdge withWavelengthHi:wavelengthHighEdge withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:nTriggers withGainVoltage:gain];
+            } @catch(NSException* e){
+                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                goto err;
+            }
+        } else {
+
+            @try{
+                [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
+            } @catch(NSException* e) {
+                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: @\n", [e reason]);
+                goto err;
+            }
+
+            @try{
+                [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:nTriggers withGainVoltage:gain];
+            } @catch(NSException* e){
+                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                goto err;
+            }
+        }
+
+        //////////////////
+        //Push record of sub-run settings to db
+        //
+        // We do this in chunks as each push to
+        // the db comes with some overheads.
+        if([runControl isRunning]){
+            if(counter > 0 && counter % 50 == 0){
+                @try{
+                    [self updateSmellieRunDocument:fireSettingsArray];
+                } @catch(NSException* e){
+                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem updating couchdb run file: %@\n", [e reason]);
                     goto err;
                 }
-                
-                // By default set the wavelength window to nil in rundoc
-                NSNumber* wavelengthLowEdge = [NSNumber numberWithInt:0];
-                NSNumber* wavelengthHighEdge = [NSNumber numberWithInt:0];
-                
-                // If this is the superK loop, make sure the wavelength window is set apropriately
-                if([laserKey isEqualToString:@"superK"]){
-                    wavelengthLowEdge = wavelength;
-                    wavelengthHighEdge = [NSNumber numberWithInt:([wavelength integerValue] + [[smellieSettings objectForKey:@"superK_wavelength_bandwidth"] integerValue])];
-                }
+                ////////////////////
+                // Reset counter for addressing objects in an array
+                [fireSettingsArray removeAllObjects];
+                counter = 0;
+            }
+        }
 
-                [valuesToFillPerSubRun setObject:wavelengthLowEdge forKey:@"wavelength_low_edge"];
-                [valuesToFillPerSubRun setObject:wavelengthHighEdge forKey:@"wavelength_high_edge"];
-                
-                // **************
-                // Intensity loop
-                //
-                for(NSNumber* intensity in intensityArray){
-                    if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
-                        NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
-                        goto err;
-                    }
-                    
-                    // Add intensity value into runDoc
-                    [valuesToFillPerSubRun setObject:intensity forKey:@"intensity"];
-                    
-                    // **************
-                    // Gain loop
-                    //
-                    for(NSNumber* gain in gainArray){
-                        if([self ellieFireFlag] == NO || [[NSThread currentThread] isCancelled]){
-                            NSLogColor([NSColor redColor], @"[SMELLIE]: thread has been cancelled, killing sequence.\n");
-                            goto err;
-                        }
+        //////////////////
+        //Check if run file requests a sleep time between sub_runs
+        if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
+            NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
+            [NSThread sleepForTimeInterval:sleepTime];
+        }
                         
-                        ///////////////////////
-                        // Inner most loop.
-                        // Need to begin a new
-                        // subrun and tell hardware
-                        // what it should be running
-                        //
-                        
-                        //////////////////////
-                        // GET FINAL SMELLIE SETTINGS
-                        [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-                        [valuesToFillPerSubRun setObject:gain forKey:@"gain"];
-                        [valuesToFillPerSubRun setObject:[smellieSettings objectForKey:@"trigger_frequency"] forKey:@"pulse_rate"];
-                        [valuesToFillPerSubRun setObject:[smellieSettings objectForKey:@"triggers_per_loop"] forKey:@"number_of_shots"];
+        //////////////////
+        // RUN CONTROL
+        //Prepare new subrun - will produce a subrun boundrary in the zdab.
+        if([runControl isRunning] && ![[NSThread currentThread] isCancelled]){
+            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
+        }
+    } // End of subRun loop
 
-                        NSNumber* laserSwitchChannel = [[self smellieLaserHeadToSepiaMapping] objectForKey:laserKey];
-                        NSNumber* fibreInputSwitchChannel = [[self smellieLaserToInputFibreMapping] objectForKey:laserKey];
-                        NSNumber* fibreOutputSwitchChannel = [[self smellieFibreSwitchToFibreMapping] objectForKey:fibreKey];
-                        NSNumber* numOfPulses = [smellieSettings objectForKey:@"triggers_per_loop"];
-                        
-                        //////////////////////
-                        // Calculate how long we expect this run loop to take
-                        // Active firing time
-                        float fireTime = [rate floatValue]*[numOfPulses floatValue];
-                        // Overheads
-                        // Assuption is that at the start of a new outer loop, all the inner
-                        // loops must start from the first object in their array.
-                        float overheads = [changeGain floatValue];
-                        if([gain isEqualTo:[gainArray firstObject]]){ // New intensity
-                            overheads = overheads + [changeIntensity floatValue];
-                            if([intensity isEqualTo:[intensityArray firstObject]]){ // New wavelength
-                                if([laserKey isEqualTo:@"superK"]){ // only important for superK
-                                    overheads = overheads + [changeSKWavelength floatValue];
-                                }
-                                if([wavelength isEqualTo:[lowEdgeWavelengthArray firstObject]]){ // New fibre
-                                    overheads = overheads + [changeFibre floatValue];
-                                    if([fibreKey isEqualTo:[fibreArray firstObject]]){ // New laser
-                                        if(![laserKey isEqualTo:@"superK"]){ // Only changing fixed lasers takes time
-                                            overheads = overheads + [changeFixedLaser floatValue];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        NSNumber* sequenceTime = [NSNumber numberWithFloat:(fireTime+overheads)];
-                        
-                        //////////////
-                        // Slave mode
-                        if([self smellieSlaveMode]){
-                            if([laserKey isEqualTo:@"superK"]){
-                                NSLogColor([NSColor redColor], @"[SMELLIE]: SuperK laser cannot be run in slave mode\n");
-                            } else {
-                                @try{
-                                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
-                                } @catch(NSException* e) {
-                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
-                                    goto err;
-                                }
-                                @try{
-                                    [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:sequenceTime withGainVoltage:gain];
-                                } @catch(NSException* e){
-                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
-                                    goto err;
-                                }
-                            }
+err:
+{
+    ////////////////////////
+    // Deactivate the system
 
-                            //// **NOTE** ////
-                            // May have to include a delay
-                            // here to ensure smellie
-                            // hardware is properly set
-                            // before TUBii sends triggers
-                            
-                            //Set up tubii to send triggers
-                            @try{
-                                //Fire trigger pulses!
-                                [theTubiiModel fireSmelliePulser_rate:[rate floatValue] pulseWidth:100 NPulses:numOfPulses];
-                            } @catch(NSException* e) {
-                                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with TUBii server request: %@\n", [e reason]);
-                                goto err;
-                            }
+    ////////////////////////
+    // Check if we have any sub-run settings we need to pipe up
+    if([runControl isRunning] && fireSettingsArray){
+        if([fireSettingsArray count] > 0){
+            @try{
+                [self updateSmellieRunDocument:fireSettingsArray];
+            } @catch(NSException* e){
+                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem updating couchdb run file: %@\n", [e reason]);
+                goto err;
+            }
+        }
+    }
 
-                        //////////////
-                        // Master mode
-                        } else {
+    // Keep alive - will stop light any light
+    [self killKeepAlive:nil];
 
-                            //Set SMELLIE settings
-                            if([laserKey isEqualTo:@"superK"]){
-                                @try{
-                                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_superK"] intValue]];
-                                } @catch(NSException* e) {
-                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
-                                    goto err;
-                                }
+    // Tubii
+    @try{
+        [theTubiiModel stopSmelliePulser];
+    } @catch(NSException* e){
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
+    }
 
-                                @try{
-                                    [self setSmellieSuperkMasterMode:intensity withRepRate:rate withWavelengthLow:wavelengthLowEdge withWavelengthHi:wavelengthHighEdge withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
-                                } @catch(NSException* e){
-                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
-                                    goto err;
-                                }
-                            } else {
+    // Smellie lasers
+    @try{
+        NSLog(@"[SMELLIE]: Waiting for lasers to deactivate....\n");
+        [self deactivateSmellieLasers];
+    } @catch(NSException* e) {
+        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command failed, reason: %@\n", [e reason]);
+    }
 
-                                @try{
-                                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
-                                } @catch(NSException* e) {
-                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
-                                    goto err;
-                                }
-
-                                @try{
-                                    [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:numOfPulses withGainVoltage:gain];
-                                } @catch(NSException* e){
-                                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
-                                    goto err;
-                                }
-                            }
-                            
-                        }
-
-                        //////////////////
-                        //Push record of sub-run settings to db
-                        if([runControl isRunning]){
-                            @try{
-                                [self updateSmellieRunDocument:valuesToFillPerSubRun];
-                            } @catch(NSException* e){
-                                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem updating couchdb run file: %@\n", [e reason]);
-                                goto err;
-                            }
-                        }
-                        
-                        //////////////////
-                        //Check if run file requests a sleep time between sub_runs
-                        if([smellieSettings objectForKey:@"sleep_between_sub_run"]){
-                            NSTimeInterval sleepTime = [[smellieSettings objectForKey:@"sleep_between_sub_run"] floatValue];
-                            [NSThread sleepForTimeInterval:sleepTime];
-                        }
-                        
-                        //////////////////
-                        // RUN CONTROL
-                        //Prepare new subrun - will produce a subrun boundrary in the zdab.
-                        if([runControl isRunning]){
-                            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-                            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
-                        }
-                    }//end of GAIN loop
-                }//end of INTENSITY loop
-            }//end of WAVELENGTH loop
-        }//end of FIBRE loop
-    }//end of LASER loop
-
+    NSLog(@"[SMELLIE]: Run sequence stopped.\n");
     //Release dict holding sub-run info
-    [valuesToFillPerSubRun release];
-    [pool release];
+    [[NSThread currentThread] cancel];
 
-    //Post a note. on the main thread to request a call to stopSmellieRun
+    //////////////////////////////////////////
+    //Post a note. on the main thread to request a call to handle run rollover stuff
     [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
     });
-    return;
-
-err:
-{
-    //Resetting the mtcd to settings before the smellie run
-    NSLogColor([NSColor redColor], @"[SMELLIE]: Sent to err statement. Stopping fire sequence.\n");
     [pool release];
-
-    ////////////
-    // If thread errored we need to post a note to
-    // call the formal stop proceedure. If the thread
-    // was canelled we must already be in a 'stop'
-    // button push, so don't need to post.
-    if(![[NSThread currentThread] isCancelled]){
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
-        });
-    }
-    [[NSThread currentThread] cancel];
 }
 }
 
@@ -2290,7 +2217,7 @@ err:
 {
     /*
      Before we perform any tidy-up actions, we want to make sure the run thread has stopped
-     executing. If the run has not been ended using the tellie specific 'stop fibre' button,
+     executing. If the run has not been canceled using the smellie specific 'stop fibre' button,
      but instead the user has simply hit the main run stop button on the SNOPController, we
      need to make sure SMELLIE has properly cleaned up before we roll into a new run.
      Fortunately there is a handy wait notification that gets picked up by the run control.
@@ -2299,69 +2226,97 @@ err:
      to stop executing before tidying up and, finally, releasing the run wait.
      */
 
-    [[self smellieThread] cancel];
-
     // Post a notification telling the run control to wait until the thread finishes
     NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for smellie run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
-    // Detatch thread to monitor smellie run thread
-    [NSThread detachNewThreadSelector:@selector(waitForSmellieRunToFinish) toTarget:self withObject:nil];
-}
+    if([[self smellieThread] isExecuting]){
+        // Cancel the SMELLIE thread
+        [[self smellieThread] cancel];
 
--(void)waitForSmellieRunToFinish
-{
-    @autoreleasepool {
-        while ([[self smellieThread] isExecuting]) {
-            [NSThread sleepForTimeInterval:0.1];
+        // Tell SMELLIE hardware to stop generating triggers
+        @try{
+            // Use a second SMELLIE client (which is not being blocked by the current fire sequence) to set
+            // a flag on the server. The flag will cause it to jump out of it's current trigger sequence early.
+            [self CancelSmellieTriggers];
+        } @catch(NSException *e) {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem telling smellie to stop sending triggers, reason: %@\n", [e reason]);
         }
-        [self smellieTidyUp];
+
+        ///////////////////////////////////////
+        // If a run transition thread isn't yet running, run one.
+        // Doing it this way avoids multiple transition behaviours.
+        if(![_smellieTransitionThread isExecuting]){
+            // Detatch thread to monitor smellie run thread
+            NSLog(@"[SMELLIE]: Waiting for SMELLIE server to release blocking trigger function...\n");
+            [self setSmellieTransitionThread:[[NSThread alloc] initWithTarget:self selector:@selector(smellieRunTransition) object:nil]];
+            [[self smellieTransitionThread] start];
+        } else {
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
+        }
+    } else {
+        // Tell run control it can stop waiting
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
     }
 }
 
--(void)smellieTidyUp
+-(void)smellieRunTransition
 {
-    /*
-     Some sign off / tidy up stuff to be called at the end of a smellie run.
-     */
-
-    ///////////
-    // This could be run in a thread, so set-up an auto release pool
+    //////////////////////////////////////////////
+    // Make a pool to handle this stuff
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
-    @try{
-        [self deactivateSmellie];
-    } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Deactivate command could not be sent to the SMELLIE server, reason: %@\n", [e reason]);
+    /////////////////////////////////////////////
+    // Wait for smellie thread to stop executing
+    while ([[self smellieThread] isExecuting]) {
+        [NSThread sleepForTimeInterval:0.2];
+    }
+    NSLog(@"[SMELLIE]: Blocking function released\n");
+
+    ////////////////////////////////////////////
+    // Tell run control it can stop waiting (this is a spawned thread so use dispatch_sync)
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object:self];
+
+    //////////////////////////////////////////
+    // HANDLE RUN ROLLOVERS
+    //
+    // If the sequence finished without external influence, move into a maintenance run.
+    if([self maintenanceRollOver]){
+        NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
+        if(![snopModels count]){
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find SNOPModel\n");
+            goto err;
+        }
+        SNOPModel* snopModel = [snopModels objectAtIndex:0];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [snopModel startStandardRun:@"MAINTENANCE" withVersion:@"DEFAULT"];
+        });
+        [pool release];
+        return;
     }
 
-    // Kill the keepalive
-    [self killKeepAlive];
-
-    // Get a Tubii object
-    NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find TUBii model. Please add it to the experiment and restart the run.\n");
-        goto err;
+    ///////
+    // Now, there's two possible cases. Either someone hit the SMELLIE stop lasers button,
+    // or they hit stop / resync / start run.
+    //
+    // In the fist case we want to roll over the run number so the 'bad' data set which was
+    // cancelled is separated from any futher SMELLIE data by a run boundary. In the second case
+    // do nothing and let the run control sort out whatever was requested.
+    if([self smellieStopButton]){
+        NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        if(![runModels count]){
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
+            goto err;
+        }
+        ORRunModel* runControl = [runModels objectAtIndex:0];
+        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
     }
-    TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    @try{
-        [theTubiiModel stopSmelliePulser];
-    } @catch(NSException* e){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Problem sending stop command to the SMELLIE pulsar.\n");
-        goto err;
-    }
 
-    // Tell run control it can stop waiting
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
-    });
-
-    NSLog(@"[SMELLIE]: Run sequence stopped.\n");
     [pool release];
     return;
 
 err:
+{
     // Tell run control it can stop waiting
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
@@ -2370,6 +2325,8 @@ err:
     [pool release];
     NSLog(@"[SMELLIE]: Run sequence stopped - TUBii is in an undefined state (may still be sending triggers).\n");
 }
+}
+
 
 /*****************************/
 /*  smellie db interactions  */
@@ -2384,7 +2341,7 @@ err:
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
 
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    NSArray *runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add one to the experiment and restart the run.\n");
         return;
@@ -2418,7 +2375,7 @@ err:
     [pool release];
 }
 
-- (void) updateSmellieRunDocument:(NSDictionary*)subRunDoc
+- (void) updateSmellieRunDocument:(NSArray*)subRunArray
 {
     /*
      Update [self smellieRunDoc] with subrun information.
@@ -2427,30 +2384,16 @@ err:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[SMELLIE]: Couldn't find ORRunModel. Please add it to the experiment and restart the run.\n");
-        return;    }
-    ORRunModel* runControl = [runModels objectAtIndex:0];
-    
-    NSMutableDictionary* runDocDict = [[self smellieRunDoc] mutableCopy];
-    NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
 
-    [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+    // Add the passed array to it
+    NSArray* newSubRunInfo = [[[self smellieRunDoc] objectForKey:@"sub_run_info"] arrayByAddingObjectsFromArray:subRunArray];
 
-    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-    [subRunInfo addObject:subRunDocDict];
-    [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
+    // Add the newly appended array back to the copy of runDocDict
+    [[self smellieRunDoc] setObject:newSubRunInfo forKey:@"sub_run_info"];
 
-    //Update tellieRunDoc property.
-    [self setSmellieRunDoc:runDocDict];
+    // Update the document on couchdb
+    [[self couchDBRef:self withDB:@"smellie"] updateDocument:[self smellieRunDoc] documentId:[[self smellieRunDoc] objectForKey:@"_id"] tag:kSmellieRunDocumentUpdated];
 
-    //check to see if run is offline or not
-    [[self couchDBRef:self withDB:@"smellie"] updateDocument:runDocDict documentId:[runDocDict objectForKey:@"_id"] tag:kSmellieRunDocumentUpdated];
-
-    [runDocDict release];
-    [subRunDocDict release];
-    [subRunInfo release];
     [pool release];
 }
 

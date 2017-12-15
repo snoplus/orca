@@ -393,8 +393,6 @@
 		543BF2041E5481C3003E4582 /* HVcRIO.tif in Resources */ = {isa = PBXBuildFile; fileRef = 543BF1FC1E5481C3003E4582 /* HVcRIO.tif */; };
 		543BF2051E5481C3003E4582 /* ORHVcRIOController.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */; };
 		543BF2061E5481C3003E4582 /* ORHVcRIOController.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */; };
-		543BF2071E5481C3003E4582 /* ORHVcRIODecoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */; };
-		543BF2081E5481C3003E4582 /* ORHVcRIODecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */; };
 		543BF2091E5481C3003E4582 /* ORHVcRIOModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */; };
 		543BF20A1E5481C3003E4582 /* ORHVcRIOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */; };
 		546D9DAF0874BDD60072A274 /* 2228A.nib in Resources */ = {isa = PBXBuildFile; fileRef = 546D9DA70874BDD60072A274 /* 2228A.nib */; };
@@ -3377,6 +3375,14 @@
 		B38DEE4B14E02B40003914FF /* ORADVME1314Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */; };
 		B38DEE4C14E02B40003914FF /* ORADVME1314Model.h in Headers */ = {isa = PBXBuildFile; fileRef = B38DEE4614E02B40003914FF /* ORADVME1314Model.h */; };
 		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
+		B86F08771FC517DE0076A269 /* SessionDB.h in Headers */ = {isa = PBXBuildFile; fileRef = B86F08751FC517DE0076A269 /* SessionDB.h */; };
+		B86F08781FC517DE0076A269 /* SessionDB.m in Sources */ = {isa = PBXBuildFile; fileRef = B86F08761FC517DE0076A269 /* SessionDB.m */; };
+		C6FAAAEC1FBDD5320069E81C /* ORWG1220PulserModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */; };
+		C6FAAAED1FBDD5320069E81C /* WG1220Pulser.tif in Resources */ = {isa = PBXBuildFile; fileRef = C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */; };
+		C6FAAAEE1FBDD5320069E81C /* ORWG1220PulserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */; };
+		C6FAAAEF1FBDD5320069E81C /* ORWG1220PulserController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6FAAAE91FBDD5310069E81C /* ORWG1220PulserController.m */; };
+		C6FAAAF01FBDD5320069E81C /* ORWG1220PulserController.h in Headers */ = {isa = PBXBuildFile; fileRef = C6FAAAEA1FBDD5310069E81C /* ORWG1220PulserController.h */; };
+		C6FAAAF11FBDD5320069E81C /* WG1220Pulser.nib in Resources */ = {isa = PBXBuildFile; fileRef = C6FAAAEB1FBDD5310069E81C /* WG1220Pulser.nib */; };
 		CE0216BC1512139A00456EB7 /* nEDMCoil.nib in Resources */ = {isa = PBXBuildFile; fileRef = CE0216B71512139A00456EB7 /* nEDMCoil.nib */; };
 		CE0216BD1512139A00456EB7 /* ORnEDMCoilController.h in Headers */ = {isa = PBXBuildFile; fileRef = CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */; };
 		CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */; };
@@ -4146,8 +4152,6 @@
 		543BF1FC1E5481C3003E4582 /* HVcRIO.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HVcRIO.tif; path = HVcRIO/HVcRIO.tif; sourceTree = "<group>"; };
 		543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOController.h; path = HVcRIO/ORHVcRIOController.h; sourceTree = "<group>"; };
 		543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIOController.m; path = HVcRIO/ORHVcRIOController.m; sourceTree = "<group>"; };
-		543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIODecoders.h; path = HVcRIO/ORHVcRIODecoders.h; sourceTree = "<group>"; };
-		543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIODecoders.m; path = HVcRIO/ORHVcRIODecoders.m; sourceTree = "<group>"; };
 		543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOModel.h; path = HVcRIO/ORHVcRIOModel.h; sourceTree = "<group>"; };
 		543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORHVcRIOModel.m; path = HVcRIO/ORHVcRIOModel.m; sourceTree = "<group>"; };
 		546D9DA70874BDD60072A274 /* 2228A.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = 2228A.nib; path = Source/Objects/Hardware/Camac/TDC2228A/2228A.nib; sourceTree = SOURCE_ROOT; };
@@ -7034,6 +7038,14 @@
 		B38DEE4514E02B40003914FF /* ORADVME1314Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Controller.m; sourceTree = "<group>"; };
 		B38DEE4614E02B40003914FF /* ORADVME1314Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORADVME1314Model.h; sourceTree = "<group>"; };
 		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
+		B86F08751FC517DE0076A269 /* SessionDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionDB.h; sourceTree = "<group>"; };
+		B86F08761FC517DE0076A269 /* SessionDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionDB.m; sourceTree = "<group>"; };
+		C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWG1220PulserModel.h; sourceTree = "<group>"; };
+		C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = WG1220Pulser.tif; sourceTree = "<group>"; };
+		C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWG1220PulserModel.m; sourceTree = "<group>"; };
+		C6FAAAE91FBDD5310069E81C /* ORWG1220PulserController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWG1220PulserController.m; sourceTree = "<group>"; };
+		C6FAAAEA1FBDD5310069E81C /* ORWG1220PulserController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWG1220PulserController.h; sourceTree = "<group>"; };
+		C6FAAAEB1FBDD5310069E81C /* WG1220Pulser.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = WG1220Pulser.nib; sourceTree = "<group>"; };
 		CE0216B71512139A00456EB7 /* nEDMCoil.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = nEDMCoil.nib; sourceTree = "<group>"; };
 		CE0216B81512139A00456EB7 /* ORnEDMCoilController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORnEDMCoilController.h; sourceTree = "<group>"; };
 		CE0216B91512139A00456EB7 /* ORnEDMCoilController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORnEDMCoilController.m; sourceTree = "<group>"; };
@@ -7851,8 +7863,6 @@
 				543BF1FC1E5481C3003E4582 /* HVcRIO.tif */,
 				543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */,
 				543BF1FE1E5481C3003E4582 /* ORHVcRIOController.m */,
-				543BF1FF1E5481C3003E4582 /* ORHVcRIODecoders.h */,
-				543BF2001E5481C3003E4582 /* ORHVcRIODecoders.m */,
 				543BF2011E5481C3003E4582 /* ORHVcRIOModel.h */,
 				543BF2021E5481C3003E4582 /* ORHVcRIOModel.m */,
 			);
@@ -9721,6 +9731,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				C6FAAAE51FBDD5310069E81C /* WG1220Pulser */,
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
 				847D308417FF0B3000D2D8BC /* NeutonMonitor5085 */,
 				84DF4C96162F1B2100261144 /* Arduino */,
@@ -14373,6 +14384,19 @@
 			path = Advanet;
 			sourceTree = "<group>";
 		};
+		C6FAAAE51FBDD5310069E81C /* WG1220Pulser */ = {
+			isa = PBXGroup;
+			children = (
+				C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */,
+				C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */,
+				C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */,
+				C6FAAAE91FBDD5310069E81C /* ORWG1220PulserController.m */,
+				C6FAAAEA1FBDD5310069E81C /* ORWG1220PulserController.h */,
+				C6FAAAEB1FBDD5310069E81C /* WG1220Pulser.nib */,
+			);
+			path = WG1220Pulser;
+			sourceTree = "<group>";
+		};
 		CE0216B51512139A00456EB7 /* nEDM */ = {
 			isa = PBXGroup;
 			children = (
@@ -14470,6 +14494,8 @@
 				364124EB1EA04EB00041BAA3 /* record_info.h */,
 				364124E71EA04E8A0041BAA3 /* NHitMonitor.h */,
 				364124E81EA04E8A0041BAA3 /* NHitMonitor.m */,
+				B86F08751FC517DE0076A269 /* SessionDB.h */,
+				B86F08761FC517DE0076A269 /* SessionDB.m */,
 				1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */,
 				6B325E071B2F4241002E2DD7 /* SNOP.xib */,
 				EFB39FC6130BA1C5001220AC /* SNOP.gif */,
@@ -15347,6 +15373,7 @@
 				848648820975C1F6001C459D /* ORProcessInConnector.h in Headers */,
 				362020291CBD390A0089296E /* WPXMLRPCDecoderDelegate.h in Headers */,
 				848648960975C415001C459D /* ORProcessOutConnector.h in Headers */,
+				C6FAAAF01FBDD5320069E81C /* ORWG1220PulserController.h in Headers */,
 				848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */,
 				84B63C000978299E005B20A5 /* ORCountController.h in Headers */,
 				84B63C020978299E005B20A5 /* ORCountModel.h in Headers */,
@@ -15528,7 +15555,6 @@
 				84A5CD5B0D464F4600D9833C /* ORFilterController.h in Headers */,
 				84A5CD5D0D464F4600D9833C /* ORFilterModel.h in Headers */,
 				9C2595B00D5172180039C5DF /* ORHashTable.h in Headers */,
-				543BF2071E5481C3003E4582 /* ORHVcRIODecoders.h in Headers */,
 				9C2595B70D5172460039C5DF /* FilterScript.h in Headers */,
 				84FBB5710D5401BD00780DBD /* ORFilterSymbolTable.h in Headers */,
 				8428ADE20D7CACD00093D35E /* ORHeaderExplorerController.h in Headers */,
@@ -15996,6 +16022,7 @@
 				8475EC3D1475A66F003A165D /* ORLabJackController.h in Headers */,
 				8475EC3F1475A66F003A165D /* ORLabJackDecoders.h in Headers */,
 				8475EC411475A66F003A165D /* ORLabJackModel.h in Headers */,
+				B86F08771FC517DE0076A269 /* SessionDB.h in Headers */,
 				8475EC461475A66F003A165D /* ORLabJackUE9Controller.h in Headers */,
 				8475EC481475A66F003A165D /* ORLabJackUE9Decoders.h in Headers */,
 				8475EC4A1475A66F003A165D /* ORLabJackUE9Model.h in Headers */,
@@ -16012,6 +16039,7 @@
 				8402B5B714C708A1007999C1 /* ORMJDPreAmpModel.h in Headers */,
 				848F6CAA14C75F690093E502 /* ORSIS3150Controller.h in Headers */,
 				848F6CAC14C75F690093E502 /* ORSIS3150Model.h in Headers */,
+				C6FAAAEC1FBDD5320069E81C /* ORWG1220PulserModel.h in Headers */,
 				8407398214CDD91F00BAD105 /* ORMet637Controller.h in Headers */,
 				8407398414CDD91F00BAD105 /* ORMet637Model.h in Headers */,
 				B38DEE4A14E02B40003914FF /* ORADVME1314Controller.h in Headers */,
@@ -16570,6 +16598,7 @@
 				0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */,
 				84AC14DF1B70E2460071C4EF /* MjdDataScanner.nib in Resources */,
 				840E00270944B29000049827 /* AndGate.tif in Resources */,
+				C6FAAAED1FBDD5320069E81C /* WG1220Pulser.tif in Resources */,
 				840E002F0944B29000049827 /* ORGate.tif in Resources */,
 				84F16AF718900D530074B787 /* XTR6.nib in Resources */,
 				840E00360944B29000049827 /* RSFlipFlop.tif in Resources */,
@@ -16987,6 +17016,7 @@
 				84E966CF11848BEF008D9119 /* Majorana.nib in Resources */,
 				84E966D011848BEF008D9119 /* Majorana.tif in Resources */,
 				848822A11D2413910030B398 /* DT5725.nib in Resources */,
+				C6FAAAF11FBDD5320069E81C /* WG1220Pulser.nib in Resources */,
 				84BF43CC118793FA00F55216 /* Caen1785.gif in Resources */,
 				84BF43CD118793FA00F55216 /* Caen1785.nib in Resources */,
 				8476200E118CD53D00016A8D /* 1dFit.nib in Resources */,
@@ -17309,6 +17339,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C6FAAAEF1FBDD5320069E81C /* ORWG1220PulserController.m in Sources */,
 				8458E8EE15DA89EF005C43A9 /* Mail.app in Sources */,
 				8434A2A7055B3287002D3102 /* main.m in Sources */,
 				8434A2A8055B3287002D3102 /* ORAppDelegate.m in Sources */,
@@ -17645,6 +17676,7 @@
 				840E00130944B29000049827 /* ORProcessHwAccessorController.m in Sources */,
 				840E00150944B29000049827 /* ORProcessNub.m in Sources */,
 				840E00170944B29000049827 /* ORInputElement.m in Sources */,
+				C6FAAAEE1FBDD5320069E81C /* ORWG1220PulserModel.m in Sources */,
 				840E00190944B29000049827 /* ORSPDTRelayController.m in Sources */,
 				0F16E3551C493AD7003C9EC9 /* net.c in Sources */,
 				840E001B0944B29000049827 /* ORSPDTRelayModel.m in Sources */,
@@ -17799,6 +17831,7 @@
 				84F46F420CA44255007EFADA /* ORIpeCrateModel.m in Sources */,
 				84F46F480CA44255007EFADA /* ORIpeFLTController.m in Sources */,
 				84F46F4A0CA44255007EFADA /* ORIpeFLTDecoder.m in Sources */,
+				B86F08781FC517DE0076A269 /* SessionDB.m in Sources */,
 				84F46F4D0CA44255007EFADA /* ORIpeFLTModel.m in Sources */,
 				84F46F520CA44255007EFADA /* ORIpeSLTController.m in Sources */,
 				84F46F550CA44255007EFADA /* ORIpeSLTModel.m in Sources */,
@@ -18141,7 +18174,6 @@
 				8457BE3811B0183500C4082D /* ORSIS3820Decoders.m in Sources */,
 				8457BE3A11B0183500C4082D /* ORSIS3820Model.m in Sources */,
 				8457C2DF11B59DEC00C4082D /* ORCaen785Decoders.m in Sources */,
-				543BF2081E5481C3003E4582 /* ORHVcRIODecoders.m in Sources */,
 				4398E7CD11B81B8B00FC4DDE /* ORCaen775Controller.m in Sources */,
 				4398E7E111B81BBD00FC4DDE /* ORCaen775Decoders.m in Sources */,
 				EF7722B611E813120064A1CF /* ORXL3Model.m in Sources */,

@@ -47,7 +47,6 @@ static MJDInterlocksStateInfo state_info [kMJDInterlocks_NumStates] = {
 #define kAllowedResponseRetry   5
 
 #define kScmSlot 2
-NSString* scmIpNumber = @"151.150.226.70";
 
 @implementation ORMJDInterlocks
 
@@ -548,8 +547,10 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         fillingLN = NO;
                         fillString = @"Not Filling";
                         fillColor = normalColor;
-
                     }
+                    
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORMajoranaModelUpdateSpikeDisplay" object:self];
+
                     [self setState:kMJDInterlocks_CheckLNFill status:fillString color:fillColor];
                     [self setCurrentState:kMJDInterlocks_CheckForBreakdown];
                 }
@@ -578,7 +579,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 if(!sentCmds){
                     self.remoteOpStatus=nil;
                     NSMutableArray* cmds = [NSMutableArray arrayWithObjects:
-                                            [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",slot],
+                                            [NSString stringWithFormat:@"fillingLN = [ORAmi286Model,2 fillStatus:%d];",[self vacSystem]],
                                             @"pollTime = [ORAmi286Model,2 pollTime];",
                                             nil];
 

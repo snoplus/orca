@@ -25,9 +25,26 @@ class ORFLTv4Readout : public ORVCard
     virtual ~ORFLTv4Readout() {} 
     virtual bool Start();
     virtual bool Readout(SBC_LAM_Data*);
-	virtual bool Stop();
+    virtual bool Stop();
 	void ClearSumHistogramBuffer();
 
+    /** Readout in energy mode with firmware 3.1  */
+    bool ReadoutEnergyV31(SBC_LAM_Data*);
+    
+    /** Readout in trace mode with firmware 3.1  */
+    bool ReadoutTraceV31(SBC_LAM_Data*);
+
+    /** Readout in histogram mode with firmware 3.1  */
+    bool ReadoutHistogramV31(SBC_LAM_Data*);
+
+    /** Readout functions for older firmware versions */
+    bool ReadoutLegacy(SBC_LAM_Data*);
+    
+    // Helper variables for histogram mode
+    
+    /** Get the number of total counts in a histogram */
+    unsigned long long Counts(uint32_t *histogram);
+    
     enum EORFLTv4Consts {
         kFifoEmpty          = 0x01,
         kNumChan            = 24,
@@ -39,6 +56,16 @@ class ORFLTv4Readout : public ORVCard
     uint32_t oldPageAB;
 	uint32_t sumHistogram[kNumChan][kMaxHistoLength];
 	uint32_t recordingTimeSum[kNumChan];
+    
+    uint32_t histoBinWidth;
+    uint32_t histoEnergyOffset;
+    uint32_t histoClearByUser;
+    uint32_t histoRefreshTime;
+    uint32_t histoReadoutSec;
+    
+    uint32_t histoStorage[kNumChan][kMaxHistoLength];
+    uint32_t histoCurrent[kMaxHistoLength];
+    
 };
 
 #endif /* _ORFLTv4Readout_hh_*/

@@ -1521,7 +1521,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     if(dataTakingThreadRunning){
 		timeToStopTakingData= YES;
 		totalWaitTime += .1;
-		if(totalWaitTime > 10){
+		if(totalWaitTime > 15){
 			NSLogColor([NSColor redColor], @"Run Thread Failed to stop.....You should stop and restart ORCA!\n");
 			[self finishRunStop];
 		}
@@ -1857,8 +1857,12 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [pool release];
     }
     [runInfo setObject:[NSNumber numberWithBool:!quickStart] forKey:@"doinit"];
-	[client runIsStopping:runInfo];
-	
+    @try {
+        [client runIsStopping:runInfo];
+    }
+    @catch(NSException* e){
+        NSLog(@"RunControl: runIsStopping Method: %@\n", e);
+    }
 	@try {
 		BOOL allDone = NO;
 		if(client) do {

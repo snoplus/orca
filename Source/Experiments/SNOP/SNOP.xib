@@ -25,6 +25,7 @@
                 <outlet property="detectorState" destination="rCO-DX-2zv" id="Rep-KK-iKb"/>
                 <outlet property="ecaNEventsTextField" destination="Fze-hD-1jb" id="bwp-QM-cS5"/>
                 <outlet property="ecaPulserRate" destination="Unf-wm-WPb" id="8ED-iU-RaC"/>
+                <outlet property="ecaStatusMatrix" destination="kKV-Je-r50" id="0o3-bo-Jjm"/>
                 <outlet property="elapsedTimeField" destination="3771" id="ZCv-hI-YYv"/>
                 <outlet property="globalxl3Mode" destination="4194" id="4216"/>
                 <outlet property="hvStatusMatrix" destination="2830" id="2912"/>
@@ -44,12 +45,6 @@
                 <outlet property="loadedTellieOperationLabel" destination="syb-lx-DpA" id="xtf-30-SAG"/>
                 <outlet property="loadedTellieRunNameLabel" destination="FCg-q6-iyf" id="ukT-F4-he3"/>
                 <outlet property="loadedTellieRunTimeLabel" destination="lqW-Ew-72m" id="809-bM-1kF"/>
-                <outlet property="lockDBID" destination="uZ3-NW-Xqt" id="7ey-We-Maw"/>
-                <outlet property="lockDBIPAddress" destination="twq-b6-2jK" id="9Lv-80-brD"/>
-                <outlet property="lockDBName" destination="UeC-s7-JHc" id="3tF-gk-nOs"/>
-                <outlet property="lockDBPort" destination="MVZ-YX-g8u" id="Pvr-8N-o1S"/>
-                <outlet property="lockDBPswd" destination="xu0-2f-77h" id="1sT-0r-hdd"/>
-                <outlet property="lockDBUser" destination="DzY-Ca-542" id="at8-xj-Dpo"/>
                 <outlet property="lockStatusTextField" destination="Np3-DI-Iif" id="5ty-0b-EY4"/>
                 <outlet property="logHost" destination="KzD-He-2lG" id="LXs-Sy-EvF"/>
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
@@ -86,6 +81,12 @@
                 <outlet property="runTypeWordMatrix" destination="3935" id="GbT-ZR-J8S"/>
                 <outlet property="runTypeWordSRMatrix" destination="zuQ-GY-eWY" id="e1l-GQ-cUd"/>
                 <outlet property="runsLockButton" destination="URx-nh-GMP" id="E2u-gI-0d3"/>
+                <outlet property="sessionDBAddress" destination="twq-b6-2jK" id="Wto-Rx-LcC"/>
+                <outlet property="sessionDBLockID" destination="uZ3-NW-Xqt" id="FXV-S3-IQX"/>
+                <outlet property="sessionDBName" destination="UeC-s7-JHc" id="nAj-kA-B7V"/>
+                <outlet property="sessionDBPassword" destination="xu0-2f-77h" id="pA2-hN-4hV"/>
+                <outlet property="sessionDBPort" destination="MVZ-YX-g8u" id="w4s-eW-bPv"/>
+                <outlet property="sessionDBUser" destination="DzY-Ca-542" id="KpO-P1-Fdq"/>
                 <outlet property="smellieEmergencyStop" destination="uhs-DN-ePI" id="MPy-Ac-3Gi"/>
                 <outlet property="smellieLoadRunFile" destination="wQo-rL-aDD" id="7t3-LC-Ad3"/>
                 <outlet property="smellieRunFileNameField" destination="3cW-2R-0PG" id="deA-fT-6xF"/>
@@ -107,7 +108,6 @@
                 <outlet property="standardRunThreshLabels" destination="002-Sr-nUh" id="UPB-Ij-RiI"/>
                 <outlet property="standardRunVersionPopupMenu" destination="6EN-vd-XcM" id="Rqc-CS-eNT"/>
                 <outlet property="startRunButton" destination="1253" id="XdY-Mu-6m6"/>
-                <outlet property="startSingleECAButton" destination="HH6-Ln-TL1" id="ugo-Qh-JRM"/>
                 <outlet property="stopNhitMonitorButton" destination="eEC-cV-Yui" id="v9K-Qp-Zvc"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
                 <outlet property="tabView" destination="101" id="332"/>
@@ -3196,27 +3196,8 @@
                                                         <rect key="frame" x="10" y="33" width="283" height="601"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <button id="S4L-A4-8QE">
-                                                                <rect key="frame" x="54" y="498" width="174" height="38"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" title="Start ECA Campaign" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bte-vs-Ygr">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                </buttonCell>
-                                                            </button>
-                                                            <button id="HH6-Ln-TL1">
-                                                                <rect key="frame" x="54" y="3" width="174" height="38"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="bevel" title="Start Single ECA Run" bezelStyle="regularSquare" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="GKp-tL-RiI">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="system"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="startECASingleRunAction:" target="-2" id="dlT-KO-XLf"/>
-                                                                </connections>
-                                                            </button>
-                                                            <box autoresizesSubviews="NO" borderType="line" title="ECA run status" id="OD6-Xe-TQT">
-                                                                <rect key="frame" x="18" y="284" width="246" height="209"/>
+                                                            <box autoresizesSubviews="NO" title="ECA run status" borderType="line" id="OD6-Xe-TQT">
+                                                                <rect key="frame" x="18" y="329" width="246" height="209"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <view key="contentView" id="Kma-lG-m19">
                                                                     <rect key="frame" x="1" y="1" width="244" height="193"/>
@@ -3354,9 +3335,6 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
-                                                                <connections>
-                                                                    <action selector="startECASingleRunAction:" target="-2" id="F0u-G0-32q"/>
-                                                                </connections>
                                                             </button>
                                                             <box verticalHuggingPriority="750" boxType="separator" id="aXs-eZ-20t">
                                                                 <rect key="frame" x="6" y="544" width="270" height="5"/>
@@ -3416,7 +3394,7 @@
                                                                 </view>
                                                             </box>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Tbe-27-6Si">
-                                                                <rect key="frame" x="80" y="150" width="49" height="17"/>
+                                                                <rect key="frame" x="79" y="266" width="49" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pattern" id="MPu-pQ-1Xq">
                                                                     <font key="font" metaFont="system"/>
@@ -3425,7 +3403,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="akO-sD-Vdf">
-                                                                <rect key="frame" x="24" y="125" width="105" height="17"/>
+                                                                <rect key="frame" x="23" y="241" width="105" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Calibration type" id="MXc-Jt-Rqa">
                                                                     <font key="font" metaFont="system"/>
@@ -3434,7 +3412,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="NcN-o1-TaW">
-                                                                <rect key="frame" x="17" y="100" width="112" height="17"/>
+                                                                <rect key="frame" x="16" y="216" width="112" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of points" id="LZl-g7-aEl">
                                                                     <font key="font" metaFont="system"/>
@@ -3443,7 +3421,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField verticalHuggingPriority="750" id="Fze-hD-1jb">
-                                                                <rect key="frame" x="133" y="72" width="96" height="22"/>
+                                                                <rect key="frame" x="132" y="188" width="96" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="200" drawsBackground="YES" id="peA-v0-vb1">
                                                                     <font key="font" metaFont="system"/>
@@ -3455,7 +3433,7 @@
                                                                 </connections>
                                                             </textField>
                                                             <textField verticalHuggingPriority="750" id="Unf-wm-WPb">
-                                                                <rect key="frame" x="133" y="47" width="96" height="22"/>
+                                                                <rect key="frame" x="132" y="163" width="96" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="10" placeholderString="rate" drawsBackground="YES" id="EjV-KE-y6o">
                                                                     <font key="font" metaFont="system"/>
@@ -3467,7 +3445,7 @@
                                                                 </connections>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="zoV-Cr-HaI">
-                                                                <rect key="frame" x="13" y="75" width="116" height="17"/>
+                                                                <rect key="frame" x="12" y="191" width="116" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Number of events" id="D5S-Pu-CgN">
                                                                     <font key="font" metaFont="system"/>
@@ -3476,7 +3454,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <popUpButton verticalHuggingPriority="750" id="V5O-ay-jfT">
-                                                                <rect key="frame" x="132" y="120" width="100" height="26"/>
+                                                                <rect key="frame" x="131" y="236" width="100" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" title="PDST" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="gFF-EJ-tqR" id="42x-As-8Mn">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -3493,7 +3471,7 @@
                                                                 </connections>
                                                             </popUpButton>
                                                             <textField verticalHuggingPriority="750" id="u1v-fA-9yA">
-                                                                <rect key="frame" x="133" y="97" width="96" height="22"/>
+                                                                <rect key="frame" x="132" y="213" width="96" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" enabled="NO" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="center" title="50" drawsBackground="YES" id="GJu-5I-rtz">
                                                                     <font key="font" metaFont="system"/>
@@ -3505,7 +3483,7 @@
                                                                 </connections>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="tAZ-wL-7yS">
-                                                                <rect key="frame" x="232" y="50" width="57" height="17"/>
+                                                                <rect key="frame" x="231" y="166" width="57" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Hz" id="JP6-KP-sku">
                                                                     <font key="font" metaFont="system"/>
@@ -3514,7 +3492,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="kQN-k1-hnW">
-                                                                <rect key="frame" x="7" y="50" width="122" height="17"/>
+                                                                <rect key="frame" x="6" y="166" width="122" height="17"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Pulser rate for ECA" id="kD3-tX-LcF">
                                                                     <font key="font" metaFont="system"/>
@@ -3522,45 +3500,8 @@
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <box autoresizesSubviews="NO" borderType="line" title="ECA Mode" id="etj-Jr-2FP">
-                                                                <rect key="frame" x="73" y="179" width="136" height="101"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="hC1-kp-Vvb">
-                                                                    <rect key="frame" x="1" y="1" width="134" height="85"/>
-                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                                    <subviews>
-                                                                        <matrix verticalHuggingPriority="750" allowsEmptySelection="NO" autorecalculatesCellSize="YES" id="914-8e-zIf">
-                                                                            <rect key="frame" x="9" y="9" width="117" height="70"/>
-                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            <size key="cellSize" width="114" height="18"/>
-                                                                            <size key="intercellSpacing" width="4" height="2"/>
-                                                                            <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" enabled="NO" inset="2" id="HkL-z3-dYJ">
-                                                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                <font key="font" metaFont="system"/>
-                                                                            </buttonCell>
-                                                                            <cells>
-                                                                                <column>
-                                                                                    <buttonCell type="radio" title="Dedicated run" imagePosition="left" alignment="left" enabled="NO" state="on" tag="1" inset="2" id="mG6-oq-08V">
-                                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                        <font key="font" metaFont="system"/>
-                                                                                    </buttonCell>
-                                                                                    <buttonCell type="radio" title="Supernova-live" imagePosition="left" alignment="left" enabled="NO" inset="2" id="LRw-sm-UdK">
-                                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                        <font key="font" metaFont="system"/>
-                                                                                    </buttonCell>
-                                                                                    <buttonCell type="radio" title="Physics-live" imagePosition="left" alignment="left" enabled="NO" inset="2" id="bSR-L1-nOz">
-                                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                        <font key="font" metaFont="system"/>
-                                                                                    </buttonCell>
-                                                                                </column>
-                                                                            </cells>
-                                                                        </matrix>
-                                                                    </subviews>
-                                                                </view>
-                                                            </box>
                                                             <popUpButton verticalHuggingPriority="750" id="dBJ-eI-bEw">
-                                                                <rect key="frame" x="133" y="145" width="143" height="26"/>
+                                                                <rect key="frame" x="132" y="261" width="143" height="26"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <popUpButtonCell key="cell" type="push" title="SNO style" bezelStyle="rounded" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" inset="2" selectedItem="C35-6s-QyJ" id="TcK-ue-FCD">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3588,6 +3529,15 @@
                                                                     <action selector="ecaPatternChangedAction:" target="-2" id="FqQ-u2-fhJ"/>
                                                                 </connections>
                                                             </popUpButton>
+                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="rrf-Ch-JlZ">
+                                                                <rect key="frame" x="93" y="299" width="97" height="17"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Single ECA run" id="EuQ-yg-Zkp">
+                                                                    <font key="font" metaFont="system"/>
+                                                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                </textFieldCell>
+                                                            </textField>
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
@@ -4900,7 +4850,7 @@
                                                             </allowedInputSourceLocales>
                                                         </secureTextFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBPassword" id="Dbf-R5-xzl"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBPassword" id="fpF-40-27C"/>
                                                         </connections>
                                                     </secureTextField>
                                                     <textField focusRingType="none" verticalHuggingPriority="750" id="vjd-Nl-BYI">
@@ -4912,18 +4862,6 @@
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField verticalHuggingPriority="750" id="UeC-s7-JHc">
-                                                        <rect key="frame" x="59" y="41" width="96" height="19"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="QHN-SN-oBd">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                        <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBName" id="ZxG-IO-dI4"/>
-                                                        </connections>
-                                                    </textField>
                                                     <textField verticalHuggingPriority="750" id="twq-b6-2jK">
                                                         <rect key="frame" x="59" y="14" width="142" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -4933,7 +4871,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBIPAddress" id="B63-1q-fOP"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBAddress" id="Fwv-iC-HK4"/>
                                                         </connections>
                                                     </textField>
                                                     <textField focusRingType="none" verticalHuggingPriority="750" id="1MQ-Jl-xJA">
@@ -4954,7 +4892,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBPort" id="BXK-2y-swJ"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBPort" id="BKv-WW-aP2"/>
                                                         </connections>
                                                     </textField>
                                                     <textField focusRingType="none" verticalHuggingPriority="750" id="l5e-0e-l6U">
@@ -4975,7 +4913,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBLockID" id="yrD-MH-8IJ"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBLockID" id="Qez-nT-mGJ"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" id="DzY-Ca-542">
@@ -4987,7 +4925,19 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <binding destination="2987" name="value" keyPath="selection.lockDBUserName" id="MnY-0t-7G0"/>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBUsername" id="j1c-RN-YOQ"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="UeC-s7-JHc">
+                                                        <rect key="frame" x="59" y="42" width="96" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="QHN-SN-oBd">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <binding destination="2987" name="value" keyPath="selection.sessionDBName" id="2RR-u9-mBa"/>
                                                         </connections>
                                                     </textField>
                                                 </subviews>

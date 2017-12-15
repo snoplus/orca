@@ -33,6 +33,7 @@
 #import "ORiSegHVCard.h"
 #import "ORMJDInterlocks.h"
 #import "ORMJDSource.h"
+#import "ORTimedTextField.h"
 
 @implementation MajoranaController
 #pragma mark ¥¥¥Initialization
@@ -64,7 +65,7 @@
 	subComponentViewSize = NSMakeSize(590,665);
 	detectorMapViewSize	 = NSMakeSize(900,760);
     vetoMapViewSize		 = NSMakeSize(580,565);
-    calibrationViewSize	 = NSMakeSize(580,320);
+    calibrationViewSize	 = NSMakeSize(580,340);
     
     [module1InterlockTable setFocusRingType:NSFocusRingTypeNone];
     [module2InterlockTable setFocusRingType:NSFocusRingTypeNone];
@@ -275,8 +276,10 @@
                          name : ORMajoranaModelMinNumDetsToAlertExperts
                        object : nil];
 
-    
-    
+    [notifyCenter addObserver : self
+                     selector : @selector(calibrationStatusChanged:)
+                         name : ORMajoranaModelCalibrationStatusChanged
+                       object : nil];
 }
 
 
@@ -323,7 +326,15 @@
     [self sourcePatternChanged:nil];
     [self sourceGatevalveChanged:nil];
     [self sourceIsInChanged:nil];
+    [self calibrationStatusChanged:nil];
 }
+
+- (void) calibrationStatusChanged:(NSNotification*)aNote
+{
+    [calibrationStatusField setTimeOut:10];
+    [calibrationStatusField setStringValue:[model calibrationStatus]];
+}
+
 - (void) minNumDetsToAlertExpertsChanged:(NSNotification*)aNote
 {
     [minNumDetsToAlertExpertsField setIntValue:[model minNumDetsToAlertExperts]];

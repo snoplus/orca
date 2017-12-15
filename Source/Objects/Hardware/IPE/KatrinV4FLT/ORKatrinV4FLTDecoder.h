@@ -52,6 +52,7 @@
 	BOOL getHistoReceivedNoteFromDecodeStage;
     unsigned char oldFifoFlags[kNumV4FLTChannels];
 	NSMutableDictionary* actualFlts;
+    unsigned long normHisto[4096];
 }
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)ptr;

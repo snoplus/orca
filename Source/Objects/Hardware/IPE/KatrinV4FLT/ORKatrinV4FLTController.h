@@ -61,7 +61,6 @@
 		IBOutlet NSPopUpButton* histClrModePU;
 		IBOutlet NSPopUpButton* histModePU;
 		IBOutlet NSPopUpButton* histEBinPU;
-	    IBOutlet NSButton*      syncWithRunControlButton;
 		IBOutlet NSTextField*	histEMinTextField;
 		IBOutlet NSButton*		storeDataInRamCB;
 		IBOutlet NSPopUpButton*	filterShapingLengthPU;
@@ -114,6 +113,8 @@
 		IBOutlet NSButton*		totalRateLogCB;
 		IBOutlet NSTextField*	totalHitRateField;
 		IBOutlet NSView*		totalView;
+        IBOutlet NSTextField*	lostEventField;
+        IBOutlet NSTextField*	lostEventTrField;
 		
 		//test page
 		IBOutlet NSButton*		testButton;
@@ -170,7 +171,6 @@
 - (void) useBipolarEnergyChanged:(NSNotification*)aNote;
 - (void) useSLTtimeChanged:(NSNotification*)aNote;
 - (void) useDmaBlockReadChanged:(NSNotification*)aNote;
-- (void) syncWithRunControlChanged:(NSNotification*)aNote;
 - (void) recommendedPZCChanged:(NSNotification*)aNote;
 - (void) decayTimeChanged:(NSNotification*)aNote;
 - (void) poleZeroCorrectionChanged:(NSNotification*)aNote;
@@ -231,6 +231,8 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote;
 - (void) fifoFlagsChanged:(NSNotification*)aNote;
 - (void) hitRateModeChanged:(NSNotification*)aNote;
+- (void) lostEventsChanged:(NSNotification*)aNote;
+- (void) lostEventsTrChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) hitRateModeAction:(id)sender;
@@ -242,7 +244,6 @@
 - (IBAction) useSLTtimePUAction:(id)sender;
 - (IBAction) useDmaBlockReadButtonAction:(id)sender;
 - (IBAction) useDmaBlockReadPUAction:(id)sender;
-- (IBAction) syncWithRunControlButtonAction:(id)sender;
 - (IBAction) decayTimeTextFieldAction:(id)sender;
 - (IBAction) poleZeroCorrectionPUAction:(id)sender;
 - (IBAction) customVariableTextFieldAction:(id)sender;

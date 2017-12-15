@@ -53,7 +53,7 @@
 
 - (void) awakeFromNib
 {
-	controlSize			= NSMakeSize(555,630);
+	controlSize			= NSMakeSize(555,480);
     statusSize			= NSMakeSize(555,480);
     lowLevelSize		= NSMakeSize(555,490);
     cpuManagementSize	= NSMakeSize(485,450);
@@ -111,42 +111,17 @@
                      selector : @selector(pulserDelayChanged:)
                          name : ORKatrinV4SLTPulserDelayChanged
                        object : model];
-		
-    [notifyCenter addObserver : self
-                     selector : @selector(pageSizeChanged:)
-                         name : ORKatrinV4SLTModelPageSizeChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(displayEventLoopChanged:)
-                         name : ORKatrinV4SLTModelDisplayEventLoopChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(displayTriggerChanged:)
-                         name : ORKatrinV4SLTModelDisplayTriggerChanged
-						object: model];
-	
+			
     [notifyCenter addObserver : self
                      selector : @selector(interruptMaskChanged:)
                          name : ORKatrinV4SLTModelInterruptMaskChanged
 						object: model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(nextPageDelayChanged:)
-                         name : ORKatrinV4SLTModelNextPageDelayChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
                      selector : @selector(pollRateChanged:)
                          name : TimedWorkerTimeIntervalChangedNotification
-                       object : [model poller]];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(pollRunningChanged:)
-                         name : TimedWorkerIsRunningChangedNotification
-                       object : [model poller]];
-	
+                       object : model];
+		
     [notifyCenter addObserver : self
                      selector : @selector(patternFilePathChanged:)
                          name : ORKatrinV4SLTModelPatternFilePathChanged
@@ -201,10 +176,33 @@
                      selector : @selector(pixelBusEnableRegChanged:)
                          name : ORKatrinV4SLTModelPixelBusEnableRegChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lostEventsChanged:)
+                         name : ORKatrinV4SLTModelLostEventsChanged
+                        object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(lostFltEventsChanged:)
+                         name : ORKatrinV4SLTModelLostFltEventsChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lostFltEventsTrChanged:)
+                         name : ORKatrinV4SLTModelLostFltEventsTrChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(minimumDecodingChanged:)
+                         name : ORKatrinV4SLTModelMinimizeDecodingChanged
+                        object: model];
 }
 
 #pragma mark •••Interface Management
+- (void) minimumDecodingChanged:(NSNotification*)aNote
+{
+    [minimumDecodingMatrix selectCellWithTag:[model minimizeDecoding]];
+}
 
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote
 {
@@ -239,26 +237,45 @@
 
 - (void) clockTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:3] setIntValue:[model clockTime]];
+	[[countersMatrix cellWithTag:5] setIntValue:[model clockTime]];
 }
 
 - (void) runTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model runTime];
-	[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
-	unsigned long long t=[model vetoTime];
-	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+	//unsigned long long t=[model vetoTime];
+	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
 	unsigned long long t=[model deadTime];
-	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
+
+- (void) lostEventsChanged:(NSNotification*)aNote
+{
+    unsigned long long t=[model lostEvents];
+    [[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+}
+
+- (void) lostFltEventsChanged:(NSNotification*)aNote
+{
+    unsigned long long t=[model lostFltEvents];
+    [[countersMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+}
+
+- (void) lostFltEventsTrChanged:(NSNotification*)aNote
+{
+    unsigned long long t=[model lostFltEventsTr];
+    [[countersMatrix cellWithTag:3] setStringValue: [NSString stringWithFormat:@"%llu",t]];
+}
+
 
 - (void) secondsSetChanged:(NSNotification*)aNote
 {
@@ -315,23 +332,10 @@
 
 - (void) pollRateChanged:(NSNotification*)aNotification
 {
-    if(aNotification== nil || [aNotification object] == [model poller]){
-        [pollRatePopup selectItemAtIndex:[pollRatePopup indexOfItemWithTag:[[model poller] timeInterval]]];
-    }
-}
+    [pollRatePopup selectItemWithTag:[model pollTime]];
+    if([model pollTime])[pollRunningIndicator startAnimation:self];
+    else                [pollRunningIndicator stopAnimation:self];
 
-- (void) pollRunningChanged:(NSNotification*)aNotification
-{
-    if(aNotification== nil || [aNotification object] == [model poller]){
-        if([[model poller] isRunning])[pollRunningIndicator startAnimation:self];
-        else [pollRunningIndicator stopAnimation:self];
-    }
-}
-
-- (void) nextPageDelayChanged:(NSNotification*)aNote
-{
-	[nextPageDelaySlider setIntValue:100-[model nextPageDelay]];
-	[nextPageDelayField  setFloatValue:[model nextPageDelay]*102.3/100.];
 }
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
@@ -344,12 +348,6 @@
 	}
 }
 
-- (void) pageSizeChanged:(NSNotification*)aNote
-{
-	[pageSizeField setIntValue: [model pageSize]];
-	[pageSizeStepper setIntValue: [model pageSize]];
-}
-
 
 - (void) updateWindow
 {
@@ -360,17 +358,15 @@
     [self pulserAmpChanged:nil];
     [self pulserDelayChanged:nil];
     [self selectedRegIndexChanged:nil];
-	[self pageSizeChanged:nil];	
-	[self displayEventLoopChanged:nil];	
-	[self displayTriggerChanged:nil];	
 	[self interruptMaskChanged:nil];
-	[self nextPageDelayChanged:nil];
     [self pollRateChanged:nil];
-    [self pollRunningChanged:nil];
 	[self patternFilePathChanged:nil];
 	[self statusRegChanged:nil];
 	[self secondsSetChanged:nil];
-	[self deadTimeChanged:nil];
+    [self deadTimeChanged:nil];
+    [self lostEventsChanged:nil];
+    [self lostFltEventsChanged:nil];
+    [self lostFltEventsTrChanged:nil];
 	[self vetoTimeChanged:nil];
 	[self runTimeChanged:nil];
 	[self clockTimeChanged:nil];
@@ -396,26 +392,41 @@
     BOOL locked = [gSecurity isLocked:ORKatrinV4SLTSettingsLock];
 	BOOL isRunning = [gOrcaGlobals runInProgress];
 	
+    [initOnConnectButton        setEnabled:!lockedOrRunningMaintenance];
+    [setCodeLocationButton      setEnabled:!lockedOrRunningMaintenance];
+    [haltSBCButton              setEnabled:!lockedOrRunningMaintenance];
+    [inhibitEnableMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusEnableRegMatrix    setEnabled:!isRunning];
+    [hwVersionButton            setEnabled:!isRunning];
+    [enableDisableCountersMatrix setEnabled:!isRunning];
+    [minimumDecodingMatrix      setEnabled:!isRunning];
+    
+    [secondsSetInitWithHostButton setEnabled:!lockedOrRunningMaintenance];
+    [secondsSetSendToFLTsCB     setEnabled:!lockedOrRunningMaintenance];
+    [secondsSetNowButton        setEnabled:!lockedOrRunningMaintenance];
+    [secondsSetField            setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusReadButton         setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusWriteButton        setEnabled:!lockedOrRunningMaintenance];
+    [miscCntrlBitsMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [testPatternEnableMatrix    setEnabled:!lockedOrRunningMaintenance];
+    [pixelBusEnableRegTextField setEnabled:!lockedOrRunningMaintenance];
+    [loadPatternFileButton      setEnabled:!lockedOrRunningMaintenance];
+	[definePatternFileButton    setEnabled:!lockedOrRunningMaintenance];
+	[setSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[resetPageManagerButton     setEnabled:!lockedOrRunningMaintenance];
+	[forceTriggerButton         setEnabled:!lockedOrRunningMaintenance];
+	[initBoardButton            setEnabled:!lockedOrRunningMaintenance];
+	[initBoard1Button           setEnabled:!lockedOrRunningMaintenance];
+	[readBoardButton            setEnabled:!lockedOrRunningMaintenance];
+	[secStrobeSrcPU             setEnabled:!lockedOrRunningMaintenance];
 	
-	[triggerEnableMatrix setEnabled:!lockedOrRunningMaintenance]; 
-    [inhibitEnableMatrix setEnabled:!lockedOrRunningMaintenance];
-	[hwVersionButton setEnabled:!isRunning];
-	[enableDisableCountersMatrix setEnabled:!isRunning];
-
-	[loadPatternFileButton setEnabled:!lockedOrRunningMaintenance];
-	[definePatternFileButton setEnabled:!lockedOrRunningMaintenance];
-	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[resetPageManagerButton setEnabled:!lockedOrRunningMaintenance];
-	[forceTriggerButton setEnabled:!lockedOrRunningMaintenance];
-	[initBoardButton setEnabled:!lockedOrRunningMaintenance];
-	[initBoard1Button setEnabled:!lockedOrRunningMaintenance];
-	[readBoardButton setEnabled:!lockedOrRunningMaintenance];
-	[secStrobeSrcPU setEnabled:!lockedOrRunningMaintenance]; 
-	
-	[setSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[relSWInhibitButton setEnabled:!lockedOrRunningMaintenance];
-	[forceTrigger1Button setEnabled:!lockedOrRunningMaintenance];
+    [interruptMaskMatrix        setEnabled:!lockedOrRunningMaintenance];
+    [resetFLTButton             setEnabled:!lockedOrRunningMaintenance];
+    [resetSLTButton             setEnabled:!lockedOrRunningMaintenance];
+    [setSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
+	[forceTrigger1Button        setEnabled:!lockedOrRunningMaintenance];
     
 	[clearAllStatusErrorBitsButton setEnabled:!lockedOrRunningMaintenance];
 
@@ -426,9 +437,7 @@
 	[pageSizeField setEnabled:!lockedOrRunningMaintenance];
 	[pageSizeStepper setEnabled:!lockedOrRunningMaintenance];
 	
-	
-	[nextPageDelaySlider setEnabled:!lockedOrRunningMaintenance];
-	
+    
 	[self enableRegControls];
 }
 
@@ -462,16 +471,6 @@
 	[regWriteValueTextField setIntValue:[model writeValue]];
 }
 
-- (void) displayEventLoopChanged:(NSNotification*) aNote
-{
-	[displayEventLoopButton setState:[model displayEventLoop]];
-}
-
-- (void) displayTriggerChanged:(NSNotification*) aNote
-{
-	[displayTriggerButton setState:[model displayTrigger]];
-}
-
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
 	short index = [model selectedRegIndex];
@@ -484,14 +483,11 @@
 - (void) controlRegChanged:(NSNotification*)aNote
 {
 	unsigned long value = [model controlReg];
-	unsigned long aMask = (value & kCtrlTrgEnMask)>>kCtrlTrgEnShift;
-	int i;
-	for(i=0;i<6;i++)[[triggerEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
-	
-	aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
+	unsigned long aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
+    int i;
 	for(i=0;i<4;i++)[[inhibitEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
 	
-	aMask = (value & kCtrlTpEnMask)>>kCtrlTpEnEnShift;
+	//aMask = (value & kCtrlTpEnMask)>>kCtrlTpEnEnShift;
 	[testPatternEnableMatrix selectCellWithTag:aMask];
 	
 	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlPPSMask];
@@ -523,6 +519,11 @@
 }
 
 #pragma mark ***Actions
+- (IBAction) minimumDecodingAction:(id)sender
+{
+    [model setMinimizeDecoding:[[sender selectedCell]tag]];
+}
+
 - (IBAction) readSLTEventFifoButtonAction:(id)sender
 {
 	[model readSLTEventFifoSingleEvent];	
@@ -584,19 +585,6 @@
 	[model setSecondsSet:[sender intValue]];	
 }
 
-- (IBAction) triggerEnableAction:(id)sender
-{
-	unsigned long aMask = 0;
-	int i;
-	for(i=0;i<6;i++){
-		if([[triggerEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
-		else aMask &= ~(1L<<i);
-	}
-	unsigned long theRegValue = [model controlReg] & ~kCtrlTrgEnMask; 
-	theRegValue |= (aMask<< kCtrlTrgEnShift);
-	[model setControlReg:theRegValue];
-}
-
 - (IBAction) inhibitEnableAction:(id)sender;
 {
 	unsigned long aMask = 0;
@@ -655,7 +643,7 @@
 
 - (IBAction) pollRateAction:(id)sender
 {
-    [model setPollingInterval:[[pollRatePopup selectedItem] tag]];
+    [model setPollTime:[[pollRatePopup selectedItem] tag]];
 }
 
 - (IBAction) interruptMaskAction:(id)sender
@@ -667,26 +655,6 @@
 		else aMaskValue &= ~(1L<<i);
 	}
 	[model setInterruptMask:aMaskValue];	
-}
-
-- (IBAction) nextPageDelayAction:(id)sender
-{
-	[model setNextPageDelay:100-[sender intValue]];	
-}
-
-- (IBAction) pageSizeAction:(id)sender
-{
-	[model setPageSize:[sender intValue]];	
-}
-
-- (IBAction) displayTriggerAction:(id)sender
-{
-	[model setDisplayTrigger:[sender intValue]];	
-}
-
-- (IBAction) displayEventLoopAction:(id)sender
-{
-	[model setDisplayEventLoop:[sender intValue]];	
 }
 
 - (IBAction) initBoardAction:(id)sender
@@ -718,9 +686,9 @@
 		[model printStatusReg];
 		[model printControlReg];
 		NSLogFont(aFont,@"--------------------------------------\n");
-		NSLogFont(aFont,@"Dead Time  : %lld\n",[model readDeadTime]);
-		NSLogFont(aFont,@"Veto Time  : %lld\n",[model readVetoTime]);
-		NSLogFont(aFont,@"Run Time   : %lld\n",[model readRunTime]);
+		NSLogFont(aFont,@"Dead Time  : %.3f\n",[model readDeadTime]/1.0E7);
+		NSLogFont(aFont,@"Veto Time  : %.3f\n",[model readVetoTime]/1.0E7);
+		NSLogFont(aFont,@"Run Time   : %.3f\n",[model readRunTime]/1.0E7);
 		NSLogFont(aFont,@"Seconds    : %d\n",  [model getSeconds]);
 		[model printInterruptMask];
 		[model printInterruptRequests];

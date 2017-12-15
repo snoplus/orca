@@ -85,7 +85,8 @@
 	IBOutlet NSTextField*	status1Field;
 	IBOutlet NSPopUpButton* errorTimeOutPU;
 	IBOutlet NSButton*		clearHistoryButton;
-	IBOutlet NSPopUpButton* sbcPollingPU;
+    IBOutlet NSPopUpButton* sbcPollingPU;
+    IBOutlet NSMatrix*      disableThrottleMatrix;
 
 	//Basic Ops
 	IBOutlet NSTextField*	functionAllowedField;
@@ -127,6 +128,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) disableThrottleChanged:(NSNotification*)aNote;
 - (void) codeVersionChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
 - (void) numTestPointsChanged:(NSNotification*)aNote;
@@ -190,6 +192,7 @@
 - (IBAction) passWordAction:(id)sender;
 - (IBAction) connectionAction:(id)sender;
 - (IBAction) errorTimeOutAction:(id)sender;
+- (IBAction) disableThrottleAction:(id)sender;
 
 - (IBAction) addressAction:(id)sender;
 - (IBAction) writeValueAction:(id)sender;

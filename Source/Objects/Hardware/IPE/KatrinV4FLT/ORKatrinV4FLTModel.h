@@ -97,23 +97,30 @@
     int customVariable;
     int poleZeroCorrection;
     double decayTime;
-    int syncWithRunControl;
-    int syncWithRunControlCounterFlag;
     int runControlState;
 	ORAlarm* fltV4useDmaBlockReadAlarm;
     int useDmaBlockRead;
     int boxcarLength;
     int hitRateMode;
+    unsigned long long  lostEvents;
+    unsigned long long  lostEventsTr;
+
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     unsigned short lastHitRateLength;
     //buffer for summed histograms
-    katrinV4FltFullHistogramDataStruct histoBuf[24];
+    //katrinV4FltFullHistogramDataStruct histoBuf[24]; // REMOVE - sum histograms are calculated at the crate PC (ak)
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
     int skipFltEventReadout;
     BOOL forceFLTReadout;  //new for bipolar firmware (SLT readout is now recommended) 2016-07 -tb-
     int energyOffset;
+    unsigned long inhibitDuringLastHitrateReading;
+    unsigned long runStatusDuringLastHitrateReading;
+    BOOL initializing;
+
+    unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
+    
 }
 
 #pragma mark •••Initialization
@@ -127,8 +134,6 @@
 - (void) registerNotificationObservers;
 - (void) runIsAboutToStop:(NSNotification*)aNote;
 - (void) runIsAboutToChangeState:(NSNotification*)aNote;
-- (void) syncWithRunControlStart:(int)numHistograms;
-- (void) syncWithRunControlCheckStopCondition;
 
 #pragma mark •••Accessors
 - (int) energyOffset;
@@ -148,8 +153,6 @@
 - (void) setBoxcarLength:(int)aBoxcarLength;
 - (int) useDmaBlockRead;
 - (void) setUseDmaBlockRead:(int)aUseDmaBlockRead;
-- (int) syncWithRunControl;
-- (void) setSyncWithRunControl:(int)aSyncWithRunControl;
 - (double) decayTime;
 - (void) setDecayTime:(double)aDecayTime;
 - (int) poleZeroCorrection;
@@ -175,8 +178,8 @@
 - (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
 - (void) setTargetRate:(int)aTargetRate;
-- (int) histMaxEnergy;
-- (void) setHistMaxEnergy:(int)aHistMaxEnergy;
+- (int) histEMax;
+- (void) setHistEMax:(int)aHistMaxEnergy;
 - (int) histPageAB;
 - (void) setHistPageAB:(int)aHistPageAB;
 - (int) runMode;
@@ -185,6 +188,8 @@
 - (BOOL) storeDataInRam;
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
 - (int) filterShapingLength;
+- (int) filterShapingLengthInBins;
+- (void) setFilterShapingLengthOnInit:(int)aFilterShapingLength;
 - (void) setFilterShapingLength:(int)aFilterShapingLength;
 - (int) gapLength;
 - (void) setGapLength:(int)aGapLength;
@@ -224,6 +229,8 @@
 - (void) setHistEBin:(unsigned long)aHistEBin;
 - (unsigned long) histEMin;
 - (void) setHistEMin:(unsigned long)aHistEMin;
+- (unsigned long) getLastHistReset;
+
 
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long)aDataId;
@@ -254,10 +261,10 @@
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
-- (unsigned long)threshold:(unsigned short) aChan;
+- (float)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
 - (BOOL) triggerEnabled:(unsigned short) aChan;
-- (void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aThreshold;
+- (void) setFloatThreshold:(unsigned short) aChan withValue:(float) aThreshold;
 - (void) setGain:(unsigned short) aChan withValue:(unsigned short) aGain;
 - (void) setTriggerEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
@@ -273,6 +280,11 @@
 
 - (ORTimeRate*) totalRate;
 - (void) setTotalRate:(ORTimeRate*)newTimeRate;
+- (unsigned long long) lostEvents;
+- (void) setLostEvents:(unsigned long long)aCounter;
+- (unsigned long long) lostEventsTr;
+//- (void) setLostTrEvents:(unsigned long long)aCounter;
+
 
 - (unsigned short) selectedRegIndex;
 - (void) setSelectedRegIndex:(unsigned short) anIndex;
@@ -322,6 +334,7 @@
 
 - (int)		readMode;
 
+- (void) writeClrCnt;
 - (void) loadThresholdsAndGains;
 - (void) initBoard;
 - (void) writeHitRateMask;
@@ -344,6 +357,7 @@
 - (void) printValueTable;
 - (void) printEventFIFOs;
 - (void) writeHistogramControl;
+- (void) resetHistogramMode;
 
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;
@@ -373,12 +387,15 @@
 - (short) getAccessType: (short) anIndex;
 - (unsigned long) getAddressOffset: (short) anIndex;
 
+- (unsigned long long ) readLostEventsTr;
 
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
-- (void) initSumHistogramBuffers;
-- (void) addToSumHistogram:(void*)someData;
-- (void) shipSumHistograms;
+
+// REMOVE - sum histograms are calculated at the crate PC (ak) 
+//- (void) initSumHistogramBuffers;
+//- (void) addToSumHistogram:(void*)someData;
+//- (void) shipSumHistograms;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
@@ -396,6 +413,8 @@
 - (NSArray*) wizardParameters;
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
+- (void) setScaledThreshold:(short)aChan withValue:(float)aValue;
+- (float) scaledThreshold:(short)aChan;
 
 
 - (void) testReadHisto;
@@ -432,7 +451,6 @@ extern NSString* ORKatrinV4FLTModelUseBipolarEnergyChanged;
 extern NSString* ORKatrinV4FLTModelUseSLTtimeChanged;
 extern NSString* ORKatrinV4FLTModelBoxcarLengthChanged;
 extern NSString* ORKatrinV4FLTModelUseDmaBlockReadChanged;
-extern NSString* ORKatrinV4FLTModelSyncWithRunControlChanged;
 extern NSString* ORKatrinV4FLTModelDecayTimeChanged;
 extern NSString* ORKatrinV4FLTModelPoleZeroCorrectionChanged;
 extern NSString* ORKatrinV4FLTModelCustomVariableChanged;
@@ -481,6 +499,8 @@ extern NSString* ORKatrinV4FLTNoiseFloorChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
+extern NSString* ORKatrinV4FLTModelLostEventsChanged;
+extern NSString* ORKatrinV4FLTModelLostEventsTrChanged;
 
 extern NSString* ORIpeSLTModelName;
 
