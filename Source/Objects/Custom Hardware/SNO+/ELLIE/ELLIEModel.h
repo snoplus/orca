@@ -162,23 +162,13 @@
 -(NSString*) calcTellieFibreForChannel:(NSUInteger)channel;
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave;
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
-<<<<<<< HEAD
 -(void)startTellieRunThread:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieMultiRunThread:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieMultiRun:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieRun:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieRun:(NSDictionary *)fireCommands forTELLIE:(BOOL)forTELLIE;
 -(void)stopTellieRun;
--(void)waitForTellieRunToFinish;
--(void)tellieTidyUp;
-=======
--(void) startTellieRunThread:(NSDictionary*)fireCommands;
--(void)startTellieMultiRunThread:(NSArray*)fireCommandArray;
--(void) startTellieMultiRun:(NSArray*)fireCommandArray;
--(void) startTellieRun:(NSDictionary*)fireCommands;
--(void) stopTellieRun;
--(void) tellieRunTransition;
->>>>>>> upstream/master
+-(void)tellieRunTransition;
 
 // TELLIE database interactions
 -(void)pushInitialTellieRunDocument;
@@ -250,12 +240,9 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
-<<<<<<< HEAD
 extern NSString* ORAMELLIEMappingReceived;
-=======
 extern NSString* ORSMELLIERunFinished;
 extern NSString* ORTELLIERunFinished;
 extern NSString* ORSMELLIEInterlockKilled;
 extern NSString* ORELLIEFlashing;
 extern NSString* ORSMELLIEEmergencyStop;
->>>>>>> upstream/master

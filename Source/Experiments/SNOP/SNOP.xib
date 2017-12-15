@@ -157,10 +157,10 @@
                                                 <action selector="startRunAction:" target="-2" id="3d7-z4-3Vt"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Run status" id="3751">
+                                        <box autoresizesSubviews="NO" title="Run status" borderType="line" id="3751">
                                             <rect key="frame" x="44" y="71" width="311" height="138"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="3r4-zS-Ie7">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="309" height="122"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -290,7 +290,8 @@
                                                 </subviews>
                                             </view>
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>                                        </box>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
                                         <customView id="URf-Um-n84" customClass="StopLightView">
                                             <rect key="frame" x="5" y="144" width="30" height="98"/>
                                             <autoresizingMask key="autoresizingMask"/>
@@ -503,24 +504,24 @@
                         <tabViewItems>
                             <tabViewItem label="Standard Runs" identifier="" id="3006">
                                 <view key="view" autoresizesSubviews="NO" id="3007">
-                                    <rect key="frame" x="10" y="29" width="773" height="631"/>
+                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Run Type Word" id="3963">
+                                        <box autoresizesSubviews="NO" title="Run Type Word" borderType="line" id="3963">
                                             <rect key="frame" x="622" y="-7" width="147" height="636"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="vTX-04-GUJ">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="145" height="620"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <box verticalHuggingPriority="750" boxType="separator" id="ZAc-Zq-koX">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="ZAc-Zq-koX">
                                                         <rect key="frame" x="7" y="416" width="133" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                         <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                         <font key="titleFont" metaFont="system"/>
                                                     </box>
-                                                    <box verticalHuggingPriority="750" boxType="separator" id="qca-QN-PXH">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="qca-QN-PXH">
                                                         <rect key="frame" x="7" y="256" width="135" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -849,10 +850,10 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <box autoresizesSubviews="NO" borderType="line" title="MTC settings" id="H5p-mY-U4E">
+                                        <box autoresizesSubviews="NO" title="MTC settings" borderType="line" id="H5p-mY-U4E">
                                             <rect key="frame" x="1" y="91" width="293" height="448"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="0dg-pH-tgT">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="291" height="432"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1212,9 +1213,12 @@
                                                             </column>
                                                         </cells>
                                                     </matrix>
-                                                    <box verticalHuggingPriority="750" boxType="separator" id="JXC-1u-fHk">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="JXC-1u-fHk">
                                                         <rect key="frame" x="14" y="111" width="263" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                        <font key="titleFont" metaFont="system"/>
                                                     </box>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Xpv-6z-rBO">
                                                         <rect key="frame" x="118" y="404" width="55" height="14"/>
@@ -1356,11 +1360,13 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="CAEN settings" id="o4g-Ms-Wnk">
+                                        <box autoresizesSubviews="NO" title="CAEN settings" borderType="line" id="o4g-Ms-Wnk">
                                             <rect key="frame" x="296" y="2" width="324" height="335"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="DX1-mR-2gs">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="322" height="319"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1732,11 +1738,13 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="TUBii settings" id="Whm-Y3-09L">
+                                        <box autoresizesSubviews="NO" title="TUBii settings" borderType="line" id="Whm-Y3-09L">
                                             <rect key="frame" x="296" y="339" width="324" height="200"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="LIP-9S-7Qp">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="322" height="184"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1973,6 +1981,8 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="UxE-oF-FYx">
                                             <rect key="frame" x="51" y="6" width="96" height="14"/>
@@ -2001,10 +2011,10 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Standard Run control" id="Oik-pb-QQv">
+                                        <box autoresizesSubviews="NO" title="Standard Run control" borderType="line" id="Oik-pb-QQv">
                                             <rect key="frame" x="1" y="539" width="619" height="90"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="JlQ-Wu-dNu">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="617" height="74"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -2107,6 +2117,8 @@
                                                     </button>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -3199,7 +3211,7 @@
                                                             <box autoresizesSubviews="NO" title="ECA run status" borderType="line" id="OD6-Xe-TQT">
                                                                 <rect key="frame" x="18" y="329" width="246" height="209"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="Kma-lG-m19">
+                                                                <view key="contentView">
                                                                     <rect key="frame" x="1" y="1" width="244" height="193"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3327,6 +3339,8 @@
                                                                         </matrix>
                                                                     </subviews>
                                                                 </view>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
                                                             <button id="DvG-pi-kwG">
                                                                 <rect key="frame" x="355" y="283" width="158" height="38"/>
@@ -3336,14 +3350,17 @@
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                             </button>
-                                                            <box verticalHuggingPriority="750" boxType="separator" id="aXs-eZ-20t">
+                                                            <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="aXs-eZ-20t">
                                                                 <rect key="frame" x="6" y="544" width="270" height="5"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                                <font key="titleFont" metaFont="system"/>
                                                             </box>
-                                                            <box autoresizesSubviews="NO" borderType="line" title="Live Pedestals" id="aNB-nF-JaI">
+                                                            <box autoresizesSubviews="NO" title="Live Pedestals" borderType="line" id="aNB-nF-JaI">
                                                                 <rect key="frame" x="18" y="553" width="246" height="42"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="vBD-HI-IMB">
+                                                                <view key="contentView">
                                                                     <rect key="frame" x="1" y="1" width="244" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3369,7 +3386,7 @@
                                                                             <rect key="frame" x="146" y="4" width="94" height="18"/>
                                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            <size key="cellSize" width="44" height="18"/>
+                                                                            <size key="cellSize" width="45" height="18"/>
                                                                             <size key="intercellSpacing" width="4" height="2"/>
                                                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" enabled="NO" inset="2" id="4nF-5X-887">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3392,6 +3409,8 @@
                                                                         </matrix>
                                                                     </subviews>
                                                                 </view>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Tbe-27-6Si">
                                                                 <rect key="frame" x="79" y="266" width="49" height="17"/>
@@ -3549,11 +3568,11 @@
                                             <tabViewItems>
                                                 <tabViewItem label="SMELLIE" identifier="" id="Qab-sY-83k">
                                                     <view key="view" id="cDN-DL-Qxe">
-                                                        <rect key="frame" x="10" y="29" width="320" height="602"/>
+                                                        <rect key="frame" x="10" y="25" width="320" height="606"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <comboBox verticalHuggingPriority="750" id="3cW-2R-0PG">
-                                                                <rect key="frame" x="17" y="575" width="279" height="22"/>
+                                                                <rect key="frame" x="17" y="579" width="279" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <comboBoxCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" enabled="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Please Choose a Run File" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="SUX-T7-vTy">
                                                                     <font key="font" metaFont="smallSystem"/>
@@ -3562,7 +3581,7 @@
                                                                 </comboBoxCell>
                                                             </comboBox>
                                                             <button verticalHuggingPriority="750" id="wQo-rL-aDD">
-                                                                <rect key="frame" x="82" y="506" width="146" height="32"/>
+                                                                <rect key="frame" x="82" y="510" width="146" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Load Run FIle" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="E2Y-DZ-p9Z">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3573,7 +3592,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="GOx-Ks-4sd">
-                                                                <rect key="frame" x="56" y="539" width="198" height="32"/>
+                                                                <rect key="frame" x="56" y="543" width="198" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Fetch Run Files" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HgZ-Xc-2aS">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3584,7 +3603,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="J8i-g9-LzC">
-                                                                <rect key="frame" x="82" y="465" width="146" height="32"/>
+                                                                <rect key="frame" x="82" y="469" width="146" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Start SMELLIE Run" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FQa-os-y2k">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3595,7 +3614,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="Cgv-06-MFb">
-                                                                <rect key="frame" x="82" y="434" width="146" height="32"/>
+                                                                <rect key="frame" x="82" y="438" width="146" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Stop SMELLIE Run" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eIz-1u-Bhr">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3606,7 +3625,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="uhs-DN-ePI">
-                                                                <rect key="frame" x="39" y="404" width="233" height="32"/>
+                                                                <rect key="frame" x="39" y="408" width="233" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Emergency Stop (SMELLIE ONLY)" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oX6-na-oB8">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3616,10 +3635,10 @@
                                                                     <action selector="emergencySmellieStopAction:" target="-2" id="1u4-9D-qMu"/>
                                                                 </connections>
                                                             </button>
-                                                            <box borderType="line" title="Summary:" id="DWO-Xg-iTT">
-                                                                <rect key="frame" x="14" y="301" width="292" height="107"/>
+                                                            <box title="Summary:" borderType="line" id="DWO-Xg-iTT">
+                                                                <rect key="frame" x="14" y="305" width="292" height="107"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="kkB-35-zb4">
+                                                                <view key="contentView">
                                                                     <rect key="frame" x="1" y="1" width="290" height="91"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3670,11 +3689,13 @@
                                                                         </textField>
                                                                     </subviews>
                                                                 </view>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
-                                                            <box autoresizesSubviews="NO" borderType="line" title="Run Details:" id="A8M-Gr-PF5">
-                                                                <rect key="frame" x="14" y="0.0" width="294" height="297"/>
+                                                            <box autoresizesSubviews="NO" title="Run Details:" borderType="line" id="A8M-Gr-PF5">
+                                                                <rect key="frame" x="14" y="4" width="294" height="297"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="C8w-ux-aEQ">
+                                                                <view key="contentView">
                                                                     <rect key="frame" x="1" y="1" width="292" height="281"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3779,6 +3800,8 @@
                                                                         </textField>
                                                                     </subviews>
                                                                 </view>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
                                                         </subviews>
                                                     </view>
@@ -3797,10 +3820,10 @@
                                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                                 </comboBoxCell>
                                                             </comboBox>
-                                                            <box borderType="line" title="Summary" id="lxF-sr-oaj">
+                                                            <box title="Summary" borderType="line" id="lxF-sr-oaj">
                                                                 <rect key="frame" x="14" y="302" width="292" height="103"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="39H-i7-JVF">
+                                                                <view key="contentView">
                                                                     <rect key="frame" x="1" y="1" width="290" height="87"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3851,6 +3874,8 @@
                                                                         </textField>
                                                                     </subviews>
                                                                 </view>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
                                                             <button verticalHuggingPriority="750" id="NfS-XO-jlw">
                                                                 <rect key="frame" x="76" y="514" width="146" height="32"/>
@@ -3907,10 +3932,10 @@
                                                                     <action selector="emergencySmellieStopAction:" target="-2" id="2vu-Pl-QOg"/>
                                                                 </connections>
                                                             </button>
-                                                            <box autoresizesSubviews="NO" borderType="line" title="Run Details:" id="CnD-jv-nWy">
+                                                            <box autoresizesSubviews="NO" title="Run Details:" borderType="line" id="CnD-jv-nWy">
                                                                 <rect key="frame" x="14" y="0.0" width="292" height="298"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="oyD-iu-nhH">
+                                                                <view key="contentView">
                                                                     <rect key="frame" x="1" y="1" width="290" height="282"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -4024,6 +4049,8 @@
                                                                         </textField>
                                                                     </subviews>
                                                                 </view>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                             </box>
                                                         </subviews>
                                                     </view>
@@ -4038,10 +4065,10 @@
                                     <rect key="frame" x="10" y="25" width="773" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Latest Results" id="osf-mb-MSE">
+                                        <box autoresizesSubviews="NO" title="Latest Results" borderType="line" id="osf-mb-MSE">
                                             <rect key="frame" x="14" y="461" width="246" height="168"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="CyE-dH-3ld">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="244" height="152"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4147,11 +4174,13 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Settings For Automatic Running" id="rvK-dU-5Pd">
+                                        <box autoresizesSubviews="NO" title="Settings For Automatic Running" borderType="line" id="rvK-dU-5Pd">
                                             <rect key="frame" x="402" y="172" width="357" height="457"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="EG7-9I-9P5">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="355" height="441"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4460,11 +4489,13 @@
                                                     </textField>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Run Nhit Monitor Once" id="ImM-MN-hPP">
+                                        <box autoresizesSubviews="NO" title="Run Nhit Monitor Once" borderType="line" id="ImM-MN-hPP">
                                             <rect key="frame" x="14" y="203" width="321" height="254"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="26X-F3-8u6">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="319" height="238"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4623,6 +4654,8 @@
                                                     </button>
                                                 </subviews>
                                             </view>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                     </subviews>
                                 </view>
@@ -4632,10 +4665,10 @@
                                     <rect key="frame" x="10" y="25" width="773" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <box autoresizesSubviews="NO" borderType="line" title="OrcaDB" id="2651">
+                                        <box autoresizesSubviews="NO" title="OrcaDB" borderType="line" id="2651">
                                             <rect key="frame" x="14" y="432" width="371" height="151"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="fwP-ca-dRT">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="369" height="135"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4779,7 +4812,7 @@
                                                             <binding destination="2987" name="value" keyPath="selection.orcaDBPort" id="2997"/>
                                                         </connections>
                                                     </textField>
-                                                    <box verticalHuggingPriority="750" boxType="separator" id="2717">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="2717">
                                                         <rect key="frame" x="21" y="38" width="330" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -4945,10 +4978,10 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="DebugDB ECAL" id="2718">
+                                        <box autoresizesSubviews="NO" title="DebugDB ECAL" borderType="line" id="2718">
                                             <rect key="frame" x="399" y="428" width="371" height="159"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="Xho-iZ-I3M">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="369" height="143"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5105,7 +5138,7 @@
                                                             <binding destination="2987" name="value" keyPath="selection.debugDBPort" id="3005"/>
                                                         </connections>
                                                     </textField>
-                                                    <box verticalHuggingPriority="750" boxType="separator" id="2720">
+                                                    <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="2720">
                                                         <rect key="frame" x="21" y="46" width="330" height="5"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
@@ -5117,10 +5150,10 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="MTC Server" id="SIk-jq-Uyj">
+                                        <box autoresizesSubviews="NO" title="MTC Server" borderType="line" id="SIk-jq-Uyj">
                                             <rect key="frame" x="14" y="314" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="Net-Ry-ecu">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5184,10 +5217,10 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="XL3 Server" id="8rD-lN-zTL">
+                                        <box autoresizesSubviews="NO" title="XL3 Server" borderType="line" id="8rD-lN-zTL">
                                             <rect key="frame" x="399" y="314" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="5Qx-IB-Qaf">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5251,10 +5284,10 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Log Server" id="7Ol-yJ-YAc">
+                                        <box autoresizesSubviews="NO" title="Log Server" borderType="line" id="7Ol-yJ-YAc">
                                             <rect key="frame" x="399" y="196" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="NFa-ZH-Sfr">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5318,10 +5351,10 @@
                                             <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                             <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
-                                        <box autoresizesSubviews="NO" borderType="line" title="Data Server" id="Vzf-gX-Lte">
+                                        <box autoresizesSubviews="NO" title="Data Server" borderType="line" id="Vzf-gX-Lte">
                                             <rect key="frame" x="14" y="196" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="3Cp-JA-JSq">
+                                            <view key="contentView">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>

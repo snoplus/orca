@@ -62,17 +62,12 @@ NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
 NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORAMELLIERunStart = @"ORAMELLIERunStarted";
 NSString* ORSMELLIERunFinished = @"ORSMELLIERunFinished";
-NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
 NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
-<<<<<<< HEAD
 NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
 NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
-=======
 NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
 NSString* ORELLIEFlashing = @"ORELLIEFlashing";
 NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
-
->>>>>>> upstream/master
 
 ///////////////////////////////
 // Define private methods
@@ -811,35 +806,19 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     //////////////////////////////
     // Loop over all objects in
     // passed array
-<<<<<<< HEAD
-    int noLoops = [fireCommandArray count];
     int counter = 0;
-=======
-    int count = 0;
     NSUInteger nloops = [fireCommandArray count];
->>>>>>> upstream/master
     for(NSDictionary* fireCommands in fireCommandArray){
         if([[NSThread currentThread] isCancelled]){
             goto err;
         }
-<<<<<<< HEAD
+        // Check if we're at the end of a sequence. If we are, set the multiFlag to NO.
+        // This will mean all shutdown stuff will be performed at the end of flashing.
         counter = counter + 1;
-        if(counter == noLoops){
+        if(counter == nloops){
             [self setTellieMultiFlag:NO];
         }
         [self startTellieRun:fireCommands forTELLIE:forTELLIE];
-=======
-
-        // Check if we're at the end of a sequence. If we are, set the multiFlag to NO.
-        // This will mean all shutdown stuff will be performed at the end of flashing.
-        count = count + 1;
-        if(count == nloops){
-            [self setTellieMultiFlag:NO];
-        }
-
-        // Run flash sequence
-        [self startTellieRun:fireCommands];
->>>>>>> upstream/master
     }
 
 err:
@@ -1219,12 +1198,10 @@ err:
     // Set fire flag
     [self setEllieFireFlag:NO];
 
-<<<<<<< HEAD
     NSLog(@"%@: TELLIE fire sequence completed\n", prefix);
-=======
+
     ////////////
     // Make sure hardware is put back into safe state
->>>>>>> upstream/master
     if(![self tellieMultiFlag]){
 
         // TELLIE
@@ -1259,16 +1236,8 @@ err:
         [self setTellieMultiFlag:NO];
 
         //Resetting the mtcd to settings before the smellie run
-<<<<<<< HEAD
         NSLog(@"%@: Killing requested flash sequence\n", prefix);
         
-        //Make a dictionary to push into sub-run array to indicate error.
-        //NSMutableDictionary* errorDict = [NSMutableDictionary dictionaryWithCapacity:10];
-        //[errorDict setObject:errorString forKey:@"tellie_error"];
-        //[self updateTellieRunDocument:errorDict];
-=======
-        NSLog(@"[TELLIE]: Killing requested flash sequence\n");
-
         // TELLIE
         @try{
             NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
@@ -1284,7 +1253,6 @@ err:
         } @catch(NSException* e) {
             NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
         }
->>>>>>> upstream/master
 
         ////////////
         // Post a note saying we've jumped out of the run sequence
@@ -1348,36 +1316,6 @@ err:
     /////////////
     // This will run in a thread so add release pool
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-<<<<<<< HEAD
-    
-    //////////////////////
-    // Send stop command to tellie hardware
-    @try{
-        NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-        NSLog(@"[ELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
-    } @catch(NSException* e){
-        // This should only ever be called from the main thread so can raise
-        NSLogColor([NSColor redColor], @"[ELLIE]: Problem with tellie server interpreting stop command!\n");
-        [pool release];
-        return;
-    }
-
-    ///////////////////
-    // Incase of slave, also get a Tubii object so we can stop Tubii sending pulses
-    NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
-    if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[ELLIE]: Couldn't find TUBii model in stopRun.\n");
-        [pool release];
-        return;
-    }
-    TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    @try{
-        [theTubiiModel stopTelliePulser];
-    } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[ELLIE]: Problem stopping TUBii pulser!\n");
-        [pool release];
-        return;
-=======
 
     ///////////////////////////////////////////
     // Wait for thread to stop
@@ -1391,7 +1329,6 @@ err:
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
         goto err;
->>>>>>> upstream/master
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
     // Roll over the run.
