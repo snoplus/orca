@@ -52,9 +52,6 @@
 - (id)		processThrow:(id) p;
 - (id)      makeException:(id) p;
 - (id)      makeDictionary:(id) p;
-- (id)      processGlobalBranches:(id)p;
-- (id)      doGlobalVar:(id)p;
-- (id)      doGlobalAssign:(id)p;
 - (id)      makeArray:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
@@ -93,7 +90,10 @@
 - (id)      genRandom:(id) p;
 - (id)      valueArray:(id)p;
 - (id)      addNodes:(id)p;
-- (id)      setUpGlobalTable:(id)p;
+- (id)      processGlobalBranches:(id)p;
+- (id)      processGlobals:(id)p;
+- (id)      doGlobalVar:(id)p;
+- (id)      doGlobalAssign:(id)p;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -638,6 +638,7 @@
         case '$':               return [self typeArray:p];
 		case kMakeArgList:		return [self doValueAppend:p container:aContainer];
 		case ',':				return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@"," stringByAppendingFormat:@"%@",NodeValue(1)]];
+        case GLOBAL:            return [self processGlobals:p];
         case kGlobal:           return [self processGlobalBranches:p];
         case kGlobalVar:        return [self doGlobalVar:p];
         case kGlobalAssign:     return [self doGlobalAssign:p];
@@ -717,7 +718,6 @@
 			
 			//printing
         case PRINT:         return [self print:p];
-        case GLOBAL:        return [self setUpGlobalTable:p];
 		case PRINTFILE:		return [self printFile:p];
 		case LOGFILE:		return [self openLogFile:p];
 		case kAppend:		return [[NSString stringWithFormat:@"%@",NodeValue(0)] stringByAppendingString:[@" " stringByAppendingFormat:@"%@",NodeValue(1)]];
@@ -922,7 +922,7 @@
 	return nil;
 }
 
-- (id) setUpGlobalTable:(id) p
+- (id) processGlobals:(id) p
 {
     NodeValue(0);
     return nil;
@@ -1386,12 +1386,26 @@
 
 - (id) doGlobalVar:(id)p
 {
-    [globalSymbolTable setValue:_zero forKey:VARIABLENAME(0)];
+    id theVariableName = VARIABLENAME(0);
+    id theNewValue     = _zero; //default
+    id existingValue  = [self valueForSymbol:theVariableName];
+    if(existingValue != nil){
+        theNewValue = existingValue;
+        [symbolTable threadSafeRemoveObjectForKey:theVariableName usingLock:symbolTableLock];
+    }
+    [globalSymbolTable threadSafeSetObject:theNewValue forKey:theVariableName usingLock:symbolTableLock];
     return nil;
 }
 - (id) doGlobalAssign:(id)p
 {
-    [globalSymbolTable setValue:NodeValue(1) forKey:VARIABLENAME(0)];
+    id theVariableName = VARIABLENAME(0);
+    id theValue        = NodeValue(1);
+    id existingValue  = [self valueForSymbol:theVariableName];
+    if(existingValue != nil){
+        [symbolTable threadSafeRemoveObjectForKey:theVariableName usingLock:symbolTableLock];
+    }
+
+    [globalSymbolTable threadSafeSetObject:theValue forKey:theVariableName usingLock:symbolTableLock];
     return nil;
 }
 
