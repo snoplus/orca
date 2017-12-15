@@ -217,10 +217,10 @@
 	NSEnumerator* e = [someArgs objectEnumerator];
 	while(anItem = [e nextObject]){	
 		if([anItem isKindOfClass:[NSDictionary class]]){
-			[self setValue:[anItem objectForKey:@"iValue"] forSymbol:[anItem objectForKey:@"name"]];
+            [globalSymbolTable threadSafeSetObject:[anItem objectForKey:@"iValue"] forKey:[anItem objectForKey:@"name"] usingLock:symbolTableLock];
 		}
 		else {
-			[self setValue:anItem forSymbol:[NSString stringWithFormat:@"$%d",i]];
+            [globalSymbolTable threadSafeSetObject:anItem forKey:[NSString stringWithFormat:@"$%d",i] usingLock:symbolTableLock];
 			i++;
 		}
 	}

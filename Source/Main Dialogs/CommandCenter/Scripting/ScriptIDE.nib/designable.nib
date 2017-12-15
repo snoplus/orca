@@ -425,9 +425,9 @@
                         </tableHeaderView>
                     </scrollView>
                     <textField verticalHuggingPriority="750" id="1391">
-                        <rect key="frame" x="24" y="140" width="134" height="14"/>
+                        <rect key="frame" x="24" y="140" width="117" height="14"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Input Variables for 'main'" id="2126">
+                        <textFieldCell key="cell" controlSize="small" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="User Global Variables" id="2126">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
