@@ -362,7 +362,11 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         return nil;
     }
 
-    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue] withNPhotons:photons withFireFrequency:frequency inSlave:mode];
+    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue]
+                                                   withNPhotons:photons
+                                              withFireFrequency:frequency
+                                                        inSlave:mode
+                                                        isAMELLIE:@NO];
     if([pulseWidth intValue] < 0){
         return nil;
     }
@@ -390,15 +394,26 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     return settingsDict;
 }
 
--(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode
+-(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode isAMELLIE:(BOOL)amellie
 {
     /*
      Calculate the pulse width settings required to return a given intenstity from a specified channel, 
      at a specified rate.
     */
+    NSDictionary* firePars;
+    if(amellie){
+        firePars = [self amellieFireParameters];
+    } else {
+        firePars = [self tellieFireParameters];
+    }
+    
     // Check if fire parameters have been successfully loaded
-    if([self tellieFireParameters] == nil){
-        NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
+    if(firePars == nil){
+        if(amellie){
+            NSLogColor([NSColor redColor], @"[AMELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
+        } else {
+            NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
+        }
         return 0;
     }
     
@@ -423,8 +438,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     }
     
     // Get Calibration parameters
-    NSArray* IPW_values = [[[self tellieFireParameters] objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_IPW",prefix]];
-    NSArray* photon_values = [[[self tellieFireParameters] objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_photons",prefix]];
+    NSArray* IPW_values = [[firePars objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_IPW",prefix]];
+    NSArray* photon_values = [[firePars objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_photons",prefix]];
 
     ////////////
     // Find minimum calibration point. If request is below minimum, estiamate the IPW
@@ -463,6 +478,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 
     return pulseWidth;
 }
+
 
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave
 {
@@ -701,7 +717,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 //////////////////////////////////////////////////////
 // AMELLIE parameter functions
 -(NSMutableDictionary*)returnAmellieFireCommands:(NSString*)fibre
-                                       withNHits:(NSUInteger)nHits
+                                     withPhotons:(NSUInteger)photons
                                withFireFrequency:(NSUInteger)frequency
                                      withNPulses:(NSUInteger)pulses
                                 withTriggerDelay:(NSUInteger)delay
@@ -710,11 +726,12 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     /*
      Calculate the tellie fire commands given certain input parameters
      */
-    NSNumber* tellieChannel = [self calcAmellieChannelForFibre:fibre];
-    NSNumber* pulseWidth = [self calcAmellieChannelPulseSettings:[tellieChannel integerValue]
-                                                       withNHits:nHits
-                                               withFireFrequency:frequency
-                                                         inSlave:mode];
+    NSNumber* amellieChannel = [self calcAmellieChannelForFibre:fibre];
+    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[amellieChannel integerValue]
+                                                   withNPhotons:photons
+                                              withFireFrequency:frequency
+                                                        inSlave:mode
+                                                      isAMELLIE:@YES];
     NSString* modeString;
     if(mode == YES){
         modeString = @"Slave";
@@ -723,14 +740,14 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     }
     float pulseSeparation = 1000.*(1./frequency); // TELLIE accepts pulse rate in ms
     NSNumber* fibre_delay = [[[self amellieFireParameters]
-                              objectForKey:[NSString stringWithFormat:@"channel_%d",[tellieChannel intValue]]]
+                              objectForKey:[NSString stringWithFormat:@"channel_%d",[amellieChannel intValue]]]
                                 objectForKey:@"fibre_delay"];
     
     NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
     [settingsDict setValue:fibre forKey:@"fibre"];
-    [settingsDict setValue:tellieChannel forKey:@"channel"];
+    [settingsDict setValue:amellieChannel forKey:@"channel"];
     [settingsDict setValue:modeString forKey:@"run_mode"];
-    [settingsDict setValue:[NSNumber numberWithInteger:nHits] forKey:@"NHits"];
+    [settingsDict setValue:[NSNumber numberWithInteger:photons] forKey:@"photons"];
     [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
     [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_separation"];
     [settingsDict setValue:[NSNumber numberWithInteger:pulses] forKey:@"number_of_shots"];

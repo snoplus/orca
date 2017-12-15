@@ -155,7 +155,8 @@
 -(NSNumber*)calcTellieChannelPulseSettings:(NSUInteger)channel
                                withNPhotons:(NSUInteger)photons
                           withFireFrequency:(NSUInteger)frequency
-                                    inSlave:(BOOL)mode;
+                                    inSlave:(BOOL)mode
+                                  isAMELLIE:(BOOL)amellie;
 
 -(NSNumber*)calcTellieChannelForFibre:(NSString*)fibre;
 -(NSString*)calcTellieFibreForNode:(NSUInteger)node;
@@ -184,7 +185,7 @@
 /************************/
 -(NSNumber*)calcAmellieChannelForFibre:(NSString*)fibre;
 -(NSMutableDictionary*)returnAmellieFireCommands:(NSString*)fibre
-                                       withNHits:(NSUInteger)nHits
+                                     withPhotons:(NSUInteger)photons
                                withFireFrequency:(NSUInteger)frequency
                                      withNPulses:(NSUInteger)pulses
                                 withTriggerDelay:(NSUInteger)delay
