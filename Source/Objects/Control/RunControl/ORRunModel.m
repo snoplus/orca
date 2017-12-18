@@ -684,8 +684,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
 - (void) setFileSuffix:(NSString *)aFileSuffx
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setFileSuffix:[self fileSuffix]];
-    
     [fileSuffix autorelease];
     fileSuffix = [aFileSuffx copy];
 }
@@ -1771,14 +1769,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[runInfo release];
     //pack up some info about the run.
     runInfo = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							  [dataPacket fileHeader], kHeader,
-							  dataPacket,kDataPacket,
-							  [NSNumber numberWithLong:runNumber],kRunNumber,
-							  [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
-							  [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
-                              [self fileSuffix], kFileSuffix,
-							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
-							  nil] retain];
+                [dataPacket fileHeader], kHeader,
+                dataPacket,kDataPacket,
+                [NSNumber numberWithLong:runNumber],kRunNumber,
+                [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+                [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+                [self fileSuffix], kFileSuffix,
+                [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
+                nil] retain];
     
     //let others know the run is about to start
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStartNotification

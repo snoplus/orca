@@ -949,7 +949,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 		if([filePrefix rangeOfString:@"Run"].location != NSNotFound){
 			s = [NSString stringWithFormat:@"%@%@%d",filePrefix,fileSuffix,runNumber];
 		}
-		else s = [NSString stringWithFormat:@"%@%@Run%d_%@",filePrefix,[filePrefix length]?@"_":@"",runNumber,fileSuffix];
+		else s = [NSString stringWithFormat:@"%@%@Run%d%@",filePrefix,[filePrefix length]?@"_":@"",runNumber,fileSuffix];
 	}
 	else s = [NSString stringWithFormat:@"Run%@%d",fileSuffix,runNumber];
 	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];

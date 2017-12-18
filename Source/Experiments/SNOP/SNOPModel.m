@@ -343,7 +343,7 @@ tellieRunFiles = _tellieRunFiles;
 {
     NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
     if (![dataFileModels count]) {
-        NSLogColor([NSColor redColor], @"Must have a DataFileModel object in the configuration\n");
+        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find ORDataFileModel!\n");
         return;
     }
     ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
@@ -351,7 +351,7 @@ tellieRunFiles = _tellieRunFiles;
     
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find run control object!");
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
@@ -360,7 +360,7 @@ tellieRunFiles = _tellieRunFiles;
     char hostname[255];
     gethostname(hostname, 255);
     
-    [runControl setFileSuffix:[NSString stringWithFormat:@"%s",hostname]];
+    [runControl setFileSuffix:[NSString stringWithFormat:@"_%s",hostname]];
 }
 
 - (id) initWithCoder:(NSCoder*)decoder
