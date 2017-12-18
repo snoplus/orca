@@ -975,15 +975,13 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     /*
      If the keep alive has died, as a user to re-start it.
      */
-    dispatch_sync(dispatch_get_main_queue(), ^{
-        BOOL restart = ORRunAlertPanel(@"The keep alive pulse to TUBii has died.",
-                                       @"Unless you restart the ELLIE systems will not be able to trigger through TUBii",
-                                       @"Restart",
-                                       @"Cancel",nil);
-        if(restart){
-            [self activateKeepAlive];
-        }
-    });
+    BOOL restart = ORRunAlertPanel(@"The keep alive pulse to TUBii has died.",
+                                   @"Unless you restart the ELLIE systems will not be able to trigger through TUBii",
+                                    @"Restart",
+                                    @"Cancel",nil);
+    if(restart){
+        [self activateKeepAlive];
+    }
 }
 
 -(void)killKeepAlive:(NSNotification*)aNote

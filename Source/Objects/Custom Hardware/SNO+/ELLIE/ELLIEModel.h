@@ -150,7 +150,8 @@
                                     withFireFrequency:(NSUInteger)frequency
                                     withNPulses:(NSUInteger)pulses
                                     withTriggerDelay:(NSUInteger)delay
-                                    inSlave:(BOOL)mode;
+                                    inSlave:(BOOL)mode
+                                    isAMELLIE:(BOOL)amellie;
 
 -(NSNumber*)calcTellieChannelPulseSettings:(NSUInteger)channel
                                withNPhotons:(NSUInteger)photons
@@ -242,8 +243,14 @@ extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
 extern NSString* ORAMELLIEMappingReceived;
-extern NSString* ORSMELLIERunFinished;
-extern NSString* ORTELLIERunFinished;
 extern NSString* ORSMELLIEInterlockKilled;
-extern NSString* ORELLIEFlashing;
 extern NSString* ORSMELLIEEmergencyStop;
+extern NSString* ORELLIEFlashing;
+
+extern NSString* ORTELLIERunStartNotification;
+extern NSString* ORSMELLIERunStartNotification;
+extern NSString* ORAMELLIERunStartNotification;
+extern NSString* ORSMELLIERunFinishedNotification;
+extern NSString* ORTELLIERunFinishedNotification;
+extern NSString* ORAMELLIERunFinishedNotification;
+

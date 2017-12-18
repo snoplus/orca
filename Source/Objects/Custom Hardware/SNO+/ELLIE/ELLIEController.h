@@ -184,7 +184,6 @@
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
 -(void)displayAmellieNodes:(id)sender;
--(void)displayAmellieAngles:(id)sender;
 -(void)updateAmellieChannel;
 
 
@@ -194,8 +193,8 @@
 
 //Amellie tab functions -----------------------------
 - (IBAction)amellieValidateSettingsAction:(id)sender;
-- (IBAction)amellieFireButton:(id)sender;
-- (IBAction)amellieStopButton:(id)sender;
+- (IBAction)amellieFireAction:(id)sender;
+- (IBAction)amellieStopAction:(id)sender;
 
 //Server tab functions -----------------------------
 - (IBAction)telliePing:(id)sender;
@@ -208,10 +207,3 @@
 - (IBAction) serverSettingsChanged:(id)sender;
 
 @end
-
-extern NSString* ORTELLIERunStart;
-extern NSString* ORAMELLIERunStart;
-extern NSString* ORSMELLIERunFinished;
-extern NSString* ORTELLIERunFinished;
-extern NSString* ORAMELLIERunFinished;
-

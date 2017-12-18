@@ -344,27 +344,27 @@ snopGreenColor;
 
     [notifyCenter addObserver :self
                      selector : @selector(stopSmellieRunAction:)
-                         name : ORSMELLIERunFinished
+                         name : ORSMELLIERunFinishedNotification
                         object: nil];
     
     [notifyCenter addObserver :self
                      selector : @selector(startTellieRunNotification:)
-                         name : ORTELLIERunStart
+                         name : ORTELLIERunStartNotification
                         object: nil];
 
     [notifyCenter addObserver :self
                      selector : @selector(stopTellieRunAction:)
-                         name : ORTELLIERunFinished
+                         name : ORTELLIERunFinishedNotification
                         object: nil];
     
     [notifyCenter addObserver :self
                      selector : @selector(startAmellieRunNotification:)
-                         name : ORAMELLIERunStart
+                         name : ORAMELLIERunStartNotification
                         object: nil];
     
     [notifyCenter addObserver :self
                      selector : @selector(stopAmellieRunAction:)
-                         name : ORAMELLIERunFinished
+                         name : ORAMELLIERunFinishedNotification
                         object: nil];
     
     [notifyCenter addObserver: self
@@ -1485,7 +1485,7 @@ snopGreenColor;
 -(void) fetchAmellieRunFilesFinish:(NSNotification *)aNote
 {
     // When we get a noticication that the database read has finished, set local variables
-    NSMutableDictionary *runFileDict = [[NSMutableDictionary alloc] initWithDictionary:[model amellieRunFiles]];
+    NSMutableDictionary *runFileDict = [NSMutableDictionary dictionaryWithDictionary:[model amellieRunFiles]];
     
     //Fill lthe combo box with information
     for(id key in runFileDict){
@@ -1497,7 +1497,6 @@ snopGreenColor;
     [amellieLoadRunFile setEnabled:YES];
     
     [self setAmellieRunFileList:runFileDict];
-    [runFileDict release];
 }
 
 -(IBAction)loadSmellieRunAction:(id)sender
@@ -1846,7 +1845,8 @@ snopGreenColor;
                                                               withFireFrequency:rate
                                                                     withNPulses:no_pulses
                                                                withTriggerDelay:delay
-                                                                        inSlave:inSlave];
+                                                                        inSlave:inSlave
+                                                                      isAMELLIE:@NO];
 
         [settingsArray addObject:settings];
     }
@@ -1976,15 +1976,15 @@ snopGreenColor;
     }
 
      if(![[model lastStandardRunType] isEqualToString:@"AMELLIE"]){
-     ORRunAlertPanel(@"The AMELLIE standard run is not loaded.",@"You must load a AMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
-     return;
+         ORRunAlertPanel(@"The AMELLIE standard run is not loaded.",@"You must load a AMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
+         return;
      }
 
     /////////////////////
     // Set a flag which defines if we should
     // roll over into maintenance or not.
     [self setTellieStandardSequenceFlag:NO];
-    
+
     [amellieLoadRunFile setEnabled:NO];
     [amellieRunFileNameField setEnabled:NO];
     [amellieStopRunButton setEnabled:YES];
@@ -2024,7 +2024,7 @@ snopGreenColor;
     /////////////////////////
     // Get settings for each node
     NSArray* fibres = [[self amellieRunFile] objectForKey:@"fibres"];
-    NSUInteger nHits = [[[self amellieRunFile] objectForKey:@"NHits"] integerValue];
+    NSUInteger photons = [[[self amellieRunFile] objectForKey:@"photons"] integerValue];
     NSUInteger no_pulses = [[[self amellieRunFile] objectForKey:@"trigger_per_node"] integerValue];
     NSUInteger rate = [[[self amellieRunFile] objectForKey:@"trigger_rate"] integerValue];
     NSUInteger delay = [[[self amellieRunFile] objectForKey:@"trigger_delay"] integerValue];
@@ -2034,13 +2034,14 @@ snopGreenColor;
         inSlave = YES;
     }
     NSMutableArray* settingsArray = [[NSMutableArray alloc] init];
-    for(NSNumber* fibre in fibres){
-        NSMutableDictionary* settings = [theELLIEModel returnAmellieFireCommands:fibre
-                                                                       withNHits:nHits
-                                                               withFireFrequency:rate
-                                                                     withNPulses:no_pulses
-                                                                withTriggerDelay:delay
-                                                                         inSlave:inSlave];
+    for(NSString* fibre in fibres){
+        NSMutableDictionary* settings = [theELLIEModel returnTellieFireCommands:fibre
+                                                                   withNPhotons:photons
+                                                              withFireFrequency:rate
+                                                                    withNPulses:no_pulses
+                                                               withTriggerDelay:delay
+                                                                        inSlave:inSlave
+                                                                      isAMELLIE:@YES];
         
         [settingsArray addObject:settings];
     }
@@ -2057,6 +2058,7 @@ snopGreenColor;
     //////////////////////
     // Start tellie thread
     [theELLIEModel startTellieMultiRunThread:settingsArray forTELLIE:NO];
+    [settingsArray release];
 }
 
 - (IBAction) stopAmellieRunAction:(id)sender

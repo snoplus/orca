@@ -59,11 +59,12 @@
 NSString* ELLIEAllLasersChanged = @"ELLIEAllLasersChanged";
 NSString* ELLIEAllFibresChanged = @"ELLIEAllFibresChanged";
 NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
-NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
-NSString* ORAMELLIERunStart = @"ORAMELLIERunStarted";
-NSString* ORSMELLIERunFinished = @"ORSMELLIERunFinished";
-NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
-NSString* ORAMELLIERunFinished = @"ORAMELLIERunFinished";
+NSString* ORTELLIERunStartNotification = @"ORTELLIERunStarted";
+NSString* ORSMELLIERunStartNotification = @"ORSMELLIERunStarted";
+NSString* ORAMELLIERunStartNotification = @"ORAMELLIERunStarted";
+NSString* ORSMELLIERunFinishedNotification = @"ORSMELLIERunFinished";
+NSString* ORTELLIERunFinishedNotification = @"ORTELLIERunFinished";
+NSString* ORAMELLIERunFinishedNotification = @"ORAMELLIERunFinished";
 NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
 NSString* ORELLIEFlashing = @"ORELLIEFlashing";
@@ -352,17 +353,25 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     return pollResponse;
 }
 
--(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibre withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses withTriggerDelay:(NSUInteger)delay inSlave:(BOOL)mode
+-(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibre withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses withTriggerDelay:(NSUInteger)delay inSlave:(BOOL)mode isAMELLIE:(BOOL)amellie
 {
     /*
      Calculate the tellie fire commands given certain input parameters
     */
-    NSNumber* tellieChannel = [self calcTellieChannelForFibre:fibre];
-    if([tellieChannel intValue] < 0){
+    NSNumber* channel;
+    NSDictionary* fireParameters;
+    if(amellie){
+        channel = [self calcAmellieChannelForFibre:fibre];
+        fireParameters = [self amellieFireParameters];
+    } else {
+        channel = [self calcTellieChannelForFibre:fibre];
+        fireParameters = [self tellieFireParameters];
+    }
+    if([channel intValue] < 0){
         return nil;
     }
 
-    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue]
+    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[channel integerValue]
                                                    withNPhotons:photons
                                               withFireFrequency:frequency
                                                         inSlave:mode
@@ -378,11 +387,11 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         modeString = @"Master";
     }
     float pulseSeparation = 1000.*(1./frequency); // TELLIE accepts pulse rate in ms
-    NSNumber* fibre_delay = [[[self tellieFireParameters] objectForKey:[NSString stringWithFormat:@"channel_%d",[tellieChannel intValue]]] objectForKey:@"fibre_delay"];
+    NSNumber* fibre_delay = [[fireParameters objectForKey:[NSString stringWithFormat:@"channel_%d",[channel intValue]]] objectForKey:@"fibre_delay"];
     
     NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
     [settingsDict setValue:fibre forKey:@"fibre"];
-    [settingsDict setValue:tellieChannel forKey:@"channel"];
+    [settingsDict setValue:channel forKey:@"channel"];
     [settingsDict setValue:modeString forKey:@"run_mode"];
     [settingsDict setValue:[NSNumber numberWithInteger:photons] forKey:@"photons"];
     [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
@@ -410,9 +419,9 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     // Check if fire parameters have been successfully loaded
     if(firePars == nil){
         if(amellie){
-            NSLogColor([NSColor redColor], @"[AMELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
+            NSLogColor([NSColor redColor], @"[AMELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB\n");
         } else {
-            NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
+            NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB\n");
         }
         return 0;
     }
@@ -851,7 +860,7 @@ err:
     // button push, so don't need to post.
     if(![[NSThread currentThread] isCancelled]){
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
         });
     }
     [[NSThread currentThread] cancel];
@@ -1238,7 +1247,7 @@ err:
         }
 
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
         });
         [[NSThread currentThread] cancel];
     }
@@ -1275,7 +1284,7 @@ err:
         // Post a note saying we've jumped out of the run sequence
         if(![[NSThread currentThread] isCancelled]){
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
             });
         }
         [[NSThread currentThread] cancel];
@@ -1315,7 +1324,7 @@ err:
         // If a run transition thread isn't yet running, run one.
         // Doing it this way avoids multiple transition behaviours.
         if(![_tellieTransitionThread isExecuting]){
-            NSLog(@"[TELLIE]: Waiting for TELLIE server to release blocking trigger function...\n");
+            NSLog(@"[T/AMELLIE]: Waiting for T/AMELLIE server to release blocking trigger function...\n");
             [self setTellieTransitionThread:[[NSThread alloc] initWithTarget:self selector:@selector(tellieRunTransition) object:nil]];
             [[self tellieTransitionThread] start];
         } else {
@@ -1344,7 +1353,7 @@ err:
     //Add run control object
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
+        NSLogColor([NSColor redColor], @"[T/AMELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
         goto err;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
@@ -1548,7 +1557,7 @@ err:{
 - (void) updateAmellieRunDocument:(NSDictionary*)subRunDoc
 {
     /*
-     Update [self tellieRunDoc] with subrun information.
+     Update [self amellieRunDoc] with subrun information.
      
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
@@ -2161,7 +2170,7 @@ err:
     //Post a note. on the main thread to request a call to handle run rollover stuff
     [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinishedNotification object:self];
     });
     [pool release];
 }

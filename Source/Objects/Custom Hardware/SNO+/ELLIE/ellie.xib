@@ -1586,7 +1586,7 @@
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="amellieFireButton:" target="-2" id="Xhw-v9-t1M"/>
+                                                            <action selector="amellieFireAction:" target="-2" id="Znv-eF-lDq"/>
                                                         </connections>
                                                     </button>
                                                     <button verticalHuggingPriority="750" id="y9s-Xj-yUz">
@@ -1597,7 +1597,7 @@
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
                                                         <connections>
-                                                            <action selector="amellieStopButton:" target="-2" id="x5u-J3-VwT"/>
+                                                            <action selector="amellieStopAction:" target="-2" id="bt7-wl-wr2"/>
                                                         </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="0aI-jh-NOY">

@@ -104,7 +104,7 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(tellieRunFinished:)
-                         name : ORTELLIERunFinished
+                         name : ORTELLIERunFinishedNotification
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -305,7 +305,7 @@
     
     [tellieGeneralFireButton setEnabled:NO];
     [tellieGeneralStopButton setEnabled:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStart object:nil userInfo:[self guiFireSettings]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
     [tellieGeneralValidationStatusTf setStringValue:@""];
 }
 
@@ -319,7 +319,7 @@
     }
     
     [tellieExpertStopButton setEnabled:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStart object:nil userInfo:[self guiFireSettings]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
     [tellieExpertFireButton setEnabled:NO];
     [tellieExpertValidationStatusTf setStringValue:@""];
 }
@@ -442,7 +442,7 @@
         noPulses = freq;
     }
     
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:freq withNPulses:noPulses withTriggerDelay:700 inSlave:(BOOL)inSlave];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:freq withNPulses:noPulses withTriggerDelay:700 inSlave:(BOOL)inSlave isAMELLIE:@NO];
     if(settings){
         float frequency = (1. / [[settings objectForKey:@"pulse_separation"] floatValue])*1000;
         //Set text fields appropriately
@@ -525,7 +525,7 @@
 //////////////////////////
 // AMELLIE actions
 //////////////////////////
-- (IBAction)amellieFireButton:(id)sender {
+- (IBAction)amellieFireAction:(id)sender {
     ////////////
     // Check a run isn't ongoing
     if([model ellieFireFlag]){
@@ -535,12 +535,12 @@
         
     [amellieFireButton setEnabled:NO];
     [amellieStopButton setEnabled:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIERunStart object:nil userInfo:[self guiFireSettings]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
     [amellieValidationStatusTf setStringValue:@""];
 }
 
-- (IBAction)amellieStopButton:(id)sender {
-
+- (IBAction)amellieStopAction:(id)sender {
+    [model stopTellieRun];
 }
 
 
@@ -731,7 +731,7 @@
         inSlave = NO;
     }
     
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieGeneralFibreSelectPb titleOfSelectedItem] withNPhotons:[tellieGeneralPhotonsTf integerValue] withFireFrequency:[tellieGeneralFreqTf integerValue] withNPulses:[tellieGeneralNoPulsesTf integerValue] withTriggerDelay:[tellieGeneralTriggerDelayTf integerValue] inSlave:inSlave];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieGeneralFibreSelectPb titleOfSelectedItem] withNPhotons:[tellieGeneralPhotonsTf integerValue] withFireFrequency:[tellieGeneralFreqTf integerValue] withNPulses:[tellieGeneralNoPulsesTf integerValue] withTriggerDelay:[tellieGeneralTriggerDelayTf integerValue] inSlave:inSlave isAMELLIE:@NO];
     
     if(settings){
         [self setGuiFireSettings:settings];
@@ -868,7 +868,6 @@
     [amellieOperationModePb.window makeFirstResponder:nil];
     
     //Check if fibre mapping has been loaded from the amellieDB
-    /*
     if(![model amellieNodeMapping]){
         [model loadAMELLIEStaticsFromDB];
     }
@@ -877,7 +876,6 @@
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
         return;
     }
-    */
     
     NSString* msg = nil;
     NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:7];
@@ -1018,13 +1016,13 @@
     
     //If still can't get reference, return
     if(![model tellieNodeMapping]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
+        NSLogColor([NSColor redColor], @"[TELLIE]: Cannot access node mapping, it's likely the code had been unable to connect to couchdb database\n");
         return;
     }
 
     //If still can't get reference, return
     if(![model amellieFibreMapping]){
-        NSLogColor([NSColor redColor], @"[AMELLIE]: Cannot connect to couchdb database\n");
+        NSLogColor([NSColor redColor], @"[AMELLIE]: Cannot access node mapping, it's likely the code had been unable to connect to couchdb database\n");
         return;
     }
     
@@ -1523,7 +1521,7 @@
 /////////////////////////////////////////////
 - (IBAction)telliePing:(id)sender {
     if([model pingTellie]){
-        NSString* response = [NSString stringWithFormat:@"Connected to tellie at: \%@:%@", [model tellieHost], [model telliePort]];
+        NSString* response = [NSString stringWithFormat:@"Connected to tellie at: %@:%@", [model tellieHost], [model telliePort]];
         [tellieServerResponseTf setStringValue:response];
         [tellieServerResponseTf setBackgroundColor:[NSColor greenColor]];
     } else {
