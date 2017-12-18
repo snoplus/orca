@@ -1594,7 +1594,7 @@ err:{
     NSArray* smellieLaserArray = [smellieSettings objectForKey:@"lasers"];
     NSArray* smellieFibreArray = [smellieSettings objectForKey:@"fibres"];
     NSArray* smellieWavelegnthsArray = [smellieSettings objectForKey:@"central_wavelengths"];
-    NSUInteger nSubRuns = [[smellieSettings objectForKey:@"total_sub_runs"] integerValue];
+    NSUInteger nSubRuns = [[smellieSettings objectForKey:@"total_sub_runs"] unsignedIntegerValue];
 
     float fireTime = (numberTriggersPerLoop * nSubRuns) / (triggerFrequency);
 
