@@ -1594,7 +1594,7 @@ err:{
     NSArray* smellieLaserArray = [smellieSettings objectForKey:@"lasers"];
     NSArray* smellieFibreArray = [smellieSettings objectForKey:@"fibres"];
     NSArray* smellieWavelegnthsArray = [smellieSettings objectForKey:@"central_wavelengths"];
-    NSUInteger nSubRuns = [smellieSettings objectForKey:@"total_sub_runs"];
+    NSUInteger nSubRuns = [[smellieSettings objectForKey:@"total_sub_runs"] integerValue];
 
     float fireTime = (numberTriggersPerLoop * nSubRuns) / (triggerFrequency);
 
@@ -2081,8 +2081,11 @@ err:
      */
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
+    // Reverse the array so it's in sub-run order
+    NSArray* reversedArray = [[subRunArray reverseObjectEnumerator] allObjects];
+    
     // Add the passed array to it
-    NSArray* newSubRunInfo = [[[self smellieRunDoc] objectForKey:@"sub_run_info"] arrayByAddingObjectsFromArray:subRunArray];
+    NSArray* newSubRunInfo = [[[self smellieRunDoc] objectForKey:@"sub_run_info"] arrayByAddingObjectsFromArray:reversedArray];
 
     // Add the newly appended array back to the copy of runDocDict
     [[self smellieRunDoc] setObject:newSubRunInfo forKey:@"sub_run_info"];
