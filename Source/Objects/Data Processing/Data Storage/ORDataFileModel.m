@@ -84,6 +84,7 @@ static const int currentVersion = 1;           // Current version
 - (void) dealloc
 {
     [filePrefix release];
+    [fileStaticSuffix release];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 	[diskFullAlarm clearAlarm];
     [diskFullAlarm release];
@@ -282,6 +283,20 @@ static const int currentVersion = 1;           // Current version
     filePrefix = [aFilePrefix copy];    
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDataFileModelFilePrefixChanged object:self];
+}
+
+- (NSString*) fileStaticSuffix
+{
+    if(fileStaticSuffix == nil)return @"";
+    else return fileStaticSuffix;
+}
+
+- (void) setFileStaticSuffix:aFileSuffix
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setFilePrefix:filePrefix];
+    if(aFileSuffix == nil)aFileSuffix = @"";
+    [fileStaticSuffix autorelease];
+    fileStaticSuffix = [aFileSuffix copy];
 }
 
 - (int) fileSegment
@@ -817,6 +832,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	[self setFilePrefix:[decoder decodeObjectForKey:@"ORDataFileModelFilePrefix"]];
 	[self setUseFolderStructure:[decoder decodeBoolForKey:@"ORDataFileModelUseFolderStructure"]];
     [self setSaveConfiguration:[decoder decodeBoolForKey:ORDataSaveConfiguration]];
+    [self setFileStaticSuffix:@""];
     
     [[self undoManager] enableUndoRegistration];
     
@@ -947,11 +963,11 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	if(!fileSuffix)fileSuffix = @"";
 	if(filePrefix!=nil){
 		if([filePrefix rangeOfString:@"Run"].location != NSNotFound){
-			s = [NSString stringWithFormat:@"%@%@%d",filePrefix,fileSuffix,runNumber];
+			s = [NSString stringWithFormat:@"%@%@%d%@",filePrefix,fileSuffix,runNumber,fileStaticSuffix];
 		}
-		else s = [NSString stringWithFormat:@"%@%@Run%d%@",filePrefix,[filePrefix length]?@"_":@"",runNumber,fileSuffix];
+		else s = [NSString stringWithFormat:@"%@%@Run%@%d%@",filePrefix,[filePrefix length]?@"_":@"",fileSuffix,runNumber,fileStaticSuffix];
 	}
-	else s = [NSString stringWithFormat:@"Run%@%d",fileSuffix,runNumber];
+	else s = [NSString stringWithFormat:@"Run%@%d%@",fileSuffix,runNumber,fileStaticSuffix];
 	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];
 	if(useDatedFileNames){
         NSDate* theDate;

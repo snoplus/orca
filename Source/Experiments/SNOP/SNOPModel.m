@@ -347,20 +347,14 @@ tellieRunFiles = _tellieRunFiles;
         return;
     }
     ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
-    [aDataFileModel setFilePrefix:@""];
-    
-    NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find run control object!");
-        return;     // (should never happen)
-    }
-    ORRunModel* runControl = [runObjects objectAtIndex:0];
     
     // Get hostname of operator machine
     char hostname[255];
     gethostname(hostname, 255);
-    
-    [runControl setFileSuffix:[NSString stringWithFormat:@"_%s",hostname]];
+
+    // Add a prefix / suffix to the datafile
+    [aDataFileModel setFilePrefix:@""];
+    [aDataFileModel setFileStaticSuffix:[NSString stringWithFormat:@"_%s",hostname]];
 }
 
 - (id) initWithCoder:(NSCoder*)decoder

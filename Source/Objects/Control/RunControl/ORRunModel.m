@@ -87,7 +87,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     [self setTimeLimit:3600];
     [self setDirName:@"~"];
-    [self setFileSuffix:@""];
 	[self registerNotificationObservers];
 
     [[self undoManager] enableUndoRegistration];
@@ -118,7 +117,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	
     [dataPacket release];
 	[runInfo release];
-    [fileSuffix release];
     [dirName release];
     [startTime release];
     [definitionsFilePath release];
@@ -680,17 +678,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 - (NSString*)dirName
 {
     return dirName;
-}
-
-- (void) setFileSuffix:(NSString *)aFileSuffx
-{
-    [fileSuffix autorelease];
-    fileSuffix = [aFileSuffx copy];
-}
-
-- (NSString*)fileSuffix
-{
-    return fileSuffix;
 }
 
 - (unsigned long)	runType
@@ -1769,14 +1756,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[runInfo release];
     //pack up some info about the run.
     runInfo = [[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                [dataPacket fileHeader], kHeader,
-                dataPacket,kDataPacket,
-                [NSNumber numberWithLong:runNumber],kRunNumber,
-                [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
-                [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
-                [self fileSuffix], kFileSuffix,
-                [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
-                nil] retain];
+							  [dataPacket fileHeader], kHeader,
+							  dataPacket,kDataPacket,
+							  [NSNumber numberWithLong:runNumber],kRunNumber,
+							  [NSNumber numberWithLong:subRunNumber],kSubRunNumber,
+							  [NSNumber numberWithLong:[[ORGlobal sharedGlobal] runMode]],  kRunMode,
+							  [NSNumber numberWithInt:doInit||forceFullInit], @"doinit",
+							  nil] retain];
     
     //let others know the run is about to start
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToStartNotification
