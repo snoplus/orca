@@ -48,6 +48,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply);
+    void readHitRates(SBC_Packet* aPacket);
 
 int getSltLinuxKernelDriverVersion(void);
 void setHostTimeToFLTsAndSLT(int32_t* args);

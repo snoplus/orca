@@ -31,6 +31,7 @@
 #import "ORCommandList.h"
 #import "ORKatrinV4FLTRegisters.h"
 #import "ORKatrinV4SLTRegisters.h"
+#import "SBC_Link.h"
 
 NSString* ORKatrinV4FLTModelEnergyOffsetChanged             = @"ORKatrinV4FLTModelEnergyOffsetChanged";
 NSString* ORKatrinV4FLTModelForceFLTReadoutChanged          = @"ORKatrinV4FLTModelForceFLTReadoutChanged";
@@ -1791,15 +1792,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) readHitRates
 {
-    unsigned long sltSubSec     = 0;
-    unsigned long sltSec        = 0;
-    unsigned long sltRunStartSec = 0;
-    unsigned long sltSubSec2    = 0;
-    unsigned long inhibit;
-    unsigned long runStatus;
+    unsigned long sltSubSec2;
     
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
-	@try {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+
+    @try {
         id slt      = [[self crate] adapter];
         if([slt sbcIsConnected]){
             
@@ -1815,109 +1812,118 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 BOOL    oneChanged          = NO;
                 int     hitRateLengthSec    = 1<<hitRateLength;
                 float   freq                = 1.0/(float)hitRateLengthSec;
-                        
-                unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
-                unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
-                
-                //combine all the hitrate read commands into one command packet
-                ORCommandList* aList = [[ORCommandList commandList] retain];
                 
                 int countHREnabledChans = 0;
                 int chan;
                 for(chan=0;chan<kNumV4FLTChannels;chan++){
                     if(hitRateEnabledMask & (1L<<chan)){
-                        [aList addCommand: [self readRegCmd:kFLTV4HitRateReg channel:chan]];
                         countHREnabledChans++;
                     }
                 }
-                
-                [self executeCommandList:aList];
-                
-                //pull out the result (same order as commands)
-                float   newTotal  = 0;
-                int     dataIndex = 0;
-                for(chan=0;chan<kNumV4FLTChannels;chan++){
-                    if(hitRateEnabledMask & (1L<<chan)){
-                        unsigned long aValue32 = [aList longValueForCmd:dataIndex];
-                        //BOOL overflow = (aValue >> 31) & 0x1;
-                        unsigned long overflow              = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-                        if(aValue32 & 0xffff0000) overflow  = 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-                        unsigned long overflow32            = (aValue32 >>23) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
-                        unsigned long aValue16              = aValue32 & 0xffff;
-                        aValue32                            = aValue32 & 0x7fffff;
 
-                        data[dataIndex + 5]                 = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue16;    // The 16 bit values
-                        data[5 + dataIndex + countHREnabledChans] =  aValue32 * freq;                                       // The 32 bit values (new format);
+                unsigned long location = (([self crateNumber]&0xf)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+                unsigned long data[5 + kNumV4FLTChannels + kNumV4FLTChannels];//2013-04-24 changed to ship full 32 bit counter; data format changed! see decoder -tb-
+                
+                //get the hitrates
+                SBC_Packet aPacket;
+                aPacket.cmdHeader.destination    = kKATRIN;
+                aPacket.cmdHeader.cmdID          = kKATRINReadHitRates;
+                aPacket.cmdHeader.numberBytesinPayload    = (kNumV4FLTChannels + 5)*sizeof(long);
+                
+                katrinV4_HitRateStructure* p = (katrinV4_HitRateStructure*) aPacket.payload;
+                p->station      = [self stationNumber];
+                p->enabledMask  = hitRateEnabledMask;
+                p->seconds      = 0;
+                p->subSeconds   = 0;
 
-                        //... = aValue32 & 0xff000000; this is the new (2013-11) overflow counter: what to do with it? -tb-
-                        if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){
-                            if (hitRateLengthSec!=0)	hitRate[chan] = aValue32 * freq;
-                            else					    hitRate[chan] = 0;
+                @try {
+                    
+                    [[slt sbcLink] send:&aPacket receive:&aPacket];
+                    
+                    katrinV4_HitRateStructure* p = (katrinV4_HitRateStructure*) aPacket.payload;
+                    unsigned long sltSec      = p->seconds;
+                    unsigned long sltSubSec   = p->subSeconds;
+                    unsigned long statusReg   = p->status;
+                    
+                    sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
+
+                    float   newTotal  = 0;
+                    int     dataIndex = 0;
+                    int     chan;
+                    for(chan=0;chan<kNumV4FLTChannels;chan++){
+                        if(hitRateEnabledMask & (1L<<chan)){
+                            unsigned long aValue32 = p->hitRates[chan];
+                            //BOOL overflow = (aValue >> 31) & 0x1;
+                            unsigned long overflow              = 0;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+                            if(aValue32 & 0xffff0000) overflow  = 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+                            unsigned long overflow32            = (aValue32 >>23) & 0x1;//2013-04-24 for legacy data we 'simulate' a 16 bit counter -> simulate a 16 bit overflow flag -tb-
+                            unsigned long aValue16              = aValue32 & 0xffff;
+                            aValue32                            = aValue32 & 0x7fffff;
                             
-                            if(overflow32) hitRate[chan] = 0;
-                            hitRateOverFlow[chan] = overflow32;
+                            data[dataIndex + 5]                 = ((chan&0xff)<<20) | ((overflow&0x1)<<16) | aValue16;    // The 16 bit values
+                            data[5 + dataIndex + countHREnabledChans] =  aValue32 * freq;                                 // The 32 bit values (new format);
                             
-                            oneChanged = YES;
+                            //... = aValue32 & 0xff000000; this is the new (2013-11) overflow counter: what to do with it? -tb-
+                            if(aValue32 != hitRate[chan] || overflow32 != hitRateOverFlow[chan]){
+                                if (hitRateLengthSec!=0)	hitRate[chan] = aValue32 * freq;
+                                else					    hitRate[chan] = 0;
+                                
+                                if(overflow32) hitRate[chan] = 0;
+                                hitRateOverFlow[chan] = overflow32;
+                                
+                                oneChanged = YES;
+                            }
+                            if(!hitRateOverFlow[chan]){
+                                newTotal += hitRate[chan];
+                            }
+                            dataIndex++;
                         }
-                        if(!hitRateOverFlow[chan]){
-                            newTotal += hitRate[chan];
-                        }
-                        dataIndex++;
-                    } else {
-                        
-                        if (0 != hitRate[chan]) {
-                            hitRate[chan] = 0;
-                            oneChanged = YES;
+                        else {
+                            if (hitRate[chan] != 0) {
+                                hitRate[chan] = 0;
+                                oneChanged = YES;
+                            }
                         }
                     }
-                }
-                [aList release];
-
-                if(	dataIndex != countHREnabledChans){
-                    NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);	
-                }
-
-                
-                //
-                // Ship the data, if during the öast second inhibit was released and run was active
-                //
-                inhibit = [slt readStatusReg] & kStatusInh;
-                runStatus = [gOrcaGlobals runInProgress];
-                
-                sltSec      =  [slt getSeconds];
-                sltSubSec   =  [slt readSubSecondsCounter];
-                sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
-                
-                // if (runStatus) NSLog(@"FLT %i.%03i - Reading hitrates\n", sltSec, sltSubSec2/20);
-                
-                
-                // Don't ship hitrate before the run has been started
-                sltRunStartSec = [slt getRunStartSecond];
-                
-                
-                if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
                     
-                    data[0] = hitRateId | (dataIndex + countHREnabledChans + 5); 
-                    data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1; //2013-04-24 version of record type: 0x1: shipping  32 bit hitrate registers  -tb-
-                    data[2] = sltSec - 1;
-                    data[3] = hitRateLengthSec;	
-                    data[4] = newTotal;
-
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-                                                                        object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
+                    if(	dataIndex != countHREnabledChans){
+                        NSLog(@"ERROR:  Shipping hitrates: FLT #%i:	dataIndex %i,  countHREnabledChans %i are not the same!!!\n",[self stationNumber],dataIndex , countHREnabledChans);
+                    }
+                    
+                    //
+                    // Ship the data, if during the last second inhibit was released and run was active
+                    //
+                     unsigned long inhibit          = statusReg & kStatusInh;
+                     unsigned long runStatus        = [gOrcaGlobals runInProgress];
+                     unsigned long sltRunStartSec   = [slt getRunStartSecond];
+                    
+                    
+                    if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
+                        
+                        data[0] = hitRateId | (dataIndex + countHREnabledChans + 5);
+                        data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1;
+                        data[2] = sltSec - 1;
+                        data[3] = hitRateLengthSec;
+                        data[4] = newTotal;
+                        
+                        [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                                            object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
+                    }
+                    
+                    // Keep the inhibit status for the next call
+                    inhibitDuringLastHitrateReading   = inhibit;
+                    runStatusDuringLastHitrateReading = runStatus;
+                    
+                    [self setHitRateTotal:newTotal];
+                    
+                    if(oneChanged){
+                        [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
+                    }
                 }
-                
-                // Keep the inhibit status for the next call
-                inhibitDuringLastHitrateReading = inhibit;
-                runStatusDuringLastHitrateReading = runStatus;
-                
-                [self setHitRateTotal:newTotal];
-                
-                if(oneChanged){
-                    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelHitRateChanged object:self];
+                @catch(NSException* e){
+                    
                 }
             }
-            
         }
         else {
             [self clearHitRates];

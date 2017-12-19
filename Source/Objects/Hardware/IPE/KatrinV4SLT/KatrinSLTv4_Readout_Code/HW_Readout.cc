@@ -135,9 +135,11 @@ void processHWCommand(SBC_Packet* aPacket)
     int32_t aCmdID = aPacket->cmdHeader.cmdID;
     
     switch(aCmdID){
-            //        default:              processUnknownCommand(aPacket); break;
+        case kKATRINReadHitRates: readHitRates(aPacket); break;
+      //default:               processUnknownCommand(aPacket); break;
     }
 }
+
 
 void FindHardware(void)
 {
@@ -374,6 +376,30 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     if(reply)writeBuffer(aPacket);
 }
 
+void readHitRates(SBC_Packet* aPacket)
+{
+    katrinV4_HitRateStructure* p = (katrinV4_HitRateStructure*)aPacket->payload;
+    if(needToSwap)SwapLongBlock(p,sizeof(katrinV4_HitRateStructure)/sizeof(int32_t));
+    int32_t station     = p->station-1;
+    int32_t enabledMask = p->enabledMask;
+
+    if(srack->theFlt[station]->isPresent()){
+        for(int32_t chan=0; chan<24;chan++){
+            if(enabledMask & (0x1<<chan)){
+                p->hitRates[chan] = srack->theFlt[station]->hitrate->read(chan);
+            }
+            else p->hitRates[chan] = 0;
+        }
+    }
+    p->subSeconds   = srack->theSlt->subSecCounter->read();//first read subsec counter!
+    p->seconds      = srack->theSlt->secCounter->read();
+    p->status       = srack->theSlt->status->read();
+    
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    if (writeBuffer(aPacket) < 0) {
+        LogError("Read HitRate Error: %s", strerror(errno));
+    }
+}
 #else //of #if !PMC_COMPILE_IN_SIMULATION_MODE
 // (here follow the 'simulation' versions of all functions -tb-)
 //----------------------------------------------------------------
@@ -646,30 +672,25 @@ int getSltLinuxKernelDriverVersion(void)
 void readSltSecSubsec(uint32_t & sec, uint32_t & subsec)
 {
     if(!srack) return;
-    uint32_t subsecreg;
-    subsecreg    = srack->theSlt->subSecCounter->read();//first read subsec counter!
-    sec             = srack->theSlt->secCounter->read();
-    subsec   = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
+    uint32_t subsecreg   = srack->theSlt->subSecCounter->read();//first read subsec counter!
+    sec                  = srack->theSlt->secCounter->read();
+    subsec               = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
 }
 
 
 
 void setHostTimeToFLTsAndSLT(int32_t* args)
 {
-    unsigned long time;
-    
-    time = srack->setSecondCounter();
+    unsigned long time = srack->setSecondCounter();
     
     if (debug) {
         if (time > 0)
-            printf("Set second counter to %lds\n", time);
+            fprintf(stdout,"Set second counter to %lds\n", time);
         else
-            printf("The timer was not set properly - repeat!\n");
+            fprintf(stdout,"The timer was not set properly - repeat!\n");
     }
     
     /*
-   
-     
     uint32_t flags=args[0];
     uint32_t secondsSet=args[1];
     //DEBUG    fprintf(stderr,"setHostTimeToFLTsAndSLT(int32_t* args):   args 0x%x %u\n",flags,secondsSet);
