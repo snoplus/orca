@@ -1849,29 +1849,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     //event readout controlled by the SLT cpu now. ORCA reads out
     //the resulting data from a generic circular buffer in the pmc code.
-    @try {
-        [pmcLink takeData:aDataPacket userInfo:userInfo];
-    }
-    @catch (NSException* e){
-        if([[e name] isEqualToString:@"ConnectionTimeOut"]){
-            timeoutCount++;
-            if(timeoutCount<=3){
-                NSLogColor([NSColor redColor],@"SLT: Run restarted because of timeout\n");
-                NSLogColor([NSColor redColor],@"SLT: Try: %d/3\n",timeoutCount);
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
-                                                                    object:self
-                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"SLT takeData timeout",@"Reason",nil]];
-            }
-            else {
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
-                                                                    object:self
-                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"SLT takeData timeout",@"Reason",nil]];
-                NSLogColor([NSColor redColor],@"SLT: Run halted because of multiple socket timeouts\n");
-
-            }
-        }
-    }
-    timeoutCount=0;
+    [pmcLink takeData:aDataPacket userInfo:userInfo];
     
     // The flag is set in doneTakingData
     // There the argument userInfo is missing
