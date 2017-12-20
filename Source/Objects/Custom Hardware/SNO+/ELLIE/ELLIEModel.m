@@ -180,6 +180,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 
         [tellieCli release];
         [smellieCli release];
+        [smellieFlaggingCli release];
         [interlockCli release];
     }
     return self;
@@ -262,6 +263,10 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [_tellieNodeMapping release];
     [_smelliePort release];
     [_interlockHost release];
+
+    // Threads
+    [_smellieTransitionThread release];
+    [_tellieTransitionThread release];
 
     [super dealloc];
 }
