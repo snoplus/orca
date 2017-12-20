@@ -75,6 +75,7 @@ class ORSLTv4Readout : public ORVCard
     readoutMode mode; //< control the readout function (standard, local storage, simulation)
 
     int filePtr; //< File pointer
+    int fileSnapshotPtr; //< File pointer for single block file (used by simulation mode)
     uint32_t dataBuffer[8192]; //< maximal DMA block size
     uint32_t header[4]; //< precompiled header
     

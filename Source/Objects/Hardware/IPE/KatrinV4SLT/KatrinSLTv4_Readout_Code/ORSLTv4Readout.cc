@@ -4,6 +4,7 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 
 #ifndef PMC_COMPILE_IN_SIMULATION_MODE
@@ -29,6 +30,7 @@ static const uint32_t FIFO0ModeReg      = 0xe00000 >> 2;//obsolete 2012-10
 static const uint32_t FIFO0StatusReg    = 0xe00004 >> 2;//obsolete 2012-10  
 
 extern int debug;
+extern int nSendToOrca;
 
 
 ORSLTv4Readout::ORSLTv4Readout(SBC_card_info* ci) : ORVCard(ci)
@@ -180,8 +182,14 @@ bool ORSLTv4Readout::Stop()
         t1Ticks = (long long int) t1.tv_sec * 1000000 + t1.tv_usec;
         runTime = (float) (t1Ticks - t0Ticks) / 1000000;
         
+        try {
+            tReadoutTime = srack->theSlt->runTime->read();
+        } catch (PbusError &perr) {
+            printf("ORSLTv4Readout::Stop Error %s\n", perr.what());
+            perr.displayMsg(stdout);
+            fflush(stdout);
+        }
 
-        tReadoutTime = srack->theSlt->runTime->read();
         rate = 0;
         if (tReadoutTime>0) rate = (float) nWords * 40 / tReadoutTime; // MB/s
         
@@ -223,63 +231,74 @@ bool ORSLTv4Readout::Stop()
 
 bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
 {
-    uint32_t headerLen  = 4;
-    uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
-    
-    if (numWordsToRead >= 8160){ // full block readout
-        nNoReadout = 0; // Clear no readout
-        nReadout = nReadout + 1;
-        
-        numWordsToRead = 8160;
-        ensureDataCanHold(numWordsToRead + headerLen);
+    try {
+        uint32_t headerLen  = 4;
+        uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
 
-        memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
-        dataIndex += headerLen;
-        
-        pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
-        dataIndex += numWordsToRead;
-        
-        nWords = nWords + numWordsToRead;
+        if (numWordsToRead >= 8160){ // full block readout
+            nNoReadout = 0; // Clear no readout
+            nReadout = nReadout + 1;
+            
+            numWordsToRead = 8160;
+            ensureDataCanHold(numWordsToRead + headerLen);
 
-    } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
-        nNoReadout = 0; // Clear no readout
-        nReadout = nReadout + 1;
-        nReducedSize = nReducedSize + 1;
-        
-        uint32_t firstIndex = dataIndex; //so we can insert the length
-        ensureDataCanHold(numWordsToRead + headerLen);
-        
-        memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
-        dataIndex += headerLen;
-        
-        if (numWordsToRead < 48) {
-            numWordsToRead = (numWordsToRead/6)*6; //make sure we are on event boundary
-            for(uint32_t i=0;i<numWordsToRead; i++){
-                data[dataIndex++] = pbus->read(FIFO0Addr);
-            }
-        }
-        else {
-            numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
+            memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
+            dataIndex += headerLen;
+            
             pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
             dataIndex += numWordsToRead;
+            
+            nWords = nWords + numWordsToRead;
+
+        } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
+            nNoReadout = 0; // Clear no readout
+            nReadout = nReadout + 1;
+            nReducedSize = nReducedSize + 1;
+            
+            uint32_t firstIndex = dataIndex; //so we can insert the length
+            ensureDataCanHold(numWordsToRead + headerLen);
+            
+            memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
+            dataIndex += headerLen;
+            
+            if (numWordsToRead < 48) {
+                numWordsToRead = (numWordsToRead/6)*6; //make sure we are on event boundary
+                for(uint32_t i=0;i<numWordsToRead; i++){
+                    data[dataIndex++] = pbus->read(FIFO0Addr);
+                }
+            }
+            else {
+                numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
+                pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
+                dataIndex += numWordsToRead;
+            }
+        
+            data[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
+            
+            
+            nWords = nWords + numWordsToRead;
+            
+        } else { // no readout
+            nNoReadout = nNoReadout + 1;
+            
+            // Todo: Better check for inhibit here?! Are these the same values???
+            if (numWordsToRead > 0) nWaitingForReadout = nWaitingForReadout + 1;
+            
+            if (srack->theSlt->status->inhibit->read()) nInhibit = nInhibit + 1;
+            
         }
-    
-        data[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
-        
-        
-        nWords = nWords + numWordsToRead;
-        
-    } else { // no readout
-        nNoReadout = nNoReadout + 1;
-        
-        // Todo: Better check for inhibit here?! Are these the same values???
-        if (numWordsToRead > 0) nWaitingForReadout = nWaitingForReadout + 1;
-        
-        if (srack->theSlt->status->inhibit->read()) nInhibit = nInhibit + 1;
-        
+       
+    } catch (PbusError &perr) {
+        printf("ORSLTv4Readout::ReadoutEnergyV31: Error %s\n", perr.what());
+        perr.displayMsg(stdout);
+        fflush(stdout);
     }
     
-   
+    catch(...){
+        printf("ORSLTv4Readout::ReadoutEnergyV31: Unexpected Error\n");
+        fflush(stdout);
+    }
+    
     return true;
 }
 
@@ -287,50 +306,93 @@ bool ORSLTv4Readout::LocalReadoutEnergyV31(SBC_LAM_Data* lamData)
 {
     // Write the Orca data blocks to file; do not transmit anything to Orca
 
-    uint32_t i;
     uint32_t bufferIndex = 0;
     
-    uint32_t energyId   = GetHardwareMask()[3];
-    uint32_t col        = GetSlot() - 1; //(1-24)
-    uint32_t crate      = GetCrate();
-    uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) ;
-    
-    
-    uint32_t headerLen  = 4;
-    uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
-    if(numWordsToRead > 0){
+    try {
+        uint32_t headerLen  = 4;
+        uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
         
-        if(numWordsToRead > 8160) numWordsToRead = 8160;    //8160 is 170*48, smallest multiple of 48 smaller than 8192 (8192=max.readout block)
-        numWordsToRead = (numWordsToRead/6)*6;              //make sure we are on event boundary
-        
-        uint32_t firstIndex = bufferIndex; //so we can insert the length
-        
-        dataBuffer[bufferIndex++] = energyId | 0; //fill in the length below
-        dataBuffer[bufferIndex++] = location  ;
-        dataBuffer[bufferIndex++] = 0; //spare
-        dataBuffer[bufferIndex++] = 0; //spare
-        
-        //if more than 8 Events (48 words) -> use DMA
-        if(numWordsToRead < 48) {
-            for(i=0;i<numWordsToRead; i++){
-                dataBuffer[bufferIndex++] = pbus->read(FIFO0Addr);
-            }
-        }
-        else {
-            numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
+        if (numWordsToRead >= 8160){ // full block readout
+            nNoReadout = 0; // Clear no readout
+            nReadout = nReadout + 1;
+            
+            numWordsToRead = 8160;
+            
+            memcpy(&dataBuffer[dataIndex], header, headerLen * sizeof(uint32_t));
+            bufferIndex += headerLen;
+            
             pbus->readBlock(FIFO0Addr, (unsigned long*)(&dataBuffer[bufferIndex]), numWordsToRead);
-            bufferIndex += numWordsToRead;
+            
+            nWords = nWords + numWordsToRead;
+
+        } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
+            nNoReadout = 0; // Clear no readout
+            nReadout = nReadout + 1;
+            nReducedSize = nReducedSize + 1;
+            
+            uint32_t firstIndex = bufferIndex; //so we can insert the length
+            
+            memcpy(&dataBuffer[dataIndex], header, headerLen * sizeof(uint32_t));
+            bufferIndex += headerLen;
+            
+            if (numWordsToRead < 48) {
+                numWordsToRead = (numWordsToRead/6)*6; //make sure we are on event boundary
+                for(uint32_t i=0;i<numWordsToRead; i++){
+                    dataBuffer[dataIndex++] = pbus->read(FIFO0Addr);
+                }
+            }
+            else {
+                numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
+                pbus->readBlock(FIFO0Addr, (unsigned long*)(&dataBuffer[bufferIndex]), numWordsToRead);
+                bufferIndex += numWordsToRead;
+            }
+            
+            dataBuffer[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
+            
+            nWords = nWords + numWordsToRead;
+            
+        } else { // no readout
+            nNoReadout = nNoReadout + 1;
+            
+            // Todo: Better check for inhibit here?! Are these the same values???
+            if (numWordsToRead > 0) nWaitingForReadout = nWaitingForReadout + 1;
+            
+            if (srack->theSlt->status->inhibit->read()) nInhibit = nInhibit + 1;
+            
         }
-        dataBuffer[firstIndex] |=  (numWordsToRead+headerLen); //fill in the record length
+        
+        // Write block to local file
+        // Merge late with the Orca readout file
+        //write(filePtr, dataBuffer, (numWordsToRead+headerLen) * sizeof(uint32_t));
+
+
+        // Send a few blocks to Orca - just to validate that still correct data is recorded)
+        if ((nNoReadout == 0) && (nReadout > 0) && (nSendToOrca > 0) && (nReadout % nSendToOrca == 0)){
+            
+            ensureDataCanHold(numWordsToRead + headerLen);
+            memcpy(&data[dataIndex], dataBuffer, (numWordsToRead + headerLen) * sizeof(uint32_t));
+            dataIndex += (numWordsToRead + headerLen);
+            
+        }
+
+        // Save single blocks to a file for usage in simulation mode
+        if ((nNoReadout == 0) && (fileSnapshotPtr > 0) && (nReadout == 1234)) {
+            if (debug) printf("Save sample block for simulation mode, nReadout %lld, block size %d\n",
+                              nReadout, numWordsToRead);
+            write(fileSnapshotPtr, dataBuffer, (numWordsToRead + headerLen) * sizeof(uint32_t));
+        }
+        
+        
+    } catch (PbusError &perr) {
+        printf("ORSLTv4Readout::ReadoutEnergyV31: Error %s\n", perr.what());
+        perr.displayMsg(stdout);
+        fflush(stdout);
     }
     
-    
-    // Write block to local file
-    // Merge late with the Orca readout file
-    
-    // Install SSD first !!!
-    //write(filePtr, dataBuffer, (numWordsToRead+headerLen) * sizeof(uint32_t));
-    nWords = nWords + numWordsToRead+headerLen;
+    catch(...){
+        printf("ORSLTv4Readout::ReadoutEnergyV31: Unexpected Error\n");
+        fflush(stdout);
+    }
     
     return true;
     
@@ -342,18 +404,26 @@ void ORSLTv4Readout::LocalReadoutInit()
     // Get the run number from Orca
     
     // Open the readout file
+    // Todo: Add start second in the file name
+    system("mkdir -p /home/katrin/data");
     filePtr = open("/home/katrin/data/Run000.part", O_WRONLY | O_CREAT, 0777);
-    
+    fileSnapshotPtr = open("/home/katrin/data/SingleBlock.snap", O_WRONLY | O_CREAT, 0777);
     
 }
 
 void ORSLTv4Readout::LocalReadoutClose()
 {
-    // Close the readout file
+    // Close the readout files
     if (filePtr) {
         close(filePtr);
         filePtr = 0;
     }
+    
+    if (fileSnapshotPtr) {
+        close(fileSnapshotPtr);
+        fileSnapshotPtr = 0;
+    }
+    
 }
 
 bool ORSLTv4Readout::SimulationReadoutEnergyV31(SBC_LAM_Data*)
