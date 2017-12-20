@@ -626,7 +626,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     NSLog(@"Rate is spiking but less than %d (pollTime: %d) seconds have passed\n",(int)dt,(int)lnPolltime);
                 }
                 else {
-                    if([self fillingLN:index]){
+                    if(![self fillingLN:index]){
                         NSLog(@"Spikes exist and NOT filling\n");
                     }
                     else {
