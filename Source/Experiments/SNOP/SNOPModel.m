@@ -1349,20 +1349,16 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     uint32_t crate_pedestal_mask, coarse_delay, fine_delay, pedestal_width, gt_mask;
     float pulser_rate;
     uint32_t channelMasks[16];
-    uint32_t sync_trigger_mask, async_trigger_mask, tubii_dac;
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    NSArray* tubiis = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
 
     xl3s = [xl3s sortedArrayUsingFunction:compareXL3s context:nil];
 
     ORMTCModel* mtc;
     ORXL3Model* xl3;
-    TUBiiModel* tubii;
 
     if ([mtcs count] == 0) {
         NSLogColor([NSColor redColor],
@@ -1371,14 +1367,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     mtc = [mtcs objectAtIndex:0];
-
-    if ([tubiis count] == 0) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: couldn't find TUBii object.\n");
-        return;
-    }
-
-    tubii = [tubiis objectAtIndex:0];
 
     crate_pedestal_mask = [mtc pedCrateMask];
     coarse_delay = [mtc coarseDelay];
@@ -1417,41 +1405,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
-                    "%@ reason: %@\n", [e name], [e reason]);
-        return;
-    }
-
-    if (gt_mask & MTC_EXT_2_MASK) {
-        NSLogColor([NSColor redColor], @"pingCratesAtRunStart: EXT2 is masked in, so can't run ping crates.\n");
-        return;
-    }
-
-    /* Set the EXT2 trigger signal high so that it gets latched in every event
-     * while we ping the crates. This is to mark these events so that if we
-     * find out that changing the pedestal mask while running causes noise or
-     * other problems we can throw these events out. */
-    @try {
-        sync_trigger_mask = [tubii syncTrigMask];
-        async_trigger_mask = [tubii asyncTrigMask];
-        tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: error getting TUBii trigger masks or dac value. error: "
-                    "%@ reason: %@\n", [e name], [e reason]);
-        return;
-    }
-
-    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: tubii already has triggers enabled.\n");
-    }
-
-    @try {
-        [tubii setTrigMask:0x10000 setAsyncMask:0];
-        [tubii setMTCAMimic1_ThresholdInBits:0];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1537,16 +1490,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([[xl3 xl3Link] isConnected]) {
             [xl3 setPedestals];
         }
-    }
-
-    /* Reset tubii's trigger masks and DAC value. */
-    @try {
-        [tubii setTrigMask:0 setAsyncMask:0];
-        [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
-                    "%@ reason: %@\n", [e name], [e reason]);
     }
 
     /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
