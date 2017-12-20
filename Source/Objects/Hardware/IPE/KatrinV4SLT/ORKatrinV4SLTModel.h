@@ -192,6 +192,8 @@
     
         unsigned long       savedInhibitStatus;
 
+        int                 timeoutCount;
+    
 }
 
 #pragma mark •••Initialization

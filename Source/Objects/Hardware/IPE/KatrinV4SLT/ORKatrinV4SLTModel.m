@@ -1734,8 +1734,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     }
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
 
-
-    
     //if cold start (not 'quick start' in RunControl) ...
     //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
     [self initBoard];
@@ -1834,7 +1832,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         runStartSec = sltsec;
     }
     
-    NSLog(@"SLT %i.%03i - Crate his ready for data taking, run start at %i run time %i\n",
+    NSLog(@"SLT %i.%03i - Crate is ready for data taking, run start at %i run time %i\n",
           sltsec, sltsubsec2/10, runStartSec);
 
     
@@ -1851,8 +1849,29 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     //event readout controlled by the SLT cpu now. ORCA reads out
     //the resulting data from a generic circular buffer in the pmc code.
-    [pmcLink takeData:aDataPacket userInfo:userInfo];
+    @try {
+        [pmcLink takeData:aDataPacket userInfo:userInfo];
+    }
+    @catch (NSException* e){
+        if([[e name] isEqualToString:@"ConnectionTimeOut"]){
+            timeoutCount++;
+            if(timeoutCount<=3){
+                NSLogColor([NSColor redColor],@"SLT: Run restarted because of timeout\n");
+                NSLogColor([NSColor redColor],@"SLT: Try: %d/3\n",timeoutCount);
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunRestart
+                                                                    object:self
+                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"SLT takeData timeout",@"Reason",nil]];
+            }
+            else {
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunHalt
+                                                                    object:self
+                                                                  userInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"SLT takeData timeout",@"Reason",nil]];
+                NSLogColor([NSColor redColor],@"SLT: Run halted because of multiple socket timeouts\n");
 
+            }
+        }
+    }
+    timeoutCount=0;
     
     // The flag is set in doneTakingData
     // There the argument userInfo is missing
