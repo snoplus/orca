@@ -38,6 +38,7 @@
 #define kSNO				   0x3
 #define kPMC				   0x4
 #define kMJD                   0x5
+#define kKATRIN                0x6
 
 /* SBC commands */
 #define kSBC_Command           0x01
