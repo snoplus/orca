@@ -610,7 +610,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readAllStatus) object:nil];
     if(pollTime){
         [self performSelector:@selector(readAllStatus) withObject:nil afterDelay:2];
-        NSLog(@"SLT new poll time %d seconds\n",pollTime);
     }
 }
 
