@@ -923,7 +923,7 @@ void commitData()
 
 void ensureDataCanHold(int numLongsRequired)
 {
-	if(dataIndex + numLongsRequired >= kMaxDataBufferSizeLongs){
+	if(dataIndex + numLongsRequired + 1024 >= kMaxDataBufferSizeLongs){
 		commitData();
 	}
 }
