@@ -525,6 +525,7 @@ void sendResponse(SBC_Packet* aPacket)
 
 void sendRunInfo(void)
 {
+    pthread_mutex_lock(&runInfoMutex);
     SBC_Packet aPacket;
     aPacket.cmdHeader.destination          = kSBC_Process;
     aPacket.cmdHeader.cmdID                = kSBC_RunInfoRequest;
@@ -546,6 +547,8 @@ void sendRunInfo(void)
     if (writeBuffer(&aPacket) < 0) {
         LogError("sendRunInfo Error: %s", strerror(errno));   
     }
+    pthread_mutex_unlock(&runInfoMutex);
+
 }
 
 void sendErrorInfo(void)
