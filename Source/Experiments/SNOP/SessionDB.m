@@ -41,11 +41,11 @@ sessionKey = _sessionKey;
 {
     [connection disconnect];
 
-    [_username dealloc];
-    [_password dealloc];
-    [_dbname dealloc];
-    [_address dealloc];
-    [_sessionKey dealloc];
+    [_username release];
+    [_password release];
+    [_dbname release];
+    [_address release];
+    [_sessionKey release];
 
     [super dealloc];
 }
