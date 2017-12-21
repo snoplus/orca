@@ -103,7 +103,7 @@ void CB_writeDataBlock(int32_t* data, int32_t length)
     if(length<=0)return;
     
     pthread_mutex_lock (&cb.cbMutex);                        //begin critical section
-    if((cb.amountInBuffer + length + 1) < cb.bufferLength){    //is there room for the data plus the block length header?
+    if((cb.amountInBuffer + length + 1024) < cb.bufferLength){    //is there room for the data plus the block length header? (plus some ~1K of reserved space
         int32_t index = cb.writeIndex;
         cb.buffer[index] = length;                        //write the block length NOT including header
         index++;

@@ -218,7 +218,7 @@ int32_t main(int32_t argc, char *argv[])
 #endif
         /*-------------------------------*/
 
-        data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t));
+        data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t) + 1024); //test ... add 1K
 
         SBC_Packet aPacket;
         int32_t numRead = 0;
