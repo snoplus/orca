@@ -20,17 +20,17 @@
 
 
 @interface ORTimer (ORTimerPrivate)
-- (long) _currentTime;
+- (double) _currentTime;
 @end
 
 @implementation ORTimer
 
-+ (void) delayNanoseconds:(unsigned long)nanoSeconds
++ (void) delayNanoseconds:(double)nanoSeconds
 {
-    static unsigned long  delayConstant;
+    static double  delayConstant;
     if(!nanoSeconds)return;
     if(!delayConstant){
-        unsigned long calibrationTime = nanoSeconds*1000.;
+        double calibrationTime = nanoSeconds*1000.;
         if(calibrationTime > 100000)calibrationTime = 100000;
         ORTimer* timer = [[ORTimer alloc] init];
         [timer start];
@@ -79,7 +79,7 @@
 }
 
 // reporting time
-- (long)microseconds
+- (double )microseconds
 {
     if (isRunning){
         // report the current total, like -stop, without stoping
@@ -96,7 +96,7 @@
 }
 
 // reporting elapsed time - from last start
-- (long)microsecondsSinceStart
+- (double )microsecondsSinceStart
 {
     if (isRunning){
         // report the time from the last start
@@ -116,11 +116,11 @@
 
 @implementation ORTimer (ORTimerPrivate)
 
-- (long) _currentTime
+- (double) _currentTime
 {
     struct timeval tp;
     gettimeofday(&tp, NULL);
-    return (tp.tv_sec * 1000000 + tp.tv_usec);
+    return (tp.tv_sec * 1000000. + tp.tv_usec);
 }
 
 @end
