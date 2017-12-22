@@ -119,7 +119,7 @@
 	
     [notifyCenter addObserver : self
                      selector : @selector(pollRateChanged:)
-                         name : TimedWorkerTimeIntervalChangedNotification
+                         name : ORKatrinV4SLTPollTimeChanged
                        object : model];
 		
     [notifyCenter addObserver : self
