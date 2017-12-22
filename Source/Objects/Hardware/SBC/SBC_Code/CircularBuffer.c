@@ -103,7 +103,7 @@ void CB_writeDataBlock(int32_t* data, int32_t length)
     if(length<=0)return;
     
     pthread_mutex_lock (&cb.cbMutex);                        //begin critical section
-    if((cb.amountInBuffer + length + 1024) < cb.bufferLength){    //is there room for the data plus the block length header? (plus some ~1K of reserved space
+    if((cb.amountInBuffer + length + 1) < cb.bufferLength){    //is there room for the data plus the block length header?
         int32_t index = cb.writeIndex;
         cb.buffer[index] = length;                        //write the block length NOT including header
         index++;
@@ -123,16 +123,6 @@ void CB_writeDataBlock(int32_t* data, int32_t length)
           memcpy(cb.buffer, data + firstWrite, secondWrite*sizeof(int32_t)); 
           cb.wrapArounds++;
         }
-        /*
-        int i;
-        for(i=0;i<length;i++){                                //write the data
-            cb.buffer[index] = data[i];
-            index++;
-            if(index >= cb.bufferLength){
-                index = 0;
-                cb.wrapArounds++;
-            }
-        }*/
         
         cb.amountInBuffer += length + 1;
         cb.writeIndex = index;                                //advance the write pointer
@@ -177,13 +167,7 @@ int32_t CB_readNextDataBlock(int32_t* buffer,int32_t maxSize)
               index = secondWrite;
               memcpy(buffer + firstWrite, cb.buffer, secondWrite*sizeof(int32_t)); 
             }
-            /*
-            int i;
-            for(i=0;i<blockLength;i++){                        //read out the block
-                buffer[i] = cb.buffer[index];
-                index = (index+1) % cb.bufferLength;
-            }*/
-            cb.amountInBuffer -= blockLength + 1;                //adjust the total
+             cb.amountInBuffer -= blockLength + 1;                //adjust the total
         }
         else {
             index += blockLength;                            //have to discard because the user buffer is too small
