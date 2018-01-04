@@ -50,6 +50,7 @@ NSString* ORCouchDBModelDBInfoChanged			  = @"ORCouchDBModelDBInfoChanged";
 NSString* ORCouchDBLock							  = @"ORCouchDBLock";
 NSString* ORCouchDBLocalHostNameChanged           = @"ORCouchDBLocalHostNameChanged";
 NSString* ORCouchDBModelUsingUpdateHandleChanged  = @"ORCouchDBModelUsingUpdateHandleChanged";
+NSString* ORCouchDBModeUseHttpsChanged            = @"ORCouchDBModeUseHttpsChanged";
 
 #define kCreateDB           @"kCreateDB"
 #define kReplicateDB        @"kReplicateDB"
@@ -358,6 +359,16 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     }
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModelKeepHistoryChanged object:self];
+}
+- (BOOL) useHttps
+{
+    return useHttps;
+}
+- (void) setUseHttps:(BOOL)aState;
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUseHttps:useHttps];
+    useHttps = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORCouchDBModeUseHttpsChanged object:self];
 }
 
 - (BOOL) stealthMode
@@ -1564,6 +1575,7 @@ nil];
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
     [self setSkipDataSets:  [decoder decodeBoolForKey:   @"skipDataSets"]];
+    [self setUseHttps:      [decoder decodeBoolForKey:   @"useHttps"]];
     [self setAlertType:     [decoder decodeIntForKey:    @"alertType"]];
     [self setAlertMessage:  [decoder decodeObjectForKey: @"alertMessage"]];
     [self setKeepHistory:   [decoder decodeBoolForKey:   @"keepHistory"]];
@@ -1594,6 +1606,7 @@ nil];
     [encoder encodeInt:alertType                forKey:@"alertType"];
     [encoder encodeObject:alertMessage          forKey:@"alertMessage"];
     [encoder encodeBool:keepHistory             forKey:@"keepHistory"];
+    [encoder encodeBool:useHttps                forKey:@"useHttps"];
     [encoder encodeBool:stealthMode             forKey:@"stealthMode"];
     [encoder encodeObject:password              forKey:@"Password"];
     [encoder encodeInteger:portNumber           forKey:@"PortNumber"];

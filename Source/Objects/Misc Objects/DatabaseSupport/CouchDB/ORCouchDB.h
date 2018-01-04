@@ -76,7 +76,8 @@
 	NSString*			database;
 	NSString*			host;
 	NSString*			username;
-	NSString*			pwd;
+    NSString*           pwd;
+    NSString*           httpType;
 	NSUInteger			port;
 	id					tag;
 	NSHTTPURLResponse*	response;
@@ -89,8 +90,9 @@
 - (id) send:(NSString*)httpString type:(NSString*)aType body:(NSDictionary*)aBody;
 - (NSString*) revision:(NSString*)anID;
 - (NSString*) database;
-@property (copy)	NSString*			username;
-@property (copy)	NSString*			pwd;
+@property (copy) NSString*    httpType;
+@property (copy) NSString*    username;
+@property (copy) NSString*    pwd;
 
 @end
 
@@ -253,6 +255,7 @@
 - (void) sweepDone;
 - (void) incChangeCounter;
 - (BOOL) usingUpdateHandler;
+- (BOOL) useHttps;
 @end
 
 

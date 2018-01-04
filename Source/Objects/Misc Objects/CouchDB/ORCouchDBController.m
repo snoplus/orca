@@ -133,6 +133,11 @@
                      selector : @selector(stealthModeChanged:)
                          name : ORCouchDBModelStealthModeChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(useHttpsChanged:)
+                         name : ORCouchDBModeUseHttpsChanged
+                        object: model];
 	
     [notifyCenter addObserver : self
                      selector : @selector(dataBaseInfoChanged:)
@@ -184,6 +189,7 @@
 	[self dataBaseNameChanged:nil];
     [self couchDBLockChanged:nil];
 	[self stealthModeChanged:nil];
+    [self useHttpsChanged:nil];
 	[self keepHistoryChanged:nil];
 	[self replicationRunningChanged:nil];
     [self usingUpdateHandlerChanged:nil];
@@ -221,6 +227,11 @@
 {
 	[keepHistoryCB setIntValue: [model keepHistory]];
 	[keepHistoryStatusField setStringValue:([model keepHistory] & ![model stealthMode])?@"":@"Disabled"];
+}
+
+- (void) useHttpsChanged:(NSNotification*)aNote
+{
+    [useHttpsCB setIntValue: [model useHttps]];
 }
 
 - (void) stealthModeChanged:(NSNotification*)aNote
@@ -274,6 +285,7 @@
     [keepHistoryCB       setEnabled:!locked];
     [stealthModeButton   setEnabled:!locked];
     [skipDataSetsCB      setEnabled:!locked];
+    [useHttpsCB          setEnabled:!locked];
 }
 
 - (void) checkGlobalSecurity
@@ -348,6 +360,11 @@
     }
     else [model setKeepHistory:YES];
 
+}
+
+- (IBAction) useHttpsAction:(id)sender
+{
+    [model setUseHttps:[sender intValue]];
 }
 
 - (IBAction) stealthModeAction:(id)sender
