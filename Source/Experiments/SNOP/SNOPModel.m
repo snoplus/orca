@@ -2486,7 +2486,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     NSError *error = nil;
     NSData *data;
 
-    urlString = [NSString stringWithFormat:@"http://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@, \"\", \"\", 0]&endkey=[%@,\"\ufff0\",\"\ufff0\",{}]&include_docs=True",
+    urlString = [NSString stringWithFormat:@"https://%@:%@@%@:%u/%@/_design/standardRuns/_view/getStandardRunsWithVersion?startkey=[%@, \"\", \"\", 0]&endkey=[%@,\"\ufff0\",\"\ufff0\",{}]&include_docs=True",
                  [self orcaDBUserName],
                  [self orcaDBPassword],
                  [self orcaDBIPAddress],
@@ -2496,7 +2496,7 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
                  [self standardRunTableVersion]];
 
     link = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:2];
+    request = [NSURLRequest requestWithURL:[NSURL URLWithString:link] cachePolicy:0 timeoutInterval:3];
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     if (error != nil) {
         NSLogColor([NSColor redColor], @"Error reading standard runs from "
