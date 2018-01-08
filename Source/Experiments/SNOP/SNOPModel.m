@@ -1149,13 +1149,12 @@ err:
 
 - (void) subRunStarted:(NSNotification*)aNote
 {
-    //Ship subrunrecord - Just a special case of an eped record
+    //Ship subrunrecord - A special case of an eped record
     [self shipSubRunRecord];
 }
 
 - (void) subRunEnded:(NSNotification*)aNote
 {
-    //update calibration documents (TELLIE temp)
 }
 
 - (void) detectorStateChanged:(NSNotification*)aNote
@@ -1183,6 +1182,7 @@ err:
     if (pqRun->valid[kRun_runType]) {
         [runControl setRunType:pqRun->runType];
     }
+
     // update run state and run start time
     if (pqRun->valid[kRun_runInProgress] && pqRun->runInProgress && [runControl runningState] == eRunStopped) {
         [runControl setRunningState:eRunInProgress];
@@ -1192,6 +1192,20 @@ err:
             [runControl startTimer];
         }
         state = RUNNING;
+    }
+
+    // Get data file object to check if there's an active logfile.
+    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    if (![dataFileModels count]) {
+        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find ORDataFileModel!\n");
+        return; // (should never happen)
+    }
+    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
+
+    // Check if the logfile name is defined. If ORCA has just started up, it won't be
+    if([[aDataFileModel fileName] isEqualToString:@""]){
+        [self setLogNameFormat];
+        [aDataFileModel runTaskStarted:[runControl runInfo]];
     }
 }
 

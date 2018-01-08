@@ -293,7 +293,6 @@ static const int currentVersion = 1;           // Current version
 
 - (void) setFileStaticSuffix:aFileSuffix
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setFilePrefix:filePrefix];
     if(aFileSuffix == nil)aFileSuffix = @"";
     [fileStaticSuffix autorelease];
     fileStaticSuffix = [aFileSuffix copy];
