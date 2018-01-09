@@ -1777,11 +1777,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     // Clear counter and update display
     [self writeClrCnt];
-    [self readLostEvents];
-    [self readLostFltEvents];
-    [self readLostFltEventsTr];
-
-	[self readStatusReg];
+    [self readAllStatus];
+    
 	actualPageIndex     = 0;
 	eventCounter        = 0;
 	first               = YES;
@@ -1805,7 +1802,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         [NSException raise:@"SLT error" format:@"Set inhibit failed"];
     }
 
-    
     // Release inhibit with the next second strobe
     [self writeClrInhibit];
 
@@ -1818,7 +1814,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     
     runStartSec = sltsec + 1;
-
     
     // If inhibit has been released the time needs to be corrected
     lStatus = [self readStatusReg];
@@ -1834,18 +1829,14 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     NSLog(@"SLT %i.%03i - Crate is ready for data taking, run start at %i run time %i\n",
           sltsec, sltsubsec2/10, runStartSec);
 
-    
     // Write run start time; starts always with the second strobe
     [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
 
-    
     callRunIsStopping = false;
-
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-
     //event readout controlled by the SLT cpu now. ORCA reads out
     //the resulting data from a generic circular buffer in the pmc code.
     [pmcLink takeData:aDataPacket userInfo:userInfo];
@@ -1860,9 +1851,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             [obj runIsStopping:aDataPacket userInfo:userInfo];
         }
         [pmcLink runIsStopping:aDataPacket userInfo:userInfo];
-        
     }
-
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1888,29 +1877,26 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (BOOL) doneTakingData
 {
- 
-
     unsigned long sltsubsecreg;
     unsigned long sltsec;
     unsigned long sltsubsec2;
-
     unsigned long lStatus;
-    lStatus = [self readStatusReg];
     
+    lStatus = [self readStatusReg];
     
     if ((lStatus & kStatusInh) == 0) {
         
         // Step 1: Wait for inhibit to become active here
         return false;
         
-    } else if (inhibitLastCheck == 0) {
+    }
+    else if (inhibitLastCheck == 0) {
 
         // Step 2: Inhibit has been detected
         //
         
         // Save the last inhibit status
         inhibitLastCheck = lStatus & kStatusInh;
-        
         
         // Keep the run stop second
         sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
@@ -1920,22 +1906,16 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
         sltSecondRunStop = sltsec;
         
- 
         // Call pmcLink runIsStopping in next takeData call
         callRunIsStopping = true;
 
         return false;
-        
-    } else {
-
-    
-        // Step 3: Clear readout buffers    
+    }
+    else {
+        // Step 3: Clear readout buffers
         return [pmcLink doneTakingData];
     }
-
-    
 }
-
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
@@ -1947,13 +1927,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
     }	
 	
-
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - End of run\n", sltsec, sltsubsec2/10);
 
-    
     // Ship run counter
     [self shipSltEvent:kSecondsCounterType withType:kStopRunType eventCt:0 high:sltSecondRunStop low:0 ];
     
@@ -1973,8 +1951,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     [self shipSltEvent:kLostFltEventCounterType withType:kStopRunType eventCt:0 high: (lostFltEvents>>32)&0xffffffff low:(lostFltEvents)&0xffffffff ];
     
-   
-    
     // Delete unused structures
     [pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
     
@@ -1982,9 +1958,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     dataTakers = nil;
     
     [self setIsPartOfRun: NO];
-    
-    
-    
+
     //
     // Activate crate during the run pause for configuration
     // Release inhibit with the next second strobe
