@@ -756,8 +756,12 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
 }
 
-- (void) taskData:(NSString*)text
+- (void) taskData:(NSDictionary*)taskData
 {
+    id       aTask = [taskData objectForKey:@"Task"];
+    NSString* text = [taskData objectForKey:@"Text"];
+    if(aTask != pingTask) return;
+
     if([text rangeOfString:@"round-trip"].location != NSNotFound){
         pingedSuccessfully = YES;
     }

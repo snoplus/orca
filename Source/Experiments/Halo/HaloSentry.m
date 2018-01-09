@@ -1416,8 +1416,12 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
         pingTask = nil;
     }
 }
-- (void) taskData:(NSString*)text
+- (void) taskData:(NSDictionary*)taskData
 {
+    id       aTask = [taskData objectForKey:@"Task"];
+    NSString* text = [taskData objectForKey:@"Text"];
+    if(aTask != pingTask) return;
+
     if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
         if(otherSystemStealthMode) [self setRemoteMachineReachable:eYES];
         else                       [self setRemoteMachineReachable:eBad];

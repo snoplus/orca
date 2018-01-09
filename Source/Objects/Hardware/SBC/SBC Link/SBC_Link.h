@@ -254,7 +254,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) getErrorInfoBlock;
 - (void) reloadClient;
 - (void) killCrate;
-- (void) taskData:(NSString*)text;
+- (void) taskData:(NSDictionary*)taskData;
 - (void) taskFinished:(ORPingTask*)aTask;
 - (void) toggleCrate;
 - (void) startCrate;

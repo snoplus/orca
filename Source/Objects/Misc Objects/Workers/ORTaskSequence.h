@@ -48,7 +48,7 @@
 @interface NSObject (ORTaskSequence)
 - (void) taskFinished:(id)sender;
 - (void) tasksCompleted:(id)sender;
-- (void) taskData:(NSString*)text;
+- (void) taskData:(NSDictionary*)taskData;
 @end
 
 //---------------------------------------------
