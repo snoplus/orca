@@ -1186,7 +1186,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
             unPingableSBCs = [[NSMutableArray arrayWithArray:sbcs]retain]; //SV
             [self appendToSentryLog:@"Pinging Crates"];
             for(id anSBC in sbcs)[[anSBC sbcLink] pingVerbose:NO];
-            [self setNextState:eWaitForPing stepTime:.2];
+            [self setNextState:eWaitForPing stepTime:1];
             loopTime = 0;
          break;
 
@@ -1274,7 +1274,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
                 [self setSentryType:ePrimary];
                 [self setNextState:eStarting stepTime:.1];
             }
-            else [self setNextState:eCheckRun stepTime:.1];
+            else [self setNextState:eCheckRun stepTime:.2];
             break;
   
         case eBootCrates:
