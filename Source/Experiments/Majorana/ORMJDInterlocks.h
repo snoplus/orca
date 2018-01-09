@@ -69,7 +69,7 @@ typedef struct {
     BOOL                vacuumSpike;
     BOOL                fillingLN;
     int                 pollingTimeForLN;
-    int                 breakDownPass;
+    BOOL                doBreakDownPass;
     NSString*           breakDownResult;
     BOOL                scheduledToSendVacReport;
     NSDate*             vacuumSpikeStarted;

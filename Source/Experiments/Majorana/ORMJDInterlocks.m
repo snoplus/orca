@@ -128,7 +128,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
     self.isRunning = YES;
     [self performSelector:@selector(step) withObject:nil afterDelay:.1];
-    
+    doBreakDownPass  = NO;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDInterlocksIsRunningChanged object:self];
 }
 
@@ -571,7 +571,6 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
                 }
-                breakDownPass       = 0;
                 sentCmds            = NO;
                 self.remoteOpStatus = nil;
             }
@@ -591,18 +590,18 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             break;
             
         case kMJDInterlocks_CheckForBreakdown:
-            if(breakDownPass == 0){
-                [self setState:kMJDInterlocks_CheckForBreakdown status:@"Checking..." color:normalColor];
+            if(!doBreakDownPass){
+                [self setState:kMJDInterlocks_CheckForBreakdown status:@"Deferred..." color:normalColor];
+                doBreakDownPass = YES;
+           }
+            else {
                 [breakDownResult autorelease];
                 NSString* s = [delegate checkForBreakdown:[self module] vacSystem:[self vacSystem] ];
                 breakDownResult = [s copy];
-
-            }
-            else {
                 [self setState:kMJDInterlocks_CheckForBreakdown status:breakDownResult color:normalColor];
                 [self setCurrentState:kMJDInterlocks_FinalState];
+                doBreakDownPass = NO;
             }
-            breakDownPass++;
             break;
             
         case kMJDInterlocks_FinalState:

@@ -414,7 +414,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                         [rateSpikes[index] release];
                         rateSpikes[index] = nil;
                         [self setRateSpikeTime:index time:nil];
-                        
+                        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(forceConstraintCheck) object:nil];
                     }
                 }
                 break;
@@ -565,7 +565,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(pollTime){
         if(!scheduledToRunCheckBreakdown){
             scheduledToRunCheckBreakdown = YES;
-            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:[self pollingTimeForLN:0]];
+            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:10];
         }
     }
 }
