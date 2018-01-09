@@ -81,7 +81,7 @@
 	[aPlot release];
 
 	[rate0 setNumber:24 height:10 spacing:6];
-    [[rate0 xAxis] setRngLimitsLow:0 withHigh:1000000 withMinRng:5];
+    [[rate0 xAxis] setRngLimitsLow:0 withHigh:5000000 withMinRng:5];
     
     [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
     NSNumberFormatter* valueFormatter = [[[NSNumberFormatter alloc] init] autorelease];
