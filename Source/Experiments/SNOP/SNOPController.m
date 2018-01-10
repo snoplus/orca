@@ -111,7 +111,7 @@ snopGreenColor;
 
 - (IBAction) orcaDBTestAction:(id)sender {
     [[NSWorkspace sharedWorkspace]
-     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@:%@@%@:%d",
                                    [model orcaDBUserName], [model orcaDBPassword],
                                    [model orcaDBIPAddress], [model orcaDBPort]]]];
 }
@@ -1190,7 +1190,7 @@ snopGreenColor;
 - (IBAction) orcaDBFutonAction:(id)sender
 {
     
-    NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
+    NSString *url = [NSString stringWithFormat:@"https://%@:%@@%@:%d/_utils/database.html?%@",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
@@ -1199,7 +1199,7 @@ snopGreenColor;
 - (IBAction) debugDBFutonAction:(id)sender
 {
     
-    NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@", [model debugDBUserName], [model debugDBPassword],[model debugDBIPAddress],[model debugDBPort], [model debugDBName]];
+    NSString *url = [NSString stringWithFormat:@"https://%@:%@@%@:%d/_utils/database.html?%@", [model debugDBUserName], [model debugDBPassword],[model debugDBIPAddress],[model debugDBPort], [model debugDBName]];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
@@ -1208,7 +1208,7 @@ snopGreenColor;
 - (IBAction) debugDBTestAction:(id)sender
 {
     [[NSWorkspace sharedWorkspace]
-     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://%@:%@@%@:%d",
+     openURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@:%@@%@:%d",
                                    [model debugDBUserName], [model debugDBPassword],
                                    [model debugDBIPAddress], [model debugDBPort]]]];
 }
@@ -1273,14 +1273,14 @@ snopGreenColor;
 
 - (IBAction) logAction:(id)sender
 {
-    NSString *url = [NSString stringWithFormat:@"http://snopl.us/shift/"];
+    NSString *url = [NSString stringWithFormat:@"https://snopl.us/shift/"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
 - (IBAction) opManualAction:(id)sender
 {
-    NSString *url = [NSString stringWithFormat:@"http://snopl.us/detector/operator_manual/operator_manual.html"];
+    NSString *url = [NSString stringWithFormat:@"https://snopl.us/detector/operator_manual/operator_manual.html"];
     NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
@@ -1312,7 +1312,7 @@ snopGreenColor;
     }
     else if([tabView indexOfTabViewItem:tabViewItem] == 2){
         //State
-        [[detectorState mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"http://snopl.us/monitoring/state"] ] ];
+        [[detectorState mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"https://snopl.us/monitoring/state"] ] ];
         [[self window] setContentView:blankView];
         [self resizeWindowToSize:detectorSize];
         [[self window] setContentView:snopView];
