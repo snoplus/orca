@@ -1,6 +1,7 @@
 #include "ORSLTv4Readout.hh"
 #include "KatrinV4_HW_Definitions.h"
 #include "readout_code.h"
+#include <errno.h>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -92,7 +93,7 @@ bool ORSLTv4Readout::Start()
     uint32_t crate      = GetCrate();
     uint32_t location   = ((crate & 0x01e)<<21) | (((col+1) & 0x0000001f)<<16) ;
     
-    header[0] = energyId | 8164; // id + length
+    header[0] = energyId; // id, put in the length later
     header[1] = location;
     header[2] = 0; //spare
     header[3] = 0; //spare
@@ -220,7 +221,7 @@ bool ORSLTv4Readout::Stop()
             load = (float) 100 * nWords / nReadout / 8160;
         }
         
-        printf("%17s: mean block size %d, load %.2f %s, loops/s %lld\n", "",
+         if (debug)printf("%17s: mean block size %d, load %.2f %s, loops/s %lld\n", "",
                meanBlockSize, load, "%", maxLoopsPerSec);
 
         }
@@ -231,36 +232,37 @@ bool ORSLTv4Readout::Stop()
 
 bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
 {
+    uint32_t firstIndex = dataIndex; //so we can insert the length and/or if we have to flush
     try {
         uint32_t headerLen  = 4;
         uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
-
         if (numWordsToRead >= 8160){ // full block readout
             nNoReadout = 0; // Clear no readout
-            nReadout = nReadout + 1;
+            nReadout   = nReadout + 1;
             
             numWordsToRead = 8160;
             ensureDataCanHold(numWordsToRead + headerLen);
-
+            
             memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
             dataIndex += headerLen;
-            
+
             pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
             dataIndex += numWordsToRead;
             
-            nWords = nWords + numWordsToRead;
+            data[firstIndex] |= (numWordsToRead+headerLen); //fill in the record length
 
-        } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
-            nNoReadout = 0; // Clear no readout
-            nReadout = nReadout + 1;
+            nWords = nWords + numWordsToRead;
+        }
+        else if (numWordsToRead > 0) { // partial readout
+            nNoReadout   = 0; // Clear no readout
+            nReadout     = nReadout + 1;
             nReducedSize = nReducedSize + 1;
             
-            uint32_t firstIndex = dataIndex; //so we can insert the length
             ensureDataCanHold(numWordsToRead + headerLen);
             
             memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
             dataIndex += headerLen;
-            
+
             if (numWordsToRead < 48) {
                 numWordsToRead = (numWordsToRead/6)*6; //make sure we are on event boundary
                 for(uint32_t i=0;i<numWordsToRead; i++){
@@ -273,30 +275,32 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
                 dataIndex += numWordsToRead;
             }
         
-            data[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
-            
+            data[firstIndex] |= (numWordsToRead+headerLen); //fill in the record length
             
             nWords = nWords + numWordsToRead;
-            
-        } else { // no readout
-            nNoReadout = nNoReadout + 1;
-            
-            // Todo: Better check for inhibit here?! Are these the same values???
-            if (numWordsToRead > 0) nWaitingForReadout = nWaitingForReadout + 1;
-            
-            if (srack->theSlt->status->inhibit->read()) nInhibit = nInhibit + 1;
-            
         }
-       
-    } catch (PbusError &perr) {
-        printf("ORSLTv4Readout::ReadoutEnergyV31: Error %s\n", perr.what());
-        perr.displayMsg(stdout);
-        fflush(stdout);
+        else { // no readout
+            nNoReadout = nNoReadout + 1;
+            if (srack->theSlt->status->inhibit->read()) nInhibit = nInhibit + 1;
+        }
+    }
+    catch (PbusError &perr) {
+        LogBusErrorForCard(GetSlot(),"PBus Err: %s",perr.what());
+        dataIndex = firstIndex; //can't rely on the data buffer. flush it
+        if (debug){
+            printf("ORSLTv4Readout::ReadoutEnergyV31: Error %s\n", perr.what());
+            perr.displayMsg(stdout);
+            fflush(stdout);
+        }
     }
     
     catch(...){
-        printf("ORSLTv4Readout::ReadoutEnergyV31: Unexpected Error\n");
-        fflush(stdout);
+        LogBusErrorForCard(GetSlot(),"Bus Err: %s",strerror(errno));
+        dataIndex = firstIndex; //can't rely on the data buffer. flush it
+        if (debug){
+            printf("ORSLTv4Readout::ReadoutEnergyV31: Unexpected Error\n");
+            fflush(stdout);
+        }
     }
     
     return true;
@@ -318,11 +322,13 @@ bool ORSLTv4Readout::LocalReadoutEnergyV31(SBC_LAM_Data* lamData)
             
             numWordsToRead = 8160;
             
+            uint32_t firstIndex = bufferIndex; //so we can insert the length
             memcpy(&dataBuffer[dataIndex], header, headerLen * sizeof(uint32_t));
             bufferIndex += headerLen;
             
             pbus->readBlock(FIFO0Addr, (unsigned long*)(&dataBuffer[bufferIndex]), numWordsToRead);
-            
+            dataBuffer[firstIndex] = (header[0] & 0xfffc0000) | (numWordsToRead+headerLen); //fill in the record length
+
             nWords = nWords + numWordsToRead;
 
         } else if ((numWordsToRead > 0) && (nNoReadout > 10)) { // partial readout
@@ -347,7 +353,7 @@ bool ORSLTv4Readout::LocalReadoutEnergyV31(SBC_LAM_Data* lamData)
                 bufferIndex += numWordsToRead;
             }
             
-            dataBuffer[firstIndex] = (header[0] & 0xffff0000) | (numWordsToRead+headerLen); //fill in the record length
+            dataBuffer[firstIndex] = (header[0] & 0xfffc0000) | (numWordsToRead+headerLen); //fill in the record length
             
             nWords = nWords + numWordsToRead;
             
@@ -384,14 +390,18 @@ bool ORSLTv4Readout::LocalReadoutEnergyV31(SBC_LAM_Data* lamData)
         
         
     } catch (PbusError &perr) {
-        printf("ORSLTv4Readout::ReadoutEnergyV31: Error %s\n", perr.what());
-        perr.displayMsg(stdout);
-        fflush(stdout);
+        if (debug){
+             printf("ORSLTv4Readout::ReadoutEnergyV31: Error %s\n", perr.what());
+            perr.displayMsg(stdout);
+            fflush(stdout);
+        }
     }
     
     catch(...){
-        printf("ORSLTv4Readout::ReadoutEnergyV31: Unexpected Error\n");
-        fflush(stdout);
+        if (debug){
+            printf("ORSLTv4Readout::ReadoutEnergyV31: Unexpected Error\n");
+            fflush(stdout);
+        }
     }
     
     return true;
