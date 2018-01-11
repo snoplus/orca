@@ -1577,10 +1577,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                         object: self
                                                       userInfo: statusInfo];
     //SV - End of changes
+
+    NSMutableDictionary* robustRunInfo = [NSMutableDictionary dictionaryWithCapacity:50];
+    if(runInfo){
+        robustRunInfo = runInfo;
+    } else { // If ORCA opened in the middle of a run, runInfo won't exist so must remake.
+        robustRunInfo = [NSMutableDictionary dictionaryWithDictionary:[self runInfo]]; //
+    }
+    [nextObject preCloseOut:robustRunInfo];
     
-    [nextObject preCloseOut:runInfo];
-    
-	//get the time(UT!)
+    //get the time(UT!)
 	time_t	ut_time;
     time(&ut_time);    
 	
@@ -1598,8 +1604,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     if(_nextRunWillQuickStart)_nextRunWillQuickStart = NO;
 
 	//closeout run will wait until the processing thread is done.
-	[nextObject closeOutRun:runInfo];
-	
+    [nextObject closeOutRun:robustRunInfo];
+
 	[self setRunningState:eRunStopped];
 	
 	[dataTypeAssigner release];
@@ -1617,9 +1623,8 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORFlushLogsNotification
                                                         object: self
-                                                      userInfo: runInfo];
+                                                      userInfo: robustRunInfo];
 
-    
 	if(willRestart){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;

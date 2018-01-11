@@ -1194,7 +1194,7 @@ err:
         state = RUNNING;
     }
 
-    // Get data file object to check if there's an active logfile.
+    // Get data file object to check if there's an active datafile.
     NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
     if (![dataFileModels count]) {
         NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find ORDataFileModel!\n");
@@ -1202,9 +1202,10 @@ err:
     }
     ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
 
-    // Check if the logfile name is defined. If ORCA has just started up, it won't be
+    // Check if the datafile name is defined. If ORCA has just started up, it won't be
     if([[aDataFileModel fileName] isEqualToString:@""]){
-        [self setLogNameFormat];
+        NSLog(@"SNOPModel: There was no datafile name!\n");
+        [self setLogNameFormat]; // this should have already been called by awakeAfterDocumentLoaded, but do it here too for piece of mind
         [aDataFileModel runTaskStarted:[runControl runInfo]];
     }
 }
