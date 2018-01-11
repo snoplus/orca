@@ -221,7 +221,7 @@ bool ORSLTv4Readout::Stop()
             load = (float) 100 * nWords / nReadout / 8160;
         }
         
-         if (debug)printf("%17s: mean block size %d, load %.2f %s, loops/s %lld\n", "",
+         printf("%17s: mean block size %d, load %.2f %s, loops/s %lld\n", "",
                meanBlockSize, load, "%", maxLoopsPerSec);
 
         }
