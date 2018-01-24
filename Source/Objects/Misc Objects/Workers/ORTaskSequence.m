@@ -234,7 +234,7 @@
             if([delegate respondsToSelector:@selector(taskData:)]){
                 NSDictionary* taskData = [NSDictionary dictionaryWithObjectsAndKeys:self,@"Task",incomingText,@"Text",nil];
 
-                [delegate performSelectorOnMainThread:@selector(taskData:) withObject:taskData waitUntilDone:NO];
+                [delegate performSelectorOnMainThread:@selector(taskData:) withObject:taskData waitUntilDone:YES];
             }
         }
         if([delegate respondsToSelector:@selector(taskFinished:)]){
