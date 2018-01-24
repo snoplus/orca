@@ -73,6 +73,7 @@ typedef struct {
     NSString*           breakDownResult;
     BOOL                scheduledToSendVacReport;
     NSDate*             vacuumSpikeStarted;
+    int                 extraWaitTime;
 }
 
 - (id)          initWithDelegate:(MajoranaModel*)aDelegate slot:(int)aSlot;
