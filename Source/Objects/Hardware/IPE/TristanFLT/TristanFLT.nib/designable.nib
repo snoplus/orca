@@ -7,30 +7,31 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="ORKatrinV4FLTController">
+        <customObject id="-2" userLabel="File's Owner" customClass="ORTristanFLTController">
             <connections>
-                <outlet property="fltSlotNumTextField" destination="3222" id="3224"/>
+                <outlet property="connectButton" destination="oO5-aO-ebX" id="d2h-ah-2sZ"/>
+                <outlet property="enabledMatrix" destination="898" id="RTH-EJ-5aR"/>
+                <outlet property="gapLengthField" destination="k7z-oF-uMW" id="sQ9-1r-6Gp"/>
+                <outlet property="hostNameField" destination="OK0-ha-Ipy" id="DwN-o2-tLX"/>
                 <outlet property="initBoardButton" destination="1872" id="1875"/>
-                <outlet property="noiseFloorOffsetField" destination="3182" id="3206"/>
-                <outlet property="noiseFloorPanel" destination="3174" id="3208"/>
-                <outlet property="noiseFloorProgress" destination="3178" id="3207"/>
-                <outlet property="noiseFloorStateField" destination="3213" id="3215"/>
+                <outlet property="portField" destination="8vt-fF-L4L" id="GQZ-du-0ew"/>
                 <outlet property="postTriggerTimeField" destination="2744" id="2995"/>
                 <outlet property="rate0" destination="3963" id="3970"/>
                 <outlet property="rateLogCB" destination="1300" id="1399"/>
                 <outlet property="rateTextFields" destination="1326" id="1397"/>
                 <outlet property="settingLockButton" destination="565" id="566"/>
-                <outlet property="startNoiseFloorButton" destination="3183" id="3212"/>
+                <outlet property="shapingLengthField" destination="dCN-H1-mig" id="7a8-nE-akN"/>
+                <outlet property="slotNumField" destination="3222" id="kbs-tQ-JXV"/>
                 <outlet property="tabView" destination="1184" id="1480"/>
-                <outlet property="targetRateField" destination="3230" id="3235"/>
-                <outlet property="thresholdTextFields" destination="662" id="878"/>
+                <outlet property="thresholdMatrix" destination="662" id="v0H-Xi-aY1"/>
                 <outlet property="timeRateLogCB" destination="1463" id="1465"/>
                 <outlet property="timeRatePlot" destination="3258" id="3263"/>
                 <outlet property="totalHitRateField" destination="1395" id="1466"/>
                 <outlet property="totalRate" destination="3964" id="3972"/>
                 <outlet property="totalRateLogCB" destination="1376" id="1401"/>
                 <outlet property="totalView" destination="2" id="3586"/>
-                <outlet property="triggerEnabledCBs" destination="898" id="922"/>
+                <outlet property="udpConnectedField" destination="99D-Mh-d4X" id="Gfn-z4-ZeR"/>
+                <outlet property="udpFrameSizeField" destination="gaJ-UW-dNU" id="g3f-rB-TIK"/>
                 <outlet property="window" destination="21" id="307"/>
             </connections>
         </customObject>
@@ -87,37 +88,101 @@
                         <tabViewItems>
                             <tabViewItem label="Settings" identifier="" id="1185">
                                 <view key="view" id="1187">
-                                    <rect key="frame" x="10" y="25" width="417" height="379"/>
+                                    <rect key="frame" x="10" y="29" width="417" height="375"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Serial Port" id="595">
-                                            <rect key="frame" x="14" y="245" width="260" height="128"/>
+                                            <rect key="frame" x="14" y="241" width="260" height="128"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="iWR-qe-1Lq">
                                                 <rect key="frame" x="2" y="2" width="256" height="111"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="WLo-Fv-8Sb">
+                                                        <rect key="frame" x="18" y="84" width="63" height="13"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="IP Address:" id="Z7X-gW-eTd">
+                                                            <font key="font" metaFont="label"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="OK0-ha-Ipy">
+                                                        <rect key="frame" x="87" y="81" width="110" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="888.888.888.888" drawsBackground="YES" id="fay-9l-NJM">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="hostNameAction:" target="-2" id="38C-cg-CWM"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="QJb-fM-p0q">
+                                                        <rect key="frame" x="18" y="60" width="63" height="13"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Port:" id="3MT-ZB-zwC">
+                                                            <font key="font" metaFont="label"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="8vt-fF-L4L">
+                                                        <rect key="frame" x="87" y="57" width="110" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="666" drawsBackground="YES" id="AFB-nz-Pas">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="portAction:" target="-2" id="pha-r4-8oD"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="oO5-aO-ebX">
+                                                        <rect key="frame" x="82" y="25" width="120" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Connect" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="Q2i-up-0jW">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="connectAction:" target="-2" id="mpl-Ej-ScM"/>
+                                                        </connections>
+                                                    </button>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="99D-Mh-d4X">
+                                                        <rect key="frame" x="85" y="8" width="116" height="13"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="?" id="9gw-B4-3XX">
+                                                            <font key="font" metaFont="label"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                </subviews>
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Filter Parameters" id="3006">
-                                            <rect key="frame" x="279" y="245" width="140" height="130"/>
+                                            <rect key="frame" x="279" y="241" width="140" height="130"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="enX-Fg-qYe">
                                                 <rect key="frame" x="1" y="1" width="138" height="114"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="3011">
-                                                        <rect key="frame" x="13" y="38" width="47" height="17"/>
+                                                        <rect key="frame" x="15" y="37" width="54" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Shaping" id="3014">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Shaping:" id="3014">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="3010">
-                                                        <rect key="frame" x="26" y="66" width="34" height="17"/>
+                                                        <rect key="frame" x="35" y="63" width="34" height="17"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Gap" id="3015">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Gap:" id="3015">
                                                             <font key="font" metaFont="label"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -132,7 +197,7 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <action selector="postTriggerTimeAction:" target="-2" id="BAO-qs-Mcy"/>
+                                                            <action selector="gapLengthAction:" target="-2" id="W4p-AK-CbQ"/>
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="dCN-H1-mig">
@@ -144,14 +209,14 @@
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <action selector="postTriggerTimeAction:" target="-2" id="z3a-e2-lHd"/>
+                                                            <action selector="shapingLengthAction:" target="-2" id="M1C-iZ-qxW"/>
                                                         </connections>
                                                     </textField>
                                                 </subviews>
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Chan Values" id="875">
-                                            <rect key="frame" x="14" y="24" width="260" height="220"/>
+                                            <rect key="frame" x="14" y="20" width="260" height="220"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="naL-Oh-mp3">
                                                 <rect key="frame" x="2" y="2" width="256" height="203"/>
@@ -353,7 +418,7 @@
                                                             </column>
                                                         </cells>
                                                         <connections>
-                                                            <action selector="triggerEnableAction:" target="-2" id="921"/>
+                                                            <action selector="enableAction:" target="-2" id="gg3-m4-wpZ"/>
                                                         </connections>
                                                     </matrix>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="871">
@@ -369,23 +434,14 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Misc HW Settings" id="2907">
-                                            <rect key="frame" x="279" y="146" width="147" height="98"/>
+                                            <rect key="frame" x="279" y="142" width="147" height="98"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="KKy-KN-lvH">
                                                 <rect key="frame" x="1" y="1" width="145" height="82"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="2748">
-                                                        <rect key="frame" x="34" y="25" width="61" height="16"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="(x50ns)" id="2853">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="2744">
-                                                        <rect key="frame" x="93" y="39" width="41" height="19"/>
+                                                        <rect key="frame" x="85" y="50" width="41" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="0" drawsBackground="YES" id="2851">
                                                             <font key="font" metaFont="smallSystem"/>
@@ -397,9 +453,30 @@
                                                         </connections>
                                                     </textField>
                                                     <textField verticalHuggingPriority="750" misplaced="YES" id="2746">
-                                                        <rect key="frame" x="7" y="38" width="82" height="18"/>
+                                                        <rect key="frame" x="-1" y="49" width="82" height="18"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Post Trigger" id="2852">
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Post Trigger:" id="2852">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="gaJ-UW-dNU">
+                                                        <rect key="frame" x="84" y="21" width="43" height="19"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" title="65000" drawsBackground="YES" id="hrb-xd-oxU">
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="udpFrameSizeAction:" target="-2" id="Kwq-1g-wUc"/>
+                                                        </connections>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="5Tq-vy-USa">
+                                                        <rect key="frame" x="0.0" y="20" width="82" height="18"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Frame Size:" id="TS0-4t-ojI">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -409,14 +486,25 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="1872">
-                                            <rect key="frame" x="308" y="108" width="88" height="28"/>
+                                            <rect key="frame" x="295" y="104" width="114" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2845">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="initBoardButtonAction:" target="-2" id="1877"/>
+                                                <action selector="initBoardAction:" target="-2" id="Tsl-jz-VMB"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="z2j-G5-AhU">
+                                            <rect key="frame" x="295" y="18" width="114" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Load Thresholds" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="dmH-2K-hkq">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="loadThresholdsAction:" target="-2" id="sGr-eW-oih"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -432,7 +520,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="kxg-TX-4B5">
                                                 <rect key="frame" x="0.0" y="0.0" width="419" height="434"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <matrix verticalHuggingPriority="750" misplaced="YES" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="1326">
                                                         <rect key="frame" x="63" y="275" width="67" height="126"/>
@@ -682,7 +770,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="308"/>
             </connections>
-            <point key="canvasLocation" x="-130" y="2"/>
+            <point key="canvasLocation" x="-451" y="-61"/>
         </window>
         <customObject id="318" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <window title="Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="3174" userLabel="ThresholdFinder" customClass="NSPanel">
@@ -702,9 +790,6 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
-                        <connections>
-                            <action selector="findNoiseFloors:" target="-2" id="3202"/>
-                        </connections>
                     </button>
                     <textField toolTip="Value added to LED threshold when finished" verticalHuggingPriority="750" misplaced="YES" id="3182">
                         <rect key="frame" x="31" y="21" width="39" height="19"/>
@@ -714,9 +799,6 @@
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
-                        <connections>
-                            <action selector="noiseFloorOffsetAction:" target="-2" id="3204"/>
-                        </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" id="3181">
                         <rect key="frame" x="28" y="87" width="322" height="34"/>
@@ -735,9 +817,6 @@
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
-                        <connections>
-                            <action selector="targetRateAction:" target="-2" id="3236"/>
-                        </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="3231">
                         <rect key="frame" x="75" y="51" width="106" height="15"/>
@@ -764,9 +843,6 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
                         </buttonCell>
-                        <connections>
-                            <action selector="closeNoiseFloorPanel:" target="-2" id="3200"/>
-                        </connections>
                     </button>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="3178">
                         <rect key="frame" x="275" y="50" width="16" height="16"/>

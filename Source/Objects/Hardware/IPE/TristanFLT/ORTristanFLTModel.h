@@ -23,25 +23,45 @@
 #import "ORHWWizard.h"
 #import "ORDataTaker.h"
 #import "SBC_Config.h"
+#import "ORUDPConnection.h"
 
 #pragma mark ***Forward Definitions
 @class ORDataPacket;
 @class ORTimeRate;
 @class ORRateGroup;
 
-#define kNumTristanFLTChannels         8
+#define kNumTristanFLTChannels      8
 
-@interface ORTristanFLTModel : ORIpeCard <ORDataTaker,ORHWWizard>
+#define kTristanFltControl        0x0
+#define kTristanFltFilterSet      0x1
+#define kTristanFltTriggerDisable 0x2
+#define kTristanFltTraceCntrl     0x3
+#define kTristanFltCommand        0x4
+#define kTristanFltRtmDacCntrl    0x5
+#define kTristanFltRtmAdcCntrl    0x6
+#define kTristanFltIICCntrl       0x7
+#define kTristanFltThreshold      0x8
+
+#define kTristanFLTSW             0x1
+
+@interface ORTristanFLTModel : ORIpeCard <ORUDPConnectionDelegate,ORDataTaker,ORHWWizard>
 {
-    unsigned short shapingLength;
-    unsigned short gapLength;
-    unsigned short postTriggerTime;
+    BOOL            firstTime;
+    unsigned short  shapingLength;
+    unsigned short  gapLength;
+    unsigned short  postTriggerTime;
+    unsigned short  udpFrameSize;
     ORTimeRate*     totalRate;
+    unsigned long   dataId;
     BOOL            enabled[kNumTristanFLTChannels];
     unsigned long   threshold[kNumTristanFLTChannels];
-    unsigned long   dataId;
     unsigned long   eventCount[kNumTristanFLTChannels];
-  }
+    ORUDPConnection*    client;
+    NSString*       hostName;
+    int             port;
+    BOOL            udpConnected;
+
+}
 
 #pragma mark ***Initialization
 - (id) init;
@@ -57,16 +77,17 @@
 #pragma mark ***Notifications
 - (void) registerNotificationObservers;
 - (void) runIsAboutToStop:(NSNotification*)aNote;
-- (void) runIsAboutToChangeState:(NSNotification*)aNote;
 - (void) reset;
 
 #pragma mark ***Accessors
 - (unsigned short) shapingLength;
 - (void) setShapingLength:(unsigned short)aValue;
 - (int) gapLength;
-- (void) setGapLength:(int)aGapLength;
+- (void) setGapLength:(int)aValue;
 - (unsigned short) postTriggerTime;
-- (void) setPostTriggerTime:(unsigned short)aPostTriggerTime;
+- (void) setPostTriggerTime:(unsigned short)aValue;
+- (unsigned short) udpFrameSize;
+- (void) setUdpFrameSize:(unsigned short)aValue;
 -(BOOL) enabled:(unsigned short) aChan;
 -(void) setEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 - (unsigned long) threshold:(unsigned short)aChan;
@@ -74,9 +95,19 @@
 - (void) setTotalRate:(ORTimeRate*)newTimeRate;
 - (void) setToDefaults;
 - (void) initBoard;
+- (ORUDPConnection*) client;
+- (void) setClient:(ORUDPConnection*)aSocket;
+- (NSString*) hostName;
+- (void) setHostName:(NSString*)aString;
+- (NSUInteger) port;
+- (void) setPort:(NSUInteger)aValue;
+- (BOOL) udpConnected;
+- (void) setUpdConnected:(BOOL)aState;
+- (void) sendData:(NSData*)someData;
 
 #pragma mark ***HW Access
 - (void) loadThresholds;
+- (void) startClient;
 
 #pragma mark ***Data Taking
 - (unsigned long) dataId;
@@ -98,10 +129,17 @@
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
 
+#pragma mark ***Communication
+- (void) loadThresholds;
+- (void) forceTrigger;
+- (void) loadFilterParameters;
+- (void) enableChannels;
+- (void) disableAllChannels;
+- (void) loadTraceControl;
+
 #pragma mark ***archival
 - (id)initWithCoder:(NSCoder*)decoder;
 - (void)encodeWithCoder:(NSCoder*)encoder;
-
 @end
 
 extern NSString* ORTristanFLTModelEnabledChanged;
@@ -110,5 +148,9 @@ extern NSString* ORTristanFLTModelGapLengthChanged;
 extern NSString* ORTristanFLTModelThresholdsChanged;
 extern NSString* ORTristanFLTModelPostTriggerTimeChanged;
 extern NSString* ORTristanFLTModelFrameSizeChanged;
+extern NSString* ORTristanFLTModelRunningChanged;
+extern NSString* ORTristanFLTModelUdpFrameSizeChanged;
 extern NSString* ORTristanFLTSettingsLock;
-
+extern NSString* ORTristanFLTModelHostNameChanged;
+extern NSString* ORTristanFLTModelPortChanged;
+extern NSString* ORTristanFLTModelUdpConnectedChanged;

@@ -79,13 +79,33 @@ static NSString* kStationKey[32] = {
 	unsigned long length	= ExtractLength(ptr[0]);								 
 	unsigned char crate		= ShiftAndExtract(ptr[1],21,0x0f);
 	unsigned char card		= ShiftAndExtract(ptr[1],16,0x1f);
-	unsigned char chan		= ShiftAndExtract(ptr[1], 8,0xff);
-	
-	NSString* crateKey		= [self getCrateKey: crate];
-	NSString* stationKey	= [self getStationKey: card];	
-	//NSString* channelKey	= [self getChannelKey: chan];
-
     
+    NSLog(@"1: 0x%08x\n",ptr[2]);
+    unsigned char type      = ShiftAndExtract(ptr[2],12,0xff);
+    unsigned char trigID    = ShiftAndExtract(ptr[2], 8,0xff);
+    unsigned char frameN    = ShiftAndExtract(ptr[2], 4,0xff);
+    unsigned char chan      = ShiftAndExtract(ptr[2], 0,0xff);
+
+    NSLog(@"type: %02x\n",type);
+    NSLog(@"trigID: %02x\n",trigID);
+    NSLog(@"frameN: %04x\n",frameN);
+    NSLog(@"chan: %04x\n",chan);
+
+//    unsigned char type      = ShiftAndExtract(ptr[2],12,0xff);
+//    unsigned char trigID    = ShiftAndExtract(ptr[2], 8,0xff);
+    
+	NSString* crateKey		= [self getCrateKey:  crate];
+    NSString* stationKey    = [self getStationKey: card];
+    NSString* chanKey       = [self getChannelKey: chan];
+
+    NSData* waveFormdata = [NSData dataWithBytes:someData length:length];
+    NSLog(@"%@\n",waveFormdata);
+    [aDataSet loadWaveform:waveFormdata
+                    offset:0 //bytes!
+                  unitSize:2 //unit size in bytes!
+                    sender:self
+                  withKeys:@"TristanFLT",@"Waveforms",crateKey,stationKey,chanKey,nil];
+
     
 	//get the actual object
 	if(getRatesFromDecodeStage){
@@ -115,7 +135,7 @@ static NSString* kStationKey[32] = {
     NSString* card  = [NSString stringWithFormat:@"Station    = %lu\n",ShiftAndExtract(ptr[1],16,0x1f)];
     NSString* chan  = [NSString stringWithFormat:@"Channel    = %lu\n",ShiftAndExtract(ptr[1],8,0xff)];
 		
-    return [NSString stringWithFormat:@"%@%@%@%@%@%@%@%@%@%@%@%@",title,crate,card,chan];
+    return [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];
     	
 }
 

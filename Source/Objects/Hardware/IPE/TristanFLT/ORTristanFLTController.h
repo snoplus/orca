@@ -32,25 +32,27 @@
         IBOutlet NSTextField*   shapingLengthField;
         IBOutlet NSMatrix*      thresholdMatrix;
         IBOutlet NSMatrix*      enabledMatrix;
-
-        IBOutlet NSButton*		settingLockButton;
+        IBOutlet NSTextField*   udpFrameSizeField;
 		IBOutlet NSTextField*   postTriggerTimeField;
+        IBOutlet NSTextField*   slotNumField;
 		IBOutlet NSButton*		initBoardButton;
-		IBOutlet NSMatrix*		thresholdFields;
-		IBOutlet NSMatrix*		enabledCBs;
 		IBOutlet NSButton*		defaultsButton;
-        IBOutlet NSTextField* slotNumField;
-    
+        IBOutlet NSButton*      settingLockButton;
+        IBOutlet NSButton*      connectButton;
+        IBOutlet NSTextField*   hostNameField;
+        IBOutlet NSTextField*   portField;
+        IBOutlet NSTextField*   udpConnectedField;
+
 		//rate page
-		IBOutlet NSMatrix*		rateTextFields;
+		IBOutlet NSMatrix*		            rateTextFields;
 		IBOutlet ORValueBarGroupView*		rate0;
 		IBOutlet ORValueBarGroupView*		totalRate;
 		IBOutlet NSButton*					rateLogCB;
 		IBOutlet ORCompositeTimeLineView*	timeRatePlot;
-		IBOutlet NSButton*		timeRateLogCB;
-		IBOutlet NSButton*		totalRateLogCB;
-		IBOutlet NSTextField*	totalHitRateField;
-		IBOutlet NSView*		totalView;
+		IBOutlet NSButton*		            timeRateLogCB;
+		IBOutlet NSButton*		            totalRateLogCB;
+		IBOutlet NSTextField*	            totalHitRateField;
+		IBOutlet NSView*		            totalView;
 		
 		NSNumberFormatter*		rateFormatter;
 		NSSize					settingSize;
@@ -68,6 +70,7 @@
 - (void) updateWindow;
 
 #pragma mark ***Interface Management
+- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
 - (void) shapingLengthChanged:(NSNotification*)aNote;
 - (void) gapLengthChanged:(NSNotification*)aNote;
 - (void) postTriggerTimeChanged:(NSNotification*)aNote;
@@ -77,7 +80,8 @@
 - (void) thresholdChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) totalRateChanged:(NSNotification*)aNote;
-- (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem;
+- (void) hostNameChanged:(NSNotification*)aNote;
+- (void) portChanged:(NSNotification*)aNote;
 
 #pragma mark ***Security
 - (void) checkGlobalSecurity;
@@ -89,12 +93,17 @@
 - (IBAction) gapLengthAction:(id)sender;
 - (IBAction) postTriggerTimeAction:(id)sender;
 - (IBAction) setDefaultsAction: (id) sender;
-- (IBAction) writeThresholdsGains:(id)sender;
+- (IBAction) writeThresholds:(id)sender;
 - (IBAction) thresholdAction:(id)sender;
 - (IBAction) enableAction:(id)sender;
-- (IBAction) initBoardButtonAction:(id)sender;
+- (IBAction) initBoardAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
 - (IBAction) resetAction: (id) sender;
+- (IBAction) loadThresholdsAction: (id) sender;
+- (IBAction) udpFrameSizeAction:(id)sender;
+- (IBAction) hostNameAction:(id)sender;
+- (IBAction) portAction:(id)sender;
+- (IBAction) connectAction:(id)sender;
 
 #pragma mark ***Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter;

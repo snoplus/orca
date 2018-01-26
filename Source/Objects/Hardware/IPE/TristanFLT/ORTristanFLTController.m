@@ -73,11 +73,9 @@
     [[rate0 xAxis] setRngLimitsLow:0 withHigh:5000000 withMinRng:5];
     
     [[totalRate xAxis] setRngLimitsLow:0 withHigh:24*1000000 withMinRng:5];
-    NSNumberFormatter* valueFormatter = [[[NSNumberFormatter alloc] init] autorelease];
-    [valueFormatter setFormat:@"#0.00;0;-#0.00"];
 	int i;
 	for(i=0;i<kNumTristanFLTChannels;i++){
-        [[thresholdFields cellWithTag:i] setFormatter:valueFormatter ];
+        [[thresholdMatrix cellWithTag:i] setTag:i ];
 	}
 	[self updateWindow];
 }
@@ -144,10 +142,71 @@
     [notifyCenter addObserver : self
                      selector : @selector(postTriggerTimeChanged:)
                          name : ORTristanFLTModelPostTriggerTimeChanged
-						object: model];
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(udpFrameSizeChanged:)
+                         name :     ORTristanFLTModelUdpFrameSizeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(hostNameChanged:)
+                         name : ORTristanFLTModelHostNameChanged
+                       object : model ] ;
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(portChanged:)
+                         name : ORTristanFLTModelPortChanged
+                       object : model ] ;
+
+    [notifyCenter addObserver : self
+                     selector : @selector(udpConnectedChanged:)
+                         name : ORTristanFLTModelUdpConnectedChanged
+                       object : model ] ;
+
 }
 
 #pragma mark ***Interface Management
+- (void) updateWindow
+{
+    [super updateWindow];
+    [self slotChanged:nil];
+    [self thresholdChanged:nil];
+    [self enabledChanged:nil];
+    [self totalRateChanged:nil];
+    [self scaleAction:nil];
+    [self miscAttributesChanged:nil];
+    [self postTriggerTimeChanged:nil];
+    [self settingsLockChanged:nil];
+    [self gapLengthChanged:nil];
+    [self shapingLengthChanged:nil];
+    [self udpFrameSizeChanged:nil];
+    [self hostNameChanged:nil];
+    [self portChanged:nil];
+    [self udpConnectedChanged:nil];
+}
+
+- (void) udpConnectedChanged:(NSNotification*)aNote
+{
+    if([model udpConnected]){
+        [udpConnectedField setStringValue:@"Connected"];
+        [connectButton setTitle:@"Disconnect"];
+    }
+    else {
+        [udpConnectedField setStringValue:@"Not Connected"];
+        [connectButton setTitle:@"Connect"];
+    }
+}
+
+- (void) hostNameChanged:(NSNotification*)aNote
+{
+    [hostNameField setStringValue:[model hostName]];
+}
+
+- (void) portChanged:(NSNotification*)aNote
+{
+    [portField setIntValue:[(ORTristanFLTModel*)model  port]];
+}
 
 - (void) shapingLengthChanged:(NSNotification*)aNote
 {
@@ -159,21 +218,45 @@
 	[gapLengthField setIntValue: [model gapLength]];
 }
 
-
-- (void) updateWindow
+- (void) enabledChanged:(NSNotification*)aNotification
 {
-    [super updateWindow];
-    [self slotChanged:nil];
-	[self thresholdChanged:nil];
-	[self enabledChanged:nil];
-    [self totalRateChanged:nil];
-	[self scaleAction:nil];
-    [self miscAttributesChanged:nil];
-	[self postTriggerTimeChanged:nil];
-    [self settingsLockChanged:nil];
-	[self gapLengthChanged:nil];
-	[self shapingLengthChanged:nil];
+    int i;
+    for(i=0;i<kNumTristanFLTChannels;i++){
+        [[enabledMatrix cellWithTag:i] setState: [model enabled:i]];
+    }
 }
+
+- (void) thresholdChanged:(NSNotification*)aNotification
+{
+    int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
+    [[thresholdMatrix cellWithTag:chan] setIntValue: [model threshold:chan]];
+}
+
+- (void) postTriggerTimeChanged:(NSNotification*)aNotification
+{
+    [postTriggerTimeField setIntValue: [model postTriggerTime]];
+}
+
+- (void) udpFrameSizeChanged:(NSNotification*)aNotification
+{
+    [udpFrameSizeField setIntValue: [model udpFrameSize]];
+}
+
+- (void) slotChanged:(NSNotification*)aNotification
+{
+    // for FLTv4 'slot' goes from 0-9, 11-20 (SLTv4 has slot 10)
+    [[self window] setTitle:[NSString stringWithFormat:@"TristanFLT Card (Slot %d, TristanFLT# %d)",[model slot]+1,[model stationNumber]]];
+    [slotNumField setStringValue: [NSString stringWithFormat:@"# %d",[model stationNumber]]];
+}
+
+- (void) totalRateChanged:(NSNotification*)aNote
+{
+    if(aNote==nil || [aNote object] == [model totalRate]){
+        [timeRatePlot setNeedsDisplay:YES];
+    }
+}
+
+
 
 - (void) checkGlobalSecurity
 {
@@ -263,41 +346,6 @@
 }
 
 
-- (void) enabledChanged:(NSNotification*)aNotification
-{
-	int i;
-	for(i=0;i<kNumTristanFLTChannels;i++){
-		[[enabledMatrix cellWithTag:i] setState: [model enabled:i]];
-	}
-}
-
-- (void) thresholdChanged:(NSNotification*)aNotification
-{
-	int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
-    [[thresholdMatrix cellWithTag:chan] setIntValue: [model threshold:chan]];
-}
-
-- (void) postTriggerTimeChanged:(NSNotification*)aNotification
-{
-    [postTriggerTimeField setIntValue: [model postTriggerTime]];
-}
-
-- (void) slotChanged:(NSNotification*)aNotification
-{
-	// for FLTv4 'slot' goes from 0-9, 11-20 (SLTv4 has slot 10)
-	[[self window] setTitle:[NSString stringWithFormat:@"TristanFLT Card (Slot %d, TristanFLT# %d)",[model slot]+1,[model stationNumber]]];
-    [slotNumField setStringValue: [NSString stringWithFormat:@"# %d",[model stationNumber]]];
-}
-
-- (void) totalRateChanged:(NSNotification*)aNote
-{
-	if(aNote==nil || [aNote object] == [model totalRate]){
-		[timeRatePlot setNeedsDisplay:YES];
-	}
-}
-
-
-
 - (void) tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
 {
     [[self window] setContentView:blankView];
@@ -314,19 +362,21 @@
 }
 
 #pragma mark ***Actions
-
 - (IBAction) shapingLengthAction:(id)sender
 {
-	[model setShapingLength:[[sender selectedCell] tag]];
+    [self endEditing];
+	[model setShapingLength:[sender intValue]];
 }
 
 - (IBAction) gapLengthAction:(id)sender
 {
-	[model setGapLength:[sender indexOfSelectedItem]];	
+    [self endEditing];
+	[model setGapLength:[sender intValue]];
 }
 
 - (IBAction) postTriggerTimeAction:(id)sender
 {
+    [self endEditing];
     [model setPostTriggerTime:[sender intValue]];
 }
 
@@ -336,22 +386,15 @@
     [model setToDefaults];
 }
 
-- (IBAction) writeThresholdsGains:(id)sender
+- (IBAction) writeThresholds:(id)sender
 {
 	[self endEditing];
-	@try {
-		[model loadThresholds];
-	}
-	@catch(NSException* localException) {
-		NSLog(@"Exception writing TristanFLT thresholds\n");
-        ORRunAlertPanel([localException name], @"%@\nWrite of TristanFLT %d failed", @"OK", nil, nil,
-                        localException,[model stationNumber]);
-	}
+    [model loadThresholds];
 }
-
 
 - (IBAction) thresholdAction:(id)sender
 {
+    [self endEditing];
     [model setThreshold:[[sender selectedCell] tag] withValue: [sender intValue]];
 }
 
@@ -361,7 +404,7 @@
 	[model setEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) initBoardButtonAction:(id)sender
+- (IBAction) initBoardAction:(id)sender
 {
 	[self endEditing];
     [model initBoard];
@@ -377,6 +420,32 @@
     [model reset];
 }
 
+- (IBAction) loadThresholdsAction: (id) sender
+{
+    [self endEditing];
+    [model loadThresholds];
+}
+
+- (IBAction) udpFrameSizeAction:(id)sender
+{
+    [self endEditing];
+    [model setUdpFrameSize:[sender intValue]];
+}
+
+- (IBAction) hostNameAction:(id)sender
+{
+    [model setHostName:[sender stringValue]];
+}
+
+- (IBAction) portAction:(id)sender
+{
+    [(ORTristanFLTModel*)model setPort:[sender intValue]];
+}
+- (IBAction) connectAction:(id)sender
+{
+   [model startClient];
+}
+
 #pragma mark ***Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {
@@ -390,6 +459,9 @@
 	*yValue =  [[model totalRate] valueAtIndex:index];
 	*xValue =  [[model totalRate] timeSampledAtIndex:index];
 }
+
+
+
 
 @end
 

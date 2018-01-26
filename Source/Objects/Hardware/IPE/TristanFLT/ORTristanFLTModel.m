@@ -23,6 +23,7 @@
 #import "ORHWWizSelection.h"
 #import "ORDataTypeAssigner.h"
 #import "ORTimeRate.h"
+#import "ORDataTaskModel.h"
 
 NSString* ORTristanFLTModelEnabledChanged            = @"ORTristanFLTModelEnabledChanged";
 NSString* ORTristanFLTModelShapingLengthChanged      = @"ORTristanFLTModelShapingLengthChanged";
@@ -30,6 +31,11 @@ NSString* ORTristanFLTModelGapLengthChanged          = @"ORTristanFLTModelGapLen
 NSString* ORTristanFLTModelThresholdsChanged         = @"ORTristanFLTModelThresholdsChanged";
 NSString* ORTristanFLTModelPostTriggerTimeChanged    = @"ORTristanFLTModelPostTriggerTimeChanged";
 NSString* ORTristanFLTModelFrameSizeChanged          = @"ORTristanFLTModelFrameSizeChanged";
+NSString* ORTristanFLTModelRunningChanged            = @"ORTristanFLTModelRunningChanged";
+NSString* ORTristanFLTModelUdpFrameSizeChanged       = @"ORTristanFLTModelUdpFrameSizeChanged";
+NSString* ORTristanFLTModelHostNameChanged           = @"ORTristanFLTModelHostNameChanged";
+NSString* ORTristanFLTModelPortChanged               = @"ORTristanFLTModelPortChanged";
+NSString* ORTristanFLTModelUdpConnectedChanged       = @"ORTristanFLTModelUdpConnectedChanged";
 NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLock";
 
 @interface ORTristanFLTModel (private)
@@ -37,7 +43,6 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 - (void) addCurrentState:(NSMutableDictionary*)dictionary longArray:(unsigned long*)anArray forKey:(NSString*)aKey;
 - (int)  restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
 @end
-
 @implementation ORTristanFLTModel
 
 - (id) init
@@ -51,6 +56,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+    [client release];
 	[super dealloc];
 }
 
@@ -101,6 +107,46 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 - (ORTimeRate*) totalRate   { return totalRate; }
 
+- (ORUDPConnection*) client
+{
+    if(client==nil){
+        client = [[ORUDPConnection alloc] init];
+    }
+    return client;
+}
+
+- (void) setClient:(ORUDPConnection*)aClient
+{
+    [aClient retain];
+    [client release];
+    client = aClient;
+}
+- (NSString*) hostName
+{
+    if(!hostName)return @"";
+    else return hostName;
+}
+
+- (void) setHostName:(NSString*)aString
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setHostName:hostName];
+    [hostName autorelease];
+    hostName = [aString copy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTristanFLTModelHostNameChanged object:self];
+}
+
+- (NSUInteger) port
+{
+    return port;
+}
+
+- (void) setPort:(NSUInteger)aValue
+{
+    [(ORTristanFLTModel*)[[self undoManager] prepareWithInvocationTarget:self] setPort:port];
+    port = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTristanFLTModelPortChanged object:self];
+}
+
 #pragma mark ***Notifications
 - (void) registerNotificationObservers
 {
@@ -108,29 +154,26 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
  	[notifyCenter removeObserver:self]; //guard against a double register
    
     [notifyCenter addObserver : self
-                     selector : @selector(runIsAboutToChangeState:)
-                         name : ORRunAboutToChangeState
-                       object : nil];
-					   
-    [notifyCenter addObserver : self
                      selector : @selector(runIsAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
 }
 
-- (void) runIsAboutToStop:(NSNotification*)aNote
-{
-}
-
-- (void) runIsAboutToChangeState:(NSNotification*)aNote
-{
-  //  int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
-}
 - (void) reset
 {
 }
 
 #pragma mark ***Accessors
+- (BOOL) udpConnected
+{
+    return udpConnected;
+}
+- (void) setUpdConnected:(BOOL)aState
+{
+    udpConnected = aState;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTristanFLTModelUdpConnectedChanged object:self];
+}
+
 - (unsigned short) shapingLength
 {
     return shapingLength;
@@ -160,11 +203,22 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     return postTriggerTime;
 }
 
-- (void) setPostTriggerTime:(unsigned short)aPostTriggerTime
+- (void) setPostTriggerTime:(unsigned short)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:0 max:0xf];
+    postTriggerTime = [self restrictIntValue:aValue min:0 max:0xffff];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTristanFLTModelPostTriggerTimeChanged object:self];
+}
+- (unsigned short) udpFrameSize
+{
+    return udpFrameSize;
+}
+
+- (void) setUdpFrameSize:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setUdpFrameSize:udpFrameSize];
+    udpFrameSize = [self restrictIntValue:aValue min:0 max:0xffff];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTristanFLTModelUdpFrameSizeChanged object:self];
 }
 
 - (BOOL) enabled:(unsigned short) aChan
@@ -210,7 +264,9 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 - (void) initBoard
 {
-
+    [self loadThresholds];
+    [self loadTraceControl];
+    [self loadFilterParameters];
 }
 
 #pragma mark Data Taking
@@ -267,12 +323,25 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     // Add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORTristanFLTModel"];    
     //----------------------------------------------------------------------------------------	
+    firstTime = YES;
 
     [self initBoard];
 }
 
+//-------------------------------------------------------------
+//The data taking process is called from a thread.
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
-{	
+{
+    if(firstTime){
+        [self enableChannels];
+    }
+    firstTime = NO;
+}
+//-------------------------------------------------------------
+
+- (void) runIsAboutToStop:(NSNotification*)aNote
+{
+    [self disableAllChannels];
 }
 
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -291,12 +360,6 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
         ++eventCount[channel];
     }
     return YES;
-}
-
-#pragma mark ***HW Access
-- (void) loadThresholds
-{
-    
 }
 
 #pragma mark ***HW Wizard
@@ -388,6 +451,165 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 	else return nil;
 }
 
+#pragma mark ***HW Access
+- (void) enableChannels
+{
+    unsigned long data = 0x0;
+    int i;
+    for(i=0;i<kNumTristanFLTChannels;i++){
+        data |= ((enabled[i]&0x1)<<i);
+    }
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltTriggerDisable,~data]; //???inverted to disable
+    
+    NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
+    
+    [self sendData:cmdAsData];
+
+    
+    NSLog(@"Trigger Disable: %@",cmd);
+}
+
+- (void) disableAllChannels
+{
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08x\r",kTristanFltTriggerDisable,0xFF]; //??? high disables ???
+    NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
+    [self sendData:cmdAsData];
+    NSLog(@"Trigger Disable: %@",cmd);
+}
+
+- (void) loadThresholds
+{
+    //eventually there will be 8 channels. this test version only sends the first channel
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltThreshold,threshold[0]];
+    NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
+    [self sendData:cmdAsData];
+    NSLog(@"Threshold Cmd: %@",cmd);
+}
+
+- (void) forceTrigger
+{
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08x\r",kTristanFltCommand,kTristanFLTSW];
+    NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
+    [self sendData:cmdAsData];
+    NSLog(@"SW Trigger Cmd: %@",cmd);
+}
+
+- (void) loadFilterParameters
+{
+    unsigned long data = ((gapLength&0xf)<<4) | (shapingLength & 0xf);
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltFilterSet,data];
+    NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
+    [self sendData:cmdAsData];
+    NSLog(@"Filter Cmd: %@",cmd);
+}
+
+- (void) loadTraceControl
+{
+    unsigned long data = ((postTriggerTime&0xffff)<<8) | (udpFrameSize & 0xffff);
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltTraceCntrl,data];
+    NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
+    [self sendData:cmdAsData];
+    NSLog(@"Trace Cmd: %@",cmd);
+}
+- (void) startClient
+{
+    if(!udpConnected)[client startConnectedToHostName:hostName port:port];
+    else [client stop];
+}
+
+- (void) sendData:(NSData*)someData
+{
+     if(udpConnected){
+        [client sendData:someData];
+    }
+}
+
+- (NSString *) DisplayStringFromData:(NSData *)data
+// Returns a human readable string for the given data.
+{
+    NSMutableString *   result;
+    NSUInteger          dataLength;
+    NSUInteger          dataIndex;
+    const uint8_t *     dataBytes;
+    
+    assert(data != nil);
+    
+    dataLength = [data length];
+    dataBytes  = [data bytes];
+    
+    result = [NSMutableString stringWithCapacity:dataLength];
+    assert(result != nil);
+    
+    [result appendString:@"\""];
+    for (dataIndex = 0; dataIndex < dataLength; dataIndex++) {
+        uint8_t     ch;
+        
+        ch = dataBytes[dataIndex];
+        if (ch == 10) {
+            [result appendString:@"\n"];
+        } else if (ch == 13) {
+            [result appendString:@"\r"];
+        } else if (ch == '"') {
+            [result appendString:@"\\\""];
+        } else if (ch == '\\') {
+            [result appendString:@"\\\\"];
+        } else if ( (ch >= ' ') && (ch < 127) ) {
+            [result appendFormat:@"%c", (int) ch];
+        } else {
+            [result appendFormat:@"\\x%02x", (unsigned int) ch];
+        }
+    }
+    [result appendString:@"\""];
+    
+    return result;
+}
+
+- (void) udpConnection:(ORUDPConnection*)echo didReceiveData:(NSData*)udpData fromAddress:(NSData*)addr
+{
+    NSLog(@"got %d bytes (%d longs). FrameSize: %d\n",[udpData length],[udpData length],[self udpFrameSize]);
+    NSLog(@"%@\n",[self DisplayStringFromData:udpData]);
+    
+    //only data so far is the trace....
+    unsigned long len = ([udpData length]/sizeof(unsigned long)) + 2;
+    unsigned long data[len];
+    data[0] = dataId | len;
+    data[1] =    (([self crateNumber] & 0x0000000f)<<21) | (([self stationNumber] & 0x0000001f)<<16);
+    unsigned long ptr = (unsigned long*)[udpData bytes];
+    int i;
+    int n = [udpData length]/sizeof(unsigned long);
+    for(i=0;i<n;i++){
+        data[2+i] = ptr++;
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                        object:[NSData dataWithBytes:data length:len]];
+}
+
+- (void) udpConnection:(ORUDPConnection*)echo didReceiveError:(NSError*)error
+{
+}
+
+- (void) udpConnection:(ORUDPConnection*)echo didSendData:(NSData*)data toAddress:(NSData*)addr
+{
+}
+
+- (void) udpConnection:(ORUDPConnection*)echo didFailToSendData:(NSData*)data toAddress:(NSData*)addr error:(NSError*)error
+{
+}
+
+- (void)echoDidStop:(ORUDPConnection *)echo
+{
+    [self setUpdConnected:NO];
+}
+
+- (void) udpConnection:(ORUDPConnection*)echo didStartWithAddress:(NSData*)address
+{
+    [self setUpdConnected:YES];
+}
+
+- (void) udpConnection:(ORUDPConnection*)echo didStopWithError:(NSError*)error
+{
+    [self setUpdConnected:NO];
+}
 
 #pragma mark ***archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -395,15 +617,26 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    
+    [self setPort:              [decoder decodeIntForKey:@"port"]];
+    [self setHostName:          [decoder decodeObjectForKey:@"hostName"]];
+
     [self setShapingLength:     [decoder decodeIntForKey:   @"shapingLength"]];
     [self setGapLength:         [decoder decodeIntForKey:   @"gapLength"]];
     [self setPostTriggerTime:   [decoder decodeIntForKey:   @"postTriggerTime"]];
+    [self setUdpFrameSize:      [decoder decodeIntForKey:   @"udpFrameSize"]];
     int i;
     for(i=0;i<kNumTristanFLTChannels;i++) {
         [self setThreshold:i withValue:[decoder decodeInt32ForKey: [NSString stringWithFormat:@"threshold%d",i]]];
         [self setEnabled:i   withValue:[decoder decodeBoolForKey:  [NSString stringWithFormat:@"enabled%d",i]]];
     }
+    
+    if(!client){
+        ORUDPConnection* aClient = [[ORUDPConnection alloc] init];
+        [aClient setDelegate:self];
+        [self setClient:aClient];
+        [aClient release];
+    }
+    
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
     return self;
@@ -413,9 +646,12 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 {
     [super encodeWithCoder:encoder];
     
-    [encoder encodeInt:shapingLength             forKey:@"shapingLength"];
-    [encoder encodeInt:gapLength                 forKey:@"gapLength"];
-    [encoder encodeInt:postTriggerTime           forKey:@"postTriggerTime"];
+    [encoder encodeInt:port                forKey:@"port"];
+    [encoder encodeObject:hostName         forKey:@"hostName"];
+    [encoder encodeInt:shapingLength       forKey:@"shapingLength"];
+    [encoder encodeInt:gapLength           forKey:@"gapLength"];
+    [encoder encodeInt:postTriggerTime     forKey:@"postTriggerTime"];
+    [encoder encodeInt:udpFrameSize        forKey:@"udpFrameSize"];
     int i;
     for(i=0;i<kNumTristanFLTChannels;i++) {
         [encoder encodeInt32: threshold[i] forKey:[NSString stringWithFormat:@"threshold%d",i]];
@@ -425,7 +661,6 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 @end
 
 @implementation ORTristanFLTModel (private)
-
 - (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(bool*)anArray forKey:(NSString*)aKey
 {
     NSMutableArray* ar = [NSMutableArray array];
@@ -452,5 +687,6 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     else if(aValue>aMaxValue)return aMaxValue;
     else return aValue;
 }
-
 @end
+
+
