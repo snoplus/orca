@@ -602,6 +602,8 @@
 		840B813F094E4D8D00B1B135 /* ORLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B8139094E4D8D00B1B135 /* ORLabelModel.h */; };
 		840B8140094E4D8D00B1B135 /* ORLabelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B813A094E4D8D00B1B135 /* ORLabelModel.m */; };
 		840B8141094E4D8D00B1B135 /* ORLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B813B094E4D8D00B1B135 /* ORLabelController.h */; };
+		840BB583201BCA7500F37939 /* ORUDPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 840BB581201BCA7400F37939 /* ORUDPConnection.m */; };
+		840BB584201BCA7500F37939 /* ORUDPConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 840BB582201BCA7400F37939 /* ORUDPConnection.h */; };
 		840C7FE01955CA0000E36622 /* NSApplication+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840C7FDE1955CA0000E36622 /* NSApplication+Extensions.h */; };
 		840C7FE11955CA0000E36622 /* NSApplication+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */; };
 		840C7FE81955CA5A00E36622 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840C7FE71955CA5A00E36622 /* Foundation.framework */; };
@@ -4381,6 +4383,8 @@
 		840B8139094E4D8D00B1B135 /* ORLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLabelModel.h; path = "Source/Objects/Misc Objects/Label/ORLabelModel.h"; sourceTree = SOURCE_ROOT; };
 		840B813A094E4D8D00B1B135 /* ORLabelModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLabelModel.m; path = "Source/Objects/Misc Objects/Label/ORLabelModel.m"; sourceTree = SOURCE_ROOT; };
 		840B813B094E4D8D00B1B135 /* ORLabelController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORLabelController.h; sourceTree = "<group>"; };
+		840BB581201BCA7400F37939 /* ORUDPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORUDPConnection.m; sourceTree = "<group>"; };
+		840BB582201BCA7400F37939 /* ORUDPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORUDPConnection.h; sourceTree = "<group>"; };
 		840C7FDE1955CA0000E36622 /* NSApplication+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSApplication+Extensions.h"; sourceTree = "<group>"; };
 		840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSApplication+Extensions.m"; sourceTree = "<group>"; };
 		840C7FE61955CA5A00E36622 /* RelaunchOrca */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RelaunchOrca; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -8418,6 +8422,15 @@
 			path = "Source/Objects/Misc Objects/Label";
 			sourceTree = SOURCE_ROOT;
 		};
+		840BB580201BCA7400F37939 /* UDPConnection */ = {
+			isa = PBXGroup;
+			children = (
+				840BB581201BCA7400F37939 /* ORUDPConnection.m */,
+				840BB582201BCA7400F37939 /* ORUDPConnection.h */,
+			);
+			path = UDPConnection;
+			sourceTree = "<group>";
+		};
 		840C7FF41955CA6A00E36622 /* Relaunch */ = {
 			isa = PBXGroup;
 			children = (
@@ -9105,6 +9118,7 @@
 				4AB9E5171DE5D820007C75E0 /* PostgreSQL */,
 				8471D4721588DF3C0039894D /* RemoteSocket */,
 				845313D01B9886B800FCEEE5 /* RemoteCommander */,
+				840BB580201BCA7400F37939 /* UDPConnection */,
 			);
 			name = "Misc Objects";
 			path = "Source/Objects/Misc Objects";
@@ -15228,6 +15242,7 @@
 				847946D607330E5300C5E1FA /* ORPciBit3View.h in Headers */,
 				8402797207397B8700972B07 /* ORBit3Controller.h in Headers */,
 				8402797407397B8700972B07 /* ORBit3Model.h in Headers */,
+				840BB584201BCA7500F37939 /* ORUDPConnection.h in Headers */,
 				84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */,
 				849F4C790768DA930087E9A8 /* ORDataExplorerModel.h in Headers */,
 				849F4C7B0768DA930087E9A8 /* ORHeaderItem.h in Headers */,
@@ -17894,6 +17909,7 @@
 				847E6C1E0CFF4C3200E963C6 /* OReGunController.m in Sources */,
 				847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */,
 				9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */,
+				840BB583201BCA7500F37939 /* ORUDPConnection.m in Sources */,
 				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
 				9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */,
 				6B40D6631B2B79960000F7C1 /* ResistorDBModel.m in Sources */,
