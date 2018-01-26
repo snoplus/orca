@@ -566,7 +566,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 - (void) udpConnection:(ORUDPConnection*)echo didReceiveData:(NSData*)udpData fromAddress:(NSData*)addr
 {
-    NSLog(@"got %d bytes (%d longs). FrameSize: %d\n",[udpData length],[udpData length],[self udpFrameSize]);
+    NSLog(@"got %d bytes (%d longs). FrameSize: %d\n",[udpData length],[udpData length]/4,[self udpFrameSize]);
     NSLog(@"%@\n",[self DisplayStringFromData:udpData]);
     
     //only data so far is the trace....
