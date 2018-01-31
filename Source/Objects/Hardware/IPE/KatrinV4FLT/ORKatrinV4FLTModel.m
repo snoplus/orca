@@ -2215,6 +2215,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[objDictionary setObject:[NSNumber numberWithInt:boxcarLength]				forKey:@"BoxcarLength"];
 	[objDictionary setObject:[NSNumber numberWithInt:useDmaBlockRead]		    forKey:@"UseDmaBlockRead"];//0=auto, 1=yes, 2=no
 	[objDictionary setObject:[NSNumber numberWithInt:fifoLength]				forKey:@"FifoLength64"];
+    //------------------
+    //added -tb- 2013-01-31
+    [objDictionary setObject:[NSNumber numberWithInt:energyOffset]				forKey:@"energyOffset"];
 	//------------------
 	
 	return objDictionary;
