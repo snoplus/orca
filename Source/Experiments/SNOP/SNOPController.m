@@ -793,6 +793,8 @@ snopGreenColor;
         [lightBoardView setState:kGoLight];
         [runStatusField setStringValue:@"Running"];
         [resyncRunButton setEnabled:true];
+        [standardRunPopupMenu setEnabled:true];
+        [standardRunVersionPopupMenu setEnabled:true];
         [runNumberField setStringValue:[runControl fullRunNumberString]];
         [doggy_icon start_animation];
 	}
@@ -801,6 +803,8 @@ snopGreenColor;
         [lightBoardView setState:kStoppedLight];
         [runStatusField setStringValue:@"Stopped"];
         [resyncRunButton setEnabled:false];
+        [standardRunPopupMenu setEnabled:true];
+        [standardRunVersionPopupMenu setEnabled:true];
         [doggy_icon stop_animation];
 	}
 	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
@@ -815,6 +819,8 @@ snopGreenColor;
             //Do nothing
         }
         [lightBoardView setState:kCautionLight];
+        [standardRunPopupMenu setEnabled:false];
+        [standardRunVersionPopupMenu setEnabled:false];
 	}
 
     if ([runControl isRunning] && ([runControl runType] & kECARun)) {
