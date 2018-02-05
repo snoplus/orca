@@ -881,6 +881,14 @@ err:
 
     [runControl setRunNumber:0xffffffff - 1];
 
+    /* Pop up warning indicating that the default run number is being used. */
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    [alert addButtonWithTitle:@"OK"];
+    [alert setMessageText:@"Error getting the run number from the database. Using default run number."];
+    [alert setInformativeText:@"Correct this immediately, as data may be lost."];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert runModal];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
     return;
