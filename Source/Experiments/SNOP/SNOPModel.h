@@ -51,6 +51,7 @@ BOOL isNotRunningOrIsInMaintenance();
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
     SessionDB* sessionDB;
+    ORAlarm* defaultRunAlarm;
 
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
