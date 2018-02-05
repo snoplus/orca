@@ -881,6 +881,14 @@ err:
 
     [runControl setRunNumber:0xffffffff - 1];
 
+    /* Post an Orca alarm indicating that the default run number is being used. */
+    ORAlarm* defaultRunAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Using default run number"]
+                                                    severity:kImportantAlarm];
+    [defaultRunAlarm setAdditionalInfoString:@"Correct this immediately, as data may be lost."];
+    [defaultRunAlarm setSticky:YES];
+    [defaultRunAlarm setAcknowledged:NO];
+    [defaultRunAlarm postAlarm];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
     return;
