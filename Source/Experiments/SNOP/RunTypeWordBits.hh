@@ -38,7 +38,7 @@ static char *RunTypeWordBitNames[32] = {
     "ECAPDST",
     "ECATSLP",
     "Spare",
-    "Spare",
+    "Embedded Peds.",
     "Spare",
     "Spare",
     "DCR Activity",
@@ -72,6 +72,7 @@ enum RunTypeWordBits {
     kPCARun=0x4000,
     kECAPedestalRun=0x8000,
     kECATSlopeRun=0x10000,
+    kEmbeddedPeds=0x40000,
     /* detector state */
     kDCRActivityRun=0x200000,
     kCompCoilsOFFRun=0x400000,

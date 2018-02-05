@@ -26,6 +26,7 @@
 #import "ECARun.h"
 #import "NHitMonitor.h"
 #import "SessionDB.h"
+#import "LivePedestals.h"
 
 @class ORCouchDB;
 @class ORRunModel;
@@ -145,6 +146,7 @@ BOOL isNotRunningOrIsInMaintenance();
         unsigned long lastRunTypeWord;
         NSString* lastRunTypeWordHex;
         ECARun* anECARun;
+        LivePedestals* livePeds;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
@@ -325,7 +327,10 @@ BOOL isNotRunningOrIsInMaintenance();
 // ECA
 -(ECARun*) anECARun;
 
-// Standard runs functions
+//Live Pedestals
+-(LivePedestals*) livePeds;
+
+//Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;
 -(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
@@ -346,3 +351,4 @@ extern NSString* ORSNOPModelSRVersionChangedNotification;
 extern NSString* ORSNOPModelNhitMonitorChangedNotification;
 extern NSString* ORSNOPStillWaitingForBuffersNotification;
 extern NSString* ORSNOPNotWaitingForBuffersNotification;
+extern NSString* ORRoutineChangedNotification;
