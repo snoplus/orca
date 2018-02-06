@@ -506,6 +506,9 @@ tellieRunFiles = _tellieRunFiles;
     [_smellieRunFiles release];
     [_tellieRunFiles release];
     [_tellieRunNameLabel release];
+
+    [defaultRunAlarm clearAlarm];
+    [defaultRunAlarm dealloc];
     [super dealloc];
 }
 
@@ -633,6 +636,8 @@ tellieRunFiles = _tellieRunFiles;
     ORXL3Model *xl3;
     TUBiiModel *tubii;
     int i;
+
+    [defaultRunAlarm clearAlarm];
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -881,6 +886,16 @@ err:
     ORRunModel* runControl = [runObjects objectAtIndex:0];
 
     [runControl setRunNumber:0xffffffff - 1];
+
+    /* Post an Orca alarm indicating that the default run number is being used. */
+    if (!defaultRunAlarm) {
+        defaultRunAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Using default run number"]
+                                               severity:kImportantAlarm];
+        [defaultRunAlarm setAdditionalInfoString:@"Correct this immediately, as data may be lost."];
+        [defaultRunAlarm setSticky:YES];
+    }
+    [defaultRunAlarm setAcknowledged:NO];
+    [defaultRunAlarm postAlarm];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
