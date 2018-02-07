@@ -934,7 +934,7 @@ err:
         goto err;
     }
     SNOPModel* snopModel = [snopModels objectAtIndex:0];
-/*
+
     ///////////////////////
     // Check TELLIE run type is masked in
     if(forTELLIE){
@@ -964,14 +964,14 @@ err:
         NSLogColor([NSColor redColor], @"%@: Error requesting asyncTrigMask from Tubii.\n",prefix);
         goto err;
     }
-*/
+
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
     if([[fireCommands objectForKey:@"run_mode"] isEqualToString:@"Master"]){
         isSlave = NO;
     }
-/*
+
     //////////////
     // TUBii has two possible slave mode configurations.
     // 0 [@NO]:  Master mode : Trigger path = TELLIE->TUBii->MTC/D
@@ -992,7 +992,7 @@ err:
         NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct master/ slave mode behaviour at TUBii, reason: %@\n", [e reason]);
         goto err;
     }
-*/
+
     /////////////
     // Final settings check
     NSNumber* photonOutput = [self calcPhotonsForIPW:[[fireCommands objectForKey:@"pulse_width"] integerValue] forChannel:[[fireCommands objectForKey:@"channel"] integerValue] inSlave:isSlave];
@@ -1104,7 +1104,6 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-/*
             @try{
                 [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
             } @catch(NSException* e) {
@@ -1112,7 +1111,6 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-*/
  }
         
         ////////////////////
