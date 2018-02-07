@@ -976,7 +976,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
      If the keep alive has died, as a user to re-start it.
      */
     BOOL restart = ORRunAlertPanel(@"The keep alive pulse to TUBii has died.",
-                                   @"Unless you restart the ELLIE systems will not be able to trigger through TUBii.\nIf you'd like to restart at a later time please do so from the servers tab of the ELLIE gui",
+                                   @"Unless you restart this process the ELLIE systems will not be able to trigger through TUBii. If you'd like to restart at a later time please do so from the servers tab of the ELLIE gui",
                                     @"Restart",
                                     @"Cancel",nil);
     if(restart){

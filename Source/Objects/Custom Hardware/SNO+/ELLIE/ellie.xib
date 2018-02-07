@@ -702,8 +702,8 @@
                                                                                                     <outlet property="delegate" destination="-2" id="IBv-fE-Isb"/>
                                                                                                 </connections>
                                                                                             </textField>
-                                                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="1418">
-                                                                                                <rect key="frame" x="74" y="33" width="117" height="17"/>
+                                                                                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="1418">
+                                                                                                <rect key="frame" x="63" y="27" width="140" height="23"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Photons per pulse" id="1419">
                                                                                                     <font key="font" metaFont="system"/>

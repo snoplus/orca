@@ -338,7 +338,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     NSArray* blankResponse = [NSArray arrayWithObjects:[NSNumber numberWithInt:0], [NSNumber numberWithInt:0], nil];
     NSArray* pollResponse = [[self tellieClient] command:@"read_pin_sequence"];
     int count = 0;
-    NSLog(@"[TELLIE]: Will poll for pin response for the next %1.1f s\n", timeOutSeconds);
+    NSLog(@"[T/AMELLIE]: Will poll for pin response for the next %1.1f s\n", timeOutSeconds);
     while ([pollResponse isKindOfClass:[NSString class]] && count < timeOutSeconds){
         // Check the thread hasn't been cancelled
         if([[NSThread currentThread] isCancelled]){
@@ -351,10 +351,10 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     
     // Some checks on the response
     if ([pollResponse isKindOfClass:[NSString class]]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.\n", pollResponse);
+        NSLogColor([NSColor redColor], @"[T/AMELLIE]: PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.\n", pollResponse);
         return blankResponse;
     } else if ([pollResponse count] != 3) {
-        NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned array of len %i - expected 3\n", [pollResponse count]);
+        NSLogColor([NSColor redColor], @"[T/AMELLIE]: PIN diode poll returned array of len %i - expected 3\n", [pollResponse count]);
         return blankResponse;
     }
     return pollResponse;
@@ -522,8 +522,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     float min_photons = [[photon_values valueForKeyPath:@"@min.self"] floatValue];
     int max_ipw = [[IPW_values objectAtIndex:[photon_values indexOfObject:[photon_values valueForKeyPath:@"@min.self"]]] intValue];
     if(ipw > max_ipw){
-        NSLog(@"[TELLIE]: Requested IPW is larger than any value in the calibration curve.\n");
-        NSLog(@"[TELLIE]: Using a linear interpolation of 5ph/IPW from min_photons = %.1f (IPW = %d) to estimate photon output at requested setting\n",min_photons, max_ipw);
+        NSLog(@"[T/AMELLIE]: Requested IPW is larger than any value in the calibration curve.\n");
+        NSLog(@"[T/AMELLIE]: Using a linear interpolation of 5ph/IPW from min_photons = %.1f (IPW = %d) to estimate photon output at requested setting\n",min_photons, max_ipw);
         float intercept = min_photons - (-5.*max_ipw);
         float photonsFloat = (-5.*ipw) + intercept;
         if(photonsFloat < 0){
@@ -788,7 +788,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [invocation setTarget:self];
     [invocation setSelector:@selector(startTellieRun: forTELLIE:)];
     [invocation setArgument:&fireCommands atIndex:2];
-    [invocation setArgument:[NSNumber numberWithBool:forTELLIE] atIndex:3];
+    [invocation setArgument:&forTELLIE atIndex:3];
     [invocation retainArguments];
     
     //////////////////////
@@ -810,7 +810,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [invocation setTarget:self];
     [invocation setSelector:@selector(startTellieMultiRun: forTELLIE:)];
     [invocation setArgument:&fireCommandArray atIndex:2];
-    [invocation setArgument:[NSNumber numberWithBool:forTELLIE] atIndex:3];
+    [invocation setArgument:&forTELLIE atIndex:3];
     [invocation retainArguments];
 
     //////////////////////
@@ -934,7 +934,7 @@ err:
         goto err;
     }
     SNOPModel* snopModel = [snopModels objectAtIndex:0];
-
+/*
     ///////////////////////
     // Check TELLIE run type is masked in
     if(forTELLIE){
@@ -964,14 +964,14 @@ err:
         NSLogColor([NSColor redColor], @"%@: Error requesting asyncTrigMask from Tubii.\n",prefix);
         goto err;
     }
-
+*/
     //////////////
     // Get run mode boolean
     BOOL isSlave = YES;
     if([[fireCommands objectForKey:@"run_mode"] isEqualToString:@"Master"]){
         isSlave = NO;
     }
-    
+/*
     //////////////
     // TUBii has two possible slave mode configurations.
     // 0 [@NO]:  Master mode : Trigger path = TELLIE->TUBii->MTC/D
@@ -992,7 +992,7 @@ err:
         NSLogColor([NSColor redColor], @"[TELLIE]: Problem setting correct master/ slave mode behaviour at TUBii, reason: %@\n", [e reason]);
         goto err;
     }
-
+*/
     /////////////
     // Final settings check
     NSNumber* photonOutput = [self calcPhotonsForIPW:[[fireCommands objectForKey:@"pulse_width"] integerValue] forChannel:[[fireCommands objectForKey:@"channel"] integerValue] inSlave:isSlave];
@@ -1104,7 +1104,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-
+/*
             @try{
                 [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
             } @catch(NSException* e) {
@@ -1112,7 +1112,8 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-        }
+*/
+ }
         
         ////////////////////
         // Init can take a while. Make sure no-one hit
@@ -1240,17 +1241,17 @@ err:
         // TELLIE
         @try{
             NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+            NSLog(@"%@: Sent stop command to hardware, received: %@\n",prefix, responseFromTellie);
         } @catch(NSException* e){
             // This should only ever be called from the main thread so can raise
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem with tellie server interpreting stop command!\n", prefix);
         }
 
         // TUBii
         @try{
             [theTubiiModel stopTelliePulser];
         } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem stopping TUBii pulser!\n", prefix);
         }
 
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -1274,17 +1275,17 @@ err:
         // TELLIE
         @try{
             NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+            NSLog(@"%@: Sent stop command to hardware, received: %@\n",prefix, responseFromTellie);
         } @catch(NSException* e){
             // This should only ever be called from the main thread so can raise
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem with tellie server interpreting stop command!\n", prefix);
         }
 
         // TUBii
         @try{
             [theTubiiModel stopTelliePulser];
         } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem stopping TUBii pulser!\n", prefix);
         }
 
         ////////////
@@ -1315,7 +1316,7 @@ err:
     [[self tellieThread] cancel];
 
     // Post a notification telling the run control to wait until the thread finishes
-    NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for tellie run to finish", @"Reason", nil];
+    NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for T/AMELLIE run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
     //////////////////////
@@ -1373,7 +1374,7 @@ err:{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
     });
 
-    NSLog(@"[ELLIE]: Stop commands sucessfully sent to ELLIE and TUBii\n");
+    NSLog(@"[T/AMELLIE]: Stop commands sucessfully sent to ELLIE and TUBii\n");
     [pool release];
 }
 }

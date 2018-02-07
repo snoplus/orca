@@ -1176,7 +1176,7 @@
         [editedField setBackgroundColor:[NSColor orangeColor]];
         [editedField setNeedsDisplay:YES];
         return;
-    } else if(expertMsg == nil && gotInside == YES){
+    } else if(buildMsg == nil && gotInside == YES){
         [tellieBuildPushToDB setEnabled:NO];
         [editedField setBackgroundColor:[NSColor whiteColor]];
         [editedField setNeedsDisplay:YES];
@@ -1211,7 +1211,7 @@
 
     if(amellieMsg){
         [amellieFireButton setEnabled:NO];
-        [amellieValidationStatusTf setStringValue:expertMsg];
+        [amellieValidationStatusTf setStringValue:amellieMsg];
         [editedField setBackgroundColor:[NSColor orangeColor]];
         [editedField setNeedsDisplay:YES];
         return;

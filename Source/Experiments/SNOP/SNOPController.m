@@ -1612,7 +1612,7 @@ snopGreenColor;
     //////////////////
     // Check if we're in the correct
     // standard run type
-    if(![[model lastStandardRunType] isEqualToString:@"SMELLIE"]){
+    if(!([model runTypeWord] & kSMELLIERun)){
         ORRunAlertPanel(@"The SMELLIE standard run is not loaded.",@"You must load a SMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
@@ -1809,7 +1809,7 @@ snopGreenColor;
         return;
     }
 
-    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+    if(!([model runTypeWord] & kTELLIERun)){
         ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
@@ -1850,7 +1850,7 @@ snopGreenColor;
         return;
     }
 
-    if(![[model lastStandardRunType] isEqualToString:@"TELLIE"]){
+    if(!([model runTypeWord] & kTELLIERun)){
         ORRunAlertPanel(@"The TELLIE standard run is not loaded.",@"You must load a TELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
         return;
     }
@@ -2005,7 +2005,7 @@ snopGreenColor;
         return;
     }
 
-     if(![[model lastStandardRunType] isEqualToString:@"AMELLIE"]){
+     if(!([model runTypeWord] & kAMELLIERun)){
          ORRunAlertPanel(@"The AMELLIE standard run is not loaded.",@"You must load a AMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
          return;
      }
@@ -2046,7 +2046,7 @@ snopGreenColor;
         return;
     }
 
-     if(![[model lastStandardRunType] isEqualToString:@"AMELLIE"]){
+     if(!([model runTypeWord] & kAMELLIERun)){
          ORRunAlertPanel(@"The AMELLIE standard run is not loaded.",@"You must load a AMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
      return;
      }
