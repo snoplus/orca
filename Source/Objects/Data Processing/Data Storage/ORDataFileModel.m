@@ -960,12 +960,13 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 	int subRunNumber	 = [[userInfo objectForKey:kSubRunNumber] intValue];
 	NSString* fileSuffix = [userInfo objectForKey:kFileSuffix];
 	if(!fileSuffix)fileSuffix = @"";
+    if(!fileStaticSuffix)fileStaticSuffix = @"";
 	if(filePrefix!=nil){
 		if([filePrefix rangeOfString:@"Run"].location != NSNotFound){
 			s = [NSString stringWithFormat:@"%@%@%d%@",filePrefix,fileSuffix,runNumber,fileStaticSuffix];
 		}
 		else s = [NSString stringWithFormat:@"%@%@Run%@%d%@",filePrefix,[filePrefix length]?@"_":@"",fileSuffix,runNumber,fileStaticSuffix];
-	}
+    }
 	else s = [NSString stringWithFormat:@"Run%@%d%@",fileSuffix,runNumber,fileStaticSuffix];
 	if(subRunNumber!=0)s = [s stringByAppendingFormat:@".%d",subRunNumber];
 	if(useDatedFileNames){

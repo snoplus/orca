@@ -365,22 +365,12 @@ tellieRunFiles = _tellieRunFiles;
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
         NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
         /* This should never happen. */
         return;
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
 
-    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
-    if (![dataFileModels count]) {
-        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find ORDataFileModel!\n");
-        return; // (should never happen)
-    }
-    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
-    
-    // Since ORCA's closing I'm not sure, if I post this note, that it will consistently be caught. Instead I'm gonna just pass it straight through.
-    NSNotification* myNote = [NSNotification notificationWithName:ORFlushLogsNotification object:self userInfo:[runControl runInfo]];
-    [aDataFileModel closeOutLogFiles:myNote];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFlushLogsNotification object:self userInfo:[runControl runInfo]];
 }
 
 - (id) initWithCoder:(NSCoder*)decoder
