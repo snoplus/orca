@@ -209,7 +209,7 @@ BOOL isNotRunningOrIsInMaintenance();
 - (NSString *) xl3Host;
 
 - (void) setLogNameFormat;
-- (void) saveLogFiles;
+- (void) saveLogFiles:(NSNotification*)aNote;
 
 - (void) initOrcaDBConnectionHistory;
 - (void) clearOrcaDBConnectionHistory;

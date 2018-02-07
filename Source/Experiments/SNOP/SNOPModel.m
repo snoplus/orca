@@ -650,7 +650,7 @@ tellieRunFiles = _tellieRunFiles;
                        object : nil];
     
     [notifyCenter addObserver : self
-                     selector : @selector(closeOutLogFiles:)
+                     selector : @selector(saveLogFiles:)
                          name : OROrcaAboutToQuitNotice
                        object : nil];
 }
