@@ -2165,7 +2165,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 							 [NSNumber numberWithUnsignedLong:[self elapsedRunTime]],	@"elapsedTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedSubRunTime]],@"elapsedSubRunTime",
 							 [NSNumber numberWithUnsignedLong:[self elapsedBetweenSubRunTime]],@"elapsedBetweenSubRunTime",
-							 [NSNumber numberWithUnsignedLong:[self timeToGo]],			@"timeToGo",
+							 [NSNumber numberWithUnsignedLong:(unsigned long)[self timeToGo]],			@"timeToGo",
 							 [NSNumber numberWithBool:[self quickStart]],				@"quickStart",
 							 [NSNumber numberWithBool:[self repeatRun]],				@"repeatRun",
 							 [NSNumber numberWithBool:[self offlineRun]],				@"offlineRun",

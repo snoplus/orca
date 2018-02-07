@@ -428,8 +428,8 @@ snopGreenColor;
                         object: nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(ECAStatusChanged:)
-                         name : ORECAStatusChangedNotification
+                     selector : @selector(routineStatusChanged:)
+                         name : ORRoutineChangedNotification
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -707,15 +707,21 @@ snopGreenColor;
          * is still running. */
         [runNhitMonitorButton setEnabled:YES];
         [stopNhitMonitorButton setEnabled:NO];
+        [[routineStatusMatrix cellAtRow:1 column:0] setStringValue:@"Not Running"];
+        [[routineStatusMatrix cellAtRow:1 column:0] setTextColor:[NSColor blackColor]];
         return;
     }
 
     if ([[model nhitMonitor] isRunning]) {
         [runNhitMonitorButton setEnabled:NO];
         [stopNhitMonitorButton setEnabled:YES];
+        [[routineStatusMatrix cellAtRow:1 column:0] setStringValue:@"Running"];
+        [[routineStatusMatrix cellAtRow:1 column:0] setTextColor:[NSColor redColor]];
     } else {
         [runNhitMonitorButton setEnabled:YES];
         [stopNhitMonitorButton setEnabled:NO];
+        [[routineStatusMatrix cellAtRow:1 column:0] setStringValue:@"Not Running"];
+        [[routineStatusMatrix cellAtRow:1 column:0] setTextColor:[NSColor blackColor]];
     }
 }
 
@@ -812,6 +818,8 @@ snopGreenColor;
         [lightBoardView setState:kGoLight];
         [runStatusField setStringValue:@"Running"];
         [resyncRunButton setEnabled:true];
+        [standardRunPopupMenu setEnabled:true];
+        [standardRunVersionPopupMenu setEnabled:true];
         [runNumberField setStringValue:[runControl fullRunNumberString]];
         [doggy_icon start_animation];
 	}
@@ -820,6 +828,8 @@ snopGreenColor;
         [lightBoardView setState:kStoppedLight];
         [runStatusField setStringValue:@"Stopped"];
         [resyncRunButton setEnabled:false];
+        [standardRunPopupMenu setEnabled:true];
+        [standardRunVersionPopupMenu setEnabled:true];
         [doggy_icon stop_animation];
 	}
 	else if([runControl runningState] == eRunStarting || [runControl runningState] == eRunStopping || [runControl runningState] == eRunBetweenSubRuns){
@@ -834,6 +844,8 @@ snopGreenColor;
             //Do nothing
         }
         [lightBoardView setState:kCautionLight];
+        [standardRunPopupMenu setEnabled:false];
+        [standardRunVersionPopupMenu setEnabled:false];
 	}
 
     if ([runControl isRunning] && ([runControl runType] & kECARun)) {
@@ -842,6 +854,21 @@ snopGreenColor;
     } else {
         [pingCratesButton setEnabled:TRUE];
     }
+
+    if ([runControl isRunning]){
+        if ([runControl runType] & kEmbeddedPeds) {
+            /* Enable LivePed radio button if we are in LivePed run. */
+            [livePedRadioButton setEnabled:YES];
+            [livePedRunTypeWordAd setHidden:YES];
+        } else {
+            [livePedRadioButton setEnabled:NO];
+            [livePedRunTypeWordAd setHidden:NO];
+        }
+    } else {
+        [livePedRadioButton setEnabled:YES];
+        [livePedRunTypeWordAd setHidden:YES];
+    }
+
 }
 
 - (IBAction) pingCratesAction: (id) sender
@@ -2231,20 +2258,24 @@ snopGreenColor;
 
 }
 
-- (void) ECAStatusChanged:(NSNotification*)aNotification
+- (void) ECAStatusChanged
 {
 
     ECARun *theECARun = [model anECARun];
 
     //Status
-    NSString * ecaStatusLabel = @"Not running";
     if ([theECARun isFinished]){
-        ecaStatusLabel = @"Not running";
+        [[ecaStatusMatrix cellAtRow:0 column:0] setStringValue:@"Not running"];
+        [[routineStatusMatrix cellAtRow:0 column:0] setStringValue:@"Not running"];
+        [[ecaStatusMatrix cellAtRow:0 column:0] setTextColor:[NSColor blackColor]];
+        [[routineStatusMatrix cellAtRow:0 column:0] setTextColor:[NSColor blackColor]];
     }
     else if ([theECARun isExecuting]){
-        ecaStatusLabel = @"Running";
+        [[ecaStatusMatrix cellAtRow:0 column:0] setStringValue:@"Running"];
+        [[routineStatusMatrix cellAtRow:0 column:0] setStringValue:@"Running"];
+        [[ecaStatusMatrix cellAtRow:0 column:0] setTextColor:[NSColor redColor]];
+        [[routineStatusMatrix cellAtRow:0 column:0] setTextColor:[NSColor redColor]];
     }
-    [[ecaStatusMatrix cellAtRow:0 column:0] setStringValue:ecaStatusLabel];
     //Mode
     [[ecaStatusMatrix cellAtRow:1 column:0] setStringValue:[theECARun ECA_mode_string]];
     //Pattern
@@ -2294,6 +2325,76 @@ snopGreenColor;
 - (IBAction)ecaPulserRateAction:(id)sender
 {
     [[model anECARun] setECA_rate:[ecaPulserRate objectValue]];
+}
+
+//LIVE PEDESTALS
+- (IBAction)livePedestalsAction:(id)sender {
+
+    switch ([sender selectedColumn]) {
+        case 0:
+            [[model livePeds] stop];
+            break;
+        case 1:
+            [[model livePeds] start];
+            break;
+        default:
+            break;
+    }
+
+}
+
+- (void) routineStatusChanged:(NSNotification*)aNote
+{
+
+    /* GUI updates for the different ORCA threads like ECA, LivePeds, ... */
+
+    // Disable embedded pedestals by default and deal with the
+    // logic below
+    [livePedRadioButton setEnabled:NO];
+
+    NSDictionary *userInfo = [aNote userInfo];
+    if(userInfo == nil) return;
+    if ([userInfo objectForKey:@"routine"] == nil) return;
+    /* ECAs */
+    if ([[userInfo objectForKey:@"routine"] isEqualToString:@"ECA"]){
+        [self ECAStatusChanged];
+    }
+    /* Embedded Pedestals */
+    else if ([[userInfo objectForKey:@"routine"] isEqualToString:@"LivePeds"]){
+        NSString *status = [userInfo objectForKey:@"status"];
+        [[routineStatusMatrix cellAtRow:2 column:0] setStringValue:status];
+        [livePedStatusLabel setStringValue:status];
+
+        if ( [[model livePeds] isThreadRunning] ){
+            [livePedRadioButton setEnabled:YES];
+
+            if ([[userInfo objectForKey:@"status"] isEqualToString:@"Running"]){
+                [[routineStatusMatrix cellAtRow:2 column:0] setTextColor:[NSColor redColor]];
+                [livePedStatusLabel setTextColor:[NSColor redColor]];
+                [livePedRadioButton setEnabled:YES];
+            }
+            else if ([[userInfo objectForKey:@"status"] isEqualToString:@"Not Running"]){
+                [[routineStatusMatrix cellAtRow:2 column:0] setTextColor:[NSColor blackColor]];
+                [livePedStatusLabel setTextColor:[NSColor blackColor]];
+                [livePedRadioButton setEnabled:YES];
+            }
+            else if ([[userInfo objectForKey:@"status"] isEqualToString:@"NHitMonitor ON"]){
+                [[routineStatusMatrix cellAtRow:2 column:0] setTextColor:[NSColor redColor]];
+                [livePedStatusLabel setTextColor:[NSColor redColor]];
+                [livePedRadioButton setEnabled:NO];
+            }
+
+        }
+        else {
+            [[routineStatusMatrix cellAtRow:2 column:0] setTextColor:[NSColor blackColor]];
+            [livePedStatusLabel setTextColor:[NSColor blackColor]];
+            [livePedRadioButton setEnabled:NO];
+        }
+
+    }
+
+    return;
+
 }
 
 //STANDARD RUNS

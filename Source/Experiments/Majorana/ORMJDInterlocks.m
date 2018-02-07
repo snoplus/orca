@@ -128,7 +128,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
     self.isRunning = YES;
     [self performSelector:@selector(step) withObject:nil afterDelay:.1];
-    
+    doBreakDownPass  = NO;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDInterlocksIsRunningChanged object:self];
 }
 
@@ -335,6 +335,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 }
                 sentCmds = NO;
                 self.remoteOpStatus=nil;
+                extraWaitTime = 0;
             }
             else {
                 if(!sentCmds){
@@ -347,6 +348,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_UpdateVacSystem status:@"Sending..." color:normalColor];
                     sentCmds = YES;
+                    extraWaitTime = 2;
                 }
             }
             break;
@@ -400,7 +402,8 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     }
                 }
                 sentCmds = NO;
-               self.remoteOpStatus=nil;
+                self.remoteOpStatus=nil;
+                extraWaitTime = 0;
             }
             else {
                 if(!sentCmds){
@@ -413,6 +416,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_GetShouldUnBias status:@"Asking..." color:normalColor];
                     sentCmds = YES;
+                    extraWaitTime = 2;
                }
             }
             break;
@@ -460,6 +464,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                 }
                 sentCmds = NO;
                 self.remoteOpStatus=nil;
+                extraWaitTime = 0;
             }
             else {
                 if(!sentCmds){
@@ -468,6 +473,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:slot]];
                     [self setState:kMJDInterlocks_GetOKToBias status:@"Asking..." color:normalColor];
                     sentCmds = YES;
+                    extraWaitTime = 2;
                }
             }
         break;
@@ -571,9 +577,9 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                         [self setCurrentState:kMJDInterlocks_Idle];
                     }
                 }
-                breakDownPass       = 0;
                 sentCmds            = NO;
                 self.remoteOpStatus = nil;
+                extraWaitTime = 0;
             }
             else {
                 if(!sentCmds){
@@ -586,23 +592,24 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
                     [self sendCommands:cmds remoteSocket:[delegate remoteSocket:kScmSlot]];
                     [self setState:kMJDInterlocks_CheckLNFill status:@"Sending..." color:normalColor];
                     sentCmds = YES;
+                    extraWaitTime = 2;
                 }
             }
             break;
             
         case kMJDInterlocks_CheckForBreakdown:
-            if(breakDownPass == 0){
-                [self setState:kMJDInterlocks_CheckForBreakdown status:@"Checking..." color:normalColor];
+            if(!doBreakDownPass){
+                [self setState:kMJDInterlocks_CheckForBreakdown status:@"Deferred..." color:normalColor];
+                doBreakDownPass = YES;
+           }
+            else {
                 [breakDownResult autorelease];
                 NSString* s = [delegate checkForBreakdown:[self module] vacSystem:[self vacSystem] ];
                 breakDownResult = [s copy];
-
-            }
-            else {
                 [self setState:kMJDInterlocks_CheckForBreakdown status:breakDownResult color:normalColor];
                 [self setCurrentState:kMJDInterlocks_FinalState];
+                doBreakDownPass = NO;
             }
-            breakDownPass++;
             break;
             
         case kMJDInterlocks_FinalState:
@@ -612,7 +619,7 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
             break;
     }
     if(currentState != kMJDInterlocks_Idle){
-        [self performSelector:@selector(step) withObject:nil afterDelay:.3];
+        [self performSelector:@selector(step) withObject:nil afterDelay:.3 + extraWaitTime];
     }
 }
 
@@ -757,8 +764,12 @@ NSString* ORMJDInterlocksStateChanged     = @"ORMJDInterlocksStateChanged";
     }
 }
 
-- (void) taskData:(NSString*)text
+- (void) taskData:(NSDictionary*)taskData
 {
+    id       aTask = [taskData objectForKey:@"Task"];
+    NSString* text = [taskData objectForKey:@"Text"];
+    if(aTask != pingTask) return;
+
     if([text rangeOfString:@"round-trip"].location != NSNotFound){
         pingedSuccessfully = YES;
     }

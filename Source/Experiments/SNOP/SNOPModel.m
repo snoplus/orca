@@ -74,6 +74,7 @@ NSString* ORSNOPModelSRVersionChangedNotification = @"ORSNOPModelSRVersionChange
 NSString* ORSNOPModelNhitMonitorChangedNotification = @"ORSNOPModelNhitMonitorChangedNotification";
 NSString* ORSNOPStillWaitingForBuffersNotification = @"ORSNOPStillWaitingForBuffersNotification";
 NSString* ORSNOPNotWaitingForBuffersNotification = @"ORSNOPNotWaitingForBuffersNotification";
+NSString* ORRoutineChangedNotification = @"ORRoutineChangedNotification";
 
 BOOL isNotRunningOrIsInMaintenance()
 {
@@ -360,11 +361,10 @@ tellieRunFiles = _tellieRunFiles;
 
     /* Initialize ECARun object: this doesn't start the run */
     anECARun = [[ECARun alloc] init];
-
     nhitMonitor = [[NHitMonitor alloc] init];
-
     ecaLock = [[NSLock alloc] init];
-
+    /* Initialize LivePed object*/
+    livePeds = [[LivePedestals alloc] init];
     [[self undoManager] disableUndoRegistration];
     [self initOrcaDBConnectionHistory];
     [self initDebugDBConnectionHistory];
@@ -501,12 +501,16 @@ tellieRunFiles = _tellieRunFiles;
     [dataHost release];
     [logHost release];
     [anECARun release];
+    [livePeds release];
     [nhitMonitor release];
     [sessionDB release];
     [ecaLock release];
     [_smellieRunFiles release];
     [_tellieRunFiles release];
     [_tellieRunNameLabel release];
+
+    [defaultRunAlarm clearAlarm];
+    [defaultRunAlarm dealloc];
     [super dealloc];
 }
 
@@ -634,6 +638,8 @@ tellieRunFiles = _tellieRunFiles;
     ORXL3Model *xl3;
     TUBiiModel *tubii;
     int i;
+
+    [defaultRunAlarm clearAlarm];
 
     objs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
@@ -883,6 +889,16 @@ err:
 
     [runControl setRunNumber:0xffffffff - 1];
 
+    /* Post an Orca alarm indicating that the default run number is being used. */
+    if (!defaultRunAlarm) {
+        defaultRunAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Using default run number"]
+                                               severity:kImportantAlarm];
+        [defaultRunAlarm setAdditionalInfoString:@"Correct this immediately, as data may be lost."];
+        [defaultRunAlarm setSticky:YES];
+    }
+    [defaultRunAlarm setAcknowledged:NO];
+    [defaultRunAlarm postAlarm];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
     return;
@@ -977,11 +993,21 @@ err:
          * the PDST or TSLP bits are enabled */
         [[self anECARun] launchECAThread:NULL];
     }
-    else if (run_type & kPhysicsRun) {
-        /* If this is a physics run with no ECAs, we ping each slot in the
-         * detector once at the beginning of the run to look for any trigger
-         * issues. */
+    else {
+
+        if (run_type & kPhysicsRun) {
+        /* If this is a physics run with no ECAs nor embedded pedestals, we 
+         * ping each slot in the detector once at the beginning of the run 
+         * to look for any trigger issues. */
         [self pingCratesAtRunStart];
+        }
+        
+        if(run_type & (kEmbeddedPeds)){
+            /* Launch the Live Pedestals routine if the corresponding
+             * bit is ticked in the run type word. */
+            [[self livePeds] launchLivePedsThread];
+        }
+
     }
 
     return;
@@ -1351,20 +1377,16 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     uint32_t crate_pedestal_mask, coarse_delay, fine_delay, pedestal_width, gt_mask;
     float pulser_rate;
     uint32_t channelMasks[16];
-    uint32_t sync_trigger_mask, async_trigger_mask, tubii_dac;
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
     NSArray* mtcs = [[(ORAppDelegate*)[NSApp delegate] document]
          collectObjectsOfClass:NSClassFromString(@"ORMTCModel")];
-    NSArray* tubiis = [[(ORAppDelegate*)[NSApp delegate] document]
-         collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
 
     xl3s = [xl3s sortedArrayUsingFunction:compareXL3s context:nil];
 
     ORMTCModel* mtc;
     ORXL3Model* xl3;
-    TUBiiModel* tubii;
 
     if ([mtcs count] == 0) {
         NSLogColor([NSColor redColor],
@@ -1373,14 +1395,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     }
 
     mtc = [mtcs objectAtIndex:0];
-
-    if ([tubiis count] == 0) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: couldn't find TUBii object.\n");
-        return;
-    }
-
-    tubii = [tubiis objectAtIndex:0];
 
     crate_pedestal_mask = [mtc pedCrateMask];
     coarse_delay = [mtc coarseDelay];
@@ -1419,41 +1433,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     } @catch (NSException *e) {
         NSLogColor([NSColor redColor],
                    @"pingCratesAtRunStart: error setting the MTCD pedestal width. error: "
-                    "%@ reason: %@\n", [e name], [e reason]);
-        return;
-    }
-
-    if (gt_mask & MTC_EXT_2_MASK) {
-        NSLogColor([NSColor redColor], @"pingCratesAtRunStart: EXT2 is masked in, so can't run ping crates.\n");
-        return;
-    }
-
-    /* Set the EXT2 trigger signal high so that it gets latched in every event
-     * while we ping the crates. This is to mark these events so that if we
-     * find out that changing the pedestal mask while running causes noise or
-     * other problems we can throw these events out. */
-    @try {
-        sync_trigger_mask = [tubii syncTrigMask];
-        async_trigger_mask = [tubii asyncTrigMask];
-        tubii_dac = [tubii MTCAMimic1_ThresholdInBits];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: error getting TUBii trigger masks or dac value. error: "
-                    "%@ reason: %@\n", [e name], [e reason]);
-        return;
-    }
-
-    if (sync_trigger_mask != 0 || async_trigger_mask != 0) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: tubii already has triggers enabled.\n");
-    }
-
-    @try {
-        [tubii setTrigMask:0x10000 setAsyncMask:0];
-        [tubii setMTCAMimic1_ThresholdInBits:0];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
                     "%@ reason: %@\n", [e name], [e reason]);
         return;
     }
@@ -1539,16 +1518,6 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
         if ([[xl3 xl3Link] isConnected]) {
             [xl3 setPedestals];
         }
-    }
-
-    /* Reset tubii's trigger masks and DAC value. */
-    @try {
-        [tubii setTrigMask:0 setAsyncMask:0];
-        [tubii setMTCAMimic1_ThresholdInBits:tubii_dac];
-    } @catch (NSException *e) {
-        NSLogColor([NSColor redColor],
-                   @"pingCratesAtRunStart: error setting TUBii trigger masks or dac value. error: "
-                    "%@ reason: %@\n", [e name], [e reason]);
     }
 
     /* Reset the crate pedestal all crates in the MTCD pedestal mask. */
@@ -2476,6 +2445,10 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 - (ECARun*) anECARun
 {
     return anECARun;
+}
+
+- (LivePedestals*) livePeds{
+    return livePeds;
 }
 
 - (BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion

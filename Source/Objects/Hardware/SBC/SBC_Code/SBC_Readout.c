@@ -218,7 +218,7 @@ int32_t main(int32_t argc, char *argv[])
 #endif
         /*-------------------------------*/
 
-        data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t));
+        data = (int32_t*)malloc(kMaxDataBufferSizeLongs*sizeof(int32_t) + 1024); //test ... add 1K
 
         SBC_Packet aPacket;
         int32_t numRead = 0;
@@ -546,6 +546,7 @@ void sendRunInfo(void)
     if (writeBuffer(&aPacket) < 0) {
         LogError("sendRunInfo Error: %s", strerror(errno));   
     }
+
 }
 
 void sendErrorInfo(void)
@@ -923,7 +924,7 @@ void commitData()
 
 void ensureDataCanHold(int numLongsRequired)
 {
-	if(dataIndex + numLongsRequired >= kMaxDataBufferSizeLongs){
+	if(dataIndex + numLongsRequired + 1024 >= kMaxDataBufferSizeLongs){
 		commitData();
 	}
 }

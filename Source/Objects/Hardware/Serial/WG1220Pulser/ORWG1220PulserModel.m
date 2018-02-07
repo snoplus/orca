@@ -571,6 +571,7 @@ NSString* ORWG1220PulserLock = @"ORWG1220PulserLock";
       NSLog(@"Waveform Data to send: %@ \n", waveformData);
     }
     [self writeData: waveformData];
+    [waveformData release]; //must release everything that is alloc'ed MAH 12/20/17
     //[self stopProgCommand];  // finishing programming mode 1
     [self writeData:[self checkStoppedProg:entries]];  // finishing programming mode 2
     [self setLocal];
@@ -739,8 +740,8 @@ NSString* ORWG1220PulserLock = @"ORWG1220PulserLock";
   if (aamplitude <= dampedMax){
     cmdData[2] = '1';
     attenuationInfo = [NSString stringWithFormat:@"attenuated"];
-  }else if( aamplitude > dampedMax)
-  {
+  }
+  else if( aamplitude > dampedMax){
     cmdData[2] = '2';
     attenuationInfo = [NSString stringWithFormat:@"not attenuated"];
   }

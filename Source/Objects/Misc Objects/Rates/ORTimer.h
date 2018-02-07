@@ -18,17 +18,13 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
-
-
-
 @interface ORTimer : NSObject 
 {
-    long time;
-    long started;
+    double time;
+    double started;
     BOOL isRunning;
 }
-+ (void) delayNanoseconds:(unsigned long)nanoSeconds;
++ (void) delayNanoseconds:(double)nanoSeconds;
 + (void) delay:(NSTimeInterval)seconds;
 
 // reset
@@ -39,10 +35,10 @@
 - (void)stop;
 
 // reporting total time
-- (long)microseconds;
+- (double)microseconds;
 - (double)seconds;
 
 // reporting elapsed time - from last start
-- (long)microsecondsSinceStart;
+- (double)microsecondsSinceStart;
 - (double)secondsSinceStart;
 @end

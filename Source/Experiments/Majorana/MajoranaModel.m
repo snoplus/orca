@@ -414,7 +414,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                         [rateSpikes[index] release];
                         rateSpikes[index] = nil;
                         [self setRateSpikeTime:index time:nil];
-                        
+                        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(forceConstraintCheck) object:nil];
                     }
                 }
                 break;
@@ -565,7 +565,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
     if(pollTime){
         if(!scheduledToRunCheckBreakdown){
             scheduledToRunCheckBreakdown = YES;
-            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:[self pollingTimeForLN:0]];
+            [self performSelector:@selector(forceConstraintCheck) withObject:nil afterDelay:10];
         }
     }
 }
@@ -626,7 +626,7 @@ static NSString* MajoranaDbConnector		= @"MajoranaDbConnector";
                     NSLog(@"Rate is spiking but less than %d (pollTime: %d) seconds have passed\n",(int)dt,(int)lnPolltime);
                 }
                 else {
-                    if([self fillingLN:index]){
+                    if(![self fillingLN:index]){
                         NSLog(@"Spikes exist and NOT filling\n");
                     }
                     else {

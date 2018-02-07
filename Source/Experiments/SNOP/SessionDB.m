@@ -1,5 +1,5 @@
 //
-//  SessionDB.h
+//  SessionDB.m
 //  Orca
 //
 //  Created by Andy Mastbaum on Mon Nov 20, 2017.
@@ -40,6 +40,13 @@ sessionKey = _sessionKey;
 - (void) dealloc
 {
     [connection disconnect];
+
+    [_username release];
+    [_password release];
+    [_dbname release];
+    [_address release];
+    [_sessionKey release];
+
     [super dealloc];
 }
 

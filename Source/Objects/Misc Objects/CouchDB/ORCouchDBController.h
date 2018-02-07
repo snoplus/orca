@@ -42,7 +42,7 @@
     IBOutlet NSTextField* alertMessageField;
     IBOutlet NSPopUpButton* alertTypePU;
     IBOutlet NSButton*	  skipDataSetsCB;
-
+    IBOutlet NSButton*    useHttpsCB;
 }
 
 #pragma mark ***Interface Management
@@ -51,6 +51,7 @@
 - (void) keepHistoryChanged:(NSNotification*)aNote;
 - (void) registerNotificationObservers;
 - (void) stealthModeChanged:(NSNotification*)aNote;
+- (void) useHttpsChanged:(NSNotification*)aNote;
 - (void) remoteHostNameChanged:(NSNotification*)aNote;
 - (void) localHostNameChanged:(NSNotification*)aNote;
 - (void) userNameChanged:(NSNotification*)aNote;
@@ -84,4 +85,5 @@
 - (IBAction) alertTypeAction:(id)sender;
 - (IBAction) postAlertAction:(id)sender;
 - (IBAction) skipDataSetsAction:(id)sender;
+- (IBAction) useHttpsAction:(id)sender;
 @end

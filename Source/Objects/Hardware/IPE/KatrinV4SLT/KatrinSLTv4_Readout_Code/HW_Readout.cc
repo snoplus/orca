@@ -59,9 +59,6 @@ January 2011,  implemented general read and write, new
 */ //-tb-
 
 
-#define USE_PBUS 0
-//Define USE_PBUS for usage of the pbusaccess library (obsolete, will be removed/changed in the future) -tb- 2010-04-09
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,16 +81,6 @@ extern "C" {
     #warning MESSAGE: HW_Readout: PMC_COMPILE_IN_SIMULATION_MODE is 1
 #endif
 
-
-#if USE_PBUS
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "pbusinterface.h"
-#ifdef __cplusplus
-}
-#endif
-#endif
 
 
 #if PMC_COMPILE_IN_SIMULATION_MODE
@@ -135,17 +122,16 @@ void processHWCommand(SBC_Packet* aPacket)
     int32_t aCmdID = aPacket->cmdHeader.cmdID;
     
     switch(aCmdID){
-            //        default:              processUnknownCommand(aPacket); break;
+        case kKATRINReadHitRates: readHitRates(aPacket); break;
+      //default:               processUnknownCommand(aPacket); break;
     }
 }
+
 
 void FindHardware(void)
 {
     //open device driver(s), get device driver handles
     const char* name = "kashell.ini";
-#if USE_PBUS
-    pbusInit((char*)name);
-#else
     //TODO: check here blocking semaphores? -tb-
     srack = new hw4::SubrackKatrin((char*)name,0);
     srack->checkSlot(); //check for available slots (init for isPresent(slot)); is necessary to prepare readout loop! -tb-
@@ -174,12 +160,15 @@ void FindHardware(void)
     if (ini->Status()==Inifile::kSUCCESS){
         ini->SpecifyGroup("OrcaReadout");
         debug = ini->GetFirstValue("debug", 0, &error);
+        nSendToOrca = ini->GetFirstValue("sendtoorca", 0, &error);
         ini->SpecifyGroup("kashell");
         configDir = ini->GetFirstString("configdir","",&error);
     }
     delete ini;
- 
 
+    if (debug)    printf("Parameter: debug = %d, sendtoorca %d\n", debug, nSendToOrca);
+
+    
     res = srack->readExpectedConfig("hardware.ini", configDir.c_str());
     
     
@@ -219,18 +208,13 @@ void FindHardware(void)
       }
     }
 
-#endif
 }
 
 void ReleaseHardware(void)
 {
     //release / close device driver(s)
-#if USE_PBUS
-    pbusFree();
-#else
     pbus = 0;
     delete srack;
-#endif
 }
 
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
@@ -259,33 +243,20 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)
     
     //**** use device driver call to write data to HW
     int32_t perr = 0;
-#if USE_PBUS
-    if (numItems == 1)    perr = pbusWrite(startAddress, *lptr);
-    else                perr = pbusWriteBlock(startAddress, (unsigned long *) lptr, numItems);
-#else
-    try{
-        if (numItems == 1){
-            #if 0
-            fprintf(stdout, "PrPMC: doWriteBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lptr,*lptr);
-            fflush(stdout);  
-            #endif		     		    
-		    pbus->write(startAddress, *lptr);
-			{
-			
-//TODO: DEBUGGING sim mode+PCIe issue -tb-    int32_t val = pbus->read(startAddress);     // TODO: !!!!!!!!!-tb-
-			
-			
-//TODO: DEBUGGING sim mode+PCIe issue -tb-            fprintf(stdout, "PrPMC: doReadBlock: read back  adr 0x%08x , val %i (0x%08x) \n",startAddress,val,val);
-//TODO: DEBUGGING sim mode+PCIe issue -tb-            fflush(stdout);  
+    try {
+        //printf("doWriteBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lptr,*lptr);
+        //fflush(stdout);
 
-			}
+        if (numItems == 1){
+            pbus->write(startAddress, *lptr);
 		}
-        else                pbus->writeBlock(startAddress, (unsigned long *) lptr, numItems);
-    }catch(PbusError &e){
+        else {
+            pbus->writeBlock(startAddress, (unsigned long *) lptr, numItems);
+        }
+    } catch(PbusError &e){
         e.displayMsg(stdout);
         perr = 1;
     }
-#endif
     
     /* echo the structure back with the error code*/
     /* 0 == no Error*/
@@ -337,26 +308,29 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     uint32_t *lPtr = (uint32_t *) returnPayload;
     
     int32_t perr   = 0;
-#if USE_PBUS
-    if (numItems == 1)  perr = pbusRead(startAddress, lPtr);
-    else                perr = pbusReadBlock(startAddress, lPtr, numItems);
-    //TODO: -tb- printf("perr: %d\n",perr);
-#else
-    try{
+    try {
+        if (debug > 1) {
+            struct timezone tz;
+            struct timeval t0;
+            
+            gettimeofday(&t0, &tz);
+            printf("%ld.%06ld: doReadBlock addr = %08x pbus = %08x\n", t0.tv_sec, t0.tv_usec,
+                    startAddress, startAddress << 2);
+            fflush(stdout);
+        }
+        
         if (numItems == 1){
 		    *lPtr = pbus->read(startAddress);
-			
-        
-//TODO: DEBUGGING sim mode+PCIe issue -tb-            fprintf(stdout, "PrPMC: doReadBlock: adr 0x%08x , val %i (0x%08x) \n",startAddress,*lPtr,*lPtr);
-//TODO: DEBUGGING sim mode+PCIe issue -tb-            fflush(stdout);  
 		}
-        else                pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
-    }catch(PbusError &e){
+        else  {
+            pbus->readBlock(startAddress, (unsigned long *) lPtr, numItems);
+        }
+        
+    } catch(PbusError &e){
         e.displayMsg(stdout);
         perr = 1;
     }
-#endif
-     
+    
     returnDataPtr->address         = startAddress;
     returnDataPtr->numItems        = numItems;
     if(perr == 0){
@@ -374,6 +348,30 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
     if(reply)writeBuffer(aPacket);
 }
 
+void readHitRates(SBC_Packet* aPacket)
+{
+    katrinV4_HitRateStructure* p = (katrinV4_HitRateStructure*)aPacket->payload;
+    if(needToSwap)SwapLongBlock(p,sizeof(katrinV4_HitRateStructure)/sizeof(int32_t));
+    int32_t station     = p->station-1;
+    int32_t enabledMask = p->enabledMask;
+
+    if(srack->theFlt[station]->isPresent()){
+        for(int32_t chan=0; chan<24;chan++){
+            if(enabledMask & (0x1<<chan)){
+                p->hitRates[chan] = srack->theFlt[station]->hitrate->read(chan);
+            }
+            else p->hitRates[chan] = 0;
+        }
+    }
+    p->subSeconds   = srack->theSlt->subSecCounter->read();//first read subsec counter!
+    p->seconds      = srack->theSlt->secCounter->read();
+    p->status       = srack->theSlt->status->read();
+    
+    if(needToSwap) SwapLongBlock(p, aPacket->cmdHeader.numberBytesinPayload/sizeof(uint32_t));
+    if (writeBuffer(aPacket) < 0) {
+        LogError("Read HitRate Error: %s", strerror(errno));
+    }
+}
 #else //of #if !PMC_COMPILE_IN_SIMULATION_MODE
 // (here follow the 'simulation' versions of all functions -tb-)
 //----------------------------------------------------------------
@@ -646,30 +644,25 @@ int getSltLinuxKernelDriverVersion(void)
 void readSltSecSubsec(uint32_t & sec, uint32_t & subsec)
 {
     if(!srack) return;
-    uint32_t subsecreg;
-    subsecreg    = srack->theSlt->subSecCounter->read();//first read subsec counter!
-    sec             = srack->theSlt->secCounter->read();
-    subsec   = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
+    uint32_t subsecreg   = srack->theSlt->subSecCounter->read();//first read subsec counter!
+    sec                  = srack->theSlt->secCounter->read();
+    subsec               = ((subsecreg>>11)&0x3fff)*2000   +  (subsecreg & 0x7ff);//TODO: move this to the fdhwlib -tb-
 }
 
 
 
 void setHostTimeToFLTsAndSLT(int32_t* args)
 {
-    unsigned long time;
-    
-    time = srack->setSecondCounter();
+    unsigned long time = srack->setSecondCounter();
     
     if (debug) {
         if (time > 0)
-            printf("Set second counter to %lds\n", time);
+            fprintf(stdout,"Set second counter to %lds\n", time);
         else
-            printf("The timer was not set properly - repeat!\n");
+            fprintf(stdout,"The timer was not set properly - repeat!\n");
     }
     
     /*
-   
-     
     uint32_t flags=args[0];
     uint32_t secondsSet=args[1];
     //DEBUG    fprintf(stderr,"setHostTimeToFLTsAndSLT(int32_t* args):   args 0x%x %u\n",flags,secondsSet);

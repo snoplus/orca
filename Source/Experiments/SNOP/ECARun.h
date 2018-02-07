@@ -7,6 +7,9 @@
 //  Class that handles ECA or electronic ADC calibrations.
 //
 
+#ifndef Orca_ECARun_h
+#define Orca_ECARun_h
+
 #import <Foundation/Foundation.h>
 
 #define ECAMODE_DEDICATED 0
@@ -23,6 +26,7 @@
     int ECA_nevents;
     NSNumber* ECA_rate;
     int ECA_mode;
+    NSString* ECA_pattern_string;
 
     //Other objects
     id anMTCModel;
@@ -89,3 +93,5 @@ extern NSString* ORECARunStartedNotification;
 extern NSString* ORECARunFinishedNotification;
 
 @end
+
+#endif

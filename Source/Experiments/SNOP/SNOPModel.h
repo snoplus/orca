@@ -26,6 +26,7 @@
 #import "ECARun.h"
 #import "NHitMonitor.h"
 #import "SessionDB.h"
+#import "LivePedestals.h"
 
 @class ORCouchDB;
 @class ORRunModel;
@@ -44,13 +45,14 @@
 #define kNumTubes	20 //XL3s
 #define kNumOfCrates 19 //number of Crates in SNO+
 #define STANDARD_RUN_VERSION 2 //Increase if Standard Runs table structure is changed
-#define SNOP_ORCA_VERSION "0.12.2" //The current Orca release
+#define SNOP_ORCA_VERSION "0.12.3" //The current Orca release
 
 BOOL isNotRunningOrIsInMaintenance();
 
 @interface SNOPModel: ORExperimentModel <snotDbDelegate>
 {
     SessionDB* sessionDB;
+    ORAlarm* defaultRunAlarm;
 
     NSString* _orcaDBUserName;
     NSString* _orcaDBPassword;
@@ -147,6 +149,7 @@ BOOL isNotRunningOrIsInMaintenance();
         unsigned long lastRunTypeWord;
         NSString* lastRunTypeWordHex;
         ECARun* anECARun;
+        LivePedestals* livePeds;
 }
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
@@ -332,7 +335,10 @@ BOOL isNotRunningOrIsInMaintenance();
 // ECA
 -(ECARun*) anECARun;
 
-// Standard runs functions
+//Live Pedestals
+-(LivePedestals*) livePeds;
+
+//Standard runs functions
 -(BOOL) refreshStandardRunsFromDB;
 -(BOOL) startStandardRun:(NSString*)_standardRun withVersion:(NSString*)_standardRunVersion;
 -(BOOL) loadStandardRun:(NSString*)runTypeName withVersion:(NSString*)runVersion;
@@ -353,3 +359,4 @@ extern NSString* ORSNOPModelSRVersionChangedNotification;
 extern NSString* ORSNOPModelNhitMonitorChangedNotification;
 extern NSString* ORSNOPStillWaitingForBuffersNotification;
 extern NSString* ORSNOPNotWaitingForBuffersNotification;
+extern NSString* ORRoutineChangedNotification;

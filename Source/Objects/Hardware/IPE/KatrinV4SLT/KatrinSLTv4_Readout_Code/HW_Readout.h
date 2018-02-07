@@ -31,6 +31,7 @@ Pbus *pbus=0;
 hw4::SubrackKatrin *srack=0;
 
 int debug = 0;
+int nSendToOrca = 0;
 
 void readSltSecSubsec(uint32_t & sec, uint32_t & subsec);
 #endif
@@ -48,6 +49,7 @@ void doWriteBlock(SBC_Packet* aPacket,uint8_t reply);
 void doReadBlock(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralWriteOp(SBC_Packet* aPacket,uint8_t reply);
 void doGeneralReadOp(SBC_Packet* aPacket,uint8_t reply);
+    void readHitRates(SBC_Packet* aPacket);
 
 int getSltLinuxKernelDriverVersion(void);
 void setHostTimeToFLTsAndSLT(int32_t* args);

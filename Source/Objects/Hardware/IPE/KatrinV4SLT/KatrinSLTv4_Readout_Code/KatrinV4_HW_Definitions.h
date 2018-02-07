@@ -24,6 +24,9 @@
 #define kSLTv4    1
 #define kFLTv4    2
 
+//Commands
+#define kKATRINReadHitRates         0x01
+
 
 #define kReadWaveForms	0x1 << 0
 
@@ -89,5 +92,13 @@ typedef struct { // -tb- 2013-05-27 struct for histogram buffer (for summing up 
     uint32_t h[2048];
 } katrinV4FltFullHistogramDataStruct;
 
+typedef struct {
+    uint32_t station;
+    uint32_t enabledMask;
+    uint32_t seconds;
+    uint32_t subSeconds;
+    uint32_t status;
+    uint32_t hitRates[24];  //returned
+} katrinV4_HitRateStructure;
 
 #endif

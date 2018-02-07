@@ -28,6 +28,7 @@
     NSString*       userName;
     NSString*       password;
     NSString*       localHostName;
+    BOOL            useHttps;
 	BOOL            stealthMode;
     NSUInteger      portNumber;
 	NSDictionary*   dBInfo;
@@ -87,6 +88,8 @@
 - (void) setReplicationRunning:(BOOL)aState;
 - (BOOL) keepHistory;
 - (void) setKeepHistory:(BOOL)aKeepHistory;
+- (BOOL) useHttps;
+- (void) setUseHttps:(BOOL)aState;
 - (BOOL) stealthMode;
 - (void) setStealthMode:(BOOL)aStealthMode;
 - (NSString*) password;
@@ -160,6 +163,7 @@ extern NSString* ORCouchDBPortNumberChanged;
 extern NSString* ORCouchDBUserNameChanged;
 extern NSString* ORCouchDBRemoteHostNameChanged;
 extern NSString* ORCouchDBModelStealthModeChanged;
+extern NSString* ORCouchDBModeUseHttpsChanged;
 extern NSString* ORCouchDBModelDBInfoChanged;
 extern NSString* ORCouchDBLocalHostNameChanged;
 extern NSString* ORCouchDBModelUsingUpdateHandleChanged;

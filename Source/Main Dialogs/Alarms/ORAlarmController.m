@@ -302,6 +302,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 #pragma mark •••Notifications
 - (void) alarmsChanged:(NSNotification*)aNotification
 {
+    if(![NSThread isMainThread]){
+        [self performSelectorOnMainThread:@selector(alarmsChanged:) withObject:aNotification waitUntilDone:NO];
+    }
     [tableView reloadData];
     if([helpDrawer state]){
         [self setUpHelpText];

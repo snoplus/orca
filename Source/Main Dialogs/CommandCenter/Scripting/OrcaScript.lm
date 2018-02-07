@@ -137,6 +137,10 @@ E			[Ee][+-]?{D}+
 "catch"             return CATCH;
 "finally"           return FINALLY;
 "throw"             return THROW;
+"global"            return GLOBAL;
+"_func_"            return SELFFUNCTION;
+"_symbols_"         return SYMBOLS;
+"_globals_"         return GLOBALS;
 
 {L}({L}|{D})*   {
                 strncpy(OrcaScriptlval.symKey,yytext,yyleng);

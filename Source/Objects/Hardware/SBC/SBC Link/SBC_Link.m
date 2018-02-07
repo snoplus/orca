@@ -1257,8 +1257,11 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 }
 
-- (void) taskData:(NSString*)text
+- (void) taskData:(NSDictionary*)taskData
 {
+    id       aTask = [taskData objectForKey:@"Task"];
+    NSString* text = [taskData objectForKey:@"Text"];
+    if(aTask != pingTask) return;
     //NSLog(@"%@\n",text);
 	if([text rangeOfString:@"error:"].location!=NSNotFound){
 		[self setCompilerErrors:compilerErrors+1];

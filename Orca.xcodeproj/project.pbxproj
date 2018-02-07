@@ -53,6 +53,8 @@
 		0FF177C81DF7AEA000BA783B /* run_dog_frame_5.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */; };
 		0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */; };
 		0FF177CB1DF7AF2F00BA783B /* waiting_dog.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */; };
+		10279A731EBA4AFE00048814 /* LivePedestals.m in Sources */ = {isa = PBXBuildFile; fileRef = 10279A721EBA4AFE00048814 /* LivePedestals.m */; };
+		10279A791EBA6B5B00048814 /* ECAPatterns.m in Sources */ = {isa = PBXBuildFile; fileRef = 10279A781EBA6B5B00048814 /* ECAPatterns.m */; };
 		10E455911E283AC000FB37A5 /* ECARun.h in Headers */ = {isa = PBXBuildFile; fileRef = 10E4558F1E283AC000FB37A5 /* ECARun.h */; };
 		10E455921E283AC000FB37A5 /* ECARun.m in Sources */ = {isa = PBXBuildFile; fileRef = 10E455901E283AC000FB37A5 /* ECARun.m */; };
 		146822430FC4799C0082BD70 /* ORCircularBufferUV.h in Headers */ = {isa = PBXBuildFile; fileRef = 146822410FC4799C0082BD70 /* ORCircularBufferUV.h */; };
@@ -602,6 +604,8 @@
 		840B813F094E4D8D00B1B135 /* ORLabelModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B8139094E4D8D00B1B135 /* ORLabelModel.h */; };
 		840B8140094E4D8D00B1B135 /* ORLabelModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 840B813A094E4D8D00B1B135 /* ORLabelModel.m */; };
 		840B8141094E4D8D00B1B135 /* ORLabelController.h in Headers */ = {isa = PBXBuildFile; fileRef = 840B813B094E4D8D00B1B135 /* ORLabelController.h */; };
+		840BB583201BCA7500F37939 /* ORUDPConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 840BB581201BCA7400F37939 /* ORUDPConnection.m */; };
+		840BB584201BCA7500F37939 /* ORUDPConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = 840BB582201BCA7400F37939 /* ORUDPConnection.h */; };
 		840C7FE01955CA0000E36622 /* NSApplication+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 840C7FDE1955CA0000E36622 /* NSApplication+Extensions.h */; };
 		840C7FE11955CA0000E36622 /* NSApplication+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */; };
 		840C7FE81955CA5A00E36622 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 840C7FE71955CA5A00E36622 /* Foundation.framework */; };
@@ -2947,6 +2951,14 @@
 		84D5D06B1C4564DF0057C1CA /* SIS3316.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D5D0631C4564DF0057C1CA /* SIS3316.nib */; };
 		84D5D06C1C4564DF0057C1CA /* SIS3316Card.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84D5D0641C4564DF0057C1CA /* SIS3316Card.tif */; };
 		84D60BCB07428C7D0061F795 /* OrcaObjectController.m in Sources */ = {isa = PBXBuildFile; fileRef = F51E69EE03AE4776015F64B1 /* OrcaObjectController.m */; };
+		84D613DE2017A9630038D662 /* ORTristanFLTController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D613D52017A9620038D662 /* ORTristanFLTController.h */; };
+		84D613DF2017A9630038D662 /* ORTristanFLTDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D613D62017A9620038D662 /* ORTristanFLTDecoder.h */; };
+		84D613E02017A9630038D662 /* ORTristanFLTModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D613D72017A9620038D662 /* ORTristanFLTModel.m */; };
+		84D613E22017A9630038D662 /* TristanFLTCard.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D613D92017A9620038D662 /* TristanFLTCard.gif */; };
+		84D613E32017A9630038D662 /* TristanFLT.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84D613DA2017A9620038D662 /* TristanFLT.nib */; };
+		84D613E42017A9630038D662 /* ORTristanFLTModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84D613DB2017A9620038D662 /* ORTristanFLTModel.h */; };
+		84D613E52017A9630038D662 /* ORTristanFLTDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D613DC2017A9620038D662 /* ORTristanFLTDecoder.m */; };
+		84D613E62017A9630038D662 /* ORTristanFLTController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84D613DD2017A9620038D662 /* ORTristanFLTController.m */; };
 		84D787321B39D8EF004CCBCA /* ORSIS3305Card.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84D7872E1B39D865004CCBCA /* ORSIS3305Card.cc */; };
 		84D787331B39D8F9004CCBCA /* ORSIS3305Card.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 84D7872F1B39D865004CCBCA /* ORSIS3305Card.hh */; };
 		84D7913B0FFA4CD000DC81D2 /* Keithley6487.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84D791330FFA4CD000DC81D2 /* Keithley6487.gif */; };
@@ -3835,6 +3847,9 @@
 		0FF177C11DF7AEA000BA783B /* run_dog_frame_5.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_5.tiff; sourceTree = "<group>"; };
 		0FF177C21DF7AEA000BA783B /* run_dog_frame_6.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = run_dog_frame_6.tiff; sourceTree = "<group>"; };
 		0FF177CA1DF7AF2F00BA783B /* waiting_dog.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = waiting_dog.tiff; sourceTree = "<group>"; };
+		10279A711EBA4AE900048814 /* LivePedestals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LivePedestals.h; sourceTree = "<group>"; };
+		10279A721EBA4AFE00048814 /* LivePedestals.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LivePedestals.m; sourceTree = "<group>"; };
+		10279A781EBA6B5B00048814 /* ECAPatterns.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECAPatterns.m; sourceTree = "<group>"; };
 		1038D8841E23160D009FFDFB /* RunTypeWordBits.hh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RunTypeWordBits.hh; sourceTree = "<group>"; };
 		10E4558F1E283AC000FB37A5 /* ECARun.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECARun.h; sourceTree = "<group>"; };
 		10E455901E283AC000FB37A5 /* ECARun.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECARun.m; sourceTree = "<group>"; };
@@ -4373,6 +4388,8 @@
 		840B8139094E4D8D00B1B135 /* ORLabelModel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORLabelModel.h; path = "Source/Objects/Misc Objects/Label/ORLabelModel.h"; sourceTree = SOURCE_ROOT; };
 		840B813A094E4D8D00B1B135 /* ORLabelModel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORLabelModel.m; path = "Source/Objects/Misc Objects/Label/ORLabelModel.m"; sourceTree = SOURCE_ROOT; };
 		840B813B094E4D8D00B1B135 /* ORLabelController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORLabelController.h; sourceTree = "<group>"; };
+		840BB581201BCA7400F37939 /* ORUDPConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORUDPConnection.m; sourceTree = "<group>"; };
+		840BB582201BCA7400F37939 /* ORUDPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORUDPConnection.h; sourceTree = "<group>"; };
 		840C7FDE1955CA0000E36622 /* NSApplication+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSApplication+Extensions.h"; sourceTree = "<group>"; };
 		840C7FDF1955CA0000E36622 /* NSApplication+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSApplication+Extensions.m"; sourceTree = "<group>"; };
 		840C7FE61955CA5A00E36622 /* RelaunchOrca */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = RelaunchOrca; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -6569,6 +6586,14 @@
 		84D5D0621C4564DF0057C1CA /* ORSIS3316Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSIS3316Model.m; sourceTree = "<group>"; };
 		84D5D0631C4564DF0057C1CA /* SIS3316.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SIS3316.nib; sourceTree = "<group>"; };
 		84D5D0641C4564DF0057C1CA /* SIS3316Card.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SIS3316Card.tif; sourceTree = "<group>"; };
+		84D613D52017A9620038D662 /* ORTristanFLTController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTristanFLTController.h; sourceTree = "<group>"; };
+		84D613D62017A9620038D662 /* ORTristanFLTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTristanFLTDecoder.h; sourceTree = "<group>"; };
+		84D613D72017A9620038D662 /* ORTristanFLTModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTristanFLTModel.m; sourceTree = "<group>"; };
+		84D613D92017A9620038D662 /* TristanFLTCard.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = TristanFLTCard.gif; sourceTree = "<group>"; };
+		84D613DA2017A9620038D662 /* TristanFLT.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = TristanFLT.nib; sourceTree = "<group>"; };
+		84D613DB2017A9620038D662 /* ORTristanFLTModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTristanFLTModel.h; sourceTree = "<group>"; };
+		84D613DC2017A9620038D662 /* ORTristanFLTDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTristanFLTDecoder.m; sourceTree = "<group>"; };
+		84D613DD2017A9620038D662 /* ORTristanFLTController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTristanFLTController.m; sourceTree = "<group>"; };
 		84D7872E1B39D865004CCBCA /* ORSIS3305Card.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSIS3305Card.cc; sourceTree = "<group>"; };
 		84D7872F1B39D865004CCBCA /* ORSIS3305Card.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSIS3305Card.hh; sourceTree = "<group>"; };
 		84D791330FFA4CD000DC81D2 /* Keithley6487.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = Keithley6487.gif; path = Source/Objects/Hardware/Serial/Keithley6487/Keithley6487.gif; sourceTree = SOURCE_ROOT; };
@@ -8402,6 +8427,15 @@
 			path = "Source/Objects/Misc Objects/Label";
 			sourceTree = SOURCE_ROOT;
 		};
+		840BB580201BCA7400F37939 /* UDPConnection */ = {
+			isa = PBXGroup;
+			children = (
+				840BB581201BCA7400F37939 /* ORUDPConnection.m */,
+				840BB582201BCA7400F37939 /* ORUDPConnection.h */,
+			);
+			path = UDPConnection;
+			sourceTree = "<group>";
+		};
 		840C7FF41955CA6A00E36622 /* Relaunch */ = {
 			isa = PBXGroup;
 			children = (
@@ -9089,6 +9123,7 @@
 				4AB9E5171DE5D820007C75E0 /* PostgreSQL */,
 				8471D4721588DF3C0039894D /* RemoteSocket */,
 				845313D01B9886B800FCEEE5 /* RemoteCommander */,
+				840BB580201BCA7400F37939 /* UDPConnection */,
 			);
 			name = "Misc Objects";
 			path = "Source/Objects/Misc Objects";
@@ -13486,6 +13521,21 @@
 			path = SIS3316;
 			sourceTree = "<group>";
 		};
+		84D613D42017A9620038D662 /* TristanFLT */ = {
+			isa = PBXGroup;
+			children = (
+				84D613D72017A9620038D662 /* ORTristanFLTModel.m */,
+				84D613DB2017A9620038D662 /* ORTristanFLTModel.h */,
+				84D613DD2017A9620038D662 /* ORTristanFLTController.m */,
+				84D613D52017A9620038D662 /* ORTristanFLTController.h */,
+				84D613DC2017A9620038D662 /* ORTristanFLTDecoder.m */,
+				84D613D62017A9620038D662 /* ORTristanFLTDecoder.h */,
+				84D613D92017A9620038D662 /* TristanFLTCard.gif */,
+				84D613DA2017A9620038D662 /* TristanFLT.nib */,
+			);
+			path = TristanFLT;
+			sourceTree = "<group>";
+		};
 		84D791320FFA4CD000DC81D2 /* Keithley6487 */ = {
 			isa = PBXGroup;
 			children = (
@@ -13962,6 +14012,7 @@
 				2D158EAB11359F5800EA1552 /* KatrinV4FLT */,
 				2D24A8C5126F516D00BA2E2E /* IpeSimulation */,
 				2D294524199E6A9400F68093 /* AmptekDP5 */,
+				84D613D42017A9620038D662 /* TristanFLT */,
 			);
 			name = IPE;
 			path = Source/Objects/Hardware/IPE;
@@ -14506,9 +14557,12 @@
 				EFB39FCC130BA1C5001220AC /* SNOPModel.h */,
 				EFB39FCD130BA1C5001220AC /* SNOPModel.m */,
 				0FF177A51DF79F5600BA783B /* run_dog_images */,
-				10E4558F1E283AC000FB37A5 /* ECARun.h */,
 				10E455931E28439B00FB37A5 /* ECAPatterns.h */,
+				10279A781EBA6B5B00048814 /* ECAPatterns.m */,
+				10E4558F1E283AC000FB37A5 /* ECARun.h */,
 				10E455901E283AC000FB37A5 /* ECARun.m */,
+				10279A711EBA4AE900048814 /* LivePedestals.h */,
+				10279A721EBA4AFE00048814 /* LivePedestals.m */,
 			);
 			path = SNOP;
 			sourceTree = "<group>";
@@ -15016,6 +15070,7 @@
 				8434A1B9055B3287002D3102 /* ORAlarmController.h in Headers */,
 				842FCCC019784AAA00B89723 /* OREDSF130pController.h in Headers */,
 				8434A1BB055B3287002D3102 /* ORFanOutController.h in Headers */,
+				84D613E42017A9630038D662 /* ORTristanFLTModel.h in Headers */,
 				8434A1BC055B3287002D3102 /* ORFanOutModel.h in Headers */,
 				8434A1BD055B3287002D3102 /* ORIP408Controller.h in Headers */,
 				8434A1BF055B3287002D3102 /* ORIP408Model.h in Headers */,
@@ -15037,6 +15092,7 @@
 				8434A1D3055B3287002D3102 /* ORVmeIPCard.h in Headers */,
 				8434A1D5055B3287002D3102 /* NcdMuxBoxModel.h in Headers */,
 				8434A1D6055B3287002D3102 /* NcdMuxBoxController.h in Headers */,
+				84D613DE2017A9630038D662 /* ORTristanFLTController.h in Headers */,
 				8434A1D8055B3287002D3102 /* ORFileIOHelpers.h in Headers */,
 				8434A1DB055B3287002D3102 /* ORDataTaker.h in Headers */,
 				8434A1DE055B3287002D3102 /* ORDataSet.h in Headers */,
@@ -15194,6 +15250,7 @@
 				847946D607330E5300C5E1FA /* ORPciBit3View.h in Headers */,
 				8402797207397B8700972B07 /* ORBit3Controller.h in Headers */,
 				8402797407397B8700972B07 /* ORBit3Model.h in Headers */,
+				840BB584201BCA7500F37939 /* ORUDPConnection.h in Headers */,
 				84028033073BF49D00972B07 /* ORLAMhosting.h in Headers */,
 				849F4C790768DA930087E9A8 /* ORDataExplorerModel.h in Headers */,
 				849F4C7B0768DA930087E9A8 /* ORHeaderItem.h in Headers */,
@@ -15372,6 +15429,7 @@
 				84DF474A0962140800ABE071 /* ORDataExplorerController.h in Headers */,
 				848648820975C1F6001C459D /* ORProcessInConnector.h in Headers */,
 				362020291CBD390A0089296E /* WPXMLRPCDecoderDelegate.h in Headers */,
+				84D613DF2017A9630038D662 /* ORTristanFLTDecoder.h in Headers */,
 				848648960975C415001C459D /* ORProcessOutConnector.h in Headers */,
 				C6FAAAF01FBDD5320069E81C /* ORWG1220PulserController.h in Headers */,
 				848648AC0975CB2E001C459D /* ORProcessConnector.h in Headers */,
@@ -16511,6 +16569,7 @@
 				84D980980795C5AC0074A035 /* AD811.nib in Resources */,
 				84D980990795C5AC0074A035 /* AD811Card.gif in Resources */,
 				84D98268079605CD0074A035 /* L2551Card.gif in Resources */,
+				84D613E22017A9630038D662 /* TristanFLTCard.gif in Resources */,
 				84D98269079605CD0074A035 /* L2551.nib in Resources */,
 				84D435B70798851B003D089F /* NoCamacDriverHelp.plist in Resources */,
 				84EC2C38079D95D800188ED3 /* No620DriverHelp.plist in Resources */,
@@ -16732,6 +16791,7 @@
 				84F46F460CA44255007EFADA /* IpeFLTCard.gif in Resources */,
 				6B325E0A1B2F42C8002E2DD7 /* SNOCrate.xib in Resources */,
 				84F46F4E0CA44255007EFADA /* IpeSLT.nib in Resources */,
+				84D613E32017A9630038D662 /* TristanFLT.nib in Resources */,
 				84F46F4F0CA44255007EFADA /* IpeSLTCard.gif in Resources */,
 				84F46F560CA44255007EFADA /* KatrinFLT.nib in Resources */,
 				84F46F570CA44255007EFADA /* KatrinFLTCard.gif in Resources */,
@@ -17356,6 +17416,7 @@
 				8434A2AF055B3287002D3102 /* ORGroupView.m in Sources */,
 				8434A2B7055B3287002D3102 /* ORVmeCrateController.m in Sources */,
 				8434A2B9055B3287002D3102 /* ORVmeCrateModel.m in Sources */,
+				84D613E52017A9630038D662 /* ORTristanFLTDecoder.m in Sources */,
 				8434A2BB055B3287002D3102 /* ORVmeAdapter.m in Sources */,
 				8489177D1D6B73D300CF5AAF /* ORCytecVM8Model.m in Sources */,
 				8434A2BC055B3287002D3102 /* ORVmeCard.m in Sources */,
@@ -17472,6 +17533,7 @@
 				844E49F3057538B1005F11A0 /* ORTask.m in Sources */,
 				8483E56E058652E400C28344 /* ORDataController.m in Sources */,
 				843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */,
+				10279A731EBA4AFE00048814 /* LivePedestals.m in Sources */,
 				847CCA69058E8C75003522C8 /* ORQueue.m in Sources */,
 				5B5A40521A79385C00543633 /* ORSIS3305Decoders.m in Sources */,
 				847CCA6B058E8C75003522C8 /* ORLinkedList.m in Sources */,
@@ -17572,6 +17634,7 @@
 				84D9809C0795C5AC0074A035 /* ORAD811Controller.m in Sources */,
 				84D980F60795DCC80074A035 /* ORAD811Decoders.m in Sources */,
 				84D98264079605CD0074A035 /* ORL2551Model.m in Sources */,
+				84D613E62017A9630038D662 /* ORTristanFLTController.m in Sources */,
 				84D98266079605CD0074A035 /* ORL2551Decoders.m in Sources */,
 				84D98267079605CD0074A035 /* ORL2551Controller.m in Sources */,
 				84D98348079716E90074A035 /* TimedWorker.m in Sources */,
@@ -17744,6 +17807,7 @@
 				84E0968609F44E3200EFE044 /* ORTek754DModel.m in Sources */,
 				844D93030A0A79AA00E83C57 /* ORPulser33220Model.m in Sources */,
 				843A4D4D0A1288A9003DF248 /* ORUSB.m in Sources */,
+				84D613E02017A9630038D662 /* ORTristanFLTModel.m in Sources */,
 				843A4D4F0A1288A9003DF248 /* ORUSBInterface.m in Sources */,
 				84F5E10E0A151D9300707A0F /* ORBasicOpenGLView.m in Sources */,
 				84F5E1640A15246000707A0F /* trackball.m in Sources */,
@@ -17854,6 +17918,7 @@
 				847E6C1E0CFF4C3200E963C6 /* OReGunController.m in Sources */,
 				847E6C200CFF4C3200E963C6 /* OReGunModel.m in Sources */,
 				9C1363CA0D0A7921006C550D /* ORCaen265Controller.m in Sources */,
+				840BB583201BCA7500F37939 /* ORUDPConnection.m in Sources */,
 				9C1363CC0D0A7921006C550D /* ORCaen265Decoders.m in Sources */,
 				9C1363CE0D0A7921006C550D /* ORCaen265Model.m in Sources */,
 				6B40D6631B2B79960000F7C1 /* ResistorDBModel.m in Sources */,
@@ -18363,6 +18428,7 @@
 				84FEAD1D15939394005D798C /* ORProXR16SSRController.m in Sources */,
 				84FEAD1F15939394005D798C /* ORProXR16SSRModel.m in Sources */,
 				84D153661BD53D2A005EC269 /* OROnCallListModel.m in Sources */,
+				10279A791EBA6B5B00048814 /* ECAPatterns.m in Sources */,
 				84FEB88B15A31F42005D798C /* ORL2301Controller.m in Sources */,
 				84FEB88D15A31F42005D798C /* ORL2301Decoders.m in Sources */,
 				84D5D0661C4564DF0057C1CA /* ORSIS3316Controller.m in Sources */,

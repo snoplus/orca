@@ -371,7 +371,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	return pingTask != nil;
 }
 
-- (void) taskData:(NSString*)text
+- (void) taskData:(NSDictionary*)taskData
 {
 }
 

@@ -1700,7 +1700,7 @@ tubRegister;
 {
 	@try {
         [mtc okCommand:"enable_pulser"];
-		NSLog(@"Enabled Pulser.\n");		
+        NSLog(@"Enabled Pulser.\n");
 	} @catch(NSException* localException) {
 		NSLog(@"Unable to enable the pulser!\n");		
 		[localException raise];
@@ -1726,7 +1726,7 @@ tubRegister;
 {
 	@try {
         [mtc okCommand:"enable_pedestals"];
-		NSLog(@"Enabled Pedestals.\n");		
+        NSLog(@"Enabled Pedestals.\n");
 	} @catch(NSException* localException) {
 		NSLog(@"Unable to enable the Pedestals!\n");		
 		[localException raise];
@@ -1737,7 +1737,7 @@ tubRegister;
 {
 	@try {
         [mtc okCommand:"disable_pedestals"];
-		NSLog(@"Disabled Pedestals.\n");
+        NSLog(@"Disabled Pedestals.\n");
 	} @catch(NSException* localException) {
 		NSLog(@"Unable to disable the Pedestals!\n");		
 		[localException raise];
