@@ -1224,7 +1224,7 @@ err:
     ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
 
     // Check if the datafile name is defined. If ORCA has just started up, it won't be.
-    // By setting here all file IO will be available for the current run. Otherwiese
+    // By setting here all file IO will be available for the current run. Otherwise
     // initialisation would only happen at the next run boundry.
     if([[aDataFileModel fileName] isEqualToString:@""]){
         NSLog(@"SNOPModel: There was no datafile name! Probably due to opening new ORCA. Correcting this now.\n");
