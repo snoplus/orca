@@ -256,6 +256,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     // amellie settings
     [_amellieFireParameters release];
     [_amellieFibreMapping release];
+    [_amellieRunDoc release];
+    [_amellieNodeMapping release];
     
     // smellie config mappings
     [_smellieLaserHeadToSepiaMapping release];

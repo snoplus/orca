@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
-        <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="11201"/>
+        <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -36,6 +36,9 @@
                 <outlet property="hvStatusMatrix" destination="2830" id="2912"/>
                 <outlet property="inMaintenanceLabel" destination="ZIv-V5-16l" id="aaL-TT-0jx"/>
                 <outlet property="lightBoardView" destination="URf-Um-n84" id="fpR-9q-LuL"/>
+                <outlet property="livePedRadioButton" destination="LBp-Zt-CUm" id="I5p-ru-RHj"/>
+                <outlet property="livePedRunTypeWordAd" destination="c8u-Xc-HHp" id="ckl-Mp-DEN"/>
+                <outlet property="livePedStatusLabel" destination="Bn6-6K-SLG" id="dKe-Io-Gpd"/>
                 <outlet property="loadedAmellieFibresLabel" destination="ceP-bE-cpw" id="AaV-Ls-GX8"/>
                 <outlet property="loadedAmellieFireRateLabel" destination="QdH-I6-QEV" id="fsZ-UY-T5q"/>
                 <outlet property="loadedAmellieIntensityLabel" destination="VzA-4H-nVQ" id="a6n-JU-FYl"/>
@@ -43,9 +46,6 @@
                 <outlet property="loadedAmellieOperationLabel" destination="dvz-QC-fDG" id="pzM-Ke-ezG"/>
                 <outlet property="loadedAmellieRunNameLabel" destination="XpR-Qx-caE" id="xqJ-of-2H2"/>
                 <outlet property="loadedAmellieRunTimeLabel" destination="MQx-aK-MNH" id="a6b-pL-9xk"/>
-                <outlet property="livePedRadioButton" destination="LBp-Zt-CUm" id="I5p-ru-RHj"/>
-                <outlet property="livePedRunTypeWordAd" destination="c8u-Xc-HHp" id="ckl-Mp-DEN"/>
-                <outlet property="livePedStatusLabel" destination="Bn6-6K-SLG" id="dKe-Io-Gpd"/>
                 <outlet property="loadedSmellieApproxTimeLabel" destination="dU9-zi-x8w" id="AEc-H4-7zL"/>
                 <outlet property="loadedSmellieFibresLabel" destination="cS3-ex-tXv" id="FLM-QI-rdR"/>
                 <outlet property="loadedSmellieLasersLabel" destination="s5i-jb-6co" id="xeO-dI-eDo"/>
@@ -270,7 +270,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Run Type Word" id="3963">
                                             <rect key="frame" x="622" y="-7" width="147" height="636"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="2Jh-qT-Nyj">
+                                            <view key="contentView" id="RRe-Ij-aGH">
                                                 <rect key="frame" x="1" y="1" width="145" height="620"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -605,7 +605,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="MTC settings" id="H5p-mY-U4E">
                                             <rect key="frame" x="1" y="91" width="293" height="448"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="3dd-5u-1NL">
+                                            <view key="contentView" id="HGe-JR-2fB">
                                                 <rect key="frame" x="1" y="1" width="291" height="432"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1113,7 +1113,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="CAEN settings" id="o4g-Ms-Wnk">
                                             <rect key="frame" x="296" y="2" width="324" height="335"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="Iu7-wC-OtZ">
+                                            <view key="contentView" id="4Jn-Ww-pBl">
                                                 <rect key="frame" x="1" y="1" width="322" height="319"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1489,7 +1489,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="TUBii settings" id="Whm-Y3-09L">
                                             <rect key="frame" x="296" y="339" width="324" height="200"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="VFy-KB-FfM">
+                                            <view key="contentView" id="GNw-hx-fhw">
                                                 <rect key="frame" x="1" y="1" width="322" height="184"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -1757,7 +1757,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Standard Run control" id="Oik-pb-QQv">
                                             <rect key="frame" x="1" y="539" width="619" height="90"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="SRO-o1-ymd">
+                                            <view key="contentView" id="dxm-0z-w7I">
                                                 <rect key="frame" x="1" y="1" width="617" height="74"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -2949,10 +2949,10 @@
                                                         <rect key="frame" x="10" y="33" width="283" height="601"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <box autoresizesSubviews="NO" title="ECA run status" borderType="line" id="OD6-Xe-TQT">
+                                                            <box autoresizesSubviews="NO" borderType="line" title="ECA run status" id="OD6-Xe-TQT">
                                                                 <rect key="frame" x="18" y="314" width="246" height="209"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="eKu-GK-jhf">
+                                                                <view key="contentView" id="aW5-0n-uuV">
                                                                     <rect key="frame" x="1" y="1" width="244" height="193"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3089,15 +3089,14 @@
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
                                                             </button>
-                                                            <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="aXs-eZ-20t">
+                                                            <box verticalHuggingPriority="750" boxType="separator" id="aXs-eZ-20t">
                                                                 <rect key="frame" x="6" y="529" width="270" height="5"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                             </box>
-
-                                                            <box autoresizesSubviews="NO" title="Live Pedestals" borderType="line" id="aNB-nF-JaI">
+                                                            <box autoresizesSubviews="NO" borderType="line" title="Live Pedestals" id="aNB-nF-JaI">
                                                                 <rect key="frame" x="18" y="538" width="246" height="42"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="WLe-lA-qB5">
+                                                                <view key="contentView" id="sXF-na-cTq">
                                                                     <rect key="frame" x="1" y="1" width="244" height="26"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3332,11 +3331,11 @@
                                             <tabViewItems>
                                                 <tabViewItem label="SMELLIE" identifier="" id="Qab-sY-83k">
                                                     <view key="view" id="cDN-DL-Qxe">
-                                                        <rect key="frame" x="10" y="25" width="320" height="606"/>
+                                                        <rect key="frame" x="10" y="29" width="320" height="602"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <comboBox verticalHuggingPriority="750" id="3cW-2R-0PG">
-                                                                <rect key="frame" x="17" y="579" width="279" height="22"/>
+                                                                <rect key="frame" x="17" y="575" width="279" height="22"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <comboBoxCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" enabled="NO" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Please Choose a Run File" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="SUX-T7-vTy">
                                                                     <font key="font" metaFont="smallSystem"/>
@@ -3345,7 +3344,7 @@
                                                                 </comboBoxCell>
                                                             </comboBox>
                                                             <button verticalHuggingPriority="750" id="wQo-rL-aDD">
-                                                                <rect key="frame" x="82" y="510" width="146" height="32"/>
+                                                                <rect key="frame" x="82" y="506" width="146" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Load Run FIle" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="E2Y-DZ-p9Z">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3356,7 +3355,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="GOx-Ks-4sd">
-                                                                <rect key="frame" x="56" y="543" width="198" height="32"/>
+                                                                <rect key="frame" x="56" y="539" width="198" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Fetch Run Files" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="HgZ-Xc-2aS">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3367,7 +3366,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="J8i-g9-LzC">
-                                                                <rect key="frame" x="82" y="469" width="146" height="32"/>
+                                                                <rect key="frame" x="82" y="465" width="146" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Start SMELLIE Run" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FQa-os-y2k">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3378,7 +3377,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="Cgv-06-MFb">
-                                                                <rect key="frame" x="82" y="438" width="146" height="32"/>
+                                                                <rect key="frame" x="82" y="434" width="146" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Stop SMELLIE Run" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="eIz-1u-Bhr">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3389,7 +3388,7 @@
                                                                 </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="uhs-DN-ePI">
-                                                                <rect key="frame" x="39" y="408" width="233" height="32"/>
+                                                                <rect key="frame" x="39" y="404" width="233" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="push" title="Emergency Stop (SMELLIE ONLY)" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="oX6-na-oB8">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -3400,9 +3399,9 @@
                                                                 </connections>
                                                             </button>
                                                             <box borderType="line" title="Summary:" id="DWO-Xg-iTT">
-                                                                <rect key="frame" x="14" y="305" width="292" height="107"/>
+                                                                <rect key="frame" x="14" y="301" width="292" height="107"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="3Uo-Bh-lMF">
+                                                                <view key="contentView" id="LZO-qw-kYN">
                                                                     <rect key="frame" x="1" y="1" width="290" height="91"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3455,9 +3454,9 @@
                                                                 </view>
                                                             </box>
                                                             <box autoresizesSubviews="NO" borderType="line" title="Run Details:" id="A8M-Gr-PF5">
-                                                                <rect key="frame" x="14" y="4" width="294" height="297"/>
+                                                                <rect key="frame" x="14" y="0.0" width="294" height="297"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="qVy-bo-LUg">
+                                                                <view key="contentView" id="OGU-sI-0Uf">
                                                                     <rect key="frame" x="1" y="1" width="292" height="281"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3583,7 +3582,7 @@
                                                             <box borderType="line" title="Summary" id="lxF-sr-oaj">
                                                                 <rect key="frame" x="14" y="302" width="292" height="103"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="T5e-sq-epU">
+                                                                <view key="contentView" id="XZp-gx-MoS">
                                                                     <rect key="frame" x="1" y="1" width="290" height="87"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3693,7 +3692,7 @@
                                                             <box autoresizesSubviews="NO" borderType="line" title="Run Details:" id="CnD-jv-nWy">
                                                                 <rect key="frame" x="14" y="0.0" width="292" height="298"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="gdz-VJ-peX">
+                                                                <view key="contentView" id="8t6-Qk-vVk">
                                                                     <rect key="frame" x="1" y="1" width="290" height="282"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3828,7 +3827,7 @@
                                                             <box borderType="line" title="Summary" id="oef-Qg-CAL">
                                                                 <rect key="frame" x="14" y="303" width="292" height="103"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="EWH-YK-Ioh">
+                                                                <view key="contentView" id="MZ4-K6-eXn">
                                                                     <rect key="frame" x="1" y="1" width="290" height="87"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -3927,7 +3926,7 @@
                                                             <box autoresizesSubviews="NO" borderType="line" title="Run Details:" id="Ska-h0-iq9">
                                                                 <rect key="frame" x="14" y="1" width="292" height="298"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView" id="eUV-sR-7hZ">
+                                                                <view key="contentView" id="xKH-Yh-kQ3">
                                                                     <rect key="frame" x="1" y="1" width="290" height="282"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <subviews>
@@ -4069,7 +4068,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Latest Results" id="osf-mb-MSE">
                                             <rect key="frame" x="14" y="461" width="246" height="168"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="RXP-ED-QE5">
+                                            <view key="contentView" id="FWq-KX-hFq">
                                                 <rect key="frame" x="1" y="1" width="244" height="152"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4179,7 +4178,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Settings For Automatic Running" id="rvK-dU-5Pd">
                                             <rect key="frame" x="402" y="172" width="357" height="457"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="gMs-Ph-amO">
+                                            <view key="contentView" id="DbO-IE-7ij">
                                                 <rect key="frame" x="1" y="1" width="355" height="441"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4492,7 +4491,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Run Nhit Monitor Once" id="ImM-MN-hPP">
                                             <rect key="frame" x="14" y="203" width="321" height="254"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="O8G-kZ-252">
+                                            <view key="contentView" id="Wsp-24-jIn">
                                                 <rect key="frame" x="1" y="1" width="319" height="238"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4663,7 +4662,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="OrcaDB" id="2651">
                                             <rect key="frame" x="14" y="432" width="371" height="151"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="82R-qn-eaa">
+                                            <view key="contentView" id="77l-ZR-w3y">
                                                 <rect key="frame" x="1" y="1" width="369" height="135"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4830,7 +4829,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="LockDB" id="D86-Ix-jxN">
                                             <rect key="frame" x="14" y="79" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="6Uz-dg-OEe">
+                                            <view key="contentView" id="Hzh-7L-TwB">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -4969,7 +4968,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="DebugDB ECAL" id="2718">
                                             <rect key="frame" x="399" y="428" width="371" height="159"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="Mc6-hp-oop">
+                                            <view key="contentView" id="xqC-Ys-Yls">
                                                 <rect key="frame" x="1" y="1" width="369" height="143"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5136,7 +5135,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="MTC Server" id="SIk-jq-Uyj">
                                             <rect key="frame" x="14" y="314" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="5UB-lc-J8W">
+                                            <view key="contentView" id="1S5-3W-oJs">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5201,7 +5200,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="XL3 Server" id="8rD-lN-zTL">
                                             <rect key="frame" x="399" y="314" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="WSa-qO-PD0">
+                                            <view key="contentView" id="YQ6-bB-ey7">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5266,7 +5265,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Log Server" id="7Ol-yJ-YAc">
                                             <rect key="frame" x="399" y="196" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="Oaw-gT-Zzb">
+                                            <view key="contentView" id="Ws2-iB-tXL">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5331,7 +5330,7 @@
                                         <box autoresizesSubviews="NO" borderType="line" title="Data Server" id="Vzf-gX-Lte">
                                             <rect key="frame" x="14" y="196" width="371" height="114"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView" id="swY-rm-jXL">
+                                            <view key="contentView" id="mIu-RZ-5RF">
                                                 <rect key="frame" x="1" y="1" width="369" height="98"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5419,10 +5418,10 @@
                                                 <action selector="startRunAction:" target="-2" id="3d7-z4-3Vt"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Run status" borderType="line" id="3751">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Run status" id="3751">
                                             <rect key="frame" x="44" y="147" width="311" height="138"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
+                                            <view key="contentView" id="cKe-pb-tSz">
                                                 <rect key="frame" x="1" y="1" width="309" height="122"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5551,8 +5550,6 @@
                                                     </textField>
                                                 </subviews>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <customView id="URf-Um-n84" customClass="StopLightView">
                                             <rect key="frame" x="5" y="220" width="30" height="98"/>
@@ -5592,10 +5589,10 @@
                                                 <action selector="resyncRunAction:" target="-2" id="uog-UL-xiy"/>
                                             </connections>
                                         </button>
-                                        <box autoresizesSubviews="NO" title="Routines" borderType="line" id="Wgj-VT-FSP">
+                                        <box autoresizesSubviews="NO" borderType="line" title="Routines" id="Wgj-VT-FSP">
                                             <rect key="frame" x="44" y="68" width="311" height="83"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
+                                            <view key="contentView" id="6BU-9J-mzF">
                                                 <rect key="frame" x="1" y="1" width="309" height="67"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
@@ -5705,8 +5702,6 @@
                                                     </matrix>
                                                 </subviews>
                                             </view>
-                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         </box>
                                         <progressIndicator verticalHuggingPriority="750" maxValue="100" bezeled="NO" controlSize="small" style="bar" id="MBu-zu-x36">
                                             <rect key="frame" x="23" y="32" width="315" height="12"/>

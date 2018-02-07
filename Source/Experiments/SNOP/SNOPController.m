@@ -109,6 +109,9 @@ snopGreenColor;
     [_smellieRunFileList release];
     [_tellieRunFileList release];
     [tellieFireSettings release];
+    [amellieFireSettings release];
+    [amellieRunFile release];
+    [_amellieRunFileList release];
     waitingForBuffersAlert = nil;
     [super dealloc];
 }

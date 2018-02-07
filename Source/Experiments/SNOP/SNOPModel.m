@@ -508,6 +508,8 @@ tellieRunFiles = _tellieRunFiles;
     [_smellieRunFiles release];
     [_tellieRunFiles release];
     [_tellieRunNameLabel release];
+    [_amellieRunFiles release];
+    [_amellieRunNameLabel release];
 
     [defaultRunAlarm clearAlarm];
     [defaultRunAlarm dealloc];

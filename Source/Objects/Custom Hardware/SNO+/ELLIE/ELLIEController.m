@@ -1560,7 +1560,7 @@
 
 -(void)killInterlock:(NSNotification *)aNote
 {
-    [model killKeepAlive];
+    [model killKeepAlive:aNote];
 }
 
 - (IBAction)tubiiRestart:(id)sender {
