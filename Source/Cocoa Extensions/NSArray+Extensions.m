@@ -122,6 +122,14 @@
     return [anArray autorelease];
 }
 
++ (NSArray*) arrayFromBoolCArray:(BOOL*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithBool:cArray[i]]];
+    return [anArray autorelease];
+}
+
 - (void) loadLongCArray:(long*)cArray size:(int)num
 {
     int n = MIN([self count],num);
@@ -150,6 +158,13 @@
     int n = MIN([self count],num);
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedShortValue];
+}
+
+- (void) loadBoolCArray:(BOOL*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] boolValue];
 }
 
 @end
