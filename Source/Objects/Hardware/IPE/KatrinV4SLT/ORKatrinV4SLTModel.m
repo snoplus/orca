@@ -1520,7 +1520,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     
     [self setMinimizeDecoding:       [decoder decodeBoolForKey:  @"minimizeDecoding"]];
-	//[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
+	[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
 	[self setSltScriptArguments:    [decoder decodeObjectForKey:@"sltScriptArguments"]];
 	[self setControlReg:            [decoder decodeInt32ForKey:@"controlReg"]];
 	[self setSecondsSet:            [decoder decodeInt32ForKey:@"secondsSet"]];
@@ -1556,7 +1556,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
 	[super encodeWithCoder:encoder];
 	
-	//[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
+	[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
     [encoder encodeBool:minimizeDecoding        forKey:@"minimizeDecoding"];
 	[encoder encodeBool:secondsSetSendToFLTs    forKey:@"secondsSetSendToFLTs"];
 	[encoder encodeBool:secondsSetInitWithHost  forKey:@"secondsSetInitWithHost"];

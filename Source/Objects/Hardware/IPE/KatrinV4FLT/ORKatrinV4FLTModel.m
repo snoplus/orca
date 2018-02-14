@@ -310,7 +310,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 - (void) setEnergyOffset:(int)aEnergyOffset
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyOffset:energyOffset];
-    energyOffset = [self restrictIntValue:aEnergyOffset min:0 max:0xfffff];
+    energyOffset = [self restrictIntValue:aEnergyOffset min:-1048576 max:0xfffff];//2018-02-12 added negative EnergyOffset (21 bit) -tb-
     //energyOffset = aEnergyOffset;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelEnergyOffsetChanged object:self];
 }
@@ -933,7 +933,7 @@ static double table[32]={
         [self setFloatThreshold:chan withValue:currentThreshold*ratio];
     }
     
-    unsigned long currentOffset = [self energyOffset];
+    long currentOffset = [self energyOffset];
     [self setEnergyOffset:currentOffset*ratio];
     
     //----------------------------------------------
