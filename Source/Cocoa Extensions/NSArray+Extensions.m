@@ -89,6 +89,69 @@
 		NSLog(@"%d : %@\n",i,[self objectAtIndex:i]);
 	}
 }
+
++ (NSArray*) arrayFromLongCArray:(long*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithLong:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromULongCArray:(unsigned long*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithUnsignedLong:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromShortCArray:(short*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithShort:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromUShortCArray:(unsigned short*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithUnsignedShort:cArray[i]]];
+    return [anArray autorelease];
+}
+
+- (void) loadLongCArray:(long*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] longValue];
+}
+
+
+- (void) loadULongCArray:(unsigned long*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedLongValue];
+}
+
+
+- (void) loadShortCArray:(short*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] shortValue];
+}
+
+- (void) loadUShortCArray:(unsigned short*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedShortValue];
+}
+
 @end
 
 @implementation NSMutableArray (OrcaExtensions)

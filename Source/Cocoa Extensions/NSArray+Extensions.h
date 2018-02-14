@@ -24,6 +24,14 @@
 - (NSData *)dataWithLineEndingType:(LineEndingType)lineEndingType;
 - (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (void) prettyPrint:(NSString*)aTitle;
++ (NSArray*) arrayFromLongCArray   : (long*)          cArray size:(int)num;
++ (NSArray*) arrayFromULongCArray  : (unsigned long*) cArray size:(int)num;
++ (NSArray*) arrayFromShortCArray  : (short*)         cArray size:(int)num;
++ (NSArray*) arrayFromUShortCArray : (unsigned short*)cArray size:(int)num;
+- (void) loadLongCArray   : (long*)          cArray size:(int)num;
+- (void) loadULongCArray  : (unsigned long*) cArray size:(int)num;
+- (void) loadShortCArray  : (short*)         cArray size:(int)num;
+- (void) loadUShortCArray : (unsigned short*)cArray size:(int)num;
 @end
 
 @interface NSMutableArray (OrcaExtensions)
