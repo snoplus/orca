@@ -40,10 +40,7 @@ enum {
     kCBLTSetupReg,
     kInternalTestReg,
     kHWVersionReg,
-    
-    kNumberOfVMEFPGAInterfaceRegisters //must be last
-};
-enum {
+
     kTemperatureReg,
     k1WireEEPROMcontrolReg,
     kSerialNumberReg,
@@ -109,11 +106,6 @@ enum {
     kChan15TrigCounterReg,
     kChan16TrigCounterReg,
     
-    kNumberOfVMEFPGARegisters
-};
-
-enum{
-    
     kKeyResetReg,
     kKeyUserFuncReg,
     
@@ -131,10 +123,10 @@ enum{
     kKeyResetAdcLogicReg,
     kKeyAdcClockPllResetReg,
     
-    kKeyAddressRegisters
+    kNumberSingleRegs //must be last
 };
 
-enum{
+enum {
     
     kAdcInputTapDelayReg,
     kAdcGainTermCntrlReg,
@@ -159,22 +151,7 @@ enum{
     kFirTrigSetupCh1Reg,
     kTrigThresholdCh1Reg,
     kHiEnergyTrigThresCh1Reg,
-    
-    
-    kFirTrigSetupCh2Reg,
-    kTrigThresholdCh2Reg,
-    kHiEnergyTrigThresCh2Reg,
-    
-    
-    kFirTrigSetupCh3Reg,
-    kTrigThresholdCh3Reg,
-    kHiEnergyTrigThresCh3Reg,
-    
-    
-    kFirTrigSetupCh4Reg,
-    kTrigThresholdCh4Reg,
-    kHiEnergyTrigThresCh4Reg,
-    
+        
     kFirTrigSetupSumCh1Ch4Reg,
     kTrigThreholdSumCh1Ch4Reg,
     kHiETrigThresSumCh1Ch4Reg,
@@ -229,11 +206,10 @@ enum{
     kTestReadback01018Reg,
     kTestReadback0101CReg,
     
-    
-    kADCGroupRegisters
+    kADCGroupRegisters //must be last
 };
 
-@interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,ORHWRamping,AutoTesting>
+@interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,AutoTesting>
 {
   @private
 //-=**    short           gateLengthMask;
@@ -248,23 +224,24 @@ enum{
     long			heSuppressTriggerMask;
     unsigned long   cfdControlBits[kNumSIS3316Channels];
     unsigned long   threshold[kNumSIS3316Channels];
-    unsigned long   peakingTime[kNumSIS3316Channels];
+    unsigned long   riseTime[kNumSIS3316Channels];
     unsigned long   gapTime[kNumSIS3316Channels];
     unsigned long   tauFactor[kNumSIS3316Channels];
     unsigned long   extraFilterBits[kNumSIS3316Channels];
     unsigned long   tauTableBits[kNumSIS3316Channels];
     unsigned long   heTrigThreshold[kNumSIS3316Channels];
-    unsigned long   heTrigThresholdSum[kNumSIS3316Groups];
     unsigned long   endAddress[kNumSIS3316Groups];
     unsigned short  intTrigOutPulseBit[kNumSIS3316Channels];
+    unsigned short  triggerDelay[kNumSIS3316Channels];
+    unsigned short  dacOffsets[kNumSIS3316Groups];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
-    long            heTrigOutputMask;
+    //long            heTrigOutputMask;
     
     
     unsigned long   eventConfigMask;
-    unsigned long   extendedEventConfigMask;
-//    unsigned long   endAddressFinalMask;
+    BOOL            extendedEventConfigBit;
+    unsigned long   endAddressSuppressionMask;
     unsigned short  activeTrigGateWindowLen[kNumSIS3316Groups];
     unsigned short  preTriggerDelay[kNumSIS3316Groups];
     
@@ -291,13 +268,14 @@ enum{
     unsigned short  accGate7Start[kNumSIS3316Groups];
     unsigned short  accGate8Len[kNumSIS3316Groups];
     unsigned short  accGate8Start[kNumSIS3316Groups];
-    unsigned long   thresholdSum[kNumSIS3316Groups];
-    unsigned short  triggerDelay[kNumSIS3316Groups];
-    unsigned short  triggerDelayTwo[kNumSIS3316Groups];
-    unsigned short  triggerDelay3[kNumSIS3316Groups];
-    unsigned short  triggerDelay4[kNumSIS3316Groups];
-
     
+    BOOL            enableSum[kNumSIS3316Groups];
+    unsigned long   thresholdSum[kNumSIS3316Groups];
+    unsigned long   heTrigThresholdSum[kNumSIS3316Groups];
+    unsigned long   riseTimeSum[kNumSIS3316Groups];
+    unsigned long   gapTimeSum[kNumSIS3316Groups];
+    unsigned long   cfdControlBitsSum[kNumSIS3316Groups];
+
 
     
     int             currentBank;
@@ -306,10 +284,13 @@ enum{
  	
     BOOL			stopTrigger;
     BOOL			pageWrap;
-    BOOL			gateChaining;
+    //BOOL			gateChaining;
 	unsigned short	moduleID;
     unsigned long   clockSource;
-	
+    unsigned short  gain;
+    unsigned short  termination;
+    int             sharing; //clock sharing
+    
 	//control status reg
  
 	
@@ -323,22 +304,17 @@ enum{
     BOOL multiplexerMode;
 
 	//clocks and delays (Acquisition control reg)
-    BOOL stopDelayEnabled;
     BOOL randomClock;
-    
-    //int	 startDelay;
-    int	 stopDelay;
-	
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3316Channels];
 
 	//cach to speed takedata
-    unsigned long* dataRecord[4];
+   // unsigned long* dataRecord[4];
 	unsigned long location;
 	id theController;
 	long count;
-    BOOL firstTime;
+    //BOOL firstTime;
     BOOL waitingForSomeChannels;
     NSString* revision;
     unsigned short majorRev;        //6.2
@@ -347,7 +323,9 @@ enum{
     float temperature;              //6.8
     unsigned short serialNumber;     //6.10  
     //
-    
+    unsigned long lemoCoMask;
+    unsigned long lemoUoMask;
+    unsigned long lemoToMask;
 }
 
 - (id) init;
@@ -360,6 +338,13 @@ enum{
 - (unsigned short) moduleID;
 - (unsigned short) hwVersion;
 - (float) temperature;
+- (unsigned short) gain;
+- (void) setGain:(unsigned short)aGain;
+- (unsigned short) termination;
+- (void) setTermination:(unsigned short)aTermination;
+- (void) setSharing:(int)aValue;
+- (int) sharing;
+
 //- (float) clockSource;
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
@@ -367,34 +352,27 @@ enum{
 
 - (long) enabledMask;
 - (unsigned long) eventConfigMask;
-- (unsigned long) extendedEventConfigMask;
-//- (unsigned long) endAddressFinalMask;
 
 - (void) setEventConfigMask:(unsigned long)aMask;
 - (BOOL) eventConfig:(unsigned short)aGroup;
 - (void) setEventConfigBit:(unsigned short)aGroup withValue:(BOOL)aValue;
 
-- (void) setExtendedEventConfigMask:(unsigned long)aMask;
-- (BOOL) extendedEventConfig:(unsigned short)aGroup;
-- (void) setExtendedEventConfigBit:(unsigned short)aGroup withValue:(BOOL)aValue;
+- (BOOL) extendedEventConfigBit;
+- (void) setExtendedEventConfigBit:(BOOL)aValue;
 
-//- (void) setEndAddressFinalMask:(unsigned long)aMask;
-//- (BOOL) endAddressFinal:(unsigned short)aGroup;
-//- (void) setEndAddressFinalBit:(unsigned short)aGroup withValue:(BOOL)aValue;
+- (unsigned long) endAddressSuppressionMask;
+- (void) setEndAddressSuppressionMask:(unsigned long)aMask;
+- (void) setEndAddressSuppressionBit:(unsigned short)aGroup withValue:(BOOL)aValue;
 
-//-=** (BOOL) enabledMask:(unsigned short)chan;
 - (void) setEnabledMask:(unsigned long)aMask;
 - (BOOL) enabled:(unsigned short)chan;
 - (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue;
 ///////
 - (long) acquisitionControlMask;
 - (void) setAcquisitionControlMask:(unsigned long)aMask;
-- (BOOL) acquisitionControl:(unsigned long)chan;
-- (void) setAcquisitionControlBit:(unsigned long)aChan withValue:(BOOL)aValue;
 //////
 - (long) nimControlStatusMask;
 - (void) setNIMControlStatusMask:(unsigned long)aMask;
-- (BOOL) nimControlStatus:(unsigned long)chan;
 - (void) setNIMControlStatusBit:(unsigned long)aChan withValue:(BOOL)aValue;
 //////
 - (long) histogramsEnabledMask;
@@ -417,33 +395,41 @@ enum{
 - (BOOL) writeHitsToEventMemory:(unsigned short)chan;
 - (void) setWriteHitsToEventMemory:(unsigned short)chan withValue:(BOOL)aValue;
 ///////
-- (void) setTriggerDelay:(unsigned short)aGroup withValue: (unsigned short)aValue;
-- (unsigned short) triggerDelay: (unsigned short)aGroup;
-
-- (void) setTriggerDelayTwo:(unsigned short)aGroup withValue: (unsigned short)aValue;
-- (unsigned short) triggerDelayTwo: (unsigned short)aGroup;
-
-- (void) setTriggerDelay3:(unsigned short)aGroup withValue: (unsigned short)aValue;
-- (unsigned short) triggerDelay3: (unsigned short)aGroup;
-
-- (void) setTriggerDelay4:(unsigned short)aGroup withValue: (unsigned short)aValue;
-- (unsigned short) triggerDelay4: (unsigned short)aGroup;
+- (void) setTriggerDelay:(unsigned short)aChan withValue: (unsigned short)aValue;
+- (unsigned short) triggerDelay: (unsigned short)aChan;
 
 - (long) heSuppressTriggerMask;
-- (BOOL) heSuppressTriggerMask:(unsigned short)chan;
 - (void) setHeSuppressTriggerMask:(unsigned long)aMask;
+- (BOOL) heSuppressTriggerBit:(unsigned short)chan;
 - (void) setHeSuppressTriggerBit:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (void) setEndAddress:(unsigned short)aGroup withValue: (unsigned long)aValue;
 - (unsigned long) endAddress: (unsigned short)aGroup;
 
 - (void) setThreshold:(unsigned short)chan withValue:(long)aValue;
-- (void) setThresholdSum:(unsigned short)aGroup withValue: (unsigned long)aValue;
 - (long) threshold:(unsigned short)chan;
+
+- (unsigned short) cfdControlBits:(unsigned short)aChan;
+- (void) setCfdControlBits:(unsigned short)aChan withValue:(unsigned short)aValue;
+
+
+- (BOOL) enableSum:(unsigned short)aGroup;
+- (void) setEnableSum:(unsigned short)aGroup withValue:(BOOL)aValue;
+
+- (unsigned long) riseTimeSum:(unsigned short)aGroup;
+- (void)          setRiseTimeSum:(unsigned short)aGroup withValue:(unsigned short)aValue;
+
+- (unsigned long) gapTimeSum:(unsigned short)aGroup;
+- (void)          setGapTimeSum:(unsigned short)aGroup withValue:(unsigned short)aValue;
+
+- (void) setThresholdSum:(unsigned short)aGroup withValue: (unsigned long)aValue;
 - (unsigned long) thresholdSum: (unsigned short)aGroup;
 
-- (long)cfdControlBits:(unsigned short)aChan;
-- (void) setCfdControlBits:(unsigned short)aChan withValue:(long)aValue;
+- (unsigned short) dacOffset:(unsigned short)aGroup;
+- (void) setDacOffset:(unsigned short)aGroup withValue:(int)aValue;
+
+- (unsigned short) cfdControlBitsSum:(unsigned short)aChan;
+- (void) setCfdControlBitsSum:(unsigned short)aChan withValue:(unsigned short)aValue;
 
 - (long)clockSource;
 - (void) setClockSource:(long)aValue;
@@ -466,22 +452,23 @@ enum{
 - (void) setGapTime:(unsigned short)chan withValue:(unsigned short)aValue;
 - (unsigned short) gapTime:(unsigned short)chan;
 
-- (void) setPeakingTime:(unsigned short)chan withValue:(unsigned short)aValue;
-- (unsigned short) peakingTime:(unsigned short)chan;
+- (void) setRiseTime:(unsigned short)chan withValue:(unsigned short)aValue;
+- (unsigned short) riseTime:(unsigned short)chan;
 
 - (void) setHeTrigThreshold:(unsigned short)chan withValue:(unsigned long)aValue;
-- (void) setHeTrigThresholdSum:(unsigned short)aGroup withValue:(unsigned long)aValue;
-- (unsigned long) heTrigThreshold:(unsigned short)chan;
 - (unsigned long) heTrigThresholdSum:(unsigned short)aGroup;
 
+- (void) setHeTrigThresholdSum:(unsigned short)aGroup withValue:(unsigned long)aValue;
+- (unsigned long) heTrigThreshold:(unsigned short)chan;
+
 - (long) trigBothEdgesMask;
-- (BOOL) trigBothEdgesMask:(unsigned short)chan;
 - (void) setTrigBothEdgesMask:(unsigned long)aMask;
+- (BOOL) trigBothEdgesBit:(unsigned short)chan;
 - (void) setTrigBothEdgesBit:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (long) intHeTrigOutPulseMask;
-- (BOOL) intHeTrigOutPulseMask:(unsigned short)chan;
 - (void) setIntHeTrigOutPulseMask:(unsigned long)aMask;
+- (BOOL) intHeTrigOutPulseBit:(unsigned short)chan;
 - (void) setIntHeTrigOutPulseBit:(unsigned short)chan withValue:(BOOL)aValue;
 
 - (unsigned short) intTrigOutPulseBit:(unsigned short)aChan;
@@ -553,6 +540,12 @@ enum{
 - (unsigned short)  accGate8Len:(unsigned short)aGroup;
 - (void)            setAccGate8Len:(unsigned short)group withValue:(unsigned short)aValue;
 
+- (unsigned long)   lemoCoMask;
+- (void)            setLemoCoMask:(unsigned long)aMask;
+- (unsigned long)   lemoUoMask;
+- (void)            setLemoUoMask:(unsigned long)aMask;
+- (unsigned long)   lemoToMask;
+- (void)             setLemoToMask:(unsigned long)aMask;
 
 
 //Acquisition control reg
@@ -609,10 +602,11 @@ enum{
 - (unsigned short) serialNumber;
 
 #pragma mark •••Hardware Access
+- (void) writeLong:(unsigned long)aValue toAddress:(unsigned long)anAddress;
+- (unsigned long) readLongFromAddress:(unsigned long)anAddress;
+
 //Comments denote section of the manual 
-- (unsigned long) interfaceRegister:(unsigned long)aRegisterIndex;
-- (unsigned long) vmeRegister:(unsigned long)aRegisterIndex;
--(unsigned long) keyRegister:(unsigned long)aRegisterIndex;
+- (unsigned long) singleRegister:(unsigned long)aRegisterIndex;
 - (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
 - (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel;
 - (unsigned long) channelRegisterVersionTwo:(unsigned long)aRegisterIndex channel:(int)aChannel;
@@ -664,6 +658,7 @@ enum{
 - (void) readFirEnergySetup:(BOOL)verbose;
 - (void) writeHistogramConfiguration;           //6.33 (section 2)
 - (void) readHistogramConfiguration:(BOOL)verbose;
+- (void) writeGainAndTermination;               //6.7
 - (void) configureAnalogRegisters;
 
 - (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
@@ -673,6 +668,7 @@ enum{
 
 - (void) clearTimeStamp;
 - (void) trigger;
+- (void) armSampleLogic;
 - (void) disarmSampleLogic;
 - (void) switchBanks;
 - (void) armBank1;
@@ -686,8 +682,6 @@ enum{
 - (void) readAddressCounts;
 
 //- (int) dataWord:(int)chan index:(int)index;
-
-- (void) testMemory;
 //- (void) testEventRead;
 
 
@@ -729,7 +723,6 @@ enum{
 extern NSString* ORSIS3316EnabledChanged;
 extern NSString* ORSIS3316EventConfigChanged;
 extern NSString* ORSIS3316ExtendedEventConfigChanged;
-//extern NSString* ORSIS3316EndAddressFinalChanged;
 extern NSString* ORSIS3316AcquisitionControlChanged;
 extern NSString* ORSIS3316NIMControlStatusChanged;
 extern NSString* ORSIS3316HistogramsEnabledChanged;
@@ -739,11 +732,9 @@ extern NSString* ORSIS3316WriteHitsIntoEventMemoryChanged;
 
 extern NSString* ORSIS3316ThresholdChanged;
 extern NSString* ORSIS3316ThresholdSumChanged;
+extern NSString* ORSIS3316EndAddressSuppressionChanged;
 extern NSString* ORSIS3316EndAddressChanged;
 extern NSString* ORSIS3316TriggerDelayChanged;
-extern NSString* ORSIS3316TriggerDelayTwoChanged;
-extern NSString* ORSIS3316TriggerDelay3Changed;
-extern NSString* ORSIS3316TriggerDelay4Changed;
 extern NSString* ORSIS3316HeSuppressTrigModeChanged;
 extern NSString* ORSIS3316CfdControlBitsChanged;
 extern NSString* ORSIS3316ExtraFilterBitsChanged;
@@ -799,4 +790,16 @@ extern NSString* ORSIS3316SampleDone;
 extern NSString* ORSIS3316IDChanged;
 extern NSString* ORSIS3316HWVersionChanged;
 extern NSString* ORSIS3316SerialNumberChanged;
+extern NSString* ORSIS3316ModelGainChanged;
+extern NSString* ORSIS3316ModelTerminationChanged;
+extern NSString* ORSIS3316DacOffsetChanged;
 
+extern NSString* ORSIS3316EnableSumChanged;
+extern NSString* ORSIS3316RiseTimeSumChanged;
+extern NSString* ORSIS3316GapTimeSumChanged;
+extern NSString* ORSIS3316CfdControlBitsSumChanged;
+extern NSString* ORSIS3316SharingChanged;
+
+extern NSString* ORSIS3316LemoCoMaskChanged;
+extern NSString* ORSIS3316LemoUoMaskChanged;
+extern NSString* ORSIS3316LemoToMaskChanged;
