@@ -45,11 +45,11 @@
 	    IBOutlet NSTextField*   receivedHistoCounterTextField;
 	    IBOutlet NSTextField*   receivedHistoChanMapTextField;
 		IBOutlet NSPopUpButton* fifoLengthPU;
-		IBOutlet NSTabView*		modeTabView;	
+		//IBOutlet NSTabView*		modeTabView;	
 		IBOutlet NSButton*		settingLockButton;
-		IBOutlet NSPopUpButton* nfoldCoincidencePU;
-        IBOutlet NSTextField*	vetoActiveField;
-		IBOutlet NSPopUpButton* vetoOverlapTimePU;
+//		IBOutlet NSPopUpButton* nfoldCoincidencePU;
+//        IBOutlet NSTextField*	vetoActiveField;
+//		IBOutlet NSPopUpButton* vetoOverlapTimePU;
 		IBOutlet NSMatrix*		displayEventRateMatrix;
 		IBOutlet NSTextField*	targetRateField;
         IBOutlet NSTextField*   fltSlotNumTextField;
@@ -82,8 +82,8 @@
 		IBOutlet NSButton*		resetButton;
 		IBOutlet NSMatrix*		gainTextFields;
 		IBOutlet NSMatrix*		thresholdTextFields;
-		IBOutlet NSMatrix*		vetoGainMatrix;
-		IBOutlet NSMatrix*		vetoThresholdMatrix;
+//		IBOutlet NSMatrix*		vetoGainMatrix;
+//		IBOutlet NSMatrix*		vetoThresholdMatrix;
 		IBOutlet NSMatrix*		triggerEnabledCBs;
 		IBOutlet NSMatrix*		hitRateEnabledCBs;
 		IBOutlet NSPopUpButton*	hitRateLengthPU;
@@ -98,8 +98,8 @@
 		IBOutlet NSTextField*	group2NFoldField;
 		IBOutlet NSTextField*	group3NFoldField;
 	
-		IBOutlet NSMatrix*		vetoHitRateEnabledCBs;
-		IBOutlet NSMatrix*		vetoTriggerEnabledCBs;
+//        IBOutlet NSMatrix*        vetoHitRateEnabledCBs;
+//        IBOutlet NSMatrix*        vetoTriggerEnabledCBs;
 		IBOutlet NSButton*		activateDebuggerCB;
 
 		//rate page
@@ -179,8 +179,8 @@
 - (void) receivedHistoChanMapChanged:(NSNotification*)aNote;
 - (void) activateDebuggerDisplaysChanged:(NSNotification*)aNote;
 - (void) fifoLengthChanged:(NSNotification*)aNote;
-- (void) nfoldCoincidenceChanged:(NSNotification*)aNote;
-- (void) vetoOverlapTimeChanged:(NSNotification*)aNote;
+//- (void) nfoldCoincidenceChanged:(NSNotification*)aNote;
+//- (void) vetoOverlapTimeChanged:(NSNotification*)aNote;
 - (void) shipSumHistogramChanged:(NSNotification*)aNote;
 - (void) targetRateChanged:(NSNotification*)aNote;
 - (void) histMaxEnergyChanged:(NSNotification*)aNote;
@@ -252,8 +252,8 @@
 - (IBAction) receivedHistoChanMapTextFieldAction:(id)sender;
 - (IBAction) activateDebuggingDisplayAction:(id)sender;
 - (IBAction) fifoLengthPUAction:(id)sender;
-- (IBAction) nfoldCoincidencePUAction:(id)sender;
-- (IBAction) vetoOverlapTimePUAction:(id)sender;
+//- (IBAction) nfoldCoincidencePUAction:(id)sender;
+//- (IBAction) vetoOverlapTimePUAction:(id)sender;
 - (IBAction) shipSumHistogramPUAction:(id)sender;
 - (IBAction) targetRateAction:(id)sender;
 - (IBAction) histClrModeAction:(id)sender;

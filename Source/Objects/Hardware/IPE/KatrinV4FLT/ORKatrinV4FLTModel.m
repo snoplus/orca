@@ -47,8 +47,8 @@ NSString* ORKatrinV4FLTModelCustomVariableChanged           = @"ORKatrinV4FLTMod
 NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged     = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged     = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
 NSString* ORKatrinV4FLTModelFifoLengthChanged               = @"ORKatrinV4FLTModelFifoLengthChanged";
-NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged         = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
-NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged          = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
+//NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged         = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
+//NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged          = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
 NSString* ORKatrinV4FLTModelShipSumHistogramChanged         = @"ORKatrinV4FLTModelShipSumHistogramChanged";
 NSString* ORKatrinV4FLTModelTargetRateChanged               = @"ORKatrinV4FLTModelTargetRateChanged";
 NSString* ORKatrinV4FLTModelHistMaxEnergyChanged            = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
@@ -656,37 +656,37 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFifoLengthChanged object:self];
 }
 
-- (int) nfoldCoincidence
-{
-    return nfoldCoincidence;
-}
-
-- (void) setNfoldCoincidence:(int)aNfoldCoincidence
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNfoldCoincidence:nfoldCoincidence];
-    nfoldCoincidence = aNfoldCoincidence;
-	if(nfoldCoincidence<0) nfoldCoincidence=0;
-	if(nfoldCoincidence>6) nfoldCoincidence=6;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelNfoldCoincidenceChanged object:self];
-}
-
-- (int) vetoOverlapTime
-{
-    return vetoOverlapTime;
-}
-
-- (void) setVetoOverlapTime:(int)aVetoOverlapTime
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setVetoOverlapTime:vetoOverlapTime];
-    
-    vetoOverlapTime = aVetoOverlapTime;
-	if(vetoOverlapTime<0) vetoOverlapTime = 0;
-	if(vetoOverlapTime>5) vetoOverlapTime = 5;//changed from 4 to 5 since FLTv4 FPGA 2.1.1.4 -tb-
-        
-	//NSLog(@"%@::%@: set vetoOverlapTime to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),vetoOverlapTime);//-tb-NSLog-tb-
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelVetoOverlapTimeChanged object:self];
-}
+//- (int) nfoldCoincidence
+//{
+//    return nfoldCoincidence;
+//}
+//
+//- (void) setNfoldCoincidence:(int)aNfoldCoincidence
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setNfoldCoincidence:nfoldCoincidence];
+//    nfoldCoincidence = aNfoldCoincidence;
+//    if(nfoldCoincidence<0) nfoldCoincidence=0;
+//    if(nfoldCoincidence>6) nfoldCoincidence=6;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelNfoldCoincidenceChanged object:self];
+//}
+//
+//- (int) vetoOverlapTime
+//{
+//    return vetoOverlapTime;
+//}
+//
+//- (void) setVetoOverlapTime:(int)aVetoOverlapTime
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setVetoOverlapTime:vetoOverlapTime];
+//
+//    vetoOverlapTime = aVetoOverlapTime;
+//    if(vetoOverlapTime<0) vetoOverlapTime = 0;
+//    if(vetoOverlapTime>5) vetoOverlapTime = 5;//changed from 4 to 5 since FLTv4 FPGA 2.1.1.4 -tb-
+//
+//    //NSLog(@"%@::%@: set vetoOverlapTime to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),vetoOverlapTime);//-tb-NSLog-tb-
+//
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelVetoOverlapTimeChanged object:self];
+//}
 
 
 /** This is the setting of the 'Ship Sum Histogram' popup button; tag values are:
@@ -1503,8 +1503,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	unsigned long aValue = 
 	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
-	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
-	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
+//    (((nfoldCoincidence)    & 0xf)<<20) |        //nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
+//    (((vetoOverlapTime)     & 0xf)<<16)    |        //vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)              |
@@ -2055,8 +2055,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setPoleZeroCorrection:        [decoder decodeIntForKey:   @"poleZeroCorrection"]];
     [self setCustomVariable:            [decoder decodeIntForKey:   @"customVariable"]];
     [self setFifoLength:                [decoder decodeIntForKey:   @"fifoLength"]];
-    [self setNfoldCoincidence:          [decoder decodeIntForKey:   @"nfoldCoincidence"]];
-    [self setVetoOverlapTime:           [decoder decodeIntForKey:   @"vetoOverlapTime"]];
+//    [self setNfoldCoincidence:          [decoder decodeIntForKey:   @"nfoldCoincidence"]];
+//    [self setVetoOverlapTime:           [decoder decodeIntForKey:   @"vetoOverlapTime"]];
     [self setShipSumHistogram:          [decoder decodeIntForKey:   @"shipSumHistogram"]];
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
@@ -2086,8 +2086,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:poleZeroCorrection           forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable               forKey:@"customVariable"];
     [encoder encodeInt:fifoLength                   forKey:@"fifoLength"];
-    [encoder encodeInt:nfoldCoincidence             forKey:@"nfoldCoincidence"];
-    [encoder encodeInt:vetoOverlapTime              forKey:@"vetoOverlapTime"];
+//    [encoder encodeInt:nfoldCoincidence             forKey:@"nfoldCoincidence"];
+//    [encoder encodeInt:vetoOverlapTime              forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
     [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
@@ -2195,8 +2195,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
     [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]  forKey:@"filterShapingLength"];//this is the fpga register value -tb-
-    [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
-    [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]		forKey:@"nfoldCoincidence"];
+//    [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]        forKey:@"vetoOverlapTime"];
+//    [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]        forKey:@"nfoldCoincidence"];
 	
 	//------------------
 	//added MAH 11/09/11

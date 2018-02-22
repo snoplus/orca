@@ -86,8 +86,8 @@
 {
     // Hardware configuration
     int shipSumHistogram;
-    int vetoOverlapTime;
-    int nfoldCoincidence;
+//    int vetoOverlapTime;
+//    int nfoldCoincidence;
     int fifoLength;
     int filterShapingLength;  
 	BOOL activateDebuggingDisplays;
@@ -170,10 +170,10 @@
 - (void) setActivateDebuggingDisplays:(BOOL)aState;
 - (int) fifoLength;
 - (void) setFifoLength:(int)aFifoLength;
-- (int) nfoldCoincidence;
-- (void) setNfoldCoincidence:(int)aNfoldCoincidence;
-- (int) vetoOverlapTime;
-- (void) setVetoOverlapTime:(int)aVetoOverlapTime;
+//- (int) nfoldCoincidence;
+//- (void) setNfoldCoincidence:(int)aNfoldCoincidence;
+//- (int) vetoOverlapTime;
+//- (void) setVetoOverlapTime:(int)aVetoOverlapTime;
 - (int) shipSumHistogram;
 - (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
@@ -302,9 +302,9 @@
 - (void) testButtonLowLevelFireTP;
 - (void) testButtonLowLevelResetTP;
 
-- (void) disableAllTriggersIfInVetoMode;
-- (void) restoreTriggersIfInVetoMode;
-
+//- (void) disableAllTriggersIfInVetoMode;
+//- (void) restoreTriggersIfInVetoMode;
+//
 #pragma mark •••HW Access
 //all can raise exceptions
 - (int) accessTypeOfReg:(int)aReg;
@@ -457,8 +457,8 @@ extern NSString* ORKatrinV4FLTModelCustomVariableChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged;
 extern NSString* ORKatrinV4FLTModelFifoLengthChanged;
-extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
-extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
+//extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
+//extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
 extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;
 extern NSString* ORKatrinV4FLTModelTargetRateChanged;
 extern NSString* ORKatrinV4FLTModelHistMaxEnergyChanged;
