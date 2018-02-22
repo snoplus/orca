@@ -618,7 +618,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
 	[self shipSltSecondCounter: kStopSubRunType];
 	[self shipSltRunCounter:    kStopSubRunType];
-	//TODO: I could set inhibit to measure the 'netto' run time precisely -tb-
 }
 
 
@@ -1392,10 +1391,13 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
 - (void) initBoard
 {
+    // Todo: Check that all Slt parameters are included
     
-	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
-		NSLogColor([NSColor redColor],@"WARNING: KATRIN-DAQ SLTv4: you used 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
-	}
+    if (countersEnabled){
+        [self writeEnCnt];
+    } else {
+        [self writeDisCnt];
+    }
     [self loadSecondsReg];
     [self writeControlReg];
     [self writeInterruptMask];
@@ -1403,7 +1405,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self writePixelBusEnableReg];
     [self writeFIFOcsrReset];
     [self clearRunTime];
-	//-----------------------------------------------
+
+    //-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];
 	//[self writeReg:kSltActResetSlt value:0];
@@ -1737,6 +1740,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Crate has stopped\n", sltsec, sltsubsec2/10);
     
+    [[self sbcLink] checkSBCTime];
+    
     if (sltsubsec2 > 8000) {
         usleep(205000);
     }
@@ -1954,14 +1959,27 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     else     NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
 }
 
-/** For the V4 SLT (Auger/KATRIN)the subseconds count 100 nsec tics! (Despite the fact that the ADC sampling has a 50 nsec base.)
-  */ //-tb- 
 - (void) shipSltSecondCounter:(unsigned char)aType
 {
 	//aType = 1 start run, =2 stop run, = 3 start subrun, =4 stop subrun, see #defines in ORKatrinV4SLTDefs.h -tb-
+    const char *sType[] = {"", "run start", "run stop", "subrun start", "subrun stop"};
+    
 	unsigned long subseconds = [self readSubSecondsCounter];
 	unsigned long seconds = [self readSecondsCounter];
-	
+    unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - shipped second counter %s at %i\n", seconds, subsec2/10, sType[aType%5], seconds+1);
+
+    // Start and stop subrun always at the full second
+    // Todo: us this function also for the run start/stop
+    if (aType == kStartSubRunType){
+        seconds = seconds +1;
+        subseconds = 0;
+    }
+    if (aType == kStopSubRunType){
+        seconds = seconds +1;
+        subseconds = 0;
+    }
+
 	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:subseconds ];
 }
 

@@ -314,9 +314,9 @@ void doReadBlock(SBC_Packet* aPacket,uint8_t reply)
             struct timeval t0;
             
             gettimeofday(&t0, &tz);
-            printf("%ld.%06ld: doReadBlock addr = %08x pbus = %08x\n", t0.tv_sec, t0.tv_usec,
-                    startAddress, startAddress << 2);
-            fflush(stdout);
+            //printf("%ld.%06ld: doReadBlock addr = %08x pbus = %08x\n", t0.tv_sec, t0.tv_usec,
+            //        startAddress, startAddress << 2);
+            //fflush(stdout);
         }
         
         if (numItems == 1){
@@ -399,7 +399,7 @@ void ReleaseHardware(void)  // 'simulation' version -tb-
 
 void doWriteBlock(SBC_Packet* aPacket,uint8_t reply)  // 'simulation' version -tb-
 {
-	printf("Called HW_Readout-doWriteBlock\n");
+	//printf("Called HW_Readout-doWriteBlock\n");
     SBC_IPEv4WriteBlockStruct* p = (SBC_IPEv4WriteBlockStruct*)aPacket->payload;
     if(needToSwap)SwapLongBlock(p,sizeof(SBC_IPEv4WriteBlockStruct)/sizeof(int32_t));
     
