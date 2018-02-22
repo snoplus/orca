@@ -168,6 +168,20 @@
 }
 
 @end
+static NSUInteger random_below(NSUInteger n) {
+    NSUInteger m = 1;
+    do {
+        m <<= 1;
+    } while(m < n);
+    
+    NSUInteger ret;
+    
+    do {
+        ret = random() % m;
+    } while(ret >= n);
+    
+    return ret;
+}
 
 @implementation NSMutableArray (OrcaExtensions)
 
@@ -196,7 +210,14 @@
     }
     else [self insertObject:anObj atIndex:newIndex];
 }
-
+- (void)shuffle {
+    // http://en.wikipedia.org/wiki/Knuth_shuffle
+    
+    for(NSUInteger i = [self count]; i > 1; i--) {
+        NSUInteger j = random_below(i);
+        [self exchangeObjectAtIndex:i-1 withObjectAtIndex:j];
+    }
+}
 - (unsigned) numberOfChildren
 {
     return [self count];

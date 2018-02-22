@@ -41,6 +41,7 @@
 - (NSMutableArray*) children;
 - (unsigned) numberOfChildren;
 - (void) moveObject:(id)anObj toIndex:(unsigned)newIndex;
+- (void)shuffle;
 
 //implements stack behavior
 - (id)   pop;
