@@ -43,6 +43,8 @@ NSString* ORDCModelTac0trimChanged			= @"ORDCModelTac0trimChanged";
 NSString* ORDCModelTac1trimChanged			= @"ORDCModelTac1trimChanged";
 NSString* ORDBLock = @"ORDBLock";
 
+const int kNumDCSettings   = 100;
+
 @implementation ORFecDaughterCardModel
 
 #pragma mark •••Initialization
@@ -557,69 +559,145 @@ NSString* ORDBLock = @"ORDBLock";
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
+    int i;
+    const uint8_t *dcSettings;
+    NSUInteger length;
+
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setComments:		[decoder decodeObjectForKey:@"comments"]];
-    [self setShowVolts:		[decoder decodeBoolForKey:@"showVolts"]];
-	[self setSetAllCmos:	[decoder decodeBoolForKey:@"setAllCmos"]];
-	[self setCmosRegShown:	[decoder decodeIntForKey:@"cmosRegShown"]];
-	int i;
-	for(i=0;i<2;i++){
-		[self setRp1:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp1_%d",i]]];
-		[self setRp2:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp2_%d",i]]];
-		[self setVli:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vli_%d",i]]];
-		[self setVsi:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vsi_%d",i]]];
-	}
-	[self setVt_safety: [decoder decodeIntForKey:@"vt_safety"]];    
- 	for(i=0;i<8;i++){
-        //the order is important see silentUpdateVt
-		[self setVt_ecal:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_ecal_%d",i]]];
-		[self setVt_zero:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_zero_%d",i]]];
-		[self setVt_corr:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_corr_%d",i]]];
-        [self silentUpdateVt:i];
-        
-		[self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"select100nsTrigger_%d",i]]];
-		[self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns100width_%d",i]]];
-		[self setNs20width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20width_%d",i]]];
-		[self setNs20delay:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20delay_%d",i]]];
-		[self setTac0trim:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tac0trim_%d",i]]];
-		[self setTac1trim:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tac1trim_%d",i]]];
-	}
- 	for(i=0;i<16;i++){
-		[self setVb:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vb_%d",i]]];
-	}
+
+    [self setComments: [decoder decodeObjectForKey:@"comments"]];
+
+    dcSettings = [decoder decodeBytesForKey: @"dcSettings" returnedLength:&length];
+
+    if (dcSettings && length == kNumDCSettings) {
+        // load from settings stored as binary data (new, smaller config file) - PH
+        int j = 0;
+        [self setShowVolts:     dcSettings[j++]];
+        [self setSetAllCmos:    dcSettings[j++]];
+        [self setCmosRegShown:  dcSettings[j++]];
+        for(i=0;i<2;i++){
+            [self setRp1:i withValue:dcSettings[j++]];
+            [self setRp2:i withValue:dcSettings[j++]];
+            [self setVli:i withValue:dcSettings[j++]];
+            [self setVsi:i withValue:dcSettings[j++]];
+        }
+        [self setVt_safety: dcSettings[j++]];
+        for(i=0;i<8;i++){
+            //the order is important see silentUpdateVt
+            [self setVt_ecal:i withValue:dcSettings[j++]];
+            [self setVt_zero:i withValue:dcSettings[j++]];
+            int16_t tmp = dcSettings[j++];
+            tmp |= (dcSettings[j++] << 8);
+            [self setVt_corr:i withValue:tmp];
+            [self silentUpdateVt:i];
+
+            [self setNs100width:i withValue:dcSettings[j++]];
+            [self setNs20width:i withValue:dcSettings[j++]];
+            [self setNs20delay:i withValue:dcSettings[j++]];
+            [self setTac0trim:i withValue:dcSettings[j++]];
+            [self setTac1trim:i withValue:dcSettings[j++]];
+        }
+        for(i=0;i<16;i++){
+            [self setVb:i withValue:dcSettings[j++]];
+        }
+    } else {
+        // load from settings stored as individual keys (old, bulky config file)
+        [self setShowVolts:     [decoder decodeBoolForKey:@"showVolts"]];
+        [self setSetAllCmos:    [decoder decodeBoolForKey:@"setAllCmos"]];
+        [self setCmosRegShown:  [decoder decodeIntForKey:@"cmosRegShown"]];
+        for(i=0;i<2;i++){
+            [self setRp1:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp1_%d",i]]];
+            [self setRp2:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"rp2_%d",i]]];
+            [self setVli:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vli_%d",i]]];
+            [self setVsi:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vsi_%d",i]]];
+        }
+        [self setVt_safety: [decoder decodeIntForKey:@"vt_safety"]];
+        for(i=0;i<8;i++){
+            //the order is important see silentUpdateVt
+            [self setVt_ecal:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_ecal_%d",i]]];
+            [self setVt_zero:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_zero_%d",i]]];
+            [self setVt_corr:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vt_corr_%d",i]]];
+            [self silentUpdateVt:i];
+
+            [self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"select100nsTrigger_%d",i]]];
+            [self setNs100width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns100width_%d",i]]];
+            [self setNs20width:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20width_%d",i]]];
+            [self setNs20delay:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"ns20delay_%d",i]]];
+            [self setTac0trim:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tac0trim_%d",i]]];
+            [self setTac1trim:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"tac1trim_%d",i]]];
+        }
+        for(i=0;i<16;i++){
+            [self setVb:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"vb_%d",i]]];
+        }
+    }
 	[[self undoManager] enableUndoRegistration];
     return self;
 }
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
+    int i;
+    uint8_t dcSettings[kNumDCSettings];
+
     [super encodeWithCoder:encoder];
+
 	[encoder encodeObject:comments	forKey:@"comments"];
-	[encoder encodeBool:showVolts	forKey:@"showVolts"];
-	[encoder encodeBool:setAllCmos	forKey:@"setAllCmos"];
-	[encoder encodeInt:cmosRegShown forKey:@"cmosRegShown"];
-    [encoder encodeInt:[self vt_safety] forKey:@"vt_safety"];
-	int i;
-	for(i=0;i<2;i++){
-		[encoder encodeInt:rp1[i] forKey:[NSString stringWithFormat:@"rp1_%d",i]];
-		[encoder encodeInt:rp2[i] forKey:[NSString stringWithFormat:@"rp2_%d",i]];
-		[encoder encodeInt:vli[i] forKey:[NSString stringWithFormat:@"vli_%d",i]];
-		[encoder encodeInt:vsi[i] forKey:[NSString stringWithFormat:@"vsi_%d",i]];
-	}
- 	for(i=0;i<8;i++){
-		[encoder encodeInt:[self vt_ecal:i] forKey:[NSString stringWithFormat:@"vt_ecal_%d",i]];
-		[encoder encodeInt:[self vt_zero:i] forKey:[NSString stringWithFormat:@"vt_zero_%d",i]];
-		[encoder encodeInt:[self vt_corr:i] forKey:[NSString stringWithFormat:@"vt_corr_%d",i]];
-		[encoder encodeInt:ns100width[i] forKey:[NSString stringWithFormat:@"ns100width_%d",i]];
-		[encoder encodeInt:ns20width[i] forKey:[NSString stringWithFormat:@"ns20width_%d",i]];
-		[encoder encodeInt:ns20delay[i] forKey:[NSString stringWithFormat:@"ns20delay_%d",i]];
-		[encoder encodeInt:tac0trim[i] forKey:[NSString stringWithFormat:@"tac0trim_%d",i]];
-		[encoder encodeInt:tac1trim[i] forKey:[NSString stringWithFormat:@"tac1trim_%d",i]];
-	}
- 	for(i=0;i<16;i++){
-		[encoder encodeInt:vb[i] forKey:[NSString stringWithFormat:@"vb_%d",i]];
-	}
+
+    if (1) {
+        // save settings as binary data (compact, but byte-order-dependent) - PH
+        int j = 0;
+        dcSettings[j++] = showVolts;
+        dcSettings[j++] = setAllCmos;
+        dcSettings[j++] = cmosRegShown;
+        for(i=0;i<2;i++){
+            dcSettings[j++] = rp1[i];
+            dcSettings[j++] = rp2[i];
+            dcSettings[j++] = vli[i];
+            dcSettings[j++] = vsi[i];
+        }
+        dcSettings[j++] = [self vt_safety];
+        for(i=0;i<8;i++){
+            dcSettings[j++] = [self vt_ecal:i];
+            dcSettings[j++] = [self vt_zero:i];
+            dcSettings[j++] = [self vt_corr:i] & 0xff;
+            dcSettings[j++] = ([self vt_corr:i] >> 8) & 0xff;
+            dcSettings[j++] = ns100width[i];
+            dcSettings[j++] = ns20width[i];
+            dcSettings[j++] = ns20delay[i];
+            dcSettings[j++] = tac0trim[i];
+            dcSettings[j++] = tac1trim[i];
+        }
+        for(i=0;i<16;i++){
+            dcSettings[j++] = vb[i];
+        }
+        [encoder encodeBytes:(void *)dcSettings length:sizeof(dcSettings) forKey:@"dcSettings"];
+    } else {
+        // save settings as separate keys (bulky)
+        [encoder encodeBool:showVolts   forKey:@"showVolts"];
+        [encoder encodeBool:setAllCmos  forKey:@"setAllCmos"];
+        [encoder encodeInt:cmosRegShown forKey:@"cmosRegShown"];
+        for(i=0;i<2;i++){
+            [encoder encodeInt:rp1[i] forKey:[NSString stringWithFormat:@"rp1_%d",i]];
+            [encoder encodeInt:rp2[i] forKey:[NSString stringWithFormat:@"rp2_%d",i]];
+            [encoder encodeInt:vli[i] forKey:[NSString stringWithFormat:@"vli_%d",i]];
+            [encoder encodeInt:vsi[i] forKey:[NSString stringWithFormat:@"vsi_%d",i]];
+        }
+        [encoder encodeInt:[self vt_safety] forKey:@"vt_safety"];
+        for(i=0;i<8;i++){
+            [encoder encodeInt:[self vt_ecal:i] forKey:[NSString stringWithFormat:@"vt_ecal_%d",i]];
+            [encoder encodeInt:[self vt_zero:i] forKey:[NSString stringWithFormat:@"vt_zero_%d",i]];
+            [encoder encodeInt:[self vt_corr:i] forKey:[NSString stringWithFormat:@"vt_corr_%d",i]];
+            [encoder encodeInt:ns100width[i] forKey:[NSString stringWithFormat:@"ns100width_%d",i]];
+            [encoder encodeInt:ns20width[i] forKey:[NSString stringWithFormat:@"ns20width_%d",i]];
+            [encoder encodeInt:ns20delay[i] forKey:[NSString stringWithFormat:@"ns20delay_%d",i]];
+            [encoder encodeInt:tac0trim[i] forKey:[NSString stringWithFormat:@"tac0trim_%d",i]];
+            [encoder encodeInt:tac1trim[i] forKey:[NSString stringWithFormat:@"tac1trim_%d",i]];
+        }
+        for(i=0;i<16;i++){
+            [encoder encodeInt:vb[i] forKey:[NSString stringWithFormat:@"vb_%d",i]];
+        }
+    }
 }
 
 - (void) readBoardIds

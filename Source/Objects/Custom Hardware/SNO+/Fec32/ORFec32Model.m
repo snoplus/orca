@@ -65,6 +65,8 @@ NSString* ORFec32ModelAdcVoltageChanged				= @"ORFec32ModelAdcVoltageChanged";
 NSString* ORFec32ModelAdcVoltageStatusChanged		= @"ORFec32ModelAdcVoltageStatusChanged";
 NSString* ORFec32ModelAdcVoltageStatusOfCardChanged	= @"ORFec32ModelAdcVoltageStatusOfCardChanged";
 
+const int kNumFECSettings   = 127;
+
 // mask for crates that need updating after Hardware Wizard action
 static unsigned long crateInitMask; // crates that need to be initialized
 static unsigned long cratePedMask;  // crates that need their pedestals set
@@ -926,39 +928,77 @@ static int              sChannelsNotChangedCount = 0;
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
+    int i;
+    uint32_t *fecSettings;
+    NSUInteger length;
+
     self = [super initWithCoder:decoder];
-	
     [[self undoManager] disableUndoRegistration];
-	
-    [self setVariableDisplay:               [decoder decodeIntForKey:	@"variableDisplay"]];
-    [self setShowVolts:                     [decoder decodeBoolForKey:  @"showVolts"]];
-    [self setComments:                      [decoder decodeObjectForKey:@"comments"]];
-    [self setVRes:                          [decoder decodeFloatForKey: @"vRes"]];
-    [self setHVRef:                         [decoder decodeFloatForKey: @"hVRef"]];
-	[self setOnlineMask:                    [decoder decodeInt32ForKey: @"onlineMask"]];
-	[self setPedEnabledMask:                [decoder decodeInt32ForKey: @"pedEnableMask"]];
-    [self setAdcVoltageStatusOfCard:        [decoder decodeIntForKey:	@"adcVoltageStatusOfCard"]];
-    [self setSeqDisabledMask:               [decoder decodeInt32ForKey: @"seqDisabledMask"]];
-    [self setCmosReadDisabledMask:              [decoder decodeInt32ForKey: @"cmosReadDisabledMask"]];
-    [self setTrigger20nsDisabledMask:           [decoder decodeInt32ForKey: @"trigger20nsDisabledMask"]];
-    [self setTrigger100nsDisabledMask:          [decoder decodeInt32ForKey: @"trigger100nsDisabledMask"]];
-    [self setSeqPendingDisabledMask:            [decoder decodeInt32ForKey: @"seqPendingDisabledMask"]];
-    [self setTrigger20nsPendingDisabledMask:    [decoder decodeInt32ForKey: @"trigger20nsPendingDisabledMask"]];
-    [self setTrigger100nsPendingDisabledMask:   [decoder decodeInt32ForKey: @"trigger100nsPendingDisabledMask"]];
-    [self setCmosReadPendingDisabledMask:       [decoder decodeInt32ForKey: @"cmosReadPendingDisabledMask"]];
-    
-	int i;
-	for(i=0;i<6;i++){
-		[self setCmos:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"cmos%d",i]]];
-	}	
-	for(i=0;i<kNumFecMonitorAdcs;i++){
-		[self setAdcVoltage:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"adcVoltage%d",i]]];
-		[self setAdcVoltageStatus:i withValue: (eFecMonitorState)[decoder decodeIntForKey: [NSString stringWithFormat:@"adcStatus%d",i]]];
-	}
-	for(i=0;i<32;i++){
-		[self setCmosRate:i withValue:[decoder decodeInt32ForKey:		[NSString stringWithFormat:@"cmosRate%d",i]]];
-		[self setBaseCurrent:i withValue:[decoder decodeFloatForKey:	[NSString stringWithFormat:@"baseCurrent%d",i]]];
-	}
+
+    [self setComments: [decoder decodeObjectForKey:@"comments"]];
+
+    fecSettings = (uint32_t *)[decoder decodeBytesForKey: @"fecSettings" returnedLength:&length];
+
+    if (fecSettings && length == kNumFECSettings * sizeof(uint32_t)) {
+        // load from settings stored as binary data (new, smaller config file) - PH
+        int j = 0;
+        [self setVariableDisplay:                   *(int32_t *)(fecSettings + j++)];
+        [self setShowVolts:                         fecSettings[j++]];
+        [self setVRes:                              *(float *)(fecSettings + j++)];
+        [self setHVRef:                             *(float *)(fecSettings + j++)];
+        [self setOnlineMask:                        fecSettings[j++]];
+        [self setPedEnabledMask:                    fecSettings[j++]];
+        [self setAdcVoltageStatusOfCard:            (eFecMonitorState)fecSettings[j++]];
+        [self setSeqDisabledMask:                   fecSettings[j++]];
+        [self setCmosReadDisabledMask:              fecSettings[j++]];
+        [self setTrigger20nsDisabledMask:           fecSettings[j++]];
+        [self setTrigger100nsDisabledMask:          fecSettings[j++]];
+        [self setSeqPendingDisabledMask:            fecSettings[j++]];
+        [self setTrigger20nsPendingDisabledMask:    fecSettings[j++]];
+        [self setTrigger100nsPendingDisabledMask:   fecSettings[j++]];
+        [self setCmosReadPendingDisabledMask:       fecSettings[j++]];
+
+        for(i=0;i<6;i++){
+            [self setCmos:i withValue: fecSettings[j++]];
+        }
+        for(i=0;i<21;i++){
+            [self setAdcVoltage:i withValue: *(float *)(fecSettings + j++)];
+            [self setAdcVoltageStatus:i withValue: (eFecMonitorState)fecSettings[j++]];
+        }
+        for(i=0;i<32;i++){
+            [self setCmosRate:i    withValue: *(int32_t *)(fecSettings + j++)];
+            [self setBaseCurrent:i withValue: *(float *)(fecSettings + j++)];
+        }
+    } else {
+        // load from settings stored as individual keys (old, bulky config file)
+        [self setVariableDisplay:               [decoder decodeIntForKey:	@"variableDisplay"]];
+        [self setShowVolts:                     [decoder decodeBoolForKey:  @"showVolts"]];
+        [self setVRes:                          [decoder decodeFloatForKey: @"vRes"]];
+        [self setHVRef:                         [decoder decodeFloatForKey: @"hVRef"]];
+        [self setOnlineMask:                    [decoder decodeInt32ForKey: @"onlineMask"]];
+        [self setPedEnabledMask:                [decoder decodeInt32ForKey: @"pedEnableMask"]];
+        [self setAdcVoltageStatusOfCard:        [decoder decodeIntForKey:	@"adcVoltageStatusOfCard"]];
+        [self setSeqDisabledMask:               [decoder decodeInt32ForKey: @"seqDisabledMask"]];
+        [self setCmosReadDisabledMask:              [decoder decodeInt32ForKey: @"cmosReadDisabledMask"]];
+        [self setTrigger20nsDisabledMask:           [decoder decodeInt32ForKey: @"trigger20nsDisabledMask"]];
+        [self setTrigger100nsDisabledMask:          [decoder decodeInt32ForKey: @"trigger100nsDisabledMask"]];
+        [self setSeqPendingDisabledMask:            [decoder decodeInt32ForKey: @"seqPendingDisabledMask"]];
+        [self setTrigger20nsPendingDisabledMask:    [decoder decodeInt32ForKey: @"trigger20nsPendingDisabledMask"]];
+        [self setTrigger100nsPendingDisabledMask:   [decoder decodeInt32ForKey: @"trigger100nsPendingDisabledMask"]];
+        [self setCmosReadPendingDisabledMask:       [decoder decodeInt32ForKey: @"cmosReadPendingDisabledMask"]];
+
+        for(i=0;i<6;i++){
+            [self setCmos:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"cmos%d",i]]];
+        }
+        for(i=0;i<kNumFecMonitorAdcs;i++){
+            [self setAdcVoltage:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"adcVoltage%d",i]]];
+            [self setAdcVoltageStatus:i withValue: (eFecMonitorState)[decoder decodeIntForKey: [NSString stringWithFormat:@"adcStatus%d",i]]];
+        }
+        for(i=0;i<32;i++){
+            [self setCmosRate:i withValue:[decoder decodeInt32ForKey:		[NSString stringWithFormat:@"cmosRate%d",i]]];
+            [self setBaseCurrent:i withValue:[decoder decodeFloatForKey:	[NSString stringWithFormat:@"baseCurrent%d",i]]];
+        }
+    }
 	[[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
 	
@@ -968,38 +1008,72 @@ static int              sChannelsNotChangedCount = 0;
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     int i;
+    uint32_t fecSettings[kNumFECSettings];
 
     [super encodeWithCoder:encoder];
 
-    [encoder encodeInt:variableDisplay              forKey: @"variableDisplay"];
-    [encoder encodeBool:showVolts                   forKey: @"showVolts"];
-    [encoder encodeObject:comments                  forKey: @"comments"];
-    [encoder encodeFloat:vRes                       forKey: @"vRes"];
-    [encoder encodeFloat:hVRef                      forKey: @"hVRef"];
-    [encoder encodeInt32:onlineMask                 forKey: @"onlineMask"];
-    [encoder encodeInt:adcVoltageStatusOfCard       forKey: @"adcVoltageStatusOfCard"];
-    [encoder encodeInt32:pedEnabledMask             forKey: @"pedEnabledMask"];
-    [encoder encodeInt32:seqDisabledMask                    forKey: @"seqDisabledMask"];
-    [encoder encodeInt32:cmosReadDisabledMask               forKey: @"cmosReadDisabledMask"];
-    [encoder encodeInt32:trigger20nsDisabledMask            forKey: @"trigger20nsDisabledMask"];
-    [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigger100nsDisabledMask"];
-    [encoder encodeInt32:seqPendingDisabledMask             forKey: @"seqDisabledPendingMask"];
-    [encoder encodeInt32:cmosReadPendingDisabledMask        forKey: @"cmosReadPendingDisabledMask"];
-    [encoder encodeInt32:trigger20nsPendingDisabledMask     forKey: @"trigger20nsPendingDisabledMask"];
-    [encoder encodeInt32:trigger100nsPendingDisabledMask    forKey: @"trigger100nsPendingDisabledMask"];
+    [encoder encodeObject:comments forKey: @"comments"];
 
-    for(i = 0; i < 6; i++) {
-        [encoder encodeFloat:cmos[i] forKey:[NSString stringWithFormat:@"cmos%d",i]];
-    }
+    if (1) {
+        // save settings as binary data (compact, but byte-order-dependent) - PH
+        int j = 0;
+        *(int32_t *)(fecSettings + j++) = variableDisplay;
+        fecSettings[j++] = showVolts;
+        *(float *)(fecSettings + j++) = vRes;
+        *(float *)(fecSettings + j++) = hVRef;
+        fecSettings[j++] = onlineMask;
+        fecSettings[j++] = pedEnabledMask;
+        fecSettings[j++] = adcVoltageStatusOfCard;
+        fecSettings[j++] = seqDisabledMask;
+        fecSettings[j++] = cmosReadDisabledMask;
+        fecSettings[j++] = trigger20nsDisabledMask;
+        fecSettings[j++] = trigger100nsDisabledMask;
+        fecSettings[j++] = seqPendingDisabledMask;
+        fecSettings[j++] = trigger20nsPendingDisabledMask;
+        fecSettings[j++] = trigger100nsPendingDisabledMask;
+        fecSettings[j++] = cmosReadPendingDisabledMask;
 
-    for(i = 0; i < kNumFecMonitorAdcs; i++) {
-        [encoder encodeFloat:adcVoltage[i] forKey:[NSString stringWithFormat:@"adcVoltage%d",i]];
-        [encoder encodeInt:adcVoltageStatus[i] forKey:[NSString stringWithFormat:@"adcStatus%d",i]];
-    }
+        for(i = 0; i < 6; i++) {
+            fecSettings[j++] = cmos[i];
+        }
+        for(i = 0; i < 21; i++) {
+            *(float *)(fecSettings + j++) = adcVoltage[i];
+            fecSettings[j++] = adcVoltageStatus[i];
+        }
+        for(i = 0; i < 32; i++){
+            *(int32_t *)(fecSettings + j++) = cmosRate[i];
+            *(float *)(fecSettings + j++) = baseCurrent[i];
+        }
+        [encoder encodeBytes:(void *)fecSettings length:sizeof(fecSettings) forKey:@"fecSettings"];
+   } else {
+        // save settings as separate keys (bulky)
+        [encoder encodeInt:variableDisplay              forKey: @"variableDisplay"];
+        [encoder encodeBool:showVolts                   forKey: @"showVolts"];
+        [encoder encodeFloat:vRes                       forKey: @"vRes"];
+        [encoder encodeFloat:hVRef                      forKey: @"hVRef"];
+        [encoder encodeInt32:onlineMask                 forKey: @"onlineMask"];
+        [encoder encodeInt:adcVoltageStatusOfCard       forKey: @"adcVoltageStatusOfCard"];
+        [encoder encodeInt32:pedEnabledMask             forKey: @"pedEnabledMask"];
+        [encoder encodeInt32:seqDisabledMask                    forKey: @"seqDisabledMask"];
+        [encoder encodeInt32:cmosReadDisabledMask               forKey: @"cmosReadDisabledMask"];
+        [encoder encodeInt32:trigger20nsDisabledMask            forKey: @"trigger20nsDisabledMask"];
+        [encoder encodeInt32:trigger100nsDisabledMask           forKey: @"trigger100nsDisabledMask"];
+        [encoder encodeInt32:seqPendingDisabledMask             forKey: @"seqDisabledPendingMask"];
+        [encoder encodeInt32:cmosReadPendingDisabledMask        forKey: @"cmosReadPendingDisabledMask"];
+        [encoder encodeInt32:trigger20nsPendingDisabledMask     forKey: @"trigger20nsPendingDisabledMask"];
+        [encoder encodeInt32:trigger100nsPendingDisabledMask    forKey: @"trigger100nsPendingDisabledMask"];
 
-    for(i = 0; i < 32; i++){
-        [encoder encodeInt32:cmosRate[i] forKey: [NSString stringWithFormat:@"cmosRate%d",i]];
-        [encoder encodeFloat:baseCurrent[i] forKey: [NSString stringWithFormat:@"baseCurrent%d",i]];
+        for(i = 0; i < 6; i++) {
+            [encoder encodeFloat:cmos[i] forKey:[NSString stringWithFormat:@"cmos%d",i]];
+        }
+        for(i = 0; i < kNumFecMonitorAdcs; i++) {
+            [encoder encodeFloat:adcVoltage[i] forKey:[NSString stringWithFormat:@"adcVoltage%d",i]];
+            [encoder encodeInt:adcVoltageStatus[i] forKey:[NSString stringWithFormat:@"adcStatus%d",i]];
+        }
+        for(i = 0; i < 32; i++){
+            [encoder encodeInt32:cmosRate[i] forKey: [NSString stringWithFormat:@"cmosRate%d",i]];
+            [encoder encodeFloat:baseCurrent[i] forKey: [NSString stringWithFormat:@"baseCurrent%d",i]];
+        }
     }
 }
 
