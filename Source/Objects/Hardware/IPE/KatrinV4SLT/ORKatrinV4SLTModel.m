@@ -1710,6 +1710,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Prepare for run\n", sltsec, sltsubsec2/10);
     
+    [[self sbcLink] checkSBCAccurateTime];
+
           
     // Stop crate
     [self saveInhibitStatus];

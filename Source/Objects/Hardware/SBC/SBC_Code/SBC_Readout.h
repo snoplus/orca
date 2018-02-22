@@ -42,6 +42,7 @@ void jobStatus(SBC_Packet* aPacket);
 void killJob(SBC_Packet* aPacket);
 void processMacAddressRequest(SBC_Packet* aPacket);
 void sendTime(void);
+void sendAccurateTime(void);
 
 // Hardware functions
 void initializeHWRun (SBC_crate_config* config);

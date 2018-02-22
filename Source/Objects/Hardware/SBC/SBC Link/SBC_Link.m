@@ -236,6 +236,41 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     [self checkSBCTime:YES];
 }
+- (void) checkSBCAccurateTime
+{
+    [self checkSBCAccurateTime:YES];
+}
+- (void) checkSBCAccurateTime:(BOOL)aVerbose
+{
+    id pw = [[SBCPacketWrapper alloc] init];
+    SBC_Packet* aPacket = [pw sbcPacket];
+    aPacket->cmdHeader.destination          = kSBC_Process;
+    aPacket->cmdHeader.cmdID                = kSBC_GetAccurateTime;
+    aPacket->cmdHeader.numberBytesinPayload = 0;
+    @try {
+        [self send:aPacket receive:aPacket];
+        SBC_accurate_time_struct* theTimeStruct = (SBC_accurate_time_struct*)(aPacket->payload);
+        
+        float theSBCTime    = theTimeStruct->seconds + (theTimeStruct->microSeconds)/1.0E6;
+        float theMacTime    = (float)[[NSDate date] timeIntervalSince1970];
+        
+        timeSkew = theSBCTime - theMacTime;
+        timeSkewValid = YES;
+        if(aVerbose){
+            NSLog(@"SBC %@ Time Check\n",[delegate fullID]);
+            NSLog(@"SBC Time: %lu\n",theSBCTime);
+            NSLog(@"Mac Time: %lu\n",theMacTime);
+            NSLog(@"SBC - Mac: %ld seconds\n",timeSkew);
+        }
+    }
+    @catch (NSException* e){
+        timeSkewValid = NO;
+    }
+    [pw releaseAndCache];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:SBC_LinkTimeSkewChanged object:self];
+}
+
 - (void) checkSBCTime:(BOOL)aVerbose
 {
     id pw = [[SBCPacketWrapper alloc] init];

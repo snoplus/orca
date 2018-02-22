@@ -69,6 +69,7 @@
 #define kSBC_GenericJob        0x23
 #define kSBC_MacAddressRequest 0x24
 #define kSBC_GetTimeRequest    0x25
+#define kSBC_GetAccurateTime   0x26
 
 #define kSBC_Exit              0xFFFFFFFF /*close socket and quit application*/
 
@@ -91,6 +92,13 @@ typedef
         uint32_t unixTime;
     }
 SBC_time_struct;
+
+typedef
+    struct {
+        uint32_t seconds;
+        uint32_t microSeconds;
+    }
+SBC_accurate_time_struct;
 
 typedef
     struct {

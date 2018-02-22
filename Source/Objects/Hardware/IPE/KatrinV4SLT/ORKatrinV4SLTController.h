@@ -52,7 +52,9 @@
 		IBOutlet NSMatrix*		enableDisableCountersMatrix;
         IBOutlet NSMatrix*      minimumDecodingMatrix;
 
-		IBOutlet NSButton*		initBoardButton;
+        IBOutlet NSButton*      initAllBoardsButton;
+        IBOutlet NSButton*      initAllBoards1Button;
+        IBOutlet NSButton*      initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
 		IBOutlet NSMatrix*		interruptMaskMatrix;

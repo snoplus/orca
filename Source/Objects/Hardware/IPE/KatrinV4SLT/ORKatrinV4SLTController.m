@@ -416,7 +416,9 @@
 	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
 	[resetPageManagerButton     setEnabled:!lockedOrRunningMaintenance];
 	[forceTriggerButton         setEnabled:!lockedOrRunningMaintenance];
-	[initBoardButton            setEnabled:!lockedOrRunningMaintenance];
+    [initAllBoardsButton         setEnabled:!lockedOrRunningMaintenance];
+    [initAllBoards1Button         setEnabled:!lockedOrRunningMaintenance];
+    [initBoardButton            setEnabled:!lockedOrRunningMaintenance];
 	[initBoard1Button           setEnabled:!lockedOrRunningMaintenance];
 	[readBoardButton            setEnabled:!lockedOrRunningMaintenance];
 	[secStrobeSrcPU             setEnabled:!lockedOrRunningMaintenance];
