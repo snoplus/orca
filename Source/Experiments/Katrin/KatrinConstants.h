@@ -22,6 +22,6 @@
 #define kNumRings				 13
 #define kNumFocalPlaneSegments	4 + (kNumRings-1)*12
 #define kNumSegmentsPerRing		 12
-#define kNumVetoSegments		 38
+#define kNumVetoSegments		 40
 
 #define kStaggeredSegments		YES
