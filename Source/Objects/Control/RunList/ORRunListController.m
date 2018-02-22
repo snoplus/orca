@@ -356,21 +356,27 @@
     }];
 }
 
-
 #pragma mark Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-
 	if(aTableView == itemsListView){
-		id addressObj = [model itemAtIndex:rowIndex];
+        if((rowIndex == 0) && [[aTableColumn identifier] isEqualToString:@"SubRun"])return nil;
+        id addressObj = [model itemAtIndex:rowIndex];
+
 		return [addressObj valueForKey:[aTableColumn identifier]]; 
 	}
 	else return nil;
 }
 
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+    if(rowIndex == 0 && [[aTableColumn identifier] isEqualToString:@"SubRun"])[aCell setEnabled:NO];
+    else [aCell setEnabled:YES];
+}
 - (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	if(aTableView == itemsListView){
+        if((rowIndex == 0) && [[aTableColumn identifier] isEqualToString:@"SubRun"])return;
 		id addressObj = [model itemAtIndex:rowIndex];
 		[addressObj setValue:anObject forKey:[aTableColumn identifier]];
 	}

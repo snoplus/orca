@@ -54,6 +54,7 @@ enum eRunListStates {
 	int             runListState;
     int             nextState; //used by some states to dynamically set the next state
 	float           runLength;
+    float           runTimeElapsed;
 	NSMutableArray* orderArray;
     BOOL            randomize;
 	NSString*       lastFile;
@@ -61,6 +62,8 @@ enum eRunListStates {
     int             executionCount;
     ORScriptIDEModel* scriptAtStartModel;
     ORScriptIDEModel* scriptAtEndModel;
+    NSDate*         timeStarted;
+    NSDate*         timeRunStarted;
 }
 
 - (void) registerNotificationObservers;
