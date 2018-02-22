@@ -36,6 +36,8 @@
                 <outlet property="infoTypeMatrix" destination="2843" id="5606"/>
                 <outlet property="inhibitEnableMatrix" destination="2744" id="4852"/>
                 <outlet property="initAfterConnectButton" destination="3076" id="3371"/>
+                <outlet property="initAllBoards1Button" destination="dVm-8b-mbu" id="GTK-tl-Vb3"/>
+                <outlet property="initAllBoardsButton" destination="ren-77-Syj" id="Wc0-eS-tQJ"/>
                 <outlet property="initBoard1Button" destination="3008" id="3405"/>
                 <outlet property="initBoardButton" destination="2721" id="3413"/>
                 <outlet property="initOnConnectButton" destination="3076" id="eix-Ne-gxw"/>
@@ -123,11 +125,11 @@
                         <tabViewItems>
                             <tabViewItem label="Control" identifier="" id="2718">
                                 <view key="view" id="2719">
-                                    <rect key="frame" x="10" y="29" width="487" height="404"/>
+                                    <rect key="frame" x="10" y="25" width="487" height="408"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" title="Hw Version" id="2725">
-                                            <rect key="frame" x="263" y="336" width="214" height="56"/>
+                                            <rect key="frame" x="263" y="340" width="214" height="56"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="6f7-cA-GcV">
                                                 <rect key="frame" x="2" y="2" width="210" height="39"/>
@@ -157,7 +159,7 @@
                                             </view>
                                         </box>
                                         <box title="Control Register" id="2724">
-                                            <rect key="frame" x="14" y="175" width="240" height="217"/>
+                                            <rect key="frame" x="14" y="179" width="240" height="217"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="VEK-6Z-wbd">
                                                 <rect key="frame" x="2" y="2" width="236" height="200"/>
@@ -331,7 +333,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Counters" id="5092">
-                                            <rect key="frame" x="262" y="276" width="215" height="57"/>
+                                            <rect key="frame" x="262" y="280" width="215" height="57"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jeV-5h-6CK">
                                                 <rect key="frame" x="1" y="1" width="213" height="41"/>
@@ -380,7 +382,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Seconds" id="5408">
-                                            <rect key="frame" x="263" y="175" width="216" height="97"/>
+                                            <rect key="frame" x="263" y="179" width="216" height="97"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="rsy-SM-YnW">
                                                 <rect key="frame" x="1" y="1" width="214" height="81"/>
@@ -444,7 +446,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Pixelbus Enable Register" id="5719">
-                                            <rect key="frame" x="14" y="8" width="240" height="163"/>
+                                            <rect key="frame" x="14" y="12" width="240" height="163"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="p14-Gf-dge">
                                                 <rect key="frame" x="2" y="2" width="236" height="146"/>
@@ -623,7 +625,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2722">
-                                            <rect key="frame" x="255" y="6" width="62" height="28"/>
+                                            <rect key="frame" x="255" y="10" width="62" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Report" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5534">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -634,7 +636,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="ren-77-Syj">
-                                            <rect key="frame" x="384" y="6" width="103" height="28"/>
+                                            <rect key="frame" x="384" y="10" width="103" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Init SLT &amp; FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="mpH-Rr-oe7">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -645,7 +647,7 @@
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Performance" id="VzC-pa-AYf">
-                                            <rect key="frame" x="263" y="45" width="214" height="126"/>
+                                            <rect key="frame" x="263" y="49" width="214" height="126"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="usB-R0-jcL">
                                                 <rect key="frame" x="1" y="1" width="212" height="110"/>
@@ -707,7 +709,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2721">
-                                            <rect key="frame" x="317" y="6" width="65" height="28"/>
+                                            <rect key="frame" x="317" y="10" width="65" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Init SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5533">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1283,9 +1285,9 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="3008">
-                                            <rect key="frame" x="378" y="68" width="87" height="28"/>
+                                            <rect key="frame" x="289" y="68" width="72" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5498">
+                                            <buttonCell key="cell" type="push" title="Init SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5498">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1400,7 +1402,7 @@
                                             </view>
                                         </box>
                                         <button toolTip="copy source, rebuild, and start the remote client" focusRingType="none" verticalHuggingPriority="750" misplaced="YES" id="5656">
-                                            <rect key="frame" x="179" y="68" width="134" height="28"/>
+                                            <rect key="frame" x="155" y="68" width="134" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Check Code Version" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" focusRingType="none" inset="2" id="5661">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1594,6 +1596,17 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="dVm-8b-mbu">
+                                            <rect key="frame" x="362" y="68" width="103" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Init SLT &amp; FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="r8x-za-uSL">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="initAllBoardsAction:" target="-2" id="daB-RP-xUD"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
