@@ -5170,6 +5170,7 @@
 		8461CAFC1CB2D8DB001E4044 /* ORPulseCheckModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPulseCheckModel.m; sourceTree = "<group>"; };
 		8461CAFD1CB2D8DB001E4044 /* PulseCheck.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PulseCheck.nib; sourceTree = "<group>"; };
 		8461CAFE1CB2D8DB001E4044 /* PulseCheck.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PulseCheck.tif; sourceTree = "<group>"; };
+		846574BF1F9D449500B4BAA9 /* Orca.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Orca.entitlements; sourceTree = "<group>"; };
 		8465BE5805DBCEFC00870151 /* NSInvocation+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+Extensions.h"; sourceTree = "<group>"; };
 		8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+Extensions.m"; sourceTree = "<group>"; };
 		8465BF6605DC43B500870151 /* Wizard.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Wizard.tif; path = "Source/Main Dialogs/HardwareWizard/Wizard.tif"; sourceTree = SOURCE_ROOT; };
@@ -7444,6 +7445,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
+				846574BF1F9D449500B4BAA9 /* Orca.entitlements */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -16363,6 +16365,13 @@
 					369E73371C7B5E6400A7F89E = {
 						CreatedOnToolsVersion = 6.1.1;
 						TestTargetID = 8434A184055B3287002D3102;
+					};
+					8434A184055B3287002D3102 = {
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
