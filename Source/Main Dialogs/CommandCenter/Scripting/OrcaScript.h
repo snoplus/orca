@@ -27,5 +27,6 @@ enum {
     kGlobal,
     kGlobalVar,
     kGlobalAssign,
-    kSelfFunction
+    kSelfFunction,
+    kBitExtract
 };

@@ -55,6 +55,7 @@
 - (id)      makeArray:(id) p;
 - (id)		processIf:(id) p;
 - (id)		processUnless:(id) p;
+- (id)      bitExtract:(id) p;
 - (id)		forLoop:(id) p;
 - (id)		waitUntil:(id) p;
 - (id)		waitTimeOut:(id) p;
@@ -788,6 +789,9 @@
 			}
 			else return NodeValue(0)  ? NodeValue(1) : NodeValue(2);
 		}
+            
+        case kBitExtract: return [self bitExtract:p];
+            
 		case '!':  
 		{
             id result = NodeValue(0);
@@ -1233,7 +1237,7 @@
 		else if([aFunctionName isEqualToString:@"rangeloc"]) return [self extractValue:0			name:aFunctionName	args:argObject];
 		else if([aFunctionName isEqualToString:@"rangelen"]) return [self extractValue:1			name:aFunctionName	args:argObject];
 		else {
-			NSLog(@"%@ has no function called %@ in its function table. Check the syntax.\n",[self scriptName],aFunctionName);
+			NSLog(@"%@ has no function called %@ in its function table. Check line %d\n",[self scriptName],aFunctionName, [[p nodeData]line]);
 			[NSException raise:@"Run time" format:@"Function not found"];
 		}
 	}
@@ -1471,6 +1475,29 @@
 	return nil;
 }
 
+- (id) bitExtract:(id) p
+{
+    unsigned long theValue = [NodeValue(0) unsignedLongValue];
+    long val1 = [NodeValue(1) unsignedLongValue];
+    long val2 = [NodeValue(2) unsignedLongValue];
+    if(val1 > val2) {
+        [NSException raise:@"Run Time Exception" format:@"Bit extract parameters out of order"];
+    }
+    if(val1 < 0 | val2 < 0) {
+        [NSException raise:@"Run Time Exception" format:@"Bit extract parameter is negative"];
+    }
+    if(val1 > 32 | val2 > 32) {
+        [NSException raise:@"Run Time Exception" format:@"Bit extract parameter greater than 32"];
+    }
+    unsigned short aShift = MIN(val1,val2);
+    unsigned long aMask = 0L;
+    int numBits = abs(val2 - val1)+1;
+    int i;
+    for(i=0;i<numBits;i++){
+        aMask |= 0x1<<i;
+    }
+    return [NSDecimalNumber numberWithUnsignedLong:(theValue>>aShift) & aMask];
+}
 - (id) doSwitch:(id) p
 {
 	@try {
@@ -1950,7 +1977,8 @@
                 case kArrayAssign:		line = [NSMutableString stringWithString:@"[=]"];			break;
                 case kLeftArray:		line = [NSMutableString stringWithString:@"[arrayLValue]"];	break;
                 case kRightArray:		line = [NSMutableString stringWithString:@"[arrayRValue]"];	break;
-                case kConditional:		line = [NSMutableString stringWithString:@"[Conditional]"];	break;
+                case kConditional:      line = [NSMutableString stringWithString:@"[Conditional]"];  break;
+                case kBitExtract:       line = [NSMutableString stringWithString:@"[BitExtract]"]; break;
                 case TRY:				line = [NSMutableString stringWithString:@"[try]"];			break;
                 case CATCH:				line = [NSMutableString stringWithString:@"[catch]"];		break;
                 case FINALLY:			line = [NSMutableString stringWithString:@"[finally]"];		break;
