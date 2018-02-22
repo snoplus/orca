@@ -1447,6 +1447,13 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	//[self printStatusReg];
 	//[self printControlReg];
 }
+- (void) initAllBoards
+{
+    [self initBoard];
+    for(id obj in dataTakers){
+        [obj initBoard];
+    }
+}
 
 - (void) reset
 {
@@ -1734,47 +1741,19 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
 
     //if cold start (not 'quick start' in RunControl) ...
-    //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
-    [self initBoard];
-    for(id obj in dataTakers){
-        [obj initBoard];
+    if([[userInfo objectForKey:@"doinit"]intValue]){
+        [self initBoard];
     }
-    
-    //
-    // Check run mode of the Flts - is Flt readout necessary?
-    // Condition: ForcFlt  OR runmode == Trace OR runmode == Histogram
-    //
-    activateFltReadout = false;
-    for(id obj in dataTakers){
-        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){
-            //NSLog(@"FLT %i mode %i forceFlt %i\n", [obj stationNumber], [obj runMode], [obj forceFLTReadout]);
-            if  ((int) [obj runMode] == kKatrinV4Flt_EnergyTraceDaqMode) activateFltReadout = true;
-            if  ((int) [obj runMode] == kKatrinV4Flt_Histogram_DaqMode)  activateFltReadout = true;
-            if (((int) [obj runMode] == kKatrinV4Flt_EnergyDaqMode) && [obj forceFLTReadout]) activateFltReadout = true;
-        }
-    }
-    //NSLog(@"Flt readout %i\n", activateFltReadout);
-    
-    
-    
-    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
-    NSLog(@"SLT %i.%03i - Boards initialized for run\n", sltsec, sltsubsec2/10);
-  
-	
-    //loop over Readout List
+    //loop over Readout List and tell our children the run is starting
 	for(id obj in dataTakers){
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs (sets run mode for non-histo-FLTs), set histogramming FLTs to standby mode etc -tb-
+        [obj runTaskStarted:aDataPacket userInfo:userInfo];
     }
-
 
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Data takers started\n", sltsec, sltsubsec2/10);
 
-    
     // Clear counter and update display
     [self writeClrCnt];
     [self readAllStatus];
@@ -1791,7 +1770,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[self load_HW_Config];
 	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
 
-   
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
     

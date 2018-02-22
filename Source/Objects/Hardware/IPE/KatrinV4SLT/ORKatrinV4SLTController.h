@@ -205,6 +205,7 @@
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
 - (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;
 - (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender;
+- (IBAction) initAllBoardsAction:(id)sender;
 
 - (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
