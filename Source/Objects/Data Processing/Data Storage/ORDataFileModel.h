@@ -59,6 +59,7 @@
 		int				fileSegment;
 		BOOL			fileLimitExceeded;
 		NSString*		filePrefix;
+        NSString*		fileStaticSuffix;
 		BOOL			useFolderStructure;
 		BOOL			useDatedFileNames;
 		int				sizeLimitReachedAction;
@@ -88,6 +89,8 @@
 - (void) setUseFolderStructure:(BOOL)aUseFolderStructure;
 - (NSString*) filePrefix;
 - (void) setFilePrefix:(NSString*)aFilePrefix;
+- (NSString*) fileStaticSuffix;
+- (void) setFileStaticSuffix:(NSString*)aFileSuffix;
 - (int) fileSegment;
 - (void) setFileSegment:(int)aFileSegment;
 - (float) maxFileSize;

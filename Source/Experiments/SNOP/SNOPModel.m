@@ -37,6 +37,7 @@
 #import "ORFec32Model.h"
 #import "OROrderedObjManager.h"
 #import "ORSNOConstants.h"
+#import "ORDataFileModel.h"
 #import "ELLIEModel.h"
 #import "SNOP_Run_Constants.h"
 #import "SBC_Link.h"
@@ -339,6 +340,40 @@ tellieRunFiles = _tellieRunFiles;
     return xl3Host;
 }
 
+- (void) setLogNameFormat
+{
+    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    if (![dataFileModels count]) {
+        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find ORDataFileModel!\n");
+        return;
+    }
+    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
+    
+    // Get hostname of operator machine
+    char hostname[255];
+    gethostname(hostname, 255);
+
+    // Add a prefix / suffix to the datafile
+    [aDataFileModel setFilePrefix:@""];
+    [aDataFileModel setFileStaticSuffix:[NSString stringWithFormat:@"_%s",hostname]];
+}
+
+- (void) saveLogFiles:(NSNotification*)aNote
+{
+    /*
+     This method gets called by a notification observer, which waits for ORCA to close.
+    */
+    NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runObjects count]){
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        /* This should never happen. */
+        return;
+    }
+    ORRunModel* runControl = [runObjects objectAtIndex:0];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORFlushLogsNotification object:self userInfo:[runControl runInfo]];
+}
+
 - (id) initWithCoder:(NSCoder*)decoder
 {
     self = [super initWithCoder:decoder];
@@ -526,6 +561,9 @@ tellieRunFiles = _tellieRunFiles;
      */
     [[self sessionDB] startSession];
 
+    /* Add hostname as prefix to logs */
+    [self setLogNameFormat];
+
     /* Get the standard runs from the database. */
     [self refreshStandardRunsFromDB];
     [self enableGlobalSecurity];
@@ -613,6 +651,11 @@ tellieRunFiles = _tellieRunFiles;
     [notifyCenter addObserver : self
                      selector : @selector(detectorStateChanged:)
                          name : ORPQDetectorStateChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(saveLogFiles:)
+                         name : OROrcaAboutToQuitNotice
                        object : nil];
 }
 
@@ -1153,13 +1196,12 @@ err:
 
 - (void) subRunStarted:(NSNotification*)aNote
 {
-    //Ship subrunrecord - Just a special case of an eped record
+    //Ship subrunrecord - A special case of an eped record
     [self shipSubRunRecord];
 }
 
 - (void) subRunEnded:(NSNotification*)aNote
 {
-    //update calibration documents (TELLIE temp)
 }
 
 - (void) detectorStateChanged:(NSNotification*)aNote
@@ -1187,6 +1229,7 @@ err:
     if (pqRun->valid[kRun_runType]) {
         [runControl setRunType:pqRun->runType];
     }
+
     // update run state and run start time
     if (pqRun->valid[kRun_runInProgress] && pqRun->runInProgress && [runControl runningState] == eRunStopped) {
         [runControl setRunningState:eRunInProgress];
@@ -1196,6 +1239,23 @@ err:
             [runControl startTimer];
         }
         state = RUNNING;
+    }
+
+    // Get data file object to check if there's an active datafile.
+    NSArray *dataFileModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORDataFileModel")];
+    if (![dataFileModels count]) {
+        NSLogColor([NSColor redColor], @"SetLogNameFormat: can't find ORDataFileModel!\n");
+        return; // (should never happen)
+    }
+    ORDataFileModel* aDataFileModel = [dataFileModels objectAtIndex:0];
+
+    // Check if the datafile name is defined. If ORCA has just started up, it won't be.
+    // By setting here all file IO will be available for the current run. Otherwise
+    // initialisation would only happen at the next run boundry.
+    if([[aDataFileModel fileName] isEqualToString:@""]){
+        NSLog(@"SNOPModel: There was no datafile name! Probably due to opening new ORCA. Correcting this now.\n");
+        [self setLogNameFormat]; // this should have already been called by awakeAfterDocumentLoaded, but do it here too for piece of mind
+        [aDataFileModel runTaskStarted:[runControl runInfo]];
     }
 }
 
