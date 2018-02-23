@@ -1121,9 +1121,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                                     [NSNumber numberWithInt:eRunStarting],@"State",
                                                                     [NSNumber numberWithBool:YES],        @"StartingSubRun",
                                                                     nil]];
-         };
     
-
         [self startNewSubRunStage1];
     }
 }
