@@ -207,6 +207,7 @@
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 - (void) cardsChanged:(NSNotification*) aNote;
+- (void) runIsAboutToChangeState:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (BOOL) minimizeDecoding;

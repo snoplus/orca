@@ -191,6 +191,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                      selector : @selector(cardsChanged:)
                          name : ORGroupObjectsAdded
                        object : [self guardian]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToChangeState:)
+                         name : ORRunAboutToChangeState
+                       object : nil];
 }
 
 - (void) cardsChanged:(NSNotification*) aNote
@@ -224,6 +229,34 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long defaultMask = (1L<<kCtrlInhEnShift) | kCtrlRunMask;
     [self setControlReg:defaultMask];
 }
+
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote
+{
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+    BOOL isSubRun = [[[aNote userInfo] objectForKey:@"StartingSubRun"] boolValue];
+
+    id rc =  [aNote object];
+    NSLog(@"%@::%@ Calling object %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([rc class]));
+    switch (state) {
+        case eRunStarting:
+            if (isSubRun)
+                NSLog(@"--- Notification: go to  %@\n",@"eSubRunStarting");
+            else
+                NSLog(@"--- Notification: go to  %@\n",@"eRunStarting");
+            break;
+        case eRunBetweenSubRuns:
+            NSLog(@"--- Notification: go to  %@\n",@"eRunBetweenSubRuns");
+            break;
+        case eRunStopping:
+            NSLog(@"--- Notification: go to  %@\n",@"eRunStopping");
+            break;
+        default:
+            break;
+    }
+    
+}
+
 
 #pragma mark •••Accessors
 - (BOOL) minimizeDecoding
