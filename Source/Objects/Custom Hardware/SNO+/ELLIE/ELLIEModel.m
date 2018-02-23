@@ -332,13 +332,35 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
             return blankResponse;
         }
         [NSThread sleepForTimeInterval:1.0];
-        pollResponse = [[self tellieClient] command:@"read_pin_sequence"];
+        @try{
+            pollResponse = [[self tellieClient] command:@"read_pin_sequence"];
+        }@catch(NSException* e){
+            NSLogColor([NSColor redColor], @"[TELLIE]: Exception caught polling for PIN response: %@\n", [e reason]);
+            return blankResponse;
+        }
         count = count + 1;
     }
     
     // Some checks on the response
     if ([pollResponse isKindOfClass:[NSString class]]){
+        // In this case the sequence has not completed (likely due to missing triggers).
+        // Output a message for the user, then tell the hardware so it can reset its counters
+        // ready for the next sequence.
         NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.\n", pollResponse);
+        @try{
+            pollResponse = [[self tellieClient] command:@"read_pin_sequence_timeout"];
+        }@catch(NSException* e){
+            NSLogColor([NSColor redColor], @"[TELLIE]: Exception caught sending pin sequence timeout: %@\n", [e reason]);
+            return blankResponse;
+        }
+
+        //If the timeout function returned, tell the user what was fed back, otherwise just return blank
+        if(![pollResponse isKindOfClass:[NSString class]]){
+            NSLogColor([NSColor redColor],
+                       @"[TELLIE]: Values returned for incomplete sequence: %i +/- %1.1f. THESE WILL NOT BE PUSHED TO COUCHDB\n",
+                       [[pollResponse objectAtIndex:0] integerValue],
+                       [[pollResponse objectAtIndex:1] floatValue]);
+        }
         return blankResponse;
     } else if ([pollResponse count] != 3) {
         NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned array of len %i - expected 3\n", [pollResponse count]);
