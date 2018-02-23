@@ -191,6 +191,9 @@
         bool                activateFltReadout;
     
         unsigned long       savedInhibitStatus;
+        BOOL                waitForSubRunStart;
+        BOOL                waitForSubRunEnd;
+        unsigned long       secondToWaitFor;
 
 }
 

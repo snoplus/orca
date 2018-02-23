@@ -578,7 +578,7 @@ void sendAccurateTime(void)
     struct timeval t;
     gettimeofday(&t,NULL);
     p->seconds = t.tv_sec;
-    p->milliSeconds = t.tv_usec;
+    p->microSeconds = t.tv_usec;
     if(needToSwap) SwapLongBlock(p,sizeof(SBC_accurate_time_struct));
     if (writeBuffer(&aPacket) < 0) {
         LogError("sendAccurateTime Error: %s", strerror(errno));

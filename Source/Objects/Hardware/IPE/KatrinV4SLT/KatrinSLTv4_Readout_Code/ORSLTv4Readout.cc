@@ -102,7 +102,7 @@ bool ORSLTv4Readout::Start()
     
     
     // Select the readoutfunction depending on the mode
-    uint32_t runFlags    = GetDeviceSpecificData()[3];
+    //uint32_t runFlags    = GetDeviceSpecificData()[3];
     
     uint32_t sltRevision = GetDeviceSpecificData()[6];
     if(sltRevision>=0x3010004){
