@@ -3019,15 +3019,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     unsigned long regValue = [self readReg:kFLTV4RunControlReg];
-    int hwBoxCarLength       = (regValue>>28) & 0x7;
+    int hwBoxCarLength1      = (regValue>>28) & 0x7;
     int hwPoleZeroCorrection = (regValue>>24) & 0xf;
-    int hwBoxcarLength       = (regValue>>14) & 0x3;
+    int hwBoxcarLength2      = (regValue>>14) & 0x3;
     int hwFilterShapingLength= (regValue>>8)  & 0xf;
     int hwGapLength          = (regValue>>4)  & 0xf;
     BOOL differencesExist = NO;
-    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength"       orcaValue:[self boxcarLength]        hwValue:hwBoxCarLength];
+    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength1"      orcaValue:[self boxcarLength]        hwValue:hwBoxCarLength1];
     differencesExist |= [self checkForDifferencesInName:@"PoleZeroCorrection" orcaValue:[self poleZeroCorrection]  hwValue:hwPoleZeroCorrection];
-    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength"       orcaValue:[self poleZeroCorrection]  hwValue:hwBoxcarLength];
+    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength2"      orcaValue:[self boxcarLength]        hwValue:hwBoxcarLength2];
     differencesExist |= [self checkForDifferencesInName:@"FilterShapingLength"orcaValue:[self filterShapingLength] hwValue:hwFilterShapingLength];
     differencesExist |= [self checkForDifferencesInName:@"GapLength"          orcaValue:[self gapLength]           hwValue:hwGapLength];
     
@@ -3040,7 +3040,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     if(hwValue != orcaValue){
-        NSLogFont(aFont, @"%@ in ORCA differs from HW\n",aName);
         NSLogFont(aFont, @"%@: ORCA:0x%0X != HW:0x%0X\n",aName,orcaValue,hwValue);
         return YES;
     }

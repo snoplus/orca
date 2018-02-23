@@ -60,7 +60,7 @@
     settingSize			= NSMakeSize(690,740);
     rateSize			= NSMakeSize(500,710);
     testSize			= NSMakeSize(610,510);
-    lowlevelSize		= NSMakeSize(610,510);
+    lowlevelSize		= NSMakeSize(610,540);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
