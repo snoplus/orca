@@ -64,7 +64,7 @@ enum eRunListStates {
     ORScriptIDEModel* scriptAtEndModel;
     NSDate*         timeStarted;
     NSDate*         timeRunStarted;
-    
+    float           skippedTime;
 }
 
 - (void) registerNotificationObservers;

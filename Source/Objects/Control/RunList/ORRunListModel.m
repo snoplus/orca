@@ -199,6 +199,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
         [anItem setObject:@"Incomplete"  forKey:@"RunState"];
     }
     [self setUpWorkingOrder];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListRunStateChanged object:self];
 }
 
@@ -391,7 +392,8 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
     timeStarted = [[NSDate alloc]init];
 	accumulatedTime   = 0;
 	totalExpectedTime = 0;
-	for(id anItem in items){ 
+    skippedTime       = 0;
+	for(id anItem in items){
 		totalExpectedTime += [[anItem objectForKey:@"RunLength"] floatValue];
 	}
 }
@@ -409,6 +411,9 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
             if(isSubRun){
                 id anItem = [self objectAtWorkingIndex];
                 [anItem setObject:@"Skipped"  forKey:@"RunState"];
+                float dt = [[anItem objectForKey:@"RunLength"]floatValue];
+                skippedTime += dt;
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelWorkingItemIndexChanged object:self];
                 [orderArray popTop];
             }
             else break;
@@ -573,7 +578,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 			[self setWorkingItemState];
             NSTimeInterval dt     = [[NSDate date] timeIntervalSinceDate:timeStarted];
             runTimeElapsed = [[NSDate date] timeIntervalSinceDate:timeRunStarted];
-			accumulatedTime = dt;
+			accumulatedTime = dt+skippedTime;
             if(runTimeElapsed>=runLength){
                 if(scriptAtEndModel)runListState = kStartEndScript;
                 else                runListState = kRunFinished;
@@ -590,7 +595,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
         case kWaitForEndScript:
             [self setWorkingItemState];
             if(![[scriptAtEndModel scriptRunner] running]) {
-                doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
+                //doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
                 runListState = kRunFinished;
             }
             break;
@@ -628,7 +633,9 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 		break;
 			
 		case kFinishUp:
-			[self setWorkingItemState];
+            accumulatedTime = totalExpectedTime;
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORRunElapsedTimesChangedNotification object:self];
+            [self setWorkingItemState];
 			[[scriptAtStartModel scriptRunner] stop];
 			if([runModel isRunning])[runModel stopRun];
 			[self restoreRunModelOptions];
