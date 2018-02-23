@@ -361,7 +361,8 @@
 //- (void)		loadPulseAmp;
 //- (void)		loadPulserValues;
 //- (void)		swTrigger;
-- (void)		initBoard;
+- (void)        initBoard;
+- (void)        initAllBoards;
 - (void)		autoCalibrate;
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;
