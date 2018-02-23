@@ -3003,6 +3003,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                                                       orcaValue:[self gain:i]
                                                         hwValue:[self readGain:i]];
         }
+
     }
     if(!differencesExist) {
         NSLogFont(aFont,      @"ALL Gains, Thresholds in ORCA match HW\n");
