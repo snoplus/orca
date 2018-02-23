@@ -223,7 +223,6 @@
 - (void) updateProgressBar:(NSNotification*)aNote
 {
 	[progressBar setDoubleValue: 100. * [model accumulatedTime]/[model totalExpectedTime]];
-	[model workingItemIndex];
 }
 
 - (void) runStateChanged:(NSNotification*)aNote
@@ -231,7 +230,19 @@
 	BOOL isRunning = [model isRunning];
 	if(isRunning)[progressBar startAnimation:self];
 	else [progressBar stopAnimation:self];
-	[startStopButton setTitle:isRunning?@"Stop":@"Start"];
+    
+    [startButton setEnabled: !isRunning];
+    [pauseButton setEnabled: isRunning];
+    if([model isPaused]){
+        [pauseButton setTitle:@"Resume"];
+        [pausedStatusField setHidden:NO];
+    }
+    else {
+        [pauseButton setTitle:@"Pause"];
+        [pausedStatusField setHidden:YES];
+    }
+    [stopButton  setEnabled:  isRunning];
+
 	if(isRunning){
 		int n		= [model timesToRepeat];
 		int count	= [model executionCount]+1;
@@ -270,10 +281,18 @@
 {
 	[model setRandomize:[sender intValue]];	
 }
-- (IBAction) startStop:(id)sender
+- (IBAction) startRunning:(id)sender
 {
 	if(![model isRunning])[model startRunning];
-	else			     [model stopRunning];
+}
+- (IBAction) pauseRunning:(id)sender
+{
+    if([model isPaused])[model restartRunning];
+    else [model pauseRunning];
+}
+- (IBAction) stopRunning:(id)sender
+{
+    if([model isRunning])[model stopRunning];
 }
 
 - (IBAction) delete:(id)sender
