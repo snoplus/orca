@@ -1117,7 +1117,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	else {
         [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
                                                             object: self
-                                                          userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+                                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                    [NSNumber numberWithInt:eRunStarting],@"State",
+                                                                    [NSNumber numberWithBool:YES],        @"StartingSubRun",
+                                                                    nil]];
+         };
+    
+
         [self startNewSubRunStage1];
     }
 }
