@@ -254,13 +254,13 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
         float theSBCTime    = theTimeStruct->seconds + (theTimeStruct->microSeconds)/1.0E6;
         float theMacTime    = (float)[[NSDate date] timeIntervalSince1970];
         
-        timeSkew = theSBCTime - theMacTime;
+        float skew = theSBCTime - theMacTime;
         timeSkewValid = YES;
         if(aVerbose){
             NSLog(@"SBC %@ Time Check\n",[delegate fullID]);
-            NSLog(@"SBC Time: %lu\n",theSBCTime);
-            NSLog(@"Mac Time: %lu\n",theMacTime);
-            NSLog(@"SBC - Mac: %ld seconds\n",timeSkew);
+            NSLog(@"SBC Time: %f\n",theSBCTime);
+            NSLog(@"Mac Time: %f\n",theMacTime);
+            NSLog(@"SBC - Mac: %f seconds\n",skew);
         }
     }
     @catch (NSException* e){
