@@ -418,6 +418,10 @@
 
 
 - (void) testReadHisto;
+- (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue;
+- (void) compareThresholdsAndGains;
+- (void) compareHitRateMask;
+- (void) compareFilter;
 
 @end
 
@@ -441,6 +445,7 @@
 			pattern:(unsigned short*) pattern
 			  shift:(int) shift
 				  n:(int) n;
+
 @end
 
 extern NSString* ORKatrinV4FLTModelEnergyOffsetChanged;

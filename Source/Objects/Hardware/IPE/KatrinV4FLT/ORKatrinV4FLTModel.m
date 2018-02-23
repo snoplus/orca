@@ -1497,14 +1497,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	return [self readReg: kFLTV4ControlReg];
 }
 
-//TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
 	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
-//    (((nfoldCoincidence)    & 0xf)<<20) |        //nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
-//    (((vetoOverlapTime)     & 0xf)<<16)    |        //vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)              |
@@ -1518,7 +1515,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) writeControl
 {
-	
 	//TODO: add fifo length -tb- <---------------------------------------------
 	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
 	//((useBipolarEnergy & 0x1)<<18) |
@@ -2939,6 +2935,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	NSLogFont(aFont,   @"---------------------------------\n");
 }
 
+
 - (void) findNoiseFloors
 {
     id slt = [[self crate] adapter];
@@ -2951,14 +2948,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         if ([slt numberOfActiveThresholdFinder] == 0){
             [slt restoreInhibitStatus];
         }
-        
 	}
 	else {
-        
         if ([gOrcaGlobals runInProgress]){
             NSLog(@"Error: Can't run threshold finder during run\n");
-            
-        } else {
+        }
+        else {
             noiseFloorState = 0;
             noiseFloorRunning = YES;
             [self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
@@ -2992,6 +2987,66 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     return [[ORKatrinV4FLTRegisters sharedRegSet] accessType:anIndex];
 }
+
+- (void) compareThresholdsAndGains
+{
+    int i;
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    BOOL differencesExist = NO;
+    for(i=0;i<kNumV4FLTChannels;i++){
+        differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Threshold:%d",i]
+                                                  orcaValue:[self threshold:i]
+                                                    hwValue:[self readThreshold:i]];
+        differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Gain:%d",i]
+                                                  orcaValue:[self gain:i]
+                                                    hwValue:[self readGain:i]];
+    }
+    if(!differencesExist) {
+        NSLogFont(aFont,      @"ALL Gains, Thresholds in ORCA match HW\n");
+    }
+}
+
+- (void) compareHitRateMask
+{
+    unsigned long aMask = [self readHitRateMask];
+    if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
+        NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+        NSLogFont(aFont, @"HitRateMask in ORCA Matches HW\n");
+    }
+}
+
+- (void) compareFilter
+{
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    unsigned long regValue = [self readReg:kFLTV4RunControlReg];
+    int hwBoxCarLength       = (regValue>>28) & 0x7;
+    int hwPoleZeroCorrection = (regValue>>24) & 0xf;
+    int hwBoxcarLength       = (regValue>>14) & 0x3;
+    int hwFilterShapingLength= (regValue>>8)  & 0xf;
+    int hwGapLength          = (regValue>>4)  & 0xf;
+    BOOL differencesExist = NO;
+    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength"       orcaValue:[self boxcarLength]        hwValue:hwBoxCarLength];
+    differencesExist |= [self checkForDifferencesInName:@"PoleZeroCorrection" orcaValue:[self poleZeroCorrection]  hwValue:hwPoleZeroCorrection];
+    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength"       orcaValue:[self poleZeroCorrection]  hwValue:hwBoxcarLength];
+    differencesExist |= [self checkForDifferencesInName:@"FilterShapingLength"orcaValue:[self filterShapingLength] hwValue:hwFilterShapingLength];
+    differencesExist |= [self checkForDifferencesInName:@"GapLength"          orcaValue:[self gapLength]           hwValue:hwGapLength];
+    
+    if(!differencesExist){
+        NSLogFont(aFont, @"All RunControl reg values in ORCA match HW\n");
+    }
+}
+
+- (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue
+{
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    if(hwValue != orcaValue){
+        NSLogFont(aFont, @"%@ in ORCA differs from HW\n",aName);
+        NSLogFont(aFont, @"%@: ORCA:0x%0X != HW:0x%0X\n",aName,orcaValue,hwValue);
+        return YES;
+    }
+    else return NO;
+}
+
 @end
 
 @implementation ORKatrinV4FLTModel (tests)
@@ -3280,29 +3335,30 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[testSuit runForObject:self]; //do next test
 }
 
-- (int) compareData:(unsigned short*) data
-			pattern:(unsigned short*) pattern
-			  shift:(int) shift
-				  n:(int) n 
-{
-	unsigned int i, j;
-	
-	// Check for errors
-	for (i=0;i<n;i++) {
-		if (data[i]!=pattern[(i+shift)%n]) {
-			for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
-				NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
-					  data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
-					  pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
-					  pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
-				return i; // check only for one error in every page!
-			}
-		}
-	}
-	
-	return n;
-}
 
+
+- (int) compareData:(unsigned short*) data
+            pattern:(unsigned short*) pattern
+              shift:(int) shift
+                  n:(int) n
+{
+    unsigned int i, j;
+    
+    // Check for errors
+    for (i=0;i<n;i++) {
+        if (data[i]!=pattern[(i+shift)%n]) {
+            for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
+                NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
+                      data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
+                      pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
+                      pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
+                return i; // check only for one error in every page!
+            }
+        }
+    }
+    
+    return n;
+}
 
 
 @end
@@ -3461,4 +3517,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	fltRunMode = savedMode;
 	[self writeControl];
 }
+
+
 @end

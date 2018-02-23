@@ -813,6 +813,9 @@
 	[histClrModePU setEnabled:                   !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[clearReceivedHistoCounterButton setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	
+    [compareRegistersButton setEnabled:!lockedOrRunningMaintenance];
+    
+    
 //    NSString* s;
 //    if(locked)s = @"Veto Locked";
 //    else if((daqMode == kIpeFltV4_VetoEnergyDaqMode) || (daqMode == kIpeFltV4_VetoEnergyTraceDaqMode)) s = @"Veto Active";
@@ -1722,6 +1725,13 @@
         NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	    [model testButtonLowLevelResetTP];
 	}
+}
+
+- (IBAction) compareRegisters:(id)sender
+{
+    [model compareThresholdsAndGains];
+    [model compareHitRateMask];
+    [model compareFilter];
 }
 
 #pragma mark •••Plot DataSource

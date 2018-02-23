@@ -151,7 +151,10 @@
 		IBOutlet NSProgressIndicator*	noiseFloorProgress;
 		IBOutlet NSTextField*			noiseFloorStateField2;
 	
-		IBOutlet NSMatrix*				fifoDisplayMatrix;		
+		IBOutlet NSMatrix*				fifoDisplayMatrix;
+    
+        IBOutlet NSButton*      compareRegistersButton;
+
 };
 
 #pragma mark •••Initialization
@@ -308,6 +311,7 @@
 - (IBAction) devTest2ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 
 - (IBAction) testButtonLowLevelAction: (id) sender; //temp routine 
+- (IBAction) compareRegisters:(id)sender;
 
 	
 #pragma mark •••Plot DataSource
