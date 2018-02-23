@@ -1729,6 +1729,8 @@
 
 - (IBAction) compareRegisters:(id)sender
 {
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    NSLogFont(aFont,@"Register Compare report for %@\n",[model fullID]);
     [model compareThresholdsAndGains];
     [model compareHitRateMask];
     [model compareFilter];
