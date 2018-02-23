@@ -2994,12 +2994,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     BOOL differencesExist = NO;
     for(i=0;i<kNumV4FLTChannels;i++){
-        differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Threshold:%d",i]
-                                                  orcaValue:[self threshold:i]
-                                                    hwValue:[self readThreshold:i]];
-        differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Gain:%d",i]
-                                                  orcaValue:[self gain:i]
-                                                    hwValue:[self readGain:i]];
+        if( triggerEnabledMask & (0x1<<i) ){
+
+            differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Threshold:%d",i]
+                                                      orcaValue:(unsigned long)[self threshold:i]
+                                                        hwValue:[self readThreshold:i]];
+            differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Gain:%d",i]
+                                                      orcaValue:[self gain:i]
+                                                        hwValue:[self readGain:i]];
+        }
     }
     if(!differencesExist) {
         NSLogFont(aFont,      @"ALL Gains, Thresholds in ORCA match HW\n");
