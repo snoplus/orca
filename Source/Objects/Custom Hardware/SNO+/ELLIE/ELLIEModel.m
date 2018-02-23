@@ -997,7 +997,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
-    }
+        }
         
         ////////////////////
         // Init can take a while. Make sure no-one hit
