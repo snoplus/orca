@@ -278,6 +278,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                                           nil];
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
                 
+                // Ship the sub run records
+                // Ship as early as possible; at high rates it's impossible to put them at the
+                // right place?!
+                [self shipSltSecondCounter: kStartSubRunType];
+                [self shipSltRunCounter:    kStartSubRunType];
+                
             } else {
                 NSLog(@"--- Notification: go to  %@\n",@"eRunStarting");
             }
@@ -313,6 +319,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                                       @"Reason",
                                       nil];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+            // Ship the sub run records
+            // Ship as early as possible; at high rates it's impossible to put them at the
+            // right place?!
+            [self shipSltSecondCounter: kStopSubRunType];
+            [self shipSltRunCounter:    kStopSubRunType];
 
             break;
             
@@ -1931,26 +1943,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-    // Manage subrun status - startint
-    if (waitForSubRunStart){
-        unsigned long subseconds = [self readSubSecondsCounter];
-        unsigned long seconds = [self readSecondsCounter];
-        unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
-        
-        if (seconds >= secondToWaitFor) {
-            waitForSubRunStart = false;
-            NSLog(@"SLT %i.%03i - met second strobe %i\n", seconds, subsec2/10, secondToWaitFor);
-            
-            // Wait for second strobe or inhibit to become active
-            NSLog(@"Go ahead to start subrun\n");
-            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
-            
-            // Ship the sub run records
-            [self shipSltSecondCounter: kStartSubRunType];
-            [self shipSltRunCounter:    kStartSubRunType];
-        }
-    }
-
     
     //event readout controlled by the SLT cpu now. ORCA reads out
     //the resulting data from a generic circular buffer in the pmc code.
@@ -1969,7 +1961,23 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     }
     
 
-    // Manage subrun status - ending up
+    // Manage subrun status
+    if (waitForSubRunStart){
+        unsigned long subseconds = [self readSubSecondsCounter];
+        unsigned long seconds = [self readSecondsCounter];
+        unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
+        
+        if (seconds >= secondToWaitFor) {
+            waitForSubRunStart = false;
+            NSLog(@"SLT %i.%03i - met second strobe %i\n", seconds, subsec2/10, secondToWaitFor);
+            
+            // Wait for second strobe or inhibit to become active
+            NSLog(@"Go ahead to start subrun\n");
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
+        }
+    }
+    
+    
     if (waitForSubRunEnd){
         unsigned long subseconds = [self readSubSecondsCounter];
         unsigned long seconds = [self readSecondsCounter];
@@ -1982,10 +1990,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             // Wait for second strobe or inhibit to become active
             NSLog(@"Go ahead to terminate subrun\n");
             [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
-            
-            // Ship the sub run records
-            [self shipSltSecondCounter: kStopSubRunType];
-            [self shipSltRunCounter:    kStopSubRunType];
         }
     }
 
