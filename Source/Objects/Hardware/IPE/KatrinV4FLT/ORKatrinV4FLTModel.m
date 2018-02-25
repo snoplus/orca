@@ -1890,13 +1890,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     // Ship the data, if during the last second inhibit was released and run was active
                     //
                     unsigned long inhibit = statusReg & kStatusInh;
-
                     unsigned long runStatus = [gOrcaGlobals runInProgress];
-                    
                     unsigned long sltRunStartSec = [slt getRunStartSecond];
                     unsigned long sltRunEndSec = [slt getRunEndSecond];
                     
                     
+                    // Todo: Include inhibit status of the last second, in order to avaid writing hitrates between subruns
                     if ((dataIndex > 0) && (sltSec > sltRunStartSec) && (sltSec <= sltRunEndSec)) {
                     //if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
                         
