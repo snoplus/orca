@@ -1889,12 +1889,16 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     //
                     // Ship the data, if during the last second inhibit was released and run was active
                     //
-                     unsigned long inhibit          = statusReg & kStatusInh;
-                     unsigned long runStatus        = [gOrcaGlobals runInProgress];
-                     unsigned long sltRunStartSec   = [slt getRunStartSecond];
+                    unsigned long inhibit = statusReg & kStatusInh;
+
+                    unsigned long runStatus = [gOrcaGlobals runInProgress];
+                    
+                    unsigned long sltRunStartSec = [slt getRunStartSecond];
+                    unsigned long sltRunEndSec = [slt getRunEndSecond];
                     
                     
-                    if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
+                    if ((dataIndex > 0) && (sltSec > sltRunStartSec) && (sltSec <= sltRunEndSec)) {
+                    //if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
                         
                         data[0] = hitRateId | (dataIndex + countHREnabledChans + 5);
                         data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1;

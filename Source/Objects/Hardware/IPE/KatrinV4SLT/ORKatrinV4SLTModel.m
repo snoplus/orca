@@ -96,6 +96,10 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[self setSecondsSetSendToFLTs: YES];
     [self setDefaults];
 	[self registerNotificationObservers];
+    
+    runStartSec = 0;
+    sltSecondRunStop = 0;
+
     return self;
 }
 
@@ -1506,6 +1510,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     return runStartSec;
 }
+
+- (unsigned long) getRunEndSecond
+{
+    return sltSecondRunStop;
+}
     
 - (void) initBoard
 {
@@ -1803,7 +1812,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     waitForSubRunStart = false;
     waitForSubRunEnd = false;
-    
+    runStartSec = 0;
+    sltSecondRunStop = 0xffffffff;
     
     [self setIsPartOfRun: YES];
 
@@ -1893,6 +1903,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	lastDisplayCounter  = 0;
 	lastDisplayRate     = 0;
 	lastSimSec          = 0;
+    
 	
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
@@ -2125,6 +2136,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - shipped second counter %s at %i\n", seconds, subsec2/10, sType[aType%5], seconds);
 
+    
+    if ((aType == kStartSubRunType) || (aType == kStopSubRunType) ){
+        seconds = seconds + 1;
+    }
+    
+    
 	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:subseconds ];
 }
 

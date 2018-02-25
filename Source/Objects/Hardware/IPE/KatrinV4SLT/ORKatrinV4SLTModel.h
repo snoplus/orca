@@ -354,6 +354,7 @@
 - (unsigned long) readSubSecondsCounter;
 - (unsigned long) getSeconds;
 - (unsigned long) getRunStartSecond;
+- (unsigned long) getRunEndSecond;
 
 - (void)		reset;
 - (void)		hw_config;
