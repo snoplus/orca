@@ -28,11 +28,16 @@
 + (NSArray*) arrayFromULongCArray  : (unsigned long*) cArray size:(int)num;
 + (NSArray*) arrayFromShortCArray  : (short*)         cArray size:(int)num;
 + (NSArray*) arrayFromUShortCArray : (unsigned short*)cArray size:(int)num;
-+ (NSArray*) arrayFromBoolCArray   :(BOOL*)cArray size:(int)num;
++ (NSArray*) arrayFromCharCArray   : (char*)          cArray size:(int)num;
++ (NSArray*) arrayFromUCharCArray  : (unsigned char*) cArray size:(int)num;
++ (NSArray*) arrayFromBoolCArray   : (BOOL*)          cArray size:(int)num;
+
 - (void) loadLongCArray   : (long*)          cArray size:(int)num;
 - (void) loadULongCArray  : (unsigned long*) cArray size:(int)num;
 - (void) loadShortCArray  : (short*)         cArray size:(int)num;
 - (void) loadUShortCArray : (unsigned short*)cArray size:(int)num;
+- (void) loadCharCArray   : (char*)          cArray size:(int)num;
+- (void) loadUCharCArray  : (unsigned char*) cArray size:(int)num;
 - (void) loadBoolCArray   : (BOOL*)          cArray size:(int)num;
 @end
 

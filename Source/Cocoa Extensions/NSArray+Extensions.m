@@ -122,6 +122,22 @@
     return [anArray autorelease];
 }
 
++ (NSArray*) arrayFromCharCArray:(char*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithChar:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromUCharCArray:(unsigned char*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithUnsignedChar:cArray[i]]];
+    return [anArray autorelease];
+}
+
 + (NSArray*) arrayFromBoolCArray:(BOOL*)cArray size:(int)num;
 {
     NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
@@ -129,7 +145,6 @@
     for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithBool:cArray[i]]];
     return [anArray autorelease];
 }
-
 - (void) loadLongCArray:(long*)cArray size:(int)num
 {
     int n = MIN([self count],num);
@@ -166,6 +181,19 @@
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] boolValue];
 }
+- (void) loadCharCArray:(char*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] charValue];
+}
+- (void) loadUCharCArray:(unsigned char*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedCharValue];
+}
+
 
 @end
 static NSUInteger random_below(NSUInteger n) {
