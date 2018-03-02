@@ -76,11 +76,14 @@
         [[riseTimeMatrix                    cellAtRow:i column:0] setTag:i];
         [[trigBothEdgesMatrix               cellAtRow:i column:0] setTag:i];
         [[intHeTrigOutPulseMatrix           cellAtRow:i column:0] setTag:i];
+        [[gate1EnableMaskMatrix             cellAtRow:i column:0] setTag:i];
+        [[gate2EnableMaskMatrix             cellAtRow:i column:0] setTag:i];
+        [[triggerDelayMatrix                cellAtRow:i column:0] setTag:i];
     }
     int tag = 0;
     int row,col;
     for(col=0;col<2;col++){
-        for(row=0;row<6;row++){
+        for(row=0;row<8;row++){
             [[acquisitionControlMatrix cellAtRow:row column:col] setTag:tag];
             tag++;
         }
@@ -132,11 +135,12 @@
         [[accGate8StartMatrix           cellAtRow:i column:0] setTag:i];
         [[rawDataBufferLenMatrix        cellAtRow:i column:0] setTag:i];
         [[rawDataBufferStartMatrix      cellAtRow:i column:0] setTag:i];
-        [[triggerDelayMatrix            cellAtRow:i column:0] setTag:i];
         [[heTrigThresholdSumMatrix      cellAtRow:i column:0] setTag:i];
         [[thresholdSumMatrix            cellAtRow:i column:0] setTag:i];
         [[riseTimeSumMatrix             cellAtRow:i column:0] setTag:i];
         [[gapTimeSumMatrix              cellAtRow:i column:0] setTag:i];
+        [[internalGateLengthMatrix      cellAtRow:i column:0] setTag:i];
+        [[internalCoinGateLengthMatrix  cellAtRow:i column:0] setTag:i];
    }
 
 	ORTimeLinePlot* aPlot1 = [[ORTimeLinePlot alloc] initWithTag:8 andDataSource:self];
@@ -547,7 +551,26 @@
                          name : ORSIS3316LemoCoMaskChanged
                         object: model];
 
-    
+    [notifyCenter addObserver : self
+                     selector : @selector(gate1EnableMaskChanged:)
+                         name : ORSIS3316Gate1EnableMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(gate2EnableMaskChanged:)
+                         name : ORSIS3316Gate2EnableMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(internalGateLenChanged:)
+                         name : ORSIS3316InternalGateLenChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(internalCoinGateLenChanged:)
+                         name : ORSIS3316InternalCoinGateLenChanged
+                        object: model];
+
     [self registerRates];
 }
 
@@ -569,8 +592,6 @@
                            object : obj];
     }
 }
-
-
 - (void) updateWindow
 {
     [super updateWindow];
@@ -662,10 +683,50 @@
     [self lemoCoMaskChanged:nil];
     [self endAddressSuppressionChanged:nil];
     
+    [self gate1EnableMaskChanged:nil];
+    [self gate2EnableMaskChanged:nil];
+    [self internalGateLenChanged:nil];
+    [self internalCoinGateLenChanged:nil];
+
+    
     [self setUpdatedOnce]; //<<--Must be last to ensure all fields are updated on first load
 }
 
 #pragma mark •••Interface Management
+- (void) gate1EnableMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model gate1EnableMask];
+    int i;
+    for(i=0;i<kNumSIS3316Channels; i++){
+        [[gate1EnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
+    }
+}
+
+- (void) gate2EnableMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model gate2EnableMask];
+    int i;
+    for(i=0;i<kNumSIS3316Channels; i++){
+        [[gate2EnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
+    }
+
+}
+
+- (void) internalGateLenChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [[internalGateLengthMatrix cellWithTag:i] setIntValue:[model internalGateLen:i]];
+    }
+}
+
+- (void) internalCoinGateLenChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [[internalCoinGateLengthMatrix cellWithTag:i] setIntValue:[model internalCoinGateLen:i]];
+    }
+}
 
 - (void) lemoToMaskChanged:(NSNotification*)aNote
 {
@@ -727,8 +788,9 @@
 - (void) eventConfigChanged:(NSNotification*)aNote
 {
     short i;
+    unsigned long aMask = [model eventConfigMask];
     for(i=0;i<8;i++){
-        [[eventConfigMatrix cellWithTag:i] setState:[model eventConfig:i]];
+        [[eventConfigMatrix cellWithTag:i] setState:aMask & (0x1<<i)];
     }
 }
 
@@ -1398,7 +1460,7 @@
 {
     short i;
     unsigned long aMask = [model acquisitionControlMask];
-    for(i=0;i<12;i++){
+    for(i=0;i<16;i++){
         [[acquisitionControlMatrix cellWithTag:i] setState:(aMask&(0x1<<i))!=0];
     }
 }
@@ -1538,7 +1600,7 @@
 	[randomClockButton          setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU              setEnabled:!lockedOrRunningMaintenance];
 	[pageSizePU                 setEnabled:!locked && !runInProgress];
-    
+    [extendedEventConfigButton  setEnabled:!locked && !runInProgress];
     [dacOffsetMatrix            setEnabled:!lockedOrRunningMaintenance];
 
 }
@@ -1697,7 +1759,8 @@
     if(aValue==0)aMask &= ~(0x1<<tag);
     else         aMask |= (0x1<<tag);
     
-    [model setLemoToMask:aMask];}
+    [model setLemoToMask:aMask];
+}
 
 - (IBAction) lemoUoMaskAction:(id)sender
 {
@@ -2182,9 +2245,44 @@
 {
     [model setTermination:[sender indexOfSelectedItem]];
 }
+
 - (IBAction) loadDefaults:(id)sender
 {
     [model setDefaults];
+}
+
+- (IBAction)gate1EnabledMaskAction:(id)sender
+{
+    unsigned long aMask = [model gate1EnableMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setGate1EnableMask:aMask];
+
+}
+
+- (IBAction)gate2EnabledMaskAction:(id)sender
+{
+    unsigned long aMask = [model gate2EnableMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setGate2EnableMask:aMask];
+
+}
+
+- (IBAction) internalGateLenAction:(id)sender
+{
+    [model setInternalGateLen:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) internalCoinGateLenAction:(id)sender
+{
+    [model setInternalCoinGateLen:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 #pragma mark •••Data Source

@@ -212,7 +212,6 @@ enum {
 @interface ORSIS3316Model : ORVmeIOCard <ORDataTaker,ORHWWizard,AutoTesting>
 {
   @private
-//-=**    short           gateLengthMask;
     unsigned long   dataId;
     long			enabledMask;
     long            histogramsEnabledMask;
@@ -309,23 +308,25 @@ enum {
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3316Channels];
 
-	//cach to speed takedata
-   // unsigned long* dataRecord[4];
-	unsigned long location;
-	id theController;
-	long count;
-    //BOOL firstTime;
-    BOOL waitingForSomeChannels;
+	
+	unsigned long location; //cach to speed takedata
+	id theController;       //cach to speed takedata
+    unsigned short waitingOnChannelMask;
+    unsigned short groupDataTransferedMask;
+
     NSString* revision;
-    unsigned short majorRev;        //6.2
-    unsigned short minorRev;        //6.2
-    unsigned short hwVersion;       //6.7
-    float temperature;              //6.8
-    unsigned short serialNumber;     //6.10  
-    //
-    unsigned long lemoCoMask;
-    unsigned long lemoUoMask;
-    unsigned long lemoToMask;
+    unsigned short  majorRev;
+    unsigned short  minorRev;
+    unsigned short  hwVersion;
+    float           temperature;
+    unsigned short  serialNumber;
+    unsigned long   lemoCoMask;
+    unsigned long   lemoUoMask;
+    unsigned long   lemoToMask;
+    unsigned long   gate1EnableMask;                          //6.24
+    unsigned long   gate2EnableMask;                          //6.24
+    unsigned long   internalGateLen[kNumSIS3316Groups];       //6.24
+    unsigned long   internalCoinGateLen[kNumSIS3316Groups];   //6.24
 }
 
 - (id) init;
@@ -354,8 +355,7 @@ enum {
 - (unsigned long) eventConfigMask;
 
 - (void) setEventConfigMask:(unsigned long)aMask;
-- (BOOL) eventConfig:(unsigned short)aGroup;
-- (void) setEventConfigBit:(unsigned short)aGroup withValue:(BOOL)aValue;
+- (void) setEventConfigBit:(unsigned short)bit withValue:(BOOL)aValue;
 
 - (BOOL) extendedEventConfigBit;
 - (void) setExtendedEventConfigBit:(BOOL)aValue;
@@ -546,6 +546,18 @@ enum {
 - (void)            setLemoUoMask:(unsigned long)aMask;
 - (unsigned long)   lemoToMask;
 - (void)             setLemoToMask:(unsigned long)aMask;
+
+- (unsigned long) gate1EnableMask;
+- (void) setGate1EnableMask:(unsigned long)aMask;
+
+- (unsigned long) gate2EnableMask;
+- (void) setGate2EnableMask:(unsigned long)aMask;
+
+- (unsigned long) internalGateLen:(unsigned short)aGroup;
+- (void) setInternalGateLen:(unsigned short)aGroup withValue:(unsigned long)aValue;
+
+- (unsigned long) internalCoinGateLen:(unsigned short)aGroup;
+- (void) setInternalCoinGateLen:(unsigned short)aGroup withValue:(unsigned long)aValue;
 
 
 //Acquisition control reg
@@ -803,3 +815,9 @@ extern NSString* ORSIS3316SharingChanged;
 extern NSString* ORSIS3316LemoCoMaskChanged;
 extern NSString* ORSIS3316LemoUoMaskChanged;
 extern NSString* ORSIS3316LemoToMaskChanged;
+
+extern NSString* ORSIS3316Gate1EnableMaskChanged;
+extern NSString* ORSIS3316Gate2EnableMaskChanged;
+extern NSString* ORSIS3316InternalGateLenChanged;
+extern NSString* ORSIS3316InternalCoinGateLenChanged;
+

@@ -98,11 +98,6 @@
     IBOutlet NSMatrix*      rawDataBufferLenMatrix;
     IBOutlet NSMatrix*      rawDataBufferStartMatrix;
 
-
-    //----------------------^^^^^^^^
-    //------------------------------
-	//CSR
-//	IBOutlet NSMatrix*		csrMatrix;
 	IBOutlet NSMatrix*		acquisitionControlMatrix;
     IBOutlet NSMatrix*      nimControlStatusMatrix;
 	
@@ -146,6 +141,11 @@
     NSView* blankView;
     NSSize  settingSize;
     NSSize  rateSize;
+    
+    IBOutlet NSMatrix* gate1EnableMaskMatrix;
+    IBOutlet NSMatrix* gate2EnableMaskMatrix;
+    IBOutlet NSMatrix* internalGateLengthMatrix;
+    IBOutlet NSMatrix* internalCoinGateLengthMatrix;
 }
 
 - (id)   init;
@@ -233,8 +233,12 @@
 - (void) moduleIDChanged:(NSNotification*)aNote;
 - (void) hwVersionChanged:(NSNotification*)aNote;
 
-- (void) temperatureChanged:(NSNotification*)aNotification;
-- (void) serialNumberChanged:(NSNotification*)aNotification;
+- (void) temperatureChanged:(NSNotification*)aNote;
+- (void) serialNumberChanged:(NSNotification*)aNote;
+- (void) gate1EnableMaskChanged:(NSNotification*)aNote;
+- (void) gate2EnableMaskChanged:(NSNotification*)aNote;
+- (void) internalGateLenChanged:(NSNotification*)aNote;
+- (void) internalCoinGateLenChanged:(NSNotification*)aNote;
 
 - (void) scaleAction:(NSNotification*)aNote;
 - (void) integrationChanged:(NSNotification*)aNote;
@@ -316,6 +320,8 @@
 - (IBAction) lemoUoMaskAction:(id)sender;
 - (IBAction) lemoCoMaskAction:(id)sender;
 - (IBAction) loadDefaults:(id)sender;
+- (IBAction) internalGateLenAction:(id)sender;
+- (IBAction) internalCoinGateLenAction:(id)sender;
 
 - (IBAction) checkEvent:(id)sender;
 
