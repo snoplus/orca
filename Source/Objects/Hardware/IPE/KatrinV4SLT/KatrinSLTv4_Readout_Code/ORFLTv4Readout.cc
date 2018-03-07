@@ -390,7 +390,9 @@ bool ORFLTv4Readout::ReadoutTraceV31(SBC_LAM_Data*){
                 data[dataIndex++] = ((traceStart16 & 0x7ff) << 8)  | (wfRecordVersion & 0xf);
                 data[dataIndex++] = 0; //spare
                 
-                usleep(50); // only for test purpose !!!
+                // Todo: Remove this sleep !!!
+                if (postTriggerTime > 1024)
+                    usleep(50); // only for test purpose !!!
                 
                 //select the page and dma the waveform into the data buffer ... should have a safety check here in case need to dump record
                 srack->theSlt->pageSelect->write(0x100 | pagenr);
@@ -528,6 +530,21 @@ bool ORFLTv4Readout::ReadoutHistogramV31(SBC_LAM_Data*){
                         }
                     }
                     
+/*
+                    // Check for readout errors
+                    uint32_t histogram2[2048];
+                    int diff;
+                    
+                    usleep(100);
+                    srack->theFlt[col]->histogramData->readBlock(chan,  (long unsigned int*) histogram2, 0, 2048);
+                    
+                    diff = 0;
+                    for (int i=0;i<2048;i++){
+                        diff = histogram2[i] - ptrHistoBuffer[i];
+                    }
+                    printf("%d - Histogram readback diff = %d\n", histoReadoutSec - histoRefreshTime, diff);
+*/
+
                 }
             }
             
