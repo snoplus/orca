@@ -162,6 +162,7 @@
         unsigned long   inhibitLastCheck; //< used in doneTakingData
         bool            callRunIsStopping;
         unsigned long   sltSecondRunStop;
+        unsigned long   lastHitrateSec;
     
 		unsigned long   lastSimSec;
 

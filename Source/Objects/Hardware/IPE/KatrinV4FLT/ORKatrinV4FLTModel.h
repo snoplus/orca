@@ -117,6 +117,8 @@
     int energyOffset;
     unsigned long inhibitDuringLastHitrateReading;
     unsigned long runStatusDuringLastHitrateReading;
+    unsigned long lastSltSecondCounter;
+    unsigned long nHitrateCount;
     BOOL initializing;
 
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed

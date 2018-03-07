@@ -1885,6 +1885,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     //loop over Readout List and tell our children the run is starting
 	for(id obj in dataTakers){
         [obj runTaskStarted:aDataPacket userInfo:userInfo];
+        [obj stopReadingHitRates];
     }
 
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
@@ -1950,10 +1951,15 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
 
     callRunIsStopping = false;
+    lastHitrateSec = runStartSec -1;
+    
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    unsigned long subseconds;
+    unsigned long seconds;
+    unsigned long subsec2;
     
     //event readout controlled by the SLT cpu now. ORCA reads out
     //the resulting data from a generic circular buffer in the pmc code.
@@ -1974,9 +1980,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     // Manage subrun status
     if (waitForSubRunStart){
-        unsigned long subseconds = [self readSubSecondsCounter];
-        unsigned long seconds = [self readSecondsCounter];
-        unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
+        subseconds = [self readSubSecondsCounter];
+        seconds = [self readSecondsCounter];
+        subsec2 = (subseconds >> 11) & 0x3fff;
         
         if (seconds >= secondToWaitFor) {
             waitForSubRunStart = false;
@@ -1990,9 +1996,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     
     if (waitForSubRunEnd){
-        unsigned long subseconds = [self readSubSecondsCounter];
-        unsigned long seconds = [self readSecondsCounter];
-        unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
+        subseconds = [self readSubSecondsCounter];
+        seconds = [self readSecondsCounter];
+        subsec2 = (subseconds >> 11) & 0x3fff;
         
         if (seconds >= secondToWaitFor) {
             waitForSubRunEnd = false;
@@ -2004,6 +2010,24 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         }
     }
 
+    
+    // Read hitrate - alternative scheduling, independant from any macOS timer
+    subseconds = [self readSubSecondsCounter]; // req. to read subsec first !!!
+    seconds = [self readSecondsCounter];
+    //subsec2 = (subseconds >> 11) & 0x3fff;
+    
+    if (seconds > lastHitrateSec) {
+        lastHitrateSec = seconds;
+
+        //NSLog(@"SLT %i.%03i - reading hitrates from SLT\n", seconds, subsec2/10);
+
+        // Call readHitrate in all Flt
+        for(id obj in dataTakers){
+            [obj readHitRates];
+        }
+    }
+    
+    
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -2105,6 +2129,13 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     // Delete unused structures
     [pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
+
+    
+    // Start reading hitrates again - for interactive mode
+    for(id obj in dataTakers){
+        [obj startReadingHitRates];
+    }
+
     
     [dataTakers release];
     dataTakers = nil;
@@ -2116,6 +2147,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     // Release inhibit with the next second strobe
     //
     [self restoreInhibitStatus];
+
+
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text

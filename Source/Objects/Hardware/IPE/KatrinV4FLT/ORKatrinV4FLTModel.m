@@ -130,6 +130,8 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
     
     inhibitDuringLastHitrateReading = 0;
     runStatusDuringLastHitrateReading = 0;
+    lastSltSecondCounter = 0;
+    nHitrateCount = 0;
     
     lastHistReset = 0;
 }
@@ -1788,7 +1790,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) readHitRates
 {
+    unsigned long sltSec;
+    unsigned long sltSubSec;
     unsigned long sltSubSec2;
+    
+    unsigned long runStatus;
+    unsigned long sltRunEndSec;
+    
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 
@@ -1837,11 +1845,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     [[slt sbcLink] send:&aPacket receive:&aPacket];
                     
                     katrinV4_HitRateStructure* p = (katrinV4_HitRateStructure*) aPacket.payload;
-                    unsigned long sltSec      = p->seconds;
-                    unsigned long sltSubSec   = p->subSeconds;
+                    sltSec      = p->seconds;
+                    sltSubSec   = p->subSeconds;
+                    sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
+
                     unsigned long statusReg   = p->status;
                     
-                    sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
 
                     float   newTotal  = 0;
                     int     dataIndex = 0;
@@ -1890,9 +1899,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     // Ship the data, if during the last second inhibit was released and run was active
                     //
                     unsigned long inhibit = statusReg & kStatusInh;
-                    unsigned long runStatus = [gOrcaGlobals runInProgress];
+                    runStatus = [gOrcaGlobals runInProgress];
                     unsigned long sltRunStartSec = [slt getRunStartSecond];
-                    unsigned long sltRunEndSec = [slt getRunEndSecond];
+                    sltRunEndSec = [slt getRunEndSecond];
                     
                     
                     // Todo: Include inhibit status of the last second, in order to avaid writing hitrates between subruns
@@ -1907,11 +1916,30 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                         
                         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
                                                                             object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
+                        
+                        if (sltSec -1 == sltRunStartSec ) {
+                            nHitrateCount = 1;
+                        } else {
+                            nHitrateCount += 1;
+                        }
+                        
+                        //NSLog(@"SLT %i.%03i ReadHItrate (end %i)\n", sltSec, sltSubSec2/10, sltRunEndSec);
+                        
                     }
+                    
+                    if ((sltSec > sltRunEndSec) && (nHitrateCount > 0)){
+                        NSLog(@"NUmber of counts in slot %d: %d \n", [self stationNumber], nHitrateCount);
+                        nHitrateCount = 0;
+                    }
+                    
+                    //if ((lastSltSecondCounter > 0) && (sltSec - hitRateLengthSec > lastSltSecondCounter)) {
+                    //    NSLog(@"E R R O R: Hitrate counter missing %d .. %d\n", lastSltSecondCounter-1, sltSec-1);
+                    //}
                     
                     // Keep the inhibit status for the next call
                     inhibitDuringLastHitrateReading   = inhibit;
                     runStatusDuringLastHitrateReading = runStatus;
+                    lastSltSecondCounter = sltSec;
                     
                     [self setHitRateTotal:newTotal];
                     
@@ -1932,20 +1960,21 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         NSLogError(@"",@"Hit Rate Exception",[self fullID],nil);
 	}
 
-    
-    
-    // Synchronize the hitrate readout to the Slt second counter
-    // If the hardware is not accible the counter runs free but not less than a second
 
-    double delay      = (1<<[self hitRateLength]) -1;
-    double deltadelay = 0.010 + (10000. - sltSubSec2)/10000.;
-    delay += deltadelay;
+    if (sltSec >= sltRunEndSec){
     
-    //if (runStatus) NSLog(@"FLT %i.%03i - Reading hitrates - delay %f %f \n", sltSec, sltSubSec2/10, delay, deltadelay);
-    
-    [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
+        // Synchronize the hitrate readout to the Slt second counter
+        // If the hardware is not accible the counter runs free but not less than a second
+
+        double delay      = (1<<[self hitRateLength]) -1;
+        double deltadelay = 0.010 + (10000. - sltSubSec2)/10000.;
+        delay += deltadelay;
+        
+        //NSLog(@"FLT %i.%03i - Reading hitrates - delay %f %f \n", sltSec, sltSubSec2/10, delay, deltadelay);
+        [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
+
+    }
 }
-
 
 - (unsigned long long) readLostEvents
 {
