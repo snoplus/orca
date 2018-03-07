@@ -1645,6 +1645,20 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[guardian setCrateNumber:aNumber];
 }
 
+
+- (BOOL) compareRegisters
+{
+    BOOL differencesExist = NO;
+
+    for(id obj in dataTakers){
+        differencesExist |= [obj compareThresholdsAndGains];
+        differencesExist |= [obj compareHitRateMask];
+        differencesExist |= [obj compareFilter];
+    }
+    
+    return (differencesExist);
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {

@@ -3020,7 +3020,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     return [[ORKatrinV4FLTRegisters sharedRegSet] accessType:anIndex];
 }
 
-- (void) compareThresholdsAndGains
+- (BOOL) compareThresholdsAndGains
 {
     int i;
     NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
@@ -3040,18 +3040,26 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if(!differencesExist) {
         NSLogFont(aFont,      @"ALL Gains, Thresholds in ORCA match HW\n");
     }
+    
+    return(differencesExist);
 }
 
-- (void) compareHitRateMask
+- (BOOL) compareHitRateMask
 {
     unsigned long aMask = [self readHitRateMask];
+    BOOL differencesExist = NO;
+
     if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
         NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
         NSLogFont(aFont, @"HitRateMask in ORCA Matches HW\n");
+    } else {
+        differencesExist = true;
     }
+    
+    return(differencesExist);
 }
 
-- (void) compareFilter
+- (BOOL) compareFilter
 {
     NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     unsigned long regValue = [self readReg:kFLTV4RunControlReg];
@@ -3070,6 +3078,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if(!differencesExist){
         NSLogFont(aFont, @"All RunControl reg values in ORCA match HW\n");
     }
+    
+    return(differencesExist);
 }
 
 - (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue

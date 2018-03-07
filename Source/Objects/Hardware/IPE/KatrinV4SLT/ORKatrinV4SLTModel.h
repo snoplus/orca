@@ -293,6 +293,9 @@
 - (void) restoreInhibitStatus;
 - (void) saveInhibitStatus;
 
+- (BOOL) compareRegisters;
+
+
 #pragma mark ***Polling
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;

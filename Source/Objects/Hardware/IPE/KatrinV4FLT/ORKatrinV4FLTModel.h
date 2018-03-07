@@ -421,9 +421,9 @@
 
 - (void) testReadHisto;
 - (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue;
-- (void) compareThresholdsAndGains;
-- (void) compareHitRateMask;
-- (void) compareFilter;
+- (BOOL) compareThresholdsAndGains;
+- (BOOL) compareHitRateMask;
+- (BOOL) compareFilter;
 
 @end
 
