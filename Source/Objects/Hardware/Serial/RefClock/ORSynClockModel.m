@@ -37,19 +37,10 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
 
 @interface ORSynClockModel (private)
 - (void) updatePoll;
-- (void) updateStatusHistory;
+- (void) updateStatusHistory:(NSString*)aMessage;
 @end
 
 @implementation ORSynClockModel
-- (ORSynClockModel*) init
-{
-    self = [super init];
-    previousStatusMessages = [[NSMutableArray arrayWithCapacity:nLastMsgs] retain];
-    for (int i = 0; i < nLastMsgs; ++i){
-        [previousStatusMessages addObject:[[NSString alloc]init]];
-    }
-    return self;
-}
 
 - (void) dealloc
 {
@@ -88,17 +79,17 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
 
 - (NSString*) statusMessages
 {
-    NSMutableString* messages = [[NSMutableString alloc] init];
+    NSMutableString* messages = [[[NSMutableString alloc] init] autorelease];
     int i;
     for(i = 0; i < nLastMsgs; ++i){
         if(i == 1){
             [messages appendString:@"***previous messages:*** \n "];
         }
-        if(previousStatusMessages[i])[messages appendString:previousStatusMessages[i]];
+        if(i<[previousStatusMessages count] && [previousStatusMessages objectAtIndex:i])[messages appendString:[previousStatusMessages objectAtIndex:i]];
         [messages appendString:@"\n "];
     }
     if([messages length]==0)return @"";
-    else return messages;
+    else                    return messages;
 }
 
 - (int) trackMode
@@ -213,6 +204,7 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
             //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
             NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
         }
+        NSString* statusMessage = nil;;
         switch(bytes[0]){
             case '0': statusMessage = @"0: warming up"; break;
             case '1': statusMessage = @"1: tracking set-up"; break;
@@ -226,9 +218,8 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
             case '9': statusMessage = @"9: Fault"; break;
             default: statusMessage = @"warning: SynClock default message"; break;
         }
-        [self updateStatusHistory];
+        [self updateStatusHistory:statusMessage];
         NSLog(@"notifying... \n");
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockStatusUpdated object:self];
         //displayStatus(bytes[0]);
     }
     else{
@@ -456,6 +447,16 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     [self setTrackMode:  [decoder decodeIntForKey:  @"trackMode"]];
     [self setSyncMode:   [decoder decodeIntForKey:  @"syncMode"]];
     [self setAlarmWindow:[decoder decodeInt32ForKey:@"alarmWindow"]];
+    
+    previousStatusMessages = [[decoder decodeObjectForKey:@"previousStatusMessages"] retain];
+    if(!previousStatusMessages){
+        previousStatusMessages = [[NSMutableArray array] retain];
+        int i;
+        for (i = 0; i < nLastMsgs; ++i){
+            [previousStatusMessages addObject:@"\n"];
+        }
+    }
+
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -463,13 +464,37 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt:  trackMode   forKey:@"trackMode"];
-    [encoder encodeInt:  syncMode    forKey:@"syncMode"];
-    [encoder encodeInt32:alarmWindow forKey:@"alarmWindow"];
+    [encoder encodeInt:   trackMode   forKey:@"trackMode"];
+    [encoder encodeInt:   syncMode    forKey:@"syncMode"];
+    [encoder encodeInt32: alarmWindow forKey:@"alarmWindow"];
+    [encoder encodeObject:previousStatusMessages forKey:@"previousStatusMessages"];
 }
+
 @end
 
 @implementation ORSynClockModel (private)
+
+- (void) updateStatusHistory:(NSString*)aMessage
+{
+    if(!aMessage) return;
+    if(!previousStatusMessages){
+        previousStatusMessages = [[NSMutableArray array] retain];
+        int i;
+        for (i = 0; i < nLastMsgs; ++i){
+            [previousStatusMessages addObject:@"\n"];
+        }
+    }
+    for(int i = nLastMsgs; i > 1 ; i--){  // insert new statusMessage at top; last message in array drops out
+        int j = i-2;
+        int k = i-1;
+        if(k<[previousStatusMessages count] && j<[previousStatusMessages count]){
+            [previousStatusMessages exchangeObjectAtIndex:k withObjectAtIndex:j]; //withObject:[previousStatusMessages objectAtIndex:i-2]];
+        }
+    }
+    if([previousStatusMessages count])[previousStatusMessages replaceObjectAtIndex:0 withObject:aMessage];
+    NSLog(@"%@\n",previousStatusMessages);
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockStatusUpdated object:self];
+}
 - (void) updatePoll
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePoll) object:nil];
@@ -480,15 +505,6 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     }
 }
 
-- (void) updateStatusHistory
-{
-    for(int i = nLastMsgs; i > 1 ; i--){  // insert new statusMessage at top; last message in array drops out
-        int j = i-2;
-        int k = i-1;
-        //previousStatusMessages[i-1] = previousStatusMessages[i-2];
-        [previousStatusMessages exchangeObjectAtIndex:k withObjectAtIndex:j]; //withObject:[previousStatusMessages objectAtIndex:i-2]];
-    }
-    previousStatusMessages[0] = statusMessage;
-}
+
 
 @end

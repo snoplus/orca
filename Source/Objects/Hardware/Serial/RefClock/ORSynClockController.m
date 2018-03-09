@@ -149,7 +149,8 @@
     [self setButtonStates];
 }
 
-- (void) statusMessageChanged:(NSNotification*)aNote{
+- (void) statusMessageChanged:(NSNotification*)aNote
+{
     NSLog(@"statusMessageChanged!! updating... \n");
     [statusOutputField setStringValue:[model statusMessages]];
 }

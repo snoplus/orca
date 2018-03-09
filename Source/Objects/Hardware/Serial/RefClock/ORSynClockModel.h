@@ -37,6 +37,8 @@
 //#define dampedMax (VMax / 10)  // maximum voltage when damping is set
 //#define VMin 0.02  // minimum voltage (with damping)
 
+#define nLastMsgs 10
+
 @interface ORSynClockModel : NSObject
 {
     @private
@@ -48,13 +50,10 @@
         // // is required, put last command to cmdQueue and dequeueFromBottom
         //
         BOOL                statusPoll;
-        NSString*           statusMessage;
-#define nLastMsgs 10
         NSMutableArray*     previousStatusMessages;
 }
 
 #pragma mark ***Initialization
-- (ORSynClockModel*) init;
 - (void) dealloc;
 - (void) setRefClock:(ORRefClockModel*)aRefClock;
 
