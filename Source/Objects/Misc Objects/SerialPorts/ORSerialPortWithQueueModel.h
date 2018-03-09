@@ -41,6 +41,7 @@
 - (void) openPort:(BOOL)state;
 - (void) setUpPort;
 - (void) firstActionAfterOpeningPort;
+- (double) queueCount;
 
 #pragma mark •••Cmd Handling
 - (id) nextCmd;
