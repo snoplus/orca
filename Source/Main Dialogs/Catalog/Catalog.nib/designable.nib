@@ -17,20 +17,20 @@
         <window title="Catalog" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="189" y="244" width="887" height="310"/>
+            <rect key="contentRect" x="189" y="244" width="945" height="310"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <value key="minSize" type="size" width="213" height="107"/>
-            <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="887" height="310"/>
+            <view key="contentView" misplaced="YES" id="6">
+                <rect key="frame" x="0.0" y="0.0" width="945" height="310"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <tabView controlSize="small" initialItem="70" id="19">
-                        <rect key="frame" x="3" y="0.0" width="881" height="303"/>
+                    <tabView misplaced="YES" controlSize="small" initialItem="70" id="19">
+                        <rect key="frame" x="3" y="0.0" width="943" height="303"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <tabViewItems>
                             <tabViewItem label="Data Flow" identifier="" id="70">
                                 <view key="view" id="71">
-                                    <rect key="frame" x="10" y="29" width="861" height="261"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView toolTip="ORFanInModel" id="2717" customClass="OrcaObjectFactory">
@@ -42,7 +42,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                         </customView>
                                         <button toolTip="ORRunModel" id="26409" customClass="ObjectFactory">
-                                            <rect key="frame" x="15" y="153" width="64" height="83"/>
+                                            <rect key="frame" x="15" y="157" width="64" height="83"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Run Control" bezelStyle="regularSquare" image="RunControl" imagePosition="above" alignment="center" inset="2" id="26410">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -50,7 +50,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORRunNotesModel" id="26411" customClass="ObjectFactory">
-                                            <rect key="frame" x="338" y="22" width="82" height="88"/>
+                                            <rect key="frame" x="338" y="26" width="82" height="88"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Run Notes" bezelStyle="regularSquare" image="RunNotes" imagePosition="above" alignment="center" state="on" inset="2" id="26412">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -58,7 +58,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORDataTaskModel" id="26413" customClass="ObjectFactory">
-                                            <rect key="frame" x="77" y="136" width="128" height="110"/>
+                                            <rect key="frame" x="77" y="140" width="128" height="110"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Read Out Task" bezelStyle="regularSquare" image="DataTask" imagePosition="above" alignment="center" state="on" inset="2" id="26414">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -66,7 +66,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORDataFileModel" id="26417" customClass="ObjectFactory">
-                                            <rect key="frame" x="306" y="155" width="77" height="80"/>
+                                            <rect key="frame" x="306" y="159" width="77" height="80"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data File" bezelStyle="regularSquare" image="DataFile" imagePosition="above" alignment="center" inset="2" id="26418">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -74,7 +74,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORReplayDataModel" id="26419" customClass="ObjectFactory">
-                                            <rect key="frame" x="388" y="155" width="80" height="70"/>
+                                            <rect key="frame" x="388" y="159" width="80" height="70"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Replay" bezelStyle="regularSquare" image="ReplayData" imagePosition="above" alignment="center" state="on" inset="2" id="26420">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -82,7 +82,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORRunScriptModel" id="26423" customClass="ObjectFactory">
-                                            <rect key="frame" x="15" y="20" width="155" height="47"/>
+                                            <rect key="frame" x="15" y="24" width="155" height="47"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Run Script" bezelStyle="regularSquare" image="RunScript" imagePosition="above" alignment="center" state="on" inset="2" id="26424">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -90,7 +90,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORRunListModel" id="26425" customClass="ObjectFactory">
-                                            <rect key="frame" x="214" y="20" width="93" height="90"/>
+                                            <rect key="frame" x="214" y="24" width="93" height="90"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Run List" bezelStyle="regularSquare" image="RunList" imagePosition="above" alignment="center" state="on" inset="2" id="26426">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -98,7 +98,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORHistoModel" id="26427" customClass="ObjectFactory">
-                                            <rect key="frame" x="209" y="153" width="93" height="89"/>
+                                            <rect key="frame" x="209" y="157" width="93" height="89"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Monitor" bezelStyle="regularSquare" image="Histo" imagePosition="above" alignment="center" state="on" inset="2" id="26428">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -106,7 +106,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORDataPipeModel" id="lzF-YJ-OYs" customClass="ObjectFactory">
-                                            <rect key="frame" x="493" y="145" width="93" height="47"/>
+                                            <rect key="frame" x="493" y="149" width="93" height="47"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Pipe" bezelStyle="regularSquare" image="DataPipe" imagePosition="above" alignment="center" state="on" inset="2" id="gBS-cd-nuH">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -114,7 +114,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORDataExplorerModel" id="26431" customClass="ObjectFactory">
-                                            <rect key="frame" x="460" y="20" width="93" height="110"/>
+                                            <rect key="frame" x="460" y="24" width="93" height="110"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Explorer" bezelStyle="regularSquare" image="DataExplorer" imagePosition="above" alignment="center" state="on" inset="2" id="26432">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -122,7 +122,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORHeaderExplorerModel" id="26433" customClass="ObjectFactory">
-                                            <rect key="frame" x="568" y="20" width="93" height="110"/>
+                                            <rect key="frame" x="568" y="24" width="93" height="110"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Header Explorer" bezelStyle="regularSquare" image="HeaderExplorer" imagePosition="above" alignment="center" state="on" inset="2" id="26434">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -130,7 +130,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORFilterModel" id="26435" customClass="ObjectFactory">
-                                            <rect key="frame" x="698" y="22" width="110" height="96"/>
+                                            <rect key="frame" x="698" y="26" width="110" height="96"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Filter" bezelStyle="regularSquare" image="Filter" imagePosition="above" alignment="center" state="on" inset="2" id="26436">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -138,7 +138,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORRemoteRunModel" id="26421" customClass="ObjectFactory">
-                                            <rect key="frame" x="706" y="149" width="102" height="91"/>
+                                            <rect key="frame" x="706" y="153" width="102" height="91"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Remote Run Control" bezelStyle="regularSquare" image="RemoteRunControl" imagePosition="above" alignment="center" state="on" inset="2" id="26422">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -146,7 +146,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORDispatcherModel" id="26415" customClass="ObjectFactory">
-                                            <rect key="frame" x="603" y="146" width="88" height="83"/>
+                                            <rect key="frame" x="603" y="150" width="88" height="83"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Broadcaster" bezelStyle="regularSquare" image="Dispatcher" imagePosition="above" alignment="center" state="on" inset="2" id="26416">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -154,7 +154,7 @@
                                             </buttonCell>
                                         </button>
                                         <button toolTip="ORListenerModel" id="26429" customClass="ObjectFactory">
-                                            <rect key="frame" x="488" y="195" width="93" height="47"/>
+                                            <rect key="frame" x="488" y="199" width="93" height="47"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" title="Data Listener" bezelStyle="regularSquare" image="Listener" imagePosition="above" alignment="center" state="on" inset="2" id="26430">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -166,7 +166,7 @@
                             </tabViewItem>
                             <tabViewItem label="Host" identifier="" id="73">
                                 <view key="view" id="72">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box title="Depreciated--Use the Bit3 Controller if possible" id="291">
@@ -314,7 +314,7 @@
                             </tabViewItem>
                             <tabViewItem label="Vme" identifier="" id="82">
                                 <view key="view" id="80">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tabView controlSize="mini" type="bottomTabsBezelBorder" id="334">
@@ -1005,7 +1005,7 @@
                             </tabViewItem>
                             <tabViewItem label="CAMAC" identifier="" id="303">
                                 <view key="view" id="304">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <tabView controlSize="mini" type="bottomTabsBezelBorder" id="442">
@@ -1261,7 +1261,7 @@
                             </tabViewItem>
                             <tabViewItem label="IPE-DAQ" identifier="" id="415">
                                 <view key="view" id="416">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box horizontalHuggingPriority="750" misplaced="YES" boxType="separator" id="5650">
@@ -1467,7 +1467,7 @@
                             </tabViewItem>
                             <tabViewItem label="cPCI/PXI" identifier="" id="592">
                                 <view key="view" id="593">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <button toolTip="ORcPCICrateModel" id="26650" customClass="ObjectFactory">
@@ -1529,7 +1529,7 @@ Digitizer</string>
                             </tabViewItem>
                             <tabViewItem label="HV" identifier="Item 13" id="24992">
                                 <view key="view" id="24993">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tabView controlSize="mini" type="bottomTabsBezelBorder" id="26997">
@@ -1693,7 +1693,7 @@ Controller</string>
                             </tabViewItem>
                             <tabViewItem label="GPIB" identifier="" id="135">
                                 <view key="view" id="137">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="10918">
@@ -1806,7 +1806,7 @@ Controller</string>
                             </tabViewItem>
                             <tabViewItem label="USB" identifier="" id="978">
                                 <view key="view" id="979">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button toolTip="ORPulser33220Model" id="26708" customClass="ObjectFactory">
@@ -1919,20 +1919,20 @@ Controller</string>
                             </tabViewItem>
                             <tabViewItem label="Serial" identifier="" id="1006">
                                 <view key="view" id="1007">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tabView controlSize="small" type="bottomTabsBezelBorder" id="27075">
-                                            <rect key="frame" x="-10" y="-3" width="881" height="271"/>
+                                        <tabView misplaced="YES" controlSize="small" type="bottomTabsBezelBorder" id="27075">
+                                            <rect key="frame" x="-10" y="-3" width="944" height="271"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Misc" identifier="1" id="27076">
                                                     <view key="view" id="27077">
-                                                        <rect key="frame" x="10" y="7" width="861" height="235"/>
+                                                        <rect key="frame" x="10" y="7" width="924" height="239"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <button toolTip="ORProXR16SSRModel" id="26991" customClass="ObjectFactory">
-                                                                <rect key="frame" x="424" y="49" width="85" height="76"/>
+                                                                <rect key="frame" x="424" y="53" width="85" height="76"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="ProXR16" bezelStyle="regularSquare" image="ProXR16SSR" imagePosition="above" alignment="center" inset="2" id="26992">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1940,7 +1940,7 @@ Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORCC4189Model" id="26742" customClass="ObjectFactory">
-                                                                <rect key="frame" x="517" y="19" width="47" height="106"/>
+                                                                <rect key="frame" x="517" y="23" width="47" height="106"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="CC4189" bezelStyle="regularSquare" image="CC4189" imagePosition="above" alignment="center" state="on" inset="2" id="26743">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1948,7 +1948,7 @@ Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORNMon5085Model" id="27102" customClass="ObjectFactory">
-                                                                <rect key="frame" x="753" y="106" width="85" height="106"/>
+                                                                <rect key="frame" x="753" y="110" width="85" height="106"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Neutron Monitor" bezelStyle="regularSquare" image="NMon5085" imagePosition="above" alignment="center" state="on" inset="2" id="27103">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1956,7 +1956,7 @@ Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORMksPdr2000Model" misplaced="YES" id="26738" customClass="ObjectFactory">
-                                                                <rect key="frame" x="517" y="148" width="87" height="70"/>
+                                                                <rect key="frame" x="517" y="152" width="87" height="70"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title=" MKS PDR2000" bezelStyle="regularSquare" image="MksPdr2000" imagePosition="above" alignment="center" state="on" inset="2" id="26739">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1964,7 +1964,7 @@ Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORCTITempModel" id="26746" customClass="ObjectFactory">
-                                                                <rect key="frame" x="104" y="31" width="68" height="105"/>
+                                                                <rect key="frame" x="104" y="35" width="68" height="105"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="CTITemp" imagePosition="above" alignment="center" state="on" inset="2" id="26747">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1974,7 +1974,7 @@ Monitor</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORLakeShore210Model" id="26730" customClass="ObjectFactory">
-                                                                <rect key="frame" x="17" y="146" width="118" height="86"/>
+                                                                <rect key="frame" x="17" y="150" width="118" height="86"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="LakeShore210" imagePosition="above" alignment="center" state="on" inset="2" id="26731">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1984,7 +1984,7 @@ Temp Monitor</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORModBusModel" id="26752" customClass="ObjectFactory">
-                                                                <rect key="frame" x="346" y="21" width="70" height="101"/>
+                                                                <rect key="frame" x="346" y="25" width="70" height="101"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="ModBus" imagePosition="above" alignment="center" state="on" inset="2" id="26753">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1994,7 +1994,7 @@ Monitor</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORRad7Model" id="26758" customClass="ObjectFactory">
-                                                                <rect key="frame" x="276" y="31" width="62" height="89"/>
+                                                                <rect key="frame" x="276" y="35" width="62" height="89"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Rad7" bezelStyle="regularSquare" image="Rad7" imagePosition="above" alignment="center" state="on" inset="2" id="26759">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2002,7 +2002,7 @@ Monitor</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORNplpCMeterModel" id="26748" customClass="ObjectFactory">
-                                                                <rect key="frame" x="5" y="38" width="80" height="98"/>
+                                                                <rect key="frame" x="5" y="42" width="80" height="98"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="NplpCMeterIcon" imagePosition="above" alignment="center" state="on" inset="2" id="26749">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2012,7 +2012,7 @@ Meter</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORAmi286Model" misplaced="YES" id="26740" customClass="ObjectFactory">
-                                                                <rect key="frame" x="630" y="143" width="115" height="86"/>
+                                                                <rect key="frame" x="630" y="147" width="115" height="86"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Ami286" imagePosition="above" alignment="center" state="on" inset="2" id="26741">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2022,7 +2022,7 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORMITPulserModel" id="26734" customClass="ObjectFactory">
-                                                                <rect key="frame" x="252" y="154" width="100" height="75"/>
+                                                                <rect key="frame" x="252" y="158" width="100" height="75"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="MIT Pulser" bezelStyle="regularSquare" image="MITPulser" imagePosition="above" alignment="center" state="on" inset="2" id="26735">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2030,7 +2030,7 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORKeithley6487Model" id="26732" customClass="ObjectFactory">
-                                                                <rect key="frame" x="139" y="154" width="109" height="70"/>
+                                                                <rect key="frame" x="139" y="158" width="109" height="70"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title=" Keithley 6487" bezelStyle="regularSquare" image="Keithley6487" imagePosition="above" alignment="center" state="on" inset="2" id="26733">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2038,7 +2038,7 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORArduinoUNOModel" id="27029" customClass="ObjectFactory">
-                                                                <rect key="frame" x="177" y="38" width="75" height="67"/>
+                                                                <rect key="frame" x="177" y="42" width="75" height="67"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Arduino UNO" bezelStyle="regularSquare" image="ArduinoUNO" imagePosition="above" alignment="center" state="on" inset="2" id="27030">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2046,7 +2046,7 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORMet637Model" id="26936" customClass="ObjectFactory">
-                                                                <rect key="frame" x="581" y="19" width="75" height="90"/>
+                                                                <rect key="frame" x="581" y="23" width="75" height="90"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Met637" bezelStyle="regularSquare" image="Met637" imagePosition="above" alignment="center" state="on" inset="2" id="26937">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2054,7 +2054,7 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORMet237Model" id="26744" customClass="ObjectFactory">
-                                                                <rect key="frame" x="670" y="21" width="82" height="76"/>
+                                                                <rect key="frame" x="670" y="25" width="82" height="76"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="Met237" bezelStyle="regularSquare" image="Met237" imagePosition="above" alignment="center" state="on" inset="2" id="26745">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2062,7 +2062,7 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORGT521Model" id="27104" customClass="ObjectFactory">
-                                                                <rect key="frame" x="769" y="22" width="52" height="76"/>
+                                                                <rect key="frame" x="769" y="26" width="52" height="76"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="GT521" bezelStyle="regularSquare" image="GT521" imagePosition="above" alignment="center" state="on" inset="2" id="27105">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2070,9 +2070,17 @@ Level Controller</string>
                                                                 </buttonCell>
                                                             </button>
                                                             <button toolTip="ORWG1220PulserModel" misplaced="YES" id="nCl-B0-aWu" customClass="ObjectFactory">
-                                                                <rect key="frame" x="368" y="158" width="124" height="67"/>
+                                                                <rect key="frame" x="368" y="162" width="124" height="67"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <buttonCell key="cell" type="bevel" title="WG1220 Pulser" bezelStyle="regularSquare" image="WG1220Pulser" imagePosition="above" alignment="center" state="on" inset="2" id="0XN-GR-WM5">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="system" size="10"/>
+                                                                </buttonCell>
+                                                            </button>
+                                                            <button toolTip="ORRefClockModel" misplaced="YES" id="7z3-70-dNY" customClass="ObjectFactory">
+                                                                <rect key="frame" x="846" y="108" width="68" height="125"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="bevel" title="RefClock" bezelStyle="regularSquare" image="RefClock" imagePosition="above" alignment="center" state="on" inset="2" id="RoC-cF-1K7">
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system" size="10"/>
                                                                 </buttonCell>
@@ -2082,7 +2090,7 @@ Level Controller</string>
                                                 </tabViewItem>
                                                 <tabViewItem label="Vacuum Related" identifier="2" id="27078">
                                                     <view key="view" id="27079">
-                                                        <rect key="frame" x="10" y="7" width="861" height="239"/>
+                                                        <rect key="frame" x="10" y="7" width="924" height="239"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <subviews>
                                                             <button toolTip="ORBocTIC3Model" id="27080" customClass="ObjectFactory">
@@ -2187,7 +2195,7 @@ Gauge Controller</string>
                             </tabViewItem>
                             <tabViewItem label="Ethernet" identifier="" id="26916">
                                 <view key="view" id="26917">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button autoresizesSubviews="NO" toolTip="ORTTCPX400DPModel" id="26918" customClass="ObjectFactory">
@@ -2292,7 +2300,7 @@ Gauge Controller</string>
                             </tabViewItem>
                             <tabViewItem label="Motors" identifier="" id="426">
                                 <view key="view" id="427">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="434">
@@ -2365,7 +2373,7 @@ Can only be used with the M21 M-Module controller.</string>
                             </tabViewItem>
                             <tabViewItem label="Misc" identifier="" id="92">
                                 <view key="view" id="93">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box horizontalHuggingPriority="750" boxType="separator" id="566">
@@ -2539,7 +2547,7 @@ Can only be used with the M21 M-Module controller.</string>
                             </tabViewItem>
                             <tabViewItem label="Process" identifier="" id="496">
                                 <view key="view" id="497">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <customView toolTip="ORJoinerModel" id="556" customClass="OrcaObjectFactory">
@@ -2827,7 +2835,7 @@ Relay</string>
                             </tabViewItem>
                             <tabViewItem label="Experiments" identifier="" id="139">
                                 <view key="view" id="140">
-                                    <rect key="frame" x="10" y="25" width="861" height="265"/>
+                                    <rect key="frame" x="10" y="25" width="923" height="265"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tabView controlSize="small" type="bottomTabsBezelBorder" id="178">
@@ -3212,7 +3220,7 @@ Relay</string>
                     </tabView>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="131.5" y="162"/>
+            <point key="canvasLocation" x="-91.5" y="166"/>
         </window>
     </objects>
     <resources>
@@ -3423,6 +3431,7 @@ Relay</string>
         <image name="RaidMonitor" width="130" height="35"/>
         <image name="Ramper" width="50" height="60"/>
         <image name="RandomPulser" width="130" height="24"/>
+        <image name="RefClock" width="49" height="100"/>
         <image name="RemoteRunControl" width="80" height="74"/>
         <image name="RemoteSocket" width="152" height="50"/>
         <image name="ReplayData" width="80" height="55"/>
