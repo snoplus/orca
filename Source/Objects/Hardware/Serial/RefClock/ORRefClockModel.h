@@ -68,33 +68,16 @@
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (BOOL) portIsOpen;
 
-// - (NSData*) progModeCommand;
-// - (NSData*) startProgCommand;
-// - (NSData*) checkReadyForProg:(int) nPoints;
-// - (NSData*) isReadyForProgReturned;
-// - (NSData*) WGBytesFromFloat;
-// - (NSData*) stopProgCommand;
-// - (NSData*) checkStoppedProg:(int) nPoints;
-// - (NSData*) isStoppedProgReturned;
-
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
 @end
 
-extern NSString* ORRefClockModelTrackModeChanged;
-extern NSString* ORRefClockModelSyncChanged;
-extern NSString* ORRefClockModelAlarmWindowChanged;
-extern NSString* ORRefClockModelStatusChanged;
-extern NSString* ORRefClockModelStatusPollChanged;
-extern NSString* ORRefClockModelStatusOutputChanged;
-extern NSString* ORRefClockModelDeviceIDButtonChanged;
-extern NSString* ORRefClockModelResetChanged;
 extern NSString* ORRefClockLock;
 extern NSString* ORRefClockModelSerialPortChanged;
 extern NSString* ORRefClockModelVerboseChanged;
-
-extern NSString* ORSynClockDataAvailable;
+extern NSString* ORRefClockModelUpdatedQueue;
 
 extern NSString* ORSynClock;
 extern NSString* ORMotoGPS;

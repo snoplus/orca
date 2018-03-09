@@ -27,22 +27,13 @@
 
 #pragma mark ***External Strings
 NSString* ORRefClockModelVerboseChanged         = @"ORRefClockModelVerboseChanged";
-NSString* ORRefClockModelTrackModeChanged	    = @"ORRefClockModelTrackModeChanged";
-NSString* ORRefClockModelSyncChanged	        = @"ORRefClockModelSyncChanged";
-NSString* ORRefClockModelAlarmWindowChanged	    = @"ORRefClockModelAlarmWindowChanged";
-NSString* ORRefClockModelStatusChanged          = @"ORRefClockModelStatusChanged";
-NSString* ORRefClockModelStatusPollChanged      = @"ORRefClockModelStatusPollChanged";
-NSString* ORRefClockModelStatusOutputChanged    = @"ORRefClockModelStatusOutputChanged";
-NSString* ORRefClockModelDeviceIDButtonChanged  = @"ORRefClockModelDeviceIDButtonChanged";
-NSString* ORRefClockModelResetChanged           = @"ORRefClockModelResetChanged";
 NSString* ORRefClockModelSerialPortChanged      = @"ORRefClockModelSerialPortChanged";
-NSString* ORRefClockModelPortStateChanged       = @"ORRefClockModelPortStateChanged";
+NSString* ORRefClockModelUpdatedQueue           = @"ORRefClockModelUpdatedQueue";
 NSString* ORRefClockLock                        = @"ORRefClockLock";
-NSString* ORSynClockDataAvailable               = @"ORSynClockDataAvailable";
-NSString* ORMotoGPSClockDataAvailable           = @"ORMotoGPSClockDataAvailable";
-NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
+
 NSString* ORSynClock                            = @"ORSynClock";
 NSString* ORMotoGPS                             = @"ORMotoGPS";
+
 //#define maxReTx 3  // above this number, stop trying to
 // retransmit and place an Error.
 
@@ -137,8 +128,10 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
  		[serialPort commitChanges];
         [serialPort setDelegate:self];
     }
-    else      [serialPort close];
+    else [serialPort close];
+    
     portWasOpen = [serialPort isOpen];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortStateChanged object:self];
 
 }
@@ -158,15 +151,13 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 	return objDictionary;
 }
 
-
 #pragma mark *** Commands
 - (void) addCmdToQueue:(NSDictionary*)aCmd
 {
-    if([serialPort isOpen]){
-        [self enqueueCmd:aCmd];
-        if(!lastRequest){
-            [self processOneCommandFromQueue];
-        }
+    [self enqueueCmd:aCmd];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRefClockModelUpdatedQueue object:self];
+    if(!lastRequest){
+        [self processOneCommandFromQueue];
     }
 }
 
@@ -176,178 +167,6 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
         [self processResponse:[[note userInfo] objectForKey:@"data"]];
     }
 }
-
-//- (void) writeToDevice:(NSDictionary*)someData
-//{
-//    NSLog(@"RefClock::writeToDevice queing...\n");
-//    if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
-//    [cmdQueue enqueue:someData];
-//    //[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
-//    if(!lastRequest)[self processOneCommandFromQueue];
-//}
-
-// - (NSData*) progModeCommand{
-//   unsigned char cmdData[7];
-//   cmdData[0] = 'X'; cmdData[1] = kWGProgModCmd;
-//   cmdData[2] = cmdData[3] = cmdData[4] = cmdData[5] = '0';
-//   cmdData[6] =  67;
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-// - (NSData*) progModeCmdReturned{  // this resembles the expected reply for the above command.
-//   // Used to check if the device has responded as expected.
-//   unsigned char cmdData[7];
-//   cmdData[0] = 'X'; cmdData[1] = kWGProgModCmd;
-//   cmdData[2] = 'f';  // matching the WG1220 documentation..
-//   cmdData[3] = 'a';
-//   cmdData[4] = 'i';
-//   cmdData[5] = 'l';
-//   cmdData[6] =  65;
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-// - (NSData*) startProgCommand{
-//   unsigned char cmdData[7];
-//   cmdData[0] = 'X'; cmdData[1] = kWGStartProgCmd;  // 'B'
-//   cmdData[2] = cmdData[3] = 0;
-//   cmdData[4] = 3;  // sync position low byte
-//   cmdData[5] = 1;  // channel nr.
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-// - (NSData*) checkReadyForProg:(int) nPoints{  // Start-Ready-request: 'X','b',0,HIBYTE(an),LOBYTE(an),knr,CRC
-//   unsigned char cmdData[7];
-//   cmdData[0] = 'X'; cmdData[1] = kWGRdyPrgrmCmd;  // 'b'
-//   cmdData[2] = '0';
-//   cmdData[3] = nPoints >> 8;
-//   cmdData[4] = nPoints & 0xFF;
-//   cmdData[5] = 1;  // channel nr.
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-// - (NSData*) isReadyForProgReturned{  // this is expected from the device when it signals redyness for the next command
-//   unsigned char cmdData[7];
-//   unsigned int nPoints = [arbWaveform count];
-//   cmdData[0] = 'X'; cmdData[1] = kWGRdyPrgrmCmd;  // 'b'
-//   cmdData[2] = '0';
-//   cmdData[3] = nPoints >> 8;
-//   cmdData[4] = nPoints & 0xFF;
-//   cmdData[5] = 1; // ready-byte
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-// - (NSData*) WGBytesFromFloat{
-//   // only the upper 12 Bit of a 16 Bit Point are used by the 12-Bit WG1220. max Voltages: 0x0000:-10 (-1) V  0xFFF0:10(1)V ;
-//   // min Voltages:0.2(0.02)V normal output (with attenuation)
-//   unsigned nPoints = [arbWaveform count];
-//  // NSPredicate *bPredicate = [NSPredicate predicateWithFormat:@"SELF beginswith[c] 'b'"];
-//   NSPredicate *pred = [NSPredicate predicateWithFormat:@"floatValue > 1.0 || floatValue < -1.0"];
-//   //filteredArr = [arbWaveform filteredArrayUsingPredicate:pred];
-//   bool damp_output = ![[arbWaveform filteredArrayUsingPredicate:pred] count];  // no value above
-//     // 2.0 V? then the -20dB filter should be used and all values multiplied by 10.
-//   // are amplitudes in range?
-//   pred = [NSPredicate predicateWithFormat:@"floatValue > 10.0 || floatValue < -10.0"];
-//   if([[arbWaveform filteredArrayUsingPredicate:pred] count]){
-//     NSLog(@"Error: Waveform contains entries with an amplitude larger than 10.0 V! \n");
-//     return [NSData dataWithBytes:arbWaveBytes length:0];
-//   }
-//
-//   if([self verbose]){
-//     NSLog(@"arbWaveform count: %d \n", [arbWaveform count]);
-//     NSLog(damp_output ? @"output will be damped (for more precision)! \n" : @"output will not be damped! \n");
-//   }
-//
-//   int ivalue;
-//   int point = 0;
-//   //NSLog(@"arbWaveBytes[0] size: %d \n", sizeof(arbWaveBytes[0]));
-//   for(NSNumber* value in arbWaveform){
-//     float fvalue = [value floatValue];
-//     if(damp_output)  // everything reduced by factor 10
-//       fvalue *= 10.0;  // compensated by multiplying everything with 10
-//     fvalue += 10.0;  // -10...+10V -> 0...20
-//     ivalue = fvalue * 65535 / 20.0;
-//     arbWaveBytes[point*2] = ivalue & 0xF0;  // from 16 Bits, only 12 upper are used
-//     arbWaveBytes[point*2+1] = ivalue >> 8;
-//     //NSLog(@"added Value (%f) #%d: LSB: %X (%X) MSB: %X (%X) \n", fvalue, point, ivalue & 0xF0, arbWaveBytes[point*2], ivalue >> 8, arbWaveBytes[point*2+1]);
-//     point++;
-//
-//   }
-//     //NSLog(@"Data to be returned: %@ \n", [NSData dataWithBytes:arbWaveBytes length:nPoints * 2]);
-//   return [NSData dataWithBytes:arbWaveBytes length:nPoints * 2];
-// }
-//
-// - (NSData*) stopProgCommand{  // Stop programming of arbitrary waveform
-//   unsigned char cmdData[7];
-//   cmdData[0] = 'X'; cmdData[1] = kWGStopPrgrmCmd;  // 'U'
-//   cmdData[2] = cmdData[3] = 0;
-//   cmdData[4] = 3;  // sync position low byte
-//   cmdData[5] = 1;  // channel nr.
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-// - (NSData*) checkStoppedProg:(int) nPoints{  // Poll if device is ready after arbitrary waveform transfer is completed
-//   unsigned char cmdData[7];
-//   cmdData[0] = 'X'; cmdData[1] = kWGFinPrgrmCmd;  // 'u'
-//   cmdData[2] = '0';
-//   cmdData[3] = nPoints >> 8;
-//   cmdData[4] = nPoints & 0xFF;
-//   cmdData[5] = 1;  // channel nr.
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-// - (NSData*) isStoppedProgReturned{  // this is expected from the device when it signals redyness for the next command
-//   unsigned char cmdData[7];
-//   unsigned int nPoints = [arbWaveform count];
-//   cmdData[0] = 'X'; cmdData[1] = kWGFinPrgrmCmd;  // 'u'
-//   cmdData[2] = '0';
-//   cmdData[3] = nPoints >> 8;
-//   cmdData[4] = nPoints & 0xFF;
-//   cmdData[5] = 1; // ready-byte
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
-//
-
-
-
-// - (NSData*) signalFormCommand:(enum SignalForms) aCommand
-// {
-//   unsigned char cmdData[7];
-//
-//   cmdData[0] = 'X';
-//   cmdData[1] = kWGFormCmd;
-//
-//   cmdData[3] ='0';
-//
-//   switch (aCommand){
-//     case Sine:
-//       cmdData[2] = 'S'; break;
-//     case Rectangular:
-//       cmdData[2] = 'R'; break;
-//     case Triangular:
-//       cmdData[2] = 'T'; break;
-//     // case DC:
-//     //   cmdData[2] = 'G'; break;
-//     case Arbitrary:
-//       cmdData[2] = 'D';
-//       cmdData[3] = 1; break;
-//     // case Noise:
-//     //   cmdData[2] = 'N'; break;
-//
-//     default: cmdData[2] = 'S';
-//
-//   }
-//
-//   cmdData[4] = '0';
-//   cmdData[5] = 0x80;
-//
-//   cmdData[6] = cmdData[1] ^  cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5];
-//   return [NSData dataWithBytes:cmdData length:7];
-// }
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -372,9 +191,11 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
     [encoder encodeObject:synClockModel    forKey:@"synClockModel"];
     [encoder encodeObject:synClockModel    forKey:@"motoGPSModel"];
 }
+
 - (void)serialPortWriteProgress:(NSDictionary *)dataDictionary
 {  // this function is required to writeDataInBackground via Serial Port
 }
+
 @end
 
 @implementation ORRefClockModel (private)
@@ -382,6 +203,8 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 - (void) processOneCommandFromQueue
 {
     NSDictionary* aCmdDictionary = [self nextCmd];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORRefClockModelUpdatedQueue object:self];
+
     if(aCmdDictionary){
         NSData* cmdData = [aCmdDictionary objectForKey:@"data"];
         [self startTimeout:3];
@@ -389,6 +212,7 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
         [serialPort writeDataInBackground:cmdData];
     }
 }
+
 - (void) processResponse:(NSData*)someData
 {
     //process the incoming data here and pass it to either the gps or the synclock
@@ -443,23 +267,24 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
         }
     }
 }
+
 - (void) timeout  // todo
 {
 	@synchronized (self){
-    NSLog(@"Warning: timeout (RefClock)! \n");
-    // reTxCount++;  // schedule retransmission
-    // if([self verbose]){
-    //   NSLog(@"Warning: timeout (RefClock)! trying(%d) retransmit. \n", reTxCount);  //Request was: %@ \n", lastRequest);
-    // }
-    //
-    // [cmdQueue enqueue:lastRequest];
-		// //[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelQueCountChanged object: self];
-		// [self processOneCommandFromQueue];	 //do the next command in the queue
+        NSLog(@"Warning: timeout (RefClock)! \n");
+        // reTxCount++;  // schedule retransmission
+        // if([self verbose]){
+        //   NSLog(@"Warning: timeout (RefClock)! trying(%d) retransmit. \n", reTxCount);  //Request was: %@ \n", lastRequest);
+        // }
+        //
+        // [cmdQueue enqueue:lastRequest];
 
-    NSLog(@"Emptying remaining commands to RefClock... \n");
-   [cmdQueue removeAllObjects];
-   [self setLastRequest:nil];
-   return;
+        
+        //Don't dump the cmdQueue if you re-sent last request above!!!
+        NSLog(@"Emptying remaining commands to RefClock... \n");
+        [cmdQueue removeAllObjects];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORRefClockModelUpdatedQueue object:self];
+        [self setLastRequest:nil];
 	}
 }
 
