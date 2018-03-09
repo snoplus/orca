@@ -44,8 +44,7 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
 - (ORSynClockModel*) init
 {
     self = [super init];
-    previousStatusMessages = [[NSMutableArray arrayWithCapacity:nLastMsgs]init];
-    [previousStatusMessages retain];  // todo: clean on exit
+    previousStatusMessages = [[NSMutableArray arrayWithCapacity:nLastMsgs] retain];
     for (int i = 0; i < nLastMsgs; ++i){
         [previousStatusMessages addObject:[[NSString alloc]init]];
     }
