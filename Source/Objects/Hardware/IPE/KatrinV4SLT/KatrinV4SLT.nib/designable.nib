@@ -36,6 +36,8 @@
                 <outlet property="infoTypeMatrix" destination="2843" id="5606"/>
                 <outlet property="inhibitEnableMatrix" destination="2744" id="4852"/>
                 <outlet property="initAfterConnectButton" destination="3076" id="3371"/>
+                <outlet property="initAllBoards1Button" destination="dVm-8b-mbu" id="GTK-tl-Vb3"/>
+                <outlet property="initAllBoardsButton" destination="ren-77-Syj" id="Wc0-eS-tQJ"/>
                 <outlet property="initBoard1Button" destination="3008" id="3405"/>
                 <outlet property="initBoardButton" destination="2721" id="3413"/>
                 <outlet property="initOnConnectButton" destination="3076" id="eix-Ne-gxw"/>
@@ -623,7 +625,7 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="2722">
-                                            <rect key="frame" x="279" y="10" width="63" height="28"/>
+                                            <rect key="frame" x="255" y="10" width="62" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Report" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5534">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -633,15 +635,15 @@
                                                 <action selector="reportAllAction:" target="-2" id="3605"/>
                                             </connections>
                                         </button>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="2721">
-                                            <rect key="frame" x="376" y="10" width="87" height="28"/>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="ren-77-Syj">
+                                            <rect key="frame" x="384" y="10" width="103" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5533">
+                                            <buttonCell key="cell" type="push" title="Init SLT &amp; FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="mpH-Rr-oe7">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="initBoardAction:" target="-2" id="3606"/>
+                                                <action selector="initAllBoardsAction:" target="-2" id="EKE-V9-zsp"/>
                                             </connections>
                                         </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Performance" id="VzC-pa-AYf">
@@ -706,6 +708,17 @@
                                                 </subviews>
                                             </view>
                                         </box>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="2721">
+                                            <rect key="frame" x="317" y="10" width="65" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Init SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5533">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="initBoardAction:" target="-2" id="3606"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -1272,9 +1285,9 @@
                                             </view>
                                         </box>
                                         <button verticalHuggingPriority="750" misplaced="YES" id="3008">
-                                            <rect key="frame" x="378" y="68" width="87" height="28"/>
+                                            <rect key="frame" x="289" y="68" width="72" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Init Board" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5498">
+                                            <buttonCell key="cell" type="push" title="Init SLT" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="5498">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="smallSystem"/>
                                             </buttonCell>
@@ -1389,7 +1402,7 @@
                                             </view>
                                         </box>
                                         <button toolTip="copy source, rebuild, and start the remote client" focusRingType="none" verticalHuggingPriority="750" misplaced="YES" id="5656">
-                                            <rect key="frame" x="179" y="68" width="134" height="28"/>
+                                            <rect key="frame" x="155" y="68" width="134" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="push" title="Check Code Version" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" focusRingType="none" inset="2" id="5661">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1583,6 +1596,17 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="dVm-8b-mbu">
+                                            <rect key="frame" x="362" y="68" width="103" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Init SLT &amp; FLTs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="r8x-za-uSL">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="initAllBoardsAction:" target="-2" id="daB-RP-xUD"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>

@@ -3389,6 +3389,24 @@
 		B38DEE4D14E02B40003914FF /* ORADVME1314Model.m in Sources */ = {isa = PBXBuildFile; fileRef = B38DEE4714E02B40003914FF /* ORADVME1314Model.m */; };
 		B86F08771FC517DE0076A269 /* SessionDB.h in Headers */ = {isa = PBXBuildFile; fileRef = B86F08751FC517DE0076A269 /* SessionDB.h */; };
 		B86F08781FC517DE0076A269 /* SessionDB.m in Sources */ = {isa = PBXBuildFile; fileRef = B86F08761FC517DE0076A269 /* SessionDB.m */; };
+		C65995A420529EE300FE5973 /* SynClock.nib in Resources */ = {isa = PBXBuildFile; fileRef = C659959220529EE300FE5973 /* SynClock.nib */; };
+		C65995A520529EE300FE5973 /* MotoGPS.tif in Resources */ = {isa = PBXBuildFile; fileRef = C659959320529EE300FE5973 /* MotoGPS.tif */; };
+		C65995A620529EE300FE5973 /* ORMotoGPSController.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959420529EE300FE5973 /* ORMotoGPSController.m */; };
+		C65995A720529EE300FE5973 /* ORRefClockController.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959520529EE300FE5973 /* ORRefClockController.h */; };
+		C65995A820529EE300FE5973 /* ORSynClockModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959620529EE300FE5973 /* ORSynClockModel.h */; };
+		C65995A920529EE300FE5973 /* ORSynClockModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959720529EE300FE5973 /* ORSynClockModel.m */; };
+		C65995AA20529EE400FE5973 /* ORSynClockController.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959820529EE300FE5973 /* ORSynClockController.m */; };
+		C65995AB20529EE400FE5973 /* ORRefClockController.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959920529EE300FE5973 /* ORRefClockController.m */; };
+		C65995AC20529EE400FE5973 /* RefClock.tif in Resources */ = {isa = PBXBuildFile; fileRef = C659959A20529EE300FE5973 /* RefClock.tif */; };
+		C65995AD20529EE400FE5973 /* ORSynClockController.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959B20529EE300FE5973 /* ORSynClockController.h */; };
+		C65995AE20529EE400FE5973 /* ORRefClockModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959C20529EE300FE5973 /* ORRefClockModel.m */; };
+		C65995AF20529EE400FE5973 /* ORMotoGPSController.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959D20529EE300FE5973 /* ORMotoGPSController.h */; };
+		C65995B020529EE400FE5973 /* ORMotoGPSModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959E20529EE300FE5973 /* ORMotoGPSModel.h */; };
+		C65995B120529EE400FE5973 /* ORMotoGPSModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959F20529EE300FE5973 /* ORMotoGPSModel.m */; };
+		C65995B220529EE400FE5973 /* ORRefClockModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C65995A020529EE300FE5973 /* ORRefClockModel.h */; };
+		C65995B320529EE400FE5973 /* RefClock.nib in Resources */ = {isa = PBXBuildFile; fileRef = C65995A120529EE300FE5973 /* RefClock.nib */; };
+		C65995B420529EE400FE5973 /* MotoGPS.nib in Resources */ = {isa = PBXBuildFile; fileRef = C65995A220529EE300FE5973 /* MotoGPS.nib */; };
+		C65995B520529EE400FE5973 /* SynClock.tif in Resources */ = {isa = PBXBuildFile; fileRef = C65995A320529EE300FE5973 /* SynClock.tif */; };
 		C6FAAAEC1FBDD5320069E81C /* ORWG1220PulserModel.h in Headers */ = {isa = PBXBuildFile; fileRef = C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */; };
 		C6FAAAED1FBDD5320069E81C /* WG1220Pulser.tif in Resources */ = {isa = PBXBuildFile; fileRef = C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */; };
 		C6FAAAEE1FBDD5320069E81C /* ORWG1220PulserModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */; };
@@ -5170,6 +5188,7 @@
 		8461CAFC1CB2D8DB001E4044 /* ORPulseCheckModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPulseCheckModel.m; sourceTree = "<group>"; };
 		8461CAFD1CB2D8DB001E4044 /* PulseCheck.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PulseCheck.nib; sourceTree = "<group>"; };
 		8461CAFE1CB2D8DB001E4044 /* PulseCheck.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PulseCheck.tif; sourceTree = "<group>"; };
+		846574BF1F9D449500B4BAA9 /* Orca.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Orca.entitlements; sourceTree = "<group>"; };
 		8465BE5805DBCEFC00870151 /* NSInvocation+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+Extensions.h"; sourceTree = "<group>"; };
 		8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+Extensions.m"; sourceTree = "<group>"; };
 		8465BF6605DC43B500870151 /* Wizard.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = Wizard.tif; path = "Source/Main Dialogs/HardwareWizard/Wizard.tif"; sourceTree = SOURCE_ROOT; };
@@ -7065,6 +7084,24 @@
 		B38DEE4714E02B40003914FF /* ORADVME1314Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORADVME1314Model.m; sourceTree = "<group>"; };
 		B86F08751FC517DE0076A269 /* SessionDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionDB.h; sourceTree = "<group>"; };
 		B86F08761FC517DE0076A269 /* SessionDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionDB.m; sourceTree = "<group>"; };
+		C659959220529EE300FE5973 /* SynClock.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = SynClock.nib; sourceTree = "<group>"; };
+		C659959320529EE300FE5973 /* MotoGPS.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = MotoGPS.tif; sourceTree = "<group>"; };
+		C659959420529EE300FE5973 /* ORMotoGPSController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMotoGPSController.m; sourceTree = "<group>"; };
+		C659959520529EE300FE5973 /* ORRefClockController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRefClockController.h; sourceTree = "<group>"; };
+		C659959620529EE300FE5973 /* ORSynClockModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSynClockModel.h; sourceTree = "<group>"; };
+		C659959720529EE300FE5973 /* ORSynClockModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSynClockModel.m; sourceTree = "<group>"; };
+		C659959820529EE300FE5973 /* ORSynClockController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSynClockController.m; sourceTree = "<group>"; };
+		C659959920529EE300FE5973 /* ORRefClockController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRefClockController.m; sourceTree = "<group>"; };
+		C659959A20529EE300FE5973 /* RefClock.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RefClock.tif; sourceTree = "<group>"; };
+		C659959B20529EE300FE5973 /* ORSynClockController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSynClockController.h; sourceTree = "<group>"; };
+		C659959C20529EE300FE5973 /* ORRefClockModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRefClockModel.m; sourceTree = "<group>"; };
+		C659959D20529EE300FE5973 /* ORMotoGPSController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotoGPSController.h; sourceTree = "<group>"; };
+		C659959E20529EE300FE5973 /* ORMotoGPSModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotoGPSModel.h; sourceTree = "<group>"; };
+		C659959F20529EE300FE5973 /* ORMotoGPSModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMotoGPSModel.m; sourceTree = "<group>"; };
+		C65995A020529EE300FE5973 /* ORRefClockModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRefClockModel.h; sourceTree = "<group>"; };
+		C65995A120529EE300FE5973 /* RefClock.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = RefClock.nib; sourceTree = "<group>"; };
+		C65995A220529EE300FE5973 /* MotoGPS.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = MotoGPS.nib; sourceTree = "<group>"; };
+		C65995A320529EE300FE5973 /* SynClock.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = SynClock.tif; sourceTree = "<group>"; };
 		C6FAAAE61FBDD5310069E81C /* ORWG1220PulserModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORWG1220PulserModel.h; sourceTree = "<group>"; };
 		C6FAAAE71FBDD5310069E81C /* WG1220Pulser.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = WG1220Pulser.tif; sourceTree = "<group>"; };
 		C6FAAAE81FBDD5310069E81C /* ORWG1220PulserModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORWG1220PulserModel.m; sourceTree = "<group>"; };
@@ -7444,6 +7481,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Orca */ = {
 			isa = PBXGroup;
 			children = (
+				846574BF1F9D449500B4BAA9 /* Orca.entitlements */,
 				CE68866C0D0CE0E400FA4158 /* PlugIns */,
 				F5AD34B203A7AEB8015F64B1 /* Readme */,
 				F51E693F03AE4775015F64B1 /* Source */,
@@ -9766,6 +9804,7 @@
 		84499B6D0F13BAB8004B855B /* Serial */ = {
 			isa = PBXGroup;
 			children = (
+				C659959120529EE300FE5973 /* RefClock */,
 				C6FAAAE51FBDD5310069E81C /* WG1220Pulser */,
 				84DEEBBA149916AD0092DB6C /* Serial Base Classes */,
 				847D308417FF0B3000D2D8BC /* NeutonMonitor5085 */,
@@ -14435,6 +14474,31 @@
 			path = Advanet;
 			sourceTree = "<group>";
 		};
+		C659959120529EE300FE5973 /* RefClock */ = {
+			isa = PBXGroup;
+			children = (
+				C65995A120529EE300FE5973 /* RefClock.nib */,
+				C659959A20529EE300FE5973 /* RefClock.tif */,
+				C659959520529EE300FE5973 /* ORRefClockController.h */,
+				C659959920529EE300FE5973 /* ORRefClockController.m */,
+				C65995A020529EE300FE5973 /* ORRefClockModel.h */,
+				C659959C20529EE300FE5973 /* ORRefClockModel.m */,
+				C65995A220529EE300FE5973 /* MotoGPS.nib */,
+				C659959320529EE300FE5973 /* MotoGPS.tif */,
+				C659959420529EE300FE5973 /* ORMotoGPSController.m */,
+				C659959D20529EE300FE5973 /* ORMotoGPSController.h */,
+				C659959E20529EE300FE5973 /* ORMotoGPSModel.h */,
+				C659959F20529EE300FE5973 /* ORMotoGPSModel.m */,
+				C659959220529EE300FE5973 /* SynClock.nib */,
+				C65995A320529EE300FE5973 /* SynClock.tif */,
+				C659959B20529EE300FE5973 /* ORSynClockController.h */,
+				C659959820529EE300FE5973 /* ORSynClockController.m */,
+				C659959620529EE300FE5973 /* ORSynClockModel.h */,
+				C659959720529EE300FE5973 /* ORSynClockModel.m */,
+			);
+			path = RefClock;
+			sourceTree = "<group>";
+		};
 		C6FAAAE51FBDD5310069E81C /* WG1220Pulser */ = {
 			isa = PBXGroup;
 			children = (
@@ -15044,6 +15108,7 @@
 				8434A196055B3287002D3102 /* ORVmeCrateController.h in Headers */,
 				8434A198055B3287002D3102 /* ORVmeCrateModel.h in Headers */,
 				8434A19A055B3287002D3102 /* ORVmeAdapter.h in Headers */,
+				C65995A720529EE300FE5973 /* ORRefClockController.h in Headers */,
 				8434A19B055B3287002D3102 /* ORVmeBusProtocol.h in Headers */,
 				8434A19C055B3287002D3102 /* ORVmeCard.h in Headers */,
 				84B51980191D285A003A580B /* ORBurstMonitorModel.h in Headers */,
@@ -15058,6 +15123,7 @@
 				8434A1A6055B3287002D3102 /* ORShaperModel.h in Headers */,
 				8434A1A9055B3287002D3102 /* ORRunController.h in Headers */,
 				8434A1AB055B3287002D3102 /* ORRunModel.h in Headers */,
+				C65995B220529EE400FE5973 /* ORRefClockModel.h in Headers */,
 				8434A1AC055B3287002D3102 /* ORPreferencesController.h in Headers */,
 				8434A1AD055B3287002D3102 /* ORDefaults.h in Headers */,
 				8434A1AF055B3287002D3102 /* ORHistoModel.h in Headers */,
@@ -15163,6 +15229,7 @@
 				8434A235055B3287002D3102 /* ORDataSetModel.h in Headers */,
 				8434A236055B3287002D3102 /* VME_eCPU_Config.h in Headers */,
 				8434A237055B3287002D3102 /* ORPulserDistribController.h in Headers */,
+				C65995A820529EE300FE5973 /* ORSynClockModel.h in Headers */,
 				8434A239055B3287002D3102 /* ORPulserDistribModel.h in Headers */,
 				8434A23A055B3287002D3102 /* NSData+Extensions.h in Headers */,
 				8434A23B055B3287002D3102 /* ORReplayDataController.h in Headers */,
@@ -15351,6 +15418,7 @@
 				84D29FE91843EAC800D320DB /* OROpSequenceController.h in Headers */,
 				849DDE6508F466630052AFC6 /* ORAD3511Decoders.h in Headers */,
 				849DDE6708F466630052AFC6 /* ORAD3511Model.h in Headers */,
+				C65995B020529EE400FE5973 /* ORMotoGPSModel.h in Headers */,
 				849DE3EF08F597410052AFC6 /* ORK3655Controller.h in Headers */,
 				849DE3F108F597410052AFC6 /* ORK3655Model.h in Headers */,
 				84CD6BFB1A1E34D90089026F /* ORGretina4AModel.h in Headers */,
@@ -15533,6 +15601,7 @@
 				84A4E82B0C187A3E00CBC222 /* ORIP220Controller.h in Headers */,
 				84A4E82D0C187A3E00CBC222 /* ORIP220Model.h in Headers */,
 				84A4E89A0C287CA900CBC222 /* ORUSBtoGPIBController.h in Headers */,
+				C65995AD20529EE400FE5973 /* ORSynClockController.h in Headers */,
 				84A4E89B0C287CA900CBC222 /* ORUSBtoGPIBModel.h in Headers */,
 				84A4EE710C2C5D0A00CBC222 /* ORAcqirisDC440Controller.h in Headers */,
 				84A4EE730C2C5D0A00CBC222 /* ORAcqirisDC440Model.h in Headers */,
@@ -15654,6 +15723,7 @@
 				848D842D0DDE060100D44B81 /* ORTimeMultiPlotController.h in Headers */,
 				848D8B2C0DE23D2400D44B81 /* ORCaen1190Controller.h in Headers */,
 				848D8B2E0DE23D2400D44B81 /* ORCaen1190Model.h in Headers */,
+				C65995AF20529EE400FE5973 /* ORMotoGPSController.h in Headers */,
 				848D8CCF0DE35AB500D44B81 /* ORValueBarGroup.h in Headers */,
 				844B42BF0DE5D5680061AE80 /* ORSNORackController.h in Headers */,
 				844B42C10DE5D5680061AE80 /* ORSNORackModel.h in Headers */,
@@ -16364,6 +16434,13 @@
 						CreatedOnToolsVersion = 6.1.1;
 						TestTargetID = 8434A184055B3287002D3102;
 					};
+					8434A184055B3287002D3102 = {
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
+					};
 				};
 			};
 			buildConfigurationList = 84F201BE0B6531990084F4C3 /* Build configuration list for PBXProject "Orca" */;
@@ -16498,6 +16575,7 @@
 				8467E6B106480F0A00A35E6A /* Trigger32Card.gif in Resources */,
 				84C5332A0652BA6B00E4731F /* MainMenu.nib in Resources */,
 				84C859050665624C00FBAF9C /* Bugs.tif in Resources */,
+				C65995A520529EE300FE5973 /* MotoGPS.tif in Resources */,
 				844514840674DF9600A19654 /* LC950Oscilloscope.gif in Resources */,
 				8467DE6A1E525EF800DDF735 /* Mail.tif in Resources */,
 				844514850674DF9600A19654 /* ORLC950.nib in Resources */,
@@ -16642,6 +16720,7 @@
 				8435625808FDB287002864C7 /* ContainerInput.tif in Resources */,
 				8435625F08FDB287002864C7 /* ContainerOutput.nib in Resources */,
 				8435626008FDB287002864C7 /* ContainerOutput.tif in Resources */,
+				C65995B320529EE400FE5973 /* RefClock.nib in Resources */,
 				84D0592E08FF367A00A99A83 /* goBack.tif in Resources */,
 				84D0593F08FF39EA00A99A83 /* goBackPressed.tif in Resources */,
 				8408A4BB09071C6A004A3B34 /* HV2132.nib in Resources */,
@@ -16790,6 +16869,7 @@
 				84F46F450CA44255007EFADA /* IpeFLT.nib in Resources */,
 				84F46F460CA44255007EFADA /* IpeFLTCard.gif in Resources */,
 				6B325E0A1B2F42C8002E2DD7 /* SNOCrate.xib in Resources */,
+				C65995B420529EE400FE5973 /* MotoGPS.nib in Resources */,
 				84F46F4E0CA44255007EFADA /* IpeSLT.nib in Resources */,
 				84D613E32017A9630038D662 /* TristanFLT.nib in Resources */,
 				84F46F4F0CA44255007EFADA /* IpeSLTCard.gif in Resources */,
@@ -16877,6 +16957,7 @@
 				84BAA2AA0E92A81A00E19946 /* SIS3300Card.gif in Resources */,
 				84CEA36C0EA4EB2E0060076A /* Fec32.gif in Resources */,
 				84CEA36E0EA4EB2E0060076A /* Fec32Card.gif in Resources */,
+				C65995B520529EE400FE5973 /* SynClock.tif in Resources */,
 				84CEA6E70EA623A50060076A /* FecDaughterCard.gif in Resources */,
 				840463CA183515FF00F69B23 /* GretinaTrigger.gif in Resources */,
 				8491F6720EC0D3C40084BAD6 /* pmtShadow.gif in Resources */,
@@ -16978,6 +17059,7 @@
 				84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */,
 				84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */,
 				84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */,
+				C65995AC20529EE400FE5973 /* RefClock.tif in Resources */,
 				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
 				8494F8D11C440E2C00A35F8B /* MJDDewarScale.tif in Resources */,
 				84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */,
@@ -17042,6 +17124,7 @@
 				84EE7DC510D2BEC200BBCBE5 /* adcText.tif in Resources */,
 				84EE877F10D94B3100BBCBE5 /* rightBug.tif in Resources */,
 				84539D1A10E137AD0066A797 /* redled.png in Resources */,
+				C65995A420529EE300FE5973 /* SynClock.nib in Resources */,
 				84539D1B10E137AD0066A797 /* greenled.png in Resources */,
 				84539E7F10E1693F0066A797 /* OnText.tif in Resources */,
 				0FB2022D1CDFCF4E0083F552 /* TUBii.xib in Resources */,
@@ -17421,6 +17504,7 @@
 				8489177D1D6B73D300CF5AAF /* ORCytecVM8Model.m in Sources */,
 				8434A2BC055B3287002D3102 /* ORVmeCard.m in Sources */,
 				8434A2BD055B3287002D3102 /* ORVmeIOCard.m in Sources */,
+				C65995A920529EE300FE5973 /* ORSynClockModel.m in Sources */,
 				8434A2BE055B3287002D3102 /* OrcaObject.m in Sources */,
 				8434A2C0055B3287002D3102 /* OrcaObjectFactory.m in Sources */,
 				8434A2C3055B3287002D3102 /* OR617Model.m in Sources */,
@@ -17472,6 +17556,7 @@
 				8434A306055B3287002D3102 /* ORQueueView.m in Sources */,
 				8434A307055B3287002D3102 /* ORCircularBuffer.m in Sources */,
 				8434A308055B3287002D3102 /* ORCircularBufferWriter.m in Sources */,
+				C65995AA20529EE400FE5973 /* ORSynClockController.m in Sources */,
 				8434A309055B3287002D3102 /* ORCircularBufferReader.m in Sources */,
 				8434A30A055B3287002D3102 /* OHexFormatter.m in Sources */,
 				8434A30B055B3287002D3102 /* ORConnectionTask.m in Sources */,
@@ -17531,6 +17616,7 @@
 				8434A355055B3287002D3102 /* ORCommandCenterController.m in Sources */,
 				844E494B057529A6005F11A0 /* ORTaskMaster.m in Sources */,
 				844E49F3057538B1005F11A0 /* ORTask.m in Sources */,
+				C65995A620529EE300FE5973 /* ORMotoGPSController.m in Sources */,
 				8483E56E058652E400C28344 /* ORDataController.m in Sources */,
 				843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */,
 				10279A731EBA4AFE00048814 /* LivePedestals.m in Sources */,
@@ -17947,6 +18033,7 @@
 				8428ADE50D7CACD00093D35E /* ORHeaderExplorerModel.m in Sources */,
 				84281C7F0D7E19C50021B820 /* ORIP320Decoders.m in Sources */,
 				84FDF52C0D7E1EAE003AE119 /* ORKatrinSLTController.m in Sources */,
+				C65995AE20529EE400FE5973 /* ORRefClockModel.m in Sources */,
 				84FDF52E0D7E1EAE003AE119 /* ORKatrinSLTModel.m in Sources */,
 				84FDF5530D7F084E003AE119 /* ORIpeV4CrateController.m in Sources */,
 				84FDF5550D7F084E003AE119 /* ORIpeV4CrateModel.m in Sources */,
@@ -18131,6 +18218,7 @@
 				84FA6619102B6E2300B426A6 /* ORSIS3350Model.m in Sources */,
 				84A2405C1032ED28002AFA0B /* ORMITPulserController.m in Sources */,
 				84A2405E1032ED28002AFA0B /* ORMITPulserModel.m in Sources */,
+				C65995B120529EE400FE5973 /* ORMotoGPSModel.m in Sources */,
 				840E72EE103DA7BC0070AD70 /* ORAmrelHVController.m in Sources */,
 				840E72F0103DA7BC0070AD70 /* ORAmrelHVModel.m in Sources */,
 				84D8CB4A10447492005585C5 /* ORAutoTester.m in Sources */,
@@ -18159,6 +18247,7 @@
 				8435AAD010C6D0EF00E03F7F /* ORVarianTPSDecoders.m in Sources */,
 				8435AAD210C6D0EF00E03F7F /* ORVarianTPSModel.m in Sources */,
 				849516B710C95382001C8112 /* ORStateLabelController.m in Sources */,
+				C65995AB20529EE400FE5973 /* ORRefClockController.m in Sources */,
 				849516B910C95382001C8112 /* ORStateLabelModel.m in Sources */,
 				8455097B10CEF7DD008A019C /* ORCaen965Decoder.m in Sources */,
 				84ACBA6410D44258003B9735 /* ORProcessView.m in Sources */,

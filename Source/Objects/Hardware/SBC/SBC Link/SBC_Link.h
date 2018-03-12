@@ -273,6 +273,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setPollingDelay:(unsigned long)numMicroseconds;
 - (void) checkSBCTime;
 - (void) checkSBCTime:(BOOL)verbose;
+- (void) checkSBCAccurateTime;
+- (void) checkSBCAccurateTime:(BOOL)aVerbose;
 - (void) setSBCTime:(NSString*)rootPwd;
 - (long) timeSkew;
 - (BOOL) timeSkewValid;

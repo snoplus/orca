@@ -416,7 +416,9 @@
 	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
 	[resetPageManagerButton     setEnabled:!lockedOrRunningMaintenance];
 	[forceTriggerButton         setEnabled:!lockedOrRunningMaintenance];
-	[initBoardButton            setEnabled:!lockedOrRunningMaintenance];
+    [initAllBoardsButton         setEnabled:!lockedOrRunningMaintenance];
+    [initAllBoards1Button         setEnabled:!lockedOrRunningMaintenance];
+    [initBoardButton            setEnabled:!lockedOrRunningMaintenance];
 	[initBoard1Button           setEnabled:!lockedOrRunningMaintenance];
 	[readBoardButton            setEnabled:!lockedOrRunningMaintenance];
 	[secStrobeSrcPU             setEnabled:!lockedOrRunningMaintenance];
@@ -670,7 +672,19 @@
                         localException,[model stationNumber]);
 	}
 }
-
+- (IBAction) initAllBoardsAction:(id)sender
+{
+    @try {
+        [self endEditing];
+        [model initAllBoards];
+        NSLog(@"SLT%d and All FLTs initialized\n",[model stationNumber]);
+    }
+    @catch(NSException* localException) {
+        NSLog(@"Exception SLT init\n");
+        ORRunAlertPanel([localException name], @"%@\nSLT%d InitAllBoards failed", @"OK", nil, nil,
+                        localException,[model stationNumber]);
+    }
+}
 - (IBAction) readStatus:(id)sender
 {
 	[model readStatusReg];

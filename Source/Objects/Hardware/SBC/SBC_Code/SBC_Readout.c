@@ -382,6 +382,7 @@ void processSBCCommand(SBC_Packet* aPacket,uint8_t reply)
 		case kSBC_JobStatus:		jobStatus(aPacket);			break;
 		case kSBC_GenericJob:		doGenericJob(aPacket);		break;
         case kSBC_GetTimeRequest:   sendTime();                 break;
+        case kSBC_GetAccurateTime:  sendAccurateTime();         break;
 
         case kSBC_Exit:             timeToExit = 1;				break;
     }
@@ -565,6 +566,26 @@ void sendErrorInfo(void)
         LogError("sendErrorInfo Error: %s", strerror(errno));
     }
 }
+
+void sendAccurateTime(void)
+{
+    SBC_Packet aPacket;
+    aPacket.cmdHeader.destination          = kSBC_Process;
+    aPacket.cmdHeader.cmdID                = kSBC_GetAccurateTime;
+    aPacket.cmdHeader.numberBytesinPayload = sizeof(SBC_accurate_time_struct);
+    
+    SBC_accurate_time_struct* p  = (SBC_accurate_time_struct*)aPacket.payload;
+    struct timeval t;
+    gettimeofday(&t,NULL);
+    p->seconds = t.tv_sec;
+    p->microSeconds = t.tv_usec;
+    if(needToSwap) SwapLongBlock(p,sizeof(SBC_accurate_time_struct));
+    if (writeBuffer(&aPacket) < 0) {
+        LogError("sendAccurateTime Error: %s", strerror(errno));
+    }
+}
+
+
 
 void sendTime(void)
 {

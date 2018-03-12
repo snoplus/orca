@@ -23,12 +23,15 @@
 	IBOutlet NSTextField*	executionCountField;
 	IBOutlet NSTextField*	timesToRepeatField;
 	IBOutlet NSTextField*	lastFileTextField;
-	IBOutlet NSTextField*	runCountField;
+    IBOutlet NSTextField*   runCountField;
+    IBOutlet NSTextField*   pausedStatusField;
 	IBOutlet NSButton*		randomizeCB;
     IBOutlet NSButton*      listLockButton;
     IBOutlet NSButton*      addItemButton;
     IBOutlet NSButton*      removeItemButton;
-    IBOutlet NSButton*      startStopButton;
+    IBOutlet NSButton*      startButton;
+    IBOutlet NSButton*      pauseButton;
+    IBOutlet NSButton*      stopButton;
     IBOutlet NSButton*      saveButton;
     IBOutlet NSButton*      restoreButton;
     IBOutlet NSProgressIndicator*      progressBar;
@@ -48,7 +51,9 @@
 - (IBAction) listLockAction:(id)sender;
 - (IBAction) delete:(id)sender;
 - (IBAction) cut:(id)sender;
-- (IBAction) startStop:(id)sender;
+- (IBAction) startRunning:(id)sender;
+- (IBAction) pauseRunning:(id)sender;
+- (IBAction) stopRunning:(id)sender;
 - (IBAction) loadFileAction:(id) sender;
 - (IBAction) saveFileAction:(id) sender;
 

@@ -86,8 +86,8 @@
 {
     // Hardware configuration
     int shipSumHistogram;
-    int vetoOverlapTime;
-    int nfoldCoincidence;
+//    int vetoOverlapTime;
+//    int nfoldCoincidence;
     int fifoLength;
     int filterShapingLength;  
 	BOOL activateDebuggingDisplays;
@@ -117,6 +117,8 @@
     int energyOffset;
     unsigned long inhibitDuringLastHitrateReading;
     unsigned long runStatusDuringLastHitrateReading;
+    unsigned long lastSltSecondCounter;
+    unsigned long nHitrateCount;
     BOOL initializing;
 
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
@@ -170,10 +172,10 @@
 - (void) setActivateDebuggingDisplays:(BOOL)aState;
 - (int) fifoLength;
 - (void) setFifoLength:(int)aFifoLength;
-- (int) nfoldCoincidence;
-- (void) setNfoldCoincidence:(int)aNfoldCoincidence;
-- (int) vetoOverlapTime;
-- (void) setVetoOverlapTime:(int)aVetoOverlapTime;
+//- (int) nfoldCoincidence;
+//- (void) setNfoldCoincidence:(int)aNfoldCoincidence;
+//- (int) vetoOverlapTime;
+//- (void) setVetoOverlapTime:(int)aVetoOverlapTime;
 - (int) shipSumHistogram;
 - (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
@@ -302,9 +304,9 @@
 - (void) testButtonLowLevelFireTP;
 - (void) testButtonLowLevelResetTP;
 
-- (void) disableAllTriggersIfInVetoMode;
-- (void) restoreTriggersIfInVetoMode;
-
+//- (void) disableAllTriggersIfInVetoMode;
+//- (void) restoreTriggersIfInVetoMode;
+//
 #pragma mark •••HW Access
 //all can raise exceptions
 - (int) accessTypeOfReg:(int)aReg;
@@ -418,6 +420,10 @@
 
 
 - (void) testReadHisto;
+- (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue;
+- (BOOL) compareThresholdsAndGains;
+- (BOOL) compareHitRateMask;
+- (BOOL) compareFilter;
 
 @end
 
@@ -441,6 +447,7 @@
 			pattern:(unsigned short*) pattern
 			  shift:(int) shift
 				  n:(int) n;
+
 @end
 
 extern NSString* ORKatrinV4FLTModelEnergyOffsetChanged;
@@ -457,8 +464,8 @@ extern NSString* ORKatrinV4FLTModelCustomVariableChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged;
 extern NSString* ORKatrinV4FLTModelFifoLengthChanged;
-extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
-extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
+//extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
+//extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
 extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;
 extern NSString* ORKatrinV4FLTModelTargetRateChanged;
 extern NSString* ORKatrinV4FLTModelHistMaxEnergyChanged;

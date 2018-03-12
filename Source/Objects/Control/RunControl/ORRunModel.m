@@ -1117,7 +1117,11 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	else {
         [[NSNotificationCenter defaultCenter] postNotificationName:ORRunAboutToChangeState
                                                             object: self
-                                                          userInfo:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:eRunStarting] forKey:@"State"]];
+                                                          userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                    [NSNumber numberWithInt:eRunStarting],@"State",
+                                                                    [NSNumber numberWithBool:YES],        @"StartingSubRun",
+                                                                    nil]];
+    
         [self startNewSubRunStage1];
     }
 }
@@ -1577,11 +1581,16 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                         object: self
                                                       userInfo: statusInfo];
     //SV - End of changes
-    
+
+    // If ORCA opened in the middle of a run, runInfo won't exist so must remake.
+    if(!runInfo){
+        runInfo = [[self runInfo] copy];
+    }
+
     [nextObject preCloseOut:runInfo];
     
-	//get the time(UT!)
-	time_t	ut_time;
+    // get the time(UT!)
+    time_t ut_time;
     time(&ut_time);    
 	
 	unsigned long data[4];
@@ -1597,13 +1606,13 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     
     if(_nextRunWillQuickStart)_nextRunWillQuickStart = NO;
 
-	//closeout run will wait until the processing thread is done.
-	[nextObject closeOutRun:runInfo];
+    // closeout run will wait until the processing thread is done.
+    [nextObject closeOutRun:runInfo];
+
+    [self setRunningState:eRunStopped];
 	
-	[self setRunningState:eRunStopped];
-	
-	[dataTypeAssigner release];
-	dataTypeAssigner = nil;
+    [dataTypeAssigner release];
+    dataTypeAssigner = nil;
 	
     [[self undoManager] disableUndoRegistration];
     if(savedSelectedRunTypeScript){
@@ -1619,7 +1628,6 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
                                                         object: self
                                                       userInfo: runInfo];
 
-    
 	if(willRestart){
 		ignoreRepeat  = NO;
 		_forceRestart = NO;

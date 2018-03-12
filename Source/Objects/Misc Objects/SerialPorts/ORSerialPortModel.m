@@ -71,13 +71,15 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 
 - (NSString*) portName
 {
-    return portName;
+    if(portName==nil)return @"";
+    else return portName;
 }
 
 - (void) setPortName:(NSString*)aPortName
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPortName:portName];
-    
+    if(aPortName==nil)aPortName = @"";
+
     if(![aPortName isEqualToString:portName]){
         [portName autorelease];
         portName = [aPortName copy];

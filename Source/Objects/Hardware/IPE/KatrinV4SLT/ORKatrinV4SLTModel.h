@@ -162,6 +162,7 @@
         unsigned long   inhibitLastCheck; //< used in doneTakingData
         bool            callRunIsStopping;
         unsigned long   sltSecondRunStop;
+        unsigned long   lastHitrateSec;
     
 		unsigned long   lastSimSec;
 
@@ -191,6 +192,9 @@
         bool                activateFltReadout;
     
         unsigned long       savedInhibitStatus;
+        BOOL                waitForSubRunStart;
+        BOOL                waitForSubRunEnd;
+        unsigned long       secondToWaitFor;
 
 }
 
@@ -207,6 +211,7 @@
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote;
 - (void) runIsStartingSubRun:(NSNotification*)aNote;
 - (void) cardsChanged:(NSNotification*) aNote;
+- (void) runIsAboutToChangeState:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (BOOL) minimizeDecoding;
@@ -288,6 +293,9 @@
 - (void) restoreInhibitStatus;
 - (void) saveInhibitStatus;
 
+- (BOOL) compareRegisters;
+
+
 #pragma mark ***Polling
 - (int) pollTime;
 - (void) setPollTime:(int)aPollTime;
@@ -350,6 +358,7 @@
 - (unsigned long) readSubSecondsCounter;
 - (unsigned long) getSeconds;
 - (unsigned long) getRunStartSecond;
+- (unsigned long) getRunEndSecond;
 
 - (void)		reset;
 - (void)		hw_config;
@@ -357,7 +366,8 @@
 //- (void)		loadPulseAmp;
 //- (void)		loadPulserValues;
 //- (void)		swTrigger;
-- (void)		initBoard;
+- (void)        initBoard;
+- (void)        initAllBoards;
 - (void)		autoCalibrate;
 - (long)		getSBCCodeVersion;
 - (long)		getFdhwlibVersion;

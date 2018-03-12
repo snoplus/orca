@@ -223,7 +223,6 @@
 - (void) updateProgressBar:(NSNotification*)aNote
 {
 	[progressBar setDoubleValue: 100. * [model accumulatedTime]/[model totalExpectedTime]];
-	[model workingItemIndex];
 }
 
 - (void) runStateChanged:(NSNotification*)aNote
@@ -231,7 +230,19 @@
 	BOOL isRunning = [model isRunning];
 	if(isRunning)[progressBar startAnimation:self];
 	else [progressBar stopAnimation:self];
-	[startStopButton setTitle:isRunning?@"Stop":@"Start"];
+    
+    [startButton setEnabled: !isRunning];
+    [pauseButton setEnabled: isRunning];
+    if([model isPaused]){
+        [pauseButton setTitle:@"Resume"];
+        [pausedStatusField setHidden:NO];
+    }
+    else {
+        [pauseButton setTitle:@"Pause"];
+        [pausedStatusField setHidden:YES];
+    }
+    [stopButton  setEnabled:  isRunning];
+
 	if(isRunning){
 		int n		= [model timesToRepeat];
 		int count	= [model executionCount]+1;
@@ -270,10 +281,18 @@
 {
 	[model setRandomize:[sender intValue]];	
 }
-- (IBAction) startStop:(id)sender
+- (IBAction) startRunning:(id)sender
 {
 	if(![model isRunning])[model startRunning];
-	else			     [model stopRunning];
+}
+- (IBAction) pauseRunning:(id)sender
+{
+    if([model isPaused])[model restartRunning];
+    else [model pauseRunning];
+}
+- (IBAction) stopRunning:(id)sender
+{
+    if([model isRunning])[model stopRunning];
 }
 
 - (IBAction) delete:(id)sender
@@ -356,21 +375,27 @@
     }];
 }
 
-
 #pragma mark Data Source Methods
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
-
 	if(aTableView == itemsListView){
-		id addressObj = [model itemAtIndex:rowIndex];
+        if((rowIndex == 0) && [[aTableColumn identifier] isEqualToString:@"SubRun"])return nil;
+        id addressObj = [model itemAtIndex:rowIndex];
+
 		return [addressObj valueForKey:[aTableColumn identifier]]; 
 	}
 	else return nil;
 }
 
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+{
+    if(rowIndex == 0 && [[aTableColumn identifier] isEqualToString:@"SubRun"])[aCell setEnabled:NO];
+    else [aCell setEnabled:YES];
+}
 - (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
 {
 	if(aTableView == itemsListView){
+        if((rowIndex == 0) && [[aTableColumn identifier] isEqualToString:@"SubRun"])return;
 		id addressObj = [model itemAtIndex:rowIndex];
 		[addressObj setValue:anObject forKey:[aTableColumn identifier]];
 	}

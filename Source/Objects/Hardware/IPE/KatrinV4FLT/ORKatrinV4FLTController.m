@@ -60,7 +60,7 @@
     settingSize			= NSMakeSize(690,740);
     rateSize			= NSMakeSize(500,710);
     testSize			= NSMakeSize(610,510);
-    lowlevelSize		= NSMakeSize(610,510);
+    lowlevelSize		= NSMakeSize(610,540);
 	
 	rateFormatter = [[NSNumberFormatter alloc] init];
 	[rateFormatter setFormat:@"##0.00"];
@@ -90,7 +90,7 @@
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
         [[thresholdTextFields cellWithTag:i] setFormatter:valueFormatter ];
-        [[vetoThresholdMatrix cellWithTag:i] setFormatter:valueFormatter ];
+        //[[vetoThresholdMatrix cellWithTag:i] setFormatter:valueFormatter ];
 	}
 	[self populatePullDown];
 	
@@ -327,15 +327,15 @@
                          name : ORKatrinV4FLTModelShipSumHistogramChanged
 						object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(vetoOverlapTimeChanged:)
-                         name : ORKatrinV4FLTModelVetoOverlapTimeChanged
-						object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(vetoOverlapTimeChanged:)
+//                         name : ORKatrinV4FLTModelVetoOverlapTimeChanged
+//                        object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(nfoldCoincidenceChanged:)
-                         name : ORKatrinV4FLTModelNfoldCoincidenceChanged
-						object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(nfoldCoincidenceChanged:)
+//                         name : ORKatrinV4FLTModelNfoldCoincidenceChanged
+//                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(fifoLengthChanged:)
@@ -522,19 +522,19 @@
 	[fifoLengthPU selectItemAtIndex: [model fifoLength]];
 }
 
-- (void) nfoldCoincidenceChanged:(NSNotification*)aNote
-{
-	[nfoldCoincidencePU selectItemAtIndex: [model nfoldCoincidence]];
-	NSString* s = [NSString stringWithFormat:@">=%d",[model nfoldCoincidence]];
-	[group1NFoldField setStringValue:s];
-	[group2NFoldField setStringValue:s];
-	[group3NFoldField setStringValue:s];
-}
+//- (void) nfoldCoincidenceChanged:(NSNotification*)aNote
+//{
+//    [nfoldCoincidencePU selectItemAtIndex: [model nfoldCoincidence]];
+//    NSString* s = [NSString stringWithFormat:@">=%d",[model nfoldCoincidence]];
+//    [group1NFoldField setStringValue:s];
+//    [group2NFoldField setStringValue:s];
+//    [group3NFoldField setStringValue:s];
+//}
 
-- (void) vetoOverlapTimeChanged:(NSNotification*)aNote
-{
-	[vetoOverlapTimePU selectItemAtIndex: [model vetoOverlapTime]];
-}
+//- (void) vetoOverlapTimeChanged:(NSNotification*)aNote
+//{
+//    [vetoOverlapTimePU selectItemAtIndex: [model vetoOverlapTime]];
+//}
 
 - (void) shipSumHistogramChanged:(NSNotification*)aNote
 {
@@ -715,8 +715,8 @@
 	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
 	[self shipSumHistogramChanged:nil];
-	[self vetoOverlapTimeChanged:nil];
-	[self nfoldCoincidenceChanged:nil];
+//	[self vetoOverlapTimeChanged:nil];
+//    [self nfoldCoincidenceChanged:nil];
 	[self fifoLengthChanged:nil];
 	[self activateDebuggerDisplaysChanged:nil];
 	[self fifoFlagsChanged:nil];
@@ -761,12 +761,12 @@
     bool useBoxcar        = ([(ORKatrinV4FLTModel*)model runMode] == 3) || ([(ORKatrinV4FLTModel*)model runMode] == 4);
 
     //MAH. put in casts below to clear warning from XCode 5
-	if([(ORKatrinV4FLTModel*)model runMode] < 3 || [(ORKatrinV4FLTModel*)model runMode] > 6)	[modeTabView selectTabViewItemAtIndex:0];
-	else											[modeTabView selectTabViewItemAtIndex:1];
+//    if([(ORKatrinV4FLTModel*)model runMode] < 3 || [(ORKatrinV4FLTModel*)model runMode] > 6)    [modeTabView selectTabViewItemAtIndex:0];
+//    else                                            [modeTabView selectTabViewItemAtIndex:1];
     
     [forceFLTReadoutCB           setEnabled: !lockedOrRunningMaintenance && [(ORKatrinV4FLTModel*)model fltRunMode] != kKatrinV4Flt_VetoEnergyTraceDaqMode];
 	[gapLengthPU                 setEnabled: !lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
-	[filterShapingLengthPU       setEnabled: !lockedOrRunningMaintenance];
+	[filterShapingLengthPU       setEnabled: !lockedOrRunningMaintenance && (([(ORKatrinV4FLTModel*)model runMode]<3) || ([(ORKatrinV4FLTModel*)model runMode]>6))];
 	[boxcarLengthPU              setEnabled: !lockedOrRunningMaintenance && useBoxcar];
 	[boxcarLengthLabel           setEnabled: !lockedOrRunningMaintenance && useBoxcar];
     [testEnabledMatrix           setEnabled: !locked && !testingOrRunning];
@@ -781,10 +781,10 @@
     [fireSoftwareTriggerButton   setEnabled: !lockedOrRunningMaintenance];
     [fireSoftwareTriggerButton1  setEnabled: !lockedOrRunningMaintenance];
     [hitRateEnabledCBs           setEnabled: !lockedOrRunningMaintenance];
-    [vetoTriggerEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
-    [vetoHitRateEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
-    [vetoGainMatrix              setEnabled: !lockedOrRunningMaintenance];
-    [vetoThresholdMatrix         setEnabled: !lockedOrRunningMaintenance];
+//    [vetoTriggerEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
+//    [vetoHitRateEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
+//    [vetoGainMatrix              setEnabled: !lockedOrRunningMaintenance];
+//    [vetoThresholdMatrix         setEnabled: !lockedOrRunningMaintenance];
 	
 	[versionButton               setEnabled: !runInProgress];
 	[testButton                  setEnabled: !runInProgress];
@@ -813,12 +813,15 @@
 	[histClrModePU setEnabled:                   !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	[clearReceivedHistoCounterButton setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	
-	NSString* s;
-	if(locked)s = @"Veto Locked";
-	else if((daqMode == kIpeFltV4_VetoEnergyDaqMode) || (daqMode == kIpeFltV4_VetoEnergyTraceDaqMode)) s = @"Veto Active";
-	else s = @"";
-	[vetoActiveField setStringValue:s];
-							  
+    [compareRegistersButton setEnabled:!lockedOrRunningMaintenance];
+    
+    
+//    NSString* s;
+//    if(locked)s = @"Veto Locked";
+//    else if((daqMode == kIpeFltV4_VetoEnergyDaqMode) || (daqMode == kIpeFltV4_VetoEnergyTraceDaqMode)) s = @"Veto Active";
+//    else s = @"";
+//    [vetoActiveField setStringValue:s];
+    
     [startNoiseFloorButton setEnabled: !runInProgress];
 	
  	[self enableRegControls];
@@ -968,7 +971,7 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
 	[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
-	[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
+//	[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
 }
 
 - (void) triggerEnabledChanged:(NSNotification*)aNotification
@@ -976,7 +979,7 @@
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[triggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
-		[[vetoTriggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
+//		[[vetoTriggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
 	}
 }
 
@@ -985,7 +988,7 @@
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[hitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
-		[[vetoHitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
+//		[[vetoHitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
 	}
 }
 
@@ -993,7 +996,7 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
     [[thresholdTextFields cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
-    [[vetoThresholdMatrix cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
+//    [[vetoThresholdMatrix cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -1009,7 +1012,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
-		[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
+//		[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
 		
 	}	
 }
@@ -1019,7 +1022,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
-		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
+//		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
 	}
 }
 
@@ -1028,7 +1031,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
-		[[vetoTriggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
+//		[[vetoTriggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
 		
 	}
 }
@@ -1038,7 +1041,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
-		[[vetoHitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
+//		[[vetoHitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
 		
 	}
 }
@@ -1218,17 +1221,17 @@
 	[model setFifoLength:[fifoLengthPU indexOfSelectedItem]];	
 }
 
-- (IBAction) nfoldCoincidencePUAction:(id)sender
-{
-	//NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-	[model setNfoldCoincidence:[sender indexOfSelectedItem]];	
-}
+//- (IBAction) nfoldCoincidencePUAction:(id)sender
+//{
+//    //NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
+//    [model setNfoldCoincidence:[sender indexOfSelectedItem]];
+//}
 
 
-- (IBAction) vetoOverlapTimePUAction:(id)sender
-{
-	[model setVetoOverlapTime:[vetoOverlapTimePU indexOfSelectedItem]];	
-}
+//- (IBAction) vetoOverlapTimePUAction:(id)sender
+//{
+//    [model setVetoOverlapTime:[vetoOverlapTimePU indexOfSelectedItem]];
+//}
 
 - (IBAction) shipSumHistogramPUAction:(id)sender
 {
@@ -1722,6 +1725,15 @@
         NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	    [model testButtonLowLevelResetTP];
 	}
+}
+
+- (IBAction) compareRegisters:(id)sender
+{
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    NSLogFont(aFont,@"Register Compare report for %@\n",[model fullID]);
+    [model compareThresholdsAndGains];
+    [model compareHitRateMask];
+    [model compareFilter];
 }
 
 #pragma mark •••Plot DataSource

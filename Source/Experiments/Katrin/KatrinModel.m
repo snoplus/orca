@@ -247,7 +247,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
 	
 	[[segmentGroups objectAtIndex:0] addParametersToDictionary:objDictionary useName:@"FPDGeometry" addInGroupName:NO];
-	[[segmentGroups objectAtIndex:1] addParametersToDictionary:objDictionary useName:@"VetoGeometry" addInGroupName:NO];
+	[[segmentGroups objectAtIndex:1] addParametersToDictionary:objDictionary useName:@"VetoGeometry2018" addInGroupName:NO];
 	
 	//NSString* rootMapFile = [[[segmentGroups objectAtIndex:0] mapFile] stringByExpandingTildeInPath];
 	//rootMapFile = [rootMapFile stringByDeletingPathExtension];
@@ -279,14 +279,13 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	
 	//for backward compatibility with the analysis code
 	
-	NSMutableDictionary* mapDictionary;
-	mapDictionary = [NSMutableDictionary dictionary];
-	[mapDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Geometry"];
-	[objDictionary setObject:mapDictionary forKey:@"Focal Plane"];
-
-	mapDictionary = [NSMutableDictionary dictionary];
-	[mapDictionary setObject:[self addOldVetoMapFormat:aDictionary] forKey:@"Geometry"];
-	[objDictionary setObject:mapDictionary forKey:@"Veto"];
+//    NSMutableDictionary* mapDictionary;
+//    mapDictionary = [NSMutableDictionary dictionary];
+//    [mapDictionary setObject:[self addOldFPDMapFormat:aDictionary] forKey:@"Geometry"];
+//    [objDictionary setObject:mapDictionary forKey:@"Focal Plane"];
+ //    mapDictionary = [NSMutableDictionary dictionary];
+//    [mapDictionary setObject:[self addOldVetoMapFormat:aDictionary] forKey:@"Geometry"];
+//    [objDictionary setObject:mapDictionary forKey:@"Veto"];
 	
     [aDictionary setObject:objDictionary forKey:[self className]];
     return aDictionary;
@@ -309,15 +308,15 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
     [self setCardIndex:kCardSlot];
     [self setChannelIndex:kChannel];
-	if(index==1){
+	if(index==1){ //veto map
 		NSMutableArray* mapEntries = [NSMutableArray array];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSlot",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"PanelSN",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"VetoSumChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"AmpBoardNum",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"AmpChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"PanelSN",        @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"VetoSumChannel",    @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"AmpBoardNum",    @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"AmpChannel",        @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
 		return mapEntries;
 	}
 	else {
@@ -325,10 +324,10 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSegmentNumber",	@"key", [NSNumber numberWithInt:0], @"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kSlot",			@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
 		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kChannel",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampModule",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBSlot",		@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
-		[mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBChannel",	@"key", [NSNumber numberWithInt:0],	@"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampModule",    @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kPreampChannel",    @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBSlot",        @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
+        [mapEntries addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"kOSBChannel",    @"key", [NSNumber numberWithInt:0],    @"sortType", nil]];
 		return mapEntries;
 	}
 }

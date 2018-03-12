@@ -47,8 +47,8 @@ NSString* ORKatrinV4FLTModelCustomVariableChanged           = @"ORKatrinV4FLTMod
 NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged     = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged     = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
 NSString* ORKatrinV4FLTModelFifoLengthChanged               = @"ORKatrinV4FLTModelFifoLengthChanged";
-NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged         = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
-NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged          = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
+//NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged         = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
+//NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged          = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
 NSString* ORKatrinV4FLTModelShipSumHistogramChanged         = @"ORKatrinV4FLTModelShipSumHistogramChanged";
 NSString* ORKatrinV4FLTModelTargetRateChanged               = @"ORKatrinV4FLTModelTargetRateChanged";
 NSString* ORKatrinV4FLTModelHistMaxEnergyChanged            = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
@@ -130,6 +130,8 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
     
     inhibitDuringLastHitrateReading = 0;
     runStatusDuringLastHitrateReading = 0;
+    lastSltSecondCounter = 0;
+    nHitrateCount = 0;
     
     lastHistReset = 0;
 }
@@ -310,7 +312,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 - (void) setEnergyOffset:(int)aEnergyOffset
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyOffset:energyOffset];
-    energyOffset = [self restrictIntValue:aEnergyOffset min:0 max:0xfffff];
+    energyOffset = [self restrictIntValue:aEnergyOffset min:-1048576 max:0xfffff];//2018-02-12 added negative EnergyOffset (21 bit) -tb-
     //energyOffset = aEnergyOffset;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelEnergyOffsetChanged object:self];
 }
@@ -656,37 +658,37 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelFifoLengthChanged object:self];
 }
 
-- (int) nfoldCoincidence
-{
-    return nfoldCoincidence;
-}
-
-- (void) setNfoldCoincidence:(int)aNfoldCoincidence
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setNfoldCoincidence:nfoldCoincidence];
-    nfoldCoincidence = aNfoldCoincidence;
-	if(nfoldCoincidence<0) nfoldCoincidence=0;
-	if(nfoldCoincidence>6) nfoldCoincidence=6;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelNfoldCoincidenceChanged object:self];
-}
-
-- (int) vetoOverlapTime
-{
-    return vetoOverlapTime;
-}
-
-- (void) setVetoOverlapTime:(int)aVetoOverlapTime
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setVetoOverlapTime:vetoOverlapTime];
-    
-    vetoOverlapTime = aVetoOverlapTime;
-	if(vetoOverlapTime<0) vetoOverlapTime = 0;
-	if(vetoOverlapTime>5) vetoOverlapTime = 5;//changed from 4 to 5 since FLTv4 FPGA 2.1.1.4 -tb-
-        
-	//NSLog(@"%@::%@: set vetoOverlapTime to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),vetoOverlapTime);//-tb-NSLog-tb-
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelVetoOverlapTimeChanged object:self];
-}
+//- (int) nfoldCoincidence
+//{
+//    return nfoldCoincidence;
+//}
+//
+//- (void) setNfoldCoincidence:(int)aNfoldCoincidence
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setNfoldCoincidence:nfoldCoincidence];
+//    nfoldCoincidence = aNfoldCoincidence;
+//    if(nfoldCoincidence<0) nfoldCoincidence=0;
+//    if(nfoldCoincidence>6) nfoldCoincidence=6;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelNfoldCoincidenceChanged object:self];
+//}
+//
+//- (int) vetoOverlapTime
+//{
+//    return vetoOverlapTime;
+//}
+//
+//- (void) setVetoOverlapTime:(int)aVetoOverlapTime
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setVetoOverlapTime:vetoOverlapTime];
+//
+//    vetoOverlapTime = aVetoOverlapTime;
+//    if(vetoOverlapTime<0) vetoOverlapTime = 0;
+//    if(vetoOverlapTime>5) vetoOverlapTime = 5;//changed from 4 to 5 since FLTv4 FPGA 2.1.1.4 -tb-
+//
+//    //NSLog(@"%@::%@: set vetoOverlapTime to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),vetoOverlapTime);//-tb-NSLog-tb-
+//
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelVetoOverlapTimeChanged object:self];
+//}
 
 
 /** This is the setting of the 'Ship Sum Histogram' popup button; tag values are:
@@ -933,7 +935,7 @@ static double table[32]={
         [self setFloatThreshold:chan withValue:currentThreshold*ratio];
     }
     
-    unsigned long currentOffset = [self energyOffset];
+    long currentOffset = [self energyOffset];
     [self setEnergyOffset:currentOffset*ratio];
     
     //----------------------------------------------
@@ -1497,14 +1499,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	return [self readReg: kFLTV4ControlReg];
 }
 
-//TODO: better use the STANDBY flag of the FLT -tb- 2010-01-xx     !!!!!!!!!!!!!!!!!
 - (void) writeRunControl:(BOOL)startSampling
 {
 	unsigned long aValue = 
 	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
-	(((nfoldCoincidence)    & 0xf)<<20) |		//nfoldCoincidence is stored as the popup index -- NEW since 2010-11-09 -tb-
-	(((vetoOverlapTime)     & 0xf)<<16)	|		//vetoOverlapTime is stored as the popup index -- NEW since 2010-08-04 -tb-
 	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)              |
@@ -1518,7 +1517,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) writeControl
 {
-	
 	//TODO: add fifo length -tb- <---------------------------------------------
 	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
 	//((useBipolarEnergy & 0x1)<<18) |
@@ -1792,7 +1790,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) readHitRates
 {
+    unsigned long sltSec;
+    unsigned long sltSubSec;
     unsigned long sltSubSec2;
+    
+    unsigned long runStatus;
+    unsigned long sltRunEndSec;
+    
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
 
@@ -1841,11 +1845,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     [[slt sbcLink] send:&aPacket receive:&aPacket];
                     
                     katrinV4_HitRateStructure* p = (katrinV4_HitRateStructure*) aPacket.payload;
-                    unsigned long sltSec      = p->seconds;
-                    unsigned long sltSubSec   = p->subSeconds;
+                    sltSec      = p->seconds;
+                    sltSubSec   = p->subSeconds;
+                    sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
+
                     unsigned long statusReg   = p->status;
                     
-                    sltSubSec2  = (sltSubSec >> 11) & 0x3fff;
 
                     float   newTotal  = 0;
                     int     dataIndex = 0;
@@ -1893,12 +1898,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     //
                     // Ship the data, if during the last second inhibit was released and run was active
                     //
-                     unsigned long inhibit          = statusReg & kStatusInh;
-                     unsigned long runStatus        = [gOrcaGlobals runInProgress];
-                     unsigned long sltRunStartSec   = [slt getRunStartSecond];
+                    unsigned long inhibit = statusReg & kStatusInh;
+                    runStatus = [gOrcaGlobals runInProgress];
+                    unsigned long sltRunStartSec = [slt getRunStartSecond];
+                    sltRunEndSec = [slt getRunEndSecond];
                     
                     
-                    if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
+                    // Todo: Include inhibit status of the last second, in order to avaid writing hitrates between subruns
+                    if ((dataIndex > 0) && (sltSec > sltRunStartSec) && (sltSec <= sltRunEndSec)) {
+                    //if( (dataIndex>0) && (!inhibitDuringLastHitrateReading) && (runStatusDuringLastHitrateReading) && (sltSec > sltRunStartSec) ){
                         
                         data[0] = hitRateId | (dataIndex + countHREnabledChans + 5);
                         data[1] = location  | ((countHREnabledChans & 0x1f)<<8) | 0x1;
@@ -1908,11 +1916,30 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                         
                         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
                                                                             object:[NSData dataWithBytes:data length:sizeof(long)*(dataIndex + 5 + countHREnabledChans)]];
+                        
+                        if (sltSec -1 == sltRunStartSec ) {
+                            nHitrateCount = 1;
+                        } else {
+                            nHitrateCount += 1;
+                        }
+                        
+                        //NSLog(@"SLT %i.%03i ReadHItrate (end %i)\n", sltSec, sltSubSec2/10, sltRunEndSec);
+                        
                     }
+                    
+                    if ((sltSec > sltRunEndSec) && (nHitrateCount > 0)){
+                        NSLog(@"NUmber of counts in slot %d: %d \n", [self stationNumber], nHitrateCount);
+                        nHitrateCount = 0;
+                    }
+                    
+                    //if ((lastSltSecondCounter > 0) && (sltSec - hitRateLengthSec > lastSltSecondCounter)) {
+                    //    NSLog(@"E R R O R: Hitrate counter missing %d .. %d\n", lastSltSecondCounter-1, sltSec-1);
+                    //}
                     
                     // Keep the inhibit status for the next call
                     inhibitDuringLastHitrateReading   = inhibit;
                     runStatusDuringLastHitrateReading = runStatus;
+                    lastSltSecondCounter = sltSec;
                     
                     [self setHitRateTotal:newTotal];
                     
@@ -1933,20 +1960,21 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         NSLogError(@"",@"Hit Rate Exception",[self fullID],nil);
 	}
 
-    
-    
-    // Synchronize the hitrate readout to the Slt second counter
-    // If the hardware is not accible the counter runs free but not less than a second
 
-    double delay      = (1<<[self hitRateLength]) -1;
-    double deltadelay = 0.010 + (10000. - sltSubSec2)/10000.;
-    delay += deltadelay;
+    if (sltSec >= sltRunEndSec){
     
-    //if (runStatus) NSLog(@"FLT %i.%03i - Reading hitrates - delay %f %f \n", sltSec, sltSubSec2/10, delay, deltadelay);
-    
-    [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
+        // Synchronize the hitrate readout to the Slt second counter
+        // If the hardware is not accible the counter runs free but not less than a second
+
+        double delay      = (1<<[self hitRateLength]) -1;
+        double deltadelay = 0.010 + (10000. - sltSubSec2)/10000.;
+        delay += deltadelay;
+        
+        //NSLog(@"FLT %i.%03i - Reading hitrates - delay %f %f \n", sltSec, sltSubSec2/10, delay, deltadelay);
+        [self performSelector:@selector(readHitRates) withObject:nil afterDelay:(delay)];
+
+    }
 }
-
 
 - (unsigned long long) readLostEvents
 {
@@ -2055,8 +2083,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setPoleZeroCorrection:        [decoder decodeIntForKey:   @"poleZeroCorrection"]];
     [self setCustomVariable:            [decoder decodeIntForKey:   @"customVariable"]];
     [self setFifoLength:                [decoder decodeIntForKey:   @"fifoLength"]];
-    [self setNfoldCoincidence:          [decoder decodeIntForKey:   @"nfoldCoincidence"]];
-    [self setVetoOverlapTime:           [decoder decodeIntForKey:   @"vetoOverlapTime"]];
+//    [self setNfoldCoincidence:          [decoder decodeIntForKey:   @"nfoldCoincidence"]];
+//    [self setVetoOverlapTime:           [decoder decodeIntForKey:   @"vetoOverlapTime"]];
     [self setShipSumHistogram:          [decoder decodeIntForKey:   @"shipSumHistogram"]];
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
@@ -2086,8 +2114,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:poleZeroCorrection           forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable               forKey:@"customVariable"];
     [encoder encodeInt:fifoLength                   forKey:@"fifoLength"];
-    [encoder encodeInt:nfoldCoincidence             forKey:@"nfoldCoincidence"];
-    [encoder encodeInt:vetoOverlapTime              forKey:@"vetoOverlapTime"];
+//    [encoder encodeInt:nfoldCoincidence             forKey:@"nfoldCoincidence"];
+//    [encoder encodeInt:vetoOverlapTime              forKey:@"vetoOverlapTime"];
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
     [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
@@ -2195,8 +2223,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [objDictionary setObject:[NSNumber numberWithLong:hitRateLength]		forKey:@"hitRateLength"];
     [objDictionary setObject:[NSNumber numberWithLong:gapLength]			forKey:@"gapLength"];
     [objDictionary setObject:[NSNumber numberWithLong:filterShapingLength]  forKey:@"filterShapingLength"];//this is the fpga register value -tb-
-    [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]		forKey:@"vetoOverlapTime"];
-    [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]		forKey:@"nfoldCoincidence"];
+//    [objDictionary setObject:[NSNumber numberWithInt:vetoOverlapTime]        forKey:@"vetoOverlapTime"];
+//    [objDictionary setObject:[NSNumber numberWithInt:nfoldCoincidence]        forKey:@"nfoldCoincidence"];
 	
 	//------------------
 	//added MAH 11/09/11
@@ -2447,9 +2475,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     //if cold start (not 'quick start' in RunControl) ...
     [self setLedOff:NO];
-    //if([[userInfo objectForKey:@"doinit"]intValue]){
+    if([[userInfo objectForKey:@"doinit"]intValue]){
 	    [self initBoard];           // writes control reg + hr control reg + PostTrigg + thresh+gains + offset + triggControl + hr mask + enab.statistics
-	//}
+	}
 	
     [self reset];               // Write 1 to all reset/clear flags of the FLTv4 command register. (-> will 'clear' the event FIFO pointers)
     
@@ -2939,6 +2967,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	NSLogFont(aFont,   @"---------------------------------\n");
 }
 
+
 - (void) findNoiseFloors
 {
     id slt = [[self crate] adapter];
@@ -2951,14 +2980,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         if ([slt numberOfActiveThresholdFinder] == 0){
             [slt restoreInhibitStatus];
         }
-        
 	}
 	else {
-        
         if ([gOrcaGlobals runInProgress]){
             NSLog(@"Error: Can't run threshold finder during run\n");
-            
-        } else {
+        }
+        else {
             noiseFloorState = 0;
             noiseFloorRunning = YES;
             [self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
@@ -2992,6 +3019,79 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     return [[ORKatrinV4FLTRegisters sharedRegSet] accessType:anIndex];
 }
+
+- (BOOL) compareThresholdsAndGains
+{
+    int i;
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    BOOL differencesExist = NO;
+    for(i=0;i<kNumV4FLTChannels;i++){
+        if( triggerEnabledMask & (0x1<<i) ){
+
+            differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Threshold:%d",i]
+                                                      orcaValue:(unsigned long)[self threshold:i]
+                                                        hwValue:[self readThreshold:i]];
+            differencesExist |= [self checkForDifferencesInName:[NSString stringWithFormat:@"Gain:%d",i]
+                                                      orcaValue:[self gain:i]
+                                                        hwValue:[self readGain:i]];
+        }
+
+    }
+    if(!differencesExist) {
+        NSLogFont(aFont,      @"ALL Gains, Thresholds in ORCA match HW\n");
+    }
+    
+    return(differencesExist);
+}
+
+- (BOOL) compareHitRateMask
+{
+    unsigned long aMask = [self readHitRateMask];
+    BOOL differencesExist = NO;
+
+    if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
+        NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+        NSLogFont(aFont, @"HitRateMask in ORCA Matches HW\n");
+    } else {
+        differencesExist = true;
+    }
+    
+    return(differencesExist);
+}
+
+- (BOOL) compareFilter
+{
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    unsigned long regValue = [self readReg:kFLTV4RunControlReg];
+    int hwBoxCarLength1      = (regValue>>28) & 0x7;
+    int hwPoleZeroCorrection = (regValue>>24) & 0xf;
+    int hwBoxcarLength2      = (regValue>>14) & 0x3;
+    int hwFilterShapingLength= (regValue>>8)  & 0xf;
+    int hwGapLength          = (regValue>>4)  & 0xf;
+    BOOL differencesExist = NO;
+    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength1"      orcaValue:[self boxcarLength]        hwValue:hwBoxCarLength1];
+    differencesExist |= [self checkForDifferencesInName:@"PoleZeroCorrection" orcaValue:[self poleZeroCorrection]  hwValue:hwPoleZeroCorrection];
+    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength2"      orcaValue:[self boxcarLength]        hwValue:hwBoxcarLength2];
+    differencesExist |= [self checkForDifferencesInName:@"FilterShapingLength"orcaValue:[self filterShapingLength] hwValue:hwFilterShapingLength];
+    differencesExist |= [self checkForDifferencesInName:@"GapLength"          orcaValue:[self gapLength]           hwValue:hwGapLength];
+    
+    if(!differencesExist){
+        NSLogFont(aFont, @"All RunControl reg values in ORCA match HW\n");
+    }
+    
+    return(differencesExist);
+}
+
+- (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue
+{
+    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
+    if(hwValue != orcaValue){
+        NSLogFont(aFont, @"%@: ORCA:0x%0X != HW:0x%0X\n",aName,orcaValue,hwValue);
+        return YES;
+    }
+    else return NO;
+}
+
 @end
 
 @implementation ORKatrinV4FLTModel (tests)
@@ -3280,29 +3380,30 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[testSuit runForObject:self]; //do next test
 }
 
-- (int) compareData:(unsigned short*) data
-			pattern:(unsigned short*) pattern
-			  shift:(int) shift
-				  n:(int) n 
-{
-	unsigned int i, j;
-	
-	// Check for errors
-	for (i=0;i<n;i++) {
-		if (data[i]!=pattern[(i+shift)%n]) {
-			for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
-				NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
-					  data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
-					  pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
-					  pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
-				return i; // check only for one error in every page!
-			}
-		}
-	}
-	
-	return n;
-}
 
+
+- (int) compareData:(unsigned short*) data
+            pattern:(unsigned short*) pattern
+              shift:(int) shift
+                  n:(int) n
+{
+    unsigned int i, j;
+    
+    // Check for errors
+    for (i=0;i<n;i++) {
+        if (data[i]!=pattern[(i+shift)%n]) {
+            for (j=(i/4);(j<i/4+3) && (j < n/4);j++){
+                NSLog(@"%04x: %04x %04x %04x %04x - %04x %04x %04x %04x \n",j*4,
+                      data[j*4],data[j*4+1],data[j*4+2],data[j*4+3],
+                      pattern[(j*4+shift)%n],  pattern[(j*4+1+shift)%n],
+                      pattern[(j*4+2+shift)%n],pattern[(j*4+3+shift)%n]  );
+                return i; // check only for one error in every page!
+            }
+        }
+    }
+    
+    return n;
+}
 
 
 @end
@@ -3461,4 +3562,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	fltRunMode = savedMode;
 	[self writeControl];
 }
+
+
 @end

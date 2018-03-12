@@ -89,7 +89,127 @@
 		NSLog(@"%d : %@\n",i,[self objectAtIndex:i]);
 	}
 }
+
++ (NSArray*) arrayFromLongCArray:(long*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithLong:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromULongCArray:(unsigned long*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithUnsignedLong:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromShortCArray:(short*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithShort:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromUShortCArray:(unsigned short*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithUnsignedShort:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromCharCArray:(char*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithChar:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromUCharCArray:(unsigned char*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithUnsignedChar:cArray[i]]];
+    return [anArray autorelease];
+}
+
++ (NSArray*) arrayFromBoolCArray:(BOOL*)cArray size:(int)num;
+{
+    NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
+    int i;
+    for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithBool:cArray[i]]];
+    return [anArray autorelease];
+}
+- (void) loadLongCArray:(long*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] longValue];
+}
+
+
+- (void) loadULongCArray:(unsigned long*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedLongValue];
+}
+
+
+- (void) loadShortCArray:(short*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] shortValue];
+}
+
+- (void) loadUShortCArray:(unsigned short*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedShortValue];
+}
+
+- (void) loadBoolCArray:(BOOL*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] boolValue];
+}
+- (void) loadCharCArray:(char*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] charValue];
+}
+- (void) loadUCharCArray:(unsigned char*)cArray size:(int)num
+{
+    int n = MIN([self count],num);
+    int i;
+    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedCharValue];
+}
+
+
 @end
+static NSUInteger random_below(NSUInteger n) {
+    NSUInteger m = 1;
+    do {
+        m <<= 1;
+    } while(m < n);
+    
+    NSUInteger ret;
+    
+    do {
+        ret = random() % m;
+    } while(ret >= n);
+    
+    return ret;
+}
 
 @implementation NSMutableArray (OrcaExtensions)
 
@@ -118,7 +238,14 @@
     }
     else [self insertObject:anObj atIndex:newIndex];
 }
-
+- (void)shuffle {
+    // http://en.wikipedia.org/wiki/Knuth_shuffle
+    
+    for(NSUInteger i = [self count]; i > 1; i--) {
+        NSUInteger j = random_below(i);
+        [self exchangeObjectAtIndex:i-1 withObjectAtIndex:j];
+    }
+}
 - (unsigned) numberOfChildren
 {
     return [self count];

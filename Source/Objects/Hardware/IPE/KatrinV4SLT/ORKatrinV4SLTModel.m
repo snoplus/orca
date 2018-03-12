@@ -96,6 +96,10 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[self setSecondsSetSendToFLTs: YES];
     [self setDefaults];
 	[self registerNotificationObservers];
+    
+    runStartSec = 0;
+    sltSecondRunStop = 0;
+
     return self;
 }
 
@@ -191,6 +195,11 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                      selector : @selector(cardsChanged:)
                          name : ORGroupObjectsAdded
                        object : [self guardian]];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(runIsAboutToChangeState:)
+                         name : ORRunAboutToChangeState
+                       object : nil];
 }
 
 - (void) cardsChanged:(NSNotification*) aNote
@@ -224,6 +233,115 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long defaultMask = (1L<<kCtrlInhEnShift) | kCtrlRunMask;
     [self setControlReg:defaultMask];
 }
+
+
+- (void) runIsAboutToChangeState:(NSNotification*)aNote
+{
+    unsigned long subseconds;
+    unsigned long seconds;
+    unsigned long subsec2;
+    unsigned long status;
+
+    int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
+    BOOL isSubRun = [[[aNote userInfo] objectForKey:@"StartingSubRun"] boolValue];
+
+    id rc =  [aNote object];
+    NSLog(@"%@::%@ Calling object %@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),NSStringFromClass([rc class]));
+    switch (state) {
+        case eRunStarting:
+            if (isSubRun){
+                NSLog(@"--- Notification: go to  %@\n",@"eSubRunStarting");
+            
+                // Release inhibit and
+                // wait for second strobe
+                // Release inhibit with the next second strobe
+                [self writeClrInhibit];
+                
+                subseconds = [self readSubSecondsCounter];
+                seconds = [self readSecondsCounter];
+                subsec2 = (subseconds >> 11) & 0x3fff;
+                NSLog(@"SLT %i.%03i - waiting for second strobe %i\n", seconds, subsec2/10, seconds+1);
+                
+                secondToWaitFor = seconds + 1;
+                waitForSubRunStart = true;
+
+                // If inhibit has been released the time needs to be corrected
+                status = [self readStatusReg];
+                if ((status & kStatusInh) == 0) {
+                    subseconds = [self readSubSecondsCounter];
+                    seconds = [self readSecondsCounter];
+                    subsec2 = (subseconds >> 11) & 0x3fff;
+                    
+                    secondToWaitFor = seconds;
+                }
+
+                // Tell run control to wait
+                NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                          @"waiting for second strobe",
+                                          @"Reason",
+                                          nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+                
+                // Ship the sub run records
+                // Ship as early as possible; at high rates it's impossible to put them at the
+                // right place?!
+                [self shipSltSecondCounter: kStartSubRunType];
+                [self shipSltRunCounter:    kStartSubRunType];
+                
+            } else {
+                NSLog(@"--- Notification: go to  %@\n",@"eRunStarting");
+            }
+            break;
+            
+        case eRunBetweenSubRuns:
+            NSLog(@"--- Notification: go to  %@\n",@"eRunBetweenSubRuns");
+            
+            // Set inhibit and
+            // wait for second strobe
+            [self writeSetInhibit];
+
+            subseconds = [self readSubSecondsCounter];
+            seconds = [self readSecondsCounter];
+            subsec2 = (subseconds >> 11) & 0x3fff;
+            NSLog(@"SLT %i.%03i - waiting for second strobe %i\n", seconds, subsec2/10, seconds+1);
+            
+            secondToWaitFor = seconds + 1;
+            waitForSubRunEnd = true;
+
+            status = [self readStatusReg];
+            if ((status & kStatusInh) != 0) {
+                subseconds = [self readSubSecondsCounter];
+                seconds = [self readSecondsCounter];
+                subsec2 = (subseconds >> 11) & 0x3fff;
+                
+                secondToWaitFor = seconds;
+            }
+            
+            // Tell run control to wait
+            NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      @"waiting for second strobe",
+                                      @"Reason",
+                                      nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
+
+            // Ship the sub run records
+            // Ship as early as possible; at high rates it's impossible to put them at the
+            // right place?!
+            [self shipSltSecondCounter: kStopSubRunType];
+            [self shipSltRunCounter:    kStopSubRunType];
+
+            break;
+            
+        case eRunStopping:
+            NSLog(@"--- Notification: go to  %@\n",@"eRunStopping");
+            break;
+            
+        default:
+            break;
+    }
+    
+}
+
 
 #pragma mark •••Accessors
 - (BOOL) minimizeDecoding
@@ -616,16 +734,19 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
-	[self shipSltSecondCounter: kStopSubRunType];
-	[self shipSltRunCounter:    kStopSubRunType];
-	//TODO: I could set inhibit to measure the 'netto' run time precisely -tb-
+    // Moved to takeData
+    
+	//[self shipSltSecondCounter: kStopSubRunType];
+	//[self shipSltRunCounter:    kStopSubRunType];
 }
 
 
 - (void) runIsStartingSubRun:(NSNotification*)aNote
 {
-	[self shipSltSecondCounter: kStartSubRunType];
-	[self shipSltRunCounter:    kStartSubRunType];
+    // Moved to takeData
+
+    //[self shipSltSecondCounter: kStartSubRunType];
+	//[self shipSltRunCounter:    kStartSubRunType];
 }
 
 #pragma mark •••Accessors
@@ -1389,13 +1510,21 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
     return runStartSec;
 }
+
+- (unsigned long) getRunEndSecond
+{
+    return sltSecondRunStop;
+}
     
 - (void) initBoard
 {
+    // Todo: Check that all Slt parameters are included
     
-	if(countersEnabled  && !(controlReg & (0x1 << kCtrlInhEnShift))  ){
-		NSLogColor([NSColor redColor],@"WARNING: KATRIN-DAQ SLTv4: you used 'Counters Enabled' but 'Inhibits Enabled SW' is not set!\n");//TODO: maybe popup Orca Alarm window? -tb-
-	}
+    if (countersEnabled){
+        [self writeEnCnt];
+    } else {
+        [self writeDisCnt];
+    }
     [self loadSecondsReg];
     [self writeControlReg];
     [self writeInterruptMask];
@@ -1403,7 +1532,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self writePixelBusEnableReg];
     [self writeFIFOcsrReset];
     [self clearRunTime];
-	//-----------------------------------------------
+
+    //-----------------------------------------------
 	//board doesn't appear to start without this stuff
 	//[self writeReg:kSltActResetFlt value:0];
 	//[self writeReg:kSltActResetSlt value:0];
@@ -1446,6 +1576,13 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	
 	//[self printStatusReg];
 	//[self printControlReg];
+}
+- (void) initAllBoards
+{
+    [self initBoard];
+    for(id obj in dataTakers){
+        [obj initBoard];
+    }
 }
 
 - (void) reset
@@ -1508,6 +1645,20 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	[guardian setCrateNumber:aNumber];
 }
 
+
+- (BOOL) compareRegisters
+{
+    BOOL differencesExist = NO;
+
+    for(id obj in dataTakers){
+        differencesExist |= [obj compareThresholdsAndGains];
+        differencesExist |= [obj compareHitRateMask];
+        differencesExist |= [obj compareFilter];
+    }
+    
+    return (differencesExist);
+}
+
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
 {
@@ -1520,7 +1671,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
     
     [self setMinimizeDecoding:       [decoder decodeBoolForKey:  @"minimizeDecoding"]];
-	//[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
+	[self setPixelBusEnableReg:     [decoder decodeIntForKey:@"pixelBusEnableReg"]];
 	[self setSltScriptArguments:    [decoder decodeObjectForKey:@"sltScriptArguments"]];
 	[self setControlReg:            [decoder decodeInt32ForKey:@"controlReg"]];
 	[self setSecondsSet:            [decoder decodeInt32ForKey:@"secondsSet"]];
@@ -1556,7 +1707,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 {
 	[super encodeWithCoder:encoder];
 	
-	//[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
+	[encoder encodeInt:pixelBusEnableReg        forKey:@"pixelBusEnableReg"];
     [encoder encodeBool:minimizeDecoding        forKey:@"minimizeDecoding"];
 	[encoder encodeBool:secondsSetSendToFLTs    forKey:@"secondsSetSendToFLTs"];
 	[encoder encodeBool:secondsSetInitWithHost  forKey:@"secondsSetInitWithHost"];
@@ -1673,6 +1824,10 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long sltsec;
     unsigned long sltsubsec2;
     
+    waitForSubRunStart = false;
+    waitForSubRunEnd = false;
+    runStartSec = 0;
+    sltSecondRunStop = 0xffffffff;
     
     [self setIsPartOfRun: YES];
 
@@ -1703,6 +1858,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Prepare for run\n", sltsec, sltsubsec2/10);
     
+    [[self sbcLink] checkSBCAccurateTime];
+
           
     // Stop crate
     [self saveInhibitStatus];
@@ -1728,53 +1885,28 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Crate has stopped\n", sltsec, sltsubsec2/10);
     
+    [[self sbcLink] checkSBCTime];
+    
     if (sltsubsec2 > 8000) {
         usleep(205000);
     }
     [self writeControlRegRunFlagOn:FALSE];//stop run mode -> clear event buffer -tb- 2016-05
 
     //if cold start (not 'quick start' in RunControl) ...
-    //BOOL fullInit = [[userInfo objectForKey:@"doinit"]boolValue];
-    [self initBoard];
-    for(id obj in dataTakers){
-        [obj initBoard];
+    if([[userInfo objectForKey:@"doinit"]intValue]){
+        [self initBoard];
     }
-    
-    //
-    // Check run mode of the Flts - is Flt readout necessary?
-    // Condition: ForcFlt  OR runmode == Trace OR runmode == Histogram
-    //
-    activateFltReadout = false;
-    for(id obj in dataTakers){
-        if([[obj class] isSubclassOfClass: NSClassFromString(@"ORKatrinV4FLTModel")]){
-            //NSLog(@"FLT %i mode %i forceFlt %i\n", [obj stationNumber], [obj runMode], [obj forceFLTReadout]);
-            if  ((int) [obj runMode] == kKatrinV4Flt_EnergyTraceDaqMode) activateFltReadout = true;
-            if  ((int) [obj runMode] == kKatrinV4Flt_Histogram_DaqMode)  activateFltReadout = true;
-            if (((int) [obj runMode] == kKatrinV4Flt_EnergyDaqMode) && [obj forceFLTReadout]) activateFltReadout = true;
-        }
-    }
-    //NSLog(@"Flt readout %i\n", activateFltReadout);
-    
-    
-    
-    sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
-    sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
-    sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
-    NSLog(@"SLT %i.%03i - Boards initialized for run\n", sltsec, sltsubsec2/10);
-  
-	
-    //loop over Readout List
+    //loop over Readout List and tell our children the run is starting
 	for(id obj in dataTakers){
-        [obj runTaskStarted:aDataPacket userInfo:userInfo];//configure FLTs (sets run mode for non-histo-FLTs), set histogramming FLTs to standby mode etc -tb-
+        [obj runTaskStarted:aDataPacket userInfo:userInfo];
+        [obj stopReadingHitRates];
     }
-
 
     sltsubsecreg  = [self readReg:kKatrinV4SLTSubSecondCounterReg];
     sltsec        = [self readReg:kKatrinV4SLTSecondCounterReg];
     sltsubsec2    = (sltsubsecreg >> 11) & 0x3fff;
     NSLog(@"SLT %i.%03i - Data takers started\n", sltsec, sltsubsec2/10);
 
-    
     // Clear counter and update display
     [self writeClrCnt];
     [self readAllStatus];
@@ -1786,12 +1918,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	lastDisplayCounter  = 0;
 	lastDisplayRate     = 0;
 	lastSimSec          = 0;
+    
 	
 	//load all the data needed for the eCPU to do the HW read-out.
 	[self load_HW_Config];
 	[pmcLink runTaskStarted:aDataPacket userInfo:userInfo];//method of SBC_Link.m: init alarm handling; send kSBC_StartRun to SBC/PrPMC -tb-
 
-   
     unsigned long long runcount = [self readRunTime];
     [self shipSltEvent:kRunCounterType withType:kStartRunType eventCt:0 high: (runcount>>32)&0xffffffff low:(runcount)&0xffffffff ];
     
@@ -1833,10 +1965,16 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self shipSltEvent:kSecondsCounterType withType:kStartRunType eventCt:0 high:runStartSec low:0 ];
 
     callRunIsStopping = false;
+    lastHitrateSec = runStartSec -1;
+    
 }
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    unsigned long subseconds;
+    unsigned long seconds;
+    unsigned long subsec2;
+    
     //event readout controlled by the SLT cpu now. ORCA reads out
     //the resulting data from a generic circular buffer in the pmc code.
     [pmcLink takeData:aDataPacket userInfo:userInfo];
@@ -1852,6 +1990,58 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         }
         [pmcLink runIsStopping:aDataPacket userInfo:userInfo];
     }
+    
+
+    // Manage subrun status
+    if (waitForSubRunStart){
+        subseconds = [self readSubSecondsCounter];
+        seconds = [self readSecondsCounter];
+        subsec2 = (subseconds >> 11) & 0x3fff;
+        
+        if (seconds >= secondToWaitFor) {
+            waitForSubRunStart = false;
+            NSLog(@"SLT %i.%03i - met second strobe %i\n", seconds, subsec2/10, secondToWaitFor);
+            
+            // Wait for second strobe or inhibit to become active
+            NSLog(@"Go ahead to start subrun\n");
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
+        }
+    }
+    
+    
+    if (waitForSubRunEnd){
+        subseconds = [self readSubSecondsCounter];
+        seconds = [self readSecondsCounter];
+        subsec2 = (subseconds >> 11) & 0x3fff;
+        
+        if (seconds >= secondToWaitFor) {
+            waitForSubRunEnd = false;
+            NSLog(@"SLT %i.%03i - met second strobe %i\n", seconds, subsec2/10, secondToWaitFor);
+
+            // Wait for second strobe or inhibit to become active
+            NSLog(@"Go ahead to terminate subrun\n");
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORReleaseRunStateChangeWait object: self];
+        }
+    }
+
+    
+    // Read hitrate - alternative scheduling, independant from any macOS timer
+    subseconds = [self readSubSecondsCounter]; // req. to read subsec first !!!
+    seconds = [self readSecondsCounter];
+    //subsec2 = (subseconds >> 11) & 0x3fff;
+    
+    if (seconds > lastHitrateSec) {
+        lastHitrateSec = seconds;
+
+        //NSLog(@"SLT %i.%03i - reading hitrates from SLT\n", seconds, subsec2/10);
+
+        // Call readHitrate in all Flt
+        for(id obj in dataTakers){
+            [obj readHitRates];
+        }
+    }
+    
+    
 }
 
 - (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
@@ -1953,6 +2143,13 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     
     // Delete unused structures
     [pmcLink runTaskStopped:aDataPacket userInfo:userInfo];
+
+    
+    // Start reading hitrates again - for interactive mode
+    for(id obj in dataTakers){
+        [obj startReadingHitRates];
+    }
+
     
     [dataTakers release];
     dataTakers = nil;
@@ -1964,6 +2161,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     // Release inhibit with the next second strobe
     //
     [self restoreInhibitStatus];
+
+
 }
 
 - (void) dumpSltSecondCounter:(NSString*)text
@@ -1974,14 +2173,22 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     else     NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
 }
 
-/** For the V4 SLT (Auger/KATRIN)the subseconds count 100 nsec tics! (Despite the fact that the ADC sampling has a 50 nsec base.)
-  */ //-tb- 
 - (void) shipSltSecondCounter:(unsigned char)aType
 {
 	//aType = 1 start run, =2 stop run, = 3 start subrun, =4 stop subrun, see #defines in ORKatrinV4SLTDefs.h -tb-
+    const char *sType[] = {"", "run start", "run stop", "subrun start", "subrun stop"};
+    
 	unsigned long subseconds = [self readSubSecondsCounter];
 	unsigned long seconds = [self readSecondsCounter];
-	
+    unsigned long subsec2 = (subseconds >> 11) & 0x3fff;
+    NSLog(@"SLT %i.%03i - shipped second counter %s at %i\n", seconds, subsec2/10, sType[aType%5], seconds);
+
+    
+    if ((aType == kStartSubRunType) || (aType == kStopSubRunType) ){
+        seconds = seconds + 1;
+    }
+    
+    
 	[self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:subseconds ];
 }
 

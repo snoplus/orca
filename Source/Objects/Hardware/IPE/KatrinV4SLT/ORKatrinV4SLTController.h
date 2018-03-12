@@ -52,7 +52,9 @@
 		IBOutlet NSMatrix*		enableDisableCountersMatrix;
         IBOutlet NSMatrix*      minimumDecodingMatrix;
 
-		IBOutlet NSButton*		initBoardButton;
+        IBOutlet NSButton*      initAllBoardsButton;
+        IBOutlet NSButton*      initAllBoards1Button;
+        IBOutlet NSButton*      initBoardButton;
 		IBOutlet NSButton*		initBoard1Button;
 		IBOutlet NSButton*		readBoardButton;
 		IBOutlet NSMatrix*		interruptMaskMatrix;
@@ -205,6 +207,7 @@
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;
 - (IBAction) sendLinkWithDmaLibConfigScriptON:(id)sender;
 - (IBAction) sendLinkWithDmaLibConfigScriptOFF:(id)sender;
+- (IBAction) initAllBoardsAction:(id)sender;
 
 - (void) _SLTv4killCrateAndStartLinkWithDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
 - (void) _SLTv4killCrateAndStartLinkWithoutDMADidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;

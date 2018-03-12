@@ -102,8 +102,7 @@ bool ORSLTv4Readout::Start()
     
     
     // Select the readoutfunction depending on the mode
-    uint32_t runFlags    = GetDeviceSpecificData()[3];
-    activateFltReadout   = runFlags & kActivateFltReadoutFlag;
+    //uint32_t runFlags    = GetDeviceSpecificData()[3];
     
     uint32_t sltRevision = GetDeviceSpecificData()[6];
     if(sltRevision>=0x3010004){
@@ -139,13 +138,11 @@ bool ORSLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
     (*this.*readoutCall)(lamData);
 
-    if (activateFltReadout){
-        // Read out the children flts that are in the readout list
-        // Leave out for the high rate tests
-        int32_t leaf_index = GetNextTriggerIndex()[0];
-        while(leaf_index >= 0) {
-            leaf_index = readout_card(leaf_index,lamData);
-        }
+    // Read out the children flts that are in the readout list
+    // Leave out for the high rate tests
+    int32_t leaf_index = GetNextTriggerIndex()[0];
+    while(leaf_index >= 0) {
+        leaf_index = readout_card(leaf_index,lamData);
     }
     
     return true; 
@@ -235,7 +232,9 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
     uint32_t firstIndex = dataIndex; //so we can insert the length and/or if we have to flush
     try {
         uint32_t headerLen  = 4;
-        uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
+        uint32_t numWordsToRead  = srack->theSlt->fifoSize->read();
+        //uint32_t numWordsToRead  = pbus->read(FIFO0ModeReg) & 0x3fffff;
+
         if (numWordsToRead >= 8160){ // full block readout
             nNoReadout = 0; // Clear no readout
             nReadout   = nReadout + 1;
@@ -245,8 +244,9 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
             
             memcpy(&data[dataIndex], header, headerLen * sizeof(uint32_t));
             dataIndex += headerLen;
-
+            
             pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
+            //srack->theSlt->fifoData->readBlock((unsigned long*)(&data[dataIndex]), numWordsToRead);
             dataIndex += numWordsToRead;
             
             data[firstIndex] |= (numWordsToRead+headerLen); //fill in the record length
@@ -266,12 +266,14 @@ bool ORSLTv4Readout::ReadoutEnergyV31(SBC_LAM_Data* lamData)
             if (numWordsToRead < 48) {
                 numWordsToRead = (numWordsToRead/6)*6; //make sure we are on event boundary
                 for(uint32_t i=0;i<numWordsToRead; i++){
+                    //data[dataIndex++] = srack->theSlt->fifoData->read();
                     data[dataIndex++] = pbus->read(FIFO0Addr);
                 }
             }
             else {
                 numWordsToRead  = (numWordsToRead/48)*48;//always read multiple of 48 word32s
                 pbus->readBlock(FIFO0Addr, (unsigned long*)(&data[dataIndex]), numWordsToRead);
+                //srack->theSlt->fifoData->readBlock((unsigned long*)(&data[dataIndex]), numWordsToRead);
                 dataIndex += numWordsToRead;
             }
         

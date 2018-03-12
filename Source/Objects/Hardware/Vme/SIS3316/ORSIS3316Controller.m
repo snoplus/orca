@@ -48,12 +48,11 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(1150,900);
+    settingSize     = NSMakeSize(1350,900);
     rateSize		= NSMakeSize(790,460);
     
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
-	
 	
     NSString* key = [NSString stringWithFormat: @"orca.SIS3316%d.selectedtab",[model slot]];
     int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
@@ -74,14 +73,17 @@
         [[energySubtractorMatrix            cellAtRow:i column:0] setTag:i];
         [[tauFactorMatrix                   cellAtRow:i column:0] setTag:i];
         [[gapTimeMatrix                     cellAtRow:i column:0] setTag:i];
-        [[peakingTimeMatrix                 cellAtRow:i column:0] setTag:i];
+        [[riseTimeMatrix                    cellAtRow:i column:0] setTag:i];
         [[trigBothEdgesMatrix               cellAtRow:i column:0] setTag:i];
         [[intHeTrigOutPulseMatrix           cellAtRow:i column:0] setTag:i];
+        [[gate1EnableMaskMatrix             cellAtRow:i column:0] setTag:i];
+        [[gate2EnableMaskMatrix             cellAtRow:i column:0] setTag:i];
+        [[triggerDelayMatrix                cellAtRow:i column:0] setTag:i];
     }
     int tag = 0;
     int row,col;
     for(col=0;col<2;col++){
-        for(row=0;row<6;row++){
+        for(row=0;row<8;row++){
             [[acquisitionControlMatrix cellAtRow:row column:col] setTag:tag];
             tag++;
         }
@@ -94,20 +96,26 @@
             tag++;
         }
     }
-    
+
     for(i=0; i<8;i++){
         [[eventConfigMatrix             cellAtRow:i column:0] setTag:i];
-        [[extendedEventConfigMatrix     cellAtRow:0 column:0] setTag:0];
-//        [[endAddressFinalMatrix         cellAtRow:0 column:0] setTag:0];
     }
     
-
-
+    tag = 0;
+    for(col=0;col<2;col++){
+        for(row=0;row<16;row++){
+            [[lemoToMaskMatrix cellAtRow:row column:col] setTag:tag];
+            [[lemoUoMaskMatrix cellAtRow:row column:col] setTag:tag];
+            [[lemoCoMaskMatrix cellAtRow:row column:col] setTag:tag];
+            tag++;
+        }
+    }
+    
     for(i=0;i<kNumSIS3316Groups;i++){
+        [[dacOffsetMatrix               cellAtRow:i column:0] setTag:i];
         [[activeTrigGateWindowLenMatrix cellAtRow:i column:0] setTag:i];
-        [[thresholdSumMatrix            cellAtRow:i column:0] setTag:i];
         [[endAddressMatrix              cellAtRow:i column:0] setTag:i];
-        [[heTrigThresholdSumMatrix      cellAtRow:i column:0] setTag:i];
+        [[endAddressSuppressionMatrix   cellAtRow:i column:0] setTag:i];
         [[preTriggerDelayMatrix         cellAtRow:i column:0] setTag:i];
         [[accGate1LenMatrix             cellAtRow:i column:0] setTag:i];
         [[accGate1StartMatrix           cellAtRow:i column:0] setTag:i];
@@ -127,10 +135,12 @@
         [[accGate8StartMatrix           cellAtRow:i column:0] setTag:i];
         [[rawDataBufferLenMatrix        cellAtRow:i column:0] setTag:i];
         [[rawDataBufferStartMatrix      cellAtRow:i column:0] setTag:i];
-        [[triggerDelayMatrix            cellAtRow:i column:0] setTag:i];
-        [[triggerDelayTwoMatrix         cellAtRow:i column:0] setTag:i];
-        [[triggerDelay3Matrix           cellAtRow:i column:0] setTag:i];
-        [[triggerDelay4Matrix           cellAtRow:i column:0] setTag:i];
+        [[heTrigThresholdSumMatrix      cellAtRow:i column:0] setTag:i];
+        [[thresholdSumMatrix            cellAtRow:i column:0] setTag:i];
+        [[riseTimeSumMatrix             cellAtRow:i column:0] setTag:i];
+        [[gapTimeSumMatrix              cellAtRow:i column:0] setTag:i];
+        [[internalGateLengthMatrix      cellAtRow:i column:0] setTag:i];
+        [[internalCoinGateLengthMatrix  cellAtRow:i column:0] setTag:i];
    }
 
 	ORTimeLinePlot* aPlot1 = [[ORTimeLinePlot alloc] initWithTag:8 andDataSource:self];
@@ -219,21 +229,7 @@
                          name : ORSIS3316TriggerDelayChanged
                        object : model];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerDelayTwoChanged:)
-                         name : ORSIS3316TriggerDelayTwoChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerDelay3Changed:)
-                         name : ORSIS3316TriggerDelay3Changed
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(triggerDelay4Changed:)
-                         name : ORSIS3316TriggerDelay4Changed
-                       object : model];
-    
+   
     [notifyCenter addObserver : self
                      selector : @selector(cfdControlBitsChanged:)
                          name : ORSIS3316CfdControlBitsChanged
@@ -250,7 +246,7 @@
                        object : model];
     
     [notifyCenter addObserver : self
-                     selector : @selector(peakingTimeChanged:)
+                     selector : @selector(riseTimeChanged:)
                          name : ORSIS3316PeakingTimeChanged
                        object : model];
     
@@ -283,7 +279,6 @@
                      selector : @selector(writeHitsIntoEventMemoryChanged:)
                          name : ORSIS3316WriteHitsIntoEventMemoryChanged
                        object : model];
-    
     
     [notifyCenter addObserver : self
                      selector : @selector(tauFactorChanged:)
@@ -455,17 +450,6 @@
                          name : ORSIS3316ClockSourceChanged
 						object: model];
 	
-   // [notifyCenter addObserver : self
-   //                  selector : @selector(startDelayChanged:)
-   //                      name : ORSIS3316StartDelayChanged
-   //  					object: model];
-	
-//    [notifyCenter addObserver : self
-//                     selector : @selector(stopDelayChanged:)
-//                         name : ORSIS3316StopDelayChanged
-//						object: model];
-			
-	
     [notifyCenter addObserver : self
                      selector : @selector(stopTriggerChanged:)
                          name : ORSIS3316StopTriggerChanged
@@ -481,10 +465,10 @@
                          name : ORSIS3316ExtendedEventConfigChanged
                         object: model];
     
-//    [notifyCenter addObserver : self
-//                     selector : @selector(endAddressFinalChanged:)
-//                         name : ORSIS3316EndAddressFinalChanged
-//                        object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(endAddressSuppressionChanged:)
+                         name : ORSIS3316EndAddressSuppressionChanged
+                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(acqChanged:)
@@ -511,8 +495,83 @@
                          name : ORSIS3316SerialNumberChanged
                         object: model];
     
-    [self registerRates];
+    [notifyCenter addObserver : self
+                     selector : @selector(gainChanged:)
+                         name : ORSIS3316ModelGainChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(terminationChanged:)
+                         name : ORSIS3316ModelTerminationChanged
+                        object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(dacOffsetChanged:)
+                         name : ORSIS3316DacOffsetChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(enableSumChanged:)
+                         name : ORSIS3316EnableSumChanged
+                        object: model];
+
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(riseTimeSumChanged:)
+                         name : ORSIS3316RiseTimeSumChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(gapTimeSumChanged:)
+                         name : ORSIS3316GapTimeChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(cfdControlBitsSumChanged:)
+                         name : ORSIS3316CfdControlBitsSumChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(sharingChanged:)
+                         name : ORSIS3316SharingChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoToMaskChanged:)
+                         name : ORSIS3316LemoToMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoUoMaskChanged:)
+                         name : ORSIS3316LemoUoMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(lemoCoMaskChanged:)
+                         name : ORSIS3316LemoCoMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(gate1EnableMaskChanged:)
+                         name : ORSIS3316Gate1EnableMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(gate2EnableMaskChanged:)
+                         name : ORSIS3316Gate2EnableMaskChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(internalGateLenChanged:)
+                         name : ORSIS3316InternalGateLenChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(internalCoinGateLenChanged:)
+                         name : ORSIS3316InternalCoinGateLenChanged
+                        object: model];
+
+    [self registerRates];
 }
 
 - (void) registerRates
@@ -533,8 +592,6 @@
                            object : obj];
     }
 }
-
-
 - (void) updateWindow
 {
     [super updateWindow];
@@ -544,13 +601,9 @@
     [self enabledChanged:nil];
     [self heSuppressTrigModeChanged:nil];
 	[self thresholdChanged:nil];
-    [self thresholdSumChanged:nil];
     [self endAddressChanged:nil];
 
     [self triggerDelayChanged:nil];
-    [self triggerDelayTwoChanged:nil];
-    [self triggerDelay3Changed:nil];
-    [self triggerDelay4Changed:nil];
     [self cfdControlBitsChanged:nil];
     [self extraFilterBitsChanged:nil];
     [self tauTableBitsChanged:nil];
@@ -566,9 +619,8 @@
     [self energySubtractorChanged:nil];
     [self tauFactorChanged:nil];
     [self gapTimeChanged:nil];
-    [self peakingTimeChanged:nil];
+    [self riseTimeChanged:nil];
     [self heTrigThresholdChanged:nil];
-    [self heTrigThresholdSumChanged:nil];
     [self trigBothEdgesChanged:nil];
     [self intHeTrigOutPulseChanged:nil];
     [self intTrigOutPulseBitsChanged:nil];
@@ -604,24 +656,126 @@
     [self updateTimePlot:nil];
     [self waveFormRateChanged:nil];
 	[self pageSizeChanged:nil];
-//	[self stopDelayChanged:nil];
 	[self clockSourceChanged:nil];
-	//[self startDelayChanged:nil];
 	[self randomClockChanged:nil];
 	[self stopTriggerChanged:nil];
 	[self eventConfigChanged:nil];
     [self extendedEventConfigChanged:nil];
-//    [self endAddressFinalChanged:nil];
 
 	[self acqChanged:nil];
 	[self moduleIDChanged:nil];
     [self hwVersionChanged:nil];
     [self serialNumberChanged:nil];
+    [self gainChanged:nil];
+    [self terminationChanged:nil];
+
+    [self enableSumChanged:nil];
+    [self thresholdSumChanged:nil];
+    [self heTrigThresholdSumChanged:nil];
+    [self riseTimeSumChanged:nil];
+    [self gapTimeSumChanged:nil];
+    [self cfdControlBitsSumChanged:nil];
+    
+    [self dacOffsetChanged:nil];
+    [self sharingChanged:nil];
+    [self lemoToMaskChanged:nil];
+    [self lemoUoMaskChanged:nil];
+    [self lemoCoMaskChanged:nil];
+    [self endAddressSuppressionChanged:nil];
+    
+    [self gate1EnableMaskChanged:nil];
+    [self gate2EnableMaskChanged:nil];
+    [self internalGateLenChanged:nil];
+    [self internalCoinGateLenChanged:nil];
+
     
     [self setUpdatedOnce]; //<<--Must be last to ensure all fields are updated on first load
 }
 
 #pragma mark •••Interface Management
+- (void) gate1EnableMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model gate1EnableMask];
+    int i;
+    for(i=0;i<kNumSIS3316Channels; i++){
+        [[gate1EnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
+    }
+}
+
+- (void) gate2EnableMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model gate2EnableMask];
+    int i;
+    for(i=0;i<kNumSIS3316Channels; i++){
+        [[gate2EnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
+    }
+
+}
+
+- (void) internalGateLenChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [[internalGateLengthMatrix cellWithTag:i] setIntValue:[model internalGateLen:i]];
+    }
+}
+
+- (void) internalCoinGateLenChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [[internalCoinGateLengthMatrix cellWithTag:i] setIntValue:[model internalCoinGateLen:i]];
+    }
+}
+
+- (void) lemoToMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model lemoToMask];
+    int i;
+    for(i=0;i<32; i++){
+        [[lemoToMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
+    }
+}
+
+- (void) lemoUoMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model lemoUoMask];
+    int i;
+    for(i=0;i<32; i++){
+        [[lemoUoMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
+    }
+}
+
+- (void) lemoCoMaskChanged:(NSNotification*)aNote
+{
+    unsigned long aMask = [model lemoCoMask];
+    int i;
+    for(i=0;i<32; i++){
+        [[lemoCoMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1<<i))!=0];
+    }
+}
+
+- (void) sharingChanged:(NSNotification*)aNote
+{
+    [sharingPU selectItemAtIndex:[model sharing]];
+}
+
+- (void) dacOffsetChanged:(NSNotification*)aNote
+{
+    short i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [[dacOffsetMatrix cellWithTag:i] setIntValue:[model dacOffset:i]];
+    }
+}
+- (void) gainChanged:(NSNotification*)aNote
+{
+    [gainPU selectItemAtIndex: [model gain]];
+}
+
+- (void) terminationChanged:(NSNotification*)aNote
+{
+    [terminationPU selectItemAtIndex: [model termination]];
+}
 
 - (void) enabledChanged:(NSNotification*)aNote  //bools and possibly more changed like this
 {
@@ -634,20 +788,16 @@
 - (void) eventConfigChanged:(NSNotification*)aNote
 {
     short i;
+    unsigned long aMask = [model eventConfigMask];
     for(i=0;i<8;i++){
-        [[eventConfigMatrix cellWithTag:i] setState:[model eventConfig:i]];
+        [[eventConfigMatrix cellWithTag:i] setState:aMask & (0x1<<i)];
     }
 }
 
 - (void) extendedEventConfigChanged:(NSNotification*)aNote
 {
-    [[extendedEventConfigMatrix cellWithTag:0] setState:[model extendedEventConfig:0]];
+    [extendedEventConfigButton setIntValue:[model extendedEventConfigBit]];
 }
-
-//- (void) endAddressFinalChanged:(NSNotification*)aNote
-//{
-//    [[endAddressFinalMatrix cellWithTag:0] setState:[model endAddressFinal:0]];
-//}
 
 - (void) cfdControlBitsChanged:(NSNotification*)aNote
 {
@@ -726,22 +876,21 @@
 {
     short i;
     for(i=0;i<kNumSIS3316Channels;i++){
-        [[heSuppressTrigModeMatrix cellWithTag:i] setState:[model heSuppressTriggerMask:i]];
+        [[heSuppressTrigModeMatrix cellWithTag:i] setState:[model heSuppressTriggerBit:i]];
     }
 }
-
 - (void) trigBothEdgesChanged:(NSNotification*)aNote
 {
     short i;
     for(i=0;i<kNumSIS3316Channels;i++){
-        [[trigBothEdgesMatrix cellWithTag:i] setState:[model trigBothEdgesMask:i]];
+        [[trigBothEdgesMatrix cellWithTag:i] setState:[model trigBothEdgesBit:i]];
     }
 }
 - (void) intHeTrigOutPulseChanged:(NSNotification*)aNote
 {
     short i;
     for(i=0;i<kNumSIS3316Channels;i++){
-        [[intHeTrigOutPulseMatrix cellWithTag:i] setState:[model intHeTrigOutPulseMask:i]];
+        [[intHeTrigOutPulseMatrix cellWithTag:i] setState:[model intHeTrigOutPulseBit:i]];
     }
 }
 
@@ -760,19 +909,7 @@
     }
 }
 
-- (void) thresholdSumChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups; i++){
-            [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
-        }
-    }
-    else{
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
-    }
-}
+
 
 - (void) endAddressChanged:(NSNotification*)aNote
 {
@@ -788,63 +925,28 @@
     }
 }
 
+- (void) endAddressSuppressionChanged:(NSNotification*)aNote
+{
+    short i;
+    unsigned short aMask = [model endAddressSuppressionMask];
+    for(i=0;i<kNumSIS3316Groups; i++){
+        [[endAddressSuppressionMatrix cellWithTag:i] setIntValue: (aMask & (0x1<<i))!=0];
+    }
+}
 
 - (void) triggerDelayChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
         short i;
-        for(i=0;i<kNumSIS3316Groups; i++){
+        for(i=0;i<kNumSIS3316Channels; i++){
             [[triggerDelayMatrix cellWithTag:i] setIntValue:[model triggerDelay:i]];
         }
     }
     else{
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
         [[triggerDelayMatrix cellWithTag:i] setIntValue:[model triggerDelay:i]];
     }
 }
-
-- (void) triggerDelayTwoChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups; i++){
-            [[triggerDelayTwoMatrix cellWithTag:i] setIntValue:[model triggerDelay:i]];
-        }
-    }
-    else{
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[triggerDelayTwoMatrix cellWithTag:i] setIntValue:[model triggerDelayTwo:i]];
-    }
-}
-
-- (void) triggerDelay3Changed:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups; i++){
-            [[triggerDelay3Matrix cellWithTag:i] setIntValue:[model triggerDelay3:i]];
-        }
-    }
-    else{
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[triggerDelay3Matrix cellWithTag:i] setIntValue:[model triggerDelay3:i]];
-    }
-}
-
-- (void) triggerDelay4Changed:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups; i++){
-            [[triggerDelay4Matrix cellWithTag:i] setIntValue:[model triggerDelay4:i]];
-        }
-    }
-    else{
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[triggerDelay4Matrix cellWithTag:i] setIntValue:[model triggerDelay4:i]];
-    }
-}
-
 
 - (void) energyDividerChanged:(NSNotification*)aNote
 {
@@ -903,17 +1005,17 @@
     }
 }
 
-- (void) peakingTimeChanged:(NSNotification*)aNote
+- (void) riseTimeChanged:(NSNotification*)aNote
 {
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Channels;i++){
-            [[peakingTimeMatrix cellWithTag:i] setIntValue:[model peakingTime:i]];
+            [[riseTimeMatrix cellWithTag:i] setIntValue:[model riseTime:i]];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[peakingTimeMatrix cellWithTag:i] setIntValue:[model peakingTime:i]];
+        [[riseTimeMatrix cellWithTag:i] setIntValue:[model riseTime:i]];
     }
 }
 
@@ -930,6 +1032,27 @@
         [[heTrigThresholdMatrix cellWithTag:i] setIntValue:[model heTrigThreshold:i]];
     }
 }
+- (void) enableSumChanged:(NSNotification*)aNote  //bools and possibly more changed like this
+{
+    short i;
+    for(i=0;i<kNumSIS3316Groups;i++){
+        [[enableSumMatrix cellWithTag:i] setState:[model enableSum:i]];
+    }
+}
+
+- (void) thresholdSumChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups; i++){
+            [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+        }
+    }
+    else{
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+    }
+}
 
 - (void) heTrigThresholdSumChanged:(NSNotification*)aNote
 {
@@ -942,6 +1065,44 @@
     else {
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
         [[heTrigThresholdSumMatrix cellWithTag:i] setIntValue:[model heTrigThresholdSum:i]];
+    }
+}
+
+- (void) riseTimeSumChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++)[[riseTimeSumMatrix cellWithTag:i] setIntValue:[model riseTimeSum:i]];
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[riseTimeSumMatrix cellWithTag:i] setIntValue:[model riseTimeSum:i]];
+    }
+}
+
+- (void) gapTimeSumChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Groups;i++)[[gapTimeSumMatrix cellWithTag:i] setIntValue:[model gapTimeSum:i]];
+    }
+    else {
+        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
+        [[gapTimeSumMatrix cellWithTag:i] setIntValue:[model gapTimeSum:i]];
+    }
+}
+
+- (void) cfdControlBitsSumChanged:(NSNotification*)aNote
+{
+    if(aNote == nil){
+        short i;
+        for(i=0;i<kNumSIS3316Channels;i++){
+            [[cfdControlBitsSumMatrix cellAtRow:i column:0] selectItemAtIndex:[model cfdControlBitsSum:i]];
+        }
+    }
+    else {
+        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        [[cfdControlBitsSumMatrix cellAtRow:chan column:0] selectItemAtIndex:[model cfdControlBitsSum:chan]];
     }
 }
 
@@ -1295,33 +1456,21 @@
     }
 }
 
-//- (void) acquisitionControlChanged:(NSNotification*)aNote
-//{
-//    if(aNote == nil){
-//        short i;
-//        for(i=0;i<12;i++){
-//            [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
-//        }
-//    }
-//    else {
-//        int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-//        [[acquisitionControlMatrix cellWithTag:i] setIntValue:[model acquisitionControl:i]];
-//    }
-//}
-
 - (void) acquisitionControlChanged:(NSNotification*)aNote  //bools and possibly more changed like this
 {
     short i;
-    for(i=0;i<12;i++){
-        [[acquisitionControlMatrix cellWithTag:i] setState:[model acquisitionControl:i]];
+    unsigned long aMask = [model acquisitionControlMask];
+    for(i=0;i<16;i++){
+        [[acquisitionControlMatrix cellWithTag:i] setState:(aMask&(0x1<<i))!=0];
     }
 }
 
 - (void) nimControlStatusChanged:(NSNotification*)aNote
 {
+    unsigned long aMask = [model nimControlStatusMask];
     short i;
     for(i=0;i<14;i++){
-        [[nimControlStatusMatrix cellWithTag:i] setState:[model nimControlStatus:i]];
+        [[nimControlStatusMatrix cellWithTag:i] setState:(aMask& (0x1<<i))!=0];
     }
 }
 
@@ -1335,7 +1484,6 @@
 //	[[acqMatrix cellWithTag:4] setIntValue:[model lemoStartStop]];
 //	[[acqMatrix cellWithTag:5] setIntValue:[model p2StartStop]];
 //	[[acqMatrix cellWithTag:6] setIntValue:[model gateMode]];
-//	[stopDelayEnabledButton setIntValue: [model stopDelayEnabled]];
 }
 
 - (void) moduleIDChanged:(NSNotification*)aNote
@@ -1384,16 +1532,6 @@
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
 }
 
-//- (void) startDelayChanged:(NSNotification*)aNote
-//{
-//	[startDelayField setIntValue: [model startDelay]];
-//}
-
-//- (void) stopDelayChanged:(NSNotification*)aNote
-//{
-//	[stopDelayField setIntValue: [model stopDelay]];
-//}
-
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
 	[pageSizePU selectItemWithTag: [model pageSize]];
@@ -1436,6 +1574,7 @@
     BOOL locked = [gSecurity isLocked:ORSIS3316SettingsLock];
     
     [settingLockButton          setState: locked];
+    [loadDefaultsButton         setEnabled:!locked && !runInProgress];
     [addressText                setEnabled:!locked && !runInProgress];
     [initButton                 setEnabled:!lockedOrRunningMaintenance];
 	[enabledMatrix              setEnabled:!lockedOrRunningMaintenance];
@@ -1446,26 +1585,24 @@
 
     [thresholdSumMatrix         setEnabled:!lockedOrRunningMaintenance];
     [endAddressMatrix           setEnabled:!lockedOrRunningMaintenance];
+    [endAddressSuppressionMatrix setEnabled:!lockedOrRunningMaintenance];
     [triggerDelayMatrix         setEnabled:!lockedOrRunningMaintenance];
-    [triggerDelayTwoMatrix      setEnabled:!lockedOrRunningMaintenance];
-    [triggerDelay3Matrix        setEnabled:!lockedOrRunningMaintenance];
-    [triggerDelay4Matrix        setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdMatrix      setEnabled:!lockedOrRunningMaintenance];
     [heTrigThresholdSumMatrix   setEnabled:!lockedOrRunningMaintenance];
     [acquisitionControlMatrix   setEnabled:!lockedOrRunningMaintenance];
     [nimControlStatusMatrix     setEnabled:!lockedOrRunningMaintenance];
     
 	[checkEventButton           setEnabled:!locked && !runInProgress];
-	[testMemoryButton           setEnabled:!locked && !runInProgress];
 	[eventConfigMatrix          setEnabled:!locked && !runInProgress];
-
+    [gainPU                     setEnabled:!locked && !runInProgress];
+    [terminationPU              setEnabled:!locked && !runInProgress];
     [stopTriggerButton          setEnabled:!lockedOrRunningMaintenance];
 	[randomClockButton          setEnabled:!lockedOrRunningMaintenance];
-//	[stopDelayEnabledButton     setEnabled:!lockedOrRunningMaintenance];
-//	[startDelayField              setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU              setEnabled:!lockedOrRunningMaintenance];
-	[stopDelayField             setEnabled:!lockedOrRunningMaintenance];
 	[pageSizePU                 setEnabled:!locked && !runInProgress];
+    [extendedEventConfigButton  setEnabled:!locked && !runInProgress];
+    [dacOffsetMatrix            setEnabled:!lockedOrRunningMaintenance];
+
 }
 
 - (void) setModel:(id)aModel
@@ -1577,6 +1714,10 @@
 {
     [model setBaseAddress:[sender intValue]];
 }
+- (IBAction) sharingAction:(id)sender
+{
+    [model setSharing:[sender indexOfSelectedItem]];
+}
 
 - (IBAction) histogramsEnabledAction:(id)sender
 {
@@ -1610,11 +1751,48 @@
     [model setHeSuppressTriggerBit:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) lemoToMaskAction:(id)sender
+{
+    unsigned long aMask = [model lemoToMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setLemoToMask:aMask];
+}
+
+- (IBAction) lemoUoMaskAction:(id)sender
+{
+    unsigned long aMask = [model lemoUoMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setLemoUoMask:aMask];
+}
+
+- (IBAction) lemoCoMaskAction:(id)sender
+{
+    unsigned long aMask = [model lemoCoMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [[sender selectedCell] intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setLemoCoMask:aMask];
+}
+
 - (IBAction) acquisitionControlAction:(id)sender
 {
+    unsigned long aMask = [model acquisitionControlMask];
     int tag =[[sender selectedCell] tag];
     int aValue = [sender intValue];
-    [model setAcquisitionControlBit:tag withValue:aValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+
+    [model setAcquisitionControlMask:aMask];
 }
 
 - (IBAction) nimControlStatusAction:(id)sender
@@ -1629,6 +1807,13 @@
     [model setThreshold:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) enableSumAction:(id)sender
+{
+    int tag =[[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    [model setEnableSum:tag withValue:aValue];
+}
+
 - (IBAction) thresholdSumAction:(id)sender
 {
     [model setThresholdSum:[[sender selectedCell] tag] withValue:[sender intValue]];
@@ -1639,24 +1824,16 @@
     [model setEndAddress:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
+- (IBAction) endAddressSuppressionAction:(id)sender
+{
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    [model setEndAddressSuppressionBit:tag withValue:aValue];
+}
+
 - (IBAction) triggerDelayAction:(id)sender
 {
     [model setTriggerDelay:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
-- (IBAction) triggerDelayTwoAction:(id)sender
-{
-    [model setTriggerDelayTwo:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
-- (IBAction) triggerDelay3Action:(id)sender
-{
-    [model setTriggerDelay3:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-
-- (IBAction) triggerDelay4Action:(id)sender
-{
-    [model setTriggerDelay4:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) cfdControlAction:(id)sender
@@ -1673,18 +1850,8 @@
 
 - (IBAction) extendedEventConfigAction:(id)sender
 {
-    int tag =[[sender selectedCell] tag];
-    int aValue = [sender intValue];
-    [model setExtendedEventConfigBit:tag withValue:aValue];
+    [model setExtendedEventConfigBit:[sender intValue]];
 }
-
-//- (IBAction) endAddressFinalAction:(id)sender
-//{
-//    int tag =[[sender selectedCell] tag];
-//    int aValue = [sender intValue];
-//    [model setEndAddressFinalBit:tag withValue:aValue];
-//}
-
 
 - (IBAction) extraFilterAction:(id)sender
 {
@@ -1696,9 +1863,9 @@
     [model setTauTableBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
-- (IBAction) peakingTimeAction:(id)sender
+- (IBAction) riseTimeAction:(id)sender
 {
-    [model setPeakingTime:[[sender selectedCell] tag] withValue:[sender intValue]];
+    [model setRiseTime:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) energyDividerAction:(id)sender
@@ -1835,31 +2002,19 @@
     [model setAccGate8Start:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) acqAction:(id)sender
+- (IBAction) riseTimeSumAction:(id)sender
 {
-	//tags are defined in IB, they have to match here or there will be trouble
-//	BOOL state = [[sender selectedCell] intValue];
-	switch ([[sender selectedCell] tag]) {
-//		case 0: [model setBankSwitchMode:state];	break; 
-//		case 1: [model setAutoStart:state];			break; 
-//		case 2: [model setMultiEventMode:state];	break; 
-//		case 3: [model setMultiplexerMode:state];	break; 
-//		case 4: [model setLemoStartStop:state];		break; 
-//		case 5: [model setP2StartStop:state];		break; 
-//		case 6: [model setGateMode:state];			break; 
-//		case 8: [model setStopDelayEnabled:state];			break;
-		default: break;
-	}
+    [model setRiseTimeSum:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
-- (IBAction) testMemoryBankAction:(id)sender;
+- (IBAction) gapTimeSumAction:(id)sender
 {
-	@try {
-		[model testMemory];
-	}
-	@catch (NSException* localException) {
-		NSLog(@"Test of SIS 3300 Memory Bank failed\n");
-	}
+    [model setGapTimeSum:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) cfdControlBitsSumAction:(id)sender
+{
+    [model setCfdControlBitsSum:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) probeBoardAction:(id)sender;
@@ -1886,29 +2041,9 @@
 }
 
 
-//- (IBAction) stopDelayEnabledAction:(id)sender
-//{
-//	[model setStopDelayEnabled:[sender intValue]];
-//}
-
-//- (IBAction) startDelayAction:(id)sender
-//{
-//	[model setStartDelay:[sender intValue]];
-//}
-
 - (IBAction) clockSourceAction:(id)sender
 {
 	[model setClockSource:[sender indexOfSelectedItem]];
-}
-
-//- (IBAction) stopDelayAction:(id)sender
-//{
-//	[model setStopDelay:[sender intValue]];
-//}
-
-- (IBAction) pageSizeAction:(id)sender
-{
-	[model setPageSize:[[sender selectedItem] tag]];	
 }
 
 
@@ -1960,6 +2095,17 @@
 	
 }
 
+- (IBAction) trigger:(id)sender
+{
+    [model trigger];
+}
+
+- (IBAction) dacOffsetAction:(id)sender
+{
+    if([sender intValue] != [model dacOffset:[[sender selectedCell] tag]]){
+        [model setDacOffset:[[sender selectedCell] tag] withValue:[sender intValue]];
+    }
+}
 - (IBAction) writeThresholdsAction:(id)sender
 {
     @try {
@@ -1979,15 +2125,10 @@
                         localException);
     }
 }
-- (IBAction) trigger:(id)sender
-{
-    [model trigger];
-}
 
 - (IBAction) readThresholdsAction:(id)sender
 {
     @try {
-        [self endEditing];
         [model readThresholds:YES];
         [model readThresholdSum:YES];
         [model readHeTrigThresholds:YES];
@@ -1998,32 +2139,6 @@
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds read FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) writeAcquisitionControlAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeAcquisitionRegister];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Acquisition Control write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) readAcquisitionControlAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model readAcquisitionRegister:YES];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Acquisition Control read FAILED.\n");
         ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
                         localException);
     }
@@ -2047,7 +2162,6 @@
 - (IBAction) readEventConfigButton:(id)sender
 {
     @try {
-        [self endEditing];
         [model readEventConfig:YES];
         [model readExtendedEventConfig:YES];
         [model readEndAddress:YES];
@@ -2058,61 +2172,6 @@
         ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
                         localException);
     }
-}
-
-
-- (IBAction) writeNIMControlStatusAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeNIMControlStatus];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 NIM Control Status write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) readNIMControlStatusAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model readNIMControlStatus:YES];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 NIM Control Status read FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) writeClockSourceAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeClockSource];
-        [model writeTriggerDelay];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Clock Source write FAILED. \n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil, localException);
-    }
-}
-
-- (IBAction)readClockSourceAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model readClockSource:YES];
-        [model readTriggerDelay:YES];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Accumulator Gate read FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
- 
 }
 
 - (IBAction) writeAccumulatorGateAction:(id)sender
@@ -2128,7 +2187,6 @@
         ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
                         localException);
     }
-
 }
 
 - (IBAction) readAccumulatorGateAction:(id)sender
@@ -2176,6 +2234,55 @@
 {
 	[self endEditing];
 	//[model testEventRead];
+}
+
+- (IBAction) gainAction:(id)sender
+{
+    [model setGain:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) terminationAction:(id)sender
+{
+    [model setTermination:[sender indexOfSelectedItem]];
+}
+
+- (IBAction) loadDefaults:(id)sender
+{
+    [model setDefaults];
+}
+
+- (IBAction)gate1EnabledMaskAction:(id)sender
+{
+    unsigned long aMask = [model gate1EnableMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setGate1EnableMask:aMask];
+
+}
+
+- (IBAction)gate2EnabledMaskAction:(id)sender
+{
+    unsigned long aMask = [model gate2EnableMask];
+    int tag    = [[sender selectedCell] tag];
+    int aValue = [sender intValue];
+    if(aValue==0)aMask &= ~(0x1<<tag);
+    else         aMask |= (0x1<<tag);
+    
+    [model setGate2EnableMask:aMask];
+
+}
+
+- (IBAction) internalGateLenAction:(id)sender
+{
+    [model setInternalGateLen:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+
+- (IBAction) internalCoinGateLenAction:(id)sender
+{
+    [model setInternalCoinGateLen:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 #pragma mark •••Data Source
