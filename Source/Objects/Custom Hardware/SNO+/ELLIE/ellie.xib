@@ -8,7 +8,21 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ELLIEController">
             <connections>
+                <outlet property="amellieAngleSelectPb" destination="ZGN-1K-BAl" id="Wa4-SW-FlX"/>
+                <outlet property="amellieChannelTf" destination="qzb-Rq-TUl" id="3Te-64-VFZ"/>
+                <outlet property="amellieFibreDelayTf" destination="fco-i6-6bJ" id="8cR-Rd-XlW"/>
+                <outlet property="amellieFireButton" destination="BqA-Ed-jy0" id="dtK-RH-Saa"/>
+                <outlet property="amellieNoPulsesTf" destination="gwO-32-WHc" id="pV7-j7-1rr"/>
+                <outlet property="amellieNodeSelectPb" destination="BxE-mg-HmW" id="0bx-Mz-Wz0"/>
+                <outlet property="amellieOperationModePb" destination="3LH-if-0M7" id="AXb-8E-13s"/>
+                <outlet property="amelliePulseFreqTf" destination="91X-ol-Jeq" id="5aj-Iu-D0g"/>
+                <outlet property="amelliePulseHeightTf" destination="baX-5O-Afk" id="eNj-Xm-baq"/>
+                <outlet property="amelliePulseWidthTf" destination="eZR-n0-YfD" id="Reh-Xz-CVL"/>
+                <outlet property="amellieStopButton" destination="fQL-E6-mvK" id="nRJ-sW-6yM"/>
                 <outlet property="amellieTViewItem" destination="150" id="Aog-HX-zFA"/>
+                <outlet property="amellieTriggerDelayTf" destination="Mua-SD-PCb" id="mqY-g6-gIO"/>
+                <outlet property="amellieValidateSettingsButton" destination="c9I-qt-a82" id="4fD-gn-bu0"/>
+                <outlet property="amellieValidationStatusTf" destination="jra-Oh-vbb" id="bge-xq-fCB"/>
                 <outlet property="ellieTabView" destination="148" id="1369"/>
                 <outlet property="interlockHostTf" destination="LKr-RC-LbQ" id="4Bt-Y6-s6x"/>
                 <outlet property="interlockPing" destination="8PW-9X-Ifs" id="sYh-9e-6M6"/>
@@ -63,6 +77,7 @@
                 <outlet property="tellieTViewItem" destination="149" id="1372"/>
                 <outlet property="tellieTabView" destination="15" id="1370"/>
                 <outlet property="tellieTriggerDelayTf" destination="1219" id="1348"/>
+                <outlet property="tubiiThreadResponseTf" destination="565-EN-tfA" id="iFq-CB-4o5"/>
                 <outlet property="window" destination="1" id="4"/>
             </connections>
         </customObject>
@@ -764,7 +779,7 @@
                                                                                                 </connections>
                                                                                             </textField>
                                                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="1418">
-                                                                                                <rect key="frame" x="74" y="33" width="117" height="17"/>
+                                                                                                <rect key="frame" x="65" y="30" width="132" height="22"/>
                                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                                                 <animations/>
                                                                                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Photons per pulse" id="1419">
@@ -1733,65 +1748,6 @@
                                             </view>
                                             <animations/>
                                         </box>
-                                        <box autoresizesSubviews="NO" title="AMELLIE Control" borderType="line" id="4c9-aC-8cu">
-                                            <rect key="frame" x="40" y="14" width="526" height="327"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="524" height="311"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                <subviews>
-                                                    <button verticalHuggingPriority="750" id="f1x-K2-Uy3">
-                                                        <rect key="frame" x="158" y="24" width="99" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <buttonCell key="cell" type="push" title="Fire Fibre" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="70p-b8-1Fa">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                    </button>
-                                                    <button verticalHuggingPriority="750" id="5nM-Jz-y84">
-                                                        <rect key="frame" x="262" y="25" width="104" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <buttonCell key="cell" type="push" title="Stop Fibre" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7MT-q2-aRA">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                    </button>
-                                                    <textField verticalHuggingPriority="750" id="b0u-KA-BsQ">
-                                                        <rect key="frame" x="16" y="276" width="102" height="22"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Current Status:" id="nVk-Cn-F04">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField verticalHuggingPriority="750" id="Goa-Q6-dWg">
-                                                        <rect key="frame" x="131" y="107" width="359" height="191"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" placeholderString="Waiting For Validation" id="1ta-8r-oJg">
-                                                            <font key="font" metaFont="system"/>
-                                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <button verticalHuggingPriority="750" id="mKd-xc-Eoi">
-                                                        <rect key="frame" x="167" y="62" width="190" height="32"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <animations/>
-                                                        <buttonCell key="cell" type="push" title="Validate Amellie Settings" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pds-Zs-XkT">
-                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="system"/>
-                                                        </buttonCell>
-                                                    </button>
-                                                </subviews>
-                                                <animations/>
-                                            </view>
-                                            <animations/>
-                                        </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="vOh-nC-ccj">
                                             <rect key="frame" x="57" y="569" width="517" height="51"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1803,6 +1759,76 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <box autoresizesSubviews="NO" title="AMELLIE Control" borderType="line" id="pzb-sW-d2m">
+                                            <rect key="frame" x="56" y="5" width="498" height="323"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView">
+                                                <rect key="frame" x="1" y="1" width="496" height="307"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField verticalHuggingPriority="750" id="jra-Oh-vbb">
+                                                        <rect key="frame" x="115" y="127" width="363" height="170"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" placeholderString="Waiting for validation" drawsBackground="YES" id="Adl-J1-dBv">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" red="0.81568627450980391" green="0.81568627450980391" blue="0.81568627450980391" alpha="1" colorSpace="calibratedRGB"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="EpP-ho-fuk">
+                                                        <rect key="frame" x="16" y="278" width="102" height="17"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Current status:" id="iQq-hg-DGj">
+                                                            <font key="font" metaFont="system"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <button verticalHuggingPriority="750" id="c9I-qt-a82">
+                                                        <rect key="frame" x="153" y="73" width="190" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="push" title="Validate Amellie Settings" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="p8b-pg-xiI">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="amellieValidateSettingsAction:" target="-2" id="neZ-ec-mia"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="BqA-Ed-jy0">
+                                                        <rect key="frame" x="143" y="38" width="97" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="push" title="Fire Fibre" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="aBV-k2-uog">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="amellieFireAction:" target="-2" id="sHa-cx-aP3"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" id="fQL-E6-mvK">
+                                                        <rect key="frame" x="252" y="38" width="103" height="32"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <animations/>
+                                                        <buttonCell key="cell" type="push" title="Stop Fibre" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="44N-L3-Z8s">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="system"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="amellieStopAction:" target="-2" id="OQ2-0p-hRP"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                                <animations/>
+                                            </view>
+                                            <animations/>
+                                            <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                            <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                        </box>
                                     </subviews>
                                     <animations/>
                                 </view>
@@ -1991,6 +2017,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="tubiiPing:" target="-2" id="z4b-Mf-EL5"/>
+                                                        </connections>
                                                     </button>
                                                     <textField verticalHuggingPriority="750" id="565-EN-tfA">
                                                         <rect key="frame" x="18" y="14" width="450" height="62"/>
@@ -2010,6 +2039,9 @@
                                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                             <font key="font" metaFont="system"/>
                                                         </buttonCell>
+                                                        <connections>
+                                                            <action selector="tubiiRestart:" target="-2" id="jqn-wX-gFl"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                                 <animations/>
@@ -2110,18 +2142,8 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="5"/>
             </connections>
+            <point key="canvasLocation" x="364" y="162.5"/>
         </window>
-        <comboBox verticalHuggingPriority="750" id="528">
-            <rect key="frame" x="0.0" y="0.0" width="99" height="26"/>
-            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-            <animations/>
-            <comboBoxCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" completes="NO" numberOfVisibleItems="5" id="529">
-                <font key="font" metaFont="system"/>
-                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-            </comboBoxCell>
-            <point key="canvasLocation" x="809" y="254"/>
-        </comboBox>
         <numberFormatter formatterBehavior="default10_4" localizesFormat="NO" numberStyle="decimal" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="3" id="GE2-Zm-Zng">
             <real key="minimum" value="0.0"/>
             <real key="maximum" value="2"/>

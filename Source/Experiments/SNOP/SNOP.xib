@@ -12,6 +12,11 @@
                 <outlet property="ECApatternPopUpButton" destination="dBJ-eI-bEw" id="Bsm-ET-LDq"/>
                 <outlet property="ECAtypePopUpButton" destination="V5O-ay-jfT" id="6wG-wM-xlf"/>
                 <outlet property="TSlopePatternTextField" destination="u1v-fA-9yA" id="Q46-aw-qcG"/>
+                <outlet property="amellieEmergencyStop" destination="JYg-iV-jIT" id="1zE-tu-3Bz"/>
+                <outlet property="amellieLoadRunFile" destination="UYT-pR-Vaz" id="YGG-V1-qYh"/>
+                <outlet property="amellieRunFileNameField" destination="ZNs-fm-0eW" id="zkf-mP-P5k"/>
+                <outlet property="amellieStartRunButton" destination="hfK-RW-a5V" id="4iO-er-fr6"/>
+                <outlet property="amellieStopRunButton" destination="aTd-O0-YKF" id="vbE-Eb-lba"/>
                 <outlet property="dataHost" destination="UWf-rc-B5V" id="XsF-fQ-J4g"/>
                 <outlet property="dataPort" destination="iRb-mE-Azg" id="q3z-dm-lJm"/>
                 <outlet property="debugDBClearButton" destination="2731" id="1EM-Mi-IT6"/>
@@ -34,6 +39,27 @@
                 <outlet property="livePedRadioButton" destination="LBp-Zt-CUm" id="I5p-ru-RHj"/>
                 <outlet property="livePedRunTypeWordAd" destination="c8u-Xc-HHp" id="ckl-Mp-DEN"/>
                 <outlet property="livePedStatusLabel" destination="Bn6-6K-SLG" id="dKe-Io-Gpd"/>
+                <outlet property="loadedAmellieFibresLabel" destination="nsl-Tu-0pZ" id="0hA-EH-459"/>
+                <outlet property="loadedAmellieFireRateLabel" destination="WBX-AY-iuO" id="eYI-EK-dzN"/>
+                <outlet property="loadedAmellieIntensityLabel" destination="iYY-bJ-C5i" id="qo1-6b-ZGD"/>
+                <outlet property="loadedAmellieNoPulsesLabel" destination="7NZ-cI-mJ9" id="ib6-Uj-YU5"/>
+                <outlet property="loadedAmellieOperationLabel" destination="i1n-rV-7JV" id="7Vj-zf-4pp"/>
+                <outlet property="loadedAmellieRunNameLabel" destination="5Lv-eN-yN3" id="uHo-Xj-hGU"/>
+                <outlet property="loadedAmellieRunTimeLabel" destination="B66-TT-a2L" id="DFC-hT-Dq7"/>
+                <outlet property="loadedSmellieApproxTimeLabel" destination="H9G-ZI-ATn" id="waZ-me-0zm"/>
+                <outlet property="loadedSmellieFibresLabel" destination="tar-Oy-X3n" id="3XF-3D-hsi"/>
+                <outlet property="loadedSmellieLasersLabel" destination="eIC-B8-dko" id="Zjv-ne-Va4"/>
+                <outlet property="loadedSmellieOperationModeLabel" destination="Wy7-3n-yqq" id="Z5L-jw-zMK"/>
+                <outlet property="loadedSmellieRunNameLabel" destination="Ggo-wF-PPV" id="rJ2-Kf-Ae7"/>
+                <outlet property="loadedSmellieSuperKwavelengths" destination="Hwd-bF-7jA" id="WNI-MN-iCO"/>
+                <outlet property="loadedSmellieTriggerFrequencyLabel" destination="men-QQ-QYA" id="MiU-Ff-u94"/>
+                <outlet property="loadedTellieFireRateLabel" destination="ORW-Iz-IJ3" id="MxU-h9-n0n"/>
+                <outlet property="loadedTellieIntensityLabel" destination="aLY-NX-9MR" id="fKI-dd-nbw"/>
+                <outlet property="loadedTellieNoPulsesLabel" destination="ewd-EK-AgB" id="Isb-B9-scZ"/>
+                <outlet property="loadedTellieNodesLabel" destination="qTS-5w-jVJ" id="0L0-pT-ACH"/>
+                <outlet property="loadedTellieOperationLabel" destination="kOY-ar-WJG" id="U8i-7r-xHw"/>
+                <outlet property="loadedTellieRunNameLabel" destination="d0q-bf-Rie" id="75t-Uo-kE9"/>
+                <outlet property="loadedTellieRunTimeLabel" destination="sbk-C6-gZI" id="6p0-lS-iyE"/>
                 <outlet property="lockStatusTextField" destination="Np3-DI-Iif" id="5ty-0b-EY4"/>
                 <outlet property="logHost" destination="KzD-He-2lG" id="LXs-Sy-EvF"/>
                 <outlet property="logPort" destination="DpW-Vd-aQd" id="9DN-uP-F1q"/>
@@ -77,6 +103,11 @@
                 <outlet property="sessionDBPassword" destination="xu0-2f-77h" id="pA2-hN-4hV"/>
                 <outlet property="sessionDBPort" destination="MVZ-YX-g8u" id="w4s-eW-bPv"/>
                 <outlet property="sessionDBUser" destination="DzY-Ca-542" id="KpO-P1-Fdq"/>
+                <outlet property="smellieEmergencyStop" destination="xUq-YE-jV9" id="4dp-7x-vaa"/>
+                <outlet property="smellieLoadRunFile" destination="Vxb-Fo-J0W" id="rK3-fv-7rW"/>
+                <outlet property="smellieRunFileNameField" destination="2XJ-OU-NXq" id="ijf-jr-EIA"/>
+                <outlet property="smellieStartRunButton" destination="eRS-4M-i1n" id="WuC-fS-yuc"/>
+                <outlet property="smellieStopRunButton" destination="4F6-3n-Mkg" id="DXc-4a-7sK"/>
                 <outlet property="snopView" destination="6" id="Vn9-RA-Mde"/>
                 <outlet property="standardRunCAENCurrentMatrix" destination="Xdt-S9-5q7" id="4sp-ez-vw0"/>
                 <outlet property="standardRunCAENDBMatrix" destination="i9Q-u5-4Yq" id="An8-fS-ch6"/>
@@ -96,6 +127,11 @@
                 <outlet property="stopNhitMonitorButton" destination="eEC-cV-Yui" id="v9K-Qp-Zvc"/>
                 <outlet property="stopRunButton" destination="1258" id="PGc-XS-Wt7"/>
                 <outlet property="tabView" destination="101" id="332"/>
+                <outlet property="tellieEmergencyStop" destination="gTa-K4-cXg" id="aOd-EJ-jJo"/>
+                <outlet property="tellieLoadRunFile" destination="cgb-Ya-Y3B" id="VFI-kf-pwv"/>
+                <outlet property="tellieRunFileNameField" destination="bb6-NV-lnT" id="wG8-vb-aFh"/>
+                <outlet property="tellieStartRunButton" destination="kvO-jm-rxO" id="jlv-xD-3vB"/>
+                <outlet property="tellieStopRunButton" destination="jq1-cM-Htd" id="OfR-ty-V6r"/>
                 <outlet property="timeLimitField" destination="1342" id="1353"/>
                 <outlet property="timeStartedField" destination="3770" id="rbE-Hw-cDc"/>
                 <outlet property="timedRunCB" destination="1344" id="1352"/>
@@ -2496,7 +2532,7 @@
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <animations/>
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            <size key="cellSize" width="126" height="16"/>
+                                            <size key="cellSize" width="124" height="16"/>
                                             <size key="intercellSpacing" width="5" height="4"/>
                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="mini" inset="2" id="giJ-Gh-5bp">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -3858,6 +3894,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="loadSmellieRunAction:" target="-2" id="84E-VS-Y8X"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="fZc-Pf-lDR">
                                                                 <rect key="frame" x="56" y="543" width="198" height="32"/>
@@ -3867,6 +3906,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="fetchSmellieRunFiles:" target="-2" id="MFk-2J-9ra"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="eRS-4M-i1n">
                                                                 <rect key="frame" x="82" y="469" width="146" height="32"/>
@@ -3876,6 +3918,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="startSmellieRunAction:" target="-2" id="6LC-Mv-fom"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="4F6-3n-Mkg">
                                                                 <rect key="frame" x="82" y="438" width="146" height="32"/>
@@ -3885,6 +3930,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="stopSmellieRunAction:" target="-2" id="3Gz-jf-gfe"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="xUq-YE-jV9">
                                                                 <rect key="frame" x="39" y="408" width="233" height="32"/>
@@ -3894,69 +3942,10 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="emergencySmellieStopAction:" target="-2" id="s5q-Xm-dYX"/>
+                                                                </connections>
                                                             </button>
-                                                            <box title="Summary:" borderType="line" id="JlT-kM-yHp">
-                                                                <rect key="frame" x="14" y="305" width="292" height="107"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <view key="contentView">
-                                                                    <rect key="frame" x="1" y="1" width="290" height="91"/>
-                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                                    <subviews>
-                                                                        <textField verticalHuggingPriority="750" id="pX9-Os-ujM">
-                                                                            <rect key="frame" x="6" y="54" width="74" height="22"/>
-                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                            <animations/>
-                                                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Run Name:" id="zlf-sz-140">
-                                                                                <font key="font" metaFont="system"/>
-                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                        <textField verticalHuggingPriority="750" id="0BG-qo-MLJ">
-                                                                            <rect key="frame" x="6" y="8" width="71" height="34"/>
-                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                            <animations/>
-                                                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Approx. Run Time:" id="PZM-9g-9c2">
-                                                                                <font key="font" metaFont="system"/>
-                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                        <textField verticalHuggingPriority="750" id="sJd-HG-tmU">
-                                                                            <rect key="frame" x="88" y="59" width="193" height="13"/>
-                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                            <animations/>
-                                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" placeholderString="Run Not Loaded" id="Ldr-Qu-jee">
-                                                                                <font key="font" metaFont="system" size="10"/>
-                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                        <textField verticalHuggingPriority="750" id="eed-vs-LqH">
-                                                                            <rect key="frame" x="231" y="14" width="54" height="17"/>
-                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                            <animations/>
-                                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Minutes" id="ixl-Qb-KSP">
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                        <textField verticalHuggingPriority="750" id="gfT-Wz-8Kd">
-                                                                            <rect key="frame" x="86" y="14" width="143" height="22"/>
-                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                            <animations/>
-                                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" placeholderString="Run Not Loaded" id="NNr-Q8-16u">
-                                                                                <font key="font" metaFont="system" size="10"/>
-                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            </textFieldCell>
-                                                                        </textField>
-                                                                    </subviews>
-                                                                    <animations/>
-                                                                </view>
-                                                                <animations/>
-                                                            </box>
                                                             <box autoresizesSubviews="NO" title="Run Details:" borderType="line" id="Lcu-zi-yGJ">
                                                                 <rect key="frame" x="14" y="4" width="294" height="297"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -4079,6 +4068,70 @@
                                                                 </view>
                                                                 <animations/>
                                                             </box>
+                                                            <box autoresizesSubviews="NO" title="Summary:" borderType="line" id="j3T-Xe-MH6">
+                                                                <rect key="frame" x="14" y="310" width="292" height="102"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <view key="contentView">
+                                                                    <rect key="frame" x="1" y="1" width="290" height="86"/>
+                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                                    <subviews>
+                                                                        <textField verticalHuggingPriority="750" id="Ggo-wF-PPV">
+                                                                            <rect key="frame" x="95" y="50" width="179" height="25"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                            <animations/>
+                                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" placeholderString="Run Not Loaded" id="CEg-bH-9sQ">
+                                                                                <font key="font" metaFont="system" size="10"/>
+                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                        </textField>
+                                                                        <textField verticalHuggingPriority="750" id="H9G-ZI-ATn">
+                                                                            <rect key="frame" x="95" y="14" width="179" height="25"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                            <animations/>
+                                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" placeholderString="Run Not Loaded" id="gl9-lV-B8I">
+                                                                                <font key="font" metaFont="system" size="10"/>
+                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                        </textField>
+                                                                        <textField verticalHuggingPriority="750" id="eBg-9K-rVN">
+                                                                            <rect key="frame" x="16" y="55" width="74" height="22"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                            <animations/>
+                                                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Run Name:" id="2aG-tt-tJJ">
+                                                                                <font key="font" metaFont="system"/>
+                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                        </textField>
+                                                                        <textField verticalHuggingPriority="750" id="Bqz-BU-RZV">
+                                                                            <rect key="frame" x="220" y="21" width="54" height="17"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                            <animations/>
+                                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Minutes" id="nqO-Yl-Vye">
+                                                                                <font key="font" metaFont="smallSystem"/>
+                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                        </textField>
+                                                                        <textField verticalHuggingPriority="750" id="iOr-yt-YQh">
+                                                                            <rect key="frame" x="16" y="14" width="71" height="34"/>
+                                                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                            <animations/>
+                                                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Approx. Run Time:" id="7hG-kr-fmX">
+                                                                                <font key="font" metaFont="system"/>
+                                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                                            </textFieldCell>
+                                                                        </textField>
+                                                                    </subviews>
+                                                                    <animations/>
+                                                                </view>
+                                                                <animations/>
+                                                                <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
+                                                                <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                                            </box>
                                                         </subviews>
                                                         <animations/>
                                                     </view>
@@ -4168,6 +4221,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="loadTellieRunAction:" target="-2" id="YAf-nT-5ue"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="kvO-jm-rxO">
                                                                 <rect key="frame" x="76" y="464" width="146" height="32"/>
@@ -4177,6 +4233,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="startTellieRunAction:" target="-2" id="kDx-Jr-g46"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="jq1-cM-Htd">
                                                                 <rect key="frame" x="76" y="436" width="146" height="32"/>
@@ -4186,6 +4245,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="stopTellieRunAction:" target="-2" id="uLf-6a-hRW"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="cqY-v0-dkm">
                                                                 <rect key="frame" x="50" y="544" width="198" height="32"/>
@@ -4195,6 +4257,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="fetchTellieRunFiles:" target="-2" id="dB3-yc-ynU"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="gTa-K4-cXg">
                                                                 <rect key="frame" x="33" y="407" width="233" height="32"/>
@@ -4204,6 +4269,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="emergencyTellieStopAction:" target="-2" id="20W-FN-2Sv"/>
+                                                                </connections>
                                                             </button>
                                                             <box autoresizesSubviews="NO" title="Run Details:" borderType="line" id="sbW-5R-ZOq">
                                                                 <rect key="frame" x="14" y="0.0" width="292" height="298"/>
@@ -4426,6 +4494,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="loadAmellieRunAction:" target="-2" id="NWG-ml-rxN"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="hfK-RW-a5V">
                                                                 <rect key="frame" x="72" y="465" width="154" height="32"/>
@@ -4435,6 +4506,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="startAmellieRunAction:" target="-2" id="4fo-ae-lTE"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="aTd-O0-YKF">
                                                                 <rect key="frame" x="73" y="437" width="153" height="32"/>
@@ -4444,6 +4518,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="stopAmellieRunAction:" target="-2" id="a0b-RS-UWA"/>
+                                                                </connections>
                                                             </button>
                                                             <button verticalHuggingPriority="750" id="2Gg-zn-V7g">
                                                                 <rect key="frame" x="50" y="545" width="198" height="32"/>
@@ -4453,6 +4530,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="fetchAmellieRunFiles:" target="-2" id="Act-S6-OOp"/>
+                                                                </connections>
                                                             </button>
                                                             <box autoresizesSubviews="NO" title="Run Details:" borderType="line" id="WNg-zV-4m6">
                                                                 <rect key="frame" x="14" y="1" width="292" height="298"/>
@@ -4594,6 +4674,9 @@
                                                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="system"/>
                                                                 </buttonCell>
+                                                                <connections>
+                                                                    <action selector="emergencyAmellieStopAction:" target="-2" id="mm1-62-bIi"/>
+                                                                </connections>
                                                             </button>
                                                         </subviews>
                                                         <animations/>
