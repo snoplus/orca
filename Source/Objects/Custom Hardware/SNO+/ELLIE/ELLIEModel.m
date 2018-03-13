@@ -235,7 +235,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [_exampleTask release];
     [_smellieRunHeaderDocList release];
     [_smellieSubRunInfo release];
-    
+
     // Server Clients
     [_tellieClient release];
     [_smellieClient release];
@@ -245,13 +245,13 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [_tellieSubRunSettings release];
     [_tellieFireParameters release];
     [_tellieFibreMapping release];
-    
+
     // smellie config mappings
     [_smellieLaserHeadToSepiaMapping release];
     [_smellieLaserToInputFibreMapping release];
     [_smellieFibreSwitchToFibreMapping release];
     [_smellieConfigVersionNo release];
-    
+
     [_tellieRunNames release];
     [_interlockPort release];
     [_tellieHost release];
@@ -2348,67 +2348,79 @@ err:
 /****************************************/
 - (void) setTelliePort: (NSString*) port
 {
-    /* Set the port number for the tellie server XMLRPC client. */
+    // Set the port number for the tellie server XMLRPC client.
     if ([port isEqualToString:[self telliePort]]) return;
 
+    [port retain];
+    [_telliePort release];
     _telliePort = port;
-    [[self tellieClient] setPort:port];
 
+    [[self tellieClient] setPort:port];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
 - (void) setSmelliePort: (NSString*) port
 {
-    /* Set the port number for the smellie server XMLRPC client. */
+    // Set the port number for the smellie server XMLRPC client.
     if ([port isEqualToString:[self smelliePort]]) return;
 
+    [port retain];
+    [_smelliePort release];
     _smelliePort = port;
-    [[self smellieClient] setPort:port];
 
+    [[self smellieClient] setPort:port];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
 - (void) setInterlockPort: (NSString*) port
 {
-    /* Set the port number for the interlock server XMLRPC client. */
+    // Set the port number for the interlock server XMLRPC client.
     if ([port isEqualToString:[self interlockPort]]) return;
 
+    [port retain];
+    [_interlockPort release];
     _interlockPort = port;
-    [[self interlockClient] setPort:port];
 
+    [[self interlockClient] setPort:port];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
 - (void) setTellieHost: (NSString*) host
 {
-    /* Set the host for the tellie server XMLRPC client. */
+    // Set the host for the tellie server XMLRPC client.
     if (host == [self tellieHost]) return;
 
+    [host retain];
+    [_tellieHost release];
     _tellieHost = host;
-    [[self tellieClient] setHost:host];
 
+    [[self tellieClient] setHost:host];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
 - (void) setSmellieHost: (NSString*) host
 {
-    /* Set the host for the smellie server XMLRPC client. */
+    // Set the host for the smellie server XMLRPC client.
     if (host == [self smellieHost]) return;
 
+    [host retain];
+    [_smellieHost release];
     _smellieHost = host;
-    [[self smellieClient] setHost:host];
 
+    [[self smellieClient] setHost:host];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
 - (void) setInterlockHost: (NSString*) host
 {
-    /* Set the host for the interlock server XMLRPC client. */
+    // Set the host for the interlock server XMLRPC client.
     if (host == [self interlockHost]) return;
 
+    [host retain];
+    [_interlockHost release];
     _interlockHost = host;
-    [[self interlockClient] setHost:host];
 
+    [[self interlockClient] setHost:host];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
 }
 
