@@ -3451,7 +3451,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     noiseFloorState = eSetThresholds;
                     NSLog(@"%@ Finding Thresholds\n",[self fullID]);
 
-                    NSLog(@"%@ Threshold Finder working on %d channels\n",[self fullID] ,workingChanCount);
+                    NSLog(@"%@ Threshold Finder working on %d channel%@\n",[self fullID] ,workingChanCount,workingChanCount>1?@"s":@"");
                 }
 				else			     noiseFloorState = eNothingToDo; //nothing to do
 			break;
@@ -3479,13 +3479,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                             //know the lastThreshold had zero rates
                             //move lo thres up and go to new mid value
                             //to the last hi thres value
-                            thresholdLo[i] = thresholdHi[i];
-                            thresholdHi[i] = lastThresholdHi[i];
-
+                            thresholdLo[i]   = thresholdHi[i];
+                            thresholdHi[i]   = lastThresholdHi[i];
                             thresholdTest[i] = thresholdHi[i];
-
                         }
-                        //case 3: rate is exactly right
+                        //case 3: rate is exactly right.. TDB... need to handle case where we miss and the delta keeps shrinking.. MAH
                         else {
                             newHitMask &= ~(1L<<i);
                             [self setHitRateEnabledMask:newHitMask];
@@ -3495,8 +3493,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                         }
                     }
                 }
-                if(progress)NSLog(@"%@ Found Threshold for %d/%d channels\n",[self fullID],doneChanCount,workingChanCount);
-
+                if(progress){
+                    NSLog(@"%@ Found Threshold%@ for %d/%d channel\n",[self fullID],workingChanCount>1?@"s":@"",doneChanCount,workingChanCount);
+                }
                 if(hitRateEnabledMask)  noiseFloorState = eSetThresholds;   //go check for data
                 else                    noiseFloorState = eFinishing;       //done
 
