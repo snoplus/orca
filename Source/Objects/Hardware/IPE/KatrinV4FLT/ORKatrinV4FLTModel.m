@@ -47,8 +47,6 @@ NSString* ORKatrinV4FLTModelCustomVariableChanged           = @"ORKatrinV4FLTMod
 NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged     = @"ORKatrinV4FLTModelReceivedHistoCounterChanged";
 NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged     = @"ORKatrinV4FLTModelReceivedHistoChanMapChanged";
 NSString* ORKatrinV4FLTModelFifoLengthChanged               = @"ORKatrinV4FLTModelFifoLengthChanged";
-//NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged         = @"ORKatrinV4FLTModelNfoldCoincidenceChanged";
-//NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged          = @"ORKatrinV4FLTModelVetoOverlapTimeChanged";
 NSString* ORKatrinV4FLTModelShipSumHistogramChanged         = @"ORKatrinV4FLTModelShipSumHistogramChanged";
 NSString* ORKatrinV4FLTModelTargetRateChanged               = @"ORKatrinV4FLTModelTargetRateChanged";
 NSString* ORKatrinV4FLTModelHistMaxEnergyChanged            = @"ORKatrinV4FLTModelHistMaxEnergyChanged";
@@ -93,7 +91,7 @@ NSString* ORKatrinV4FLTSelectedRegIndexChanged              = @"ORKatrinV4FLTSel
 NSString* ORKatrinV4FLTWriteValueChanged                    = @"ORKatrinV4FLTWriteValueChanged";
 NSString* ORKatrinV4FLTSelectedChannelValueChanged          = @"ORKatrinV4FLTSelectedChannelValueChanged";
 NSString* ORKatrinV4FLTNoiseFloorChanged                    = @"ORKatrinV4FLTNoiseFloorChanged";
-NSString* ORKatrinV4FLTNoiseFloorOffsetChanged              = @"ORKatrinV4FLTNoiseFloorOffsetChanged";
+NSString* ORKatrinV4FLTFinalThresholdOffsetChanged          = @"ORKatrinV4FLTNoiseFloorOffsetChanged";
 NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged = @"ORKatrinV4FLTModelActivateDebuggingDisplaysChanged";
 NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTModeFifoFlagsChanged";
 NSString* ORKatrinV4FLTModelHitRateModeChanged              = @"ORKatrinV4FLTModelHitRateModeChanged";
@@ -799,12 +797,12 @@ static double table[32]={
 
 - (BOOL) noiseFloorRunning { return noiseFloorRunning; }
 
-- (int) noiseFloorOffset { return noiseFloorOffset; }
-- (void) setNoiseFloorOffset:(int)aNoiseFloorOffset
+- (float) finalThresholdOffset { return finalThresholdOffset; }
+- (void) setFinalThresholdOffset:(float)anOffset
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setNoiseFloorOffset:noiseFloorOffset];
-    noiseFloorOffset = aNoiseFloorOffset;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTNoiseFloorOffsetChanged object:self];
+    [[[self undoManager] prepareWithInvocationTarget:self] setFinalThresholdOffset:finalThresholdOffset];
+    finalThresholdOffset = anOffset;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTFinalThresholdOffsetChanged object:self];
 }
 
 - (unsigned long) histLastEntry { return histLastEntry; }
@@ -2083,14 +2081,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setPoleZeroCorrection:        [decoder decodeIntForKey:   @"poleZeroCorrection"]];
     [self setCustomVariable:            [decoder decodeIntForKey:   @"customVariable"]];
     [self setFifoLength:                [decoder decodeIntForKey:   @"fifoLength"]];
-//    [self setNfoldCoincidence:          [decoder decodeIntForKey:   @"nfoldCoincidence"]];
-//    [self setVetoOverlapTime:           [decoder decodeIntForKey:   @"vetoOverlapTime"]];
     [self setShipSumHistogram:          [decoder decodeIntForKey:   @"shipSumHistogram"]];
     [self setActivateDebuggingDisplays: [decoder decodeBoolForKey:  @"activateDebuggingDisplays"]];
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
     [self setForceFLTReadout:           [decoder decodeBoolForKey:  @"forceFLTReadout"]];
     [self setFilterShapingLengthOnInit: [decoder decodeIntForKey:   @"filterShapingLength"]];
-	
+    [self setFinalThresholdOffset:      [decoder decodeFloatForKey: @"finalThresholdOffset"]];
 	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
     
     [[self undoManager] enableUndoRegistration];
@@ -2114,8 +2110,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:poleZeroCorrection           forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable               forKey:@"customVariable"];
     [encoder encodeInt:fifoLength                   forKey:@"fifoLength"];
-//    [encoder encodeInt:nfoldCoincidence             forKey:@"nfoldCoincidence"];
-//    [encoder encodeInt:vetoOverlapTime              forKey:@"vetoOverlapTime"];
+    [encoder encodeFloat:finalThresholdOffset             forKey:@"finalThresholdOffset"];
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
     [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
@@ -2974,8 +2969,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
 	if(noiseFloorRunning){
         // Terminate threshold finder (stop buton)
-		noiseFloorRunning = NO;
-        
+        noiseFloorState   = eManualAbort;
+
         // Restore inhibit state
         if ([slt numberOfActiveThresholdFinder] == 0){
             [slt restoreInhibitStatus];
@@ -2986,8 +2981,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
             NSLog(@"Error: Can't run threshold finder during run\n");
         }
         else {
-            noiseFloorState = 0;
-            noiseFloorRunning = YES;
+            noiseFloorState   = eInitializing;
             [self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:0];
         }
 	}
@@ -2997,12 +2991,15 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (NSString*) noiseFloorStateString
 {
 	if(!noiseFloorRunning) return @"Idle";
-	else switch(noiseFloorState){
-		case 0: return @"Initializing"; 
-		case 1: return @"Setting Thresholds";
-		case 2: return @"Integrating";
-		case 3: return @"Finishing";
-		default: return @"?";
+	else switch(noiseFloorState) {
+		case eInitializing:  return @"Initializing";
+		case eSetThresholds: return @"Setting Thresholds";
+		case eIntegrating:   return @"Integrating";
+        case eCheckRates:    return @"Checking Rates";
+        case eFinishing:     return @"Finishing";
+        case eNothingToDo:   return @"No Channels Enabled";
+        case eManualAbort:   return @"Manual Stop";
+		default:             return @"?";
 	}	
 }
 - (NSString*) getRegisterName: (short) anIndex
@@ -3414,121 +3411,164 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
 	[[self undoManager] disableUndoRegistration];
 	int i;
-	BOOL atLeastOne;
-	unsigned long maxThreshold = 0xfffff;
-    
+	float           maxThreshold     = 65535.;
+    unsigned long   newHitMask       = 0x0;
+    BOOL            progress         = NO;
     id slt = [[self crate] adapter];
     
     @try {
 		switch(noiseFloorState){
-			case 0:
+			case eInitializing:
+                noiseFloorRunning = YES;
+                workingChanCount = 0;
+
                 // Save inhibit state
-                if ([slt numberOfActiveThresholdFinder] == 1) // this one is the first one
-                {
+                if ([slt numberOfActiveThresholdFinder] == 1){ // this one is the first one
                     //inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
                     [slt saveInhibitStatus];
                 }
-                // Release inhibit
-                [slt writeClrInhibit];
+                [slt writeClrInhibit];     // Release inhibit
                 
+				//set max threshold on all channels (saving old values)
+				for(i=0;i<kNumV4FLTChannels;i++){
+                    if([self hitRateEnabled:i]){
+                        oldEnabled[i]      = [self hitRateEnabled:i];
+                        thresholdHi[i]     = maxThreshold;
+                        thresholdLo[i]     = 0;
+                        oldThresholds[i]   = [self scaledThreshold:i];
+                        thresholdTest[i]   = maxThreshold;
+                        workingChanCount++;
+                   }
+				}
                 
-				//disable all channels
-				for(i=0;i<kNumV4FLTChannels;i++){
-					oldEnabled[i]   = [self hitRateEnabled:i];
-					oldThreshold[i] = [self threshold:i];
-					[self setFloatThreshold:i withValue:maxThreshold];
-					newThreshold[i] = maxThreshold;
-				}
-				atLeastOne = NO;
-				for(i=0;i<kNumV4FLTChannels;i++){
-					if(oldEnabled[i]){
-						noiseFloorLow[i]			= 0;
-						noiseFloorHigh[i]		= maxThreshold;
-						noiseFloorTestValue[i]	= maxThreshold/2;              //Initial probe position
-						[self setFloatThreshold:i withValue:noiseFloorHigh[i]];
-						atLeastOne = YES;
-					}
-				}
-				
-				[self initBoard];
-				
-				if(atLeastOne)	noiseFloorState = 1;
-				else			noiseFloorState = 4; //nothing to do
+                oldHitRateLength = hitRateLength;
+                oldHitRateMode   = hitRateMode;
+                [self setHitRateLength:0]; //1 sec
+                [self setHitRateMode:  1]; //always
+                
+                if(workingChanCount) {
+                    doneChanCount = 0;
+                    noiseFloorState = eSetThresholds;
+                    NSLog(@"%@ Finding Thresholds\n",[self fullID]);
+
+                    NSLog(@"%@ Threshold Finder working on %d channels\n",[self fullID] ,workingChanCount);
+                }
+				else			     noiseFloorState = eNothingToDo; //nothing to do
 			break;
-				
-			case 1:
+                
+            case eIntegrating:
+                //this state is basically a wait to let the rates come back
+                noiseFloorState = eCheckRates;
+            break;
+                
+            case eCheckRates:
+                newHitMask = hitRateEnabledMask;
+                
+                for(i=0;i<kNumV4FLTChannels;i++) {
+                    if([self hitRateEnabled:i]) {
+                        //case 1: rate is zero
+                        if([self hitRate:i] == 0) {
+                            //last written threshold too high
+                            //lower the threshold to midway
+                            lastThresholdHi[i] = thresholdHi[i];
+                            thresholdTest[i]   = thresholdLo[i] + ((thresholdHi[i]-thresholdLo[i])/2.);
+                            thresholdHi[i]     = thresholdTest[i];
+                        }
+                        //case 2: rate too high
+                        else if([self hitRate:i] > targetRate) {
+                            //know the lastThreshold had zero rates
+                            //move lo thres up and go to new mid value
+                            //to the last hi thres value
+                            thresholdLo[i] = thresholdHi[i];
+                            thresholdHi[i] = lastThresholdHi[i];
+
+                            thresholdTest[i] = thresholdHi[i];
+
+                        }
+                        //case 3: rate is exactly right
+                        else {
+                            newHitMask &= ~(1L<<i);
+                            [self setHitRateEnabledMask:newHitMask];
+                            oldThresholds[i]   = [self scaledThreshold:i];
+                            doneChanCount++;
+                            progress = YES;
+                        }
+                    }
+                }
+                if(progress)NSLog(@"%@ Found Threshold for %d/%d channels\n",[self fullID],doneChanCount,workingChanCount);
+
+                if(hitRateEnabledMask)  noiseFloorState = eSetThresholds;   //go check for data
+                else                    noiseFloorState = eFinishing;       //done
+
+            break;
+                
+			case eSetThresholds:
 				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
-						if(noiseFloorLow[i] <= noiseFloorHigh[i]) {
-							[self setFloatThreshold:i withValue:noiseFloorTestValue[i]];
-							
-						}
-						else {
-							newThreshold[i] = MAX(0,noiseFloorTestValue[i] + noiseFloorOffset * [self filterShapingLengthInBins]);
-							[self setFloatThreshold:i withValue:maxThreshold];
-							hitRateEnabledMask &= ~(1L<<i);
-						}
+                        [self setScaledThreshold:i withValue:thresholdTest[i]];
 					}
 				}
 				[self initBoard];
-				
-				if(hitRateEnabledMask)	noiseFloorState = 2;	//go check for data
-				else					noiseFloorState = 3;	//done
+				if(hitRateEnabledMask)	noiseFloorState = eIntegrating;	//go check for data
+				else					noiseFloorState = eFinishing;	//done
 			break;
-				
-			case 2:
-				//read the hitrates
-				[self readHitRates];
-				
-				for(i=0;i<kNumV4FLTChannels;i++){
-					if([self hitRateEnabled:i]){
-						if([self hitRate:i] > targetRate){
-							//the rate is too high, bump the threshold up
-							[self setFloatThreshold:i withValue:maxThreshold];
-							noiseFloorLow[i] = noiseFloorTestValue[i] + 1;
-						}
-						else noiseFloorHigh[i] = noiseFloorTestValue[i] - 1;									//no data so continue lowering threshold
-						noiseFloorTestValue[i] = noiseFloorLow[i]+((noiseFloorHigh[i]-noiseFloorLow[i])/2);     //Next probe position.
-					}
-				}
-				
-				[self initBoard];
-				
-				noiseFloorState = 1;
-				break;
-								
-			case 3: //finish up	
+                
+			case eFinishing: //finish up
 				//load new results
 				for(i=0;i<kNumV4FLTChannels;i++){
 					[self setHitRateEnabled:i withValue:oldEnabled[i]];
-					[self setFloatThreshold:i withValue:newThreshold[i]];
 				}
-				[self initBoard];
 				noiseFloorRunning = NO;
-                
+                [self setHitRateLength:oldHitRateLength];
+                [self setHitRateMode:oldHitRateMode]; //always
                 // Restore inhibit state
                 if ([slt numberOfActiveThresholdFinder] == 0){
                     [slt restoreInhibitStatus];
                 }
+                [self initBoard];
+                noiseFloorRunning = NO;
 			break;
+                
+            case eNothingToDo:
+                noiseFloorRunning = NO;
+                NSLog(@"%@ Threshold Finder quit because no channels have hitrate enabled\n",[self fullID]);
+             break;
+                
+            case eManualAbort:
+                noiseFloorRunning = NO;
+                for(i=0;i<kNumV4FLTChannels;i++){
+                    [self setHitRateEnabled:i withValue:oldEnabled[i]];
+                    [self setScaledThreshold:i withValue:oldThresholds[i]];
+                    [self initBoard];
+                    [self setHitRateLength:oldHitRateLength];
+                    [self setHitRateMode:oldHitRateMode];
+                }
+                NSLog(@"%@ Threshold Finder manually stopped\n",[self fullID]);
+
+                break;
 		}
+        
 		if(noiseFloorRunning){
 			float timeToWait;
-			if(noiseFloorState==2)	timeToWait = pow(2.,hitRateLength)* 1.5;
-			else					timeToWait = 0.2;
+			if(noiseFloorState==eIntegrating)	timeToWait = 2.5;
+			else					            timeToWait = 0.2;
+            
 			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:timeToWait];
 		}
+        
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTNoiseFloorChanged object:self];
     }
 	@catch(NSException* localException) {
         int i;
         for(i=0;i<kNumV4FLTChannels;i++){
             [self setHitRateEnabled:i withValue:oldEnabled[i]];
-            [self setFloatThreshold:i withValue:oldThreshold[i]];
+            [self setScaledThreshold:i withValue:oldThresholds[i]];
 			//[self reset];
 			[self initBoard];
+            [self setHitRateLength:oldHitRateLength];
+            [self setHitRateMode:oldHitRateMode];
         }
-		NSLog(@"FLT4 LED threshold finder quit because of exception\n");
+		NSLog(@"&@ threshold finder quit because of exception\n",[self fullID]);
     }
 	[[self undoManager] enableUndoRegistration];
 }

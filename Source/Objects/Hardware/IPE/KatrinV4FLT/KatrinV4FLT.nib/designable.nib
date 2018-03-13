@@ -25,6 +25,7 @@
                 <outlet property="fifoDisplayMatrix" destination="3930" id="3956"/>
                 <outlet property="fifoLengthPU" destination="3883" id="3897"/>
                 <outlet property="filterShapingLengthPU" destination="3118" id="3962"/>
+                <outlet property="finalThresholdOffsetField" destination="3182" id="MpO-cM-i0V"/>
                 <outlet property="fireSoftwareTriggerButton" destination="4106" id="4174"/>
                 <outlet property="fireSoftwareTriggerButton1" destination="tlb-B1-N7e" id="biy-sj-v5x"/>
                 <outlet property="fireTPButton" destination="4140" id="4146"/>
@@ -3485,12 +3486,13 @@ Enable</string>
                         <rect key="frame" x="31" y="21" width="39" height="19"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3185">
+                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0.##" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="2" id="W2Q-tE-nlk"/>
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
-                            <action selector="noiseFloorOffsetAction:" target="-2" id="3204"/>
+                            <action selector="finalThresholdOffsetAction:" target="-2" id="iDn-he-IcY"/>
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" id="3181">

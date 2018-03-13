@@ -81,6 +81,15 @@
 // - in ORKatrinV4FLTDefs.h ipeFltHitRateDataStruct already was known from ORIpeV4FLTDefs.h
 // - in Interface Builder: File's Owner need to be changed to ORKatrinV4FLTModel (was ORIpeV4FLTModel)
 
+enum {
+    eInitializing,
+    eSetThresholds,
+    eIntegrating,
+    eCheckRates,
+    eFinishing,
+    eNothingToDo,
+    eManualAbort
+} eKatrinV4ThresFinderStates;
 
 @interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
@@ -123,6 +132,17 @@
 
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
     
+    unsigned short  oldHitRateLength;
+    int             oldHitRateMode;
+    float thresholdLo[kNumV4FLTChannels];
+    float thresholdHi[kNumV4FLTChannels];
+    float lastThresholdHi[kNumV4FLTChannels];
+    float thresholdTest[kNumV4FLTChannels];
+    float oldThresholds[kNumV4FLTChannels];
+    float finalThresholdOffset;
+    int   doneChanCount;
+    int   workingChanCount;
+
 }
 
 #pragma mark •••Initialization
@@ -208,8 +228,8 @@
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
 - (BOOL) noiseFloorRunning;
-- (int) noiseFloorOffset;
-- (void) setNoiseFloorOffset:(int)aNoiseFloorOffset;
+- (float) finalThresholdOffset;
+- (void) setFinalThresholdOffset:(float)anOffset;
 - (void) findNoiseFloors;
 - (NSString*) noiseFloorStateString;
 
@@ -503,7 +523,7 @@ extern NSString* ORKatrinV4FLTModelModeChanged;
 extern NSString* ORKatrinV4FLTSettingsLock;
 extern NSString* ORKatrinV4FLTModelEventMaskChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorChanged;
-extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
+extern NSString* ORKatrinV4FLTFinalThresholdOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsChanged;

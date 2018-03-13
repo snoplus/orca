@@ -304,9 +304,10 @@
                        object : model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(noiseFloorOffsetChanged:)
-                         name : ORKatrinV4FLTNoiseFloorOffsetChanged
+                     selector : @selector(finalThresholdOffsetChanged:)
+                         name : ORKatrinV4FLTFinalThresholdOffsetChanged
                        object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(histPageABChanged:)
                          name : ORKatrinV4FLTModelHistPageABChanged
@@ -710,7 +711,7 @@
 	[self histFirstEntryChanged:nil];
 	[self histLastEntryChanged:nil];
 	[self noiseFloorChanged:nil];
-	[self noiseFloorOffsetChanged:nil];
+	[self finalThresholdOffsetChanged:nil];
 	[self histPageABChanged:nil];
 	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
@@ -873,9 +874,9 @@
 	[noiseFloorStateField2 setStringValue:[model noiseFloorStateString]];
 }
 
-- (void) noiseFloorOffsetChanged:(NSNotification*)aNote
+- (void) finalThresholdOffsetChanged:(NSNotification*)aNote
 {
-	[noiseFloorOffsetField setIntValue:[model noiseFloorOffset]];
+	[finalThresholdOffsetField setFloatValue:[model finalThresholdOffset]];
 }
 
 
@@ -1268,7 +1269,6 @@
 {
 	[noiseFloorPanel endEditingFor:nil];		
     @try {
-        NSLog(@"IPE V4 FLT (slot %d) Finding Thresholds \n",[model slot]);
 		[model findNoiseFloors];
     }
 	@catch(NSException* localException) {
@@ -1277,11 +1277,9 @@
                         localException);
     }
 }
-- (IBAction) noiseFloorOffsetAction:(id)sender
+- (IBAction) finalThresholdOffsetAction:(id)sender
 {
-    if([sender intValue] != [model noiseFloorOffset]){
-        [model setNoiseFloorOffset:[sender intValue]];
-    }
+    [model setFinalThresholdOffset:[sender floatValue]];
 }
 
 - (IBAction) histClrModeAction:(id)sender
@@ -1597,9 +1595,6 @@
                         localException,[model stationNumber]);
 	}
 }
-
-
-
 
 - (IBAction) statusAction:(id)sender
 {
