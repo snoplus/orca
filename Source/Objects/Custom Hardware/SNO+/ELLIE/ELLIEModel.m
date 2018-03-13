@@ -2529,6 +2529,11 @@ err:
                 [aResult prettyPrint:@"CouchDB Message:"];
             }
 
+            NSString* error = [aResult objectForKey:@"error"];
+            if(error){
+                NSLogColor([NSColor redColor], @"[ELLIE]: Problem recieving couch doc with tag %@: %@\n", aTag, error);
+                return;
+            }
             //Look through all of the possible tags for ellie couchDB results
             //This is called when smellie run header is queried from CouchDB
             if ([aTag isEqualToString:kTellieRunDocumentAdded]){
