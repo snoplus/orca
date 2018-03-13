@@ -107,7 +107,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 @synthesize amellieFireParameters = _amellieFireParameters;
 @synthesize amellieFibreMapping = _amellieFibreMapping;
 @synthesize amellieNodeMapping = _amellieNodeMapping;
-    
+
 @synthesize tellieHost = _tellieHost;
 @synthesize smellieHost = _smellieHost;
 @synthesize interlockHost = _interlockHost;
@@ -252,7 +252,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [_tellieFireParameters release];
     [_tellieFibreMapping release];
     [_tellieNodeMapping release];
-    
+
     // amellie settings
     [_amellieFireParameters release];
     [_amellieFibreMapping release];
@@ -389,7 +389,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     */
     NSNumber* channel;
     NSDictionary* fireParameters;
-    
+
     if(amellie){
         channel = [self calcAmellieChannelForFibre:fibre];
         fireParameters = [self amellieFireParameters];
@@ -445,7 +445,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     } else {
         firePars = [self tellieFireParameters];
     }
-    
+
     // Check if fire parameters have been successfully loaded
     if(firePars == nil){
         if(amellie){
@@ -781,7 +781,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     NSNumber* fibre_delay = [[[self amellieFireParameters]
                               objectForKey:[NSString stringWithFormat:@"channel_%d",[amellieChannel intValue]]]
                                 objectForKey:@"fibre_delay"];
-    
+
     NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
     [settingsDict setValue:fibre forKey:@"fibre"];
     [settingsDict setValue:amellieChannel forKey:@"channel"];
@@ -803,7 +803,6 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     /*
      Launch a thread to host the tellie run functionality.
     */
-    
     //////////////////////
     // Make invocation so we can pass multiple args into thread
     NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieRun: forTELLIE:)];
@@ -813,7 +812,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [invocation setArgument:&fireCommands atIndex:2];
     [invocation setArgument:&forTELLIE atIndex:3];
     [invocation retainArguments];
-    
+
     //////////////////////
     // Start tellie thread
     [self setTellieThread:[[NSThread alloc] initWithTarget:invocation selector:@selector(invoke) object:nil]];
@@ -972,7 +971,6 @@ err:
             NSLogColor([NSColor redColor], @"%@: Please load the TELLIE standard run type.\n",prefix);
             goto err;
         }
-        
     }
 
     ///////////////////////
@@ -1293,7 +1291,7 @@ err:
 
         //Resetting the mtcd to settings before the smellie run
         NSLog(@"%@: Killing requested flash sequence\n", prefix);
-        
+
         // TELLIE
         @try{
             NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
@@ -1559,17 +1557,17 @@ err:{
      the tellieRunDoc propery, to be updated later in the run.
      */
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
-    
+
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
         NSLogColor([NSColor redColor], @"[AMELLIE_UPLOAD]: Couldn't find ORRunModel\n");
         return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
-    
+
     NSString* docType = [NSMutableString stringWithFormat:@"AMELLIE_RUN"];
     NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
-    
+
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
     [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"index"];
@@ -1579,7 +1577,7 @@ err:{
                            [NSNumber numberWithUnsignedLong:[runControl runNumber]], nil]
                    forKey:@"run_range"];
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
-    
+
     [self setAmellieRunDoc:runDocDict];
     [[self couchDBRef:self withDB:@"amellie"] addDocument:runDocDict tag:kAmellieRunDocumentAdded];
 }
@@ -1592,7 +1590,7 @@ err:{
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
-    
+
     // Get run control
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
@@ -1600,19 +1598,19 @@ err:{
         return;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
-    
+
     NSMutableDictionary* runDocDict = [[self amellieRunDoc] mutableCopy];
     NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
-    
+
     [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-    
+
     NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
     [subRunInfo addObject:subRunDocDict];
     [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
-    
+
     //Update tellieRunDoc property.
     [self setAmellieRunDoc:runDocDict];
-    
+
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [[self couchDBRef:self withDB:@"amellie"]
@@ -1633,15 +1631,14 @@ err:{
      and fibreMapping documents. The data is then saved to the member variables
      amellieFireParameters and amellieFibreMapping.
      */
-    
+
     //Set all to be nil
     [self setAmellieFireParameters:nil];
     [self setAmellieFibreMapping:nil];
-    
-    
+
     NSString* fibreString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchFibreMapping?key=2147483647"];
     NSString* nodeString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchNodeMapping?key=2147483647"];
-    
+
     // Make requests
     [[self couchDBRef:self withDB:@"amellie"] getDocumentId:fibreString tag:kAmellieFibresRetrieved];
     [[self couchDBRef:self withDB:@"amellie"] getDocumentId:nodeString tag:kAmellieNodesRetrieved];
@@ -1673,7 +1670,7 @@ err:{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIEMappingReceived object:self];
     });
 }
-    
+
 /*********************************************************/
 /*                  Smellie Functions                    */
 /*********************************************************/

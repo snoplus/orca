@@ -89,17 +89,17 @@
     IBOutlet NSTextField *amellieTriggerDelayTf;
     IBOutlet NSTextField *amellieNoPulsesTf;
     IBOutlet NSTextField *amellieChannelTf;
-    
+
     IBOutlet NSPopUpButton *amellieNodeSelectPb;
     IBOutlet NSPopUpButton *amellieAngleSelectPb;
     IBOutlet NSPopUpButton *amellieOperationModePb; //Operation mode (master or slave)
-    
+
     IBOutlet NSTextField *amellieValidationStatusTf;
-    
+
     IBOutlet NSButton *amellieFireButton;
     IBOutlet NSButton *amellieStopButton;
     IBOutlet NSButton *amellieValidateSettingsButton;
-    
+
     //Server interface ------------------------------------------
 
     IBOutlet NSTextField *tellieHostTf;
@@ -115,7 +115,7 @@
     IBOutlet NSTextField *interlockServerResponseTf;
 
     IBOutlet NSTextField *tubiiThreadResponseTf;
-    
+
     // Instance variables
     NSThread *tellieThread;
     NSButton *tellieExpertConvertAction;
@@ -125,7 +125,7 @@
     NSThread* _smellieThread;
     NSButton *interlockPing;
     NSButton *tubiiRestart;
-    
+
     //For delegation
     NSHashTable* _delegates;
 }

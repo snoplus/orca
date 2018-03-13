@@ -111,7 +111,7 @@
                      selector : @selector(displayAmellieNodes:)
                          name : ORAMELLIEMappingReceived
                         object: nil];
-    
+
     [notifyCenter addObserver : self
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
@@ -121,12 +121,11 @@
                      selector : @selector(killInterlock:)
                          name : @"SMELLIEEmergencyStop"
                         object: nil];
-    
+
     [notifyCenter addObserver : self
                      selector : @selector(tubiiDied:)
                          name : @"TUBiiKeepAliveDied"
                        object : nil];
-
 }
 
 -(void)fetchConfigurationFile:(NSNotification *)aNote{
@@ -215,7 +214,7 @@
     [amellieAngleSelectPb setAction:@selector(updateAmellieChannel)];
     [amellieTriggerDelayTf setStringValue:@"650"];
     [amelliePulseHeightTf setStringValue:@"16383"];
-    
+
     // Build custom run tab
     [tellieBuildPushToDB setEnabled:NO];
     [tellieBuildOpMode removeAllItems];
@@ -237,7 +236,7 @@
     NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
     return [[text componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
 }
-    
+
 -(void)displayAmellieNodes:(id)sender
 {
     // Fill the NSPopUpButton
@@ -270,7 +269,7 @@
 {
     [amellieAngleSelectPb removeAllItems];
     [amellieAngleSelectPb setEnabled:YES];
-    
+
     NSString* panel_name = [NSString stringWithFormat:@"panel_%@", [amellieNodeSelectPb titleOfSelectedItem]];
     NSDictionary* angle_to_fibre = [[model amellieNodeMapping] objectForKey:panel_name];
     for(id angle in angle_to_fibre){
@@ -284,7 +283,7 @@
     [amellieAngleSelectPb selectItemAtIndex:0];
     [self updateAmellieChannel];
 }
-    
+
 -(void)updateAmellieChannel
 {
     NSString* panel_name = [NSString stringWithFormat:@"panel_%@", [amellieNodeSelectPb titleOfSelectedItem]];
@@ -532,7 +531,7 @@
         NSLogColor([NSColor redColor], @"[AMELLIE]: Fire button will not work while an ELLIE run is underway\n");
         return;
     }
-        
+
     [amellieFireButton setEnabled:NO];
     [amellieStopButton setEnabled:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
@@ -866,7 +865,7 @@
     [amellieNoPulsesTf.window makeFirstResponder:nil];
     [amellieNodeSelectPb.window makeFirstResponder:nil];
     [amellieOperationModePb.window makeFirstResponder:nil];
-    
+
     //Check if fibre mapping has been loaded from the amellieDB
     if(![model amellieNodeMapping]){
         [model loadAMELLIEStaticsFromDB];
@@ -876,7 +875,7 @@
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot connect to couchdb database\n");
         return;
     }
-    
+
     NSString* msg = nil;
     NSMutableArray* msgs = [NSMutableArray arrayWithCapacity:7];
     NSLog(@"---------------------------- Amellie Validation messages ----------------------------\n");
@@ -886,35 +885,35 @@
     } else {
         [msgs insertObject:[NSNull null] atIndex:0];
     }
-    
+
     msg = [self validateTellieFibreDelay:[amellieFibreDelayTf stringValue]];
     if(msg){
         [msgs insertObject:msg atIndex:1];
     } else {
         [msgs insertObject:[NSNull null] atIndex:1];
     }
-    
+
     msg = [self validateTelliePulseWidth:[amelliePulseWidthTf stringValue]];
     if(msg){
         [msgs insertObject:msg atIndex:2];
     } else {
         [msgs insertObject:[NSNull null] atIndex:2];
     }
-    
+
     msg = [self validateTelliePulseHeight:[amelliePulseHeightTf stringValue]];
     if(msg){
         [msgs insertObject:msg atIndex:3];
     } else {
         [msgs insertObject:[NSNull null] atIndex:3];
     }
-    
+
     msg = [self validateTelliePulseFreq:[amelliePulseFreqTf stringValue]];
     if(msg){
         [msgs insertObject:msg atIndex:4];
     } else {
         [msgs insertObject:[NSNull null] atIndex:4];
     }
-    
+
     
     msg = [self validateTellieNoPulses:[amellieNoPulsesTf stringValue]];
     if(msg){
@@ -922,14 +921,14 @@
     } else {
         [msgs insertObject:[NSNull null] atIndex:5];
     }
-    
+
     // Remove any null objects
     for(int i = 0; i < [msgs count]; i++){
         if([msgs objectAtIndex:i] == [NSNull null]){
             [msgs removeObject:[msgs objectAtIndex:i]];
         }
     }
-    
+
     // Check if validation passed
     if([msgs count] == 0){
         NSLog(@"[AMELLIE]: fire settings are valid\n");
@@ -1013,7 +1012,7 @@
     if(![model amellieFibreMapping]){
         [model loadAMELLIEStaticsFromDB];
     }
-    
+
     //If still can't get reference, return
     if(![model tellieNodeMapping]){
         NSLogColor([NSColor redColor], @"[TELLIE]: Cannot access node mapping, it's likely the code had been unable to connect to couchdb database\n");
@@ -1033,9 +1032,9 @@
     NSString* generalMsg = nil;
     NSString* buildMsg = nil;
     NSString* amellieMsg = nil;
-    
+
     BOOL gotInside = NO;
-    
+
     //Make sure background gets drawn
     [editedField setDrawsBackground:YES];
 
@@ -1185,10 +1184,10 @@
     
     /////////////////////////////////////////////////////////////
     // check if this notification originated from the AMELLIE tab
-    
+
     //Re-set got inside.
     gotInside = NO;
-    
+
     if([note object] == amellieTriggerDelayTf){
         amellieMsg = [self validateTellieTriggerDelay:currentString];
         gotInside = YES;
@@ -1597,7 +1596,7 @@
         return;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
-    
+
     // If ping was requested by note, wait to see if keep alive inits OK.
     if([[theTubiiModel keepAliveThread] isExecuting]){
         NSString* response = @"TUBii keep alive thread is active.\n";

@@ -2359,17 +2359,17 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
 {
     //Set TellieRunFiles to nil
     [self setAmellieRunFiles:nil];
-    
+
     // Check there is an ELLIE model in the current configuration
     NSArray*  ellieModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
     if(![ellieModels count]){
         NSLogColor([NSColor redColor], @"Must have an ELLIE object in the configuration\n");
         return;
     }
-    
+
     ELLIEModel* anELLIEModel = [ellieModels objectAtIndex:0];
     NSString *requestString = [NSString stringWithFormat:@"_design/runs/_view/run_plans"];
-    
+
     // This line calls [self couchDBresult], which in turn calls [self parseSmellieRunFileDocs] where the
     // [self smellieRunFiles] property variable gets set.
     [[anELLIEModel couchDBRef:self withDB:@"amellie"]  getDocumentId:requestString tag:@"kAmellieRunHeaderRetrieved"];

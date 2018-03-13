@@ -122,7 +122,7 @@
     NSDictionary *tellieRunFile;
     NSDictionary* tellieFireSettings;
     BOOL tellieStandardSequenceFlag;
-    
+
     //AMELLIE
     IBOutlet NSComboBox *amellieRunFileNameField;
     IBOutlet NSTextField *loadedAmellieRunNameLabel;
@@ -132,17 +132,17 @@
     IBOutlet NSTextField *loadedAmellieFibresLabel;
     IBOutlet NSTextField *loadedAmellieRunTimeLabel;
     IBOutlet NSTextField *loadedAmellieOperationLabel;
-    
+
     IBOutlet NSButton *amellieLoadRunFile;
     IBOutlet NSButton *amellieStartRunButton;
     IBOutlet NSButton *amellieStopRunButton;
     IBOutlet NSButton *amellieEmergencyStop;
-    
+
     NSMutableDictionary *_amellieRunFileList;
     NSDictionary *amellieRunFile;
     NSDictionary* amellieFireSettings;
     BOOL amellieStandardSequenceFlag;
-    
+
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
 

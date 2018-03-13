@@ -349,7 +349,7 @@ snopGreenColor;
                      selector : @selector(stopSmellieRunAction:)
                          name : ORSMELLIERunFinishedNotification
                         object: nil];
-    
+
     [notifyCenter addObserver :self
                      selector : @selector(startTellieRunNotification:)
                          name : ORTELLIERunStartNotification
@@ -359,22 +359,22 @@ snopGreenColor;
                      selector : @selector(stopTellieRunAction:)
                          name : ORTELLIERunFinishedNotification
                         object: nil];
-    
+
     [notifyCenter addObserver :self
                      selector : @selector(startAmellieRunNotification:)
                          name : ORAMELLIERunStartNotification
                         object: nil];
-    
+
     [notifyCenter addObserver :self
                      selector : @selector(stopAmellieRunAction:)
                          name : ORAMELLIERunFinishedNotification
                         object: nil];
-    
+
     [notifyCenter addObserver: self
                      selector: @selector(runStatusChanged:)
                          name: ORRunStatusChangedNotification
                        object: nil];
-    
+
     [notifyCenter addObserver:self
                      selector:@selector(standardRunsCollectionChanged:)
                          name:ORSNOPModelSRCollectionChangedNotification
@@ -384,12 +384,12 @@ snopGreenColor;
                      selector:@selector(SRTypeChanged:)
                          name:ORSNOPModelSRChangedNotification
                        object:nil];
-    
+
     [notifyCenter addObserver:self
                      selector:@selector(SRVersionChanged:)
                          name:ORSNOPModelSRVersionChangedNotification
                        object:nil];
-    
+
     [notifyCenter addObserver :self
                      selector :@selector(runTypeWordChanged:)
                          name :ORRunTypeChangedNotification
@@ -1931,33 +1931,33 @@ snopGreenColor;
     {
         //Loop through all the smellie files in the run list
         for(id key in [self amellieRunFileList]){
-            
+
             id currentRunFile = [[self amellieRunFileList] objectForKey:key];
-            
+
             NSString *thisRunFile = [currentRunFile objectForKey:@"name"];
             NSString *requestedRunFile = [amellieRunFileNameField objectValueOfSelectedItem];
-            
+
             if( [thisRunFile isEqualToString:requestedRunFile]){
-                
+
                 [self setAmellieRunFile:currentRunFile];
                 [loadedAmellieRunNameLabel setStringValue:[amellieRunFile objectForKey:@"name"]];
                 [model setAmellieRunNameLabel:[NSString stringWithFormat:@"%@",[amellieRunFile objectForKey:@"name"]]];
-                
+
                 NSArray* fibres = [[self amellieRunFile] objectForKey:@"fibres"];
                 NSString* fibresString = [fibres componentsJoinedByString:@", "];
-                
+
                 [loadedAmellieFibresLabel setStringValue:fibresString];
                 [loadedAmellieIntensityLabel setStringValue:[amellieRunFile objectForKey:@"NHits"]];
                 [loadedAmellieFireRateLabel setStringValue:[amellieRunFile objectForKey:@"trigger_rate"]];
                 [loadedAmellieNoPulsesLabel setStringValue:[amellieRunFile objectForKey:@"trigger_per_node"]];
-                
+
                 BOOL slaveCheck = [[amellieRunFile objectForKey:@"slave_mode"] boolValue];
                 if(slaveCheck){
                     [loadedAmellieOperationLabel setStringValue:@"Slave"];
                 } else {
                     [loadedAmellieOperationLabel setStringValue:@"Master"];
                 }
-                
+
                 // Estimate run time
                 int no_pulses = [[amellieRunFile objectForKey:@"trigger_per_node"] intValue];
                 int no_nodes = [fibres count];
@@ -1985,7 +1985,7 @@ snopGreenColor;
 -(void)startAmellieRunNotification:(NSNotification *)note;
 {
     [self setAmellieFireSettings:[note userInfo]];
-    
+
     //////////////////
     // Get ellie model and launch a fire
     // sequence
@@ -1995,7 +1995,7 @@ snopGreenColor;
         return;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
+
     //////////////////
     // Check if a run is already ongoing
     // If so tell the user and ignore this
@@ -2005,7 +2005,7 @@ snopGreenColor;
         return;
     }
 
-     if(!([model runTypeWord] & kAMELLIERun)){
+    if(!([model runTypeWord] & kAMELLIERun)){
          ORRunAlertPanel(@"The AMELLIE standard run is not loaded.",@"You must load a AMELLIE standard run and start a new run before starting a fire sequence",@"OK",nil,nil);
          return;
      }
@@ -2019,7 +2019,7 @@ snopGreenColor;
     [amellieRunFileNameField setEnabled:NO];
     [amellieStopRunButton setEnabled:YES];
     [amellieStartRunButton setEnabled:NO];
-    
+
     //////////////////////
     // Start tellie thread
     [theELLIEModel startTellieRunThread:[self amellieFireSettings] forTELLIE:NO];
@@ -2027,7 +2027,6 @@ snopGreenColor;
 
 -(IBAction)startAmellieRunAction:(id)sender
 {
-    
     //////////////////
     // Get ellie model
     NSArray*  objs = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ELLIEModel")];
@@ -2036,7 +2035,7 @@ snopGreenColor;
         return;
     }
     ELLIEModel* theELLIEModel = [objs objectAtIndex:0];
-    
+
     //////////////////
     // Check if a run is already ongoing
     // If so tell the user and ignore this
@@ -2072,19 +2071,19 @@ snopGreenColor;
                                                                withTriggerDelay:delay
                                                                         inSlave:inSlave
                                                                       isAMELLIE:@YES];
-        
+
         [settingsArray addObject:settings];
     }
-    
+
     /////////////////////
     // Set a flag which defines if we should
     // roll over into maintenance or not.
     [self setTellieStandardSequenceFlag:YES];
-    
+
     [amellieRunFileNameField setEnabled:NO];
     [amellieStopRunButton setEnabled:YES];
     [amellieStartRunButton setEnabled:NO];
-    
+
     //////////////////////
     // Start tellie thread
     [theELLIEModel startTellieMultiRunThread:settingsArray forTELLIE:NO];

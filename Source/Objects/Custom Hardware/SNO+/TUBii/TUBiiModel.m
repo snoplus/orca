@@ -170,7 +170,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
                      selector : @selector(restartKeepAlive:)
                          name : @"TUBiiKeepAliveDied"
                        object : nil];
-    
+
     [notifyCenter addObserver : self
                      selector : @selector(killKeepAlive:)
                          name : @"TELLIEEmergencyStop"
@@ -961,7 +961,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         }
         counter = counter + 1;
     }
-    
+
     NSLog(@"[TUBii]: Stopped sending keep-alive to TUBii - ELLIE pulses will be shut off\n");
 
     // This thread should always be running. If it's died, post a note to get it automatically restarted.
