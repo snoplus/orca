@@ -2519,6 +2519,10 @@ err:
      id anOp:        This doesn't appear to be used??
      */
     @synchronized(self){
+        if(aResult == (id)[NSNull null]){
+            NSLogColor([NSColor redColor], @"[ELLIE]: DB Query returned NULL %@", aTag);
+            return;
+        }
         if([aResult isKindOfClass:[NSDictionary class]]){
             NSString* message = [aResult objectForKey:@"Message"];
             if(message){
