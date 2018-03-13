@@ -389,6 +389,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     */
     NSNumber* channel;
     NSDictionary* fireParameters;
+    
     if(amellie){
         channel = [self calcAmellieChannelForFibre:fibre];
         fireParameters = [self amellieFireParameters];
@@ -404,7 +405,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
                                                    withNPhotons:photons
                                               withFireFrequency:frequency
                                                         inSlave:mode
-                                                        isAMELLIE:@NO];
+                                                        isAMELLIE:amellie];
     if([pulseWidth intValue] < 0){
         return nil;
     }
@@ -1126,6 +1127,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
+
             @try{
                 [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
             } @catch(NSException* e) {
@@ -1133,7 +1135,7 @@ err:
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
- }
+        }
         
         ////////////////////
         // Init can take a while. Make sure no-one hit

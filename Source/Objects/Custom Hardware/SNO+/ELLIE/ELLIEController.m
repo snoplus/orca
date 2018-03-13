@@ -442,7 +442,7 @@
         noPulses = freq;
     }
     
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:freq withNPulses:noPulses withTriggerDelay:700 inSlave:(BOOL)inSlave isAMELLIE:@NO];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:freq withNPulses:noPulses withTriggerDelay:700 inSlave:(BOOL)inSlave isAMELLIE:NO];
     if(settings){
         float frequency = (1. / [[settings objectForKey:@"pulse_separation"] floatValue])*1000;
         //Set text fields appropriately
@@ -731,7 +731,7 @@
         inSlave = NO;
     }
     
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieGeneralFibreSelectPb titleOfSelectedItem] withNPhotons:[tellieGeneralPhotonsTf integerValue] withFireFrequency:[tellieGeneralFreqTf integerValue] withNPulses:[tellieGeneralNoPulsesTf integerValue] withTriggerDelay:[tellieGeneralTriggerDelayTf integerValue] inSlave:inSlave isAMELLIE:@NO];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieGeneralFibreSelectPb titleOfSelectedItem] withNPhotons:[tellieGeneralPhotonsTf integerValue] withFireFrequency:[tellieGeneralFreqTf integerValue] withNPulses:[tellieGeneralNoPulsesTf integerValue] withTriggerDelay:[tellieGeneralTriggerDelayTf integerValue] inSlave:inSlave isAMELLIE:NO];
     
     if(settings){
         [self setGuiFireSettings:settings];
