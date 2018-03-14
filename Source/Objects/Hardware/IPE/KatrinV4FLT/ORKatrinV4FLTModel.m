@@ -97,6 +97,7 @@ NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTMod
 NSString* ORKatrinV4FLTModelHitRateModeChanged              = @"ORKatrinV4FLTModelHitRateModeChanged";
 NSString* ORKatrinV4FLTModelLostEventsChanged               = @"ORKatrinV4FLTModelLostEventsChanged";
 NSString* ORKatrinV4FLTModelLostEventsTrChanged             = @"ORKatrinV4FLTModelLostEventsTrChanged";
+NSString* ORKatrinV4FLTStartingUpperBoundChanged            = @"ORKatrinV4FLTStartingUpperBoundChanged";
 
 
 static NSString* fltTestName[kNumKatrinV4FLTTests]= {
@@ -805,6 +806,19 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTFinalThresholdOffsetChanged object:self];
 }
 
+- (unsigned  long) startingUpperBound
+{
+    if(startingUpperBound==0)startingUpperBound = 65535;
+    return startingUpperBound;
+}
+- (void) setStartingUpperBound:(unsigned  long)aValue
+{
+    if(aValue == 0) aValue = 65535;
+    [[[self undoManager] prepareWithInvocationTarget:self] setStartingUpperBound:startingUpperBound];
+    startingUpperBound = aValue;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTStartingUpperBoundChanged object:self];
+}
+
 - (unsigned long) histLastEntry { return histLastEntry; }
 - (void) setHistLastEntry:(unsigned long)aHistLastEntry
 {
@@ -1061,14 +1075,20 @@ static double table[32]={
 //for HardwareWizard access
 - (void) setScaledThreshold:(short)aChan withValue:(float)aValue
 {
-    [self setFloatThreshold:aChan withValue:aValue * powf(2.,[self filterShapingLength])];
-}
-- (float) scaledThreshold:(short)aChan
-{
-    return [self threshold:aChan] / powf(2.,[self filterShapingLength]);
+    [self setFloatThreshold:aChan withValue:aValue * [self actualFilterLength]];
 }
 
--(float) threshold:(unsigned short) aChan
+- (float) actualFilterLength
+{
+    return powf(2.,[self filterShapingLength]);
+}
+                
+- (float) scaledThreshold:(short)aChan
+{
+    return [self threshold:aChan] / [self actualFilterLength];
+}
+
+- (float) threshold:(unsigned short) aChan
 {
     return [[thresholds objectAtIndex:aChan] floatValue];
 }
@@ -1082,7 +1102,7 @@ static double table[32]={
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFloatThreshold:aChan withValue:[self threshold:aChan]];
     if(aThreshold<=0)aThreshold=0;
-    else if(aThreshold>0xfffff)aThreshold = 0xfffff;
+    else if(aThreshold>65535.)aThreshold = 65535.;
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -2087,7 +2107,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setForceFLTReadout:           [decoder decodeBoolForKey:  @"forceFLTReadout"]];
     [self setFilterShapingLengthOnInit: [decoder decodeIntForKey:   @"filterShapingLength"]];
     [self setFinalThresholdOffset:      [decoder decodeFloatForKey: @"finalThresholdOffset"]];
-	//TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
+    [self setStartingUpperBound:        [decoder decodeInt32ForKey: @"startingUpperBound"]];
+
+    int i;
+    for(i=0;i<kNumV4FLTChannels;i++){
+        [self setScaledThreshold:i withValue: [decoder decodeFloatForKey: [NSString stringWithFormat:@"scaledThreshold%d",i]]];
+    }
+    //TODO: many fields are  still in super class ORIpeV4FLTModel, some should move here (see ORIpeV4FLTModel::initWithCoder, see my comments in 2011-04-07-ORKatrinV4FLTModel.m) -tb-
     
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -2110,11 +2136,18 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:poleZeroCorrection           forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable               forKey:@"customVariable"];
     [encoder encodeInt:fifoLength                   forKey:@"fifoLength"];
-    [encoder encodeFloat:finalThresholdOffset             forKey:@"finalThresholdOffset"];
+    [encoder encodeFloat:finalThresholdOffset       forKey:@"finalThresholdOffset"];
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
     [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
     [encoder encodeInt:filterShapingLength          forKey:@"filterShapingLength"];
+    [encoder encodeInt32:startingUpperBound         forKey:@"startingUpperBound"];
+    
+    int i;
+    for(i=0;i<kNumV4FLTChannels;i++){
+        [encoder encodeFloat:[self scaledThreshold:i] forKey:[NSString stringWithFormat:@"scaledThreshold%d",i]];
+    }
+
 }
 
 #pragma mark Data Taking
@@ -3411,7 +3444,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
 	[[self undoManager] disableUndoRegistration];
 	int i;
-	float           maxThreshold     = 65535.;
+	float           maxThreshold     = [self startingUpperBound];
     unsigned long   newHitMask       = 0x0;
     BOOL            progress         = NO;
     id slt = [[self crate] adapter];
@@ -3428,15 +3461,14 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     [slt saveInhibitStatus];
                 }
                 [slt writeClrInhibit];     // Release inhibit
-                
+                oldHitRateMask = [self hitRateEnabledMask];
 				//set max threshold on all channels (saving old values)
 				for(i=0;i<kNumV4FLTChannels;i++){
                     if([self hitRateEnabled:i]){
-                        oldEnabled[i]      = [self hitRateEnabled:i];
-                        thresholdHi[i]     = maxThreshold;
-                        thresholdLo[i]     = 0;
+                        upperThresholdBound[i]     = maxThreshold;
+                        lowerThresholdBound[i]     = 0;
                         oldThresholds[i]   = [self scaledThreshold:i];
-                        thresholdTest[i]   = maxThreshold;
+                        thresholdToTest[i]   = maxThreshold;
                         workingChanCount++;
                    }
 				}
@@ -3470,18 +3502,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                         if([self hitRate:i] == 0) {
                             //last written threshold too high
                             //lower the threshold to midway
-                            lastThresholdHi[i] = thresholdHi[i];
-                            thresholdTest[i]   = thresholdLo[i] + ((thresholdHi[i]-thresholdLo[i])/2.);
-                            thresholdHi[i]     = thresholdTest[i];
+                            lastThresholdWithNoRate[i] = upperThresholdBound[i];
+                            thresholdToTest[i]         = lowerThresholdBound[i] + ((upperThresholdBound[i]-lowerThresholdBound[i])/2.);
+                            upperThresholdBound[i]     = thresholdToTest[i];
                         }
                         //case 2: rate too high
                         else if([self hitRate:i] > targetRate) {
                             //know the lastThreshold had zero rates
-                            //move lo thres up and go to new mid value
-                            //to the last hi thres value
-                            thresholdLo[i]   = thresholdHi[i];
-                            thresholdHi[i]   = lastThresholdHi[i];
-                            thresholdTest[i] = thresholdHi[i];
+                            //move lower bounds up
+                            lowerThresholdBound[i] = upperThresholdBound[i];
+                            upperThresholdBound[i] = lastThresholdWithNoRate[i];
+                            thresholdToTest[i]     = upperThresholdBound[i];
                         }
                         //case 3: rate is exactly right.. TDB... need to handle case where we miss and the delta keeps shrinking.. MAH
                         else {
@@ -3504,7 +3535,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 			case eSetThresholds:
 				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
-                        [self setScaledThreshold:i withValue:thresholdTest[i]];
+                        [self setScaledThreshold:i withValue:thresholdToTest[i]];
 					}
 				}
 				[self initBoard];
@@ -3514,9 +3545,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 
 			case eFinishing: //finish up
 				//load new results
-				for(i=0;i<kNumV4FLTChannels;i++){
-					[self setHitRateEnabled:i withValue:oldEnabled[i]];
-				}
+                [self setHitRateEnabledMask:oldHitRateMask];
+				
 				noiseFloorRunning = NO;
                 [self setHitRateLength:oldHitRateLength];
                 [self setHitRateMode:oldHitRateMode]; //always
@@ -3535,13 +3565,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 
             case eManualAbort:
                 noiseFloorRunning = NO;
+                [self setHitRateEnabledMask:oldHitRateMask];
+
                 for(i=0;i<kNumV4FLTChannels;i++){
-                    [self setHitRateEnabled:i withValue:oldEnabled[i]];
-                    [self setScaledThreshold:i withValue:oldThresholds[i]];
-                    [self initBoard];
-                    [self setHitRateLength:oldHitRateLength];
-                    [self setHitRateMode:oldHitRateMode];
+                    if(oldHitRateMask & (0x1<<i)){
+                        [self setScaledThreshold:i withValue:oldThresholds[i]];
+                        [self setHitRateLength:oldHitRateLength];
+                        [self setHitRateMode:oldHitRateMode];
+                    }
                 }
+                [self initBoard];
+
                 NSLog(@"%@ Threshold Finder manually stopped\n",[self fullID]);
 
                 break;
@@ -3559,14 +3593,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     }
 	@catch(NSException* localException) {
         int i;
+        [self setHitRateEnabledMask:oldHitRateMask];
+
         for(i=0;i<kNumV4FLTChannels;i++){
-            [self setHitRateEnabled:i withValue:oldEnabled[i]];
-            [self setScaledThreshold:i withValue:oldThresholds[i]];
-			//[self reset];
-			[self initBoard];
-            [self setHitRateLength:oldHitRateLength];
-            [self setHitRateMode:oldHitRateMode];
+            if(oldHitRateMask & (0x1<<i)){
+                [self setFloatThreshold:i withValue:oldThresholds[i]];
+                [self setHitRateLength:oldHitRateLength];
+                [self setHitRateMode:oldHitRateMode];
+            }
         }
+        [self initBoard];
+
 		NSLog(@"&@ threshold finder quit because of exception\n",[self fullID]);
     }
 	[[self undoManager] enableUndoRegistration];

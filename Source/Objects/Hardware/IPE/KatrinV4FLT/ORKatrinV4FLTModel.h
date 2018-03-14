@@ -131,14 +131,15 @@ enum {
     BOOL initializing;
 
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
-    
+    unsigned long   oldHitRateMask;
     unsigned short  oldHitRateLength;
     int             oldHitRateMode;
-    float thresholdLo[kNumV4FLTChannels];
-    float thresholdHi[kNumV4FLTChannels];
-    float lastThresholdHi[kNumV4FLTChannels];
-    float thresholdTest[kNumV4FLTChannels];
+    float lowerThresholdBound[kNumV4FLTChannels];
+    float upperThresholdBound[kNumV4FLTChannels];
+    float lastThresholdWithNoRate[kNumV4FLTChannels];
+    float thresholdToTest[kNumV4FLTChannels];
     float oldThresholds[kNumV4FLTChannels];
+    int startingUpperBound;
     float finalThresholdOffset;
     int   doneChanCount;
     int   workingChanCount;
@@ -228,6 +229,8 @@ enum {
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
 - (BOOL) noiseFloorRunning;
+- (unsigned  long) startingUpperBound;
+- (void) setStartingUpperBound:(unsigned  long)aValue;
 - (float) finalThresholdOffset;
 - (void) setFinalThresholdOffset:(float)anOffset;
 - (void) findNoiseFloors;
@@ -283,6 +286,7 @@ enum {
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
+- (float) actualFilterLength;
 - (float)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
 - (BOOL) triggerEnabled:(unsigned short) aChan;
@@ -528,6 +532,7 @@ extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsTrChanged;
+extern NSString* ORKatrinV4FLTStartingUpperBoundChanged;
 
 extern NSString* ORIpeSLTModelName;
 
