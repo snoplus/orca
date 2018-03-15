@@ -53,20 +53,26 @@
 {
     NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	if(currentDecoder){
-        NSError* err = nil;
         @try {
+            long long dataSizeLimit = 2147483648LL;
             NSLog(@"Data Explorer: Opening %@\n",filePath);
-            // NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
-            //fileAsData = [[fh readDataToEndOfFile] retain];
-            //[fh closeFile];
-            fileAsData = [[NSData alloc] initWithContentsOfFile:filePath options:NSUncachedRead | NSMappedRead error:&err];
-
+            NSError*      attributesError;
+            NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&attributesError];
+            long long     fileSize       = [[fileAttributes objectForKey:NSFileSize] longLongValue];
+            NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:filePath];
+            if(fileSize < dataSizeLimit){
+                fileAsData = [[fh readDataToEndOfFile] retain];
+            }
+            else {
+                fileAsData = [[fh readDataOfLength:dataSizeLimit] retain];
+                NSLog(@"Data Explorer: Truncating %@ at 2GB limit\n",filePath);
+            }
+            [fh closeFile];
             [delegate setDataRecords:[self decodeDataIntoArray]];
             [delegate setHeader:[ORHeaderItem headerFromObject:[currentDecoder fileHeader] named:@"Root"]];
         }
         @catch(NSException* e){
             NSLogColor([NSColor redColor],@"Data Explorer: File too big -- out of memory\n");
-            NSLogColor([NSColor redColor],@"Data Explorer: %@\n",err);
             [delegate setDataRecords:nil];
             [delegate setHeader:nil];
         }
