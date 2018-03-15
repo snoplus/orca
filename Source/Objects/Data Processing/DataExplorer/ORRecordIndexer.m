@@ -54,7 +54,7 @@
     NSAutoreleasePool* thePool = [[NSAutoreleasePool alloc] init];
 	if(currentDecoder){
         @try {
-            long long dataSizeLimit = 2147483648LL;
+            long long dataSizeLimit = 2.0e9;
             NSLog(@"Data Explorer: Opening %@\n",filePath);
             NSError*      attributesError;
             NSDictionary* fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&attributesError];
@@ -64,8 +64,9 @@
                 fileAsData = [[fh readDataToEndOfFile] retain];
             }
             else {
-                fileAsData = [[fh readDataOfLength:dataSizeLimit] retain];
-                NSLog(@"Data Explorer: Truncating %@ at 2GB limit\n",filePath);
+                fileAsData = [[fh readDataOfLength:dataSizeLimit*.5] retain];
+                NSLogColor([NSColor redColor],@"Data Explorer: Truncating the parse of %@ to 1GB\n",filePath);
+                NSLogColor([NSColor redColor],@"Data Explorer: Parse will probably report corrupt last record\n");
             }
             [fh closeFile];
             [delegate setDataRecords:[self decodeDataIntoArray]];
