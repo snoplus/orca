@@ -1131,7 +1131,7 @@ static double table[32]={
 
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan
 {
-	return [self threshold:aChan];
+    return [[thresholds objectAtIndex:aChan] floatValue] / [self actualFilterLength];
 }
 
 - (unsigned short) gainForDisplay:(unsigned short) aChan
@@ -1482,13 +1482,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) initBoard
 {
     
-    [self writeClrCnt]; // Clear lost event counters
+    [self writeClrCnt];                     // Clear lost event counters
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
-	[self writeReg: kFLTV4PostTriggerReg      value:postTriggerTime];
+	[self writeReg: kFLTV4PostTriggerReg   value:postTriggerTime];
 	[self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
 	[self loadThresholdsAndGains];
-	[self writeReg:kFLTV4AnalogOffsetReg  value:analogOffset];
+	[self writeReg:kFLTV4AnalogOffsetReg   value:analogOffset];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	
@@ -3434,8 +3434,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     return n;
 }
-
-
 @end
 
 @implementation ORKatrinV4FLTModel (private)
@@ -3481,9 +3479,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 if(workingChanCount) {
                     doneChanCount = 0;
                     noiseFloorState = eSetThresholds;
-                    NSLog(@"%@ Finding Thresholds\n",[self fullID]);
-
-                    NSLog(@"%@ Threshold Finder working on %d channel%@\n",[self fullID] ,workingChanCount,workingChanCount>1?@"s":@"");
+                    NSLog(@"%@ Threshold Finder Started\n",[self fullID]);
+                    NSLog(@"%@ Working on %d channel%@\n",[self fullID] ,workingChanCount,workingChanCount>1?@"s":@"");
                 }
 				else			     noiseFloorState = eNothingToDo; //nothing to do
 			break;
@@ -3497,25 +3494,29 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 newHitMask = hitRateEnabledMask;
                 
                 for(i=0;i<kNumV4FLTChannels;i++) {
+                    BOOL doneWithChannel = NO;
                     if([self hitRateEnabled:i]) {
-                        //case 1: rate is zero
-                        if([self hitRate:i] == 0) {
-                            //last written threshold too high
-                            //lower the threshold to midway
+                        if(fabs(upperThresholdBound[i]-lowerThresholdBound[i])<0.001){
+                            //case 0: not necessarily done, but the upper and lower bounds have converged
+                            doneWithChannel = YES;
+                        }
+                        else if([self hitRate:i] == 0) {
+                            //case 1: rate is zero. Lower the upper bound
                             lastThresholdWithNoRate[i] = upperThresholdBound[i];
                             thresholdToTest[i]         = lowerThresholdBound[i] + ((upperThresholdBound[i]-lowerThresholdBound[i])/2.);
                             upperThresholdBound[i]     = thresholdToTest[i];
                         }
-                        //case 2: rate too high
                         else if([self hitRate:i] > targetRate) {
-                            //know the lastThreshold had zero rates
-                            //move lower bounds up
+                            //case 2: rate too high. Reset the lower bound and try again
                             lowerThresholdBound[i] = upperThresholdBound[i];
                             upperThresholdBound[i] = lastThresholdWithNoRate[i];
                             thresholdToTest[i]     = upperThresholdBound[i];
                         }
-                        //case 3: rate is exactly right.. TDB... need to handle case where we miss and the delta keeps shrinking.. MAH
                         else {
+                            //case 3: rate is exactly right
+                            doneWithChannel = YES;
+                        }
+                        if(doneWithChannel){
                             newHitMask &= ~(1L<<i);
                             [self setHitRateEnabledMask:newHitMask];
                             oldThresholds[i]   = [self scaledThreshold:i];
@@ -3525,7 +3526,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     }
                 }
                 if(progress){
-                    NSLog(@"%@ Found Threshold%@ for %d/%d channel\n",[self fullID],workingChanCount>1?@"s":@"",doneChanCount,workingChanCount);
+                    NSLog(@"%@ Done with %d/%d channel%@\n",[self fullID],doneChanCount,workingChanCount,workingChanCount>1?@"s":@"");
                 }
                 if(hitRateEnabledMask)  noiseFloorState = eSetThresholds;   //go check for data
                 else                    noiseFloorState = eFinishing;       //done
@@ -3543,25 +3544,21 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 				else					noiseFloorState = eFinishing;	//done
 			break;
                 
-			case eFinishing: //finish up
-				//load new results
+			case eFinishing:
                 [self setHitRateEnabledMask:oldHitRateMask];
-				
-				noiseFloorRunning = NO;
-                [self setHitRateLength:oldHitRateLength];
-                [self setHitRateMode:oldHitRateMode]; //always
-                // Restore inhibit state
+                [self setHitRateLength:     oldHitRateLength];
+                [self setHitRateMode:       oldHitRateMode];
                 if ([slt numberOfActiveThresholdFinder] == 0){
                     [slt restoreInhibitStatus];
                 }
-                [self initBoard];
+                NSLog(@"%@ Threshold Finder Done\n",[self fullID]);
                 noiseFloorRunning = NO;
 			break;
                 
             case eNothingToDo:
                 noiseFloorRunning = NO;
                 NSLog(@"%@ Threshold Finder quit because no channels have hitrate enabled\n",[self fullID]);
-             break;
+            break;
                 
             case eManualAbort:
                 noiseFloorRunning = NO;
@@ -3578,7 +3575,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
                 NSLog(@"%@ Threshold Finder manually stopped\n",[self fullID]);
 
-                break;
+            break;
 		}
         
 		if(noiseFloorRunning){
@@ -3591,6 +3588,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTNoiseFloorChanged object:self];
     }
+    
 	@catch(NSException* localException) {
         int i;
         [self setHitRateEnabledMask:oldHitRateMask];
@@ -3638,6 +3636,4 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	fltRunMode = savedMode;
 	[self writeControl];
 }
-
-
 @end
