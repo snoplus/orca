@@ -650,13 +650,13 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) startReplication
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-    
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
+
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startReplication) object:nil];
-   
+    [self performSelector:@selector(startReplication) withObject:nil afterDelay:3600];
+
     [self replicate:YES restart:replicationRunning];
     
-	[self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
-    [self performSelector:@selector(startReplication) withObject:nil afterDelay:3600];
 }
 
 - (void) replicate:(BOOL)continuously
@@ -682,6 +682,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProcesses) object:nil];
+        [self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];
         NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
         
         NSMutableArray* arrayForDoc = [NSMutableArray array];
@@ -721,7 +722,6 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
         NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"_id",@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
         [[self statusDBRef] updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
 		
-		[self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];	
 	}
 }
 
@@ -729,6 +729,7 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
 	if(!stealthMode){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateMachineRecord) object:nil];
+        [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
         if([thisHostAdress length]==0){
             //only have to get this once
             struct ifaddrs *ifaddr, *ifa;
@@ -811,7 +812,6 @@ nil];
 
         [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
     }
-    [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
 	
 }
 
@@ -905,10 +905,10 @@ nil];
 {
     if (stealthMode) return;
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
     [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
     if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
     [self getRemoteInfo:NO];
-    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
 }
 
 - (void) setDBInfo:(NSDictionary*)someInfo
@@ -1115,8 +1115,8 @@ nil];
 {
     if (stealthMode) return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(periodicCompact) object:nil];
+    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 	[self compactDatabase];
-	[self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
 }
 
 - (void) compactDatabase
@@ -1459,9 +1459,9 @@ nil];
 {
 	if(!stealthMode){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
+        [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:30];
         id experiment = [self objectConnectedTo:ORCouchDBModelInConnector];
         [experiment postCouchDBRecord];
-        [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:30];
 	}
 }
 
