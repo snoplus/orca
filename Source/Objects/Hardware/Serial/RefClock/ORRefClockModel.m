@@ -189,7 +189,7 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:synClockModel    forKey:@"synClockModel"];
-    [encoder encodeObject:synClockModel    forKey:@"motoGPSModel"];
+    [encoder encodeObject:motoGPSModel    forKey:@"motoGPSModel"];
 }
 
 - (void)serialPortWriteProgress:(NSDictionary *)dataDictionary

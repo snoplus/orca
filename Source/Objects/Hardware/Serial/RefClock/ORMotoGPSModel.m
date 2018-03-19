@@ -85,6 +85,15 @@ extern NSString* ORMotoGPS;
     return [refClock portIsOpen];
 }
 
+- (int) CableDelay
+{
+    return cableDelayNs;
+}
+- (void) setCableDelay:(int)aDelay
+{
+    cableDelayNs = aDelay;
+}
+
 #pragma mark *** Commands
 - (void) writeData:(NSDictionary*)aDictionary
 {
@@ -374,12 +383,14 @@ extern NSString* ORMotoGPS;
     self = [super init];
 
     [[self undoManager] disableUndoRegistration];
+    [self setCableDelay:  [decoder decodeIntForKey:  @"cableDelayNs"]];
     [[self undoManager] enableUndoRegistration];
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder*)encoder  // todo: function needed?
 {
+    [encoder encodeInt: cableDelayNs  forKey:@"cableDelayNs"];
 }
 @end
 

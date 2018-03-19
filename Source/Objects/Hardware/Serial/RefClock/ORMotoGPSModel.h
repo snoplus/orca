@@ -41,6 +41,7 @@
         // int reTxCount;  // in case of errors or timeout retransmit; if retransmit
         // // is required, put last command to cmdQueue and dequeueFromBottom
         //
+        int  cableDelayNs;
         BOOL statusPoll;
 }
 
@@ -52,6 +53,8 @@
 - (BOOL) portIsOpen;
 - (BOOL) statusPoll;
 - (void) setStatusPoll:(BOOL)aStatusPoll;
+- (int) CableDelay;
+- (void) setCableDelay:(int)aDelay;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;

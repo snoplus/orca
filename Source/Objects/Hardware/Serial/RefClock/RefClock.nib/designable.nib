@@ -11,7 +11,6 @@
             <connections>
                 <outlet property="lockButton" destination="1311" id="1319"/>
                 <outlet property="motoGPSController" destination="rTr-Oc-9lG" id="F4t-vL-ujU"/>
-                <outlet property="motoGPSView" destination="qld-j4-9rT" id="NE9-Hv-oDL"/>
                 <outlet property="openPortButton" destination="888" id="889"/>
                 <outlet property="portNameField" destination="7Al-mA-my7" id="P7A-H6-ODC"/>
                 <outlet property="portStateField" destination="892" id="893"/>
