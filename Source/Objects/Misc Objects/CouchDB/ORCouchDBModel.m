@@ -650,13 +650,17 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) startReplication
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
-
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(startReplication) object:nil];
-    [self performSelector:@selector(startReplication) withObject:nil afterDelay:3600];
-
-    [self replicate:YES restart:replicationRunning];
-    
+    @try {
+        [self replicate:YES restart:replicationRunning];
+    }
+    @catch(NSException* e){
+        NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+    }
+    @finally {
+        [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:4];
+        [self performSelector:@selector(startReplication) withObject:nil afterDelay:3600];
+    }
 }
 
 - (void) replicate:(BOOL)continuously
@@ -681,138 +685,152 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 - (void) updateProcesses
 {
 	if(!stealthMode){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProcesses) object:nil];
-        [self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];
-        NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
+        @try {
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateProcesses) object:nil];
+            NSArray* theProcesses = [[[[self document] collectObjectsOfClass:NSClassFromString(@"ORProcessModel")] retain] autorelease];
         
-        NSMutableArray* arrayForDoc = [NSMutableArray array];
-        if([theProcesses count]){
-            for(id aProcess in theProcesses){
-                NSString* shortName     = [aProcess shortName];
-                
-                NSDate *localDate = [aProcess lastSampleTime];
+            NSMutableArray* arrayForDoc = [NSMutableArray array];
+            if([theProcesses count]){
+                for(id aProcess in theProcesses){
+                    NSString* shortName     = [aProcess shortName];
+                    
+                    NSDate *localDate = [aProcess lastSampleTime];
+                    
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
+                    
+                    NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+                    [dateFormatter setTimeZone:gmt];
+                    NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
+                    NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
+                    unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
+                    [dateFormatter release];
+                    
+                    if(![lastTimeStamp length]) lastTimeStamp = @"0";
+                    if(![shortName length]) shortName = @"Untitled";
+                    
+                    NSString* s = [aProcess report];
+                    
+                    NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                 [aProcess fullID],@"name",
+                                                 shortName,@"title",
+                                                 lastTimeStamp,@"timestamp",
+                                                 [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                                 s,@"data",
+                                                 [NSNumber numberWithUnsignedLong:[aProcess processRunning]] ,@"state",
+                                                 nil];
+                    [arrayForDoc addObject:processInfo];
+                }
+            }
+        
+            NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"_id",@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
+            [[self statusDBRef] updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
+        }
+        @catch(NSException* e){
+            NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+        }
+        @finally {
+            [self performSelector:@selector(updateProcesses) withObject:nil afterDelay:30];
+        }
+
+	}
+}
+
+- (void) updateMachineRecord
+{
+        if(!stealthMode){
+            @try {
+                [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateMachineRecord) object:nil];
+                if([thisHostAdress length]==0){
+                    //only have to get this once
+                    struct ifaddrs *ifaddr, *ifa;
+                    if (getifaddrs(&ifaddr) == 0) {
+                        // Successfully received the structs of addresses.
+                        char tempInterAddr[INET_ADDRSTRLEN];
+                        NSMutableArray* names = [NSMutableArray array];
+                        // The following is a replacement for [[NSHost currentHost] addresses].  The problem is
+                        // that the NSHost call can do reverse DNS calls which block and are *very* slow.  The
+                        // following is much faster.
+                        for (ifa = ifaddr; ifa != nil; ifa = ifa->ifa_next) {
+                            // skip IPv6 addresses
+                            if (ifa->ifa_addr->sa_family != AF_INET) continue;
+                            inet_ntop(AF_INET,
+                                      &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
+                                      tempInterAddr,
+                                      sizeof(tempInterAddr));
+                            [names addObject:[NSString stringWithCString:tempInterAddr encoding:NSASCIIStringEncoding]];
+                        }
+                        freeifaddrs(ifaddr);
+                        // Now enumerate and find the first non-loop-back address.
+                        NSEnumerator* e = [names objectEnumerator];
+                        id aName;
+                        while(aName = [e nextObject]){
+                            if([aName rangeOfString:@".0.0."].location == NSNotFound){
+                                thisHostAdress = [aName copy];
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(!thisHostAdress)thisHostAdress = @"";
                 
                 NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                 dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
                 
                 NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
                 [dateFormatter setTimeZone:gmt];
-                NSString *lastTimeStamp = [dateFormatter stringFromDate:localDate];
+                NSString *lastTimeStamp = [dateFormatter stringFromDate:[NSDate date]];
                 NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
                 unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
                 [dateFormatter release];
                 
+                
                 if(![lastTimeStamp length]) lastTimeStamp = @"0";
-                if(![shortName length]) shortName = @"Untitled";
                 
-                NSString* s = [aProcess report];
+                NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                        @"machineinfo", @"_id",
+                                                        @"machineinfo", @"type",
+                                                        [NSNumber numberWithLong:[[(ORAppDelegate*)(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
+                                                        computerName(), @"name",
+                                                        macAddress(),   @"hw_address",
+                                                        thisHostAdress, @"ip_address",
+                                                        fullVersion(),  @"version",
+                                                        lastTimeStamp,  @"timestamp",
+                                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+        nil];
                 
-                NSDictionary* processInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                             [aProcess fullID],@"name",
-                                             shortName,@"title",
-                                             lastTimeStamp,@"timestamp",
-                                             [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-                                             s,@"data",
-                                             [NSNumber numberWithUnsignedLong:[aProcess processRunning]] ,@"state",
-                                             nil];
-                [arrayForDoc addObject:processInfo];
+                NSFileManager* fm = [NSFileManager defaultManager];
+                
+                NSArray* diskInfo = [fm mountedVolumeURLsIncludingResourceValuesForKeys:0 options:NSVolumeEnumerationSkipHiddenVolumes];
+                NSMutableArray* diskStats = [NSMutableArray array];
+                for(id aVolume in diskInfo){
+                    NSError *fsError = nil;
+                    aVolume = [aVolume relativePath];
+                    NSDictionary *fsDictionary = [fm attributesOfFileSystemForPath:aVolume error:&fsError];
+                    
+                    if (fsDictionary != nil){
+                        double freeSpace   = [[fsDictionary objectForKey:@"NSFileSystemFreeSize"] doubleValue]/1E9;
+                        double totalSpace  = [[fsDictionary objectForKey:@"NSFileSystemSize"] doubleValue]/1E9;
+                        double percentUsed   = 100*(totalSpace-freeSpace)/totalSpace;
+                        if([aVolume rangeOfString:@"Volumes"].location !=NSNotFound){
+                            aVolume = [aVolume substringFromIndex:9];
+                        }
+                        NSDictionary* dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.02f%% Full",percentUsed] forKey:aVolume];
+                        [diskStats addObject:dict];
+                     }
+                }
+                if([diskStats count]>0) [machineInfo setObject:diskStats forKey:@"diskInfo"];
+
+                [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
+            }
+            @catch (NSException* e){
+                NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+            }
+            @finally {
+                [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
             }
         }
-        
-        NSDictionary* processInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"processinfo",@"_id",@"processinfo",@"name",arrayForDoc,@"processlist",@"processes",@"type",nil];
-        [[self statusDBRef] updateDocument:processInfo documentId:@"processinfo" tag:kDocumentUpdated];
-		
-	}
-}
 
-- (void) updateMachineRecord
-{
-	if(!stealthMode){
-		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateMachineRecord) object:nil];
-        [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:60];
-        if([thisHostAdress length]==0){
-            //only have to get this once
-            struct ifaddrs *ifaddr, *ifa;
-            if (getifaddrs(&ifaddr) == 0) {
-                // Successfully received the structs of addresses.
-                char tempInterAddr[INET_ADDRSTRLEN];
-                NSMutableArray* names = [NSMutableArray array];
-                // The following is a replacement for [[NSHost currentHost] addresses].  The problem is
-                // that the NSHost call can do reverse DNS calls which block and are *very* slow.  The 
-                // following is much faster.
-                for (ifa = ifaddr; ifa != nil; ifa = ifa->ifa_next) {
-                    // skip IPv6 addresses
-                    if (ifa->ifa_addr->sa_family != AF_INET) continue;
-                    inet_ntop(AF_INET, 
-                              &((struct sockaddr_in *)ifa->ifa_addr)->sin_addr,
-                              tempInterAddr,
-                              sizeof(tempInterAddr));
-                    [names addObject:[NSString stringWithCString:tempInterAddr encoding:NSASCIIStringEncoding]];
-                }
-                freeifaddrs(ifaddr);
-                // Now enumerate and find the first non-loop-back address.
-                NSEnumerator* e = [names objectEnumerator];
-                id aName;
-                while(aName = [e nextObject]){
-                    if([aName rangeOfString:@".0.0."].location == NSNotFound){
-                        thisHostAdress = [aName copy];
-                        break;
-                    }
-                }
-            }
-        }
-        if(!thisHostAdress)thisHostAdress = @"";
-        
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-        
-        NSTimeZone *gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-        [dateFormatter setTimeZone:gmt];
-        NSString *lastTimeStamp = [dateFormatter stringFromDate:[NSDate date]];
-        NSDate* gmtTime = [dateFormatter dateFromString:lastTimeStamp];
-        unsigned long secondsSince1970 = [gmtTime timeIntervalSince1970];
-        [dateFormatter release];
-        
-        
-        if(![lastTimeStamp length]) lastTimeStamp = @"0";
-        
-        NSMutableDictionary* machineInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                                @"machineinfo", @"_id",
-                                                @"machineinfo", @"type",
-                                                [NSNumber numberWithLong:[[(ORAppDelegate*)(ORAppDelegate*)[NSApp delegate] memoryWatcher] accurateUptime]], @"uptime",
-                                                computerName(), @"name",
-                                                macAddress(),   @"hw_address",
-                                                thisHostAdress, @"ip_address",
-                                                fullVersion(),  @"version",
-                                                lastTimeStamp,  @"timestamp",
-                                                [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-nil];
-        
-        NSFileManager* fm = [NSFileManager defaultManager];
-        
-        NSArray* diskInfo = [fm mountedVolumeURLsIncludingResourceValuesForKeys:0 options:NSVolumeEnumerationSkipHiddenVolumes];
-        NSMutableArray* diskStats = [NSMutableArray array];
-        for(id aVolume in diskInfo){
-            NSError *fsError = nil;
-            aVolume = [aVolume relativePath];
-            NSDictionary *fsDictionary = [fm attributesOfFileSystemForPath:aVolume error:&fsError];
-            
-            if (fsDictionary != nil){
-                double freeSpace   = [[fsDictionary objectForKey:@"NSFileSystemFreeSize"] doubleValue]/1E9;
-                double totalSpace  = [[fsDictionary objectForKey:@"NSFileSystemSize"] doubleValue]/1E9;
-                double percentUsed   = 100*(totalSpace-freeSpace)/totalSpace;
-                if([aVolume rangeOfString:@"Volumes"].location !=NSNotFound){
-                    aVolume = [aVolume substringFromIndex:9];
-                }
-                NSDictionary* dict = [NSDictionary dictionaryWithObject:[NSString stringWithFormat:@"%.02f%% Full",percentUsed] forKey:aVolume];
-                [diskStats addObject:dict];
-             }
-        }
-        if([diskStats count]>0) [machineInfo setObject:diskStats forKey:@"diskInfo"];
-
-        [[self statusDBRef] updateDocument:machineInfo documentId:@"machineinfo" tag:kDocumentUpdated];
-    }
-	
 }
 
 - (void) processElementStateChanged:(NSNotification*)aNote
@@ -904,11 +922,18 @@ nil];
 - (void) updateDatabaseStats
 {
     if (stealthMode) return;
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
-    [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
-    [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
-    if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
-    [self getRemoteInfo:NO];
+    @try {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDatabaseStats) object:nil];
+        [[self statusDBRef] databaseInfo:self tag:kInfoInternalDB];
+        if(keepHistory)[[self historyDBRef] databaseInfo:self tag:kInfoHistoryDB];
+        [self getRemoteInfo:NO];
+    }
+    @catch (NSException* e){
+        NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+    }
+    @finally {
+        [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:kUpdateStatsInterval];
+    }
 }
 
 - (void) setDBInfo:(NSDictionary*)someInfo
@@ -1115,8 +1140,15 @@ nil];
 {
     if (stealthMode) return;
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(periodicCompact) object:nil];
-    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
-	[self compactDatabase];
+    @try {
+        [self compactDatabase];
+    }
+    @catch (NSException* e){
+        NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+    }
+    @finally {
+        [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
+    }
 }
 
 - (void) compactDatabase
@@ -1454,14 +1486,20 @@ nil];
 	}
 }
 
-
 - (void) updateExperiment
 {
 	if(!stealthMode){
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExperiment) object:nil];
-        [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:30];
-        id experiment = [self objectConnectedTo:ORCouchDBModelInConnector];
-        [experiment postCouchDBRecord];
+        @try {
+            id experiment = [self objectConnectedTo:ORCouchDBModelInConnector];
+            [experiment postCouchDBRecord];
+        }
+        @catch (NSException* e){
+            NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+        }
+        @finally {
+            [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:30];
+        }
 	}
 }
 
@@ -1483,74 +1521,78 @@ nil];
 {
 	if(!stealthMode && !skipDataSets){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDataSets) object:nil];
-        if([[ORCouchDBQueue sharedCouchDBQueue]lowPriorityOperationCount]<10){
-            NSMutableArray* dataSetNames = [NSMutableArray array];
-            for(id aMonitor in dataMonitors){
-                NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
-                NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
-                @try {
-                    
-                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-                    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-                    
-                    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-                    [dateFormatter setTimeZone:gmt];
-                    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
-                    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
-                    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
-                    [dateFormatter release];
-
-                    for(OR1DHisto* aDataSet in objs1d){
-                        unsigned long start,end;
-                        NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
-                        NSString* dataSetName = [baseMonitorName stringByAppendingFormat:@",%@",[aDataSet fullName]];
-                        NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                    dataSetName,                                                @"name",
-                                                    [NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
-                                                    [NSNumber numberWithUnsignedLong:start],					@"start",
-                                                    [NSNumber numberWithUnsignedLong:end],                      @"end",
-                                                    [NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
-                                                    s,															@"PlotData",
-                                                    lastTimeStamp,                                              @"timestamp",
-                                                    [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-
-                                                    @"Histogram1D",												@"type",
-                                                     nil];
-                        NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
-                        [dataSetNames addObject:
-                            [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"_id",dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
-                         ];
-
-                        [[self statusDBRef] updateLowPriorityDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
+        @try {
+            if([[ORCouchDBQueue sharedCouchDBQueue]lowPriorityOperationCount]<10){
+                NSMutableArray* dataSetNames = [NSMutableArray array];
+                for(id aMonitor in dataMonitors){
+                    NSArray* objs1d = [[aMonitor  collectObjectsOfClass:[OR1DHisto class]] retain];
+                    NSString* baseMonitorName = [NSString stringWithFormat:@"Monitor%lu",[aMonitor uniqueIdNumber]];
+                    @try {
                         
-                    }
-                    
-                    if([dataSetNames count]){
-                        NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                                  @"HistogramCatalog",              @"_id",
-                                                  @"HistogramCatalog",              @"name",
-                                                  dataSetNames,                     @"list",
-                                                  lastTimeStamp,                                            @"timestamp",
-                                                  [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-                                                  nil];
+                        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
                         
-                        [[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentUpdated];
-                      
+                        NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+                        [dateFormatter setTimeZone:gmt];
+                        NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+                        NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+                        unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+                        [dateFormatter release];
+
+                        for(OR1DHisto* aDataSet in objs1d){
+                            unsigned long start,end;
+                            NSString* s = [aDataSet getnonZeroDataAsStringWithStart:&start end:&end];
+                            NSString* dataSetName = [baseMonitorName stringByAppendingFormat:@",%@",[aDataSet fullName]];
+                            NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                        dataSetName,                                                @"name",
+                                                        [NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],	@"counts",
+                                                        [NSNumber numberWithUnsignedLong:start],					@"start",
+                                                        [NSNumber numberWithUnsignedLong:end],                      @"end",
+                                                        [NSNumber numberWithUnsignedLong:[aDataSet numberBins]],	@"length",
+                                                        s,															@"PlotData",
+                                                        lastTimeStamp,                                              @"timestamp",
+                                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+
+                                                        @"Histogram1D",												@"type",
+                                                         nil];
+                            NSString* dataName = [[dataSetName lowercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
+                            [dataSetNames addObject:
+                                [NSDictionary dictionaryWithObjectsAndKeys:dataName,@"_id",dataName,@"name",[NSNumber numberWithUnsignedLong:[aDataSet totalCounts]],@"counts",nil]
+                             ];
+
+                            [[self statusDBRef] updateLowPriorityDocument:dataInfo documentId:dataName tag:kDocumentUpdated];
+                            
+                        }
+                        
+                        if([dataSetNames count]){
+                            NSDictionary* dataInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                                      @"HistogramCatalog",              @"_id",
+                                                      @"HistogramCatalog",              @"name",
+                                                      dataSetNames,                     @"list",
+                                                      lastTimeStamp,                                            @"timestamp",
+                                                      [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                                      nil];
+                            
+                            [[self statusDBRef] updateDocument:dataInfo documentId:@"HistogramCatalog" tag:kDocumentUpdated];
+                          
+                        }
+                        else {
+                            [[self statusDBRef] deleteDocumentId:@"HistogramCatalog" tag:kDocumentDeleted];
+                        }
                     }
-                    else {
-                        [[self statusDBRef] deleteDocumentId:@"HistogramCatalog" tag:kDocumentDeleted];
+                    @catch(NSException* e){
+                        [objs1d release];
+                        [e raise]; //throw out to the outer level
                     }
-                    
-                }
-                @catch(NSException* e){
-                }
-                @finally {
-                    [objs1d release];
                 }
             }
         }
-		
-		[self performSelector:@selector(updateDataSets) withObject:nil afterDelay:30];
+        @catch (NSException* e){
+            NSLog(@"%@ %@ Exception: %@\n",[self fullID],NSStringFromSelector(_cmd),e);
+        }
+        @finally {
+            [self performSelector:@selector(updateDataSets) withObject:nil afterDelay:30];
+        }
 	}
 }
 
@@ -1562,10 +1604,10 @@ nil];
 - (void) _startAllPeriodicOperations
 {
     [self performSelector:@selector(updateMachineRecord) withObject:nil afterDelay:2];
-    [self performSelector:@selector(updateExperiment) withObject:nil afterDelay:3];
-    [self performSelector:@selector(updateRunInfo) withObject:nil afterDelay:4];
+    [self performSelector:@selector(updateExperiment)    withObject:nil afterDelay:3];
+    [self performSelector:@selector(updateRunInfo)       withObject:nil afterDelay:4];
     [self performSelector:@selector(updateDatabaseStats) withObject:nil afterDelay:5];
-    [self performSelector:@selector(periodicCompact) withObject:nil afterDelay:60*60];
+    [self performSelector:@selector(periodicCompact)     withObject:nil afterDelay:60*60];
 }
 
 
