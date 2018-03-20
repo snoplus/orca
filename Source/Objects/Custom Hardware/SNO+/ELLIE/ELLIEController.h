@@ -11,7 +11,8 @@
 
 #import <Foundation/Foundation.h>
 
-@interface ELLIEController : OrcaObjectController <NSTextFieldDelegate>{
+@interface ELLIEController : OrcaObjectController <NSTextFieldDelegate>
+{
 
     //TAB Views
     IBOutlet NSTabView *ellieTabView;
@@ -80,6 +81,25 @@
     IBOutlet NSButton *tellieBuildValidate;
     IBOutlet NSButton *tellieBuildPushToDB;
 
+    //AMELLIE interface ------------------------------------------
+    IBOutlet NSTextField *amelliePulseWidthTf;
+    IBOutlet NSTextField *amelliePulseFreqTf;
+    IBOutlet NSTextField *amelliePulseHeightTf;
+    IBOutlet NSTextField *amellieFibreDelayTf;
+    IBOutlet NSTextField *amellieTriggerDelayTf;
+    IBOutlet NSTextField *amellieNoPulsesTf;
+    IBOutlet NSTextField *amellieChannelTf;
+
+    IBOutlet NSPopUpButton *amellieNodeSelectPb;
+    IBOutlet NSPopUpButton *amellieAngleSelectPb;
+    IBOutlet NSPopUpButton *amellieOperationModePb; //Operation mode (master or slave)
+
+    IBOutlet NSTextField *amellieValidationStatusTf;
+
+    IBOutlet NSButton *amellieFireButton;
+    IBOutlet NSButton *amellieStopButton;
+    IBOutlet NSButton *amellieValidateSettingsButton;
+
     //Server interface ------------------------------------------
 
     IBOutlet NSTextField *tellieHostTf;
@@ -94,6 +114,8 @@
     IBOutlet NSTextField *smellieServerResponseTf;
     IBOutlet NSTextField *interlockServerResponseTf;
 
+    IBOutlet NSTextField *tubiiThreadResponseTf;
+
     // Instance variables
     NSThread *tellieThread;
     NSButton *tellieExpertConvertAction;
@@ -102,6 +124,10 @@
     NSThread* _tellieThread;
     NSThread* _smellieThread;
     NSButton *interlockPing;
+    NSButton *tubiiRestart;
+
+    //For delegation
+    NSHashTable* _delegates;
 }
 
 // Properties
@@ -109,6 +135,7 @@
 @property (nonatomic,strong) NSMutableDictionary* guiFireSettings;
 @property (nonatomic, strong) NSThread* tellieThread;
 @property (nonatomic, strong) NSThread* smellieThread;
+@property (nonatomic, strong) NSHashTable *delegates;
 
 -(id)init;
 -(void)dealloc;
@@ -128,7 +155,6 @@
 -(IBAction)tellieNodeMapAction:(id)sender;
 -(IBAction)tellieGeneralFibreNameAction:(NSPopUpButton *)sender;
 -(IBAction)tellieGeneralModeAction:(NSPopUpButton *)sender;
-
 
 //Expert tab
 -(IBAction)tellieExpertFireAction:(id)sender;
@@ -154,22 +180,30 @@
 -(NSString*)validateTellieTriggerDelay:(NSString *)currentText;
 -(NSString*)validateTellieNoPulses:(NSString *)currentText;
 
+// Some extra's
 -(void)tellieRunFinished:(NSNotification *)aNote;
 -(void)initialiseTellie;
+-(void)displayAmellieNodes:(id)sender;
+-(void)updateAmellieChannel;
+
 
 //Build Custom sequence
 -(IBAction)tellieBuildValidateAction:(id)sender;
 -(IBAction)tellieBuildPushToDBAction:(id)sender;
 
+//Amellie tab functions -----------------------------
+- (IBAction)amellieValidateSettingsAction:(id)sender;
+- (IBAction)amellieFireAction:(id)sender;
+- (IBAction)amellieStopAction:(id)sender;
 
 //Server tab functions -----------------------------
 - (IBAction)telliePing:(id)sender;
 - (IBAction)smelliePing:(id)sender;
 - (IBAction)interlockPing:(id)sender;
+- (IBAction)tubiiPing:(id)sender;
+- (IBAction)tubiiRestart:(id)sender;
+- (IBAction)serverSettingsChanged:(id)sender;
+-(void)killInterlock:(NSNotification *)aNote;
 - (IBAction) serverSettingsChanged:(id)sender;
 
 @end
-
-extern NSString* ORTELLIERunStart;
-extern NSString* ORTELLIERunFinished;
-

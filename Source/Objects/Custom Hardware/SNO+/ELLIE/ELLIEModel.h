@@ -26,6 +26,7 @@
     NSMutableDictionary* _currentOrcaSettingsForSmellie;
     NSMutableDictionary* _tellieRunDoc;
     NSMutableDictionary* _smellieRunDoc;
+    NSMutableDictionary* _amellieRunDoc;
     NSTask* _exampleTask;
     NSMutableDictionary* _smellieRunHeaderDocList;
     NSMutableArray* _smellieSubRunInfo;
@@ -49,7 +50,6 @@
     XmlrpcClient* _interlockClient;
 
     //tellie settings
-    NSMutableDictionary* _tellieSubRunSettings;
     NSMutableDictionary* _tellieFireParameters;
     NSMutableDictionary* _tellieFibreMapping;
     NSMutableDictionary* _tellieNodeMapping;
@@ -58,6 +58,12 @@
     BOOL _tellieMultiFlag;
     BOOL _maintenanceRollOver;
     BOOL _smellieStopButton;
+
+    //tellie settings
+    NSMutableDictionary* _amellieFireParameters;
+    NSMutableDictionary* _amellieFibreMapping;
+    NSMutableDictionary* _amellieNodeMapping;
+    NSArray* _amellieRunNames;
 
     //smellie config mappings
     NSMutableDictionary* _smellieLaserHeadToSepiaMapping;
@@ -77,7 +83,9 @@
 @property (nonatomic,retain) NSMutableDictionary* tellieFibreMapping;
 @property (nonatomic,retain) NSMutableDictionary* tellieNodeMapping;
 @property (nonatomic,retain) NSArray* tellieRunNames;
-@property (nonatomic,retain) NSMutableDictionary* tellieSubRunSettings;
+@property (nonatomic,retain) NSMutableDictionary* amellieFireParameters;
+@property (nonatomic,retain) NSMutableDictionary* amellieFibreMapping;
+@property (nonatomic,retain) NSMutableDictionary* amellieNodeMapping;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunSettings;
 @property (nonatomic,retain) NSMutableDictionary* currentOrcaSettingsForSmellie;
 @property (nonatomic,retain) NSMutableDictionary* smellieLaserHeadToSepiaMapping;
@@ -87,6 +95,7 @@
 @property (nonatomic,assign) BOOL smellieSlaveMode;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunDoc;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;
+@property (nonatomic,retain) NSMutableDictionary* amellieRunDoc;
 @property (nonatomic,assign) BOOL ellieFireFlag;
 @property (nonatomic,assign) BOOL tellieMultiFlag;
 @property (nonatomic,retain) NSTask* exampleTask;
@@ -135,28 +144,57 @@
 // TELLIE calc & control functons
 -(NSArray*) pollTellieFibre:(double)seconds;
 -(BOOL)photonIntensityCheck:(NSUInteger)photons atFrequency:(NSUInteger)frequency;
--(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibre  withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses withTriggerDelay:(NSUInteger)delay inSlave:(BOOL)mode;
--(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode;
--(NSNumber*) calcTellieChannelForFibre:(NSString*)fibre;
--(NSString*) calcTellieFibreForNode:(NSUInteger)node;
+
+-(NSMutableDictionary*)returnTellieFireCommands:(NSString*)fibre
+                                    withNPhotons:(NSUInteger)photons
+                                    withFireFrequency:(NSUInteger)frequency
+                                    withNPulses:(NSUInteger)pulses
+                                    withTriggerDelay:(NSUInteger)delay
+                                    inSlave:(BOOL)mode
+                                    isAMELLIE:(BOOL)amellie;
+
+-(NSNumber*)calcTellieChannelPulseSettings:(NSUInteger)channel
+                               withNPhotons:(NSUInteger)photons
+                          withFireFrequency:(NSUInteger)frequency
+                                    inSlave:(BOOL)mode
+                                  isAMELLIE:(BOOL)amellie;
+
+-(NSNumber*)calcTellieChannelForFibre:(NSString*)fibre;
+-(NSString*)calcTellieFibreForNode:(NSUInteger)node;
 -(NSString*) calcTellieFibreForChannel:(NSUInteger)channel;
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave;
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
--(void) startTellieRunThread:(NSDictionary*)fireCommands;
--(void)startTellieMultiRunThread:(NSArray*)fireCommandArray;
--(void) startTellieMultiRun:(NSArray*)fireCommandArray;
--(void) startTellieRun:(NSDictionary*)fireCommands;
--(void) stopTellieRun;
--(void) tellieRunTransition;
+-(void)startTellieRunThread:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
+-(void)startTellieMultiRunThread:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
+-(void)startTellieMultiRun:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
+-(void)startTellieRun:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
+-(void)startTellieRun:(NSDictionary *)fireCommands forTELLIE:(BOOL)forTELLIE;
+-(void)stopTellieRun;
+-(void)tellieRunTransition;
 
 // TELLIE database interactions
--(void) pushInitialTellieRunDocument;
--(void) updateTellieRunDocument:(NSDictionary*)subRunDoc;
--(void) loadTELLIEStaticsFromDB;
--(void) loadTELLIERunPlansFromDB;
+-(void)pushInitialTellieRunDocument;
+-(void)updateTellieRunDocument:(NSDictionary*)subRunDoc;
+-(void)loadTELLIEStaticsFromDB;
+-(void)loadTELLIERunPlansFromDB;
 -(void)parseTellieFirePars:(id)aResult;
 -(void)parseTellieFibreMap:(id)aResult;
 -(void)parseTellieNodeMap:(id)aResult;
+
+/************************/
+/*   AMELLIE Functions   */
+/************************/
+-(NSNumber*)calcAmellieChannelForFibre:(NSString*)fibre;
+-(NSMutableDictionary*)returnAmellieFireCommands:(NSString*)fibre
+                                     withPhotons:(NSUInteger)photons
+                               withFireFrequency:(NSUInteger)frequency
+                                     withNPulses:(NSUInteger)pulses
+                                withTriggerDelay:(NSUInteger)delay
+                                         inSlave:(BOOL)mode;
+// AMELLIE database interactions
+-(void) pushInitialAmellieRunDocument;
+-(void) updateAmellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) loadAMELLIEStaticsFromDB;
 
 /************************/
 /*  SMELLIE Functions   */
@@ -204,8 +242,14 @@
 extern NSString* ELLIEAllLasersChanged;
 extern NSString* ELLIEAllFibresChanged;
 extern NSString* smellieRunDocsPresent;
-extern NSString* ORSMELLIERunFinished;
-extern NSString* ORTELLIERunFinished;
+extern NSString* ORAMELLIEMappingReceived;
 extern NSString* ORSMELLIEInterlockKilled;
-extern NSString* ORELLIEFlashing;
 extern NSString* ORSMELLIEEmergencyStop;
+extern NSString* ORELLIEFlashing;
+
+extern NSString* ORTELLIERunStartNotification;
+extern NSString* ORSMELLIERunStartNotification;
+extern NSString* ORAMELLIERunStartNotification;
+extern NSString* ORSMELLIERunFinishedNotification;
+extern NSString* ORTELLIERunFinishedNotification;
+extern NSString* ORAMELLIERunFinishedNotification;

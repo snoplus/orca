@@ -116,11 +116,33 @@
     IBOutlet NSButton *tellieLoadRunFile;
     IBOutlet NSButton *tellieStartRunButton;
     IBOutlet NSButton *tellieStopRunButton;
+    IBOutlet NSButton *tellieEmergencyStop;
 
     NSMutableDictionary *_tellieRunFileList;
     NSDictionary *tellieRunFile;
     NSDictionary* tellieFireSettings;
     BOOL tellieStandardSequenceFlag;
+
+    //AMELLIE
+    IBOutlet NSComboBox *amellieRunFileNameField;
+    IBOutlet NSTextField *loadedAmellieRunNameLabel;
+    IBOutlet NSTextField *loadedAmellieFireRateLabel;
+    IBOutlet NSTextField *loadedAmellieIntensityLabel;
+    IBOutlet NSTextField *loadedAmellieNoPulsesLabel;
+    IBOutlet NSTextField *loadedAmellieFibresLabel;
+    IBOutlet NSTextField *loadedAmellieRunTimeLabel;
+    IBOutlet NSTextField *loadedAmellieOperationLabel;
+
+    IBOutlet NSButton *amellieLoadRunFile;
+    IBOutlet NSButton *amellieStartRunButton;
+    IBOutlet NSButton *amellieStopRunButton;
+    IBOutlet NSButton *amellieEmergencyStop;
+
+    NSMutableDictionary *_amellieRunFileList;
+    NSDictionary *amellieRunFile;
+    NSDictionary* amellieFireSettings;
+    BOOL amellieStandardSequenceFlag;
+
     IBOutlet NSButton* runsLockButton;
     IBOutlet NSTextField *lockStatusTextField;
 
@@ -201,11 +223,15 @@
     IBOutlet WebView* detectorState;
 }
 @property (nonatomic) BOOL tellieStandardSequenceFlag;
+@property (nonatomic) BOOL amellieStandardSequenceFlag;
 @property (nonatomic,retain) NSDictionary *tellieFireSettings;
+@property (nonatomic,retain) NSDictionary *amellieFireSettings;
 @property (nonatomic,retain) NSMutableDictionary *tellieRunFileList;
 @property (nonatomic,retain) NSMutableDictionary *smellieRunFileList;
+@property (nonatomic,retain) NSMutableDictionary *amellieRunFileList;
 @property (nonatomic,retain) NSDictionary *smellieRunFile;
 @property (nonatomic,retain) NSDictionary *tellieRunFile;
+@property (nonatomic,retain) NSDictionary *amellieRunFile;
 @property (nonatomic,retain) NSColor *snopRedColor;
 @property (nonatomic,retain) NSColor *snopBlueColor;
 @property (nonatomic,retain) NSColor *snopGreenColor;
@@ -287,7 +313,18 @@
 - (void) fetchTellieRunFilesFinish:(NSNotification *)aNote;
 - (IBAction)startTellieRunAction:(id)sender;
 - (IBAction) stopTellieRunAction:(id)sender;
-- (void)startTellieRunNotification:(NSNotification *)notification;
+- (void)startTellieRunNotification:(NSNotification *)aNote;
+- (IBAction)emergencyTellieStopAction:(id)sender;
+
+//amellie functions ---------------------
+- (IBAction) loadAmellieRunAction:(id)sender;
+- (IBAction) fetchAmellieRunFiles:(id)sender;
+- (void) fetchAmellieRunFilesFinish:(NSNotification *)aNote;
+- (IBAction)startAmellieRunAction:(id)sender;
+- (IBAction) stopAmellieRunAction:(id)sender;
+- (void)startAmellieRunNotification:(NSNotification *)aNote;
+- (IBAction)emergencyAmellieStopAction:(id)sender;
+
 
 #pragma mark ¥¥¥Details Interface Management
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)tabViewItem;

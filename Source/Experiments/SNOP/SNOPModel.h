@@ -68,6 +68,7 @@ BOOL isNotRunningOrIsInMaintenance();
     NSString* _debugDBName;
     NSString* _smellieRunNameLabel;
     NSString* _tellieRunNameLabel;
+    NSString* _amellieRunNameLabel;
     unsigned int _debugDBPort;
     NSString* _debugDBIPAddress;
     NSMutableArray* _debugDBConnectionHistory;
@@ -90,6 +91,7 @@ BOOL isNotRunningOrIsInMaintenance();
     NSMutableDictionary* _runTypeDocumentPhysics;
     NSMutableDictionary* _smellieRunFiles;
     NSMutableDictionary* _tellieRunFiles;
+    NSMutableDictionary* _amellieRunFiles;
     
     bool _smellieDBReadInProgress;
     bool _smellieDocUploaded;
@@ -152,6 +154,7 @@ BOOL isNotRunningOrIsInMaintenance();
 
 @property (nonatomic,retain) NSMutableDictionary* smellieRunFiles;
 @property (nonatomic,retain) NSMutableDictionary* tellieRunFiles;
+@property (nonatomic,retain) NSMutableDictionary* amellieRunFiles;
 
 @property (nonatomic,copy) NSString* orcaDBUserName;
 @property (nonatomic,copy) NSString* orcaDBPassword;
@@ -167,6 +170,7 @@ BOOL isNotRunningOrIsInMaintenance();
 @property (nonatomic,copy) NSString* debugDBName;
 @property (nonatomic,copy) NSString* smellieRunNameLabel;
 @property (nonatomic,copy) NSString* tellieRunNameLabel;
+@property (nonatomic,copy) NSString* amellieRunNameLabel;
 @property (nonatomic,assign) unsigned int debugDBPort;
 @property (nonatomic,copy) NSString* debugDBIPAddress;
 @property (nonatomic,retain) NSMutableArray* debugDBConnectionHistory;
@@ -327,6 +331,9 @@ BOOL isNotRunningOrIsInMaintenance();
 
 // tellie functions -------
 -(void) getTellieRunFiles;
+
+//tellie functions -------
+-(void) getAmellieRunFiles;
 
 // ECA
 -(ECARun*) anECARun;

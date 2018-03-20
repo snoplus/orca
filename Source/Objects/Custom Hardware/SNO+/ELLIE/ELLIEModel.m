@@ -36,22 +36,22 @@
 #import "RunTypeWordBits.hh"
 
 //tags to define that an ELLIE run file has been updated
-#define kSmellieRunDocumentAdded   @"kSmellieRunDocumentAdded"
-#define kSmellieRunDocumentUpdated   @"kSmellieRunDocumentUpdated"
+#define kSmellieRunDocumentAdded @"kSmellieRunDocumentAdded"
+#define kSmellieRunDocumentUpdated @"kSmellieRunDocumentUpdated"
 #define kSmellieConigVersionRetrieved @"kSmellieConfigVersionRetrieved"
 #define kSmellieConigRetrieved @"kSmellieConfigRetrieved"
 
-#define kTellieRunDocumentAdded   @"kTellieRunDocumentAdded"
-#define kTellieRunDocumentUpdated   @"kTellieRunDocumentUpdated"
+#define kTellieRunDocumentAdded @"kTellieRunDocumentAdded"
+#define kTellieRunDocumentUpdated @"kTellieRunDocumentUpdated"
 #define kTellieParsRetrieved @"kTellieParsRetrieved"
 #define kTellieMapRetrieved @"kTellieMapRetrieved"
 #define kTellieNodeRetrieved @"kTellieNodeRetrieved"
 #define kTellieRunPlansRetrieved @"kTellieRunPlansRetrieved"
 
-#define kAmellieRunDocumentAdded   @"kAmellieRunDocumentAdded"
-#define kAmellieRunDocumentUpdated   @"kAmellieRunDocumentUpdated"
-#define kSmellieRunHeaderRetrieved   @"kSmellieRunHeaderRetrieved"
-#define kSmellieConfigHeaderRetrieved @"kSmellieConfigHeaderRetrieved"
+#define kAmellieFibresRetrieved @"kAmellieFibresRetrieved"
+#define kAmellieNodesRetrieved @"kAmellieNodesRetrieved"
+#define kAmellieRunDocumentAdded @"kAmellieRunDocumentAdded"
+#define kAmellieRunDocumentUpdated @"kAmellieRunDocumentUpdated"
 
 //sub run information tags
 #define kSmellieSubRunDocumentAdded @"kSmellieSubRunDocumentAdded"
@@ -59,13 +59,16 @@
 NSString* ELLIEAllLasersChanged = @"ELLIEAllLasersChanged";
 NSString* ELLIEAllFibresChanged = @"ELLIEAllFibresChanged";
 NSString* smellieRunDocsPresent = @"smellieRunDocsPresent";
-NSString* ORSMELLIERunFinished = @"ORSMELLIERunFinished";
-NSString* ORTELLIERunStart = @"ORTELLIERunStarted";
-NSString* ORTELLIERunFinished = @"ORTELLIERunFinished";
+NSString* ORTELLIERunStartNotification = @"ORTELLIERunStarted";
+NSString* ORSMELLIERunStartNotification = @"ORSMELLIERunStarted";
+NSString* ORAMELLIERunStartNotification = @"ORAMELLIERunStarted";
+NSString* ORSMELLIERunFinishedNotification = @"ORSMELLIERunFinished";
+NSString* ORTELLIERunFinishedNotification = @"ORTELLIERunFinished";
+NSString* ORAMELLIERunFinishedNotification = @"ORAMELLIERunFinished";
+NSString* ORAMELLIEMappingReceived = @"ORAMELLIEMappingReceived";
 NSString* ORSMELLIEInterlockKilled = @"ORSMELLIEInterlockKilled";
 NSString* ORELLIEFlashing = @"ORELLIEFlashing";
 NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
-
 
 ///////////////////////////////
 // Define private methods
@@ -88,7 +91,6 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 @synthesize tellieNodeMapping = _tellieNodeMapping;
 @synthesize tellieRunNames = _tellieRunNames;
 @synthesize tellieRunDoc = _tellieRunDoc;
-@synthesize tellieSubRunSettings = _tellieSubRunSettings;
 
 @synthesize smellieRunSettings = _smellieRunSettings;
 @synthesize smellieRunHeaderDocList = _smellieRunHeaderDocList;
@@ -100,6 +102,11 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 @synthesize smellieConfigVersionNo = _smellieConfigVersionNo;
 @synthesize smellieRunDoc = _smellieRunDoc;
 @synthesize smellieDBReadInProgress = _smellieDBReadInProgress;
+
+@synthesize amellieRunDoc = _amellieRunDoc;
+@synthesize amellieFireParameters = _amellieFireParameters;
+@synthesize amellieFibreMapping = _amellieFibreMapping;
+@synthesize amellieNodeMapping = _amellieNodeMapping;
 
 @synthesize tellieHost = _tellieHost;
 @synthesize smellieHost = _smellieHost;
@@ -242,9 +249,15 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [_smellieFlaggingClient release];
     
     // tellie settings
-    [_tellieSubRunSettings release];
     [_tellieFireParameters release];
     [_tellieFibreMapping release];
+    [_tellieNodeMapping release];
+
+    // amellie settings
+    [_amellieFireParameters release];
+    [_amellieFibreMapping release];
+    [_amellieRunDoc release];
+    [_amellieNodeMapping release];
 
     // smellie config mappings
     [_smellieLaserHeadToSepiaMapping release];
@@ -325,7 +338,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     NSArray* blankResponse = [NSArray arrayWithObjects:[NSNumber numberWithInt:0], [NSNumber numberWithInt:0], nil];
     NSArray* pollResponse = [[self tellieClient] command:@"read_pin_sequence"];
     int count = 0;
-    NSLog(@"[TELLIE]: Will poll for pin response for the next %1.1f s\n", timeOutSeconds);
+    NSLog(@"[T/AMELLIE]: Will poll for pin response for the next %1.1f s\n", timeOutSeconds);
     while ([pollResponse isKindOfClass:[NSString class]] && count < timeOutSeconds){
         // Check the thread hasn't been cancelled
         if([[NSThread currentThread] isCancelled]){
@@ -335,7 +348,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         @try{
             pollResponse = [[self tellieClient] command:@"read_pin_sequence"];
         }@catch(NSException* e){
-            NSLogColor([NSColor redColor], @"[TELLIE]: Exception caught polling for PIN response: %@\n", [e reason]);
+            NSLogColor([NSColor redColor], @"[T/AMELLIE]: Exception caught polling for PIN response: %@\n", [e reason]);
             return blankResponse;
         }
         count = count + 1;
@@ -346,40 +359,53 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         // In this case the sequence has not completed (likely due to missing triggers).
         // Output a message for the user, then tell the hardware so it can reset its counters
         // ready for the next sequence.
-        NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.\n", pollResponse);
+        NSLogColor([NSColor redColor], @"[T/AMELLIE]: PIN diode poll returned %@. Likely that the sequence didn't finish before timeout.\n", pollResponse);
         @try{
             pollResponse = [[self tellieClient] command:@"read_pin_sequence_timeout"];
         }@catch(NSException* e){
-            NSLogColor([NSColor redColor], @"[TELLIE]: Exception caught sending pin sequence timeout: %@\n", [e reason]);
+            NSLogColor([NSColor redColor], @"[T/AMELLIE]: Exception caught sending pin sequence timeout: %@\n", [e reason]);
             return blankResponse;
         }
 
         //If the timeout function returned, tell the user what was fed back, otherwise just return blank
         if(![pollResponse isKindOfClass:[NSString class]]){
             NSLogColor([NSColor redColor],
-                       @"[TELLIE]: Values returned for incomplete sequence: %i +/- %1.1f. THESE WILL NOT BE PUSHED TO COUCHDB\n",
+                       @"[T/AMELLIE]: Values returned for incomplete sequence: %i +/- %1.1f. THESE WILL NOT BE PUSHED TO COUCHDB\n",
                        [[pollResponse objectAtIndex:0] integerValue],
                        [[pollResponse objectAtIndex:1] floatValue]);
         }
         return blankResponse;
     } else if ([pollResponse count] != 3) {
-        NSLogColor([NSColor redColor], @"[TELLIE]: PIN diode poll returned array of len %i - expected 3\n", [pollResponse count]);
+        NSLogColor([NSColor redColor], @"[T/AMELLIE]: PIN diode poll returned array of len %i - expected 3\n", [pollResponse count]);
         return blankResponse;
     }
     return pollResponse;
 }
 
--(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibre withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses withTriggerDelay:(NSUInteger)delay inSlave:(BOOL)mode
+-(NSMutableDictionary*) returnTellieFireCommands:(NSString*)fibre withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency withNPulses:(NSUInteger)pulses withTriggerDelay:(NSUInteger)delay inSlave:(BOOL)mode isAMELLIE:(BOOL)amellie
 {
     /*
      Calculate the tellie fire commands given certain input parameters
     */
-    NSNumber* tellieChannel = [self calcTellieChannelForFibre:fibre];
-    if([tellieChannel intValue] < 0){
+    NSNumber* channel;
+    NSDictionary* fireParameters;
+
+    if(amellie){
+        channel = [self calcAmellieChannelForFibre:fibre];
+        fireParameters = [self amellieFireParameters];
+    } else {
+        channel = [self calcTellieChannelForFibre:fibre];
+        fireParameters = [self tellieFireParameters];
+    }
+    if([channel intValue] < 0){
         return nil;
     }
 
-    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[tellieChannel integerValue] withNPhotons:photons withFireFrequency:frequency inSlave:mode];
+    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[channel integerValue]
+                                                   withNPhotons:photons
+                                              withFireFrequency:frequency
+                                                        inSlave:mode
+                                                        isAMELLIE:amellie];
     if([pulseWidth intValue] < 0){
         return nil;
     }
@@ -391,11 +417,11 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         modeString = @"Master";
     }
     float pulseSeparation = 1000.*(1./frequency); // TELLIE accepts pulse rate in ms
-    NSNumber* fibre_delay = [[[self tellieFireParameters] objectForKey:[NSString stringWithFormat:@"channel_%d",[tellieChannel intValue]]] objectForKey:@"fibre_delay"];
+    NSNumber* fibre_delay = [[fireParameters objectForKey:[NSString stringWithFormat:@"channel_%d",[channel intValue]]] objectForKey:@"fibre_delay"];
     
     NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
     [settingsDict setValue:fibre forKey:@"fibre"];
-    [settingsDict setValue:tellieChannel forKey:@"channel"];
+    [settingsDict setValue:channel forKey:@"channel"];
     [settingsDict setValue:modeString forKey:@"run_mode"];
     [settingsDict setValue:[NSNumber numberWithInteger:photons] forKey:@"photons"];
     [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
@@ -407,15 +433,26 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     return settingsDict;
 }
 
--(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode
+-(NSNumber*) calcTellieChannelPulseSettings:(NSUInteger)channel withNPhotons:(NSUInteger)photons withFireFrequency:(NSUInteger)frequency inSlave:(BOOL)mode isAMELLIE:(BOOL)amellie
 {
     /*
      Calculate the pulse width settings required to return a given intenstity from a specified channel, 
      at a specified rate.
     */
+    NSDictionary* firePars;
+    if(amellie){
+        firePars = [self amellieFireParameters];
+    } else {
+        firePars = [self tellieFireParameters];
+    }
+
     // Check if fire parameters have been successfully loaded
-    if([self tellieFireParameters] == nil){
-        NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB");
+    if(firePars == nil){
+        if(amellie){
+            NSLogColor([NSColor redColor], @"[AMELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB\n");
+        } else {
+            NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE_FIRE_PARMETERS doc has not been loaded from telliedb - you need to call loadTellieStaticsFromDB\n");
+        }
         return 0;
     }
     
@@ -440,8 +477,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     }
     
     // Get Calibration parameters
-    NSArray* IPW_values = [[[self tellieFireParameters] objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_IPW",prefix]];
-    NSArray* photon_values = [[[self tellieFireParameters] objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_photons",prefix]];
+    NSArray* IPW_values = [[firePars objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_IPW",prefix]];
+    NSArray* photon_values = [[firePars objectForKey:[NSString stringWithFormat:@"channel_%d",channel]] objectForKey:[NSString stringWithFormat:@"%@_photons",prefix]];
 
     ////////////
     // Find minimum calibration point. If request is below minimum, estiamate the IPW
@@ -481,6 +518,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     return pulseWidth;
 }
 
+
 -(NSNumber*)calcPhotonsForIPW:(NSUInteger)ipw forChannel:(NSUInteger)channel inSlave:(BOOL)inSlave
 {
     /*
@@ -507,8 +545,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     float min_photons = [[photon_values valueForKeyPath:@"@min.self"] floatValue];
     int max_ipw = [[IPW_values objectAtIndex:[photon_values indexOfObject:[photon_values valueForKeyPath:@"@min.self"]]] intValue];
     if(ipw > max_ipw){
-        NSLog(@"[TELLIE]: Requested IPW is larger than any value in the calibration curve.\n");
-        NSLog(@"[TELLIE]: Using a linear interpolation of 5ph/IPW from min_photons = %.1f (IPW = %d) to estimate photon output at requested setting\n",min_photons, max_ipw);
+        NSLog(@"[T/AMELLIE]: Requested IPW is larger than any value in the calibration curve.\n");
+        NSLog(@"[T/AMELLIE]: Using a linear interpolation of 5ph/IPW from min_photons = %.1f (IPW = %d) to estimate photon output at requested setting\n",min_photons, max_ipw);
         float intercept = min_photons - (-5.*max_ipw);
         float photonsFloat = (-5.*ipw) + intercept;
         if(photonsFloat < 0){
@@ -636,6 +674,25 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     return channel;
 }
 
+-(NSNumber*) calcAmellieChannelForFibre:(NSString*)fibre
+{
+    /*
+     Use patch pannel map loaded from the amelliedb to map a given fibre to the correct amellie channel.
+     */
+    if([self amellieFibreMapping] == nil){
+        NSLogColor([NSColor redColor], @"[AMELLIE]: fibre map has not been loaded from couchdb - you need to call loadTellieStaticsFromDB\n");
+        return [NSNumber numberWithInt:-1];
+    }
+    if(![[[self amellieFibreMapping] objectForKey:@"fibres"] containsObject:fibre]){
+        NSLogColor([NSColor redColor], @"[AMELLIE]: Patch map does not include a reference to fibre: %@\n",fibre);
+        return [NSNumber numberWithInt:-2];
+    }
+    NSUInteger fibreIndex = [[[self amellieFibreMapping] objectForKey:@"fibres"] indexOfObject:fibre];
+    NSUInteger channelInt = [[[[self amellieFibreMapping] objectForKey:@"channels"] objectAtIndex:fibreIndex] integerValue];
+    NSNumber* channel = [NSNumber numberWithInt:channelInt];
+    return channel;
+}
+
 -(NSString*) calcTellieFibreForChannel:(NSUInteger)channel
 {
     /*
@@ -696,31 +753,95 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     return returnFibre;
 }
 
--(void)startTellieRunThread:(NSDictionary*)fireCommands
+//////////////////////////////////////////////////////
+// AMELLIE parameter functions
+-(NSMutableDictionary*)returnAmellieFireCommands:(NSString*)fibre
+                                     withPhotons:(NSUInteger)photons
+                               withFireFrequency:(NSUInteger)frequency
+                                     withNPulses:(NSUInteger)pulses
+                                withTriggerDelay:(NSUInteger)delay
+                                         inSlave:(BOOL)mode
+{
+    /*
+     Calculate the tellie fire commands given certain input parameters
+     */
+    NSNumber* amellieChannel = [self calcAmellieChannelForFibre:fibre];
+    NSNumber* pulseWidth = [self calcTellieChannelPulseSettings:[amellieChannel integerValue]
+                                                   withNPhotons:photons
+                                              withFireFrequency:frequency
+                                                        inSlave:mode
+                                                      isAMELLIE:@YES];
+    NSString* modeString;
+    if(mode == YES){
+        modeString = @"Slave";
+    } else {
+        modeString = @"Master";
+    }
+    float pulseSeparation = 1000.*(1./frequency); // TELLIE accepts pulse rate in ms
+    NSNumber* fibre_delay = [[[self amellieFireParameters]
+                              objectForKey:[NSString stringWithFormat:@"channel_%d",[amellieChannel intValue]]]
+                                objectForKey:@"fibre_delay"];
+
+    NSMutableDictionary* settingsDict = [NSMutableDictionary dictionaryWithCapacity:100];
+    [settingsDict setValue:fibre forKey:@"fibre"];
+    [settingsDict setValue:amellieChannel forKey:@"channel"];
+    [settingsDict setValue:modeString forKey:@"run_mode"];
+    [settingsDict setValue:[NSNumber numberWithInteger:photons] forKey:@"photons"];
+    [settingsDict setValue:pulseWidth forKey:@"pulse_width"];
+    [settingsDict setValue:[NSNumber numberWithFloat:pulseSeparation] forKey:@"pulse_separation"];
+    [settingsDict setValue:[NSNumber numberWithInteger:pulses] forKey:@"number_of_shots"];
+    [settingsDict setValue:[NSNumber numberWithInteger:delay] forKey:@"trigger_delay"];
+    [settingsDict setValue:[NSNumber numberWithFloat:[fibre_delay floatValue]] forKey:@"fibre_delay"];
+    [settingsDict setValue:[NSNumber numberWithInteger:16383] forKey:@"pulse_height"];
+    return settingsDict;
+}
+
+
+
+-(void)startTellieRunThread:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE
 {
     /*
      Launch a thread to host the tellie run functionality.
     */
+    //////////////////////
+    // Make invocation so we can pass multiple args into thread
+    NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieRun: forTELLIE:)];
+    NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setTarget:self];
+    [invocation setSelector:@selector(startTellieRun: forTELLIE:)];
+    [invocation setArgument:&fireCommands atIndex:2];
+    [invocation setArgument:&forTELLIE atIndex:3];
+    [invocation retainArguments];
 
     //////////////////////
     // Start tellie thread
-    [self setTellieThread:[[NSThread alloc] initWithTarget:self selector:@selector(startTellieRun:) object:fireCommands]];
+    [self setTellieThread:[[NSThread alloc] initWithTarget:invocation selector:@selector(invoke) object:nil]];
     [[self tellieThread] start];
 }
 
--(void)startTellieMultiRunThread:(NSArray*)fireCommandArray
+-(void)startTellieMultiRunThread:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE
 {
     /*
      Launch a thread to host the tellie multi run functionality.
      */
 
     //////////////////////
+    // Make invocation so we can pass multiple args into thread
+    NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieMultiRun: forTELLIE:)];
+    NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
+    [invocation setTarget:self];
+    [invocation setSelector:@selector(startTellieMultiRun: forTELLIE:)];
+    [invocation setArgument:&fireCommandArray atIndex:2];
+    [invocation setArgument:&forTELLIE atIndex:3];
+    [invocation retainArguments];
+
+    //////////////////////
     // Start tellie thread
-    [self setTellieThread:[[NSThread alloc] initWithTarget:self selector:@selector(startTellieMultiRun:) object:fireCommandArray]];
+    [self setTellieThread:[[NSThread alloc] initWithTarget:invocation selector:@selector(invoke) object:nil]];
     [[self tellieThread] start];
 }
 
--(void) startTellieMultiRun:(NSArray*)fireCommandArray
+-(void) startTellieMultiRun:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE
 {
     /*
      Fire light down one or more fibres using fireCommands given in the passed array.
@@ -740,22 +861,19 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     //////////////////////////////
     // Loop over all objects in
     // passed array
-    int count = 0;
+    int counter = 0;
     NSUInteger nloops = [fireCommandArray count];
     for(NSDictionary* fireCommands in fireCommandArray){
         if([[NSThread currentThread] isCancelled]){
             goto err;
         }
-
         // Check if we're at the end of a sequence. If we are, set the multiFlag to NO.
         // This will mean all shutdown stuff will be performed at the end of flashing.
-        count = count + 1;
-        if(count == nloops){
+        counter = counter + 1;
+        if(counter == nloops){
             [self setTellieMultiFlag:NO];
         }
-
-        // Run flash sequence
-        [self startTellieRun:fireCommands];
+        [self startTellieRun:fireCommands forTELLIE:forTELLIE];
     }
 
 err:
@@ -771,14 +889,19 @@ err:
     // button push, so don't need to post.
     if(![[NSThread currentThread] isCancelled]){
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
         });
     }
     [[NSThread currentThread] cancel];
 }
 }
 
--(void) startTellieRun:(NSDictionary*)fireCommands
+-(void) startTellieRun:(NSDictionary *)fireCommands
+{
+    [self startTellieRun:fireCommands forTELLIE:YES];
+}
+
+-(void) startTellieRun:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE
 {
     /*
      Fire a tellie using hardware settings passed as dictionary. This function
@@ -803,12 +926,15 @@ err:
     ///////////
     // Make a sting accessable inside err; incase of error.
     NSString* errorString;
-    
+    NSString* prefix = @"[TELLIE]";
+    if(!forTELLIE){
+        prefix = @"[AMELLIE]";
+    }
     //////////////
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
     if(![tubiiModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find Tubii model.\n");
+        NSLogColor([NSColor redColor], @"%@: Couldn't find Tubii model.\n",prefix);
         goto err;
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
@@ -817,7 +943,7 @@ err:
     //Add run control object
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
+        NSLogColor([NSColor redColor], @"%@: Couldn't find ORRunModel please add one to the experiment\n",prefix);
         goto err;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
@@ -826,31 +952,37 @@ err:
     //Add SNOPModel object
     NSArray*  snopModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"SNOPModel")];
     if(![snopModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find SNOPModel\n");
+        NSLogColor([NSColor redColor], @"%@: Couldn't find SNOPModel\n",prefix);
         goto err;
     }
     SNOPModel* snopModel = [snopModels objectAtIndex:0];
 
     ///////////////////////
     // Check TELLIE run type is masked in
-    if(!([snopModel lastRunTypeWord] & kTELLIERun)){
-        NSLogColor([NSColor redColor], @"[TELLIE]: TELLIE bit is not masked into the run type word.\n");
-        NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
-        goto err;
+    if(forTELLIE){
+        if(!([snopModel lastRunTypeWord] & kTELLIERun)){
+            NSLogColor([NSColor redColor], @"%@: TELLIE bit is not masked into the run type word.\n",prefix);
+            NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
+            goto err;
+        }
+    } else {
+        if(!([snopModel lastRunTypeWord] & kAMELLIERun)){
+            NSLogColor([NSColor redColor], @"%@: AMELLIE bit is not masked into the run type word.\n",prefix);
+            NSLogColor([NSColor redColor], @"%@: Please load the TELLIE standard run type.\n",prefix);
+            goto err;
+        }
     }
 
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
+    if([[theTubiiModel keepAliveThread] isCancelled]){
+        [theTubiiModel restartKeepAlive:nil];
+    }
     NSUInteger asyncTrigMask;
     @try{
         asyncTrigMask = [theTubiiModel asyncTrigMask];
     } @catch(NSException* e) {
-        NSLogColor([NSColor redColor], @"[TELLIE]: Error requesting asyncTrigMask from Tubii.\n");
-        goto err;
-    }
-    if(!(asyncTrigMask & 0x400000)){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Triggers as not being sent to asynchronous MTC/D port\n");
-        NSLogColor([NSColor redColor], @"[TELLIE]: Please amend via the TUBii GUI (triggers tab)\n");
+        NSLogColor([NSColor redColor], @"%@: Error requesting asyncTrigMask from Tubii.\n",prefix);
         goto err;
     }
 
@@ -860,7 +992,7 @@ err:
     if([[fireCommands objectForKey:@"run_mode"] isEqualToString:@"Master"]){
         isSlave = NO;
     }
-    
+
     //////////////
     // TUBii has two possible slave mode configurations.
     // 0 [@NO]:  Master mode : Trigger path = TELLIE->TUBii->MTC/D
@@ -887,26 +1019,26 @@ err:
     NSNumber* photonOutput = [self calcPhotonsForIPW:[[fireCommands objectForKey:@"pulse_width"] integerValue] forChannel:[[fireCommands objectForKey:@"channel"] integerValue] inSlave:isSlave];
     float rate = 1000.*(1./[[fireCommands objectForKey:@"pulse_separation"] floatValue]);
     NSLog(@"---------------------------Single Fibre Settings Summary-------------------------\n");
-    NSLog(@"[TELLIE]: Fibre: %@\n", [fireCommands objectForKey:@"fibre"]);
-    NSLog(@"[TELLIE]: Channel: %i\n", [[fireCommands objectForKey:@"channel"] intValue]);
+    NSLog(@"%@: Fibre: %@\n", prefix, [fireCommands objectForKey:@"fibre"]);
+    NSLog(@"%@: Channel: %i\n", prefix, [[fireCommands objectForKey:@"channel"] intValue]);
     if (isSlave){
-        NSLog(@"[TELLIE]: Mode: slave\n");
+        NSLog(@"%@: Mode: slave\n", prefix);
     } else {
-        NSLog(@"[TELLIE]: Mode: master\n");
+        NSLog(@"%@: Mode: master\n", prefix);
     }
-    NSLog(@"[TELLIE]: IPW: %d\n", [[fireCommands objectForKey:@"pulse_width"] integerValue]);
-    NSLog(@"[TELLIE]: Trigger delay: %1.1f ns\n", [[fireCommands objectForKey:@"trigger_delay"] floatValue]);
-    NSLog(@"[TELLIE]: Fibre delay: %1.2f ns\n", [[fireCommands objectForKey:@"fibre_delay"] floatValue]);
-    NSLog(@"[TELLIE]: No. triggers %d\n", [[fireCommands objectForKey:@"number_of_shots"] integerValue]);
-    NSLog(@"[TELLIE]: Rate %1.1f Hz\n", rate);
-    NSLog(@"[TELLIE]: Expected photon output: %i photons / pulse\n", [photonOutput integerValue]);
+    NSLog(@"%@: IPW: %d\n", prefix, [[fireCommands objectForKey:@"pulse_width"] integerValue]);
+    NSLog(@"%@: Trigger delay: %1.1f ns\n", prefix, [[fireCommands objectForKey:@"trigger_delay"] floatValue]);
+    NSLog(@"%@: Fibre delay: %1.2f ns\n", prefix, [[fireCommands objectForKey:@"fibre_delay"] floatValue]);
+    NSLog(@"%@: No. triggers %d\n", prefix, [[fireCommands objectForKey:@"number_of_shots"] integerValue]);
+    NSLog(@"%@: Rate %1.1f Hz\n", prefix, rate);
+    NSLog(@"%@: Expected photon output: %i photons / pulse\n", prefix, [photonOutput integerValue]);
     NSLog(@"------------\n");
-    NSLog(@"[TELLIE]: Estimated excecution time %1.1f mins\n", (([[fireCommands objectForKey:@"number_of_shots"] integerValue] / rate) + 10) / 60.);
+    NSLog(@"%@: Estimated excecution time %1.1f mins\n", prefix, (([[fireCommands objectForKey:@"number_of_shots"] integerValue] / rate) + 10) / 60.);
     NSLog(@"---------------------------------------------------------------------------------------------\n");
 
     BOOL safety_check = [self photonIntensityCheck:[photonOutput integerValue] atFrequency:rate];
     if(safety_check == NO){
-        NSLogColor([NSColor redColor], @"[TELLIE]: The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n", [photonOutput integerValue], rate);
+        NSLogColor([NSColor redColor], @"%@: The requested number of photons (%lu), is not detector safe at %f Hz. This setting will not be run.\n",  prefix, [photonOutput integerValue], rate);
         goto err;
     }
 
@@ -931,9 +1063,13 @@ err:
     // Now set-up is done, push initial run document
     if([runControl isRunning]){
         @try{
-            [self pushInitialTellieRunDocument];
+            if(forTELLIE){
+                [self pushInitialTellieRunDocument];
+            } else {
+                [self pushInitialAmellieRunDocument];
+            }
         }@catch(NSException* e){
-            NSLogColor([NSColor redColor],@"[TELLIE]: Problem pushing initial tellie run description document: %@\n", [e reason]);
+            NSLogColor([NSColor redColor],@"%@: Problem pushing initial run description document: %@\n", prefix, [e reason]);
             goto err;
         }
     }
@@ -967,7 +1103,7 @@ err:
                 [[self tellieClient] command:@"stop"];
             } @catch(NSException* e){
                 // This should only ever be called from the main thread so can raise
-                NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+                NSLogColor([NSColor redColor], @"%@: Problem with tellie server interpreting stop command!\n", prefix);
             }
             
             ////////
@@ -981,11 +1117,11 @@ err:
                                   [[fireCommands objectForKey:@"fibre_delay"] stringValue],
                                   ];
             
-            NSLog(@"[TELLIE]: Init-ing tellie with settings\n");
+            NSLog(@"%@: Init-ing tellie with settings\n", prefix);
             @try{
                 [[self tellieClient] command:@"init_channel" withArgs:fireArgs];
             } @catch(NSException *e){
-                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem init-ing channel on server: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat:@"%@: Problem init-ing channel on server: %@\n", prefix, [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
@@ -993,7 +1129,7 @@ err:
             @try{
                 [theTubiiModel setTellieDelay:[[fireCommands objectForKey:@"trigger_delay"] intValue]];
             } @catch(NSException* e) {
-                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat:@"%@: Problem setting trigger delay at TUBii: %@\n", prefix, [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
@@ -1011,7 +1147,7 @@ err:
         @try{
             [[self tellieClient] command:@"set_pulse_number" withArgs:@[noShots]];
         } @catch(NSException* e) {
-            errorString = @"[TELLIE]: Problem setting pulse number on server.\n";
+            errorString = [NSString stringWithFormat:@"%@: Problem setting pulse number: %@\n", prefix, [e reason]];
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
@@ -1023,7 +1159,7 @@ err:
         [valuesToFillPerSubRun setObject:noShots forKey:@"number_of_shots"];
         [valuesToFillPerSubRun setObject:photonOutput forKey:@"photons"];
         
-        NSLog(@"[TELLIE]: Firing fibre %@: %d pulses, %1.0f Hz\n", [fireCommands objectForKey:@"fibre"], [noShots integerValue], rate);
+        NSLog(@"%@: Firing fibre %@: %d pulses, %1.0f Hz\n", prefix, [fireCommands objectForKey:@"fibre"], [noShots integerValue], rate);
         
         ///////////////
         // Handle master / slave mode firing
@@ -1035,7 +1171,7 @@ err:
             @try{
                 [[self tellieClient] command:@"trigger_averaged"];
             } @catch(NSException* e) {
-                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting pulse number on server: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat:@"%@ Problem setting pulse number on server: %@\n", prefix, [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
@@ -1045,7 +1181,7 @@ err:
             @try{
                 [theTubiiModel fireTelliePulser_rate:rate pulseWidth:100 NPulses:[noShots intValue]];
             } @catch(NSException* e){
-                errorString = [NSString stringWithFormat:@"[TELLIE]: Problem setting TUBii parameters: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat:@"%@: Problem setting TUBii parameters: %@\n", prefix, [e reason]];
                 NSLogColor([NSColor redColor], errorString);
                 goto err;
             }
@@ -1058,7 +1194,7 @@ err:
             @try{
                 [[self tellieClient] command:@"fire_sequence"];
             } @catch(NSException* e){
-                errorString = [NSString stringWithFormat: @"[TELLIE]: Problem requesting tellie master to fire: %@\n", [e reason]];
+                errorString = [NSString stringWithFormat: @"%@: Problem requesting tellie master to fire: %@\n", prefix, [e reason]];
                 NSLogColor([NSColor redColor],errorString);
                 goto err;
             }
@@ -1078,16 +1214,16 @@ err:
         @try{
             pinReading = [self pollTellieFibre:pollTimeOut];
         } @catch(NSException* e){
-            errorString = [NSString stringWithFormat:@"[TELLIE] Problem polling for pin: %@\n", [e reason]];
+            errorString = [NSString stringWithFormat:@"%@: Problem polling for pin: %@\n", prefix, [e reason]];
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
-        NSLog(@"[TELLIE]: Pin response received %i +/- %1.1f\n", [[pinReading objectAtIndex:0] integerValue], [[pinReading objectAtIndex:1] floatValue]);
+        NSLog(@"%@: Pin response received %i +/- %1.1f\n", prefix, [[pinReading objectAtIndex:0] integerValue], [[pinReading objectAtIndex:1] floatValue]);
         @try {
             [valuesToFillPerSubRun setObject:[pinReading objectAtIndex:0] forKey:@"pin_value"];
             [valuesToFillPerSubRun setObject:[pinReading objectAtIndex:1] forKey:@"pin_rms"];
         } @catch (NSException *e) {
-            errorString = [NSString stringWithFormat:@"[TELLIE]: Unable to add pin readout to sub_run file due to error: %@\n",[e reason]];
+            errorString = [NSString stringWithFormat:@"%@: Unable to add pin readout to sub_run file due to error: %@\n", prefix, [e reason]];
             NSLogColor([NSColor redColor], errorString);
             goto err;
         }
@@ -1096,9 +1232,13 @@ err:
         // Update run document
         if([runControl isRunning]){
             @try{
-                [self updateTellieRunDocument:valuesToFillPerSubRun];
+                if(forTELLIE){
+                    [self updateTellieRunDocument:valuesToFillPerSubRun];
+                } else {
+                    [self updateAmellieRunDocument:valuesToFillPerSubRun];
+                }
             } @catch(NSException* e){
-                NSLogColor([NSColor redColor],@"[TELLIE]: Problem updating tellie run description document: %@\n", [e reason]);
+                NSLogColor([NSColor redColor],@"%@: Problem updating run description document: %@\n", prefix, [e reason]);
                 goto err;
             }
 
@@ -1112,6 +1252,8 @@ err:
     // Set fire flag
     [self setEllieFireFlag:NO];
 
+    NSLog(@"%@: TELLIE fire sequence completed\n", prefix);
+
     ////////////
     // Make sure hardware is put back into safe state
     if(![self tellieMultiFlag]){
@@ -1119,21 +1261,21 @@ err:
         // TELLIE
         @try{
             NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+            NSLog(@"%@: Sent stop command to hardware, received: %@\n",prefix, responseFromTellie);
         } @catch(NSException* e){
             // This should only ever be called from the main thread so can raise
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem with tellie server interpreting stop command!\n", prefix);
         }
 
         // TUBii
         @try{
             [theTubiiModel stopTelliePulser];
         } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem stopping TUBii pulser!\n", prefix);
         }
 
         dispatch_sync(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
         });
         [[NSThread currentThread] cancel];
     }
@@ -1148,29 +1290,29 @@ err:
         [self setTellieMultiFlag:NO];
 
         //Resetting the mtcd to settings before the smellie run
-        NSLog(@"[TELLIE]: Killing requested flash sequence\n");
+        NSLog(@"%@: Killing requested flash sequence\n", prefix);
 
         // TELLIE
         @try{
             NSString* responseFromTellie = [[self tellieClient] command:@"stop"];
-            NSLog(@"[TELLIE]: Sent stop command to tellie, received: %@\n",responseFromTellie);
+            NSLog(@"%@: Sent stop command to hardware, received: %@\n",prefix, responseFromTellie);
         } @catch(NSException* e){
             // This should only ever be called from the main thread so can raise
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem with tellie server interpreting stop command!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem with tellie server interpreting stop command!\n", prefix);
         }
 
         // TUBii
         @try{
             [theTubiiModel stopTelliePulser];
         } @catch(NSException* e) {
-            NSLogColor([NSColor redColor], @"[TELLIE]: Problem stopping TUBii pulser!\n");
+            NSLogColor([NSColor redColor], @"%@: Problem stopping TUBii pulser!\n", prefix);
         }
 
         ////////////
         // Post a note saying we've jumped out of the run sequence
         if(![[NSThread currentThread] isCancelled]){
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinished object:self];
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
             });
         }
         [[NSThread currentThread] cancel];
@@ -1194,7 +1336,7 @@ err:
     [[self tellieThread] cancel];
 
     // Post a notification telling the run control to wait until the thread finishes
-    NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for tellie run to finish", @"Reason", nil];
+    NSDictionary* userInfo  = [NSDictionary dictionaryWithObjectsAndKeys:@"waiting for T/AMELLIE run to finish", @"Reason", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object:self userInfo:userInfo];
 
     //////////////////////
@@ -1210,7 +1352,7 @@ err:
         // If a run transition thread isn't yet running, run one.
         // Doing it this way avoids multiple transition behaviours.
         if(![_tellieTransitionThread isExecuting]){
-            NSLog(@"[TELLIE]: Waiting for TELLIE server to release blocking trigger function...\n");
+            NSLog(@"[T/AMELLIE]: Waiting for T/AMELLIE server to release blocking trigger function...\n");
             [self setTellieTransitionThread:[[NSThread alloc] initWithTarget:self selector:@selector(tellieRunTransition) object:nil]];
             [[self tellieTransitionThread] start];
         } else {
@@ -1239,7 +1381,7 @@ err:
     //Add run control object
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
+        NSLogColor([NSColor redColor], @"[T/AMELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
         goto err;
     }
     ORRunModel* runControl = [runModels objectAtIndex:0];
@@ -1252,7 +1394,7 @@ err:{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
     });
 
-    NSLog(@"[TELLIE]: Stop commands sucessfully sent to TELLIE and TUBii\n");
+    NSLog(@"[T/AMELLIE]: End of ELLIE sequence\n");
     [pool release];
 }
 }
@@ -1284,13 +1426,13 @@ err:{
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
     [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"index"];
     [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"timestamp"];
-
-    [runDocDict setObject:[NSMutableArray arrayWithObjects:[NSNumber numberWithUnsignedLong:[runControl runNumber]],[NSNumber numberWithUnsignedLong:[runControl runNumber]], nil] forKey:@"run_range"];
-
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:
+                            [NSNumber numberWithUnsignedLong:[runControl runNumber]],
+                            [NSNumber numberWithUnsignedLong:[runControl runNumber]], nil]
+                            forKey:@"run_range"];
     [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
 
     [self setTellieRunDoc:runDocDict];
-
     [[self couchDBRef:self withDB:@"telliedb"] addDocument:runDocDict tag:kTellieRunDocumentAdded];
     [pool release];
 }
@@ -1402,6 +1544,131 @@ err:{
     }
     NSLog(@"[TELLIE_DATABASE]: run plan lables sucessfully loaded\n");
     [self setTellieRunNames:names];
+}
+
+/*****************************/
+/*   amellie db interactions  */
+/*****************************/
+-(void) pushInitialAmellieRunDocument
+{
+    /*
+     Create a standard tellie run doc using ELLIEModel / SNOPModel / ORRunModel class
+     variables and push up to the telliedb. Additionally, the run doc dictionary set as
+     the tellieRunDoc propery, to be updated later in the run.
+     */
+    NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
+
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSLogColor([NSColor redColor], @"[AMELLIE_UPLOAD]: Couldn't find ORRunModel\n");
+        return;
+    }
+    ORRunModel* runControl = [runModels objectAtIndex:0];
+
+    NSString* docType = [NSMutableString stringWithFormat:@"AMELLIE_RUN"];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+
+    [runDocDict setObject:docType forKey:@"type"];
+    [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
+    [runDocDict setObject:[NSString stringWithFormat:@""] forKey:@"index"];
+    [runDocDict setObject:[self stringDateFromDate:nil] forKey:@"timestamp"];
+    [runDocDict setObject:[NSMutableArray arrayWithObjects:
+                           [NSNumber numberWithUnsignedLong:[runControl runNumber]],
+                           [NSNumber numberWithUnsignedLong:[runControl runNumber]], nil]
+                   forKey:@"run_range"];
+    [runDocDict setObject:subRunArray forKey:@"sub_run_info"];
+
+    [self setAmellieRunDoc:runDocDict];
+    [[self couchDBRef:self withDB:@"amellie"] addDocument:runDocDict tag:kAmellieRunDocumentAdded];
+}
+
+- (void) updateAmellieRunDocument:(NSDictionary*)subRunDoc
+{
+    /*
+     Update [self amellieRunDoc] with subrun information.
+
+     Arguments:
+     NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
+     */
+
+    // Get run control
+    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+    if(![runModels count]){
+        NSLogColor([NSColor redColor], @"[AMELLIE_UPLOAD]: Couldn't find ORRunModel\n");
+        return;
+    }
+    ORRunModel* runControl = [runModels objectAtIndex:0];
+
+    NSMutableDictionary* runDocDict = [[self amellieRunDoc] mutableCopy];
+    NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
+
+    [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
+
+    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
+    [subRunInfo addObject:subRunDocDict];
+    [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
+
+    //Update tellieRunDoc property.
+    [self setAmellieRunDoc:runDocDict];
+
+    //check to see if run is offline or not
+    if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
+        [[self couchDBRef:self withDB:@"amellie"]
+         updateDocument:runDocDict
+         documentId:[runDocDict objectForKey:@"_id"]
+         tag:kAmellieRunDocumentUpdated];
+    }
+    [subRunInfo release];
+    [runDocDict release];
+    [subRunDocDict release];
+}
+
+-(void) loadAMELLIEStaticsFromDB
+{
+    /*
+     Load current Amellie channel calibration and patch map settings from couch.
+     This function accesses the telliedb and pulls down the most recent fireParameters
+     and fibreMapping documents. The data is then saved to the member variables
+     amellieFireParameters and amellieFibreMapping.
+     */
+
+    //Set all to be nil
+    [self setAmellieFireParameters:nil];
+    [self setAmellieFibreMapping:nil];
+
+    NSString* fibreString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchFibreMapping?key=2147483647"];
+    NSString* nodeString = [NSString stringWithFormat:@"_design/orcaQueries/_view/fetchNodeMapping?key=2147483647"];
+
+    // Make requests
+    [[self couchDBRef:self withDB:@"amellie"] getDocumentId:fibreString tag:kAmellieFibresRetrieved];
+    [[self couchDBRef:self withDB:@"amellie"] getDocumentId:nodeString tag:kAmellieNodesRetrieved];
+}
+
+-(void)parseAmellieFirePars:(id)aResult
+{
+    NSMutableDictionary* fireParametersDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[AMELLIE_DATABASE]: channel calibrations sucessfully loaded\n");
+    [self setAmellieFireParameters:fireParametersDoc];
+}
+
+-(void)parseAmellieFibreMap:(id)aResult
+{
+    NSMutableDictionary* mappingDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[AMELLIE_DATABASE]: mapping document sucessfully loaded\n");
+    [self setAmellieFibreMapping:mappingDoc];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIEMappingReceived object:self];
+    });
+}
+
+-(void)parseAmellieNodeMap:(id)aResult
+{
+    NSMutableDictionary* mappingDoc =[[[aResult objectForKey:@"rows"]  objectAtIndex:0] objectForKey:@"value"];
+    NSLog(@"[AMELLIE_DATABASE]: mapping document sucessfully loaded\n");
+    [self setAmellieNodeMapping:mappingDoc];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIEMappingReceived object:self];
+    });
 }
 
 /*********************************************************/
@@ -1930,7 +2197,7 @@ err:
     //Post a note. on the main thread to request a call to handle run rollover stuff
     [[NSThread currentThread] cancel];
     dispatch_sync(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinished object:self];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSMELLIERunFinishedNotification object:self];
     });
     [pool release];
 }
@@ -2251,22 +2518,24 @@ err:
      id anOp:        This doesn't appear to be used??
      */
     @synchronized(self){
+        if(aResult == (id)[NSNull null]){
+            NSLogColor([NSColor redColor], @"[ELLIE]: DB Query returned NULL %@", aTag);
+            return;
+        }
         if([aResult isKindOfClass:[NSDictionary class]]){
             NSString* message = [aResult objectForKey:@"Message"];
             if(message){
                 [aResult prettyPrint:@"CouchDB Message:"];
             }
 
+            NSString* error = [aResult objectForKey:@"error"];
+            if(error){
+                NSLogColor([NSColor redColor], @"[ELLIE]: Problem recieving couch doc with tag %@: %@\n", aTag, error);
+                return;
+            }
             //Look through all of the possible tags for ellie couchDB results
             //This is called when smellie run header is queried from CouchDB
-            if ([aTag isEqualToString:kSmellieRunHeaderRetrieved]){
-                NSLog(@"Object: %@\n",aResult);
-                NSLog(@"result: %@\n",[aResult objectForKey:@"run_name"]);
-                //[self parseSmellieRunHeaderDoc:aResult];
-            }else if ([aTag isEqualToString:kSmellieConfigHeaderRetrieved]){
-                NSLog(@"Smellie configuration file Object: %@\n",aResult);
-                //[self parseSmellieConfigHeaderDoc:aResult];
-            }else if ([aTag isEqualToString:kTellieRunDocumentAdded]){
+            if ([aTag isEqualToString:kTellieRunDocumentAdded]){
                 NSMutableDictionary* runDoc = [[self tellieRunDoc] mutableCopy];
                 [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
                 [self setTellieRunDoc:runDoc];
@@ -2288,6 +2557,10 @@ err:
                 [self parseTellieNodeMap:aResult];
             } else if ([aTag isEqualToString:kTellieRunPlansRetrieved]){
                 [self parseTellieRunPlans:aResult];
+            } else if ([aTag isEqualToString:kAmellieFibresRetrieved]){
+                [self parseAmellieFibreMap:aResult];
+            } else if ([aTag isEqualToString:kAmellieNodesRetrieved]){
+                [self parseAmellieNodeMap:aResult];
             }
 
             //If no tag is found for the query result

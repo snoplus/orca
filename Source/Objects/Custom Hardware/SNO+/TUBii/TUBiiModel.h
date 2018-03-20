@@ -224,7 +224,8 @@ struct TUBiiState { //A struct that allows users of TUBiiModel to get/set all of
                                CounterInhibitOn: (bool) Inhibit;
 -(void)activateKeepAlive;
 -(void)pulseKeepAlive:(id)passed;
--(void)killKeepAlive;
+-(void)restartKeepAlive:(NSNotification*)aNote;
+-(void)killKeepAlive:(NSNotification*)aNote;
 @end
 
 extern NSString* ORTubiiLockNotification;

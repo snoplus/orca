@@ -165,6 +165,16 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
                      selector : @selector(runAboutToStart:)
                          name : ORRunAboutToStartNotification
                        object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(restartKeepAlive:)
+                         name : @"TUBiiKeepAliveDied"
+                       object : nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(killKeepAlive:)
+                         name : @"TELLIEEmergencyStop"
+                       object : nil];
 }
 - (void) runAboutToStart: (NSNotification*) aNone {
     [self setDataReadout:NO];
@@ -174,6 +184,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 
 - (void) awakeAfterDocumentLoaded
 {
+    [self registerNotificationObservers];
     [self activateKeepAlive];
 }
 
@@ -950,11 +961,30 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         }
         counter = counter + 1;
     }
+
     NSLog(@"[TUBii]: Stopped sending keep-alive to TUBii - ELLIE pulses will be shut off\n");
+
+    // This thread should always be running. If it's died, post a note to get it automatically restarted.
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"TUBiiKeepAliveDied" object:nil];
+
+    // release memory
     [pool release];
 }
 
--(void)killKeepAlive
+-(void)restartKeepAlive:(NSNotification*)aNote{
+    /*
+     If the keep alive has died, as a user to re-start it.
+     */
+    BOOL restart = ORRunAlertPanel(@"The keep alive pulse to TUBii has died.",
+                                   @"Unless you restart this process the ELLIE systems will not be able to trigger through TUBii. If you'd like to restart at a later time please do so from the servers tab of the ELLIE gui",
+                                    @"Restart",
+                                    @"Cancel",nil);
+    if(restart){
+        [self activateKeepAlive];
+    }
+}
+
+-(void)killKeepAlive:(NSNotification*)aNote
 {
     /*
      Stop pulsing the keep alive and disarm the interlock
@@ -962,6 +992,5 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     [[self keepAliveThread] cancel];
     NSLog(@"[TUBii]: Killing keep alive - ELLIE pulses will be shut off\n");
 }
-
 
 @end
