@@ -89,7 +89,7 @@
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-        <customObject id="-3" userLabel="Application"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Katrin" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
@@ -605,12 +605,12 @@
                                         <popUpButton verticalHuggingPriority="750" id="2304">
                                             <rect key="frame" x="120" y="169" width="117" height="15"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <popUpButtonCell key="cell" type="push" title="Pixel View" bezelStyle="rounded" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="2552">
+                                            <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="center" controlSize="mini" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="2552">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="miniSystem"/>
                                                 <menu key="menu" title="OtherViews" id="2306">
                                                     <items>
-                                                        <menuItem title="Pixel View" state="on" id="2307"/>
+                                                        <menuItem title="Pixel View" id="2307"/>
                                                         <menuItem title="Crate View" id="2308"/>
                                                         <menuItem title="PreAmp View" id="2309"/>
                                                         <menuItem title="3D View" id="2950"/>
@@ -688,7 +688,7 @@
                                                 <tabViewItem label="Tab" identifier="1" id="2942">
                                                     <view key="view" id="2943">
                                                         <rect key="frame" x="0.0" y="0.0" width="416" height="521"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
                                                             <customView id="1151" customClass="KatrinDetectorView">
                                                                 <rect key="frame" x="14" y="0.0" width="387" height="501"/>
@@ -1087,11 +1087,11 @@
                                             <rect key="frame" x="69" y="431" width="196" height="272"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="DxT-Ps-EQo">
-                                                <rect key="frame" x="1" y="23" width="194" height="248"/>
+                                                <rect key="frame" x="1" y="0.0" width="183" height="271"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="13" headerView="2599" id="1200">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="248"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="183" height="248"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.77501147999999997" green="1" blue="0.83125859000000002" alpha="1" colorSpace="calibratedRGB"/>
@@ -1124,7 +1124,7 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="gain" width="77.0302734375" minWidth="32.0302734375" maxWidth="1000" id="1203">
+                                                            <tableColumn identifier="gain" width="66.0302734375" minWidth="32.0302734375" maxWidth="1000" id="1203">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Gain">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1149,11 +1149,11 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="2597">
-                                                <rect key="frame" x="181" y="23" width="14" height="248"/>
+                                                <rect key="frame" x="184" y="23" width="11" height="248"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="2599">
-                                                <rect key="frame" x="0.0" y="0.0" width="194" height="23"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="183" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
@@ -1161,11 +1161,11 @@
                                             <rect key="frame" x="376" y="431" width="196" height="272"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="Hpn-u1-4tx">
-                                                <rect key="frame" x="1" y="23" width="194" height="248"/>
+                                                <rect key="frame" x="1" y="0.0" width="183" height="271"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="13" headerView="2602" id="1205">
-                                                        <rect key="frame" x="0.0" y="0.0" width="194" height="248"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="183" height="248"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" red="0.86666666999999997" green="1" blue="0.86666666999999997" alpha="1" colorSpace="deviceRGB"/>
@@ -1198,7 +1198,7 @@
                                                                 </textFieldCell>
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                             </tableColumn>
-                                                            <tableColumn identifier="gain" width="77.0302734375" minWidth="32.0302734375" maxWidth="1000" id="1207">
+                                                            <tableColumn identifier="gain" width="66.0302734375" minWidth="32.0302734375" maxWidth="1000" id="1207">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Gain">
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
@@ -1224,11 +1224,11 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <scroller key="verticalScroller" verticalHuggingPriority="750" controlSize="small" horizontal="NO" id="2600">
-                                                <rect key="frame" x="181" y="23" width="14" height="248"/>
+                                                <rect key="frame" x="184" y="23" width="11" height="248"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="2602">
-                                                <rect key="frame" x="0.0" y="0.0" width="194" height="23"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="183" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
@@ -1314,8 +1314,8 @@
                                             <rect key="frame" x="24" y="272" width="499" height="438"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="qjM-gS-7RA">
-                                                <rect key="frame" x="1" y="23" width="497" height="414"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="497" height="437"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="2596" id="250">
                                                         <rect key="frame" x="0.0" y="0.0" width="497" height="414"/>
@@ -1327,7 +1327,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="kSegmentNumber" editable="NO" width="36" minWidth="4" maxWidth="1000" id="274">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Pixel">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1340,7 +1340,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="kSlot" width="72" minWidth="4" maxWidth="1000" id="254">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="FLT Slot">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1353,7 +1353,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="kChannel" width="61.853515625" minWidth="32.853515625" maxWidth="1000" id="265">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="FLT Chan">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1441,8 +1441,8 @@
                                             <rect key="frame" x="535" y="572" width="213" height="138"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="Rra-o2-ImR">
-                                                <rect key="frame" x="1" y="23" width="211" height="114"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="211" height="137"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="2660" id="2663">
                                                         <rect key="frame" x="0.0" y="0.0" width="215" height="114"/>
@@ -1454,7 +1454,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="kFltSlot" editable="NO" width="51" minWidth="4" maxWidth="1000" id="2670">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="FLT Slot">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1467,7 +1467,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="kFltSN" width="80" minWidth="4" maxWidth="1000" id="2712">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title=" FLT S/N">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1480,7 +1480,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="kORBSN" width="75" minWidth="4" maxWidth="1000" id="2736">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title=" ORB S/N">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1516,8 +1516,8 @@
                                             <rect key="frame" x="535" y="314" width="213" height="167"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="gsc-8c-dgS">
-                                                <rect key="frame" x="1" y="23" width="211" height="143"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="211" height="166"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="2701" id="2698">
                                                         <rect key="frame" x="0.0" y="0.0" width="211" height="143"/>
@@ -1529,7 +1529,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="kPreAmpMod" editable="NO" width="73" minWidth="4" maxWidth="1000" id="2703">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Preamp Mod">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1542,7 +1542,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="kPreAmpSN" width="122" minWidth="4" maxWidth="1000" id="2702">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title=" Preamp S/N">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1578,8 +1578,8 @@
                                             <rect key="frame" x="535" y="487" width="213" height="78"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="MU6-Kk-Y2e">
-                                                <rect key="frame" x="1" y="23" width="211" height="54"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="211" height="77"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="2729" id="2726">
                                                         <rect key="frame" x="0.0" y="0.0" width="211" height="54"/>
@@ -1591,7 +1591,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="kOSBSlot" editable="NO" width="70" minWidth="4" maxWidth="1000" id="2731">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="OSB Slot">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1604,7 +1604,7 @@
                                                             </tableColumn>
                                                             <tableColumn identifier="kOSBSN" width="135" minWidth="4" maxWidth="1000" id="2730">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title=" OSB S/N">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1640,8 +1640,8 @@
                                             <rect key="frame" x="536" y="272" width="213" height="33"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" copiesOnScroll="NO" id="Ehb-GE-CT1">
-                                                <rect key="frame" x="1" y="23" width="211" height="9"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <rect key="frame" x="1" y="0.0" width="211" height="32"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="FocalPlaneTableView" rowHeight="13" headerView="2686" id="2683">
                                                         <rect key="frame" x="0.0" y="0.0" width="212" height="15"/>
@@ -1653,7 +1653,7 @@
                                                         <tableColumns>
                                                             <tableColumn identifier="kSltSN" width="103" minWidth="4" maxWidth="1000" id="2687">
                                                                 <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="SLT S/N">
-                                                                    <font key="font" metaFont="label"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
                                                                     <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                                     <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                                                 </tableHeaderCell>
@@ -1879,8 +1879,8 @@
                                             <rect key="frame" x="27" y="306" width="439" height="393"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <clipView key="contentView" id="yGF-fV-rps">
-                                                <rect key="frame" x="1" y="23" width="437" height="369"/>
-                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <rect key="frame" x="1" y="0.0" width="437" height="392"/>
+                                                <autoresizingMask key="autoresizingMask"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="none" alternatingRowBackgroundColors="YES" multipleSelection="NO" autosaveName="VetoTableView" rowHeight="13" headerView="2605" id="1590">
                                                         <rect key="frame" x="0.0" y="0.0" width="437" height="369"/>
