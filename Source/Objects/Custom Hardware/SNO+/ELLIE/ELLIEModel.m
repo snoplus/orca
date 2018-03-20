@@ -1586,7 +1586,7 @@ err:{
 {
     /*
      Update [self amellieRunDoc] with subrun information.
-     
+
      Arguments:
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */

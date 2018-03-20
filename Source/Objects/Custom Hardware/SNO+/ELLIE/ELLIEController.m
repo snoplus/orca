@@ -164,7 +164,7 @@
 
     [amellieNodeSelectPb removeAllItems];
     [amellieAngleSelectPb removeAllItems];
-    
+
     //Grey out fibre until node is given
     [tellieGeneralFibreSelectPb setTarget:self];
     [tellieGeneralFibreSelectPb setEnabled:NO];
@@ -914,7 +914,6 @@
         [msgs insertObject:[NSNull null] atIndex:4];
     }
 
-    
     msg = [self validateTellieNoPulses:[amellieNoPulsesTf stringValue]];
     if(msg){
         [msgs insertObject:msg atIndex:5];
@@ -1181,7 +1180,7 @@
         [editedField setNeedsDisplay:YES];
         return;
     }
-    
+
     /////////////////////////////////////////////////////////////
     // check if this notification originated from the AMELLIE tab
 

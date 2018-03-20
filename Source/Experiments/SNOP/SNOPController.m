@@ -567,7 +567,7 @@ snopGreenColor;
                      selector : @selector(fetchTellieRunFilesFinish:)
                          name : @"TellieRunFilesLoaded"
                         object: nil];
-    
+
     [notifyCenter addObserver : self
                      selector : @selector(fetchAmellieRunFilesFinish:)
                          name : @"AmellieRunFilesLoaded"
@@ -1502,10 +1502,10 @@ snopGreenColor;
     [amellieRunFileNameField setEnabled:NO];
     [amellieRunFileNameField removeAllItems];
     [amellieStartRunButton setEnabled:NO];
-    
+
     // Set the smellieRunFileList to nil
     [self setAmellieRunFileList:nil];
-    
+
     // Call getAmellieRunFiles from the model. This queries the DB and sets the tellieRunFiles
     // property. This function runs asyncronously so we have to wait for a notification to be
     // posted back before we can fill and re-activate the dropdown list (see below).
@@ -1516,16 +1516,16 @@ snopGreenColor;
 {
     // When we get a noticication that the database read has finished, set local variables
     NSMutableDictionary *runFileDict = [NSMutableDictionary dictionaryWithDictionary:[model amellieRunFiles]];
-    
+
     //Fill lthe combo box with information
     for(id key in runFileDict){
         id loopValue = [runFileDict objectForKey:key];
         [amellieRunFileNameField addItemWithObjectValue:[NSString stringWithFormat:@"%@",[loopValue objectForKey:@"name"]]];
     }
-    
+
     [amellieRunFileNameField setEnabled:YES];
     [amellieLoadRunFile setEnabled:YES];
-    
+
     [self setAmellieRunFileList:runFileDict];
 }
 

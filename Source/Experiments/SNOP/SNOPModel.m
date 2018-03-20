@@ -2381,16 +2381,16 @@ static NSComparisonResult compareXL3s(ORXL3Model *xl3_1, ORXL3Model *xl3_2, void
     // run file documents.
     unsigned int nFiles = [[aResult objectForKey:@"rows"] count];
     NSMutableDictionary *runFiles = [[NSMutableDictionary alloc] init];
-    
+
     for(int i=0;i<nFiles;i++){
         NSMutableDictionary* amellieRunFileIterator = [[[aResult objectForKey:@"rows"] objectAtIndex:i] objectForKey:@"value"];
         NSString *keyForAmellieDocs = [NSString stringWithFormat:@"%u",i];
         [runFiles setObject:amellieRunFileIterator forKey:keyForAmellieDocs];
     }
-    
+
     [self setAmellieRunFiles:runFiles];
     [runFiles release];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName: @"AmellieRunFilesLoaded" object:nil];
 }
 
