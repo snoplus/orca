@@ -176,7 +176,7 @@ static NSString* HaloDbConnector		= @"HaloDbConnector";
     [sentryValues setObject:[haloSentry remoteMachineStatusString] forKey:@"RemoteDaqStatus"];
     [sentryValues setObject:[haloSentry connectionStatusString] forKey:@"RemoteOrcaStatus"];
     [sentryValues setObject:[haloSentry nextToggleTime] forKey:@"NextToggle"];
-    [sentryValues setObject:[haloSentry sentryLog] forKey:@"SentryLog"];
+    if([haloSentry sentryLog])[sentryValues setObject:[haloSentry sentryLog] forKey:@"SentryLog"];
     [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry macPingFailedCount]] forKey:@"FailedMacPings"];
     [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry sbcPingFailedCount]] forKey:@"FailedSbcPings"];
     [sentryValues setObject:[NSString stringWithFormat:@"%i",[haloSentry sbcRebootCount]] forKey:@"SbcReboots"];
