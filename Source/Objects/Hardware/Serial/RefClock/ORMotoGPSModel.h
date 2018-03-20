@@ -43,8 +43,11 @@
         //
         int  cableDelayNs;
         BOOL statusPoll;
+        NSString* lastRecTelegram;
 }
 
+#pragma mark ***Initialization
+- (void) dealloc;
 
 #pragma mark ***Accessors
 - (void) setRefClock:(ORRefClockModel*)aRefClock;
@@ -55,6 +58,7 @@
 - (void) setStatusPoll:(BOOL)aStatusPoll;
 - (int) CableDelay;
 - (void) setCableDelay:(int)aDelay;
+- (NSString*) lastReceived;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;

@@ -207,7 +207,8 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 
     if(aCmdDictionary){
         NSData* cmdData = [aCmdDictionary objectForKey:@"data"];
-        [self startTimeout:3];
+        float delay = [cmdData length]/500.0;  // give it some extra time for big data chunks
+        [self startTimeout:3 + delay];
         [self setLastRequest:aCmdDictionary];
         [serialPort writeDataInBackground:cmdData];
     }
@@ -233,7 +234,7 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
     unsigned short nBytes = [inComingData length];
     unsigned char* bytes  = (unsigned char *)[inComingData bytes];
     NSLog(@"receiving... (so far %d bytes ) \n", nBytes);
-    [self startTimeout:3]; //reset incase there is a lot of data
+    //[self startTimeout:3]; //reset incase there is a lot of data
     if([[lastRequest objectForKey:@"replySize"] intValue] == nBytes){
         //if([inComingData length] >= 7) {
         if(bytes[nBytes - 2] == '\r' && bytes[nBytes - 1] == '\n' ) { // check for trailing \n (LF)

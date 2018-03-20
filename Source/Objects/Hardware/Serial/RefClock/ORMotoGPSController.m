@@ -94,6 +94,7 @@
     //BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORRefClockLock];//ORMotoGPSLock];
     BOOL portOpen = [model portIsOpen];
+    [setDefaults         setEnabled:!lockedOrRunningMaintenance && portOpen];
     [autoSurveyButton    setEnabled:!lockedOrRunningMaintenance && portOpen];
     [statusButton        setEnabled:!lockedOrRunningMaintenance && portOpen];
     [statusPollCB        setEnabled:!lockedOrRunningMaintenance && portOpen];
@@ -103,7 +104,9 @@
 
 - (void) receivedMessageChanged:(NSNotification*)aNote
 {
-
+    if([model lastReceived] != nil){
+        [receivedMessageField setStringValue:[model lastReceived]];
+    }
 }
 - (void) autoSurveyChanged:(NSNotification*)aNote
 {

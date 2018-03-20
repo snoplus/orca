@@ -42,6 +42,12 @@ extern NSString* ORMotoGPS;
 
 @implementation ORMotoGPSModel
 
+- (void) dealloc
+{
+    //[lastRecTelegram dealloc];
+    [super dealloc];
+}
+
 - (void) setRefClock:(ORRefClockModel*)aRefClock
 {
     refClock  = aRefClock; //this is a delegate... don't retain or release
@@ -94,6 +100,10 @@ extern NSString* ORMotoGPS;
     cableDelayNs = aDelay;
 }
 
+- (NSString*) lastReceived{
+    return lastRecTelegram;
+}
+
 #pragma mark *** Commands
 - (void) writeData:(NSDictionary*)aDictionary
 {
@@ -112,244 +122,23 @@ extern NSString* ORMotoGPS;
     ///MAH -- I didn't attempt to do anything to the old processing code below since I don't know the format
     //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
 
-    //if(!inComingData)inComingData = [[NSMutableData data] retain];
-    //  [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-    
-    //while (((char*)[inComingData mutableBytes])[0] != 'X' && [inComingData length] > 0){  //  remove possible error bytes at beginning until 'X';
-    // this can occur when the device has sent faulty data.
-    //NSRange range = NSMakeRange(0, 1);
-    //[inComingData replaceBytesInRange:range withBytes:NULL length:0];
-    //if([refClock verbose]){
-    //  NSLog(@"removed wrong starting Byte! \n");
-    //}
-    //}
     unsigned short nBytes = [receivedData length];
     unsigned char* bytes = (unsigned char *)[receivedData bytes];
     //if([inComingData length] >= 7) {
     if(bytes[nBytes - 1] == '\n') { // check for trailing \n (LF)
-        //NSLog(@"lastRequest contains %d bytes", [lastRequest length]);
-        // char* lastCmd;
-        // if([lastRequest length] > 7)  // waveform was sent...
-        // {
-        //   if([refClock verbose]){
-        //     NSLog(@"respond after set waveform: %@, length: %d \n", inComingData, [inComingData length]);
-        //   }
-        //   NSRange range = NSMakeRange([lastRequest length] - 7, 7);
-        //   lastCmd = (char*) [[lastRequest subdataWithRange:range]bytes];
-        //   if([refClock verbose]){
-        //     NSLog(@"last command (waveform): %7s \n", lastCmd);
-        //   }
-        // }
-        // else{
-        //lastCmd = (char*)[lastRequest bytes];
-        //}
-        
-        if([refClock verbose]){
-            //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
-            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
-        }
-        //            switch(bytes[0]){
-        //                case '0': statusMessage = @"0: warming up"; break;
-        //                case '1': statusMessage = @"1: tracking set-up"; break;
-        //                case '2': statusMessage = @"2: track to PPSREF"; break;
-        //                case '3': statusMessage = @"3: sync to PPSREF"; break;
-        //                case '4': statusMessage = @"4: Free Run. Track OFF"; break;
-        //                case '5': statusMessage = @"5: PSREF unstable (Hold over)"; break;
-        //                case '6': statusMessage = @"6: No PSREF (Hold over)"; break;
-        //                case '7': statusMessage = @"7: factory used"; break;
-        //                case '8': statusMessage = @"8: factory used"; break;
-        //                case '9': statusMessage = @"9: Fault"; break;
-        //                default: statusMessage = @"warning: SynClock default message"; break;
-        //            }
-        //            [self updateStatusHistory];
-        //            NSLog(@"notifying... \n");
+        lastRecTelegram = [NSString stringWithCString:(char*)bytes encoding: NSASCIIStringEncoding];
+//        if([refClock verbose]){
+//            //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
+//            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
+//        }
+
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMotoGPSModelReceivedMessageChanged object:self];
-        //displayStatus(bytes[0]);
     }
     else {
         NSLog(@"Warning (MotoGPSModel::dataAvailable): unsupported command \n");
     }
-    //  switch (lastCmd[1]){
-    //    case kWGRemoteCmd:
-    //
-    //      if([lastRequest isEqual: inComingData]){
-    //        //NSLog(@"setRemote was successful: %@ \n", inComingData);
-    //        reTxCount = 0;
-    //      }else{
-    //        reTxCount++;
-    //        if([refClock verbose]){
-    //          NSLog(@"setRemote (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //      }
-    //        [cmdQueue enqueue:lastRequest];
-    //      }
-    //      done = YES;
-    //      break;
-    //    case kWGFreqCmd:
-    //     if(![lastRequest isEqual: inComingData]){
-    //       reTxCount++;
-    //       if([refClock verbose]){
-    //         NSLog(@"setFrequency (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //received wrong acknowledge: %@ \n", inComingData);
-    //       }
-    //       [cmdQueue enqueue:lastRequest];
-    //     }else {
-    //       //NSLog(@"setFrequency was successful: %@ \n", inComingData);
-    //       reTxCount = 0;
-    //     }
-    //     done = YES;
-    //    break;
-    //   case kWGAttCmd:
-    //
-    //     if([lastRequest isEqual: inComingData]){
-    //       reTxCount = 0;
-    //     }else{
-    //       reTxCount++;
-    //       if([refClock verbose]){
-    //         NSLog(@"setAmplitude (Attenuation) (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //       }
-    //       [cmdQueue enqueue:lastRequest];
-    //     }
-    //     done = YES;
-    //     break;
-    //   case kWGAmpltCmd:
-    //     if([lastRequest isEqual: inComingData]){
-    //       reTxCount = 0;
-    //     }else{
-    //       reTxCount++;
-    //       if([refClock verbose]){
-    //         NSLog(@"setAmplitude (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //       }
-    //       [cmdQueue enqueue:lastRequest];
-    //     }
-    //     done = YES;
-    //     break;
-    //  case kWGDutyCCmd:
-    //   if([lastRequest isEqual: inComingData]){
-    //     reTxCount = 0;
-    //   }else{
-    //     reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"setDutyCycle (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount);
-    //     }
-    //     [cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    // case kWGFormCmd:
-    //   if([lastRequest isEqual: inComingData]){
-    //     reTxCount = 0;
-    //   }else{
-    //     reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"setSignalForm (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //       NSLog(@"sent Data: %@ \n", lastRequest);
-    //       NSLog(@"incoming Data: %@ \n", inComingData);
-    //     }
-    //     [cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    //
-    //   case kWGProgModCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGProgModCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   if(! [[self progModeCmdReturned] isEqual: inComingData]){
-    //     reTxCount++;
-    //     [cmdQueue enqueue:lastRequest];
-    //   }else{
-    //     reTxCount = 0;
-    //   }
-    //   done = YES;
-    //   break;
-    //   case kWGStartProgCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGStartProgCmd:incoming Data: %@ \n", inComingData);
-    //   }
-    //   if([lastRequest isEqual: inComingData]){
-    //     reTxCount = 0;
-    //   }else{
-    //     reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"start Programming (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount);
-    //     }
-    //     [cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    //
-    //   case kWGRdyPrgrmCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGRdyPrgrmCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   if(! [[self isReadyForProgReturned] isEqual: inComingData]){
-    //     reTxCount++;
-    //     [cmdQueue enqueue:lastRequest];
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGRdyPrgrmCmd not successful. repeating.. \n");
-    //     }
-    //     usleep(1000000);
-    //   }else{
-    //     reTxCount = 0;
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGRdyPrgrmCmd successful \n");
-    //     }
-    //   }
-    //   done = YES;
-    //   break;
-    //   case kWGStopPrgrmCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGStopPrgrmCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   NSData* expectedReturn = [NSData dataWithBytes:lastCmd length:7];
-    //   if([expectedReturn isEqual: inComingData]){
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGStopPrgrmCmd: incoming Data OK \n");
-    //     }
-    //     reTxCount = 0;
-    //   }else{
-    //     //reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"ERROR: stop Programming (SynClock): wrong data; expected: %@  \n", expectedReturn);
-    //     }
-    //     //[cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    //   case kWGFinPrgrmCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGFinPrgrmCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   if(! [[self isStoppedProgReturned] isEqual: inComingData]){
-    //     reTxCount++; // = 1;
-    //     [cmdQueue enqueue:lastRequest];
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGFinPrgrmCmd not successful. repeating.. \n");
-    //     }
-    //     usleep(1000000);
-    //   }else{
-    //     reTxCount = 0;
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGFinPrgrmCmd successful \n");
-    //     }
-    //   }
-    //   usleep(1000000);
-    //   done = YES;
-    //   break;
-    //
-    //   }
-    
-    //if(done){
-    //      [inComingData release];
-    //    inComingData = nil;
-    //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    //[self processOneCommandFromQueue];     //do the next command in the queue
-    //}
-    //}
+
 }
-//- (NSData*) alarmWindowCommand{
-//  unsigned char cmdData[0];
-//  return [NSData dataWithBytes:cmdData length:0];
-//}
 
 - (NSDictionary*) defaultsCommand
 {
@@ -384,6 +173,8 @@ extern NSString* ORMotoGPS;
 
     [[self undoManager] disableUndoRegistration];
     [self setCableDelay:  [decoder decodeIntForKey:  @"cableDelayNs"]];
+    //lastRecTelegram = [[[NSString alloc] init] retain];
+    //lastRecTelegram = @"";
     [[self undoManager] enableUndoRegistration];
     return self;
 }
