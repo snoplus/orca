@@ -62,7 +62,8 @@
 - (id)		whileLoop:(id) p;
 - (id)		doLoop:(id) p;
 - (id)		doSwitch:(id) p;
-- (id)		doCase:(id)p;
+- (id)      doCase:(id)p;
+- (id)      doCaseRange:(id)p;
 - (id)		doDefault:(id)p;
 - (id)		processObjC:(id) p;
 - (id)		processSelectName:(id) p;
@@ -386,6 +387,7 @@
 #define NodeValue(aNode) [self execute:[[p nodeData] objectAtIndex:aNode] container:nil]
 #define NodeValueWithContainer(aNode,aContainer) [self execute:[[p nodeData] objectAtIndex:aNode] container:aContainer]
 #define VARIABLENAME(aNode)  [[[p nodeData] objectAtIndex:aNode] nodeData]
+#define LineNumber(aNode) [[[p nodeData] objectAtIndex:0] line]
 
 - (id) execute:(id) p container:(id)aContainer
 {
@@ -659,14 +661,15 @@
 			
 			//loops
 		case FOR:			return [self forLoop:p];
-		case BREAK:			[NSException raise:@"break" format:@""]; return nil;
+		case BREAK:			[NSException raise:@"break"    format:@""]; return nil;
 		case CONTINUE:		[NSException raise:@"continue" format:@""]; return nil;
 		case EXIT:			return [self doExit:p];
 		case RETURN:		return [self doReturn:p];
 		case WHILE:			return [self whileLoop:p];
 		case DO:			return [self doLoop:p];
 		case SWITCH:		return [self doSwitch:p];
-		case CASE:			return [self doCase:p];
+        case CASE:          return [self doCase:p];
+        case kCaseRange:    return [self doCaseRange:p];
 		case DEFAULT:		return [self doDefault:p];
 			
 			//built-in funcs
@@ -1304,7 +1307,7 @@
 		return [theArray objectAtIndex:n];
 	}
 	else { //run time error
-		[NSException raise:@"Array Bounds" format:@"Out of Bounds Error"];
+        [NSException raise:@"Array Bounds" format:@"Out of Bounds Error. Line: %d",LineNumber(0)];
 	}
 	return nil;
 }
@@ -1481,13 +1484,13 @@
     long val1 = [NodeValue(1) unsignedLongValue];
     long val2 = [NodeValue(2) unsignedLongValue];
     if(val1 > val2) {
-        [NSException raise:@"Run Time Exception" format:@"Bit extract parameters out of order"];
+        [NSException raise:@"Run Time Exception" format:@"Bit extract parameters out of order. Line: %d",LineNumber(1)];
     }
     if(val1 < 0 | val2 < 0) {
-        [NSException raise:@"Run Time Exception" format:@"Bit extract parameter is negative"];
+        [NSException raise:@"Run Time Exception" format:@"Bit extract parameter is negative. Line: %d",LineNumber(1)];
     }
     if(val1 > 32 | val2 > 32) {
-        [NSException raise:@"Run Time Exception" format:@"Bit extract parameter greater than 32"];
+        [NSException raise:@"Run Time Exception" format:@"Bit extract parameter greater than 32. Line: %d",LineNumber(1)];
     }
     unsigned short aShift = MIN(val1,val2);
     unsigned long aMask = 0L;
@@ -1524,6 +1527,25 @@
 		if([[p nodeData] count] == 3)NodeValue(2);
 	}
 	return nil;
+}
+
+- (id) doCaseRange:(id)p
+{
+    NSDecimalNumber* leftNum  = NodeValue(0);
+    NSDecimalNumber* rightNum = NodeValue(1);
+    if([leftNum compare:rightNum] == NSOrderedAscending){
+        int leftCompare  = [switchValue[switchLevel] compare: leftNum];
+        int rightCompare = [switchValue[switchLevel] compare: rightNum];
+        if((leftCompare  == NSOrderedSame || leftCompare  == NSOrderedDescending) &&
+           (rightCompare == NSOrderedSame || rightCompare == NSOrderedAscending) ){
+            NodeValue(2);
+            if([[p nodeData] count] == 4)NodeValue(3);
+        }
+    }
+    else {
+        [NSException raise:@"Run time" format:@"Case range must be ascending. Line: %d",LineNumber(0)];
+    }
+    return nil;
 }
 
 - (id) doDefault:(id)p
@@ -1618,7 +1640,7 @@
             collectionObj = [collectionObj allKeys];
         }
         else {
-            [NSException raise:@"Run Time Exception" format:@"%@ is not an array or dictionary",VARIABLENAME(1)];
+            [NSException raise:@"Run Time Exception" format:@"%@ is not an array or dictionary. Line: %d",VARIABLENAME(1),LineNumber(1)];
         }
         
         int i;
@@ -1901,7 +1923,7 @@
 	}
 	
 	NSLog(@"In %@, <%@> not passed the right kind of argument. Check the syntax.\n",[self scriptName],aFunctionName);
-	[NSException raise:@"Run time" format:@"Arg Type error"];
+    [NSException raise:@"Run time" format:@"Arg Type error. Line: %d"];
 	return nil;
 }
 
@@ -2024,7 +2046,8 @@
                 case '/':				line = [NSMutableString stringWithString:@"[/]"];			break;
                 case '<':				line = [NSMutableString stringWithString:@"[<]"];			break;
                 case '>':				line = [NSMutableString stringWithString:@"[>]"];			break;
-                case LEFT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
+                case kCaseRange:        line = [NSMutableString stringWithString:@"[<=<]"];         break;
+                case LEFT_OP:           line = [NSMutableString stringWithString:@"[<<]"];          break;
                 case RIGHT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
 				case AND_OP:			line = [NSMutableString stringWithString:@"[&&]"];			break;
 				case '&':				line = [NSMutableString stringWithString:@"[&]"];			break;

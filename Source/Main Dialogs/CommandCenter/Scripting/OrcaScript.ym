@@ -34,9 +34,9 @@
 %token <symKey> VARIABLE
 %token FUNCTION WHILE DO FOR IN IF PRINT LOGFILE PRINTFILE FIND MAKE SORT SORTR BREAK EXIT CONTINUE SLEEP YIELD RETURN WAITUNTIL HEX MAKEARRAY
 %token INC_OP DEC_OP ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN ORQUALS LEFT_ASSIGN RIGHT_ASSIGN TIME FIXED SCI SYMBOLS GLOBALS
-%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE DEFAULT MAKEPOINT MAKERECT MAKESIZE SHELL
+%token AND_ASSIGN XOR_ASSIGN MOD_ASSIGN OR_ASSIGN MAKESTRING CATSTRING SWITCH CASE  DEFAULT MAKEPOINT MAKERECT MAKESIZE SHELL
 %token LEFT_OP RIGHT_OP  EQ_OP NE_OP GE_OP LE_OP AND_OP OR_OP ALARM CLEAR UNLESS DISPLAY NSDICTIONARY NSDATECOMPONENTS NSARRAY MAKEEXCEPTION MAKERANGE
-%token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE IMPORT HASH CONFIRM REQUEST SHOW SEEDRANDOM RANDOM TRY CATCH FINALLY THROW GLOBAL SELFFUNCTION BIT_EXTRACT
+%token NSFILEMANAGER STRINGFROMFILE WRITELINETOFILE DELETEFILE IMPORT HASH CONFIRM REQUEST SHOW SEEDRANDOM RANDOM TRY CATCH FINALLY THROW GLOBAL SELFFUNCTION BIT_EXTRACT CASERANGE
 %nonassoc ELSE
 
 %left '+' '-' 
@@ -220,7 +220,7 @@ iteration_statement
 : WHILE '(' expr ')' statement					{ $$ = executionNode(WHILE, $3, $5,nil); }
 | DO statement WHILE '(' expr ')' ';'			{ $$ = executionNode(DO, $2, $5,nil); }
 | FOR '(' expr ';' expr ';' expr ')' statement	{ $$ = executionNode(FOR, $3,$5,$7,$9,nil); }
-| FOR '(' VARIABLE IN VARIABLE ')' statement            { $$ = executionNode(FOR, identifierNode($3),identifierNode($5),$7,nil); }
+| FOR '(' VARIABLE IN VARIABLE ')' statement    { $$ = executionNode(FOR, identifierNode($3),identifierNode($5),$7,nil); }
 ;
 
 jump_statement 
@@ -237,9 +237,11 @@ case_list
 ;
 
 case_statement
-: CASE constant_expr ':' statement_list	break_statement		{ $$ = executionNode(CASE, $2, $4, $5,nil); }
-| CASE constant_expr ':' break_statement					{ $$ = executionNode(CASE, $2, $4, nil); }
-| DEFAULT ':' statement_list	break_statement				{ $$ = executionNode(DEFAULT, $3, $4, nil); }
+: CASE constant_expr ':' statement_list	break_statement		                    { $$ = executionNode(CASE, $2, $4, $5,nil); }
+| CASE constant_expr ':' break_statement					                    { $$ = executionNode(CASE, $2, $4, nil);    }
+| DEFAULT ':' statement_list	break_statement				                    { $$ = executionNode(DEFAULT, $3, $4, nil); }
+| CASE constant_expr CASERANGE constant_expr ':' statement_list break_statement { $$ = executionNode(kCaseRange, $2, $4, $6, $7, nil); }
+| CASE constant_expr CASERANGE constant_expr ':' break_statement                { $$ = executionNode(kCaseRange, $2, $4, $6, nil); }
 ;
 
 break_statement

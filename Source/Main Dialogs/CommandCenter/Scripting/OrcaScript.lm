@@ -76,7 +76,7 @@ E			[Ee][+-]?{D}+
 "#"				return HASH;
 "<<"			return LEFT_OP;
 ">>"			return RIGHT_OP;
-
+"<=<"           return CASERANGE;
 "do"			return DO;
 "while"         return WHILE;
 "for"			return FOR;
