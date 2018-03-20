@@ -1394,7 +1394,7 @@ err:{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object:self];
     });
 
-    NSLog(@"[T/AMELLIE]: Stop commands sucessfully sent to ELLIE and TUBii\n");
+    NSLog(@"[T/AMELLIE]: End of ELLIE sequence\n");
     [pool release];
 }
 }
