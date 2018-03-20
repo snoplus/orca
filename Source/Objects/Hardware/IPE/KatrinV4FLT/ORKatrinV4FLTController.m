@@ -90,7 +90,6 @@
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[fifoDisplayMatrix cellAtRow:i column:0] setTag:i];
         [[thresholdTextFields cellWithTag:i] setFormatter:valueFormatter ];
-        //[[vetoThresholdMatrix cellWithTag:i] setFormatter:valueFormatter ];
 	}
 	[self populatePullDown];
 	
@@ -304,9 +303,10 @@
                        object : model];
 	
     [notifyCenter addObserver : self
-                     selector : @selector(noiseFloorOffsetChanged:)
-                         name : ORKatrinV4FLTNoiseFloorOffsetChanged
+                     selector : @selector(finalThresholdOffsetChanged:)
+                         name : ORKatrinV4FLTFinalThresholdOffsetChanged
                        object : model];
+    
     [notifyCenter addObserver : self
                      selector : @selector(histPageABChanged:)
                          name : ORKatrinV4FLTModelHistPageABChanged
@@ -326,16 +326,6 @@
                      selector : @selector(shipSumHistogramChanged:)
                          name : ORKatrinV4FLTModelShipSumHistogramChanged
 						object: model];
-
-//    [notifyCenter addObserver : self
-//                     selector : @selector(vetoOverlapTimeChanged:)
-//                         name : ORKatrinV4FLTModelVetoOverlapTimeChanged
-//                        object: model];
-
-//    [notifyCenter addObserver : self
-//                     selector : @selector(nfoldCoincidenceChanged:)
-//                         name : ORKatrinV4FLTModelNfoldCoincidenceChanged
-//                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(fifoLengthChanged:)
@@ -432,10 +422,20 @@
                          name : ORKatrinV4FLTModelLostEventsTrChanged
                         object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(startingUpperBoundChanged:)
+                         name : ORKatrinV4FLTStartingUpperBoundChanged
+                        object: model];
+
     
 }
 
 #pragma mark •••Interface Management
+
+- (void) startingUpperBoundChanged:(NSNotification*)aNote
+{
+    [startingUpperBoundField setIntValue:[model startingUpperBound]];
+}
 
 - (void) hitRateModeChanged:(NSNotification*)aNote
 {
@@ -521,20 +521,6 @@
 	//NSLog(@"%@::%@: fifoLength is %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[model fifoLength]);//-tb-NSLog-tb-
 	[fifoLengthPU selectItemAtIndex: [model fifoLength]];
 }
-
-//- (void) nfoldCoincidenceChanged:(NSNotification*)aNote
-//{
-//    [nfoldCoincidencePU selectItemAtIndex: [model nfoldCoincidence]];
-//    NSString* s = [NSString stringWithFormat:@">=%d",[model nfoldCoincidence]];
-//    [group1NFoldField setStringValue:s];
-//    [group2NFoldField setStringValue:s];
-//    [group3NFoldField setStringValue:s];
-//}
-
-//- (void) vetoOverlapTimeChanged:(NSNotification*)aNote
-//{
-//    [vetoOverlapTimePU selectItemAtIndex: [model vetoOverlapTime]];
-//}
 
 - (void) shipSumHistogramChanged:(NSNotification*)aNote
 {
@@ -710,13 +696,11 @@
 	[self histFirstEntryChanged:nil];
 	[self histLastEntryChanged:nil];
 	[self noiseFloorChanged:nil];
-	[self noiseFloorOffsetChanged:nil];
+	[self finalThresholdOffsetChanged:nil];
 	[self histPageABChanged:nil];
 	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
 	[self shipSumHistogramChanged:nil];
-//	[self vetoOverlapTimeChanged:nil];
-//    [self nfoldCoincidenceChanged:nil];
 	[self fifoLengthChanged:nil];
 	[self activateDebuggerDisplaysChanged:nil];
 	[self fifoFlagsChanged:nil];
@@ -737,6 +721,8 @@
     [self hitRateModeChanged:nil];
     [self lostEventsChanged:nil];
     [self lostEventsTrChanged:nil];
+    [self thresholdChanged:nil];
+    [self startingUpperBoundChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -781,10 +767,6 @@
     [fireSoftwareTriggerButton   setEnabled: !lockedOrRunningMaintenance];
     [fireSoftwareTriggerButton1  setEnabled: !lockedOrRunningMaintenance];
     [hitRateEnabledCBs           setEnabled: !lockedOrRunningMaintenance];
-//    [vetoTriggerEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
-//    [vetoHitRateEnabledCBs       setEnabled: !lockedOrRunningMaintenance];
-//    [vetoGainMatrix              setEnabled: !lockedOrRunningMaintenance];
-//    [vetoThresholdMatrix         setEnabled: !lockedOrRunningMaintenance];
 	
 	[versionButton               setEnabled: !runInProgress];
 	[testButton                  setEnabled: !runInProgress];
@@ -814,13 +796,6 @@
 	[clearReceivedHistoCounterButton setEnabled: !lockedOrRunningMaintenance & (daqMode == kIpeFltV4_Histogram_DaqMode)];
 	
     [compareRegistersButton setEnabled:!lockedOrRunningMaintenance];
-    
-    
-//    NSString* s;
-//    if(locked)s = @"Veto Locked";
-//    else if((daqMode == kIpeFltV4_VetoEnergyDaqMode) || (daqMode == kIpeFltV4_VetoEnergyTraceDaqMode)) s = @"Veto Active";
-//    else s = @"";
-//    [vetoActiveField setStringValue:s];
     
     [startNoiseFloorButton setEnabled: !runInProgress];
 	
@@ -873,9 +848,9 @@
 	[noiseFloorStateField2 setStringValue:[model noiseFloorStateString]];
 }
 
-- (void) noiseFloorOffsetChanged:(NSNotification*)aNote
+- (void) finalThresholdOffsetChanged:(NSNotification*)aNote
 {
-	[noiseFloorOffsetField setIntValue:[model noiseFloorOffset]];
+	[finalThresholdOffsetField setFloatValue:[model finalThresholdOffset]];
 }
 
 
@@ -971,7 +946,6 @@
 {
 	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
 	[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
-//	[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
 }
 
 - (void) triggerEnabledChanged:(NSNotification*)aNotification
@@ -979,7 +953,6 @@
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[triggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
-//		[[vetoTriggerEnabledCBs cellWithTag:i] setState: [model triggerEnabled:i]];
 	}
 }
 
@@ -988,15 +961,21 @@
 	int i;
 	for(i=0;i<kNumV4FLTChannels;i++){
 		[[hitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
-//		[[vetoHitRateEnabledCBs cellWithTag:i] setState: [model hitRateEnabled:i]];
 	}
 }
 
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
-	int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
-    [[thresholdTextFields cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
-//    [[vetoThresholdMatrix cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
+    if(!aNotification){
+        int chan;
+        for(chan=0;chan<kNumV4FLTChannels;chan++){
+            [[thresholdTextFields cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
+        }
+    }
+    else {
+        int chan = [[[aNotification userInfo] objectForKey:ORKatrinV4FLTChan] intValue];
+        [[thresholdTextFields cellWithTag:chan] setFloatValue: [model scaledThreshold:chan]];
+    }
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -1012,9 +991,7 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[gainTextFields cellWithTag:chan] setIntValue: [model gain:chan]];
-//		[[vetoGainMatrix cellWithTag:chan] setIntValue: [model gain:chan]];
-		
-	}	
+	}
 }
 
 - (void) thresholdArrayChanged:(NSNotification*)aNotification
@@ -1022,7 +999,6 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[thresholdTextFields cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
-//		[[vetoThresholdMatrix cellWithTag:chan] setIntValue: [(ORKatrinV4FLTModel*)model scaledThreshold:chan]];
 	}
 }
 
@@ -1031,8 +1007,6 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[triggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
-//		[[vetoTriggerEnabledCBs cellWithTag:chan] setIntValue: [model triggerEnabled:chan]];
-		
 	}
 }
 
@@ -1041,8 +1015,6 @@
 	short chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		[[hitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
-//		[[vetoHitRateEnabledCBs cellWithTag:chan] setIntValue: [model hitRateEnabled:chan]];
-		
 	}
 }
 
@@ -1098,8 +1070,6 @@
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
 {
-	//	NSLog(@"This is v4FLT selectedRegIndexChanged\n" );
-    //[registerPopUp selectItemAtIndex: [model selectedRegIndex]];
 	[self updatePopUpButton:registerPopUp	 setting:[model selectedRegIndex]];
 	
 	[self enableRegControls];
@@ -1113,8 +1083,6 @@
 - (void) selectedChannelValueChanged:(NSNotification*) aNote
 {
     [channelPopUp selectItemWithTag: [model selectedChannelValue]];
-	//[self updatePopUpButton:channelPopUp	 setting:[model selectedRegIndex]];
-	
 	[self enableRegControls];
 }
 
@@ -1221,21 +1189,8 @@
 	[model setFifoLength:[fifoLengthPU indexOfSelectedItem]];	
 }
 
-//- (IBAction) nfoldCoincidencePUAction:(id)sender
-//{
-//    //NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-//    [model setNfoldCoincidence:[sender indexOfSelectedItem]];
-//}
-
-
-//- (IBAction) vetoOverlapTimePUAction:(id)sender
-//{
-//    [model setVetoOverlapTime:[vetoOverlapTimePU indexOfSelectedItem]];
-//}
-
 - (IBAction) shipSumHistogramPUAction:(id)sender
 {
-	//[model setShipSumHistogram:[sender intValue]];
     [model setShipSumHistogram:[sender indexOfSelectedItem]];
 
 }
@@ -1260,6 +1215,7 @@
 
 - (IBAction) closeNoiseFloorPanel:(id)sender
 {
+    [noiseFloorPanel endEditingFor:nil];
     [noiseFloorPanel orderOut:nil];
     [NSApp endSheet:noiseFloorPanel];
 }
@@ -1268,7 +1224,6 @@
 {
 	[noiseFloorPanel endEditingFor:nil];		
     @try {
-        NSLog(@"IPE V4 FLT (slot %d) Finding Thresholds \n",[model slot]);
 		[model findNoiseFloors];
     }
 	@catch(NSException* localException) {
@@ -1277,11 +1232,9 @@
                         localException);
     }
 }
-- (IBAction) noiseFloorOffsetAction:(id)sender
+- (IBAction) finalThresholdOffsetAction:(id)sender
 {
-    if([sender intValue] != [model noiseFloorOffset]){
-        [model setNoiseFloorOffset:[sender intValue]];
-    }
+    [model setFinalThresholdOffset:[sender floatValue]];
 }
 
 - (IBAction) histClrModeAction:(id)sender
@@ -1346,7 +1299,6 @@
 						localException,[model stationNumber]);
 	}
 }
-
 
 - (IBAction) postTriggerTimeAction:(id)sender
 {
@@ -1455,16 +1407,14 @@
 
 - (IBAction) gainAction:(id)sender
 {
-	if([sender intValue] != [model gain:[[sender selectedCell] tag]]){
-		[[self undoManager] setActionName: @"Set Gain"];
-		[model setGain:[[sender selectedCell] tag] withValue:[sender intValue]];
-	}
+    [[self undoManager] setActionName: @"Set Gain"];
+    [model setGain:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) thresholdAction:(id)sender
 {
     [[self undoManager] setActionName: @"Set Threshold"];
-    [model setFloatThreshold:[[sender selectedCell] tag] withValue: [sender floatValue] * powf(2., [model filterShapingLength])];
+    [model setScaledThreshold:[[sender selectedCell] tag] withValue:[sender floatValue]];
 }
 
 
@@ -1598,9 +1548,6 @@
 	}
 }
 
-
-
-
 - (IBAction) statusAction:(id)sender
 {
 	@try {
@@ -1725,6 +1672,11 @@
         NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	    [model testButtonLowLevelResetTP];
 	}
+}
+
+- (IBAction) startingUpperBoundAction:(id)sender
+{
+    [model setStartingUpperBound:[sender intValue]];
 }
 
 - (IBAction) compareRegisters:(id)sender

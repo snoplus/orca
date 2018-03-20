@@ -21,61 +21,36 @@
 
 #import "ORMotoGPSController.h"
 #import "ORMotoGPSModel.h"
-
-@interface ORMotoGPSController (private)
-//- (void) populatePortListPopup;
-@end
+#import "ORRefClockModel.h"
 
 @implementation ORMotoGPSController
-
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [topLevelObjects release];
-    
     [super dealloc];
 }
 
 #pragma mark ***Initialization
 
-- (void) viewDidLoad  // todo debug. remove
-{
-    NSLog(@"loaded view ! \n");
-    return;
-}
-
-//- (id) init
-//{
-//    NSLog(@"MotoGPSController init() ! \n");  // remove this debug
-//    self = [super initWithNibName:@"MotoGPS" bundle:nil]; // "MotoGPS" ....!!
-//    //[self loadView];
-//    //self = [super initWithWindowNibName:@"MotoGPS"];
-//    return self;
-//}
-
-
 - (void) awakeFromNib
 {
     if(!deviceContent){
-    if ([[NSBundle mainBundle] loadNibNamed:@"MotoGPS" owner:self  topLevelObjects:&topLevelObjects]){
-        [topLevelObjects retain];
+        if ([[NSBundle mainBundle] loadNibNamed:@"MotoGPS" owner:self  topLevelObjects:&topLevelObjects]) {
+            [topLevelObjects retain];
         
-        [deviceView setContentView:deviceContent];
-         [[self model] setStatusPoll:[statusPollCB state]];
-        //NSLog(@"Loaded MotoGPS.nib");
-        
+            [deviceView setContentView:deviceContent];
+            [[self model] setStatusPoll:[statusPollCB state]];
+        }
+        else NSLog(@"Failed to load MotoGPS.nib");
     }
-    else NSLog(@"Failed to load MotoGPS.nib");
-    }
-    return;
-    //[self populatePortListPopup];
-    //[super awakeFromNib];
 }
 
 - (id) model
 {
     return model;
 }
+
 - (void) setModel:(id)aModel
 {
     model = aModel;
@@ -84,236 +59,97 @@
 }
 
 #pragma mark ***Notifications
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
-    //[super registerNotificationObservers];
-    [notifyCenter addObserver : self
-                     selector : @selector(lockChanged:)
-                         name : ORRunStatusChangedNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(lockChanged:)
-                         name : ORRefClockLock //ORMotoGPSLock
-                        object: self];
 
     [notifyCenter addObserver : self
                      selector : @selector(statusChanged:)
                          name : ORMotoGPSModelStatusChanged
-											object: model];
+                        object: model];
 
-		[notifyCenter addObserver : self
+    [notifyCenter addObserver : self
                      selector : @selector(statusPollChanged:)
                          name : ORMotoGPSModelStatusPollChanged
-            		object: model];
+                        object: model];
 
+    [notifyCenter addObserver : self
+                     selector : @selector(receivedMessageChanged:)
+                         name : ORMotoGPSModelReceivedMessageChanged
+                        object: model];
 
-   [notifyCenter addObserver : self  // todo: not needed/ only output (input deactivated)
-                    selector : @selector(lastMessageChanged:)
-                        name : ORMotoGPSModelReceivedMessageOutputChanged
-                       object: model];
-
-		[notifyCenter addObserver : self
-						         selector : @selector(deviceIDButtonChanged:)
-						             name : ORMotoGPSModelDeviceIDButtonChanged
-					 						 object: model];
-
-//        [notifyCenter addObserver : self  // todo: not needed/ only output (input deactivated)
-//                                         selector : @selector(resetChanged:)
-//                                                 name : ORMotoGPSModelResetChanged
-//                                            object: model];
-
-		[notifyCenter addObserver : self
-				             selector : @selector(verboseChanged:)
-				                 name : ORRefClockModelVerboseChanged //ORMotoGPSModelVerboseChanged
-                                object: model];
-
+    
+    
 }
-
 
 - (void) updateWindow
 {
-    //[super updateWindow];
-    [self lockChanged:nil];
+    [self statusChanged:nil];
+    [self statusPollChanged:nil];
+    [self receivedMessageChanged:nil];
 }
 
-- (void) setButtonStates{
-    
+- (void) setButtonStates
+{
     //BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORRefClockLock];//ORMotoGPSLock];
     BOOL portOpen = [model portIsOpen];
-    [autoSurveyButton setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [statusButton setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [statusPollCB setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [deviceIDButton setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [autoSurveyButton    setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [statusButton        setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [statusPollCB        setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [deviceIDButton      setEnabled:!lockedOrRunningMaintenance && portOpen];
     [cableDelayCorButton setEnabled:!lockedOrRunningMaintenance && portOpen];
-    
-    // [statusOutputField setEnabled:!lockedOrRunningMaintenance]; // todo: delte
-    
-    //[resetButton setEnabled:!lockedOrRunningMaintenance];
-    //        [verboseCB setEnabled:!lockedOrRunningMaintenance];
-    
 }
 
-
-
-// - (void) amplitudeChanged:(NSNotification*)aNote
-// {
-//     [amplitudeStepper setFloatValue: [model amplitude]];
-// 	[amplitudeField   setFloatValue: [model amplitude]];
-// }
-
-- (void) alarmWindowChanged:(NSNotification*)aNote
+- (void) receivedMessageChanged:(NSNotification*)aNote
 {
 
 }
 - (void) autoSurveyChanged:(NSNotification*)aNote
 {
-    
 }
 
 - (void) statusChanged:(NSNotification*)aNote
 {
-
-	//[signalFormPU selectItemAtIndex: [model signalForm]];
-	//[loadWaveButton setEnabled: NO];
 }
 
 - (void) statusPollChanged:(NSNotification*)aNote
 {
- // [signalFormPU selectItemAtIndex: [model signalForm]];
- // [loadWaveButton setEnabled: YES];
-
+    [statusPollCB setIntValue:[model statusPoll]];
 }
-
 
 - (void) visibleSatsChanged:(NSNotification*)aNote
 {
-    
 }
+
 - (void) trackedSatsChanged:(NSNotification*)aNote
 {
-    
 }
+
 - (void) visibilityStatusChanged:(NSNotification*)aNote
 {
-    
 }
+
 - (void) antennaSenseChanged:(NSNotification*)aNote
 {
-    
 }
+
 - (void) accSignalStrengthChanged:(NSNotification*)aNote
 {
-    
 }
+
 - (void) oscTemperatureChanged:(NSNotification*)aNote
 {
-    
-}
-
-- (void) deviceIDButtonChanged:(NSNotification*)aNote
-{
-
-}
-
-//- (void) resetChanged:(NSNotification*)aNote
-//{
-//
-//}
-
-- (void) checkGlobalSecurity
-{
-    //BOOL secure = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
-    //[gSecurity setLock:ORMotoGPSLock to:secure];
-    //[lockButton setEnabled:secure];
-}
-
-//- (void) portStateChanged:(NSNotification*)aNotification
-//{
-//    if(aNotification == nil || [aNotification object] == [model serialPort]){
-//        if([model serialPort]){
-//            [openPortButton setEnabled:YES];
-//
-//            if([[model serialPort] isOpen]){
-//                [openPortButton setTitle:@"Close"];
-//                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-//                [portStateField setStringValue:@"Open"];
-//            }
-//            else {
-//                [openPortButton setTitle:@"Open"];
-//                [portStateField setStringValue:@"Closed"];
-//                [portStateField setTextColor:[NSColor redColor]];
-//            }
-//        }
-//        else {
-//            [openPortButton setEnabled:NO];
-//            [portStateField setTextColor:[NSColor blackColor]];
-//            [portStateField setStringValue:@"---"];
-//            [openPortButton setTitle:@"---"];
-//        }
-//    }
-//}
-//
-//- (void) portNameChanged:(NSNotification*)aNotification
-//{
-//    NSString* portName = [model portName];
-//
-//    NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-//    ORSerialPort *aPort;
-//
-//    [portListPopup selectItemAtIndex:0]; //the default
-//    while (aPort = [enumerator nextObject]) {
-//        if([portName isEqualToString:[aPort name]]){
-//            [portListPopup selectItemWithTitle:portName];
-//            break;
-//        }
-//    }
-//    [self portStateChanged:nil];
-//}
-
-- (void) lockChanged:(NSNotification*)aNotification  // todo
-{
-    [self setButtonStates];
-
-}
-
-- (void) verboseChanged:(NSNotification*)aNote
-{
-	//[verboseCB setIntValue:[model verbose]];
-}
-
-- (void) lastMessageChanged:(NSNotification*)aNote{
-    NSLog(@"lastMessageChanged!! updating... \n");
-    [receivedMessageField setStringValue:[model lastMessage]];
-    
 }
 
 #pragma mark ***Actions
-
-//- (void) trackModeAction:(id)sender
-//{
-//
-//}
-//
-//- (void) syncAction:(id)sender
-//{
-//
-//}
-//
-//- (void) alarmWindowAction:(id)sender
-//{
-//
-//}
-- (IBAction) setDefaultsAction:(id)sender{
+- (IBAction) setDefaultsAction:(id)sender
+{
     [model setDefaults];
-    
 }
+
 - (IBAction) autoSurveyAction:(id)sender
 {
-    
 }
 
 - (void) statusAction:(id)sender
@@ -323,130 +159,17 @@
 
 - (void) statusPollAction:(id)sender
 {
-
+    [model setStatusPoll:[sender intValue]];
 }
 
 - (void) deviceIDAction:(id)sender
 {
-
 }
 
 - (IBAction) cableDelayCorAction:(id)sender
 {
-    
 }
 
-//- (void) resetAction:(id)sender
-//{
-//
-//}
-
-
-// - (void) frequencyAction:(id)sender
-// {
-// 	[model setFrequency:[sender floatValue]];
-// }
-//
-// - (void) dutyCycleAction:(id)sender
-// {
-// 	[model setDutyCycle:[sender intValue]];
-// }
-//
-// - (void) amplitudeAction:(id)sender
-// {
-// 	[model setAmplitude:[sender floatValue]];
-// }
-//
-// - (void) signalFormAction:(id)sender
-// {
-// 	[model setSignalForm:[sender indexOfSelectedItem]];
-// }
-
-
-//- (IBAction) portListAction:(id) sender
-//{
-//    [model setPortName: [portListPopup titleOfSelectedItem]];
-//}
-//
-//- (IBAction) openPortAction:(id)sender
-//{
-//    [model openPort:![[model serialPort] isOpen]];
-//}
-//
-// - (IBAction) loadAmpAction:(id)sender
-// {
-// 	[model commitAmplitude];
-// }
-//
-// - (IBAction) signalFileAction:(id)sender
-// {
-// 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-//     [openPanel setPrompt:@"Waveform File"];
-//
-//     NSString* startingDir;
-//     NSString* defaultFile;
-//
-// 	NSString* fullPath = [model waveformFile];
-//     if(fullPath){
-//         startingDir = [fullPath stringByDeletingLastPathComponent];
-//         defaultFile = [fullPath lastPathComponent];
-//     }
-//     else {
-//         startingDir = NSHomeDirectory();
-//         defaultFile = @"Waveform.ktf";
-//     }
-//
-//     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-//     [openPanel setNameFieldLabel:defaultFile];
-//     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-// 				if(result == NSModalResponseOK){
-// 				[model setWaveformFile:[[openPanel URL] path]];
-// 				NSLog(@"File path: %@ \n", [model waveformFile]);
-// 				[self loadWaveAction];
-// 			}
-//     }];
-//
-// }
-//
-// - (void) loadWaveAction
-// {
-// 	if([model verbose]){
-// 		NSLog(@"loadWaveAction.. \n");
-// 	}
-// 	[model loadValuesFromFile];
-// 	[model commitWaveform];
-// }
-
-//- (IBAction) lockAction:(id) sender
-//{
-//    //[gSecurity tryToSetLock:ORMotoGPSLock to:[sender intValue] forWindow:[self window]];
-//}
-//
-//- (IBAction) verboseAction:(id)sender;
-//{
-//    //[model setVerbose:[sender intValue]];
-//}
-
-
-
-//- (NSView*) view  // todo ?
-//{
-//    //return subview;
-//}
-
 @end
 
-@implementation ORMotoGPSController (private)
 
-//- (void) populatePortListPopup
-//{
-//    NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-//    ORSerialPort *aPort;
-//    [portListPopup removeAllItems];
-//    [portListPopup addItemWithTitle:@"--"];
-//
-//    while (aPort = [enumerator nextObject]) {
-//        [portListPopup addItemWithTitle:[aPort name]];
-//    }
-//}
-@end

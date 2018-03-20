@@ -84,6 +84,11 @@ NSString* ORSerialPortWithQueueModelTimeoutCountChanged     = @"ORSerialPortWith
 	}
 }
 
+- (double) queueCount
+{
+    return [cmdQueue count];
+}
+
 #pragma mark •••Cmd Handling
 - (id) nextCmd
 {
@@ -92,7 +97,7 @@ NSString* ORSerialPortWithQueueModelTimeoutCountChanged     = @"ORSerialPortWith
 
 - (void) enqueueCmd:(id)aCmd
 {
-    if([serialPort isOpen]){ 
+    if([serialPort isOpen]){
 		if(!cmdQueue)cmdQueue = [[ORSafeQueue alloc] init];
 		[cmdQueue enqueue:aCmd];	
 	}

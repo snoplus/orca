@@ -38,48 +38,25 @@
     @private
         ORRefClockModel* refClock;
 
-    // int reTxCount;  // in case of errors or timeout retransmit; if retransmit
-    // // is required, put last command to cmdQueue and dequeueFromBottom
-    //
- 
-    BOOL verbose;
-    BOOL statusPoll;
-    NSString* lastMessage;
+        // int reTxCount;  // in case of errors or timeout retransmit; if retransmit
+        // // is required, put last command to cmdQueue and dequeueFromBottom
+        //
+        BOOL statusPoll;
 }
-
-#pragma mark ***Initialization
-- (ORMotoGPSModel*) init;
-- (void) dealloc;
-- (void) dataAvailable:(NSNotification*)note;  // todo: rename this function to dataAvailable
 
 
 #pragma mark ***Accessors
 - (void) setRefClock:(ORRefClockModel*)aRefClock;
-- (BOOL) verbose;
-- (void) setVerbose:(BOOL)aVerbose;
 - (void) setDefaults;
 - (void) requestStatus;
-- (NSString*) lastMessage;
 - (BOOL) portIsOpen;
-
-
+- (BOOL) statusPoll;
 - (void) setStatusPoll:(BOOL)aStatusPoll;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
 - (void) processResponse:(NSData*)someData;
 - (NSDictionary*) defaultsCommand;
-
-// - (void) setRemote;
-// - (void) setLocal;
-// - (NSData*) progModeCommand;
-// - (NSData*) startProgCommand;
-// - (NSData*) checkReadyForProg:(int) nPoints;
-// - (NSData*) isReadyForProgReturned;
-// - (NSData*) WGBytesFromFloat;
-// - (NSData*) stopProgCommand;
-// - (NSData*) checkStoppedProg:(int) nPoints;
-// - (NSData*) isStoppedProgReturned;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -92,17 +69,5 @@ extern NSString* ORMotoGPSModelSyncChanged;
 extern NSString* ORMotoGPSModelAlarmWindowChanged;
 extern NSString* ORMotoGPSModelStatusChanged;
 extern NSString* ORMotoGPSModelStatusPollChanged;
-extern NSString* ORMotoGPSModelReceivedMessageOutputChanged;
-extern NSString* ORMotoGPSModelDeviceIDButtonChanged;
+extern NSString* ORMotoGPSModelReceivedMessageChanged;
 
-//extern NSString* ORMotoGPSLock;
-//extern NSString* ORMotoGPSModelSerialPortChanged;
-//extern NSString* ORMotoGPSModelPortNameChanged;
-//extern NSString* ORMotoGPSModelPortStateChanged;
-//extern NSString* ORMotoGPSModelVerboseChanged;
-
-//extern NSString* ORRefClockLockChanged;
-extern NSString* ORRefClockModelVerboseChanged;
-extern NSString* ORRefClockLock;
-
-extern NSString* ORMotoGPSClockDataAvailable;

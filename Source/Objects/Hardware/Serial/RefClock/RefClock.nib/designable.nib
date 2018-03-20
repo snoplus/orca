@@ -15,6 +15,7 @@
                 <outlet property="openPortButton" destination="888" id="889"/>
                 <outlet property="portNameField" destination="7Al-mA-my7" id="P7A-H6-ODC"/>
                 <outlet property="portStateField" destination="892" id="893"/>
+                <outlet property="queueBarGraph" destination="HDN-Na-QtY" id="7BQ-5e-nkM"/>
                 <outlet property="synClockController" destination="sdu-iM-aGy" id="98H-pQ-uvc"/>
                 <outlet property="verboseCB" destination="giU-1v-5T2" id="D3x-xb-kO2"/>
                 <outlet property="window" destination="5" id="38"/>
@@ -25,21 +26,20 @@
         <window title="RefClock" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="17" y="546" width="1083" height="794"/>
+            <rect key="contentRect" x="17" y="546" width="910" height="794"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="1083" height="794"/>
+                <rect key="frame" x="0.0" y="0.0" width="910" height="794"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <box misplaced="YES" title="SynClock" id="eGu-jp-5w3">
-                        <rect key="frame" x="543" y="47" width="523" height="618"/>
+                        <rect key="frame" x="543" y="47" width="350" height="618"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="ezJ-6L-vvh">
-                            <rect key="frame" x="2" y="2" width="519" height="601"/>
+                            <rect key="frame" x="2" y="2" width="346" height="601"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         </view>
-                        <font key="titleFont" metaFont="message" size="11"/>
                     </box>
                     <box misplaced="YES" title="MotoGPS" id="D5s-vU-LkQ">
                         <rect key="frame" x="21" y="47" width="516" height="618"/>
@@ -48,10 +48,9 @@
                             <rect key="frame" x="2" y="2" width="512" height="601"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         </view>
-                        <font key="titleFont" metaFont="message" size="11"/>
                     </box>
                     <button misplaced="YES" imageHugsTitle="YES" id="1311">
-                        <rect key="frame" x="24" y="10" width="36" height="33"/>
+                        <rect key="frame" x="24" y="6" width="41" height="42"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="1312">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -66,11 +65,31 @@
                         <autoresizingMask key="autoresizingMask"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="RefClock" id="97A-Mp-Zf5"/>
                     </imageView>
+                    <button misplaced="YES" id="giU-1v-5T2">
+                        <rect key="frame" x="107" y="8" width="72" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Verbose" bezelStyle="regularSquare" imagePosition="left" inset="2" id="TgJ-IR-9y0">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="verboseAction:" target="-2" id="Yk5-uw-paY"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="hVl-mh-nKP">
+                        <rect key="frame" x="208" y="764" width="405" height="23"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Preliminary! not all functionality implemented" id="Au7-Ky-uLl">
+                            <font key="font" metaFont="system" size="19"/>
+                            <color key="textColor" red="1" green="0.023286350454939653" blue="0.0" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                     <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Serial Port" id="YwU-gf-YG8">
-                        <rect key="frame" x="58" y="669" width="316" height="105"/>
+                        <rect key="frame" x="64" y="669" width="835" height="105"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="TLA-e4-OA9">
-                            <rect key="frame" x="1" y="1" width="314" height="89"/>
+                            <rect key="frame" x="1" y="1" width="833" height="89"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textField verticalHuggingPriority="750" id="885">
@@ -132,36 +151,35 @@
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
+                                <customView misplaced="YES" id="HDN-Na-QtY" customClass="ORValueBarGroupView">
+                                    <rect key="frame" x="358" y="25" width="444" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-2" id="pcI-M5-eFh"/>
+                                    </connections>
+                                </customView>
+                                <box horizontalHuggingPriority="750" misplaced="YES" boxType="separator" id="86O-bX-fTY">
+                                    <rect key="frame" x="325" y="12" width="5" height="65"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                </box>
+                                <textField verticalHuggingPriority="750" misplaced="YES" id="oyL-M3-GG5">
+                                    <rect key="frame" x="356" y="65" width="438" height="13"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Outgoing Commands In Buffer" id="vue-3v-AA3">
+                                        <font key="font" metaFont="label"/>
+                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
                             </subviews>
                         </view>
-                        <font key="titleFont" metaFont="message" size="11"/>
                     </box>
-                    <button misplaced="YES" id="giU-1v-5T2">
-                        <rect key="frame" x="107" y="8" width="72" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Verbose" bezelStyle="regularSquare" imagePosition="left" inset="2" id="TgJ-IR-9y0">
-                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="verboseAction:" target="-2" id="Yk5-uw-paY"/>
-                        </connections>
-                    </button>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="hVl-mh-nKP">
-                        <rect key="frame" x="360" y="688" width="705" height="54"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Preliminary! not all functionality implemented." id="Au7-Ky-uLl">
-                            <font key="font" size="36" name=".AppleSystemUIFont"/>
-                            <color key="textColor" red="1" green="0.023286350454939653" blue="0.0" alpha="0.84999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="61"/>
             </connections>
-            <point key="canvasLocation" x="341.5" y="110"/>
+            <point key="canvasLocation" x="255" y="110"/>
         </window>
         <customObject id="rTr-Oc-9lG" customClass="ORMotoGPSController">
             <connections>

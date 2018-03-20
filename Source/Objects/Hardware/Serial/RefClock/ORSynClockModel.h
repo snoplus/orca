@@ -37,50 +37,44 @@
 //#define dampedMax (VMax / 10)  // maximum voltage when damping is set
 //#define VMin 0.02  // minimum voltage (with damping)
 
+#define nLastMsgs 10
+
 @interface ORSynClockModel : NSObject
 {
     @private
-        ORRefClockModel*  refClock;
+        ORRefClockModel*    refClock;
+        int                 trackMode;
+        int                 syncMode;
+        unsigned long       alarmWindow;
         // int reTxCount;  // in case of errors or timeout retransmit; if retransmit
         // // is required, put last command to cmdQueue and dequeueFromBottom
         //
-        BOOL      verbose;
-        BOOL      statusPoll;
-        NSString* statusMessage;
-#define nLastMsgs 10
-        NSMutableArray* previousStatusMessages;
+        BOOL                statusPoll;
+        NSMutableArray*     previousStatusMessages;
 }
 
 #pragma mark ***Initialization
-- (ORSynClockModel*) init;
 - (void) dealloc;
 - (void) setRefClock:(ORRefClockModel*)aRefClock;
-- (void) dataAvailable:(NSNotification*)note;
 
 #pragma mark ***Accessors
-- (BOOL) verbose;
-- (void) setVerbose:(BOOL)aVerbose;
 - (void) requestStatus;
+- (BOOL) statusPoll;
 - (void) setStatusPoll:(BOOL)aStatusPoll;
 - (NSString*) statusMessages;  // returns the statusses of nLastMsgs previeous requests for display
 - (BOOL) portIsOpen;
+- (int) trackMode;
+- (void) setTrackMode:(int)aMode;
+- (int) syncMode;
+- (void) setSyncMode:(int)aMode;
+- (unsigned long) alarmWindow;
+- (void) setAlarmWindow:(unsigned long)aValue;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
 - (void) processResponse:(NSData*)someData;
 - (NSDictionary*) alarmWindowCommand;
 - (NSDictionary*) statusCommand;
-
-// - (void) setRemote;
-// - (void) setLocal;
-// - (NSData*) progModeCommand;
-// - (NSData*) startProgCommand;
-// - (NSData*) checkReadyForProg:(int) nPoints;
-// - (NSData*) isReadyForProgReturned;
-// - (NSData*) WGBytesFromFloat;
-// - (NSData*) stopProgCommand;
-// - (NSData*) checkStoppedProg:(int) nPoints;
-// - (NSData*) isStoppedProgReturned;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -93,20 +87,5 @@ extern NSString* ORSynClockModelAlarmWindowChanged;
 extern NSString* ORSynClockModelStatusChanged;
 extern NSString* ORSynClockModelStatusPollChanged;
 extern NSString* ORSynClockModelStatusOutputChanged;
-extern NSString* ORSynClockModelDeviceIDButtonChanged;
-extern NSString* ORSynClockModelResetChanged;
-
-//extern NSString* ORRefClockLockChanged;
-extern NSString* ORRefClockModelVerboseChanged;
-extern NSString* ORRefClockLock;
-
-extern NSString* ORSynClockDataAvailable;
-
 extern NSString* ORSynClockStatusUpdated;
-
-//extern NSString* ORSynClockLock;
-//extern NSString* ORSynClockModelSerialPortChanged;
-//extern NSString* ORSynClockModelPortNameChanged;
-//extern NSString* ORSynClockModelPortStateChanged;
-//extern NSString* ORSynClockModelVerboseChanged;
 

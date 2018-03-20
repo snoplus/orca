@@ -81,6 +81,15 @@
 // - in ORKatrinV4FLTDefs.h ipeFltHitRateDataStruct already was known from ORIpeV4FLTDefs.h
 // - in Interface Builder: File's Owner need to be changed to ORKatrinV4FLTModel (was ORIpeV4FLTModel)
 
+enum {
+    eInitializing,
+    eSetThresholds,
+    eIntegrating,
+    eCheckRates,
+    eFinishing,
+    eNothingToDo,
+    eManualAbort
+} eKatrinV4ThresFinderStates;
 
 @interface ORKatrinV4FLTModel : ORIpeV4FLTModel <ORDataTaker,ORHWWizard,ORHWRamping,ORAdcInfoProviding>
 {
@@ -122,7 +131,19 @@
     BOOL initializing;
 
     unsigned long lastHistReset; //< indicates if the histogramm parameter have been changed
-    
+    unsigned long   oldHitRateMask;
+    unsigned short  oldHitRateLength;
+    int             oldHitRateMode;
+    float lowerThresholdBound[kNumV4FLTChannels];
+    float upperThresholdBound[kNumV4FLTChannels];
+    float lastThresholdWithNoRate[kNumV4FLTChannels];
+    float thresholdToTest[kNumV4FLTChannels];
+    float oldThresholds[kNumV4FLTChannels];
+    int startingUpperBound;
+    float finalThresholdOffset;
+    int   doneChanCount;
+    int   workingChanCount;
+
 }
 
 #pragma mark •••Initialization
@@ -172,10 +193,6 @@
 - (void) setActivateDebuggingDisplays:(BOOL)aState;
 - (int) fifoLength;
 - (void) setFifoLength:(int)aFifoLength;
-//- (int) nfoldCoincidence;
-//- (void) setNfoldCoincidence:(int)aNfoldCoincidence;
-//- (int) vetoOverlapTime;
-//- (void) setVetoOverlapTime:(int)aVetoOverlapTime;
 - (int) shipSumHistogram;
 - (void) setShipSumHistogram:(int)aShipSumHistogram;
 - (int) targetRate;
@@ -208,8 +225,10 @@
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
 - (BOOL) noiseFloorRunning;
-- (int) noiseFloorOffset;
-- (void) setNoiseFloorOffset:(int)aNoiseFloorOffset;
+- (unsigned  long) startingUpperBound;
+- (void) setStartingUpperBound:(unsigned  long)aValue;
+- (float) finalThresholdOffset;
+- (void) setFinalThresholdOffset:(float)anOffset;
 - (void) findNoiseFloors;
 - (NSString*) noiseFloorStateString;
 
@@ -263,6 +282,7 @@
 - (BOOL) hitRateEnabled:(unsigned short) aChan;
 - (void) setHitRateEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 
+- (float) actualFilterLength;
 - (float)threshold:(unsigned short) aChan;
 - (unsigned short)gain:(unsigned short) aChan;
 - (BOOL) triggerEnabled:(unsigned short) aChan;
@@ -287,7 +307,6 @@
 - (unsigned long long) lostEventsTr;
 //- (void) setLostTrEvents:(unsigned long long)aCounter;
 
-
 - (unsigned short) selectedRegIndex;
 - (void) setSelectedRegIndex:(unsigned short) anIndex;
 - (unsigned long) writeValue;
@@ -304,9 +323,6 @@
 - (void) testButtonLowLevelFireTP;
 - (void) testButtonLowLevelResetTP;
 
-//- (void) disableAllTriggersIfInVetoMode;
-//- (void) restoreTriggersIfInVetoMode;
-//
 #pragma mark •••HW Access
 //all can raise exceptions
 - (int) accessTypeOfReg:(int)aReg;
@@ -394,11 +410,6 @@
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
 
-// REMOVE - sum histograms are calculated at the crate PC (ak) 
-//- (void) initSumHistogramBuffers;
-//- (void) addToSumHistogram:(void*)someData;
-//- (void) shipSumHistograms;
-
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -464,8 +475,6 @@ extern NSString* ORKatrinV4FLTModelCustomVariableChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoCounterChanged;
 extern NSString* ORKatrinV4FLTModelReceivedHistoChanMapChanged;
 extern NSString* ORKatrinV4FLTModelFifoLengthChanged;
-//extern NSString* ORKatrinV4FLTModelNfoldCoincidenceChanged;
-//extern NSString* ORKatrinV4FLTModelVetoOverlapTimeChanged;
 extern NSString* ORKatrinV4FLTModelShipSumHistogramChanged;
 extern NSString* ORKatrinV4FLTModelTargetRateChanged;
 extern NSString* ORKatrinV4FLTModelHistMaxEnergyChanged;
@@ -503,11 +512,12 @@ extern NSString* ORKatrinV4FLTModelModeChanged;
 extern NSString* ORKatrinV4FLTSettingsLock;
 extern NSString* ORKatrinV4FLTModelEventMaskChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorChanged;
-extern NSString* ORKatrinV4FLTNoiseFloorOffsetChanged;
+extern NSString* ORKatrinV4FLTFinalThresholdOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsTrChanged;
+extern NSString* ORKatrinV4FLTStartingUpperBoundChanged;
 
 extern NSString* ORIpeSLTModelName;
 

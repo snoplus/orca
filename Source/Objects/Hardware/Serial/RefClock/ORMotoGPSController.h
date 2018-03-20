@@ -25,12 +25,8 @@
 @interface ORMotoGPSController : NSObject
 {
     IBOutlet ORRefClockController* owner;
-    id                            model;
-    
-    IBOutlet NSView*            deviceContent;
-    IBOutlet NSBox*                deviceView;
-    NSArray*                    topLevelObjects;
-    
+    IBOutlet NSView*        deviceContent;
+    IBOutlet NSBox*         deviceView;
     IBOutlet NSButton*      setDefaults;
     IBOutlet NSButton*      autoSurveyButton;
     IBOutlet NSButton*      statusButton;
@@ -47,13 +43,16 @@
     IBOutlet NSButton*      cableDelayCorButton;
     IBOutlet NSTextField*   approxCableLengthField;
     IBOutlet NSTextField*   receivedMessageField;
+    //IBOutlet NSButton*    resetButton;
     
-    //IBOutlet NSButton*			resetButton;
+    id                      model;
+    NSArray*                topLevelObjects;
+
 }
 
 #pragma mark ***Initialization
 - (void) awakeFromNib;
-- (id) model;
+- (id)   model;
 - (void) setModel:(ORMotoGPSModel*)aModel;
 - (void) setButtonStates;
 
@@ -63,8 +62,8 @@
 - (void) setButtonStates;
 
 #pragma mark ***Interface Management
+- (void) receivedMessageChanged:(NSNotification*)aNote;
 - (void) autoSurveyChanged:(NSNotification*)aNote;
-//- (void) syncChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
 - (void) statusPollChanged:(NSNotification*)aNote;
 - (void) visibleSatsChanged:(NSNotification*)aNote;
@@ -73,11 +72,6 @@
 - (void) antennaSenseChanged:(NSNotification*)aNote;
 - (void) accSignalStrengthChanged:(NSNotification*)aNote;
 - (void) oscTemperatureChanged:(NSNotification*)aNote;
-- (void) deviceIDButtonChanged:(NSNotification*)aNote;
-//- (void) resetChanged:(NSNotification*)aNote;
-- (void) lockChanged:(NSNotification*)aNotification;
-- (void) verboseChanged:(NSNotification*)aNote;
-- (void) lastMessageChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
 - (IBAction) setDefaultsAction:(id)sender;
@@ -87,9 +81,5 @@
 - (IBAction) deviceIDAction:(id)sender;
 - (IBAction) cableDelayCorAction:(id)sender;
 //- (IBAction) resetAction:(id)sender;
-//- (IBAction) portListAction:(id) sender;
-//- (IBAction) openPortAction:(id)sender;
-//- (IBAction) lockAction:(id) sender;
-//- (IBAction) verboseAction:(id)sender;
 
 @end

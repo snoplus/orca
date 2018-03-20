@@ -21,10 +21,9 @@
 
 #import "ORSynClockController.h"
 #import "ORSynClockModel.h"
-
+#import "ORRefClockModel.h"
 
 @implementation ORSynClockController
-
 
 - (void) dealloc
 {
@@ -35,41 +34,23 @@
 }
 
 #pragma mark ***Initialization
-
-//- (id) init
-//{
-//    self = [super initWithWindowNibName:@"SynClock"];
-//    return self;
-//}
-
-//- (void) awakeFromNib
-//{
-//   // [self populatePortListPopup];
-//    [super awakeFromNib];
-//}
-
 - (void) awakeFromNib
 {
     if(!deviceContent){
         if ([[NSBundle mainBundle] loadNibNamed:@"SynClock" owner:self  topLevelObjects:&topLevelObjects]){
             [topLevelObjects retain];
-            
             [deviceView setContentView:deviceContent];
-            //NSLog(@"Loaded SynClock.nib");
             [[self model] setStatusPoll:[statusPollCB state]];
-            
         }
         else NSLog(@"Failed to load SynClock.nib");
     }
-    return;
-    //[self populatePortListPopup];
-    //[super awakeFromNib];
 }
 
 - (id) model
 {
     return model;
 }
+
 - (void) setModel:(ORSynClockModel*)aModel
 {
     model = aModel;
@@ -78,7 +59,6 @@
 }
 
 #pragma mark ***Notifications
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -99,46 +79,29 @@
                              object: model];
 
         [notifyCenter addObserver : self
-                     selector : @selector(statusChanged:)
-                         name : ORSynClockModelStatusChanged
-					object: model];
+                         selector : @selector(statusChanged:)
+                             name : ORSynClockModelStatusChanged
+                            object: model];
 
 		[notifyCenter addObserver : self
-                     selector : @selector(statusPollChanged:)
-                         name : ORSynClockModelStatusPollChanged
-            					object: self]; //	object: model];
-
-
-		// [notifyCenter addObserver : self  // todo: not needed/ only output (input deactivated)
-		// 								 selector : @selector(statusOutputChanged:)
-		// 										 name : ORSynClockModelStatusOutputChanged
-		// 				object: model];
-
-		[notifyCenter addObserver : self
-						         selector : @selector(deviceIDButtonChanged:)
-						             name : ORSynClockModelDeviceIDButtonChanged
-					 			object: model];
-
-		[notifyCenter addObserver : self  // todo: not needed/ only output (input deactivated)
-                         selector : @selector(resetChanged:)
-                             name : ORSynClockModelResetChanged
+                         selector : @selector(statusPollChanged:)
+                             name : ORSynClockModelStatusPollChanged
                             object: model];
     
         [notifyCenter addObserver : self
                      selector : @selector(statusMessageChanged:)
                          name : ORSynClockStatusUpdated 
                         object: nil];
-
 }
 
 - (void) updateWindow
 {
-   // [super updateWindow];
-   [self lockChanged:nil];
-    
-	// [self statusChanged:nil];
-	// [self syncChanged:nil];
-	// [self trackModeChanged:nil];
+    [self trackModeChanged:nil];
+    [self syncChanged:nil];
+    [self alarmWindowChanged:nil];
+    [self statusChanged:nil];
+    [self statusPollChanged:nil];
+    [self statusMessageChanged:nil];
 }
 
 - (void) setButtonStates
@@ -148,24 +111,28 @@
     //BOOL locked = [gSecurity isLocked:ORRefClockLock];
     BOOL portOpen = [model portIsOpen];
 
-    [trackModePU setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [syncPU setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [alarmWindowField setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [statusButton setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [statusPollCB setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [deviceIDButton setEnabled:!lockedOrRunningMaintenance && portOpen];
-    [resetButton setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [trackModePU        setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [syncPU             setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [alarmWindowField   setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [statusButton       setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [statusPollCB       setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [deviceIDButton     setEnabled:!lockedOrRunningMaintenance && portOpen];
+    [resetButton        setEnabled:!lockedOrRunningMaintenance && portOpen];
 }
+
 - (void) trackModeChanged:(NSNotification*)aNote
 {
+    [trackModePU selectItemAtIndex:[model trackMode]];
 }
 
 - (void) syncChanged:(NSNotification*)aNote
 {
+    [syncPU selectItemAtIndex:[model syncMode]];
 }
 
 - (void) alarmWindowChanged:(NSNotification*)aNote
 {
+    [alarmWindowField setIntValue:[model alarmWindow]];
 }
 
 - (void) statusChanged:(NSNotification*)aNote
@@ -173,158 +140,55 @@
 }
 
 - (void) statusPollChanged:(NSNotification*)aNote
-
 {
+    [statusPollCB setIntValue:[model statusPoll]];
 }
 
-- (void) deviceIDButtonChanged:(NSNotification*)aNote
-{
-
-}
-
-- (void) resetChanged:(NSNotification*)aNote
-{
-
-}
-
-
-- (void) lockChanged:(NSNotification*)aNotification  // todo
+- (void) lockChanged:(NSNotification*)aNotification
 {
     [self setButtonStates];
 }
 
-
-- (void) statusMessageChanged:(NSNotification*)aNote{
+- (void) statusMessageChanged:(NSNotification*)aNote
+{
     NSLog(@"statusMessageChanged!! updating... \n");
     [statusOutputField setStringValue:[model statusMessages]];
-    
 }
 
 #pragma mark ***Actions
-
-- (void) trackModeAction:(id)sender
+- (IBAction) trackModeAction:(id)sender
 {
-
+    [model setTrackMode:[sender indexOfSelectedItem]];
 }
 
-- (void) syncAction:(id)sender
+- (IBAction) syncAction:(id)sender
 {
-
+    [model setSyncMode:[sender indexOfSelectedItem]];
 }
 
-- (void) alarmWindowAction:(id)sender
+- (IBAction) alarmWindowAction:(id)sender
 {
-
+    [model setAlarmWindow:[sender intValue]];
 }
 
-- (void) statusAction:(id)sender
+- (IBAction) statusAction:(id)sender
 {
   [model requestStatus];
 }
 
-- (void) statusPollAction:(id)sender
+- (IBAction) statusPollAction:(id)sender
 {
     [model setStatusPoll:[sender intValue]]; 
-    // todo: activate / deactivate timer
-
+    // todo: activate / deactivate timer -- do in model!!
 }
 
-- (void) deviceIDAction:(id)sender
+- (IBAction) deviceIDAction:(id)sender
 {
-
 }
 
-- (void) resetAction:(id)sender
+- (IBAction) resetAction:(id)sender
 {
-
 }
-
-
-// - (void) frequencyAction:(id)sender
-// {
-// 	[model setFrequency:[sender floatValue]];
-// }
-//
-// - (void) dutyCycleAction:(id)sender
-// {
-// 	[model setDutyCycle:[sender intValue]];
-// }
-//
-// - (void) amplitudeAction:(id)sender
-// {
-// 	[model setAmplitude:[sender floatValue]];
-// }
-//
-// - (void) signalFormAction:(id)sender
-// {
-// 	[model setSignalForm:[sender indexOfSelectedItem]];
-// }
-
-
-//- (IBAction) portListAction:(id) sender
-//{
-//    [model setPortName: [portListPopup titleOfSelectedItem]];
-//}
-
-- (IBAction) openPortAction:(id)sender
-{
-    //[model openPort:![[model serialPort] isOpen]];
-}
-//
-// - (IBAction) loadAmpAction:(id)sender
-// {
-// 	[model commitAmplitude];
-// }
-//
-// - (IBAction) signalFileAction:(id)sender
-// {
-// 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-//     [openPanel setPrompt:@"Waveform File"];
-//
-//     NSString* startingDir;
-//     NSString* defaultFile;
-//
-// 	NSString* fullPath = [model waveformFile];
-//     if(fullPath){
-//         startingDir = [fullPath stringByDeletingLastPathComponent];
-//         defaultFile = [fullPath lastPathComponent];
-//     }
-//     else {
-//         startingDir = NSHomeDirectory();
-//         defaultFile = @"Waveform.ktf";
-//     }
-//
-//     [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
-//     [openPanel setNameFieldLabel:defaultFile];
-//     [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
-// 				if(result == NSModalResponseOK){
-// 				[model setWaveformFile:[[openPanel URL] path]];
-// 				NSLog(@"File path: %@ \n", [model waveformFile]);
-// 				[self loadWaveAction];
-// 			}
-//     }];
-//
-// }
-//
-// - (void) loadWaveAction
-// {
-// 	if([model verbose]){
-// 		NSLog(@"loadWaveAction.. \n");
-// 	}
-// 	[model loadValuesFromFile];
-// 	[model commitWaveform];
-// }
-
-- (IBAction) lockAction:(id) sender
-{
-    //[gSecurity tryToSetLock:ORSynClockLock to:[sender intValue] forWindow:[self window]];
-}
-
-- (IBAction) verboseAction:(id)sender;
-{
-	//[model setVerbose:[sender intValue]];
-}
-
 @end
 
 

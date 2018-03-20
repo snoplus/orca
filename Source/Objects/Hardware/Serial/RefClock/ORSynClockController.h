@@ -25,13 +25,8 @@
 @interface ORSynClockController : NSObject
 {
     IBOutlet ORRefClockController* owner;
-    ORSynClockModel*               model;  // todo
-    //id               model;
-    
     IBOutlet NSView*        deviceContent;
     IBOutlet NSBox*         deviceView;
-    NSArray*                topLevelObjects;
-    
 	IBOutlet NSPopUpButton* trackModePU;
 	IBOutlet NSPopUpButton* syncPU;
     IBOutlet NSTextField*	alarmWindowField;
@@ -40,6 +35,10 @@
     IBOutlet NSTextField*   statusOutputField;
     IBOutlet NSButton*      deviceIDButton;
     IBOutlet NSButton*		resetButton;
+    
+    id                      model;
+    NSArray*                topLevelObjects;
+
 }
 
 #pragma mark ***Initialization
@@ -59,8 +58,6 @@
 - (void) alarmWindowChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
 - (void) statusPollChanged:(NSNotification*)aNote;
-- (void) deviceIDButtonChanged:(NSNotification*)aNote;
-- (void) resetChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) statusMessageChanged:(NSNotification*)aNotification;
 

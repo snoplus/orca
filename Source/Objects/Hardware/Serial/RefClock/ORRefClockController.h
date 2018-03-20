@@ -19,25 +19,25 @@
 
 #pragma mark ***Imported Files
 
-
-
 #import "ORMotoGPSController.h"
 #import "ORSynClockController.h"
+
+@class ORValueBarGroupView;
 
 @interface ORRefClockController : OrcaObjectController
 {
     IBOutlet ORMotoGPSController*  motoGPSController;
     IBOutlet ORSynClockController* synClockController;
-	IBOutlet NSView*        motoGPSView;
-	IBOutlet NSView*        refClockView;
 
-	//serial port and misc fields
     IBOutlet NSTextField*   portNameField;
     IBOutlet NSTextField*   portStateField;
     IBOutlet NSButton*      openPortButton;
 
     IBOutlet NSButton*      lockButton;
     IBOutlet NSButton*		verboseCB;
+    
+    IBOutlet ORValueBarGroupView*    queueBarGraph;
+
 }
 
 #pragma mark ***Initialization
@@ -49,31 +49,21 @@
 - (void) registerNotificationObservers;
 - (void) updateWindow;
 - (void) setButtonStates;
+- (void) checkGlobalSecurity;
 
 #pragma mark ***Interface Management
-- (void) trackModeChanged:(NSNotification*)aNote;
-- (void) syncChanged:(NSNotification*)aNote;
-- (void) alarmWindowChanged:(NSNotification*)aNote;
-- (void) statusChanged:(NSNotification*)aNote;
-- (void) statusPollChanged:(NSNotification*)aNote;
-- (void) deviceIDButtonChanged:(NSNotification*)aNote;
-- (void) resetChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) portNameChanged:(NSNotification*)aNotification;
 - (void) portStateChanged:(NSNotification*)aNotification;
 - (void) verboseChanged:(NSNotification*)aNote;
 
 #pragma mark ***Actions
-- (IBAction) trackModeAction:(id)sender;
-- (IBAction) syncAction:(id)sender;
-- (IBAction) alarmWindowAction:(id)sender;
-- (IBAction) statusAction:(id)sender;
-- (IBAction) statusPollAction:(id)sender;  // todo: needed?
-- (IBAction) deviceIDAction:(id)sender;
-- (IBAction) resetAction:(id)sender;
 - (IBAction) openPortAction:(id)sender;
 - (IBAction) lockAction:(id) sender;
 - (IBAction) verboseAction:(id)sender;
 - (IBAction) portNameAction:(id)sender;
+
+#pragma mark •••Data Source for queue
+- (double) doubleValue;
 
 @end

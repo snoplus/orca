@@ -22,39 +22,16 @@
 #import "ORRefClockController.h"
 #import "ORRefClockModel.h"
 #import "ORSerialPort.h"
+#import "ORValueBarGroupView.h"
+#import "ORAxis.h"
 
 @implementation ORRefClockController
 
 #pragma mark ***Initialization
 
-
-
 - (id) init
 {
 	self = [super initWithWindowNibName:@"RefClock"];
-
-	// todo
-	//[NSBundle loadNibNamed:@"MotoGPSView" owner:self]; [someview addSubview:myView];
-//    NSNib *nib = [[NSNib alloc] initWithNibNamed:@"MotoGPS" bundle:nil];
-//    [motoGPSView addSubview:nib];
-    
-//    contentViewController = [[ContentViewController alloc] initWithNibName:@"ContentView" bundle:nil];
-//    [[contentViewController view] setFrame:[contentView frame]];
-//    [[self view] replaceSubview:contentView with:[contentViewController view]];
-    
-  //NSLog(@"RefClockController::init A\n");
-  //motoGPSController = [[ORMotoGPSController alloc] init];  //todo...
-    
-    //motoGPSView  = [motoGPSController view];
-    //[[motoGPSController view] setFrame:[motoGPSView frame]];
-    //[[self.contentViewController view] replaceSubview:motoGPSView with:[motoGPSController view]];
-    //[motoGPSView addSubview:[motoGPSController view]];
-    
-  //motoGPSView = motoGPSController.view;
-    
-    
-       //[motoGPSView dra];
-    ////[motoGPSView addSubview: [motoGPSController view]];
     
     NSLog(@"RefClockController::init B\n");
     
@@ -66,6 +43,10 @@
     [super awakeFromNib];
     [motoGPSController  setModel: [model motoGPSModel]];
     [synClockController setModel: [model synClockModel]];
+    
+    [[queueBarGraph xAxis] setRngLow:0 withHigh:100];
+    [[queueBarGraph xAxis] setLog:YES];
+
 }
 
 - (void) setModel:(ORRefClockModel*)aModel
@@ -75,16 +56,7 @@
     [synClockController setModel: [aModel synClockModel]];
 }
 
-- (void) checkGlobalSecurity
-{
-    BOOL secure = [gSecurity globalSecurityEnabled];
-    [gSecurity setLock:ORRefClockLock to:secure];
-    [lockButton setEnabled:secure];
-}
-
-
 #pragma mark ***Notifications
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -97,7 +69,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(lockChanged:)
                          name : ORRefClockLock
-                        object: self];
+                        object: model];
 
     [notifyCenter addObserver : self
                      selector : @selector(portNameChanged:)
@@ -109,54 +81,15 @@
                          name : ORSerialPortModelPortStateChanged
                        object : model];
 
-		// [notifyCenter addObserver : self
-		//                  selector : @selector(trackModeChanged:)
-		//                      name : ORSynClockModelTrackModeChanged
-		// 		    				 		object: model];
-    //
-		//  [notifyCenter addObserver : self
-		// 		 	            selector : @selector(syncChanged:)
-		// 		 	                name : ORSynClockModelSyncChanged
-		// 		 	 	 						 object: model];
-    //
-		//  [notifyCenter addObserver : self
-		// 				 				  selector : @selector(alarmWindowChanged:)
-		// 				 							name : ORSynClockModelAlarmWindowChanged
-		// 				             object: model];
-    //
-    // [notifyCenter addObserver : self
-    //                  selector : @selector(statusChanged:)
-    //                      name : ORSynClockModelStatusChanged
-		// 										object: model];
-    //
-		// [notifyCenter addObserver : self
-    //                  selector : @selector(statusPollChanged:)
-    //                      name : ORSynClockModelStatusPollChanged
-    //         						object: model];
-    //
-    //
-		// // [notifyCenter addObserver : self  // todo: not needed/ only output (input deactivated)
-		// // 								 selector : @selector(statusOutputChanged:)
-		// // 										 name : ORSynClockModelStatusOutputChanged
-		// // 				object: model];
-    //
-		// [notifyCenter addObserver : self
-		// 				         selector : @selector(deviceIDButtonChanged:)
-		// 				             name : ORSynClockModelDeviceIDButtonChanged
-		// 			 						 	object: model];
-    //
-		// [notifyCenter addObserver : self  // todo: not needed/ only output (input deactivated)
-		// 								 selector : @selector(resetChanged:)
-		// 										 name : ORSynClockModelResetChanged
-		// 										object: model];
-
-         [notifyCenter addObserver : self
-                              selector : @selector(verboseChanged:)
-                                  name : ORRefClockModelVerboseChanged
-                                 object: model];  // object: nil];
-
-		// todo: one verbose for the whole nib
-
+     [notifyCenter addObserver : self
+                      selector : @selector(verboseChanged:)
+                          name : ORRefClockModelVerboseChanged
+                         object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(queueCountChanged:)
+                         name : ORRefClockModelUpdatedQueue
+                       object : model];
 }
 
 - (void) updateWindow
@@ -165,97 +98,59 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	// [self statusChanged:nil];
+    [self verboseChanged:nil];
+    [self queueCountChanged:nil];
+}
 
-	// [self verboseChanged:nil];
+- (void) queueCountChanged:(NSNotification*)aNote
+{
+    [queueBarGraph setNeedsDisplay:YES];
+}
+
+- (void) checkGlobalSecurity
+{
+    BOOL secure = [gSecurity globalSecurityEnabled];
+    [gSecurity setLock:ORRefClockLock to:secure];
+    [lockButton setEnabled:secure];
 }
 
 - (void) setButtonStates
 {
     //BOOL runInProgress  = [gOrcaGlobals runInProgress];
-    
-    //BOOL runInProgress = [gOrcaGlobals runInProgress];
     BOOL lockedOrRunningMaintenance = [gSecurity runInProgressButNotType:eMaintenanceRunType orIsLocked:ORRefClockLock];
     BOOL locked = [gSecurity isLocked:ORRefClockLock];
-    [lockButton setState: locked];
-    [openPortButton setEnabled:    !locked];
-    [verboseCB setEnabled:!lockedOrRunningMaintenance];
+    
+    [lockButton setState:       locked];
+    [openPortButton setEnabled: !locked];
+    [verboseCB setEnabled:      !lockedOrRunningMaintenance];
     
     [motoGPSController setButtonStates];
     [synClockController setButtonStates];
 }
 
-- (void) trackModeChanged:(NSNotification*)aNote
-{
-  //   [frequencyStepper setFloatValue: [model frequency]];
-	// [frequencyField   setFloatValue: [model frequency]];
-}
-
-- (void) syncChanged:(NSNotification*)aNote
-{
-  //   [dutyCycleStepper setIntValue: [model dutyCycle]];
-	// [dutyCycleField   setIntValue: [model dutyCycle]];
-}
-
-// - (void) amplitudeChanged:(NSNotification*)aNote
-// {
-//     [amplitudeStepper setFloatValue: [model amplitude]];
-// 	[amplitudeField   setFloatValue: [model amplitude]];
-// }
-
-- (void) alarmWindowChanged:(NSNotification*)aNote
-{
-
-}
-
-- (void) statusChanged:(NSNotification*)aNote
-{
-
-	//[signalFormPU selectItemAtIndex: [model signalForm]];
-	//[loadWaveButton setEnabled: NO];
-}
-
-- (void) statusPollChanged:(NSNotification*)aNote
-{
- // [signalFormPU selectItemAtIndex: [model signalForm]];
- // [loadWaveButton setEnabled: YES];
-
-}
-
-- (void) deviceIDButtonChanged:(NSNotification*)aNote
-{
-
-}
-
-- (void) resetChanged:(NSNotification*)aNote
-{
-
-}
-
-
 - (void) portStateChanged:(NSNotification*)aNotification
 {
-        if([model serialPort]){
-            [openPortButton setEnabled:YES];
+    if([model serialPort]){
+        [openPortButton setEnabled:YES];
 
-            if([[model serialPort] isOpen]){
-                [openPortButton setTitle:@"Close"];
-                [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
-                [portStateField setStringValue:@"Open"];
-            }
-            else {
-                [openPortButton setTitle:@"Open"];
-                [portStateField setStringValue:@"Closed"];
-                [portStateField setTextColor:[NSColor redColor]];
-            }
+        if([[model serialPort] isOpen]){
+            [openPortButton setTitle:@"Close"];
+            [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
+            [portStateField setStringValue:@"Open"];
         }
         else {
-            [openPortButton setEnabled:NO];
-            [portStateField setTextColor:[NSColor blackColor]];
-            [portStateField setStringValue:@"---"];
-            [openPortButton setTitle:@"---"];
+            [openPortButton setTitle:@"Open"];
+            [portStateField setStringValue:@"Closed"];
+            [portStateField setTextColor:[NSColor redColor]];
         }
-       [self setButtonStates];
+    }
+    else {
+        [openPortButton setEnabled:NO];
+        [portStateField setTextColor:[NSColor blackColor]];
+        [portStateField setStringValue:@"---"];
+        [openPortButton setTitle:@"---"];
+    }
+    [self setButtonStates];
 }
 
 - (void) portNameChanged:(NSNotification*)aNotification
@@ -274,35 +169,6 @@
 }
 
 #pragma mark ***Actions
-- (IBAction) trackModeAction:(id)sender
-{
-}
-
-- (IBAction) syncAction:(id)sender
-{
-}
-
-- (IBAction) alarmWindowAction:(id)sender
-{
-}
-
-- (IBAction) statusAction:(id)sender
-{
-  //[model requestStatus];
-}
-
-- (IBAction) statusPollAction:(id)sender
-{
-}
-
-- (IBAction) deviceIDAction:(id)sender
-{
-}
-
-- (IBAction) resetAction:(id)sender
-{
-}
-
 - (IBAction) openPortAction:(id)sender
 {
     [model openPort:![[model serialPort] isOpen]];
@@ -322,6 +188,13 @@
 {
     [model setPortName:[sender stringValue]];
 }
+
+#pragma mark •••Data Source for queue
+- (double) doubleValue
+{
+    return [model queueCount];
+}
+
 @end
 
 

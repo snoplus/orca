@@ -25,6 +25,7 @@
                 <outlet property="fifoDisplayMatrix" destination="3930" id="3956"/>
                 <outlet property="fifoLengthPU" destination="3883" id="3897"/>
                 <outlet property="filterShapingLengthPU" destination="3118" id="3962"/>
+                <outlet property="finalThresholdOffsetField" destination="3182" id="MpO-cM-i0V"/>
                 <outlet property="fireSoftwareTriggerButton" destination="4106" id="4174"/>
                 <outlet property="fireSoftwareTriggerButton1" destination="tlb-B1-N7e" id="biy-sj-v5x"/>
                 <outlet property="fireTPButton" destination="4140" id="4146"/>
@@ -73,6 +74,7 @@
                 <outlet property="settingLockButton" destination="565" id="566"/>
                 <outlet property="shipSumHistogramPU" destination="2wq-sE-zyk" id="3cG-WZ-5hQ"/>
                 <outlet property="startNoiseFloorButton" destination="3183" id="3212"/>
+                <outlet property="startingUpperBoundField" destination="tSX-90-pic" id="yfH-X0-nOT"/>
                 <outlet property="statusButton" destination="1613" id="1614"/>
                 <outlet property="tabView" destination="1184" id="1480"/>
                 <outlet property="targetRateField" destination="3230" id="3235"/>
@@ -3463,16 +3465,16 @@ Enable</string>
         <window title="Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="3174" userLabel="ThresholdFinder" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="21" y="146" width="388" height="129"/>
+            <rect key="contentRect" x="21" y="146" width="388" height="165"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="213" height="107"/>
-            <view key="contentView" id="3175">
-                <rect key="frame" x="0.0" y="0.0" width="388" height="129"/>
+            <view key="contentView" misplaced="YES" id="3175">
+                <rect key="frame" x="0.0" y="0.0" width="388" height="165"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3183">
-                        <rect key="frame" x="202" y="43" width="65" height="28"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <rect key="frame" x="208" y="73" width="65" height="28"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="push" title="Start" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3184">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="smallSystem"/>
@@ -3482,29 +3484,96 @@ Enable</string>
                         </connections>
                     </button>
                     <textField toolTip="Value added to LED threshold when finished" verticalHuggingPriority="750" misplaced="YES" id="3182">
-                        <rect key="frame" x="31" y="21" width="39" height="19"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <rect key="frame" x="26" y="16" width="43" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3185">
+                            <numberFormatter key="formatter" formatterBehavior="custom10_4" positiveFormat="0.##" numberStyle="decimal" usesGroupingSeparator="NO" groupingSize="0" minimumIntegerDigits="1" maximumIntegerDigits="2000000000" maximumFractionDigits="2" id="W2Q-tE-nlk"/>
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                         <connections>
-                            <action selector="noiseFloorOffsetAction:" target="-2" id="3204"/>
+                            <action selector="finalThresholdOffsetAction:" target="-2" id="MxV-M7-xVC"/>
                         </connections>
                     </textField>
-                    <textField verticalHuggingPriority="750" id="3181">
-                        <rect key="frame" x="28" y="87" width="322" height="34"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Adjust the threshold relative to the noise floor in all active channels; turn off systematical signals" id="3186">
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="3181">
+                        <rect key="frame" x="27" y="117" width="322" height="34"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" title="Searchs for a threshold that produces a target hit rate from noise. Turn off external signals first." id="3186">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <textField toolTip="Value added to LED threshold when finished" verticalHuggingPriority="750" misplaced="YES" id="tSX-90-pic">
+                        <rect key="frame" x="26" y="79" width="43" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="5E9-BD-5sJ">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                        <connections>
+                            <action selector="startingUpperBoundAction:" target="-2" id="qVJ-AN-aF8"/>
+                        </connections>
+                    </textField>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="TfN-Ug-Qs4">
+                        <rect key="frame" x="74" y="81" width="126" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Starting Upper Bound" id="x03-bX-a0Q">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="3213">
+                        <rect key="frame" x="217" y="49" width="145" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="---" id="3214">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3179">
+                        <rect key="frame" x="298" y="73" width="66" height="28"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Close" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3188">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="closeNoiseFloorPanel:" target="-2" id="3200"/>
+                        </connections>
+                    </button>
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="3178">
+                        <rect key="frame" x="281" y="80" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </progressIndicator>
+                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="3216">
+                        <rect key="frame" x="30" y="135" width="322" height="5"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </box>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="3180">
+                        <rect key="frame" x="75" y="18" width="125" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Final Threshold Offset" id="3187">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <box horizontalHuggingPriority="750" misplaced="YES" boxType="separator" id="6mJ-6K-N8N">
+                        <rect key="frame" x="199" y="10" width="5" height="96"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </box>
+                    <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="xk7-hg-PcT">
+                        <rect key="frame" x="26" y="103" width="334" height="5"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </box>
                     <textField toolTip="Value added to LED threshold when finished" verticalHuggingPriority="750" misplaced="YES" id="3230">
-                        <rect key="frame" x="31" y="49" width="39" height="19"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <rect key="frame" x="26" y="48" width="43" height="19"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="3233">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -3515,46 +3584,9 @@ Enable</string>
                         </connections>
                     </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="3231">
-                        <rect key="frame" x="75" y="51" width="106" height="15"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Target Noise Rate" id="3232">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField verticalHuggingPriority="750" misplaced="YES" id="3213">
-                        <rect key="frame" x="211" y="20" width="145" height="17"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="---" id="3214">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <button verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="3179">
-                        <rect key="frame" x="299" y="43" width="66" height="28"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <buttonCell key="cell" type="push" title="Close" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="3188">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="closeNoiseFloorPanel:" target="-2" id="3200"/>
-                        </connections>
-                    </button>
-                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="3178">
-                        <rect key="frame" x="275" y="50" width="16" height="16"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </progressIndicator>
-                    <box verticalHuggingPriority="750" boxType="separator" id="3216">
-                        <rect key="frame" x="31" y="76" width="322" height="5"/>
+                        <rect key="frame" x="74" y="50" width="106" height="15"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                    </box>
-                    <textField verticalHuggingPriority="750" misplaced="YES" id="3180">
-                        <rect key="frame" x="76" y="23" width="125" height="14"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Final Threshold Offset" id="3187">
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Target Noise Rate" id="3232">
                             <font key="font" metaFont="smallSystem"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3565,7 +3597,7 @@ Enable</string>
             <connections>
                 <outlet property="delegate" destination="-2" id="3209"/>
             </connections>
-            <point key="canvasLocation" x="-46" y="681.5"/>
+            <point key="canvasLocation" x="-46" y="699.5"/>
         </window>
     </objects>
     <resources>
