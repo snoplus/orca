@@ -232,6 +232,7 @@ enum eHaloStatus {
 - (void) postNoRemoteSentryAlarm;
 - (void) clearNoRemoteSentryAlarm;
 - (void) postRunProblemAlarm:(NSString*)aTitle;
+- (void) clearRunProblemAlarm;
 - (void) postListModAlarm;
 - (void) clearListModAlarm;
 - (void) postSBCPingAlarm:(id)anSBC;

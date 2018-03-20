@@ -1324,6 +1324,7 @@ NSString* HaloSentryToggleIntervalChanged   = @"HaloSentryToggleIntervalChanged"
     [self clearMacPingAlarm];
     [self clearConnectionAlarm];
     [self clearOrcaHungAlarm];
+    [self clearRunProblemAlarm];
     [self setSentryIsRunning:NO];
     [self setSentryType:eNeither];
     [self setNextState:eIdle stepTime:.2];
