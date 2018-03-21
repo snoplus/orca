@@ -64,6 +64,11 @@
 - (id)		doSwitch:(id) p;
 - (id)      doCase:(id)p;
 - (id)      doCaseRange:(id)p;
+- (id)      doCaseRange1:(id)p;
+- (id)      doCaseGtE:(id)p;
+- (id)      doCaseLtE:(id)p;
+- (id)      doCaseGt:(id)p;
+- (id)      doCaseLt:(id)p;
 - (id)		doDefault:(id)p;
 - (id)		processObjC:(id) p;
 - (id)		processSelectName:(id) p;
@@ -670,9 +675,14 @@
 		case SWITCH:		return [self doSwitch:p];
         case CASE:          return [self doCase:p];
         case kCaseRange:    return [self doCaseRange:p];
+        case kCaseRange1:   return [self doCaseRange1:p];
+        case kCaseGtE:      return [self doCaseGtE:p];
+        case kCaseLtE:      return [self doCaseLtE:p];
+        case kCaseGt:       return [self doCaseGt:p];
+        case kCaseLt:       return [self doCaseLt:p];
 		case DEFAULT:		return [self doDefault:p];
 			
-			//built-in funcs
+        //built-in funcs
 		case SLEEP:			return [self sleepFunc:p];
 		case YIELD:			return [self yieldFunc:p];
 		case TIME:			return [self timeFunc];
@@ -1529,6 +1539,25 @@
 	return nil;
 }
 
+- (id) doCaseRange1:(id)p
+{
+    NSDecimalNumber* leftNum  = NodeValue(0);
+    NSDecimalNumber* rightNum = NodeValue(1);
+    if([leftNum compare:rightNum] == NSOrderedAscending){
+        int leftCompare  = [switchValue[switchLevel] compare: leftNum];
+        int rightCompare = [switchValue[switchLevel] compare: rightNum];
+        if(leftCompare  != NSOrderedSame && rightCompare  != NSOrderedSame ){
+            if((leftCompare  == NSOrderedDescending) && (rightCompare == NSOrderedAscending) ){
+                NodeValue(2);
+                if([[p nodeData] count] == 4)NodeValue(3);
+            }
+        }
+    }
+    else {
+        [NSException raise:@"Run time" format:@"Case range must be ascending. Line: %d",LineNumber(0)];
+    }
+    return nil;
+}
 - (id) doCaseRange:(id)p
 {
     NSDecimalNumber* leftNum  = NodeValue(0);
@@ -1544,6 +1573,48 @@
     }
     else {
         [NSException raise:@"Run time" format:@"Case range must be ascending. Line: %d",LineNumber(0)];
+    }
+    return nil;
+}
+
+- (id) doCaseGt:(id)p
+{
+    int compare  = [switchValue[switchLevel] compare: NodeValue(0)];
+    if(compare  == NSOrderedDescending){
+        NodeValue(1);
+        if([[p nodeData] count] == 3)NodeValue(2);
+    }
+    
+    return nil;
+}
+
+- (id) doCaseLt:(id)p
+{
+    int compare  = [switchValue[switchLevel] compare: NodeValue(0)];
+    if(compare  == NSOrderedAscending){
+        NodeValue(1);
+        if([[p nodeData] count] == 3)NodeValue(2);
+    }
+    return nil;
+}
+
+- (id) doCaseGtE:(id)p
+{
+    int compare  = [switchValue[switchLevel] compare: NodeValue(0)];
+    if(compare  == NSOrderedSame || compare  == NSOrderedDescending){
+        NodeValue(1);
+        if([[p nodeData] count] == 3)NodeValue(2);
+    }
+
+    return nil;
+}
+
+- (id) doCaseLtE:(id)p
+{
+    int compare  = [switchValue[switchLevel] compare: NodeValue(0)];
+    if(compare  == NSOrderedSame || compare  == NSOrderedAscending){
+        NodeValue(1);
+        if([[p nodeData] count] == 3)NodeValue(2);
     }
     return nil;
 }
@@ -2047,6 +2118,12 @@
                 case '<':				line = [NSMutableString stringWithString:@"[<]"];			break;
                 case '>':				line = [NSMutableString stringWithString:@"[>]"];			break;
                 case kCaseRange:        line = [NSMutableString stringWithString:@"[<=<]"];         break;
+                case kCaseRange1:       line = [NSMutableString stringWithString:@"[<<]"];         break;
+                case kCaseGtE:          line = [NSMutableString stringWithString:@"[>=]"];         break;
+                case kCaseLtE:          line = [NSMutableString stringWithString:@"[<=]"];         break;
+                case kCaseGt:           line = [NSMutableString stringWithString:@"[>]"];         break;
+                case kCaseLt:           line = [NSMutableString stringWithString:@"[<]"];         break;
+
                 case LEFT_OP:           line = [NSMutableString stringWithString:@"[<<]"];          break;
                 case RIGHT_OP:			line = [NSMutableString stringWithString:@"[<<]"];			break;
 				case AND_OP:			line = [NSMutableString stringWithString:@"[&&]"];			break;

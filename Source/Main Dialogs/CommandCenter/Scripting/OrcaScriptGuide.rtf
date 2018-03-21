@@ -110,10 +110,21 @@ unless(<condition>) \{\
 \b0 switch(<condition>)\{\
 	case <val>: <statements> break;\
 	case <val>: <statements> break;\
-	case <val1> <=< <val2>: <statements> break; //val1 and val2 inclusive range\
+	case <val1> <rangeConditional> <val2>: <statements> break;\
+	case <conditional> <val1>: <statements> break;\
 	..\
 	default: <statements> break;\
 \}\
+\
+
+\b Switch Case Conditionals\
+
+\b0 case <val1> <<  <val2>    //check condition is between <val1> and <val2>\
+case <val1> <=<  <val2>  //check if condition is in range of <val1> & <val2> inclusive\
+case <= <val>		     //check if <val> less than or equal to condition\
+case >= <val>                   //check if <val> greater than or equal to condition\
+case < <val>                     //check if <val> less than condition\
+case > <val>                     //check if <val> greater than  condition\
 \
 
 \b Conditional\

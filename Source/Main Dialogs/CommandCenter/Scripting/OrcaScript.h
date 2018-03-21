@@ -29,5 +29,10 @@ enum {
     kGlobalAssign,
     kSelfFunction,
     kBitExtract,
-    kCaseRange
+    kCaseRange,
+    kCaseRange1,
+    kCaseGtE,
+    kCaseLtE,
+    kCaseLt,
+    kCaseGt
 };
