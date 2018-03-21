@@ -74,6 +74,7 @@
 	[[self window] makeFirstResponder:scriptView];
 	[breakChainButton setTransparent:[model nextScriptConnector]==nil];
     [inputVariablesTableView reloadData];
+    [outputVariablesTableView reloadData];
 }
 
 #pragma mark •••Notifications
