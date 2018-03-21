@@ -73,6 +73,7 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"Script: %@",[model identifier]]];
 	[[self window] makeFirstResponder:scriptView];
 	[breakChainButton setTransparent:[model nextScriptConnector]==nil];
+    [inputVariablesTableView reloadData];
 }
 
 #pragma mark •••Notifications
