@@ -49,6 +49,8 @@
                 <outlet property="tellieExpertOpTViewItem" destination="1122" id="1379"/>
                 <outlet property="tellieExpertOperationModePb" destination="fCF-HW-P1M" id="SCf-yc-vpe"/>
                 <outlet property="tellieExpertStopButton" destination="1207" id="1390"/>
+                <outlet property="tellieExpertTuning" destination="1" id="36p-q6-KG8"/>
+                <outlet property="tellieExpertTuningCb" destination="UKS-br-kMc" id="kyD-Pw-mnu"/>
                 <outlet property="tellieExpertValidateSettingsButton" destination="1206" id="fLS-Bc-uBD"/>
                 <outlet property="tellieExpertValidationStatusTf" destination="1205" id="gzZ-6M-LW3"/>
                 <outlet property="tellieFibreDelayTf" destination="6hn-XS-e2a" id="Ifu-Ap-6EO"/>
@@ -814,6 +816,18 @@
                                                                                     <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
                                                                                     <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                                                 </box>
+                                                                                <button id="KnK-bH-jqv">
+                                                                                    <rect key="frame" x="383" y="392" width="87" height="18"/>
+                                                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                                    <animations/>
+                                                                                    <buttonCell key="cell" type="check" title="Tuning run" bezelStyle="regularSquare" imagePosition="left" inset="2" id="UKS-br-kMc">
+                                                                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                                                        <font key="font" metaFont="system"/>
+                                                                                        <connections>
+                                                                                            <action selector="tellieExpertTuningAction:" target="-2" id="Iy7-ak-kel"/>
+                                                                                        </connections>
+                                                                                    </buttonCell>
+                                                                                </button>
                                                                             </subviews>
                                                                             <animations/>
                                                                         </view>
