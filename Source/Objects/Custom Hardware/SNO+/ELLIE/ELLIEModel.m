@@ -192,7 +192,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         [smellieFlaggingCli release];
         [interlockCli release];
 
-        // Force the tuningRun flag (and checkbox) to be zero (i.e. run rollovers at end of sequence by default)
+        // Force the tuningRun flag (and checkbox) to be zero (i.e. run rolls over at end of T/AMELLIE sequence by default)
         [self setTuningRun:[NSNumber numberWithInteger:0]];
     }
     return self;
@@ -1386,7 +1386,6 @@ err:
 
     // Only roll over if this is NOT a tuning run.
     if(![[self tuningRun] boolValue]){
-        NSLog(@"[TELLIE]: Got inside run rollover\n");
         ///////////////
         //Add run control object
         NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
