@@ -1994,7 +1994,7 @@
 	}
 	
 	NSLog(@"In %@, <%@> not passed the right kind of argument. Check the syntax.\n",[self scriptName],aFunctionName);
-    [NSException raise:@"Run time" format:@"Arg Type error. Line: %d"];
+    [NSException raise:@"Run time" format:@"Arg Type error."];
 	return nil;
 }
 
