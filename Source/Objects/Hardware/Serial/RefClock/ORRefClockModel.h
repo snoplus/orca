@@ -19,25 +19,9 @@
 
 #pragma mark ***Imported Files
 
-// todo: only one serial port in ORRefClock; only one command queue etc.
+
 #import "ORSerialPortWithQueueModel.h"
 
-// #define kWGRemoteCmd	'R'
-// #define kWGFreqCmd 'F'
-// #define kWGAttCmd 'Q'
-// #define kWGAmpltCmd 'A'
-// #define kWGDutyCCmd 'D'
-// #define kWGFormCmd 'K'
-// #define kWGProgModCmd 'C'
-// #define kWGStartProgCmd 'B'
-// #define kWGRdyPrgrmCmd 'b'
-// #define kWGStopPrgrmCmd 'U'
-// #define kWGFinPrgrmCmd 'u'
-
-//#define VMax 19.93  // maximum Voltage; tests with an available device showed,
-//// that the 20V from the datasheet could not be reached.
-//#define dampedMax (VMax / 10)  // maximum voltage when damping is set
-//#define VMin 0.02  // minimum voltage (with damping)
 @class ORSynClockModel;
 @class ORMotoGPSModel;
 

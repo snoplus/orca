@@ -235,10 +235,11 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
     unsigned char* bytes  = (unsigned char *)[inComingData bytes];
     NSLog(@"receiving... (so far %d bytes ) \n", nBytes);
     //[self startTimeout:3]; //reset incase there is a lot of data
-    if([[lastRequest objectForKey:@"replySize"] intValue] == nBytes){
+    if([[lastRequest objectForKey:@"replySize"] intValue] <= nBytes){
         //if([inComingData length] >= 7) {
         if(bytes[nBytes - 2] == '\r' && bytes[nBytes - 1] == '\n' ) { // check for trailing \n (LF)
-            NSLog(@"received %s \n", bytes);
+            NSString* incomingStr = [[NSString alloc]initWithBytes:bytes length:nBytes encoding:NSASCIIStringEncoding];
+            NSLog(@"received %@ \n", incomingStr);
             //NSLog(@"lastRequest contains %d bytes", [lastRequest length]);
             //       char* lastCmd;
             //
@@ -253,10 +254,10 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
             //senderDevice = (bytes[0] == '@' && bytes[1] == '@') ? 'MGPS' : 'SYCK';  // check if the last incoming Data came from the MOTOGPS Clock (first two chars are '@'); otherwise, the Synclock (which shares the serial connection) sent the last message.
             NSString* senderDevice = [lastRequest objectForKey:@"device"];
             if([senderDevice isEqualToString:ORSynClock]){
-                [synClockModel processResponse:inComingData];
+                [synClockModel processResponse:inComingData forRequest:lastRequest];
             }
             else if ([senderDevice isEqualToString:ORMotoGPS]){
-                [motoGPSModel processResponse:inComingData];
+                [motoGPSModel processResponse:inComingData forRequest:lastRequest];
             }
             
             [inComingData release];

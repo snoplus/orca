@@ -56,15 +56,6 @@ extern NSString* ORMotoGPS;
 
 #pragma mark ***Accessors
 
-- (void) setDefaults{
-    [self writeData:[self defaultsCommand]];
-}
-
-- (void) requestStatus
-{
-   // [self writeData:statuscommand];
-}
-
 - (BOOL) statusPoll
 {
     return statusPoll;
@@ -110,13 +101,13 @@ extern NSString* ORMotoGPS;
     [refClock addCmdToQueue:aDictionary];
 }
 
-- (void) processResponse:(NSData*)receivedData;
+- (void) processResponse:(NSData*)receivedData forRequest:(NSDictionary*)lastRequest;
 {
     //receivedData should have been processed by refClockModel to be the full response.
     //Here is where the data is decoded into something meaningful for this object
     
     //use [refClock lastRequest] to get the orginal command
-    
+    NSLog(@"debug Moto \n");
      if([refClock verbose]) NSLog(@"Received Moto GPS response \n");
     
     ///MAH -- I didn't attempt to do anything to the old processing code below since I don't know the format
@@ -126,7 +117,21 @@ extern NSString* ORMotoGPS;
     unsigned char* bytes = (unsigned char *)[receivedData bytes];
     //if([inComingData length] >= 7) {
     if(bytes[nBytes - 1] == '\n') { // check for trailing \n (LF)
-        lastRecTelegram = [NSString stringWithCString:(char*)bytes encoding: NSASCIIStringEncoding];
+        //lastRecTelegram = [NSString stringWithCString:(char*)bytes encoding: NSASCIIStringEncoding];
+        lastRecTelegram = [[NSString alloc]initWithBytes:bytes length:nBytes encoding:NSASCIIStringEncoding];
+        
+        if([lastRequest isEqualToDictionary:[self statusCommand]]){
+            NSLog(@"processing GPS status...\n");
+            
+//        //status variables
+//        unsigned int    visibleSatellites;
+//        unsigned int    trackedSatellites;
+//        unsigned int    accSignalStrength;
+//        NSString*       AntennaSense;
+//        float           oscTemperature;
+            
+        }
+        
 //        if([refClock verbose]){
 //            //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
 //            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
@@ -138,6 +143,18 @@ extern NSString* ORMotoGPS;
         NSLog(@"Warning (MotoGPSModel::dataAvailable): unsupported command \n");
     }
 
+}
+
+
+- (void) setDefaults{
+    [self writeData:[self defaultsCommand]];
+}
+- (void) autoSurvey{
+    [self writeData:[self autoSurveyCommand]];
+}
+- (void) requestStatus
+{
+    [self writeData:[self statusCommand]];
 }
 
 - (NSDictionary*) defaultsCommand
@@ -161,6 +178,47 @@ extern NSString* ORMotoGPS;
     return commandDict;
 }
 
+- (NSDictionary*) autoSurveyCommand{
+    unsigned char cmdData[8];
+    cmdData[0] = '@';
+    cmdData[1] = '@';
+    cmdData[2] = 'G';
+    cmdData[3] = 'd';
+    cmdData[4] = 0x03;  // 3: enabel auto-survey
+    cmdData[5] = 32;  // checksum
+    cmdData[6] = '\r';
+    cmdData[7] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:8],
+                                   @"device"    : ORMotoGPS,
+                                   @"replySize" : @8
+                                   };
+    NSLog(@"MotoGPSModel::autoSurveyCommand! \n");
+    
+    return commandDict;
+}
+
+- (NSDictionary*) statusCommand{
+    unsigned char cmdData[8];
+    cmdData[0] = '@';
+    cmdData[1] = '@';
+    cmdData[2] = 'H';
+    cmdData[3] = 'a';
+    cmdData[4] = 0x00;  // 0: GPS response message once
+    cmdData[5] = 41;  // checksum
+    cmdData[6] = '\r';
+    cmdData[7] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:8],
+                                   @"device"    : ORMotoGPS,
+                                   @"replySize" : @154
+                                   };
+    NSLog(@"MotoGPSModel::statusCommand! \n");
+    
+    return commandDict;
+}
 
 - (NSUndoManager*) undoManager
 {
@@ -190,7 +248,7 @@ extern NSString* ORMotoGPS;
 - (void) updatePoll
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePoll) object:nil];
-    float delay = 1.0; // Seconds
+    float delay = 2.0; // Seconds
     if(statusPoll){
         [self requestStatus];
         [self performSelector:@selector(updatePoll) withObject:nil afterDelay:delay];

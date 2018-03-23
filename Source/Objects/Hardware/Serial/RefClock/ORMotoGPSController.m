@@ -76,7 +76,7 @@
     [notifyCenter addObserver : self
                      selector : @selector(receivedMessageChanged:)
                          name : ORMotoGPSModelReceivedMessageChanged
-                        object: model];
+                        object: nil];
 
     
     
@@ -104,6 +104,7 @@
 
 - (void) receivedMessageChanged:(NSNotification*)aNote
 {
+    NSLog(@"New message received \n");
     if([model lastReceived] != nil){
         [receivedMessageField setStringValue:[model lastReceived]];
     }
@@ -153,11 +154,12 @@
 
 - (IBAction) autoSurveyAction:(id)sender
 {
+    [model autoSurvey];
 }
 
 - (void) statusAction:(id)sender
 {
-  //[model requestStatus];
+  [model requestStatus];
 }
 
 - (void) statusPollAction:(id)sender

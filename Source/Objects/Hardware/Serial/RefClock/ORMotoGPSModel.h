@@ -41,9 +41,16 @@
         // int reTxCount;  // in case of errors or timeout retransmit; if retransmit
         // // is required, put last command to cmdQueue and dequeueFromBottom
         //
-        int  cableDelayNs;
-        BOOL statusPoll;
-        NSString* lastRecTelegram;
+        int         cableDelayNs;
+        BOOL        statusPoll;
+        NSString*   lastRecTelegram;
+    
+        //status variables
+        unsigned int    visibleSatellites;
+        unsigned int    trackedSatellites;
+        unsigned int    accSignalStrength;
+        NSString*       AntennaSense;
+        float           oscTemperature;
 }
 
 #pragma mark ***Initialization
@@ -51,8 +58,6 @@
 
 #pragma mark ***Accessors
 - (void) setRefClock:(ORRefClockModel*)aRefClock;
-- (void) setDefaults;
-- (void) requestStatus;
 - (BOOL) portIsOpen;
 - (BOOL) statusPoll;
 - (void) setStatusPoll:(BOOL)aStatusPoll;
@@ -62,8 +67,13 @@
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
-- (void) processResponse:(NSData*)someData;
+- (void) processResponse:(NSData*)someData forRequest:(NSDictionary*)lastRequest;
+- (void) setDefaults;
+- (void) autoSurvey;
+- (void) requestStatus;
 - (NSDictionary*) defaultsCommand;
+- (NSDictionary*) autoSurveyCommand;
+- (NSDictionary*) statusCommand;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

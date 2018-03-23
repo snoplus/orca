@@ -72,7 +72,7 @@
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
-- (void) processResponse:(NSData*)someData;
+- (void) processResponse:(NSData*)someData forRequest:(NSDictionary*)lastRequest;
 - (NSDictionary*) alarmWindowCommand;
 - (NSDictionary*) statusCommand;
 

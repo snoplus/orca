@@ -155,7 +155,7 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     [refClock addCmdToQueue:aDictionary];
 }
 
-- (void) processResponse:(NSData*)receivedData;
+- (void) processResponse:(NSData*)receivedData forRequest:(NSDictionary*)lastRequest;
 {
     //receivedData should have been processed by refClockModel to be the full response.
     //Here is where the data is decoded into something meaningful for this object
