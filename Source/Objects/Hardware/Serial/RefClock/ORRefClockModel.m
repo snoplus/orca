@@ -233,6 +233,16 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
     //a = @50;
     unsigned short nBytes = [inComingData length];
     unsigned char* bytes  = (unsigned char *)[inComingData bytes];
+    
+    // remove undesired bytes from the other device
+    while(1 && nBytes > 0){
+            if(bytes[0] == '?' || bytes[0] == '\n' || bytes[0] == '\r'){
+                //NSLog(@"replacing %c ... \n", startByte[0]);
+                [inComingData replaceBytesInRange:NSMakeRange(0, 1) withBytes:NULL length:0];
+                nBytes = [inComingData length];
+                bytes  = (unsigned char *)[inComingData bytes];
+            }else break;
+    }
     NSLog(@"receiving... (so far %d bytes ) \n", nBytes);
     //[self startTimeout:3]; //reset incase there is a lot of data
     if([[lastRequest objectForKey:@"replySize"] intValue] <= nBytes){
@@ -240,6 +250,7 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
         if(bytes[nBytes - 2] == '\r' && bytes[nBytes - 1] == '\n' ) { // check for trailing \n (LF)
             NSString* incomingStr = [[NSString alloc]initWithBytes:bytes length:nBytes encoding:NSASCIIStringEncoding];
             NSLog(@"received %@ \n", incomingStr);
+        
             //NSLog(@"lastRequest contains %d bytes", [lastRequest length]);
             //       char* lastCmd;
             //

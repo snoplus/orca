@@ -77,6 +77,10 @@
                      selector : @selector(receivedMessageChanged:)
                          name : ORMotoGPSModelReceivedMessageChanged
                         object: nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(updateStatusDisplay:)
+                         name : ORMotoGPSStatusValuesReceived
+                        object: nil];
 
     
     
@@ -108,6 +112,15 @@
     if([model lastReceived] != nil){
         [receivedMessageField setStringValue:[model lastReceived]];
     }
+}
+- (void) updateStatusDisplay:(NSNotification*)aNote{
+
+    [visibleSatsField setStringValue:[NSString stringWithFormat:@"%u",[model visibleSatellites]]];
+    [trackedSatsField setStringValue:[NSString stringWithFormat:@"%u",[model trackedSatellites]]];
+    
+    [accSignalStrengthField setStringValue:[NSString stringWithFormat:@"%u",[model accSignalStrength]]];
+    [antennaSenseField setStringValue:[NSString stringWithFormat:@"%@",[model antennaSense]]];
+    [oscTemperatureField setStringValue:[NSString stringWithFormat:@"%.1f",[model oscTemperature]]];
 }
 - (void) autoSurveyChanged:(NSNotification*)aNote
 {

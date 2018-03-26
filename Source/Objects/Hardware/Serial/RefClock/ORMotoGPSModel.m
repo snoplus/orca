@@ -30,6 +30,8 @@ NSString* ORMotoGPSModelAlarmWindowChanged	    = @"ORMotoGPSModelAlarmWindowChan
 NSString* ORMotoGPSModelStatusChanged           = @"ORMotoGPSModelStatusChanged";
 NSString* ORMotoGPSModelStatusPollChanged       = @"ORMotoGPSModelStatusPollChanged";
 NSString* ORMotoGPSModelReceivedMessageChanged  = @"ORMotoGPSModelReceivedMessageChanged";
+NSString* ORMotoGPSStatusValuesReceived =
+    @"ORMotoGPSStatusValuesReceived";
 
 extern NSString* ORMotoGPS;
 
@@ -95,11 +97,35 @@ extern NSString* ORMotoGPS;
     return lastRecTelegram;
 }
 
+- (unsigned int) visibleSatellites{
+    return visibleSatellites;
+}
+- (unsigned int) trackedSatellites{
+    return trackedSatellites;
+}
+- (unsigned int) accSignalStrength{
+    return accSignalStrength;
+}
+- (NSString*) antennaSense{
+    return antennaSense;
+}
+- (float) oscTemperature{
+    return oscTemperature;
+}
+
 #pragma mark *** Commands
 - (void) writeData:(NSDictionary*)aDictionary
 {
     [refClock addCmdToQueue:aDictionary];
 }
+
+#define visSatIdx 55
+#define trSatIdx 56
+#define chanDatIdx 57
+#define relSigStrIdx 2
+#define antSenseIdx 130
+#define antSenseBitMask 0x03
+#define tempIdx 139
 
 - (void) processResponse:(NSData*)receivedData forRequest:(NSDictionary*)lastRequest;
 {
@@ -122,14 +148,35 @@ extern NSString* ORMotoGPS;
         
         if([lastRequest isEqualToDictionary:[self statusCommand]]){
             NSLog(@"processing GPS status...\n");
+//#define visSatIdx 55
+//#define trSatIdx 56
+//#define chanDatIdx 57
+//#define relSigStrIdx 2
+//#define antSenseIdx 130
+//#define antSenseBitMask 0x03
+//#define tempIdx 139
             
 //        //status variables
-//        unsigned int    visibleSatellites;
-//        unsigned int    trackedSatellites;
-//        unsigned int    accSignalStrength;
-//        NSString*       AntennaSense;
-//        float           oscTemperature;
+            visibleSatellites = bytes[visSatIdx];
+            trackedSatellites = bytes[trSatIdx];
+            accSignalStrength = 0;
+            unsigned char chanSignalStrength;
+            for (int i = 0; i < 12; ++i){
+                chanSignalStrength = bytes[chanDatIdx + 6*i + relSigStrIdx];
+                accSignalStrength += chanSignalStrength;
+            }
+            switch(bytes[antSenseIdx] & antSenseBitMask){
+                case 0: antennaSense = @"OK"; break;
+                case 1: antennaSense = @"over current (shorted!)"; break;
+                case 2: antennaSense = @"under current (open!)"; break;
+                case 3: antennaSense = @"warning: not valid"; break;
+            }
+
+            oscTemperature = -110.0;
+            unsigned short temperature = bytes[tempIdx];
+            oscTemperature += 0.5 * temperature;
             
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORMotoGPSStatusValuesReceived object:self];
         }
         
 //        if([refClock verbose]){
@@ -248,7 +295,7 @@ extern NSString* ORMotoGPS;
 - (void) updatePoll
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePoll) object:nil];
-    float delay = 2.0; // Seconds
+    float delay = 3.0; // Seconds
     if(statusPoll){
         [self requestStatus];
         [self performSelector:@selector(updatePoll) withObject:nil afterDelay:delay];

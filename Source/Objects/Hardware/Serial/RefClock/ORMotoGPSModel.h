@@ -21,18 +21,6 @@
 
 @class ORRefClockModel;
 
-// #define kWGRemoteCmd	'R'
-// #define kWGFreqCmd 'F'
-// #define kWGAttCmd 'Q'
-// #define kWGAmpltCmd 'A'
-// #define kWGDutyCCmd 'D'
-// #define kWGFormCmd 'K'
-// #define kWGProgModCmd 'C'
-// #define kWGStartProgCmd 'B'
-// #define kWGRdyPrgrmCmd 'b'
-// #define kWGStopPrgrmCmd 'U'
-// #define kWGFinPrgrmCmd 'u'
-
 @interface ORMotoGPSModel : NSObject
 {
     @private
@@ -49,7 +37,7 @@
         unsigned int    visibleSatellites;
         unsigned int    trackedSatellites;
         unsigned int    accSignalStrength;
-        NSString*       AntennaSense;
+        NSString*       antennaSense;
         float           oscTemperature;
 }
 
@@ -64,6 +52,12 @@
 - (int) CableDelay;
 - (void) setCableDelay:(int)aDelay;
 - (NSString*) lastReceived;
+
+- (unsigned int) visibleSatellites;
+- (unsigned int) trackedSatellites;
+- (unsigned int) accSignalStrength;
+- (NSString*) antennaSense;
+- (float) oscTemperature;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
@@ -86,5 +80,6 @@ extern NSString* ORMotoGPSModelSyncChanged;
 extern NSString* ORMotoGPSModelAlarmWindowChanged;
 extern NSString* ORMotoGPSModelStatusChanged;
 extern NSString* ORMotoGPSModelStatusPollChanged;
+extern NSString* ORMotoGPSStatusValuesReceived;
 extern NSString* ORMotoGPSModelReceivedMessageChanged;
 
