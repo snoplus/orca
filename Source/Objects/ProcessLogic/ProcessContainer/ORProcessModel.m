@@ -487,7 +487,10 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
 - (void) setUpImage
 {
-	NSAssert([NSThread mainThread],@"ORProcessModel drawing from non-gui thread");
+    if(![NSThread isMainThread]){
+        [self performSelectorOnMainThread:@selector(setUpImage) withObject:nil waitUntilDone:YES];
+        return;
+    }
     //---------------------------------------------------------------------------------------------------
     //arghhh....NSImage caches one image. The NSImage setCachMode:NSImageNeverCache appears to not work.
     //so, we cache the image here so that each Process can have its own version for drawing into.
