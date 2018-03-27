@@ -41,7 +41,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [model release];
     model = nil;
-	//[[self window] close];
+	[[self window] close]; //don't know why this line had been commented out.....
     [super dealloc];
 }
 
