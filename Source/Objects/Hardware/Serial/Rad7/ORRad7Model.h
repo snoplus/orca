@@ -238,7 +238,6 @@ enum {
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
-- (void) setLastOpenPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
 - (NSDictionary*) statusDictionary;
