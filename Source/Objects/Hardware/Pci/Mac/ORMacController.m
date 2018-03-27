@@ -26,10 +26,12 @@
 #import "ORGroupView.h"
 #import "ORPciCard.h"
 #import "ORSerialPort.h"
+#import "ORSerialPortList.h"
 #import "ORSerialPortAdditions.h"
 
 #import "ORUSB.h"
 #import "ORUSBInterface.h"
+#import "ORSerialPortList.h"
 
 @interface ORMacController (private)
 - (void) setSpeedPopup:(NSDictionary*)options port:(ORSerialPort*)thePort;
@@ -61,12 +63,10 @@
     blankView   = [[NSView alloc] init];
 
 	[groupView setGroup:model];
-    [serialPortView reloadData];
+    [self reloadSerialPortList];
 
     [tabView selectTabViewItemAtIndex: 0];
 }
-
-
 
 #pragma mark ¥¥¥Accessors
 - (ORGroupView *)groupView
@@ -133,11 +133,6 @@
 
     [notifyCenter addObserver : self
                      selector : @selector(updateUSBView)
-                         name : ORUSBInterfacesChanged
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(updateUSBView)
                          name : ORUSBRegisteredObjectChanged
                        object : nil];
 
@@ -170,8 +165,11 @@
                      selector : @selector(tableViewSelectionDidChange:)
                          name : NSTableViewSelectionDidChangeNotification
 						object: nil];
-
-
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(serialPortListChanged:)
+                         name : ORSerialPortListChanged
+                        object: nil];
 }
 
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote
@@ -181,10 +179,15 @@
 	if([aNote object] == serialPortView || !aNote){
 		int index = [serialPortView selectedRow];
 		if(index >= 0){
-			[selectedPortNameField setStringValue:[[model serialPort:index] name]];
+            ORSerialPort* thePort = [[ORSerialPortList sharedSerialPortList] objectAtIndex: index];
+			[selectedPortNameField setStringValue:[thePort name]];
 			[openPortButton setEnabled:YES];
-			ORSerialPort* thePort = [model serialPort:index];
-			
+            NSDictionary* options = [thePort getOptions];
+            [self setSpeedPopup:options port:thePort];
+            [self setParityPopup:options port:thePort];
+            [self setStopBitsPopup:options port:thePort];
+            [self setDataBitsPopup:options port:thePort];
+
 			[notifyCenter addObserver : self
 							 selector : @selector(dataReceived:)
 								 name : ORSerialPortDataReceived
@@ -196,11 +199,6 @@
 				[clearDisplayButton setEnabled:YES];
 				
 				[openPortButton setTitle:@"Close"];
-				NSDictionary* options = [thePort getOptions];
-				[self setSpeedPopup:options port:thePort];
-				[self setParityPopup:options port:thePort];
-				[self setStopBitsPopup:options port:thePort];
-				[self setDataBitsPopup:options port:thePort];
 			}
 			else {
 				[outputView setString:@""];
@@ -210,10 +208,10 @@
 				[clearDisplayButton setEnabled:NO];
 				
 				[openPortButton setTitle:@"Open"];
-				[self setSpeedPopup:nil port:thePort];
-				[self setParityPopup:nil port:thePort];
-				[self setStopBitsPopup:nil port:thePort];
-				[self setDataBitsPopup:nil port:thePort];
+//                [self setSpeedPopup:nil port:thePort];
+//                [self setParityPopup:nil port:thePort];
+//                [self setStopBitsPopup:nil port:thePort];
+//                [self setDataBitsPopup:nil port:thePort];
 			}
 		}
 		else {
@@ -223,10 +221,10 @@
 			[selectedPortNameField setStringValue:@"---"];
 			[openPortButton setEnabled:NO];
 			[openPortButton setTitle:@"---"];
-			[self setSpeedPopup:nil port:nil];
-			[self setParityPopup:nil port:nil];
-			[self setStopBitsPopup:nil port:nil];
-			[self setDataBitsPopup:nil port:nil];
+//            [self setSpeedPopup:nil port:nil];
+//            [self setParityPopup:nil port:nil];
+//            [self setStopBitsPopup:nil port:nil];
+//            [self setDataBitsPopup:nil port:nil];
 		}
 	}
 
@@ -250,11 +248,22 @@
     [self documentLockChanged:nil];
     [self tableViewSelectionDidChange:nil];
     [groupView setNeedsDisplay:YES];
-    [serialPortView reloadData];
+    [self reloadSerialPortList];
 	int index = [usbDevicesView selectedRow];
 	if(index>=0 && [model usbDeviceCount]>0)[usbDetailsView setString:[[model usbDeviceAtIndex:index] usbInterfaceDescription]];
 	else [usbDetailsView setString:@"<nothing selected>"];
 	[self eolTypeChanged:nil];
+}
+
+- (void) serialPortListChanged:(NSNotification*)aNote
+{
+    [self reloadSerialPortList];
+    [self tableViewSelectionDidChange:nil];
+}
+
+- (void) reloadSerialPortList
+{
+    [serialPortView reloadData];
 }
 
 - (void) eolTypeChanged:(NSNotification*)aNote
@@ -269,7 +278,6 @@
 	int index = [usbDevicesView selectedRow];
 	if(index>=0 && [model usbDeviceCount]>0)[usbDetailsView setString:[[model usbDeviceAtIndex:index] usbInterfaceDescription]];
 	else [usbDetailsView setString:@"<nothing selected>"];
-
 }
 
 - (void) isNowKeyWindow:(NSNotification*)aNotification
@@ -286,7 +294,7 @@
 {
     int index = [serialPortView selectedRow];
     if(index >=0){
-        ORSerialPort* thePort = [model serialPort:index];
+        ORSerialPort* thePort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:index];
         if([[note userInfo] objectForKey:@"serialPort"] == thePort){
 			//it's possible the data is non-ascii. We'll keep only the ascii part for display.
 			NSMutableData* theData = [NSMutableData dataWithData:[[note userInfo] objectForKey:@"data"]];
@@ -339,16 +347,14 @@
 {
     int index = [serialPortView selectedRow];
     if(index >=0){
-        ORSerialPort* thePort = [model serialPort:index];
+        ORSerialPort* thePort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:index];
         if([thePort isOpen]){
             [thePort close];
         }
         else  {
             [thePort open];
-            NSDictionary* options = [thePort getOptions];
-            NSLog(@"%@\n",options);
         }
-        [serialPortView reloadData];
+        [self reloadSerialPortList];
         [self tableViewSelectionDidChange:nil];
     }
 }
@@ -357,7 +363,7 @@
 {
     int index = [serialPortView selectedRow];
     if(index >=0){
-        ORSerialPort* thePort = [model serialPort:index];
+        ORSerialPort* thePort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:index];
         if([thePort isOpen]){
             //get the current options
             NSMutableDictionary* options = [[[thePort getOptions] mutableCopy] autorelease];
@@ -395,7 +401,7 @@
     [self endEditing];
     int index = [serialPortView selectedRow];
     if(index >= 0){
-        ORSerialPort* thePort = [model serialPort:index];
+        ORSerialPort* thePort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:index];
         if([thePort isOpen]){
             if([cmdField stringValue]!=nil){
 				int eolType = [model eolType];
@@ -414,7 +420,7 @@
 {
     int index = [serialPortView selectedRow];
     if(index >= 0){
-        ORSerialPort* thePort = [model serialPort:index];
+        ORSerialPort* thePort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:index];
         if([thePort isOpen]){
             [thePort writeString:[NSString stringWithFormat:@"%c",0x03]]; //0x03 is control-C
         }
@@ -440,12 +446,12 @@
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
 	if(aTableView == serialPortView){
-		NSParameterAssert(rowIndex >= 0 && rowIndex < [[model serialPorts] count]);
-		ORSerialPort* aPort = [[model serialPorts] objectAtIndex:rowIndex];
-		if([[aTableColumn identifier] isEqualToString:@"name"])return [aPort name];
-		else if([[aTableColumn identifier] isEqualToString:@"bsdPath"])return [aPort bsdPath];
-		else if([[aTableColumn identifier] isEqualToString:@"state"])return [aPort isOpen]?@"open":@"closed";
-		else return @"";
+        ORSerialPort* aPort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:rowIndex];
+        if([[aTableColumn identifier] isEqualToString:@"name"])return [aPort name];
+        else if([[aTableColumn identifier] isEqualToString:@"bsdPath"])return [aPort bsdPath];
+        else
+            if([[aTableColumn identifier] isEqualToString:@"state"])return [aPort isOpen]?@"open":@"closed";
+        else return @"";
 	}
 	else {
 		if(rowIndex >= 0 && rowIndex < [model usbDeviceCount]){
@@ -459,7 +465,7 @@
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == serialPortView){
-		return [[model serialPorts] count];
+		return [[ORSerialPortList sharedSerialPortList] count];
 	}
 	else if(aTableView == usbDevicesView){
 		int n =  [model usbDeviceCount];
@@ -475,7 +481,7 @@
 - (void) setSpeedPopup:(NSDictionary*)options port:(ORSerialPort*)thePort
 {
     if(options && [thePort isOpen]){
-        [speedPopUp setEnabled:YES];
+       [speedPopUp setEnabled:YES];
         NSString* speedString = [options objectForKey:ORSerialOptionSpeed];
         [speedPopUp selectItemWithTitle:speedString];
     }
@@ -501,7 +507,6 @@
 
 - (void) setStopBitsPopup:(NSDictionary*)options port:(ORSerialPort*)thePort
 {
-
     if(options && [thePort isOpen]){
         [stopBitsPopUp setEnabled:YES];
         NSString* stopBitsString = [options objectForKey:ORSerialOptionStopBits];
@@ -515,7 +520,6 @@
 
 - (void) setDataBitsPopup:(NSDictionary*)options port:(ORSerialPort*)thePort
 {
-
     if(options && [thePort isOpen]){
         [dataBitsPopUp setEnabled:YES];
         NSString* dataBitsString = [options objectForKey:ORSerialOptionDataBits];

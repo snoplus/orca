@@ -68,6 +68,7 @@
 - (void) groupChanged:(NSNotification*)note;
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote;
 - (void) dataReceived:(NSNotification*)note;
+- (void) serialPortListChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) listSupportedUSBDevices:(id)sender;

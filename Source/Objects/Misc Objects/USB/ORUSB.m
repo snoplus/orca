@@ -1,4 +1,4 @@
-//
+ //
 //  ORUSB.m
 //  Orca
 //
@@ -23,12 +23,12 @@
 #import "ORUSBInterface.h"
 #import "SupportedUSBDevices.h"
 #import "SynthesizeSingleton.h"
+#import "ORSerialPortList.h"
 
 NSString* ORUSBDevicesAdded		= @"ORUSBDevicesAdded";
 NSString* ORUSBDevicesRemoved	= @"ORUSBDevicesRemoved";
 NSString* ORUSBInterfaceRemoved	= @"ORUSBInterfaceRemoved";
 NSString* ORUSBInterfaceAdded	= @"ORUSBInterfaceAdded";
-NSString* ORUSBInterfacesChanged= @"ORUSBInterfacesChanged";
 
 static void _deviceAdded( void * refcon, io_service_t service)
 {
@@ -287,14 +287,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 										  self,
 										  &_deviceAddedIter);
 	
-	[self deviceAdded:_deviceAddedIter];				// Iterate once to get already-present devices and arm the notification
+	[self deviceAdded:_deviceAddedIter]; // Iterate once to get already-present devices and arm the notification
 	
 	// Now done with the master_port
 	mach_port_deallocate(mach_task_self(), masterPort);
 	masterPort = 0;
-	
 }
-
 
 - (void) deviceAdded:(io_iterator_t) iterator
 {
@@ -307,11 +305,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	UInt32			locationID;
 	
     while ((usbDevice = IOIteratorNext(iterator))){
-		IOCFPlugInInterface**	plugInInterface=NULL;
-		NSString*				deviceNameAsString;  
-		io_name_t				deviceName;
+		IOCFPlugInInterface**	    plugInInterface=NULL;
+		io_name_t				    deviceName;
 		IOUSBDeviceInterface182**	deviceInterface;
-		ORUSBInterface*			usbCallbackData = 0;
+		ORUSBInterface*			    usbCallbackData = 0;
 		
 		@try {
 			
@@ -320,14 +317,20 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			if (KERN_SUCCESS != kr){
 				[NSException raise: @"USB Exception" format:@"Failed to find device in IORegistry"];
 			}
-			
+            
+            NSString* deviceNameAsString = [NSString stringWithCString:deviceName encoding:NSASCIIStringEncoding];
+            if([deviceNameAsString rangeOfString:@"Apple"].location           != NSNotFound) continue;
+            if([deviceNameAsString rangeOfString:@"IOUSBHostDevice"].location != NSNotFound) continue;
+            if([deviceNameAsString rangeOfString:@"Hub"].location             != NSNotFound) continue;
+            if([deviceNameAsString rangeOfString:@"Rugged"].location          != NSNotFound) continue;
+            if([deviceNameAsString rangeOfString:@"Display"].location         != NSNotFound) continue;
+            if([deviceNameAsString rangeOfString:@"Host"].location         != NSNotFound) continue;
+
 			// Add some app-specific information about this device.
 			// Create a buffer to hold the data.
 			usbCallbackData = [[ORUSBInterface alloc] init];
 			
-			deviceNameAsString = [NSString stringWithCString:deviceName encoding:NSASCIIStringEncoding];
-			
-			// Now, get the locationID of this device. In order to do this, we need to create an IOUSBDeviceInterface182 
+			// Now, get the locationID of this device. In order to do this, we need to create an IOUSBDeviceInterface182
 			// for our device. This will create the necessary connections between our userland application and the 
 			// kernel object for the USB Device.
 			SInt32 score;
@@ -370,14 +373,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 					break;
 				}
 			}
-			if(!supported) {
-				[NSException raise: @"USB Exception" format:@"Skipping device -- Not supported"];
-			}
 			
 			
 			NSLog(@"USB: %@ added\n",deviceNameAsString);
-			//NSLog(@"location: 0x%0x\n",locationID);
-			// Save the device's name to our private data.        
+			// Save the device's name to our private data.
 			[ usbCallbackData setDeviceName:deviceNameAsString];
 						
 			UInt8 snsi;
@@ -459,11 +458,13 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			
 			if (KERN_SUCCESS != kr)[NSException raise: @"USB Exception" format:@"Unable to add USB interest notification"];
 			
-			[self _findInterfaces:deviceInterface  userInfo:usbCallbackData];
+            [self _findInterfaces:deviceInterface  userInfo:usbCallbackData supported:supported];
 			
 			// Done with this USB device; release the reference added by IOIteratorNext
 			IOObjectRelease(usbDevice);
-			
+            if(!supported) {
+                [[ORSerialPortList sharedSerialPortList] updatePortList];
+            }
 		}
 		@catch(NSException* localException) {
 			if(plugInInterface)	(*plugInInterface)->Release(plugInInterface);
@@ -471,8 +472,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		}
 		
 		[usbCallbackData release];
-		
+
     }
+
 }
 
 - (void) listSupportedDevices
@@ -497,13 +499,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 {
     ORUSBInterface* usbCallbackData = (ORUSBInterface*) refCon;
     
-    if (messageType == kIOMessageServiceIsTerminated){    
+    if (messageType == kIOMessageServiceIsTerminated){
 		NSLog(@"USB: %@ removed.\n",[usbCallbackData deviceName]);
 		NSDictionary* userInfo = nil;
-		if(usbCallbackData) userInfo = [NSDictionary dictionaryWithObject:usbCallbackData forKey:@"USBInterface"];
+		if(usbCallbackData) userInfo = [NSDictionary dictionaryWithObjectsAndKeys:usbCallbackData,@"USBInterface",[usbCallbackData deviceName],@"name",nil];
 		[interfaces removeObject:usbCallbackData];
+        
+        [[ORSerialPortList sharedSerialPortList] updatePortList];
+
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceRemoved object:self userInfo:userInfo];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfacesChanged object:self userInfo:userInfo];
 	}
 }
 
@@ -534,7 +538,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     return kIOReturnSuccess;
 }
 
--(IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*) usbCallbackData
+- (IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*) usbCallbackData supported:(BOOL)supported
 {
 	// UInt8                       intfClass;
     //UInt8                       intfSubClass;
@@ -601,34 +605,36 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		int interruptInPipeCount = 0;
 		int interruptOutPipeCount= 0;
 		
-		UInt8 pipeRef;
-		for (pipeRef = 1; pipeRef <= intfNumEndpoints; pipeRef++){
-			IOReturn    kr2;
-			UInt8       direction;
-			UInt8       number;
-			UInt8       transferType;
-			UInt16      maxPacketSize;
-			UInt8       interval;
-			
-			kr2 = (*intf)->GetPipeProperties(intf, pipeRef, &direction, &number, &transferType, &maxPacketSize, &interval);
-			if(kIOReturnNoDevice == kr2)NSLog(@"no Device\n");
-			else if(kIOReturnNotOpen == kr2) NSLog(@"not open\n");
-			if (kIOReturnSuccess == kr2) {
-				if (transferType == kUSBBulk){
-					int kr = (*intf)->ClearPipeStallBothEnds(intf, pipeRef);
-					if(kr)NSLog(@"unable to clear pipe stall: 0x%0x\n",kr);
-					if (direction == kUSBIn)		inPipes[inPipeCount++]   = pipeRef;
-					else if (direction == kUSBOut)	outPipes[outPipeCount++] = pipeRef;
-				}
-				else if(transferType == kUSBInterrupt){
-					if (direction == kUSBIn)		interruptInPipes[interruptInPipeCount++]   = pipeRef;
-					else if (direction == kUSBOut)	interruptOutPipes[interruptOutPipeCount++] = pipeRef;
-				}
-			}
-			else{
-				NSLog(@"unable to get properties of pipe %d (%08x)\n", pipeRef, kr2);
-			}
-		}
+        if(supported){
+            UInt8 pipeRef;
+            for (pipeRef = 1; pipeRef <= intfNumEndpoints; pipeRef++){
+                IOReturn    kr2;
+                UInt8       direction;
+                UInt8       number;
+                UInt8       transferType;
+                UInt16      maxPacketSize;
+                UInt8       interval;
+                
+                kr2 = (*intf)->GetPipeProperties(intf, pipeRef, &direction, &number, &transferType, &maxPacketSize, &interval);
+                if(kIOReturnNoDevice == kr2)     NSLog(@"no Device\n");
+                else if(kIOReturnNotOpen == kr2) NSLog(@"not open\n");
+                if (kIOReturnSuccess == kr2) {
+                    if (transferType == kUSBBulk){
+                        int kr = (*intf)->ClearPipeStallBothEnds(intf, pipeRef);
+                        if(kr)NSLog(@"unable to clear pipe stall: 0x%0x\n",kr);
+                        if (direction == kUSBIn)		inPipes[inPipeCount++]   = pipeRef;
+                        else if (direction == kUSBOut)	outPipes[outPipeCount++] = pipeRef;
+                    }
+                    else if(transferType == kUSBInterrupt){
+                        if (direction == kUSBIn)		interruptInPipes[interruptInPipeCount++]   = pipeRef;
+                        else if (direction == kUSBOut)	interruptOutPipes[interruptOutPipeCount++] = pipeRef;
+                    }
+                }
+                else{
+                    NSLog(@"unable to get properties of pipe %d (%08x)\n", pipeRef, kr2);
+                }
+            }
+        }
 		
 		// Just like with service matching notifications, we need to create an event source and add it
 		//  to our run loop in order to receive async completion notifications.
@@ -643,18 +649,17 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		
 		//create and save an ORCA interface object with this USB interface.
 		(void) (*intf)->USBInterfaceClose(intf);
-		
-		[usbCallbackData setInterface:intf];
-		[usbCallbackData setInPipes:inPipes		numberPipes:inPipeCount];
-		[usbCallbackData setOutPipes:outPipes	numberPipes:outPipeCount];
-		[usbCallbackData setControlPipes:controlPipes numberPipes:controlPipeCount];
-		[usbCallbackData setInterruptInPipes:interruptInPipes	numberPipes:interruptInPipeCount];
-		[usbCallbackData setInterruptOutPipes:interruptOutPipes numberPipes:interruptOutPipeCount];
-		
+        if(supported){
+            [usbCallbackData setInterface:intf];
+            [usbCallbackData setInPipes:inPipes		numberPipes:inPipeCount];
+            [usbCallbackData setOutPipes:outPipes	numberPipes:outPipeCount];
+            [usbCallbackData setControlPipes:controlPipes numberPipes:controlPipeCount];
+            [usbCallbackData setInterruptInPipes:interruptInPipes	numberPipes:interruptInPipeCount];
+            [usbCallbackData setInterruptOutPipes:interruptOutPipes numberPipes:interruptOutPipeCount];
+        }
 		if(!interfaces)interfaces	 = [[NSMutableArray array] retain];
 		
 		[interfaces addObject:usbCallbackData];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfacesChanged object:self userInfo:nil];
 		
 		//done with the intf, the ORCA interface has retained a ref to the interface.
 		(void) (*intf)->Release(intf);
@@ -665,8 +670,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		if (KERN_SUCCESS != kr){
 			[NSException raise: @"USB Exception" format:@"IOServiceAddInterestNotification returned %08x\n", kr];
 		}
-		//        NSLog(@"now ready to start working.\n");
-		
 		//startUp Interrupt handling
 		//        UInt32 numBytesRead = sizeof(_recieveBuffer); // leave one byte at the end for NUL termination
 		//        bzero(&_recieveBuffer, numBytesRead);

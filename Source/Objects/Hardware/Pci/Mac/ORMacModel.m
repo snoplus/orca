@@ -30,9 +30,9 @@
 #import "ORFireWireBus.h"
 #import "ORUSB.h"
 
-NSString* ORMacModelEolTypeChanged = @"ORMacModelEolTypeChanged";
-NSString* ORMacModelSerialPortsChanged = @"ORMacModelSerialPortsChanged";
-NSString* ORMacModelUSBChainVerified   = @"ORMacModelUSBChainVerified";
+NSString* ORMacModelEolTypeChanged       = @"ORMacModelEolTypeChanged";
+NSString* ORMacModelSerialPortsChanged   = @"ORMacModelSerialPortsChanged";
+NSString* ORMacModelUSBChainVerified     = @"ORMacModelUSBChainVerified";
 
 static NSString *ORMacFireWireConnection = @"ORMacFireWireConnection";
 static NSString *ORMacUSBConnection		 = @"ORMacUSBConnection";
@@ -54,7 +54,6 @@ void registryChanged(
 - (id) init
 {
 	self = [super init];
-	[self scanForSerialPorts];
 	usb = [ORUSB sharedUSB];
 	[self registerNotifications];
 	return self;
@@ -65,7 +64,6 @@ void registryChanged(
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fwBus release];
 	[usb release];
-    [serialPorts release];
     [lastStringReceived release];
     [super dealloc];
 }
@@ -85,19 +83,18 @@ void registryChanged(
 
 - (void) registerNotifications
 {
+    NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
+	[notifyCenter  removeObserver:self];
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[notifyCenter  addObserver : self
+                      selector : @selector(objectsAdded:)
+                          name : ORGroupObjectsAdded
+                        object : nil];
 	
-	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	[[NSNotificationCenter defaultCenter] addObserver : self
-											 selector : @selector(objectsAdded:)
-												 name : ORGroupObjectsAdded
-											   object : nil];
-	
-	[[NSNotificationCenter defaultCenter] addObserver : self
-											 selector : @selector(objectsRemoved:)
-												 name : ORGroupObjectsRemoved
-											   object : nil];
+	[notifyCenter addObserver : self
+                     selector : @selector(objectsRemoved:)
+                         name : ORGroupObjectsRemoved
+                       object : nil];
 }
 
 - (void) awakeAfterDocumentLoaded
@@ -239,31 +236,11 @@ void registryChanged(
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMacModelEolTypeChanged object:self];
 }
 
-
-- (NSMutableArray*) serialPorts
-{
-    return serialPorts;
-}
-
-- (void) setSerialPorts:(NSMutableArray*)somePorts
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSerialPorts:serialPorts];
-    
-    [somePorts retain];
-    [serialPorts release];
-    serialPorts = somePorts;
-	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORMacModelSerialPortsChanged object:self];
-}
-
-- (id) serialPort:(int)index
-{
-    return [serialPorts objectAtIndex:index];
-}
+#pragma mark ¥¥¥Serial Ports
 
 - (void) sendOnPort:(int)index anArray:(NSArray*)someData
 {
-	ORSerialPort* aPort = [self serialPort:index];
+	ORSerialPort* aPort = [[ORSerialPortList sharedSerialPortList] objectAtIndex:index];
 	[aPort setDelegate:self];
 	if(aPort){
 		NSMutableData* theData = [NSMutableData data];
@@ -280,25 +257,7 @@ void registryChanged(
 {
 }
 
-#pragma mark ¥¥¥Serial Ports
-- (void) scanForSerialPorts
-{
-	// get an port enumerator
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
-    if(!serialPorts) [self setSerialPorts:[NSMutableArray array]];
-	while (aPort = [enumerator nextObject]) {
-        [serialPorts addObject:aPort];
-	}
-    if([serialPorts count]){
-        NSLog(@"%d serial port%@found\n",[serialPorts count],[serialPorts count]>1?@"s ":@" ");
-        NSEnumerator *enumerator = [serialPorts objectEnumerator];
-        int i = 0;
-        while (aPort = [enumerator nextObject]) {
-            NSLog(@"Port %d: %@\n",i++,[aPort name]);
-        }
-    }
-}
+
 #pragma mark ¥¥¥FireWire
 - (id) getFireWireInterface:(unsigned long)aVenderID
 {
@@ -344,7 +303,6 @@ void registryChanged(
 	//desiredNetwork == 2 for next private network,
 	//...
 	
-	
 	NSString* theResult = @"";
 	NSArray* names =  [[NSHost currentHost] addresses];
 	NSEnumerator* e = [names objectEnumerator];
@@ -366,7 +324,6 @@ void registryChanged(
 	return theResult;
 }
 
-
 #pragma mark ¥¥¥Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -374,9 +331,7 @@ void registryChanged(
 
     [[self undoManager] disableUndoRegistration];
     [self setEolType:[decoder decodeIntForKey:@"ORMacModelEolType"]];
-    //[self setSerialPorts:[decoder decodeObjectForKey:@"serialPorts"]];
     [[self undoManager] enableUndoRegistration];
-	[self scanForSerialPorts];
 	
 	usb = [ORUSB sharedUSB];
 	
@@ -386,10 +341,8 @@ void registryChanged(
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [encoder encodeInt:eolType forKey:@"ORMacModelEolType"];
-    //[encoder encodeObject:serialPorts forKey:@"serialPorts"];
     [super encodeWithCoder:encoder];	
 }
-
 
 #pragma mark ¥¥¥OROrderedObjHolding Protocol
 - (int) maxNumberOfObjects	{ return 4; }

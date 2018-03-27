@@ -47,9 +47,12 @@
 #pragma mark •••Port Methods
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 - (void) openPort:(BOOL)aState;
-- (void) dataReceived:(NSNotification*)note;
+- (void) portsChanged:(NSNotification*)aNote;
+- (void) dataReceived:(NSNotification*)aNote;
 @end
 
 extern NSString* ORSerialPortModelSerialPortChanged;
 extern NSString* ORSerialPortModelPortNameChanged;
 extern NSString* ORSerialPortModelPortStateChanged;
+extern NSString* ORSerialPortModelSerialListChanged;
+

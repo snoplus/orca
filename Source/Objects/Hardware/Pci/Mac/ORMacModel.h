@@ -17,9 +17,9 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
-#import "OROrderedObjHolding.h"
 
 #pragma mark ¥¥¥Imported Files
+#import "OROrderedObjHolding.h"
 
 #pragma mark ¥¥¥Forward Declarations
 @class ORConnector;
@@ -27,37 +27,32 @@
 @class ORUSB;
 
 @interface ORMacModel : ORGroup <OROrderedObjHolding> {
-    NSMutableArray* serialPorts;
-	BOOL			mStarted;
-	ORFireWireBus*	fwBus;
-	ORUSB*			usb;
-    int				eolType;
-    NSString* lastStringReceived;
-    BOOL   useAllOutputBuffer;
-    NSMutableString*  allOutput;
+	BOOL			 mStarted;
+	ORFireWireBus*	 fwBus;
+	ORUSB*			 usb;
+    int				 eolType;
+    NSString*        lastStringReceived;
+    BOOL             useAllOutputBuffer;
+    NSMutableString* allOutput;
 }
 
 #pragma mark ¥¥¥Accessors
-- (NSString*) lastStringReceived;
-- (void) setLastStringReceived:(NSString*)aLastStringReceived;
-- (NSString*) allOutput;
-- (void) clearAllOutput;
-- (BOOL) allOutputHasSubstring:(NSString*)s;
-- (void) turnOnAllOutputBuffer:(BOOL)state;
+- (NSString*)   lastStringReceived;
+- (void)        setLastStringReceived:(NSString*)aLastStringReceived;
+- (NSString*)   allOutput;
+- (void)        clearAllOutput;
+- (BOOL)        allOutputHasSubstring:(NSString*)s;
+- (void)        turnOnAllOutputBuffer:(BOOL)state;
 
 - (NSString*) commandByAppendingEOL:(NSString*) aCmd;
-- (int) eolType;
-- (void) setEolType:(int)aEolType;
-- (NSMutableArray*) serialPorts;
-- (void) setSerialPorts:(NSMutableArray*)somePorts;
-- (id) serialPort:(int)index;
+- (int)       eolType;
+- (void)      setEolType:(int)aEolType;
 
-- (void) positionConnector:(ORConnector*)aConnector forCard:(id)aCard;
-- (int) crateNumber;
-- (void) registerNotifications;
+- (void)    positionConnector:(ORConnector*)aConnector forCard:(id)aCard;
+- (int)     crateNumber;
+- (void)    registerNotifications;
 
 #pragma mark ¥¥¥Serial Ports
-- (void) scanForSerialPorts;
 - (void) sendOnPort:(int)index anArray:(NSArray*)someData;
 - (void) serialPortWriteProgress:(NSDictionary *)dataDictionary;
 
@@ -77,16 +72,16 @@
 - (void)	 encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ¥¥¥OROrderedObjHolding Protocol
-- (int) maxNumberOfObjects;
-- (int) objWidth;
-- (BOOL) slot:(int)aSlot excludedFor:(id)anObj;
+- (int)       maxNumberOfObjects;
+- (int)       objWidth;
+- (BOOL)      slot:(int)aSlot excludedFor:(id)anObj;
 - (NSString*) nameForSlot:(int)aSlot;
-- (NSRange) legalSlotsForObj:(id)anObj;
-- (int) slotAtPoint:(NSPoint)aPoint; 
-- (NSPoint) pointForSlot:(int)aSlot;
-- (void) place:(id)anObj intoSlot:(int)aSlot;
-- (int) slotForObj:(id)anObj;
-- (int) numberSlotsNeededFor:(id)anObj;
+- (NSRange)   legalSlotsForObj:(id)anObj;
+- (int)       slotAtPoint:(NSPoint)aPoint;
+- (NSPoint)   pointForSlot:(int)aSlot;
+- (void)      place:(id)anObj intoSlot:(int)aSlot;
+- (int)       slotForObj:(id)anObj;
+- (int)       numberSlotsNeededFor:(id)anObj;
 @end
 
 

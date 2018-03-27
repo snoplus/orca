@@ -3,7 +3,7 @@
 //  ORCA
 //
 //  Created by Mark Howe on Mon Feb 10 2003.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -31,15 +31,18 @@
 
 + (ORSerialPortList*) sharedSerialPortList;
 + (NSEnumerator*) portEnumerator;
+- (void) updatePortList;
 
-- (unsigned) count;
+- (NSUInteger) count;
 - (ORSerialPort*) objectAtIndex:(unsigned)index;
 - (ORSerialPort*) objectWithName:(NSString*) name;
-- (NSArray*) getPortList;
+- (NSInteger) indexOfObjectWithName:(NSString*) name;
+- (NSArray*) portList;
 
 - (NSString*) aliaseForPort:(ORSerialPort*)aPort;
 - (NSString*) aliaseForPortName:(NSString*)aPortName;
 - (void) assignAliase:(NSString*)anAliase forPort:(ORSerialPort*)aPort;
 
-
 @end
+
+extern NSString* ORSerialPortListChanged;

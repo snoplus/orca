@@ -23,6 +23,7 @@
 #import "ORSerialPortList.h"
 #import "ORSerialPort.h"
 #import "ORSerialPortModel.h"
+#import "ORUSB.h"
 
 @interface ORSerialPortController (private)
 - (void) populatePortListPopup;
@@ -53,12 +54,11 @@
 		else NSLog(@"Failed to load SerialPortControls.nib");
 	}
     else {
-		[self populatePortListPopup];	
+		//[self populatePortListPopup];	
 	}
 }
 
 #pragma mark •••Notifications
-
 - (void) registerNotificationObservers
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
@@ -74,14 +74,21 @@
                      selector : @selector(portStateChanged:)
                          name : ORSerialPortStateChanged
                        object : nil];
-                                              
-	[self updateWindow];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updatePortList:)
+                         name : ORSerialPortListChanged
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(popupIsAboutToOpen:)
+                         name : NSPopUpButtonWillPopUpNotification
+                       object : portListPopup];
 }
-
-
-
+    
 - (void) updateWindow
 {
+    [self updatePortList:nil];
     [self portNameChanged:nil];
     [self portStateChanged:nil];
 }
@@ -92,13 +99,30 @@
     [portListPopup setEnabled:!locked && !portOpen];
     [openPortButton setEnabled:!locked];
 }
-
+    
+- (void) popupIsAboutToOpen:(NSNotification*)aNote
+{
+    NSArray* portList = [[ORSerialPortList sharedSerialPortList]portList];
+    for (ORSerialPort *aPort in portList) {
+        NSString* portName = [aPort name];
+        [[portListPopup itemWithTitle:portName] setEnabled:![aPort isOpen]];
+    }
+}
+    
+- (void) updatePortList:(NSNotification*)aNote
+{
+    [self populatePortListPopup];
+  //  [self updateButtons];
+}
+    
 - (void) portStateChanged:(NSNotification*)aNotification
 {
     if(aNotification == nil || [aNotification object] == [[owner model] serialPort]){
-        if([[owner model] serialPort]){
+        ORSerialPort* aPort = [[owner model] serialPort];
+        if(aPort){
             [openPortButton setEnabled:YES];
-			
+            [[portListPopup itemWithTitle:[aPort name]] setEnabled:![aPort isOpen]];
+
             if([[[owner model] serialPort] isOpen]){
                 [openPortButton setTitle:@"Close"];
                 [portStateField setTextColor:[NSColor colorWithCalibratedRed:0.0 green:.8 blue:0.0 alpha:1.0]];
@@ -125,18 +149,16 @@
 {
 	if(aNote == nil || [aNote object] == [owner model]){
 		NSString* portName = [[owner model] portName];
-		
-		NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-		ORSerialPort *aPort;
-
 		[portListPopup selectItemAtIndex:0]; //the default
-		while (aPort = [enumerator nextObject]) {
+        NSArray* portList = [[ORSerialPortList sharedSerialPortList]portList];
+		for (ORSerialPort *aPort in portList) {
 			if([portName isEqualToString:[aPort name]]){
 				[portListPopup selectItemWithTitle:portName];
 				break;
 			}
 		}  
 		[self portStateChanged:nil];
+        [self updateButtons];
 	}
 }
 
@@ -148,10 +170,17 @@
 
 - (void) updateButtons;
 {
-	BOOL portOpen = [[[owner model] serialPort] isOpen];
-	BOOL locked = [self portLocked];
+	BOOL portOpen    = [[[owner model] serialPort] isOpen];
+	BOOL locked      = [self portLocked];
+    BOOL noSelection = [portListPopup indexOfSelectedItem]==0;
+
     [portListPopup setEnabled:!locked && !portOpen];
-    [openPortButton setEnabled:!locked];
+    [openPortButton setEnabled:!locked && !noSelection];
+    if(noSelection){
+        [openPortButton setTitle:@"---"];
+        [portStateField setTextColor:[NSColor blackColor]];
+        [portStateField setStringValue:@"---"];
+    }
 }
 
 #pragma mark •••Actions
@@ -164,20 +193,22 @@
 {
     [[owner model] openPort:![[[owner model] serialPort] isOpen]];
 }
-
 @end
 
 @implementation ORSerialPortController (private)
 - (void) populatePortListPopup
 {
-	NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-	ORSerialPort *aPort;
+    [portListPopup setAutoenablesItems:NO];
+
     [portListPopup removeAllItems];
     [portListPopup addItemWithTitle:@"--"];
-
-	while (aPort = [enumerator nextObject]) {
+    NSArray* serialPorts = [[ORSerialPortList sharedSerialPortList] portList];
+	for (ORSerialPort* aPort in serialPorts) {
         [portListPopup addItemWithTitle:[aPort name]];
-	}    
+	}
+    int index = [portListPopup indexOfItemWithTitle:[[owner model] portName]];
+    if(index>0)[portListPopup selectItemWithTitle:[[owner model] portName]];
+    else [portListPopup selectItemAtIndex:0];
 }
 @end
 

@@ -64,10 +64,11 @@ typedef  struct  {
 - (void) deviceAdded:(io_iterator_t) iterator;
 - (void) deviceNotification:(void*)refCon
 					service:(io_service_t) service
-						messageType:(natural_t) messageType
-						messageArgument:(void*) messageArgument;
+                messageType:(natural_t) messageType
+            messageArgument:(void*) messageArgument;
+
 - (IOReturn) _configureAnchorDevice:(IOUSBDeviceInterface182**)dev;
-- (IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*)userInfo;
+- (IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*) usbCallbackData supported:(BOOL)supported;
 
 
 - (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(unsigned long)aProductID;
@@ -93,7 +94,6 @@ extern NSString* ORUSBDevicesAdded;
 extern NSString* ORUSBDevicesRemoved;
 extern NSString* ORUSBInterfaceRemoved;
 extern NSString* ORUSBInterfaceAdded;
-extern NSString* ORUSBInterfacesChanged;
 
 @interface NSObject (multipleIDs)
 - (NSArray*) vendorIDs;

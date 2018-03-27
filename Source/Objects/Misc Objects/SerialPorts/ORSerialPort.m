@@ -3,7 +3,7 @@
 //  ORCA
 //
 //  Created by Mark Howe on Mon Feb 10 2003.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -152,7 +152,7 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 {
 	const char* thePath = [bsdPath cStringUsingEncoding:NSASCIIStringEncoding];
 	fileDescriptor = open(thePath, O_RDWR | O_NOCTTY); // | O_NONBLOCK);
-	NSLog(@"opened: %@ (file descriptor:%d)\n", bsdPath, fileDescriptor);
+	NSLog(@"opened: %@\n", bsdPath);
 	
 	if (fileDescriptor < 0){
 		NSLog(@"Error opening serial port %@ - %s(%d).\n", bsdPath, strerror(errno), errno);
@@ -190,35 +190,37 @@ error:
 	//int err;
 	// Traditionally it is good to reset a serial port back to
 	// the state in which you found it.  Let's continue that tradition.
-	if (fileDescriptor >= 0) {
-        [self stopReadInBackground];
-		[closeLock lock];
-		// kill pending read by setting O_NONBLOCK
-		if (fcntl(fileDescriptor, F_SETFL, fcntl(fileDescriptor, F_GETFL, 0) | O_NONBLOCK) == -1){
-			NSLog(@"Error clearing O_NONBLOCK %@ - %s(%d).\n", bsdPath, strerror(errno), errno);
-		}
-		
-		if (tcsetattr(fileDescriptor, TCSANOW, originalOptions) == -1){
-			NSLog(@"Error resetting tty attributes - %s(%d).\n", 				strerror(errno), errno);
-		}
-		
-		[readTarget release];
-		readTarget = nil;
-		
-		[readTimer release];
-		readTimer = nil;
-		
-		[fileHandle closeFile];
-		[fileHandle release];
-		fileHandle = nil;
-		
-        NSLog(@"closed: %@ (file descriptor:%d)\n", bsdPath, fileDescriptor);
-		close(fileDescriptor);
-		
-		fileDescriptor = -1;
-		[closeLock unlock];
-        [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortStateChanged object:self];
-	}
+    @synchronized(self){
+        if (fileDescriptor >= 0) {
+            [self stopReadInBackground];
+            [closeLock lock];
+            // kill pending read by setting O_NONBLOCK
+            if (fcntl(fileDescriptor, F_SETFL, fcntl(fileDescriptor, F_GETFL, 0) | O_NONBLOCK) == -1){
+                NSLog(@"Error clearing O_NONBLOCK %@ - %s(%d).\n", bsdPath, strerror(errno), errno);
+            }
+            
+            if (tcsetattr(fileDescriptor, TCSANOW, originalOptions) == -1){
+                NSLog(@"Error resetting tty attributes - %s(%d).\n", 				strerror(errno), errno);
+            }
+            
+            [readTarget release];
+            readTarget = nil;
+            
+            [readTimer release];
+            readTimer = nil;
+            
+            [fileHandle closeFile];
+            [fileHandle release];
+            fileHandle = nil;
+            
+            NSLog(@"closed: %@\n", bsdPath);
+            close(fileDescriptor);
+            
+            fileDescriptor = -1;
+            [closeLock unlock];
+            [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORSerialPortStateChanged object:self];
+        }
+    }
 }
 
 -(void)drainInput
@@ -244,7 +246,7 @@ error:
 
 // read and write serial port settings through a dictionary
 
-- (void)buildOptionsDictionary
+- (void) buildOptionsDictionary
 {
 	[optionsDictionary removeAllObjects];
 	[optionsDictionary setObject:[self name]
@@ -272,9 +274,7 @@ error:
 	if ([self testCAROutputFlowControl]) [optionsDictionary setObject:@"CAR" forKey:ORSerialOptionOutputFlowControl];
 	
 	if ([self testEchoEnabled]) [optionsDictionary setObject:@"YES" forKey:ORSerialOptionEcho];
-	
 }
-
 
 - (NSDictionary*) getOptions
 {
@@ -285,7 +285,11 @@ error:
 			[self buildOptionsDictionary];
 			[self close];
 		}
+        else if(options) [self buildOptionsDictionary];
 	}
+    else if(options){
+        [self buildOptionsDictionary];
+    }
 	return [NSMutableDictionary dictionaryWithDictionary:optionsDictionary];
 }
 
@@ -358,7 +362,6 @@ error:
 		case 8:	options->c_cflag |= CS8;    break;
 	}
 }
-
 
 -(bool)testParity
 {
@@ -518,6 +521,8 @@ error:
 	// if CommitChanges returns NO, look here for further info
 	return lastError;
 }
-
-
+- (NSString*)description
+{
+    return [self name];
+}
 @end

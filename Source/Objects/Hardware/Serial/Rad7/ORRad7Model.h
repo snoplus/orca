@@ -118,6 +118,7 @@ enum {
 {
 @private
 	NSString*       portName;
+    NSString*       lastOpenPortName;
 	BOOL            portWasOpen;
 	ORSerialPort*   serialPort;
 	ORSafeQueue* cmdQueue;
@@ -173,6 +174,7 @@ enum {
 - (void) dealloc;
 - (void) registerNotificationObservers;
 - (void) dataReceived:(NSNotification*)note;
+- (void) portsChanged:(NSNotification*)aNote;
 
 #pragma mark ***Accessors
 - (NSString*)statusString;
@@ -236,6 +238,7 @@ enum {
 - (void) setPortWasOpen:(BOOL)aPortWasOpen;
 - (NSString*) portName;
 - (void) setPortName:(NSString*)aPortName;
+- (void) setLastOpenPortName:(NSString*)aPortName;
 - (void) openPort:(BOOL)state;
 - (unsigned long) timeMeasured;
 - (NSDictionary*) statusDictionary;
@@ -312,10 +315,7 @@ extern NSString* ORRad7ModelRecycleChanged;
 extern NSString* ORRad7ModelCycleTimeChanged;
 extern NSString* ORRad7ModelProtocolChanged;
 extern NSString* ORRad7ModelPollTimeChanged;
-extern NSString* ORRad7ModelSerialPortChanged;
 extern NSString* ORRad7Lock;
-extern NSString* ORRad7ModelPortNameChanged;
-extern NSString* ORRad7ModelPortStateChanged;
 extern NSString* ORRad7ModelStatusChanged;
 extern NSString* ORRad7ModelUpdatePlot;
 extern NSString* ORRad7ModelCommandStateChanged;

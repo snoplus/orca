@@ -40,8 +40,11 @@
 - (BOOL) portLocked;
 
 #pragma mark •••Interface Management
+- (void) popupIsAboutToOpen:(NSNotification*)aNote;
 - (void) portNameChanged:(NSNotification*)aNote;
 - (void) portStateChanged:(NSNotification*)aNote;
+- (void) updatePortList:(NSNotification*)aNote;
+- (void) popupIsAboutToOpen:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) portListAction:(id) sender;

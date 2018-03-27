@@ -23,11 +23,13 @@
 #import "ORSerialPort.h"
 #import "ORSerialPortAdditions.h"
 #import "ORSerialPortList.h"
+#import "ORUSB.h"
 
 #pragma mark •••External Strings
 NSString* ORSerialPortModelSerialPortChanged	= @"ORSerialPortModelSerialPortChanged";
 NSString* ORSerialPortModelPortNameChanged		= @"ORSerialPortModelPortNameChanged";
-NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChanged";
+NSString* ORSerialPortModelPortStateChanged     = @"ORSerialPortModelPortStateChanged";
+NSString* ORSerialPortModelSerialListChanged     = @"ORSerialPortModelSerialListChanged";
 
 @implementation ORSerialPortModel
 
@@ -42,9 +44,7 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [portName release];
-
     [serialPort release];
-
 	[super dealloc];
 }
 
@@ -52,9 +52,15 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 {
 	NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 	[notifyCenter removeObserver:self];
+    
     [notifyCenter addObserver : self
                      selector : @selector(dataReceived:)
                          name : ORSerialPortDataReceived
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(portsChanged:)
+                         name : ORSerialPortListChanged
                        object : nil];
 }
 
@@ -90,12 +96,30 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortNameChanged object:self];
 }
 
+- (void) portsChanged:(NSNotification*)aNote
+{
+    NSArray* portList = [[ORSerialPortList sharedSerialPortList] portList];
+    BOOL portIsGone = YES;
+    for ( ORSerialPort* aPort in portList) {
+        if([portName isEqualToString:[aPort name]]){
+            portIsGone = NO;
+            break;
+        }
+    }
+    if(portIsGone){
+        [[self undoManager] disableUndoRegistration];
+        [self setPortName:nil];
+        portWasOpen = NO;
+        [self setSerialPort:nil];
+        [[self undoManager] enableUndoRegistration];
+   }
+}
+
 - (void) openPortIfNeeded
 {
     BOOL valid = NO;
-    NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-    ORSerialPort *aPort;
-    while (aPort = [enumerator nextObject]) {
+    NSArray* portList = [[ORSerialPortList sharedSerialPortList] portList];
+    for ( ORSerialPort* aPort in portList) {
         if([portName isEqualToString:[aPort name]]){
             [self setSerialPort:aPort];
             if(portWasOpen){
@@ -134,6 +158,7 @@ NSString* ORSerialPortModelPortStateChanged		= @"ORSerialPortModelPortStateChang
 {
 	//subclasses should override to process the data their way
 }
+
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder

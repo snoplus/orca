@@ -27,6 +27,8 @@
 #import "ORDataTypeAssigner.h"
 #import "ORDataPacket.h"
 #import "ORSafeQueue.h"
+#import "ORUSB.h"
+#import "ORSerialPortModel.h"
 
 #pragma mark ***External Strings
 NSString* ORRad7ModelRadLinkLoadingChanged = @"ORRad7ModelRadLinkLoadingChanged";
@@ -53,9 +55,6 @@ NSString* ORRad7ModelRecycleChanged		= @"ORRad7ModelRecycleChanged";
 NSString* ORRad7ModelCycleTimeChanged	= @"ORRad7ModelCycleTimeChanged";
 NSString* ORRad7ModelProtocolChanged	= @"ORRad7ModelProtocolChanged";
 NSString* ORRad7ModelPollTimeChanged	= @"ORRad7ModelPollTimeChanged";
-NSString* ORRad7ModelSerialPortChanged	= @"ORRad7ModelSerialPortChanged";
-NSString* ORRad7ModelPortNameChanged	= @"ORRad7ModelPortNameChanged";
-NSString* ORRad7ModelPortStateChanged	= @"ORRad7ModelPortStateChanged";
 NSString* ORRad7ModelStatusChanged		= @"ORRad7ModelStatusChanged";
 NSString* ORRad7ModelUpdatePlot			= @"ORRad7ModelUpdatePlot";
 NSString* ORRad7ModelCommandStateChanged= @"ORRad7ModelCommandStateChanged";
@@ -211,6 +210,31 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
                      selector : @selector(dataReceived:)
                          name : ORSerialPortDataReceived
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(portsChanged:)
+                         name : ORSerialPortListChanged
+                       object : nil];
+}
+
+- (void) portsChanged:(NSNotification*)aNote
+{
+    NSEnumerator* enumerator = [ORSerialPortList portEnumerator];
+    ORSerialPort* aPort;
+    BOOL portIsGone = YES;
+    while (aPort = [enumerator nextObject]) {
+        if([portName isEqualToString:[aPort name]]){
+            portIsGone = NO;
+            break;
+        }
+    }
+    if(portIsGone){
+        [[self undoManager] disableUndoRegistration];
+        [self setPortName:nil];
+        portWasOpen = NO;
+        [self setSerialPort:nil];
+        [[self undoManager] enableUndoRegistration];
+    }
 }
 
 - (void) dataReceived:(NSNotification*)note
@@ -730,26 +754,29 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     if(![aPortName isEqualToString:portName]){
         [portName autorelease];
         portName = [aPortName copy];    
-		
         BOOL valid = NO;
-        NSEnumerator *enumerator = [ORSerialPortList portEnumerator];
-        ORSerialPort *aPort;
-        while (aPort = [enumerator nextObject]) {
-            if([portName isEqualToString:[aPort name]]){
-                [self setSerialPort:aPort];
-                if(portWasOpen){
-                    [self openPort:YES];
-				}
-                valid = YES;
-                break;
+        if(portName){
+            NSArray* serialPorts = [[ORSerialPortList sharedSerialPortList] portList];
+            for (ORSerialPort* aPort in serialPorts) {
+                if([portName isEqualToString:[aPort name]]){
+                    [self setSerialPort:aPort];
+                    if(portWasOpen){
+                        [self openPort:YES];
+                    }
+                    valid = YES;
+                    break;
+                }
             }
-        } 
+        }
         if(!valid){
             [self setSerialPort:nil];
         }       
     }
+    else {
+        [self setPortWasOpen:NO];
+    }
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelPortNameChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortModelPortNameChanged object:self];
 }
 
 - (ORSerialPort*) serialPort
@@ -763,7 +790,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [serialPort release];
     serialPort = aSerialPort;
 	
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelSerialPortChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortStateChanged object:self];
 }
 
 - (void) openPort:(BOOL)state
@@ -778,7 +805,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     }
     else [serialPort close];
     portWasOpen = [serialPort isOpen];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelPortStateChanged object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortStateChanged object:self];
 }
 
 - (NSDictionary*) statusDictionary

@@ -32,6 +32,8 @@
 #include <IOKit/IOBSD.h>
 #import "SynthesizeSingleton.h"
 
+NSString* ORSerialPortListChanged = @"ORSerialPortListChanged";
+
 @implementation ORSerialPortList
 
 SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
@@ -43,6 +45,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 
 -(kern_return_t)findSerialPorts:(io_iterator_t*) matchingServices
 {
+    
     mach_port_t			masterPort;
 
     kern_return_t kernResult = IOMasterPort(MACH_PORT_NULL, &masterPort);
@@ -69,7 +72,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
 }
 
 
--(ORSerialPort*) getNextSerialPort:(io_iterator_t)serialPortIterator
+- (ORSerialPort*) getNextSerialPort:(io_iterator_t)serialPortIterator
 {
     io_object_t		serialService;
     ORSerialPort*   aSerialPort = nil;
@@ -99,64 +102,109 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
     else return NULL;
 }
 
-
--(id)init
+- (id)init
 {
-    /*
-     *	error number layout as follows (see mach/error.h):
-     *
-     *	hi		 		       lo
-     *	| system(6) | subsystem(12) | code(14) |
-     */
-	self = [super init];
-	
-	portList = [[NSMutableArray array] retain];
-
-    io_iterator_t	serialPortIterator;
-	[self findSerialPorts:&serialPortIterator];
-	ORSerialPort* serialPort;
-	do { 
-		serialPort = [self getNextSerialPort:serialPortIterator];
-		if (serialPort != NULL) {
-			if(	[[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound &&
-				[[serialPort name] rangeOfString:@"KeySerial"].location == NSNotFound ){
-				[portList addObject:serialPort];
-			}
-		}
-	}
-	while (serialPort != NULL);
-	IOObjectRelease(serialPortIterator);	// Release the iterator.
-
+ 	self = [super init];
+    [self updatePortList];
     return self;
 }
 
--(NSArray*) getPortList;
+- (void) updatePortList
 {
-    return [[portList copy] autorelease];
+    if(!portList)    portList = [[NSMutableArray array] retain];
+    io_iterator_t    serialPortIterator;
+    [self findSerialPorts:&serialPortIterator];
+    ORSerialPort* serialPort;
+    NSMutableArray* newList = [NSMutableArray array];
+
+    do {
+        serialPort = [self getNextSerialPort:serialPortIterator];
+        if (serialPort != NULL) {
+            if( [[serialPort name] rangeOfString:@"Bluetooth"].location == NSNotFound &&
+                [[serialPort name] rangeOfString:@"KeySerial"].location == NSNotFound ){
+                [newList addObject:serialPort];
+            }
+        }
+    } while (serialPort != NULL);
+    IOObjectRelease(serialPortIterator);    // Release the iterator.
+    
+    BOOL anyChanges = NO;
+    //add any new ports to the old list
+    for(ORSerialPort* portNew in newList){
+        NSString* nameNew = [portNew name];
+        BOOL inList = NO;
+        for(ORSerialPort* portOld in portList ){
+            NSString* nameOld = [portOld name];
+            if([nameOld isEqualToString:nameNew]){
+                inList = YES;
+                break;
+            }
+        }
+        if(!inList){
+            [portList addObject:portNew];
+            anyChanges = YES;
+        }
+    }
+    
+    //anything in the old list that is missing from the new list, remove it
+    NSMutableArray* portsToDelete = [NSMutableArray array];
+    for(ORSerialPort* portOld in portList ){
+        NSString* nameOld = [portOld name];
+        BOOL inList = NO;
+        for(ORSerialPort* portNew in newList){
+            NSString* nameNew = [portNew name];
+            if([nameOld isEqualToString:nameNew]){
+                inList = YES;
+            }
+        }
+        if(!inList){
+            [portsToDelete addObject:portOld];
+            anyChanges = YES;
+        }
+    }
+    [portList removeObjectsInArray:portsToDelete];
+    if(anyChanges){
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortListChanged object:self userInfo:nil];
+    }
 }
 
--(unsigned)count
+- (NSArray*) portList;
+{
+    [self updatePortList];
+    return [[portList copy] autorelease]; //return copy, since the list could change at anytime
+}
+
+- (NSUInteger) count
 {
     return [portList count];
 }
 
--(ORSerialPort*) objectAtIndex:(unsigned)index
+- (ORSerialPort*) objectAtIndex:(unsigned)index
 {
-    return [portList objectAtIndex:index];
+    if(index<[portList count]) return [portList objectAtIndex:index];
+    else return nil;
 }
 
--(ORSerialPort*) objectWithName:(NSString*) name
+- (ORSerialPort*) objectWithName:(NSString*) name
 {
-	ORSerialPort *result = NULL;
-	int i;
-
-	for (i=0; i<[portList count]; i++){
-        if ([[(ORSerialPort*) [portList objectAtIndex:i] name] isEqualToString:name]){
-			result = (ORSerialPort*) [portList objectAtIndex:i];
-			break;
+	for (ORSerialPort* aPort in portList){
+        if ([[aPort name] isEqualToString:name]){
+            return aPort;
 		}
     }
-	return result;
+	return nil;
+}
+
+- (NSInteger) indexOfObjectWithName:(NSString*) name
+{
+    NSUInteger i = 0;
+    for (ORSerialPort* aPort in portList){
+        if ([[aPort name] isEqualToString:name]){
+            return i;
+        }
+        else i++;
+    }
+    return -1;
 }
 
 #pragma mark ¥¥¥Port Aliases
