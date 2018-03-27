@@ -27,7 +27,7 @@
 @interface ORProcessThread : NSObject {
     NSMutableSet*    endNodes;
     BOOL             running;
-    NSConditionLock* _cancelled;
+    BOOL             canceled;
     NSArray*         allProcessElements;
     NSArray*         allEndNodes;
     NSArray*         allProcesses;

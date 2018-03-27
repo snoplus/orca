@@ -76,7 +76,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 		[crBits[i] release];
 	}
     [endNodes release];
-    [_cancelled release];
     [super dealloc];
 }
 
@@ -276,9 +275,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 - (void) start
 {
     if(!running){
-        if( _cancelled ) [ _cancelled release ];
-        _cancelled  = [[ NSConditionLock alloc ] initWithCondition: NO ];
-		
+        canceled = NO;
 		int i;
 		for(i=0;i<8;i++)crBits[i] = 0L;
 		
@@ -301,8 +298,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	
 	float totalTime = 0;
+    [self markAsCanceled];
     while([self isRunning]){
-		[self markAsCanceled];
+		//[self markAsCanceled];
 		
 		[NSThread sleepUntilDate:[[NSDate date] dateByAddingTimeInterval:.05]];
 		totalTime += .05;
@@ -328,16 +326,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
     inputs = nil;
 }
 
--(BOOL)cancelled
+-(BOOL) cancelled
 {
-    return [_cancelled condition];
+    return canceled;
 }
 
 - (void) markAsCanceled
 {
-    if( [ _cancelled tryLockWhenCondition: NO ] ){
-        [ _cancelled unlockWithCondition: YES ];
-    }
+    canceled = YES;
 }
 
 - (void) processThread
@@ -375,7 +371,6 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessThread);
         [pool release];
     }while(![ self cancelled ]);
 	running = NO;
-    
 }
 @end
 
