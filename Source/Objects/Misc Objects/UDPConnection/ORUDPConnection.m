@@ -358,10 +358,10 @@ static void SocketReadCallback(CFSocketRef s, CFSocketCallBackType type, CFDataR
             if ((addrPtr->sa_family == AF_INET)) {
                 success = [self setupSocketConnectedToAddress:address port:[self port] error:&error];
                 if (success) {
-                    CFDataRef hostAddress = CFSocketCopyPeerAddress(self->_cfSocket);
-                    assert(hostAddress != NULL);
-                    self.hostAddress = (__bridge NSData *) hostAddress;
-                    CFRelease(hostAddress);
+                    CFDataRef hostAdr = CFSocketCopyPeerAddress(self->_cfSocket);
+                    assert(hostAdr != NULL);
+                    self.hostAddress = (__bridge NSData *) hostAdr;
+                    CFRelease(hostAdr);
                 }
             }
             if (success) {
@@ -408,11 +408,11 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
     }
 }
 
-- (void) startConnectedToHostName:(NSString *)hostName port:(NSUInteger)port
+- (void) startConnectedToHostName:(NSString *)aHostName port:(NSUInteger)aPort
 // See comment in header.
 {
-    assert(hostName != nil);
-    assert( (port > 0) && (port < 65536) );
+    assert(aHostName != nil);
+    assert( (aPort > 0) && (aPort < 65536) );
     
     assert(self.port == 0);     // don't try and start a started object
     if (self.port == 0) {
@@ -420,7 +420,7 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
         
         assert(self->_cfHost == NULL);
         
-        self->_cfHost = CFHostCreateWithName(NULL, (__bridge CFStringRef) hostName);
+        self->_cfHost = CFHostCreateWithName(NULL, (__bridge CFStringRef) aHostName);
         assert(self->_cfHost != NULL);
         
         CFHostSetClient(self->_cfHost, HostResolveCallback, &context);
@@ -430,8 +430,8 @@ static void HostResolveCallback(CFHostRef theHost, CFHostInfoType typeInfo, cons
         CFStreamError       streamError;
         Boolean success = CFHostStartInfoResolution(self->_cfHost, kCFHostAddresses, &streamError);
         if (success) {
-            self.hostName = hostName;
-            self.port = port;
+            self.hostName = aHostName;
+            self.port = aPort;
             // ... continue in HostResolveCallback
         }
         else {
