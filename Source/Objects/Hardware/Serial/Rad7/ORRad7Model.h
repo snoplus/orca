@@ -118,7 +118,6 @@ enum {
 {
 @private
 	NSString*       portName;
-    NSString*       lastOpenPortName;
 	BOOL            portWasOpen;
 	ORSerialPort*   serialPort;
 	ORSafeQueue* cmdQueue;
