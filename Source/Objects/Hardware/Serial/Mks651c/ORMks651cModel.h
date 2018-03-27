@@ -33,7 +33,7 @@
         NSString*			lastRequest;
         ORSafeQueue*		cmdQueue;
 		float				pressure;
-		float				setPoint[4];
+		float				setPoint[5];
 		float               leadValue[5];
 		float               gainValue[5];
 		int					setPointType[5];
