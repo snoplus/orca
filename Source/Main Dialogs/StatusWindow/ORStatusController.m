@@ -967,6 +967,27 @@ void NSLogFont(NSFont* aFont,NSString* s,...)
 	[pool release];
 }
 
+void NSLogMono(NSString* s,...)
+{
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    @try {
+        va_list myArgs;
+        va_start(myArgs,s);
+        NSFont* aFont = [NSFont fontWithName:@"Monaco" size:11];
+        NSAttributedString* s1 = [[[NSAttributedString alloc]
+                                   initWithString:[[[NSString alloc] initWithFormat:s
+                                                                             locale:nil
+                                                                          arguments:myArgs] autorelease]
+                                   attributes:[NSDictionary dictionaryWithObject:aFont
+                                                                          forKey:NSFontAttributeName ]] autorelease];
+        va_end(myArgs);
+        [sharedStatusController printAttributedString:s1];
+    }
+    @catch(NSException* localException) {
+    }
+    [pool release];
+}
+
 //----------------------------------------------------------------------------------------------------
 //LogError
 //	a helper function to redirect a call to logError to a logger defined by the NSApp delegate
