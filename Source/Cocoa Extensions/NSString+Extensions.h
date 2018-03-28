@@ -3,7 +3,7 @@
 //  Orca
 //
 //  Created by Mark Howe on Wed Dec 04 2002.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -30,6 +30,9 @@ typedef enum {
 } LineEndingType;
 
 @interface NSString (OR_NSStringWithExtensions)
+- (NSString*) rightJustified:(NSUInteger)aWidth;
+- (NSString*) leftJustified:(NSUInteger)aWidth;
+- (NSString*) centered:(NSUInteger)aWidth;
 - (NSString*) trimSpacesFromEnds;
 - (NSString*) removeExtraSpaces;
 -(NSString*) removeSpaces;

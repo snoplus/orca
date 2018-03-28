@@ -23,7 +23,24 @@
 
 @implementation NSString (OR_NSStringWithExtensions)
 
+- (NSString*) rightJustified:(NSUInteger)aWidth
+{
+    return [NSString stringWithFormat:@"%*s", aWidth,[self UTF8String]];
+}
 
+- (NSString*) leftJustified:(NSUInteger)aWidth
+{
+    return [NSString stringWithFormat:@"%-*s", aWidth,[self UTF8String]];
+}
+- (NSString*) centered:(NSUInteger)aWidth
+{
+    int len = [self length];
+    if(len >= aWidth)return self;
+    else {
+        int w = (aWidth - len)/2;
+        return [[self leftJustified:len+w] rightJustified:aWidth];
+    }
+}
 - (NSString*) trimSpacesFromEnds
 {
 	return [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -194,6 +211,7 @@
 {
     return [[NSDecimalNumber decimalNumberWithString:self] unsignedShortValue];
 }
+
 - (unsigned int) unsignedIntValue
 {
     return [[NSDecimalNumber decimalNumberWithString:self] unsignedIntValue];
@@ -212,7 +230,6 @@
 + (NSString*) stringWithFormat:(NSString*)a parameters:(va_list)valist;
 {
     return [[[NSString alloc] initWithFormat:a arguments:valist] autorelease];
-
 }
 
 @end
@@ -256,9 +273,7 @@
             }
         }
     }
-    
     return allStrings;
-    
 }
 
 + (NSString*)scanString:(NSString *)string
@@ -280,8 +295,6 @@
         @catch(NSException* e){
         }
     }
-    
     return scanString;
-    
 }
 @end
