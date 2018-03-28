@@ -59,6 +59,12 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
 }
 
 #pragma mark ***Accessors
+
+- (void) reset{
+    [self writeData:[self resetCommand]];
+    [self writeData:[self errMessgOffCommand]];  // this is written to SynClock flash and needs to be activate only once for a new device (2018-03-28 JH.) (dont use more than 100'000 times to save the synclocks flash memory)
+}
+
 - (BOOL) statusPoll
 {
     return statusPoll;
@@ -405,6 +411,50 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     //}
 }
 
+
+- (NSDictionary*) resetCommand
+{
+    unsigned char cmdData[7];
+    cmdData[0] = 'R';
+    cmdData[1] = 'E';
+    cmdData[2] = 'S';
+    cmdData[3] = 'E';
+    cmdData[4] = 'T';
+    cmdData[5] = '\r';
+    cmdData[6] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:7],
+                                   @"device"    : ORSynClock,
+                                   @"replySize" : @20
+                                   };
+    NSLog(@"SynClockModel::resetCommand! \n");
+    
+    return commandDict;
+}
+- (NSDictionary*) errMessgOffCommand
+{
+    unsigned char cmdData[9];
+    cmdData[0] = 'M';
+    cmdData[1] = 'C';
+    cmdData[2] = 'S';
+    cmdData[3] = '0';
+    cmdData[4] = '7';
+    cmdData[5] = '0';  // switch off '?' reply for unknown command
+    cmdData[6] = '0';
+    cmdData[7] = '\r';
+    cmdData[8] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:9],
+                                   @"device"    : ORSynClock,
+                                   @"replySize" : @2 // todo
+                                   };
+    NSLog(@"SynClockModel::errMessgOffCommand! (!'?') \n");
+    
+    return commandDict;
+}
+
 - (NSDictionary*) alarmWindowCommand
 {
     unsigned char cmdData[0];
@@ -498,7 +548,7 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
 - (void) updatePoll
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePoll) object:nil];
-    float delay = 1.0; // Seconds
+    float delay = 4.0; // Seconds
     if(statusPoll && [refClock portIsOpen]) {
         [self requestStatus];
         [self performSelector:@selector(updatePoll) withObject:nil afterDelay:delay];

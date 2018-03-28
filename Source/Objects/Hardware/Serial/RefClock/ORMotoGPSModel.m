@@ -124,7 +124,7 @@ extern NSString* ORMotoGPS;
 #define chanDatIdx 57
 #define relSigStrIdx 2
 #define antSenseIdx 130
-#define antSenseBitMask 0x03
+#define antSenseBitMask 0x06
 #define tempIdx 139
 
 - (void) processResponse:(NSData*)receivedData forRequest:(NSDictionary*)lastRequest;
@@ -295,7 +295,7 @@ extern NSString* ORMotoGPS;
 - (void) updatePoll
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updatePoll) object:nil];
-    float delay = 3.0; // Seconds
+    float delay = 4.0; // Seconds
     if(statusPoll){
         [self requestStatus];
         [self performSelector:@selector(updatePoll) withObject:nil afterDelay:delay];

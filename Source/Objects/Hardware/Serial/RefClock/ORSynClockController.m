@@ -188,6 +188,7 @@
 
 - (IBAction) resetAction:(id)sender
 {
+    [model reset];
 }
 @end
 
