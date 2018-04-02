@@ -142,8 +142,6 @@
     NSSize  settingSize;
     NSSize  rateSize;
     
-    IBOutlet NSMatrix* gate1EnableMaskMatrix;
-    IBOutlet NSMatrix* gate2EnableMaskMatrix;
     IBOutlet NSMatrix* internalGateLengthMatrix;
     IBOutlet NSMatrix* internalCoinGateLengthMatrix;
 }
@@ -235,8 +233,6 @@
 
 - (void) temperatureChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
-- (void) gate1EnableMaskChanged:(NSNotification*)aNote;
-- (void) gate2EnableMaskChanged:(NSNotification*)aNote;
 - (void) internalGateLenChanged:(NSNotification*)aNote;
 - (void) internalCoinGateLenChanged:(NSNotification*)aNote;
 

@@ -76,8 +76,6 @@
         [[riseTimeMatrix                    cellAtRow:i column:0] setTag:i];
         [[trigBothEdgesMatrix               cellAtRow:i column:0] setTag:i];
         [[intHeTrigOutPulseMatrix           cellAtRow:i column:0] setTag:i];
-        [[gate1EnableMaskMatrix             cellAtRow:i column:0] setTag:i];
-        [[gate2EnableMaskMatrix             cellAtRow:i column:0] setTag:i];
         [[triggerDelayMatrix                cellAtRow:i column:0] setTag:i];
     }
     int tag = 0;
@@ -552,16 +550,6 @@
                         object: model];
 
     [notifyCenter addObserver : self
-                     selector : @selector(gate1EnableMaskChanged:)
-                         name : ORSIS3316Gate1EnableMaskChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(gate2EnableMaskChanged:)
-                         name : ORSIS3316Gate2EnableMaskChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
                      selector : @selector(internalGateLenChanged:)
                          name : ORSIS3316InternalGateLenChanged
                         object: model];
@@ -683,8 +671,6 @@
     [self lemoCoMaskChanged:nil];
     [self endAddressSuppressionChanged:nil];
     
-    [self gate1EnableMaskChanged:nil];
-    [self gate2EnableMaskChanged:nil];
     [self internalGateLenChanged:nil];
     [self internalCoinGateLenChanged:nil];
 
@@ -693,24 +679,6 @@
 }
 
 #pragma mark •••Interface Management
-- (void) gate1EnableMaskChanged:(NSNotification*)aNote
-{
-    unsigned long aMask = [model gate1EnableMask];
-    int i;
-    for(i=0;i<kNumSIS3316Channels; i++){
-        [[gate1EnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
-    }
-}
-
-- (void) gate2EnableMaskChanged:(NSNotification*)aNote
-{
-    unsigned long aMask = [model gate2EnableMask];
-    int i;
-    for(i=0;i<kNumSIS3316Channels; i++){
-        [[gate2EnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
-    }
-
-}
 
 - (void) internalGateLenChanged:(NSNotification*)aNote
 {
@@ -2249,30 +2217,6 @@
 - (IBAction) loadDefaults:(id)sender
 {
     [model setDefaults];
-}
-
-- (IBAction)gate1EnabledMaskAction:(id)sender
-{
-    unsigned long aMask = [model gate1EnableMask];
-    int tag    = [[sender selectedCell] tag];
-    int aValue = [sender intValue];
-    if(aValue==0)aMask &= ~(0x1<<tag);
-    else         aMask |= (0x1<<tag);
-    
-    [model setGate1EnableMask:aMask];
-
-}
-
-- (IBAction)gate2EnabledMaskAction:(id)sender
-{
-    unsigned long aMask = [model gate2EnableMask];
-    int tag    = [[sender selectedCell] tag];
-    int aValue = [sender intValue];
-    if(aValue==0)aMask &= ~(0x1<<tag);
-    else         aMask |= (0x1<<tag);
-    
-    [model setGate2EnableMask:aMask];
-
 }
 
 - (IBAction) internalGateLenAction:(id)sender

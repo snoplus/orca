@@ -120,8 +120,6 @@ NSString* ORSIS3316LemoCoMaskChanged                = @"ORSIS3316LemoCoMaskChang
 NSString* ORSIS3316LemoUoMaskChanged                = @"ORSIS3316LemoUoMaskChanged";
 NSString* ORSIS3316LemoToMaskChanged                = @"ORSIS3316LemoToMaskChanged";
 
-NSString* ORSIS3316Gate1EnableMaskChanged           = @"ORSIS3316Gate1EnableMaskChanged";
-NSString* ORSIS3316Gate2EnableMaskChanged           = @"ORSIS3316Gate2EnableMaskChanged";
 NSString* ORSIS3316InternalGateLenChanged           = @"ORSIS3316InternalGateLenChanged";
 NSString* ORSIS3316InternalCoinGateLenChanged       = @"ORSIS3316InternalCoinGateLenChanged";
 
@@ -159,7 +157,7 @@ static ORSIS3316RegisterInformation singleRegister[kNumberSingleRegs] = {
     
     {0x00000040,    @"ADC Clock",                               YES,    YES,    NO,   kAdcClockI2CReg},
     {0x00000044,    @"MGT1 Clock",                              YES,    YES,    NO,   kMgt1ClockI2CReg},
-    {0x00000048,    @" MGT2 CLock",                             YES,    YES,    NO,   kMgt2ClockI2CReg},
+    {0x00000048,    @"MGT2 CLock",                              YES,    YES,    NO,   kMgt2ClockI2CReg},
     {0x0000004C,    @"DDR3 Clock",                              YES,    YES,    NO,   kDDR3ClockI2CReg},
     
     {0x00000050,    @"ADC Sample CLock distribution control",   YES,    YES,    NO,   kAdcSampleClockDistReg},
@@ -506,8 +504,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         [self setAccGate8Len:  iadc withValue:100];
         [self setAccGate8Start:iadc withValue:100+7*100];
     }
-    gate1EnableMask = 0x0;
-    gate2EnableMask = 0x0;
     [self setEventConfigMask:0x5];
     [self setTermination:1];
     [self setGain:1];
@@ -1033,7 +1029,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (BOOL) addressThresholdFlag
 {
     unsigned long aValue =  [self readLongFromAddress:[self singleRegister:kAcqControlStatusReg]];
-    return (aValue & (0x1<<19)) != 0;
+    return (aValue >> 19) & 0x1;
 }
 
 - (BOOL) sampleLogicIsBusy
@@ -1047,7 +1043,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     [self writeLong:acquisitionControlMask toAddress:[self singleRegister:kAcqControlStatusReg]];
 }
 
-- (void) readAcquisitionRegister:(BOOL)verbose
+- (unsigned long) readAcquisitionRegister:(BOOL)verbose
 {
     NSString* acquisitionString[32] = {
         @"Single Bank Mode (reserved)                                   ",
@@ -1093,9 +1089,10 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     if(verbose){
         for(i =0; i < 32; i++) {
             unsigned long theAcquisitionControl  = ((aValue >> i) & 0x1);
-            NSLogFont([NSFont fontWithName:@"Monaco" size:12], @"%2d: %@ %@ \n",i, acquisitionString[i], theAcquisitionControl?@"YES":@" NO");
+            NSLogMono( @"%2d: %@ %@ \n",i, acquisitionString[i], theAcquisitionControl?@"YES":@" NO");
         }
     }
+    return aValue;
 }
 
 //6.22 MAW Test Buffer Configuration register
@@ -1103,29 +1100,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.23 Internal Trigger Delay Configruation register
 
 //6.24 Internal Gate Length Configuration register
-- (unsigned long) gate1EnableMask;
-{
-    return gate1EnableMask;
-}
-
-- (void) setGate1EnableMask:(unsigned long)aMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setGate1EnableMask:gate1EnableMask];
-    gate1EnableMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316Gate1EnableMaskChanged object:self];
-}
-
-- (unsigned long) gate2EnableMask;
-{
-    return gate2EnableMask;
-}
-
-- (void) setGate2EnableMask:(unsigned long)aMask
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setGate2EnableMask:gate2EnableMask];
-    gate2EnableMask = aMask;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316Gate2EnableMaskChanged object:self];
-}
 
 - (unsigned long) internalGateLen:(unsigned short)aGroup;
 {
@@ -1329,7 +1303,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (unsigned short) dacOffset:(unsigned short)aGroup
 {
     if(aGroup>=kNumSIS3316Groups) return 0;
-    else return dacOffsets[aGroup];
+    else return dacOffsets[aGroup]&0xffff;
 }
 
 - (void) setDacOffset:(unsigned short)aGroup withValue:(int)aValue
@@ -1363,7 +1337,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
         [self writeLong:0x80000000 + 0x08000000 +  0x00f00000 + 0x1
               toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:iadc]]; // set internal Reference
         usleep(1);
-        [self writeLong:0x80000000 + 0x02000000 +  0x00f00000 + ((dacOffsets[iadc] & 0xffff) << 4)
+        [self writeLong:0x80000000 + 0x02000000 +  0x00f00000 + ([self dacOffset:iadc] << 4)
               toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:iadc]];// clear error Latch bits
         usleep(1);
         [self writeLong:0xC0000000
@@ -1683,7 +1657,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     int i;
     for(i=0;i<kNumSIS3316Groups;i++){
-        unsigned long aValue = 0x05050505;//<<<<<<<---------hard coded for now---------------
+        //unsigned long aValue = 0x0f0f0f0f;//<<<<<<<---------hard coded for now---------------
+        unsigned long aValue = 0x0;//<<<<<<<---------hard coded for now---------------
         [self writeLong:aValue toAddress:[self groupRegister:kDataFormatConfigReg group:i]];
      }
 }
@@ -1743,10 +1718,10 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.26 Trigger Threshold registers
 
 NSString* cfdCntrlString[4] = {
-    @"Disabled     ",
-    @"Disabled     ",
+    @"Disabled",
+    @"Disabled",
     @"Zero Crossing",
-    @"50%          "
+    @"50%"
 };
 
 - (long) enabledMask                                { return enabledMask;                              }
@@ -1893,63 +1868,52 @@ NSString* cfdCntrlString[4] = {
 //6.25 FIR Trigger Setup registers
 - (void) configureFIR
 {
-    unsigned long addr;
     unsigned long data;
     // set FIR Trigger Setup
     int ichan;
     for (ichan=0;ichan<kNumSIS3316Channels;ichan++) {
-        addr = [self baseAddress]
-             + ( (ichan/kNumSIS3316ChansPerGroup) + 1)*kSIS3316FpgaAdcRegOffset
-             + 0x10*(ichan%kNumSIS3316ChansPerGroup)
-             + 0x40;
-        [self writeLong:0 toAddress:addr];
-        [self writeLong:(riseTime[ichan]&0xFFF) | ((gapTime[ichan]&0xFFF) << 12) toAddress:addr];
+
+        [self writeLong:(riseTime[ichan]&0xFFF) | ((gapTime[ichan]&0xFFF) << 12) toAddress:[self channelRegister:kFirTrigSetupCh1Reg channel:ichan]];
         
         //FIR Thresh
-        addr = [self baseAddress]
-             + ( (ichan/kNumSIS3316ChansPerGroup) + 1)*kSIS3316FpgaAdcRegOffset
-             + 0x10*(ichan%kNumSIS3316ChansPerGroup)
-             + 0x44;
 
         data =  ([self enabled:ichan]              << 31)       |
                 ([self heSuppressTriggerBit:ichan] << 30)       |
                 ((0x3 & (cfdControlBits[ichan]+1)) << 28)       |
-                (0x08000000 + (riseTime[ichan]*threshold[ichan]));
-        [self writeLong:data toAddress:addr];
+                (0x08000000 + threshold[ichan]);
+        //(0x08000000 + (riseTime[ichan]*threshold[ichan]));
+        [self writeLong:data toAddress:[self channelRegister:kTrigThresholdCh1Reg channel:ichan]];
         
         //High Energy Threshold
-        addr = [self baseAddress]
-             + ( (ichan/kNumSIS3316ChansPerGroup) + 1)*kSIS3316FpgaAdcRegOffset
-             + 0x10*(ichan%kNumSIS3316ChansPerGroup)
-             + 0x48;
         data= 0xFFF & heTrigThreshold[ichan];
-        [self writeLong:data toAddress:addr];
+        
+        
+        [self writeLong:data toAddress:[self channelRegister:kHiEnergyTrigThresCh1Reg channel:ichan]];
     }
     
     // set FIR Block Trigger Setup
     int iadc;
     for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
+        unsigned long rootAdd = [self baseAddress] + (iadc + 1)*kSIS3316FpgaAdcRegOffset;
         // sum dir trigger setup
-        addr = [self baseAddress] + (iadc + 1)*kSIS3316FpgaAdcRegOffset + 0x80;
-        [self writeLong:0 toAddress:addr];
-        [self writeLong:(riseTimeSum[iadc]&0xFFF) | ((gapTimeSum[iadc]&0xFFF) << 12) toAddress:addr];
+        [self writeLong:0 toAddress:rootAdd + 0x80];
+        [self writeLong:(riseTimeSum[iadc]&0xFFF) | ((gapTimeSum[iadc]&0xFFF) << 12) toAddress:rootAdd + 0x80];
 
         //FIR Thresh
-        addr = [self baseAddress] + (iadc + 1)*kSIS3316FpgaAdcRegOffset + 0x84;
         data= ((0x1 & enableSum[iadc]) << 31)                   |
               ((0x1 & [self heSuppressTriggerBit:iadc]) << 30)  |
               ((0x3 & cfdControlBitsSum[iadc]) << 28 )          |
               (0x08000000 + (riseTimeSum[iadc] * thresholdSum[iadc]) );
-        [self writeLong:data toAddress:addr];
+        [self writeLong:data toAddress:rootAdd + 0x84];
 
         //High Energy Threshold
-        addr = [self baseAddress] + (iadc + 1)*kSIS3316FpgaAdcRegOffset + 0x88;
         data = 0xFFF & heTrigThresholdSum[iadc];
-        [self writeLong:data toAddress:addr];
+        [self writeLong:data toAddress:rootAdd + 0x88];
 
 //        addr = [self baseAddress]
 //        + kSIS3316FpgaAdcRegOffset*iadc
-//        + SIS3316_ADC_CH1_4_TRIGGER_STATISTIC_COUNTER_MODE_REG;
+//        + 0x1090;
+//
 //        data=triggerstatmode_block[iadc];
 //        [self writeLong:data toAddress:addr];
     }
@@ -1961,8 +1925,8 @@ NSString* cfdCntrlString[4] = {
 {
     int i;
     for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long aValue =  (([self gapTime:i]  & 0xFFF) << 12) |
-                                 ([self riseTime:i] & 0xFFF);
+        unsigned long aValue =  ([self gapTime:i] << 12) |
+                                 [self riseTime:i];
         [self writeLong:aValue toAddress:[self channelRegister:kFirTrigSetupCh1Reg channel:i]];
     }
 }
@@ -1986,7 +1950,7 @@ NSString* cfdCntrlString[4] = {
         unsigned long aValue  = ((unsigned long)((trigBothEdgesMask>>i) & 0x1) << 31)  |
         (((intHeTrigOutPulseMask>>i)  & 0x1) << 30)  |
         (([self intTrigOutPulseBit:i] & 0x3) << 28)  |
-        ([self heTrigThreshold:i]     & 0xfffffff);
+        ([self heTrigThreshold:i]);
         [self writeLong:aValue toAddress:[self channelRegister:kHiEnergyTrigThresCh1Reg channel:i]];
     }
 }
@@ -2018,8 +1982,10 @@ NSString* cfdCntrlString[4] = {
 {
     int i;
     if(verbose){
-        NSLog(@"Reading Thresholds:\n");
-        NSLogFont([NSFont fontWithName:@"Monaco" size:12],@"Chan Enabled HESupp CFD Threshold \n");
+        NSLogStartTable(@"FIR Trigger Reg",54);
+        NSLogMono(@"| Ch | Enabled | HESupp |      CDF      |  Threshold |\n");
+        NSLogDivider(@"-",54);
+
     }
     for(i =0; i < kNumSIS3316Channels; i++) {
         unsigned long aValue =  [self readLongFromAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]];
@@ -2028,8 +1994,15 @@ NSString* cfdCntrlString[4] = {
             unsigned long cfdCnt = ((aValue>>28) & 0x3);
             unsigned long heSup  = ((aValue>>30) & 0x1);
             unsigned long enabl  = ((aValue>>31) & 0x1);
-            NSLogFont([NSFont fontWithName:@"Monaco" size:12],@"%2d: %@ %@ %@ 0x%08x\n",i, enabl?@"YES":@" NO",heSup?@"YES":@" NO",cfdCntrlString[cfdCnt],thres);
+            NSLogMono(@"| %2d | %@ | %@ | %@ | 0x%08x |\n",i,
+                      [enabl?@"YES":@" NO" centered:7],
+                      [heSup?@"YES":@" NO" centered:6],
+                      [cfdCntrlString[cfdCnt] centered:13],
+                      thres);
         }
+    }
+    if(verbose){
+        NSLogDivider(@"=",54);
     }
 }
 
@@ -2055,16 +2028,21 @@ NSString* intTrigOutPulseString[3] = {
     @"Pileup Pulse"
 };
 
-- (unsigned long) heTrigThreshold:(unsigned short)aChan      { return heTrigThreshold[aChan];                    }
+- (unsigned long) heTrigThreshold:(unsigned short)aChan
+{
+    if(aChan<kNumSIS3316Channels) return heTrigThreshold[aChan] & 0xFFFFFFF;
+    else return 0;
+}
+
 - (unsigned long) heTrigThresholdSum:(unsigned short)aGroup  {if(aGroup<kNumSIS3316Groups)return heTrigThresholdSum[aGroup]; else return 0;}
 
-- (long) trigBothEdgesMask                                   { return trigBothEdgesMask;                         }
+- (long) trigBothEdgesMask                                  { return trigBothEdgesMask;                         }
 - (BOOL) trigBothEdgesBit:(unsigned short)chan              { return (trigBothEdgesMask     & (0x1<<chan)) != 0;}
 
-- (long) intHeTrigOutPulseMask                               { return intHeTrigOutPulseMask;                     }
+- (long) intHeTrigOutPulseMask                              { return intHeTrigOutPulseMask;                     }
 - (BOOL) intHeTrigOutPulseBit:(unsigned short)chan          { return (intHeTrigOutPulseMask & (0x1<<chan)) != 0;}
 
-- (unsigned short) intTrigOutPulseBit:(unsigned short)aChan  { return intTrigOutPulseBit[aChan];                 }
+- (unsigned short) intTrigOutPulseBit:(unsigned short)aChan { return intTrigOutPulseBit[aChan];                 }
 
 - (void) setHeTrigThreshold:(unsigned short)aChan withValue:(unsigned long)aValue
 {
@@ -2094,7 +2072,6 @@ NSString* intTrigOutPulseString[3] = {
     [[[self undoManager] prepareWithInvocationTarget:self] setTrigBothEdgesMask:trigBothEdgesMask];
     trigBothEdgesMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TrigBothEdgesChanged object:self];
-    
 }
 
 - (void) setTrigBothEdgesBit:(unsigned short)aChan withValue:(BOOL)aValue
@@ -2704,13 +2681,13 @@ NSString* tauTable[4] ={
 - (unsigned short) gapTime:(unsigned short)aChan
 {
     if(aChan>kNumSIS3316Channels)return 0;
-    else return gapTime[aChan] & 0x3ff;
+    else return gapTime[aChan] & 0xfff;
 }
 
 - (void) setGapTime:(unsigned short)aChan withValue:(unsigned short)aValue
 {
     if(aChan>kNumSIS3316Channels)return;
-    if(aValue>0x3ff)aValue = 0x3ff;
+    if(aValue>0x3ff)aValue = 0xfff;
     if(aValue<2)aValue = 2;
     aValue &= ~0x0001; //bit zero is always zero
     
@@ -2952,7 +2929,10 @@ NSString* tauTable[4] ={
     [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmXArmBank2Reg]];
     currentBank = 2;
 }
-
+- (int) currentBank
+{
+    return currentBank;
+}
 //6.39.13 Key address: ADC Clock DCM/PLL Reset
 - (void) resetADCClockDCM
 {
@@ -3051,8 +3031,8 @@ NSString* tauTable[4] ={
         unsigned long gate2Mask = 0x0;
         int i;
         for(i=0;i<4;i++){
-            if(gate1EnableMask & (0x1 << i+(group*4))) gate1Mask |= (0x1 << i);
-            if(gate1EnableMask & (0x1 << i+(group*4))) gate2Mask |= (0x1 << i);
+            if(eventConfigMask & 0x02) gate1Mask |= (0x1 << i);
+            if(eventConfigMask & 0x04) gate2Mask |= (0x1 << i);
         }
         
         data =  ((0xF & gate1Mask)                << 20)   |
@@ -3085,7 +3065,6 @@ NSString* tauTable[4] ={
     
     [self writeFirEnergySetup];
     [self writeFirTriggerSetup];
-    [self writeThresholdSum];
     [self writeTriggerDelay];
     [self writeNIMControlStatus];
     [self writeHistogramConfiguration];
@@ -3326,6 +3305,11 @@ NSString* tauTable[4] ={
 	[self armBank2];
 	[self setLed:YES];
 	isRunning = NO;
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        //[dataBuffer[group] release];
+        //dataBuffer[group] = [[NSMutableData alloc] initWithLength:endAddress[group]];
+    }
     waitingOnChannelMask = 0x0; //not waiting on any channel
 }
 
@@ -3368,45 +3352,54 @@ NSString* tauTable[4] ={
         if(waitingOnChannelMask == 0x0){
             if([self addressThresholdFlag]){ //checks the OR of the address threshold flags
                 [self switchBanks];
-                waitingOnChannelMask    = 0xffff;
-                groupDataTransferedMask = 0x0;
+                waitingOnChannelMask    = enabledMask;
+                //groupDataTransferedMask = 0x0;
             }
         }
         else {
             //appears to be data. wait on each channel for the bank switch to finish
             int i;
             for(i=0;i<kNumSIS3316Channels;i++){
-                int group = i/4;;
-                unsigned int addr = [self baseAddress] + groupRegister[kPreviousBankSampleCh1Reg].offset + group*kSIS3316FpgaAdcRegOffset + (i%4)*0x4;
-                unsigned long prevBankEndingAddress = [self readLongFromAddress:addr];
-                //bit 24 is 0 for bank1, 1 for bank2. currentBank is 1 or 2
-                if(((prevBankEndingAddress>>24) & 0x1)+1 != currentBank){
-                    waitingOnChannelMask &= ~(0x1 << i);
-               }
-            
-                if((waitingOnChannelMask & (0xf << group*4)) == 0x0){
-                    if(!(groupDataTransferedMask & (0x1<<group))){
-                        //bank switch is complete on this group. set up data transfer from adc FPGA to main FPGA
-                        unsigned long addr = [self baseAddress] + groupRegister[kAdcCh1_Ch4DataCntrReg].offset + group*0x4;
-                        unsigned long prevBankReadBeginAddress  = (prevBankEndingAddress & 0x03000000) + 0x10000000*((i/2)%2);;
-                        [self writeLong:0x80000000 + prevBankReadBeginAddress toAddress:addr];
-                        [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
-                        groupDataTransferedMask |= (0x1<<group);
+                if((enabledMask>>i) & 0x1){
+                    unsigned long prevBankEndingAddress = [self readLongFromAddress:[self channelRegisterVersionTwo:kPreviousBankSampleCh1Reg channel:i]];
+                    //bit 24 is 0 for bank1, 1 for bank2. currentBank is 1 or 2
+                    if(((prevBankEndingAddress>>24) & 0x1) != currentBank-1){
+                        waitingOnChannelMask &= ~(0x1L << i);
                     }
-                }
-                if((groupDataTransferedMask & (0x1<<group)) > 0){
-                    //this group is transfered, so read out the data for this channel
-                    unsigned long expectedNumberOfWords     = prevBankEndingAddress & 0x00FFFFFF;
-                   if(expectedNumberOfWords>0 && expectedNumberOfWords<1000){
-                       unsigned long dataBuffer[1001];
-                       unsigned long addr = [self baseAddress] + kSIS3316FpgaAdc1MemBase +i*kSIS3316FpgaAdcMemOffset;
-                       NSLog(@"addr: 0x%x num: %d\n",addr, expectedNumberOfWords);
+                
+    //                if((waitingOnChannelMask & (0xf << group*4)) == 0x0){
+    //                    if(!(groupDataTransferedMask & (0x1<<group))){
+    //                        //bank switch is complete on this group. set up data transfer from adc FPGA to main FPGA
+    //                        unsigned long addr = [self baseAddress] + groupRegister[kAdcCh1_Ch4DataCntrReg].offset + group*0x4;
+    //                        unsigned long prevBankReadBeginAddress  = (prevBankEndingAddress & 0x03000000) + 0x10000000*((i/2)%2);;
+    //                        [self writeLong:0x80000000 + prevBankReadBeginAddress toAddress:addr];
+    //                        [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
+    //                        groupDataTransferedMask |= (0x1<<group);
+    //                    }
+    //                }
+                    if(!((waitingOnChannelMask>>i) & 0x1)){
+//                        unsigned long addr = [self baseAddress] + groupRegister[kAdcCh1_Ch4DataCntrReg].offset + i%4*0x4;
+//                        unsigned long prevBankReadBeginAddress  = (prevBankEndingAddress & 0x03000000) + 0x10000000*((i/2)%2);;
+//                        [self writeLong:0x80000000 + prevBankReadBeginAddress toAddress:addr];
+//                        [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
+                        
+                        //this group is transfered, so read out the data for this channel
+                        unsigned long expectedNumberOfWords = prevBankEndingAddress & 0x00FFFFFF;
+                        if(expectedNumberOfWords>0){
+                           unsigned long addr = [self baseAddress] + kSIS3316FpgaAdc1MemBase +i*kSIS3316FpgaAdcMemOffset;
+                           //NSLog(@"addr: 0x%x num: %d\n",addr, expectedNumberOfWords);
+                           // unsigned long* db = (unsigned long*)[dataBuffer[i%4] bytes];
+                            dataBuffer[0] = dataId | 1024+2;
+                            dataBuffer[1] = location;
+                            [[self adapter] readLongBlock:&dataBuffer[2]
+                                                atAddress:addr
+                                                numToRead:512
+                                               withAddMod:0x09
+                                            usingAddSpace:0x01];
+                            
+                            dataBuffer[0] = dataId | 1024+2;
 
-                        [[self adapter] readLongBlock:dataBuffer
-                                            atAddress:addr
-                                            numToRead:((expectedNumberOfWords + 1) & 0xfffffE)
-                                           withAddMod:[self addressModifier]
-                                        usingAddSpace:0x01];
+                        }
                     }
                 }
             }
@@ -3417,7 +3410,41 @@ NSString* tauTable[4] ={
 		[localException raise];
 	}
 }
+- (void) readStatistics
+{
+    // start readout FSM
+    int i_adc=0; // only channel 1 to ch4
+    // Space = Statistic counter
+    [self writeLong:0x80000000 + 0x30000000  toAddress: [self singleRegister:kAdcCh1_Ch4DataCntrReg] + (i_adc*4)];
+    
+    // read from FIFO
+    unsigned long req_nof_32bit_words = 24 ;
+    unsigned long dataBuffer[100];
+    [[self adapter] readLongBlock:dataBuffer
+                        atAddress:[self baseAddress] +0x100000 + (i_adc*0x100000)
+                        numToRead:req_nof_32bit_words
+                       withAddMod:[self addressModifier]
+                    usingAddSpace:0x01];
+    int cLen = 84;
+    NSLogStartTable(@"Stats",cLen);
+    NSLogMono(@"| ch | Hits/Events|  Deadtime  |    Pileup  |    Veto    | High-Energy| Supressed  |\n");
+    NSLogDivider(@"-",cLen);
+    int i_ch;
+    for (i_ch = 0; i_ch < 4;i_ch++) {
+        NSLogMono(@"| %2d | 0x%08x | 0x%08x | 0x%08x | 0x%08x | 0x%08x | 0x%08x |\n",
+              i_ch,
+                  dataBuffer[(i_ch*6) + 0],
+                  dataBuffer[(i_ch*6) + 1],
+                  dataBuffer[(i_ch*6) + 2],
+                  dataBuffer[(i_ch*6) + 3],
+                  dataBuffer[(i_ch*6) + 4],
+                  dataBuffer[(i_ch*6) + 5],
+                  dataBuffer[(i_ch*6) + 6]
+                  );
+      }
+    NSLogDivider(@"=",cLen);
 
+}
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
     isRunning = NO;
@@ -3472,6 +3499,27 @@ NSString* tauTable[4] ={
         waveFormCount[i]=0;
     }
 }
+#pragma mark •••Reporting
+- (void) settingsTable
+{
+    NSLogStartTable(@"Settings",80);
+    NSLogMono(@"|Chan|Enabled|HESupp| CFD |\n");
+    NSLogDivider(@"-",80);
+
+    int i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        unsigned long rootAdd = [self baseAddress] + ((i/kNumSIS3316ChansPerGroup) + 1)*kSIS3316FpgaAdcRegOffset + 0x10*(i%kNumSIS3316ChansPerGroup);
+        unsigned long firData = [self readLongFromAddress:rootAdd + 0x44];
+        NSString* isEnabled   = ((firData>>31) & 0x1)?@"X":@"";
+        NSString* isHeSupp    = ((firData>>30) & 0x1)?@"X":@"";
+        NSString* cfdControl  = [NSString stringWithFormat:@"0x%01lx", ((firData>>28) & 0x3)];
+        NSString* thres       = [NSString stringWithFormat:@"0x%08lx", (firData & 0xffffff)];
+        NSLogMono(@"|%3d |%@|%@|%@|%@\n",i,[isEnabled centered:7],[isHeSupp centered:6],[cfdControl centered:5],thres);
+    }
+    NSLogDivider(@"=",80);
+
+}
+
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder
 {
@@ -3494,8 +3542,6 @@ NSString* tauTable[4] ={
     [self setLemoToMask:                [decoder decodeInt32ForKey: @"lemoToMask"]];
     [self setAcquisitionControlMask:    [decoder decodeInt32ForKey: @"acquisitionControlMask"]];
     [self setNIMControlStatusMask:      [decoder decodeInt32ForKey: @"nimControlStatusMask"]];
-    [self setGate1EnableMask:           [decoder decodeInt32ForKey: @"gate1EnableMask"]];
-    [self setGate2EnableMask:           [decoder decodeInt32ForKey: @"gate2EnableMask"]];
 
     //load up all the C Arrays
     [[decoder decodeObjectForKey: @"cfdControlBits"]    loadULongCArray:cfdControlBits      size:kNumSIS3316Channels];
@@ -3616,8 +3662,6 @@ NSString* tauTable[4] ={
     [encoder encodeInt32: lemoUoMask                 forKey:@"lemoUoMask"];
     [encoder encodeInt32: lemoCoMask                 forKey:@"lemoCoMask"];
     [encoder encodeInt32: acquisitionControlMask     forKey:@"acquisitionControlMask"];
-    [encoder encodeInt32: gate1EnableMask            forKey:@"gate1EnableMask"];
-    [encoder encodeInt32: gate2EnableMask            forKey:@"gate2EnableMask"];
 
     //clocks
     [encoder encodeBool:  randomClock                forKey:@"randomClock"];

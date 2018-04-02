@@ -323,10 +323,9 @@ enum {
     unsigned long   lemoCoMask;
     unsigned long   lemoUoMask;
     unsigned long   lemoToMask;
-    unsigned long   gate1EnableMask;                          //6.24
-    unsigned long   gate2EnableMask;                          //6.24
     unsigned long   internalGateLen[kNumSIS3316Groups];       //6.24
     unsigned long   internalCoinGateLen[kNumSIS3316Groups];   //6.24
+    unsigned long  dataBuffer[4096];
 }
 
 - (id) init;
@@ -547,12 +546,6 @@ enum {
 - (unsigned long)   lemoToMask;
 - (void)             setLemoToMask:(unsigned long)aMask;
 
-- (unsigned long) gate1EnableMask;
-- (void) setGate1EnableMask:(unsigned long)aMask;
-
-- (unsigned long) gate2EnableMask;
-- (void) setGate2EnableMask:(unsigned long)aMask;
-
 - (unsigned long) internalGateLen:(unsigned short)aGroup;
 - (void) setInternalGateLen:(unsigned short)aGroup withValue:(unsigned long)aValue;
 
@@ -637,7 +630,7 @@ enum {
 - (void) writeNIMControlStatus;                 //6.20
 - (void) readNIMControlStatus:(BOOL)verbose;
 - (void) writeAcquisitionRegister;              //6.21
-- (void) readAcquisitionRegister:(BOOL)verbose;
+- (unsigned long) readAcquisitionRegister:(BOOL)verbose;
 - (BOOL) sampleLogicIsBusy;                     //6.21      //pg 119 and on
 - (void) writeEventConfig;                      //6.12 (section 2)
 - (void) readEventConfig:(BOOL)verbose;
@@ -685,6 +678,7 @@ enum {
 - (void) switchBanks;
 - (void) armBank1;
 - (void) armBank2;
+- (int) currentBank;
 - (void) resetADCClockDCM;
 - (void) setClockChoice:(int) clck_choice;
 - (int) setFrequency:(int) osc values:(unsigned char*)values;
@@ -720,6 +714,8 @@ enum {
 - (NSArray*) wizardSelections;
 - (NSNumber*) extractParam:(NSString*)param from:(NSDictionary*)fileHeader forChannel:(int)aChannel;
 
+#pragma mark •••Reporting
+- (void) settingsTable;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -816,8 +812,6 @@ extern NSString* ORSIS3316LemoCoMaskChanged;
 extern NSString* ORSIS3316LemoUoMaskChanged;
 extern NSString* ORSIS3316LemoToMaskChanged;
 
-extern NSString* ORSIS3316Gate1EnableMaskChanged;
-extern NSString* ORSIS3316Gate2EnableMaskChanged;
 extern NSString* ORSIS3316InternalGateLenChanged;
 extern NSString* ORSIS3316InternalCoinGateLenChanged;
 
