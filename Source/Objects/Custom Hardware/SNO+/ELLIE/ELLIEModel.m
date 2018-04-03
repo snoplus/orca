@@ -1937,6 +1937,19 @@ err:{
     [self setMaintenanceRollOver:YES]; // Asssume we roll over by default.
     [self setSmellieStopButton:NO]; // Had the stop button been pressed?
 
+    /////////////////////
+    // Define some static variables
+    int counter=0;
+    NSString* laser;
+    NSString* fibre;
+    NSNumber* wavelengthLowEdge;
+    NSNumber* wavelengthHighEdge;
+    NSNumber* intensity;
+    NSNumber* gain;
+    NSNumber* rate = [NSNumber numberWithInt:[[smellieSettings objectForKey:@"trigger_frequency"] integerValue]];
+    NSNumber* nTriggers = [NSNumber numberWithInt:[[smellieSettings objectForKey:@"triggers_per_loop"] integerValue]];
+    NSMutableArray* fireSettingsArray = [NSMutableArray arrayWithCapacity:51];
+
     //////////////
     //   GET TUBii & RunControl MODELS
     //////////////
@@ -2006,19 +2019,6 @@ err:{
     dispatch_sync(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:ORELLIEFlashing object:self];
     });
-
-    /////////////////////
-    // Define some static variables
-    int counter=0;
-    NSString* laser;
-    NSString* fibre;
-    NSNumber* wavelengthLowEdge;
-    NSNumber* wavelengthHighEdge;
-    NSNumber* intensity;
-    NSNumber* gain;
-    NSNumber* rate = [NSNumber numberWithInt:[[smellieSettings objectForKey:@"trigger_frequency"] integerValue]];
-    NSNumber* nTriggers = [NSNumber numberWithInt:[[smellieSettings objectForKey:@"triggers_per_loop"] integerValue]];
-    NSMutableArray* fireSettingsArray = [NSMutableArray arrayWithCapacity:51];
 
     //////////////////////
     // BEGIN LOOPING!
