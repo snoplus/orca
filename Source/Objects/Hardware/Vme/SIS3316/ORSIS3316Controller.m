@@ -123,16 +123,6 @@
         [[accGate3StartMatrix           cellAtRow:i column:0] setTag:i];
         [[accGate4LenMatrix             cellAtRow:i column:0] setTag:i];
         [[accGate4StartMatrix           cellAtRow:i column:0] setTag:i];
-        [[accGate5LenMatrix             cellAtRow:i column:0] setTag:i];
-        [[accGate5StartMatrix           cellAtRow:i column:0] setTag:i];
-        [[accGate6LenMatrix             cellAtRow:i column:0] setTag:i];
-        [[accGate6StartMatrix           cellAtRow:i column:0] setTag:i];
-        [[accGate7LenMatrix             cellAtRow:i column:0] setTag:i];
-        [[accGate7StartMatrix           cellAtRow:i column:0] setTag:i];
-        [[accGate8LenMatrix             cellAtRow:i column:0] setTag:i];
-        [[accGate8StartMatrix           cellAtRow:i column:0] setTag:i];
-        [[rawDataBufferLenMatrix        cellAtRow:i column:0] setTag:i];
-        [[rawDataBufferStartMatrix      cellAtRow:i column:0] setTag:i];
         [[heTrigThresholdSumMatrix      cellAtRow:i column:0] setTag:i];
         [[thresholdSumMatrix            cellAtRow:i column:0] setTag:i];
         [[riseTimeSumMatrix             cellAtRow:i column:0] setTag:i];
@@ -382,47 +372,7 @@
                          name : ORSIS3316AccGate4StartChanged
                        object : model];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate5LenChanged:)
-                         name : ORSIS3316AccGate5LenChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate5StartChanged:)
-                         name : ORSIS3316AccGate5StartChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate6LenChanged:)
-                         name : ORSIS3316AccGate6LenChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate6StartChanged:)
-                         name : ORSIS3316AccGate6StartChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate7LenChanged:)
-                         name : ORSIS3316AccGate7LenChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate7StartChanged:)
-                         name : ORSIS3316AccGate7StartChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate8LenChanged:)
-                         name : ORSIS3316AccGate8LenChanged
-                       object : model];
-    
-    [notifyCenter addObserver : self
-                     selector : @selector(accGate8StartChanged:)
-                         name : ORSIS3316AccGate8StartChanged
-                       object : model];
-    
-    //a fake action for the scale objects
+     //a fake action for the scale objects
     [notifyCenter addObserver : self
                      selector : @selector(scaleAction:)
                          name : ORAxisRangeChangedNotification
@@ -439,18 +389,8 @@
                        object : [[model waveFormRateGroup]timeRate]];
     
     [notifyCenter addObserver : self
-                     selector : @selector(pageSizeChanged:)
-                         name : ORSIS3316PageSizeChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
                      selector : @selector(clockSourceChanged:)
                          name : ORSIS3316ClockSourceChanged
-						object: model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(stopTriggerChanged:)
-                         name : ORSIS3316StopTriggerChanged
 						object: model];
 	
     [notifyCenter addObserver : self
@@ -558,6 +498,27 @@
                      selector : @selector(internalCoinGateLenChanged:)
                          name : ORSIS3316InternalCoinGateLenChanged
                         object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(hsDivChanged:)
+                         name : ORSIS3316HsDivChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(n1DivChanged:)
+                         name : ORSIS3316N1DivChanged
+                        object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(pileUpWindowLenChanged:)
+                         name : ORSIS3316PileUpWindowLengthChanged
+                        object: model];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(rePileUpWindowLenChanged:)
+                         name : ORSIS3316RePileUpWindowLengthChanged
+                        object: model];
+
 
     [self registerRates];
 }
@@ -628,14 +589,6 @@
     [self accGate3StartChanged:nil];
     [self accGate4LenChanged:nil];
     [self accGate4StartChanged:nil];
-    [self accGate5LenChanged:nil];
-    [self accGate5StartChanged:nil];
-    [self accGate6LenChanged:nil];
-    [self accGate6StartChanged:nil];
-    [self accGate7LenChanged:nil];
-    [self accGate7StartChanged:nil];
-    [self accGate8LenChanged:nil];
-    [self accGate8StartChanged:nil];
 
     [self rateGroupChanged:nil];
     [self integrationChanged:nil];
@@ -643,10 +596,7 @@
     [self totalRateChanged:nil];
     [self updateTimePlot:nil];
     [self waveFormRateChanged:nil];
-	[self pageSizeChanged:nil];
 	[self clockSourceChanged:nil];
-	[self randomClockChanged:nil];
-	[self stopTriggerChanged:nil];
 	[self eventConfigChanged:nil];
     [self extendedEventConfigChanged:nil];
 
@@ -673,12 +623,36 @@
     
     [self internalGateLenChanged:nil];
     [self internalCoinGateLenChanged:nil];
+    [self hsDivChanged:nil];
+    [self n1DivChanged:nil];
+    [self pileUpWindowLenChanged:nil];
+    [self rePileUpWindowLenChanged:nil];
 
     
     [self setUpdatedOnce]; //<<--Must be last to ensure all fields are updated on first load
 }
 
 #pragma mark •••Interface Management
+- (void) hsDivChanged:(NSNotification*)aNote
+{
+    [hsDivPU selectItemWithTag:[model hsDiv]];
+    [sampleFreqField setIntValue: 5E9/([model hsDiv]*[model n1Div])/1E6];
+}
+- (void) n1DivChanged:(NSNotification*)aNote
+{
+    [n1DivField setIntValue:[model n1Div]];
+    [sampleFreqField setIntValue: 5E9/([model hsDiv]*[model n1Div])/1e6];
+}
+
+- (void) pileUpWindowLenChanged:(NSNotification*)aNote
+{
+    [pileUpWindowLenField setIntValue:[model pileUpWindowLength]];
+}
+
+- (void) rePileUpWindowLenChanged:(NSNotification*)aNote
+{
+    [rePileUpWindowLenField setIntValue:[model rePileUpWindowLength]];
+}
 
 - (void) internalGateLenChanged:(NSNotification*)aNote
 {
@@ -1064,12 +1038,12 @@
 {
     if(aNote == nil){
         short i;
-        for(i=0;i<kNumSIS3316Channels;i++){
+        for(i=0;i<kNumSIS3316Groups;i++){
             [[cfdControlBitsSumMatrix cellAtRow:i column:0] selectItemAtIndex:[model cfdControlBitsSum:i]];
         }
     }
     else {
-        int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
+        int chan = [[[aNote userInfo] objectForKey:@"Group"] intValue];
         [[cfdControlBitsSumMatrix cellAtRow:chan column:0] selectItemAtIndex:[model cfdControlBitsSum:chan]];
     }
 }
@@ -1125,10 +1099,6 @@
             [[accGate2LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
             [[accGate3LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
             [[accGate4LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-            [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-            [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-            [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-            [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
         }
     }
     else {
@@ -1137,10 +1107,6 @@
         [[accGate2LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
         [[accGate3LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
         [[accGate4LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-        [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-        [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-        [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
-        [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accumulatorGateLength:i]];
     }
 }
 
@@ -1153,10 +1119,6 @@
             [[accGate2StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
             [[accGate3StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
             [[accGate4StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-            [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-            [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-            [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-            [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
         }
     }
     else {
@@ -1165,10 +1127,6 @@
         [[accGate2StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
         [[accGate3StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
         [[accGate4StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-        [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-        [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-        [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
-        [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accumulatorGateStart:i]];
     }
 }
 //-------------------------------------------------------------------------
@@ -1284,144 +1242,16 @@
     }
 }
 
-- (void) accGate5LenChanged:  (NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accGate5Len:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate5LenMatrix cellWithTag:i] setIntValue:[model accGate5Len:i]];
-    }
-}
 
-- (void) accGate5StartChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accGate5Start:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate5StartMatrix cellWithTag:i] setIntValue:[model accGate5Start:i]];
-    }
-}
-
-- (void) accGate6LenChanged:  (NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accGate6Len:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate6LenMatrix cellWithTag:i] setIntValue:[model accGate6Len:i]];
-    }
-}
-
-- (void) accGate6StartChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accGate6Start:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate6StartMatrix cellWithTag:i] setIntValue:[model accGate6Start:i]];
-    }
-}
-
-- (void) accGate7LenChanged:  (NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accGate7Len:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate7LenMatrix cellWithTag:i] setIntValue:[model accGate7Len:i]];
-    }
-}
-
-- (void) accGate7StartChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accGate7Start:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate7StartMatrix cellWithTag:i] setIntValue:[model accGate7Start:i]];
-    }
-}
-
-- (void) accGate8LenChanged:  (NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accGate8Len:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate8LenMatrix cellWithTag:i] setIntValue:[model accGate8Len:i]];
-    }
-}
-
-- (void) accGate8StartChanged:(NSNotification*)aNote
-{
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accGate8Start:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[accGate8StartMatrix cellWithTag:i] setIntValue:[model accGate8Start:i]];
-    }
-}
 
 - (void) rawDataBufferLenChanged:  (NSNotification*)aNote
 {
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[rawDataBufferLenMatrix cellWithTag:i] setIntValue:[model rawDataBufferLen:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[rawDataBufferLenMatrix cellWithTag:i] setIntValue:[model rawDataBufferLen:i]];
-    }
+    [rawDataBufferLenField setIntValue:[model rawDataBufferLen]];
 }
 
 - (void) rawDataBufferStartChanged:(NSNotification*)aNote
 {
-    if(aNote == nil){
-        short i;
-        for(i=0;i<kNumSIS3316Groups;i++){
-            [[rawDataBufferStartMatrix cellWithTag:i] setIntValue:[model rawDataBufferStart:i]];
-        }
-    }
-    else {
-        int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[rawDataBufferStartMatrix cellWithTag:i] setIntValue:[model rawDataBufferStart:i]];
-    }
+    [rawDataBufferStartField setIntValue:[model rawDataBufferStart]];
 }
 
 - (void) acquisitionControlChanged:(NSNotification*)aNote  //bools and possibly more changed like this
@@ -1482,27 +1312,9 @@
     else [serialNumberField setStringValue:@""];
 }
 
-
-
-
-- (void) stopTriggerChanged:(NSNotification*)aNote
-{
-	[stopTriggerButton setIntValue: [model stopTrigger]];
-}
-
-- (void) randomClockChanged:(NSNotification*)aNote
-{
-	[randomClockButton setIntValue: [model randomClock]];
-}
-
 - (void) clockSourceChanged:(NSNotification*)aNote
 {
 	[clockSourcePU selectItemAtIndex: [model clockSource]];
-}
-
-- (void) pageSizeChanged:(NSNotification*)aNote
-{
-	[pageSizePU selectItemWithTag: [model pageSize]];
 }
 
 - (void) waveFormRateChanged:(NSNotification*)aNote
@@ -1564,10 +1376,7 @@
 	[eventConfigMatrix          setEnabled:!locked && !runInProgress];
     [gainPU                     setEnabled:!locked && !runInProgress];
     [terminationPU              setEnabled:!locked && !runInProgress];
-    [stopTriggerButton          setEnabled:!lockedOrRunningMaintenance];
-	[randomClockButton          setEnabled:!lockedOrRunningMaintenance];
 	[clockSourcePU              setEnabled:!lockedOrRunningMaintenance];
-	[pageSizePU                 setEnabled:!locked && !runInProgress];
     [extendedEventConfigButton  setEnabled:!locked && !runInProgress];
     [dacOffsetMatrix            setEnabled:!lockedOrRunningMaintenance];
 
@@ -1893,12 +1702,12 @@
 
 - (IBAction) rawDataBufferLenAction:(id)sender
 {
-    [model setRawDataBufferLen:[[sender selectedCell] tag] withValue:[sender intValue]];
+    [model setRawDataBufferLen:[sender intValue]];
 }
 
 - (IBAction) rawDataBufferStartAction:(id)sender
 {
-    [model setRawDataBufferStart:[[sender selectedCell] tag] withValue:[sender intValue]];
+    [model setRawDataBufferStart:[sender intValue]];
 }
 
 - (IBAction) accGate1LenAction:(id)sender
@@ -1936,39 +1745,7 @@
 {
     [model setAccGate4Start:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
-- (IBAction) accGate5LenAction:(id)sender
-{
-    [model setAccGate5Len:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-- (IBAction) accGate5StartAction:(id)sender
-{
-    [model setAccGate5Start:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
 
-- (IBAction) accGate6LenAction:(id)sender
-{
-    [model setAccGate6Len:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-- (IBAction) accGate6StartAction:(id)sender
-{
-    [model setAccGate6Start:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-- (IBAction) accGate7LenAction:(id)sender
-{
-    [model setAccGate7Len:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-- (IBAction) accGate7StartAction:(id)sender
-{
-    [model setAccGate7Start:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-- (IBAction) accGate8LenAction:(id)sender
-{
-    [model setAccGate8Len:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
-- (IBAction) accGate8StartAction:(id)sender
-{
-    [model setAccGate8Start:[[sender selectedCell] tag] withValue:[sender intValue]];
-}
 
 - (IBAction) riseTimeSumAction:(id)sender
 {
@@ -1996,16 +1773,6 @@
 	@catch (NSException* localException) {
 		NSLog(@"Probe of SIS 3300 board ID failed\n");
 	}
-}
-
-- (IBAction) stopTriggerAction:(id)sender
-{
-	[model setStopTrigger:[sender intValue]];	
-}
-
-- (IBAction) randomClockAction:(id)sender
-{
-	[model setRandomClock:[sender intValue]];	
 }
 
 
@@ -2227,6 +1994,22 @@
 - (IBAction) internalCoinGateLenAction:(id)sender
 {
     [model setInternalCoinGateLen:[[sender selectedCell] tag] withValue:[sender intValue]];
+}
+- (IBAction) hsDivAction:(id)sender
+{
+    [model setHsDiv:[[hsDivPU selectedItem]tag]];
+}
+- (IBAction) n1DivAction:(id)sender
+{
+    [model setN1Div:[n1DivField intValue]];
+}
+- (IBAction) pileUpWindowLenAction:(id)sender
+{
+    [model setPileUpWindow:[pileUpWindowLenField intValue]];
+}
+- (IBAction) rePileUpWindowLenAction:(id)sender
+{
+    [model setRePileUpWindow:[rePileUpWindowLenField intValue]];
 }
 
 #pragma mark •••Data Source

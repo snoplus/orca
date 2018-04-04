@@ -80,36 +80,31 @@
     IBOutlet NSMatrix*      accGate3StartMatrix;
     IBOutlet NSMatrix*      accGate4LenMatrix;
     IBOutlet NSMatrix*      accGate4StartMatrix;
-    IBOutlet NSMatrix*      accGate5LenMatrix;
-    IBOutlet NSMatrix*      accGate5StartMatrix;
-    IBOutlet NSMatrix*      accGate6LenMatrix;
-    IBOutlet NSMatrix*      accGate6StartMatrix;
-    IBOutlet NSMatrix*      accGate7LenMatrix;
-    IBOutlet NSMatrix*      accGate7StartMatrix;
-    IBOutlet NSMatrix*      accGate8LenMatrix;
-    IBOutlet NSMatrix*      accGate8StartMatrix;
- 
+  
     
     IBOutlet NSMatrix*		histogramsEnabledMatrix;
     IBOutlet NSMatrix*		pileupEnabledMatrix;
     IBOutlet NSMatrix*		clrHistogramWithTSMatrix;
     IBOutlet NSMatrix*		writeHitsIntoEventMemoryMatrix;
 
-    IBOutlet NSMatrix*      rawDataBufferLenMatrix;
-    IBOutlet NSMatrix*      rawDataBufferStartMatrix;
+    IBOutlet NSTextField*      rawDataBufferLenField;
+    IBOutlet NSTextField*      rawDataBufferStartField;
 
 	IBOutlet NSMatrix*		acquisitionControlMatrix;
     IBOutlet NSMatrix*      nimControlStatusMatrix;
 	
     IBOutlet NSButton*      loadDefaultsButton;
-    IBOutlet NSButton*      stopTriggerButton;
-	IBOutlet NSButton*		randomClockButton;
 	IBOutlet NSButton*		writeThresholdButton;
 	IBOutlet NSButton*		readThresholdButton;
     IBOutlet NSButton*      writeHistogramConfigurationButton;
     IBOutlet NSButton*      readHistogramConfigurationButton;
 	IBOutlet NSPopUpButton* clockSourcePU;
-	IBOutlet NSPopUpButton* pageSizePU;
+    IBOutlet NSPopUpButton* hsDivPU;
+    IBOutlet NSTextField*   n1DivField;
+    IBOutlet NSTextField*   sampleFreqField;
+    IBOutlet NSTextField*   pileUpWindowLenField;
+    IBOutlet NSTextField*   rePileUpWindowLenField;
+
 
     IBOutlet NSButton*      writeEventConfigButton;
     IBOutlet NSButton*      readEventConfigButton;
@@ -171,7 +166,10 @@
 - (void) lemoToMaskChanged:(NSNotification*)aNote;
 - (void) lemoUoMaskChanged:(NSNotification*)aNote;
 - (void) lemoCoMaskChanged:(NSNotification*)aNote;
-
+- (void) hsDivChanged:(NSNotification*)aNote;
+- (void) n1DivChanged:(NSNotification*)aNote;
+- (void) pileUpWindowLenChanged:(NSNotification*)aNote;
+- (void) rePileUpWindowLenChanged:(NSNotification*)aNote;
 
 - (void) tauFactorChanged:(NSNotification*)aNote;
 - (void) gapTimeChanged:(NSNotification*)aNote;
@@ -205,21 +203,11 @@
 - (void) accGate3StartChanged:(NSNotification*)aNote;
 - (void) accGate4LenChanged:(NSNotification*)aNote;
 - (void) accGate4StartChanged:(NSNotification*)aNote;
-- (void) accGate5LenChanged:(NSNotification*)aNote;
-- (void) accGate5StartChanged:(NSNotification*)aNote;
-- (void) accGate6LenChanged:(NSNotification*)aNote;
-- (void) accGate6StartChanged:(NSNotification*)aNote;
-- (void) accGate7LenChanged:(NSNotification*)aNote;
-- (void) accGate7StartChanged:(NSNotification*)aNote;
-- (void) accGate8LenChanged:(NSNotification*)aNote;
-- (void) accGate8StartChanged:(NSNotification*)aNote;
+
 - (void) eventConfigChanged:(NSNotification*)aNote;
 - (void) extendedEventConfigChanged:(NSNotification*)aNote;
 
-- (void) stopTriggerChanged:(NSNotification*)aNote;
-- (void) randomClockChanged:(NSNotification*)aNote;
 - (void) clockSourceChanged:(NSNotification*)aNote;
-- (void) pageSizeChanged:(NSNotification*)aNote;
 - (void) slotChanged:(NSNotification*)aNote;
 - (void) baseAddressChanged:(NSNotification*)aNote;
 - (void) settingsLockChanged:(NSNotification*)aNote;
@@ -281,16 +269,6 @@
 - (IBAction) accGate2StartAction:(id)sender;
 - (IBAction) accGate3LenAction:(id)sender;
 - (IBAction) accGate3StartAction:(id)sender;
-- (IBAction) accGate4LenAction:(id)sender;
-- (IBAction) accGate4StartAction:(id)sender;
-- (IBAction) accGate5LenAction:(id)sender;
-- (IBAction) accGate5StartAction:(id)sender;
-- (IBAction) accGate6LenAction:(id)sender;
-- (IBAction) accGate6StartAction:(id)sender;
-- (IBAction) accGate7LenAction:(id)sender;
-- (IBAction) accGate7StartAction:(id)sender;
-- (IBAction) accGate8LenAction:(id)sender;
-- (IBAction) accGate8StartAction:(id)sender;
 - (IBAction) acquisitionControlAction:(id)sender;
 - (IBAction) nimControlStatusAction:(id)sender;
 - (IBAction) writeAccumulatorGateAction:(id)sender;
@@ -300,8 +278,6 @@
 - (IBAction) writeThresholdsAction:(id)sender;
 - (IBAction) readThresholdsAction:(id)sender;
 
-- (IBAction) stopTriggerAction:(id)sender;
-- (IBAction) randomClockAction:(id)sender;
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
 - (IBAction) settingLockAction:(id) sender;
@@ -318,6 +294,10 @@
 - (IBAction) loadDefaults:(id)sender;
 - (IBAction) internalGateLenAction:(id)sender;
 - (IBAction) internalCoinGateLenAction:(id)sender;
+- (IBAction) hsDivAction:(id)sender;
+- (IBAction) n1DivAction:(id)sender;
+- (IBAction) pileUpWindowLenAction:(id)sender;
+- (IBAction) rePileUpWindowLenAction:(id)sender;
 
 - (IBAction) checkEvent:(id)sender;
 

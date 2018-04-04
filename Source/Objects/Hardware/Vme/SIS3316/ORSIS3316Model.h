@@ -235,7 +235,8 @@ enum {
     unsigned short  dacOffsets[kNumSIS3316Groups];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
-    //long            heTrigOutputMask;
+    unsigned short  hsDiv;
+    unsigned short  n1Div;
     
     
     unsigned long   eventConfigMask;
@@ -244,8 +245,8 @@ enum {
     unsigned short  activeTrigGateWindowLen[kNumSIS3316Groups];
     unsigned short  preTriggerDelay[kNumSIS3316Groups];
     
-    unsigned long   rawDataBufferLen[kNumSIS3316Groups];
-    unsigned long   rawDataBufferStart[kNumSIS3316Groups];
+    unsigned long   rawDataBufferLen;
+    unsigned long   rawDataBufferStart;
     unsigned short  energyDivider[kNumSIS3316Channels];
     unsigned short  energySubtractor[kNumSIS3316Channels];
 
@@ -274,16 +275,13 @@ enum {
     unsigned long   riseTimeSum[kNumSIS3316Groups];
     unsigned long   gapTimeSum[kNumSIS3316Groups];
     unsigned long   cfdControlBitsSum[kNumSIS3316Groups];
-
+    unsigned long   pileUpWindowLength;
+    unsigned long   rePileUpWindowLength;
 
     
     int             currentBank;
-    int				pageSize;
 	BOOL			isRunning;
  	
-    BOOL			stopTrigger;
-    BOOL			pageWrap;
-    //BOOL			gateChaining;
 	unsigned short	moduleID;
     unsigned long   clockSource;
     unsigned short  gain;
@@ -303,7 +301,6 @@ enum {
     BOOL multiplexerMode;
 
 	//clocks and delays (Acquisition control reg)
-    BOOL randomClock;
 	
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3316Channels];
@@ -345,10 +342,15 @@ enum {
 - (void) setSharing:(int)aValue;
 - (int) sharing;
 
-//- (float) clockSource;
+- (unsigned short) hsDiv;
+- (void) setHsDiv:(unsigned short)aValue;
+- (unsigned short) n1Div;
+- (void) setN1Div:(unsigned short)aValue;
+
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
 - (unsigned short) majorRevision;
+- (void) readFirmwareVersion:(BOOL)verbose;
 
 - (long) enabledMask;
 - (unsigned long) eventConfigMask;
@@ -410,6 +412,12 @@ enum {
 
 - (unsigned short) cfdControlBits:(unsigned short)aChan;
 - (void) setCfdControlBits:(unsigned short)aChan withValue:(unsigned short)aValue;
+
+- (unsigned long)   pileUpWindowLength;
+- (void) setPileUpWindow:(unsigned long)aValue;
+- (unsigned long)   rePileUpWindowLength;
+- (void) setRePileUpWindow:(unsigned long)aValue;
+- (void) writePileUpRegisters;
 
 
 - (BOOL) enableSum:(unsigned short)aGroup;
@@ -479,11 +487,11 @@ enum {
 - (unsigned short)  preTriggerDelay:(unsigned short)group;
 - (void)            setPreTriggerDelay:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned long)  rawDataBufferLen:(unsigned short)aGroup;
-- (void)            setRawDataBufferLen:(unsigned short)group withValue:(unsigned long)aValue;
+- (unsigned long)  rawDataBufferLen;
+- (void)            setRawDataBufferLen:(unsigned long)aValue;
 
-- (unsigned long)  rawDataBufferStart:(unsigned short)aGroup;
-- (void)           setRawDataBufferStart:(unsigned short)group withValue:(unsigned long)aValue;
+- (unsigned long)  rawDataBufferStart;
+- (void)           setRawDataBufferStart:(unsigned long)aValue;
 
 - (unsigned short)  accumulatorGateStart:(unsigned short)aGroup;
 - (void)            setAccumulatorGateStart:(unsigned short)aGroup withValue:(unsigned short)aValue;
@@ -515,29 +523,7 @@ enum {
 - (unsigned short)  accGate4Len:(unsigned short)aGroup;
 - (void)            setAccGate4Len:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate5Start:(unsigned short)aGroup;
-- (void)            setAccGate5Start:(unsigned short)group withValue:(unsigned short)aValue;
 
-- (unsigned short)  accGate5Len:(unsigned short)aGroup;
-- (void)            setAccGate5Len:(unsigned short)group withValue:(unsigned short)aValue;
-
-- (unsigned short)  accGate6Start:(unsigned short)aGroup;
-- (void)            setAccGate6Start:(unsigned short)group withValue:(unsigned short)aValue;
-
-- (unsigned short)  accGate6Len:(unsigned short)aGroup;
-- (void)            setAccGate6Len:(unsigned short)group withValue:(unsigned short)aValue;
-
-- (unsigned short)  accGate7Start:(unsigned short)aGroup;
-- (void)            setAccGate7Start:(unsigned short)group withValue:(unsigned short)aValue;
-
-- (unsigned short)  accGate7Len:(unsigned short)aGroup;
-- (void)            setAccGate7Len:(unsigned short)group withValue:(unsigned short)aValue;
-
-- (unsigned short)  accGate8Start:(unsigned short)aGroup;
-- (void)            setAccGate8Start:(unsigned short)group withValue:(unsigned short)aValue;
-
-- (unsigned short)  accGate8Len:(unsigned short)aGroup;
-- (void)            setAccGate8Len:(unsigned short)group withValue:(unsigned short)aValue;
 
 - (unsigned long)   lemoCoMask;
 - (void)            setLemoCoMask:(unsigned long)aMask;
@@ -552,47 +538,8 @@ enum {
 - (unsigned long) internalCoinGateLen:(unsigned short)aGroup;
 - (void) setInternalCoinGateLen:(unsigned short)aGroup withValue:(unsigned long)aValue;
 
-
-//Acquisition control reg
-//- (BOOL) bankSwitchMode;
-//- (void) setBankSwitchMode:(BOOL)aBankSwitchMode;
-//- (BOOL) autoStart;
-//- (void) setAutoStart:(BOOL)aAutoStart;
-//- (BOOL) multiEventMode;
-//- (void) setMultiEventMode:(BOOL)aMultiEventMode;
-//- (BOOL) multiplexerMode;
-//- (void) setMultiplexerMode:(BOOL)aMultiplexerMode;
-//- (BOOL) lemoStartStop;
-//- (void) setLemoStartStop:(BOOL)aLemoStartStop;
-//- (BOOL) p2StartStop;
-//- (void) setP2StartStop:(BOOL)aP2StartStop;
-//- (BOOL) gateMode;
-//- (void) setGateMode:(BOOL)aGateMode;
-
-//clocks and delays (Acquisition control reg)
-//- (BOOL) stopDelayEnabled;
-//- (void) setStopDelayEnabled:(BOOL)aStopDelayEnabled;
-- (BOOL) randomClock;
-- (void) setRandomClock:(BOOL)aRandomClock;
-
-
-
 //-=**- (int) clockSource;
 //-=**- (void) setClockSource:(int)aClockSource;
-
-//event configuration
-//- (BOOL) gateChaining;
-//- (void) setGateChaining:(BOOL)aState;
-
-
-- (BOOL) stopTrigger;
-- (void) setStopTrigger:(BOOL)aStopTrigger;
-//- (int) stopDelay;
-//- (void) setStopDelay:(int)aStopDelay;
-//- (int) startDelay;
-//- (void) setStartDelay:(int)aStartDelay;
-- (int) pageSize;
-- (void) setPageSize:(int)aPageSize;
 
 - (void) initParams;
 
@@ -602,7 +549,6 @@ enum {
 - (void)            setRateIntegrationTime:(double)newIntegrationTime;
 - (BOOL)			bumpRateFromDecodeStage:(unsigned short)channel;
 
-- (int) numberOfSamples;
 - (BOOL) checkRegList;
 - (unsigned short) serialNumber;
 
@@ -680,8 +626,9 @@ enum {
 - (void) armBank2;
 - (int) currentBank;
 - (void) resetADCClockDCM;
-- (void) setClockChoice:(int) clck_choice;
+- (void) setClockFreq;
 - (int) setFrequency:(int) osc values:(unsigned char*)values;
+- (void) si570ReadDivider:(int) osc data:(unsigned char*)data;
 
 //some test functions
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
@@ -771,26 +718,13 @@ extern NSString* ORSIS3316AccGate3LenChanged;
 extern NSString* ORSIS3316AccGate3StartChanged;
 extern NSString* ORSIS3316AccGate4LenChanged;
 extern NSString* ORSIS3316AccGate4StartChanged;
-extern NSString* ORSIS3316AccGate5LenChanged;
-extern NSString* ORSIS3316AccGate5StartChanged;
-extern NSString* ORSIS3316AccGate6LenChanged;
-extern NSString* ORSIS3316AccGate6StartChanged;
-extern NSString* ORSIS3316AccGate7LenChanged;
-extern NSString* ORSIS3316AccGate7StartChanged;
-extern NSString* ORSIS3316AccGate8LenChanged;
-extern NSString* ORSIS3316AccGate8StartChanged;
 extern NSString* ORSIS3316TemperatureChanged;
 
 //CSR
 extern NSString* ORSIS3316CSRRegChanged;
 extern NSString* ORSIS3316AcqRegChanged;
 
-extern NSString* ORSIS3316StopTriggerChanged;
-extern NSString* ORSIS3316RandomClockChanged;
-//extern NSString* ORSIS3316StopDelayChanged;
-//extern NSString* ORSIS3316StartDelayChanged;
 extern NSString* ORSIS3316ClockSourceChanged;
-extern NSString* ORSIS3316PageSizeChanged;
 
 extern NSString* ORSIS3316SettingsLock;
 extern NSString* ORSIS3316RateGroupChangedNotification;
@@ -814,4 +748,9 @@ extern NSString* ORSIS3316LemoToMaskChanged;
 
 extern NSString* ORSIS3316InternalGateLenChanged;
 extern NSString* ORSIS3316InternalCoinGateLenChanged;
+extern NSString* ORSIS3316HsDivChanged;
+extern NSString* ORSIS3316N1DivChanged;
+
+extern NSString* ORSIS3316PileUpWindowLengthChanged;
+extern NSString* ORSIS3316RePileUpWindowLengthChanged;
 
