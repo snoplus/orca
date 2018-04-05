@@ -94,8 +94,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textDidChange:) name:NSControlTextDidChangeNotification object:logBookField];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmPosted:) name:ORAlarmAddedToCollection object : nil];	
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmCleared:) name:ORAlarmRemovedFromCollection object : nil];	
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmAcknowledged:) name:ORAlarmWasAcknowledgedNotification object : nil];	
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(alarmAcknowledged:) name:ORAlarmWasAcknowledgedNotification object : nil];
 }
 
 - (void) loadAlarmHistory
@@ -988,6 +987,34 @@ void NSLogMono(NSString* s,...)
     [pool release];
 }
 
+void NSLogStartTable(NSString* aTitle,int aWidth)
+{
+    aTitle = [aTitle stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+    NSString* dashes = @"_";
+    int len = [aTitle length];
+    int i;
+    for(i=0;i<len;i++){
+        dashes = [dashes stringByAppendingString:@"_"];
+    }
+    NSLogMono(@"%@\n",[dashes rightJustified:len + 8]);
+    NSLogMono(@"     / %@ \\\n",aTitle);
+    dashes = @"=";
+    for(i=0;i<aWidth-1;i++){
+        dashes = [dashes stringByAppendingString:@"="];
+    }
+    NSLogMono(@"%@\n",dashes);
+}
+void NSLogDivider(NSString* divider, int aWidth)
+{
+    NSString* dash = [divider substringToIndex:1];
+    NSMutableString* dashes = [[@"" mutableCopy]autorelease];
+    int i;
+    for(i=0;i<aWidth;i++){
+        [dashes appendString:dash];
+    }
+    NSLogMono(@"%@\n",dashes);
+
+}
 //----------------------------------------------------------------------------------------------------
 //LogError
 //	a helper function to redirect a call to logError to a logger defined by the NSApp delegate

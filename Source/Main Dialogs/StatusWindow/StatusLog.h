@@ -3,7 +3,7 @@
 //  Redirects NSLog to logStatus.
 //
 //  Created by Mark Howe on Sunday, Oct 13,2002.
-//  Copyright  © 2001 CENPA. All rights reserved.
+//  Copyright  ï¿½ 2001 CENPA. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -24,6 +24,8 @@ void NSLogString(NSString* aString,...);
 void NSLogColor(NSColor* aColor,NSString* aString,...);
 void NSLogFont(NSFont* aFont,NSString* aString,...);
 void NSLogMono(NSString* aString,...);
+void NSLogStartTable(NSString* aString,int aWidth);
+void NSLogDivider(NSString* aString,int aWidth);
 void NSLogError(NSString* aString,...);
 void NSLogAttr(NSAttributedString* aString);
 #define NSLog NSLogString

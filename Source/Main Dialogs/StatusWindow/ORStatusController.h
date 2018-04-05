@@ -51,6 +51,7 @@
 
 #pragma mark ¥¥¥Accessors
 + (ORStatusController*) sharedStatusController;
+
 - (int) statusTextlength;
 - (int) alarmLogTextlength;
 - (void) setDataSet: (ORDataSet *) aDataSet;
