@@ -89,7 +89,94 @@
 	[self recolorCompleteFile:nil];
 	[self colorsChanged:nil];
 }
+- (void)mouseDown:(NSEvent *)theEvent
+{
+    // Start out willing to work with a double-click for delimiter-balancing;
+    // see selectionRangeForProposedRange:proposedCharRange granularity: below
+    inEligibleDoubleClick = YES;
+    
+    [super mouseDown:theEvent];
+}
 
+- (NSRange)selectionRangeForProposedRange:(NSRange)proposedCharRange
+                              granularity:(NSSelectionGranularity)granularity
+{
+    if ((granularity == NSSelectByWord) && inEligibleDoubleClick) {
+        // The proposed range has to be zero-length to qualify
+        if (proposedCharRange.length == 0) {
+            NSEvent*        event     = [NSApp currentEvent];
+            NSEventType     eventType = [event type];
+            NSTimeInterval eventTime  = [event timestamp];
+            
+            if (eventType == NSLeftMouseDown) {
+                // This is the mouseDown of the double-click; we do not want
+                // to modify the selection here, just log the time
+                doubleDownTime = eventTime;
+            }
+            else if (eventType == NSLeftMouseUp) {
+                // After the double-click interval since the second mouseDown,
+                // the mouseUp is no longer eligible
+                if (eventTime - doubleDownTime <= [NSEvent doubleClickInterval]){
+                    NSString* scriptString = [[self textStorage] string];
+                    NSRange   startRange = NSMakeRange(proposedCharRange.location,1);
+                    NSString*          s = [scriptString substringWithRange: startRange];
+                    unsigned char      c = [s characterAtIndex:0];
+                    int            start = startRange.location;
+                    int              len = [scriptString length];
+                    int i;
+                    int level = 0;
+                    switch(c){
+                        case '(':
+                            for(i=start;i<len;i++){
+                                NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
+                                if([s1 isEqualToString:@")"]){
+                                    if(level == 1)return NSMakeRange(start,i-start+1);
+                                    else level--;
+                                }
+                                else if([s1 isEqualToString:@"("])level++;
+                            }
+                            break;
+                        case ')':
+                            for(i=start;i>0;i--){
+                                NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
+                                if([s1 isEqualToString:@"("]){
+                                    if(level == 1)return NSMakeRange(i,startRange.location-i+1);
+                                    else level--;
+                                }
+                                else if([s1 isEqualToString:@")"])level++;
+                            }
+                           break;
+                        case '{':
+                            for(i=start;i<len;i++){
+                                NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
+                                if([s1 isEqualToString:@"}"]){
+                                    if(level == 1)return NSMakeRange(start,i-start+1);
+                                    else level--;
+                                }
+                                else if([s1 isEqualToString:@"{"])level++;
+                            }
+                            break;
+                        case '}':
+                            for(i=start;i>0;i--){
+                                NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
+                                if([s1 isEqualToString:@"{"]){
+                                    if(level == 1)return NSMakeRange(i,startRange.location-i+1);
+                                    else level--;
+                                }
+                                else if([s1 isEqualToString:@"}"])level++;
+                            }
+                            break;
+                    }
+                }
+                else inEligibleDoubleClick = false;
+            }
+            else inEligibleDoubleClick = false;
+        }
+        else inEligibleDoubleClick = false;
+    }
+    return [super selectionRangeForProposedRange:proposedCharRange
+                                     granularity:granularity];
+}
 - (void) colorsChanged: (NSNotification*)notification
 {
 	[self recolorCompleteFile:self];
@@ -98,7 +185,6 @@
 		[enclosingView setBackgroundColor:[self backgroundColor]];
 		[enclosingView setNeedsDisplay:YES];
 	}
-	
 }
 
 - (void) unselectAll

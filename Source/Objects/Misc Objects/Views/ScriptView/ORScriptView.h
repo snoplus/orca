@@ -39,6 +39,9 @@
 	NSTimer*						recolorTimer;			// Timer used to do the actual recoloring a little while after the last keypress.
 	BOOL							syntaxColoringBusy;		// Set while recolorRange is busy, so we don't recursively call recolorRange.
 	NSString*						syntaxDefinitionFilename;
+    BOOL inEligibleDoubleClick;
+    NSTimeInterval doubleDownTime;
+    
 }
 
 - (IBAction) recolorCompleteFile: (id)sender;
