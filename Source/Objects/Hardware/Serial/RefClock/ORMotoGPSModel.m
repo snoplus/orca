@@ -153,7 +153,15 @@ extern NSString* ORMotoGPS;
 //#define chanDatIdx 57
 //#define relSigStrIdx 2
 //#define antSenseIdx 130
-//#define antSenseBitMask 0x03
+//#define antSenseBitMask 0x06
+            
+            
+            
+            
+            
+            
+            
+            
 //#define tempIdx 139
             
 //        //status variables
@@ -167,9 +175,9 @@ extern NSString* ORMotoGPS;
             }
             switch(bytes[antSenseIdx] & antSenseBitMask){
                 case 0: antennaSense = @"OK"; break;
-                case 1: antennaSense = @"over current (shorted!)"; break;
-                case 2: antennaSense = @"under current (open!)"; break;
-                case 3: antennaSense = @"warning: not valid"; break;
+                case 2: antennaSense = @"over current (shorted!)"; break;
+                case 4: antennaSense = @"under current (open!)"; break;
+                case 6: antennaSense = @"warning: not valid"; break;
             }
 
             oscTemperature = -110.0;
