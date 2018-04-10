@@ -1070,6 +1070,8 @@ void NSLogError(NSString* aString,...)
 - (void) mainThreadPrint:(NSAttributedString*)s1
 {
     if(![NSThread isMainThread])return;
+    [sharedStatusController scheduleCouchDBUpdate];
+
     NSDate* now  	= [NSDate date];
     NSMutableAttributedString* now_Attr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ ",[now stdDescription]] attributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]] autorelease];
     
@@ -1106,7 +1108,6 @@ void NSLogError(NSString* aString,...)
         i += range.length;
     }
     [s1 release];
-    [sharedStatusController scheduleCouchDBUpdate];
     
 }
 @end
