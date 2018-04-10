@@ -996,8 +996,8 @@ void NSLogStartTable(NSString* aTitle,int aWidth)
     for(i=0;i<len;i++){
         dashes = [dashes stringByAppendingString:@"_"];
     }
-    NSLogMono(@"%@\n",[dashes rightJustified:len + 8]);
-    NSLogMono(@"     / %@ \\\n",aTitle);
+    NSLogMono(@"%@\n",[dashes rightJustified:len + 6]);
+    NSLogMono(@"   / %@ \\\n",aTitle);
     dashes = @"=";
     for(i=0;i<aWidth-1;i++){
         dashes = [dashes stringByAppendingString:@"="];
