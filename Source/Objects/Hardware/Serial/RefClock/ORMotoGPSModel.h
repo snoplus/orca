@@ -62,6 +62,7 @@
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
 - (void) processResponse:(NSData*)someData forRequest:(NSDictionary*)lastRequest;
+- (NSString*) bytesToPrintable:(unsigned char *)bytes length:(unsigned short)aLength;
 - (void) setDefaults;
 - (void) autoSurvey;
 - (void) requestStatus;

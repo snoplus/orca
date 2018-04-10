@@ -12,6 +12,7 @@
                 <outlet property="alarmWindowField" destination="cB4-K8-wOy" id="uWG-tF-BZ1"/>
                 <outlet property="deviceContent" destination="6" id="W8Z-QY-0gX"/>
                 <outlet property="deviceIDButton" destination="HFP-h0-yK6" id="KAl-dl-Wu5"/>
+                <outlet property="deviceIDField" destination="8NR-IJ-lIx" id="D7T-FU-iLS"/>
                 <outlet property="resetButton" destination="im4-6S-Pt9" id="sB0-KG-hBX"/>
                 <outlet property="statusButton" destination="Z1f-bu-KCh" id="Os1-6w-Jeo"/>
                 <outlet property="statusOutputField" destination="XZc-Vg-KTl" id="ZM5-FC-1pM"/>
@@ -56,12 +57,12 @@
                                 <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="HFg-go-Bng" userLabel="Signal Form">
                                     <rect key="frame" x="121" y="148" width="153" height="22"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <popUpButtonCell key="cell" type="push" title="Free Run" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Mkt-5f-qUp" id="oRU-mZ-DBD">
+                                    <popUpButtonCell key="cell" type="push" title="Free Run" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="Mkt-5f-qUp" id="oRU-mZ-DBD">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
                                         <menu key="menu" title="OtherViews" id="wNo-kB-tjV">
                                             <items>
-                                                <menuItem title="Free Run" id="Mkt-5f-qUp"/>
+                                                <menuItem title="Free Run" state="on" id="Mkt-5f-qUp"/>
                                                 <menuItem title="Always" id="x6l-3M-gc1"/>
                                             </items>
                                         </menu>
@@ -73,12 +74,12 @@
                                 <popUpButton verticalHuggingPriority="750" misplaced="YES" imageHugsTitle="YES" id="39F-Ft-5cr" userLabel="Signal Form">
                                     <rect key="frame" x="121" y="121" width="153" height="22"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <popUpButtonCell key="cell" type="push" title="Never Sync" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="5eV-CM-CHM" id="ibD-qb-vQT">
+                                    <popUpButtonCell key="cell" type="push" title="Never Sync" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="5eV-CM-CHM" id="ibD-qb-vQT">
                                         <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="smallSystem"/>
                                         <menu key="menu" title="OtherViews" id="H9T-iT-ThA">
                                             <items>
-                                                <menuItem title="Never Sync" id="5eV-CM-CHM"/>
+                                                <menuItem title="Never Sync" state="on" id="5eV-CM-CHM"/>
                                                 <menuItem title="Always Sync" id="LP6-nv-8Om"/>
                                             </items>
                                         </menu>

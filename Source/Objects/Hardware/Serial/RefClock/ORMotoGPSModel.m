@@ -144,7 +144,8 @@ extern NSString* ORMotoGPS;
     //if([inComingData length] >= 7) {
     if(bytes[nBytes - 1] == '\n') { // check for trailing \n (LF)
         //lastRecTelegram = [NSString stringWithCString:(char*)bytes encoding: NSASCIIStringEncoding];
-        lastRecTelegram = [[NSString alloc]initWithBytes:bytes length:nBytes encoding:NSASCIIStringEncoding];
+        //lastRecTelegram = [[NSString alloc]initWithBytes:bytes length:nBytes encoding:NSASCIIStringEncoding];
+        lastRecTelegram = [self bytesToPrintable:bytes length:nBytes];
         
         if([lastRequest isEqualToDictionary:[self statusCommand]]){
             NSLog(@"processing GPS status...\n");
@@ -200,6 +201,21 @@ extern NSString* ORMotoGPS;
 
 }
 
+- (NSString*) bytesToPrintable:(unsigned char *)bytes length:(unsigned short)aLength{
+    NSString* printable = [[NSString alloc]init];
+    char c;
+    for(int i = 0; i < aLength; ++i){
+        c = bytes[i];
+        if(isprint(c)){
+            printable = [printable stringByAppendingFormat:@"%c", c];
+        }
+        else{
+            printable = [printable stringByAppendingString:@"."];
+        }
+    }
+    
+    return printable;
+}
 
 - (void) setDefaults{
     [self writeData:[self defaultsCommand]];

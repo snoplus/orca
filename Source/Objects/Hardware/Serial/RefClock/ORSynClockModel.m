@@ -31,6 +31,7 @@ NSString* ORSynClockModelStatusPollChanged      = @"ORSynClockModelStatusPollCha
 NSString* ORSynClockModelStatusOutputChanged    = @"ORSynClockModelStatusOutputChanged";
 NSString* ORSynClockModelResetChanged           = @"ORSynClockModelResetChanged";
 NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
+NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
 
 //#define maxReTx 3  // above this number, stop trying to
 // retransmit and place an Error.
@@ -65,6 +66,10 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     [self writeData:[self errMessgOffCommand]];  // this is written to SynClock flash and needs to be activate only once for a new device (2018-03-28 JH.) (dont use more than 100'000 times to save the synclocks flash memory)
 }
 
+- (void) requestID{
+    [self writeData:[self iDCommand]];
+}
+
 - (BOOL) statusPoll
 {
     return statusPoll;
@@ -96,6 +101,9 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     }
     if([messages length]==0)return @"";
     else                    return messages;
+}
+- (NSString*) clockID{
+    return clockID;
 }
 
 - (int) trackMode
@@ -168,247 +176,53 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
     
     //use [refClock lastRequest] to get the orginal command
     
-    if([refClock verbose]) NSLog(@"received synClock response\n");
+    //if([refClock verbose]) NSLog(@"received synClock response\n");
+    NSLog(@"received synClock response\n");
     
     ///MAH -- I didn't attempt to do anything to the old processing code below since I don't know the format
     //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
     //BOOL done = NO;
-    
-    //if(!inComingData)inComingData = [[NSMutableData data] retain];
-    //  [inComingData appendData:[[note userInfo] objectForKey:@"data"]];
-    
-    //while (((char*)[inComingData mutableBytes])[0] != 'X' && [inComingData length] > 0){  //  remove possible error bytes at beginning until 'X';
-    // this can occur when the device has sent faulty data.
-    //NSRange range = NSMakeRange(0, 1);
-    //[inComingData replaceBytesInRange:range withBytes:NULL length:0];
-    //if([refClock verbose]){
-    //  NSLog(@"removed wrong starting Byte! \n");
-    //}
-    //}
+ 
     unsigned short nBytes = [receivedData length];
     unsigned char * bytes = (unsigned char *)[receivedData bytes];
     //if([inComingData length] >= 7) {
     if(bytes[nBytes - 1] == '\n') { // check for trailing \n (LF)
-        //NSLog(@"lastRequest contains %d bytes", [lastRequest length]);
-        // char* lastCmd;
-        // if([lastRequest length] > 7)  // waveform was sent...
-        // {
-        //   if([refClock verbose]){
-        //     NSLog(@"respond after set waveform: %@, length: %d \n", inComingData, [inComingData length]);
-        //   }
-        //   NSRange range = NSMakeRange([lastRequest length] - 7, 7);
-        //   lastCmd = (char*) [[lastRequest subdataWithRange:range]bytes];
-        //   if([refClock verbose]){
-        //     NSLog(@"last command (waveform): %7s \n", lastCmd);
-        //   }
-        // }
-        // else{
-        //lastCmd = (char*)[lastRequest bytes];
-        //}
+        
         
         if([refClock verbose]){
             //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
             NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
         }
-        NSString* statusMessage = nil;;
-        switch(bytes[0]){
-            case '0': statusMessage = @"0: warming up"; break;
-            case '1': statusMessage = @"1: tracking set-up"; break;
-            case '2': statusMessage = @"2: track to PPSREF"; break;
-            case '3': statusMessage = @"3: sync to PPSREF"; break;
-            case '4': statusMessage = @"4: Free Run. Track OFF"; break;
-            case '5': statusMessage = @"5: PSREF unstable (Hold over)"; break;
-            case '6': statusMessage = @"6: No PSREF (Hold over)"; break;
-            case '7': statusMessage = @"7: factory used"; break;
-            case '8': statusMessage = @"8: factory used"; break;
-            case '9': statusMessage = @"9: Fault"; break;
-            default: statusMessage = @"warning: SynClock default message"; break;
-        }
-        [self updateStatusHistory:statusMessage];
-        NSLog(@"notifying... \n");
+        if([lastRequest isEqualToDictionary:[self statusCommand]]){
+            NSString* statusMessage = nil;
+            switch(bytes[0]){
+                case '0': statusMessage = @"0: warming up"; break;
+                case '1': statusMessage = @"1: tracking set-up"; break;
+                case '2': statusMessage = @"2: track to PPSREF"; break;
+                case '3': statusMessage = @"3: sync to PPSREF"; break;
+                case '4': statusMessage = @"4: Free Run. Track OFF"; break;
+                case '5': statusMessage = @"5: PSREF unstable (Hold over)"; break;
+                case '6': statusMessage = @"6: No PSREF (Hold over)"; break;
+                case '7': statusMessage = @"7: factory used"; break;
+                case '8': statusMessage = @"8: factory used"; break;
+                case '9': statusMessage = @"9: Fault"; break;
+                default: statusMessage = @"warning: SynClock default message"; break;
+            }
+            [self updateStatusHistory:statusMessage];
+            NSLog(@"statusMessage: notifying... \n");
         //displayStatus(bytes[0]);
+        }
+        else if([lastRequest isEqualToDictionary:[self iDCommand]]){
+            clockID = [[NSString alloc]initWithBytes:bytes length:nBytes - 2 encoding:NSASCIIStringEncoding];
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockIDChanged object:self];
+            NSLog(@"clockID: notifying... \n");
+        }
+        
+        else{
+            NSLog(@"Warning (SynClockModel::dataAvailable): unsupported command \n");
+        }
     }
-    else{
-        NSLog(@"Warning (SynClockModel::dataAvailable): unsupported command \n");
-    }
-    //  switch (lastCmd[1]){
-    //    case kWGRemoteCmd:
-    //
-    //      if([lastRequest isEqual: inComingData]){
-    //        //NSLog(@"setRemote was successful: %@ \n", inComingData);
-    //        reTxCount = 0;
-    //      }else{
-    //        reTxCount++;
-    //        if([refClock verbose]){
-    //          NSLog(@"setRemote (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //      }
-    //        [cmdQueue enqueue:lastRequest];
-    //      }
-    //      done = YES;
-    //      break;
-    //    case kWGFreqCmd:
-    //     if(![lastRequest isEqual: inComingData]){
-    //       reTxCount++;
-    //       if([refClock verbose]){
-    //         NSLog(@"setFrequency (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //received wrong acknowledge: %@ \n", inComingData);
-    //       }
-    //       [cmdQueue enqueue:lastRequest];
-    //     }else {
-    //       //NSLog(@"setFrequency was successful: %@ \n", inComingData);
-    //       reTxCount = 0;
-    //     }
-    //     done = YES;
-    //    break;
-    //   case kWGAttCmd:
-    //
-    //     if([lastRequest isEqual: inComingData]){
-    //       reTxCount = 0;
-    //     }else{
-    //       reTxCount++;
-    //       if([refClock verbose]){
-    //         NSLog(@"setAmplitude (Attenuation) (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //       }
-    //       [cmdQueue enqueue:lastRequest];
-    //     }
-    //     done = YES;
-    //     break;
-    //   case kWGAmpltCmd:
-    //     if([lastRequest isEqual: inComingData]){
-    //       reTxCount = 0;
-    //     }else{
-    //       reTxCount++;
-    //       if([refClock verbose]){
-    //         NSLog(@"setAmplitude (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //       }
-    //       [cmdQueue enqueue:lastRequest];
-    //     }
-    //     done = YES;
-    //     break;
-    //  case kWGDutyCCmd:
-    //   if([lastRequest isEqual: inComingData]){
-    //     reTxCount = 0;
-    //   }else{
-    //     reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"setDutyCycle (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount);
-    //     }
-    //     [cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    // case kWGFormCmd:
-    //   if([lastRequest isEqual: inComingData]){
-    //     reTxCount = 0;
-    //   }else{
-    //     reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"setSignalForm (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount); //%@ \n", inComingData);
-    //       NSLog(@"sent Data: %@ \n", lastRequest);
-    //       NSLog(@"incoming Data: %@ \n", inComingData);
-    //     }
-    //     [cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    //
-    //   case kWGProgModCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGProgModCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   if(! [[self progModeCmdReturned] isEqual: inComingData]){
-    //     reTxCount++;
-    //     [cmdQueue enqueue:lastRequest];
-    //   }else{
-    //     reTxCount = 0;
-    //   }
-    //   done = YES;
-    //   break;
-    //   case kWGStartProgCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGStartProgCmd:incoming Data: %@ \n", inComingData);
-    //   }
-    //   if([lastRequest isEqual: inComingData]){
-    //     reTxCount = 0;
-    //   }else{
-    //     reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"start Programming (SynClock): wrong data: trying(%d) to retransmit \n", reTxCount);
-    //     }
-    //     [cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    //
-    //   case kWGRdyPrgrmCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGRdyPrgrmCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   if(! [[self isReadyForProgReturned] isEqual: inComingData]){
-    //     reTxCount++;
-    //     [cmdQueue enqueue:lastRequest];
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGRdyPrgrmCmd not successful. repeating.. \n");
-    //     }
-    //     usleep(1000000);
-    //   }else{
-    //     reTxCount = 0;
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGRdyPrgrmCmd successful \n");
-    //     }
-    //   }
-    //   done = YES;
-    //   break;
-    //   case kWGStopPrgrmCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGStopPrgrmCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   NSData* expectedReturn = [NSData dataWithBytes:lastCmd length:7];
-    //   if([expectedReturn isEqual: inComingData]){
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGStopPrgrmCmd: incoming Data OK \n");
-    //     }
-    //     reTxCount = 0;
-    //   }else{
-    //     //reTxCount++;
-    //     if([refClock verbose]){
-    //       NSLog(@"ERROR: stop Programming (SynClock): wrong data; expected: %@  \n", expectedReturn);
-    //     }
-    //     //[cmdQueue enqueue:lastRequest];
-    //   }
-    //   done = YES;
-    //   break;
-    //   case kWGFinPrgrmCmd:
-    //   if([refClock verbose]){
-    //     NSLog(@"kWGFinPrgrmCmd: incoming Data: %@ \n", inComingData);
-    //   }
-    //   if(! [[self isStoppedProgReturned] isEqual: inComingData]){
-    //     reTxCount++; // = 1;
-    //     [cmdQueue enqueue:lastRequest];
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGFinPrgrmCmd not successful. repeating.. \n");
-    //     }
-    //     usleep(1000000);
-    //   }else{
-    //     reTxCount = 0;
-    //     if([refClock verbose]){
-    //       NSLog(@"kWGFinPrgrmCmd successful \n");
-    //     }
-    //   }
-    //   usleep(1000000);
-    //   done = YES;
-    //   break;
-    //
-    //   }
-    
-    //if(done){
-    //      [inComingData release];
-    //    inComingData = nil;
-    //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-    //[self setLastRequest:nil];             //clear the last request
-    //[self processOneCommandFromQueue];     //do the next command in the queue
-    //}
-    
-    //}
+   
 }
 
 
@@ -479,7 +293,24 @@ NSString* ORSynClockStatusUpdated               = @"ORSynClockStatusUpdated";
         @"device"    : ORSynClock,
         @"replySize" : @3
     };
-    NSLog(@"SynClockModel::statusCommand! \n");
+    //NSLog(@"SynClockModel::statusCommand! \n");
+    
+    return commandDict;
+}
+
+- (NSDictionary*) iDCommand{
+    unsigned char cmdData[4];
+    cmdData[0] = 'I';
+    cmdData[1] = 'D';
+    cmdData[2] = '\r';
+    cmdData[3] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:4],
+                                   @"device"    : ORSynClock,
+                                   @"replySize" : @20
+                                   };
+    //NSLog(@"SynClockModel::iDCommand! \n");
     
     return commandDict;
 }

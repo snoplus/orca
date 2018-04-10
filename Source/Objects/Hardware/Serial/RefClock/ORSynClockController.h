@@ -34,6 +34,7 @@
     IBOutlet NSButton*		statusPollCB;
     IBOutlet NSTextField*   statusOutputField;
     IBOutlet NSButton*      deviceIDButton;
+    IBOutlet NSTextField*   deviceIDField;
     IBOutlet NSButton*		resetButton;
     
     id                      model;
@@ -60,6 +61,7 @@
 - (void) statusPollChanged:(NSNotification*)aNote;
 - (void) lockChanged:(NSNotification*)aNotification;
 - (void) statusMessageChanged:(NSNotification*)aNotification;
+- (void) iDChanged:(NSNotification*)aNotification;
 
 #pragma mark ***Actions
 - (IBAction) trackModeAction:(id)sender;

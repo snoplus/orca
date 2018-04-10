@@ -89,9 +89,14 @@
                             object: model];
     
         [notifyCenter addObserver : self
-                     selector : @selector(statusMessageChanged:)
-                         name : ORSynClockStatusUpdated 
-                        object: nil];
+                         selector : @selector(statusMessageChanged:)
+                             name : ORSynClockStatusUpdated
+                            object: nil];
+    
+        [notifyCenter addObserver : self
+                         selector : @selector(iDChanged:)
+                             name : ORSynClockIDChanged
+                            object: nil];
 }
 
 - (void) updateWindow
@@ -155,6 +160,11 @@
     [statusOutputField setStringValue:[model statusMessages]];
 }
 
+- (void) iDChanged:(NSNotification*)aNotification{
+    NSLog(@"iDChanged!! updating... \n");
+    [deviceIDField setStringValue:[model clockID]];
+}
+
 #pragma mark ***Actions
 - (IBAction) trackModeAction:(id)sender
 {
@@ -184,6 +194,7 @@
 
 - (IBAction) deviceIDAction:(id)sender
 {
+    [model requestID];
 }
 
 - (IBAction) resetAction:(id)sender

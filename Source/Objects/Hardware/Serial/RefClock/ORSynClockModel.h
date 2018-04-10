@@ -36,6 +36,7 @@
         //
         BOOL                statusPoll;
         NSMutableArray*     previousStatusMessages;
+        NSString*           clockID;
 }
 
 #pragma mark ***Initialization
@@ -44,10 +45,12 @@
 
 #pragma mark ***Accessors
 - (void) reset;
+- (void) requestID;
 - (void) requestStatus;
 - (BOOL) statusPoll;
 - (void) setStatusPoll:(BOOL)aStatusPoll;
 - (NSString*) statusMessages;  // returns the statusses of nLastMsgs previeous requests for display
+- (NSString*) clockID;
 - (BOOL) portIsOpen;
 - (int) trackMode;
 - (void) setTrackMode:(int)aMode;
@@ -63,6 +66,7 @@
 - (NSDictionary*) errMessgOffCommand;
 - (NSDictionary*) alarmWindowCommand;
 - (NSDictionary*) statusCommand;
+- (NSDictionary*) iDCommand;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -76,4 +80,5 @@ extern NSString* ORSynClockModelStatusChanged;
 extern NSString* ORSynClockModelStatusPollChanged;
 extern NSString* ORSynClockModelStatusOutputChanged;
 extern NSString* ORSynClockStatusUpdated;
+extern NSString* ORSynClockIDChanged;
 
