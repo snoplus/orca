@@ -798,11 +798,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 - (void) scheduleCouchDBUpdate
 {
-    if([NSThread isMainThread]){
-        if(!scheduledToPostToDB){
-            scheduledToPostToDB = YES;
-            [self performSelector:@selector(postToCouchDB) withObject:nil afterDelay:notFirstTime?60:10];
-        }
+    if(!scheduledToPostToDB){
+        scheduledToPostToDB = YES;
+        [self performSelector:@selector(postToCouchDB) withObject:nil afterDelay:notFirstTime?60:10];
     }
 }
 
@@ -810,16 +808,15 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 {
     scheduledToPostToDB = NO;
     notFirstTime        = YES;
-    if([NSThread isMainThread]){
-        NSString* s = [self contents];
-        NSDictionary* dbRecord = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  s,				@"statuslog",
-                                  @"StatusLog",		@"type",
-                                  nil];
+    NSString* s = [self contents];
+    NSDictionary* dbRecord = [NSDictionary dictionaryWithObjectsAndKeys:
+                              s,				@"statuslog",
+                              @"StatusLog",		@"type",
+                              nil];
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:dbRecord];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:dbRecord];
 
-    }
+    
 }
 
 @end
