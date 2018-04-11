@@ -62,8 +62,9 @@
     IBOutlet NSPopUpButton *tellieExpertFibreSelectPb;
     IBOutlet NSPopUpButton *tellieExpertOperationModePb; //Operation mode (master or slave)
     
+    IBOutlet NSButtonCell *tellieExpertTuningCb;
     IBOutlet NSTextField *tellieExpertValidationStatusTf;
-    
+
     IBOutlet NSButton *tellieExpertFireButton;
     IBOutlet NSButton *tellieExpertStopButton;
     IBOutlet NSButton *tellieExpertValidateSettingsButton;
@@ -143,6 +144,7 @@
 -(void)registerNotificationObservers;
 -(void)awakeFromNib;
 -(void)updateServerSettings:(NSNotification *)aNote;
+-(void)updateTuningRunCB:(NSNotification *)aNote;
 -(BOOL)isNumeric:(NSString *)s;
 -(void)fetchConfigurationFile:(NSNotification *)aNote;
 
@@ -163,6 +165,7 @@
 -(IBAction)tellieExpertAutoFillAction:(id)sender;
 -(IBAction)tellieExpertFibreNameAction:(NSPopUpButton *)sender;
 -(IBAction)tellieExpertModeAction:(NSPopUpButton *)sender;
+-(IBAction)tellieExpertTuningAction:(id)sender;
 
 //Vaidation functions
 -(NSString*)validateGeneralTellieNode:(NSString *)currentText;

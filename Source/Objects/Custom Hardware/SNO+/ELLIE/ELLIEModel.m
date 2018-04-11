@@ -134,6 +134,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 @synthesize maintenanceRollOver = _maintenanceRollOver;
 @synthesize smellieStopButton = _smellieStopButton;
 
+@synthesize tuningRun = _tuningRun;
+
 /*********************************************************/
 /*                  Class control methods                */
 /*********************************************************/
@@ -189,6 +191,9 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         [smellieCli release];
         [smellieFlaggingCli release];
         [interlockCli release];
+
+        // Force the tuningRun flag (and checkbox) to be zero (i.e. run rolls over at end of T/AMELLIE sequence by default)
+        [self setTuningRun:[NSNumber numberWithInteger:0]];
     }
     return self;
 }
@@ -280,6 +285,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     // Threads
     [_smellieTransitionThread release];
     [_tellieTransitionThread release];
+
+    [_tuningRun release];
 
     [super dealloc];
 }
@@ -1377,16 +1384,19 @@ err:
         [NSThread sleepForTimeInterval:0.1];
     }
 
-    ///////////////
-    //Add run control object
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[T/AMELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
-        goto err;
+    // Only roll over if this is NOT a tuning run.
+    if(![[self tuningRun] boolValue]){
+        ///////////////
+        //Add run control object
+        NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        if(![runModels count]){
+            NSLogColor([NSColor redColor], @"[T/AMELLIE]: Couldn't find ORRunModel please add one to the experiment\n");
+            goto err;
+        }
+        ORRunModel* runControl = [runModels objectAtIndex:0];
+        // Roll over the run.
+        [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
     }
-    ORRunModel* runControl = [runModels objectAtIndex:0];
-    // Roll over the run.
-    [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
 
 err:{
     // Tell run control it can stop the run.
@@ -2717,6 +2727,18 @@ err:
 
     [[self interlockClient] setHost:host];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIEServerSettingsChanged" object:self];
+}
+
+- (void) setTuningRun:(NSNumber *)tuningRun
+{
+    // Set the host for the interlock server XMLRPC client.
+    if (tuningRun == [self tuningRun]) return;
+
+    [tuningRun retain];
+    [_tuningRun release];
+    _tuningRun = tuningRun;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ELLIETuningRunChanged" object:self];
 }
 
 -(BOOL)pingTellie

@@ -58,8 +58,9 @@
     BOOL _tellieMultiFlag;
     BOOL _maintenanceRollOver;
     BOOL _smellieStopButton;
+    NSNumber* _tuningRun;
 
-    //tellie settings
+    //amellie settings
     NSMutableDictionary* _amellieFireParameters;
     NSMutableDictionary* _amellieFibreMapping;
     NSMutableDictionary* _amellieNodeMapping;
@@ -119,6 +120,7 @@
 @property (nonatomic,retain) NSThread* smellieTransitionThread;
 @property (nonatomic,assign) BOOL maintenanceRollOver;
 @property (nonatomic,assign) BOOL smellieStopButton;
+@property (nonatomic,retain) NSNumber* tuningRun;
 
 
 -(id) init;

@@ -69,7 +69,7 @@
 	[super updateWindow];
 }
 
-- (void) updateServerSettings: (NSNotification *) aNote
+- (void) updateServerSettings:(NSNotification *)aNote
 {
     [tellieHostTf setStringValue:[model tellieHost]];
     [telliePortTf setStringValue:[model telliePort]];
@@ -79,6 +79,11 @@
 
     [interlockHostTf setStringValue:[model interlockHost]];
     [interlockPortTf setStringValue:[model interlockPort]];
+}
+
+- (void) updateTuningRunCB:(NSNotification *)aNote
+{
+    [tellieExpertTuningCb setState:[model tuningRun]];
 }
 
 - (IBAction) serverSettingsChanged:(id)sender {
@@ -115,6 +120,11 @@
     [notifyCenter addObserver : self
                      selector : @selector(updateServerSettings:)
                          name : @"ELLIEServerSettingsChanged"
+                        object: nil];
+
+    [notifyCenter addObserver : self
+                     selector : @selector(updateTuningRunCB:)
+                         name : @"ELLIETuningButtonChanged"
                         object: nil];
 
     [notifyCenter addObserver : self
@@ -395,6 +405,10 @@
 
 -(IBAction)tellieExpertModeAction:(NSPopUpButton *)sender{
     [tellieExpertFireButton setEnabled:NO];
+}
+
+- (IBAction)tellieExpertTuningAction:(id)sender {
+    [model setTuningRun:[NSNumber numberWithInteger:[tellieExpertTuningCb state]]];
 }
 
 - (IBAction)tellieExpertAutoFillAction:(id)sender {
