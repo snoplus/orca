@@ -103,7 +103,8 @@
     
     NSMutableData *itemData = [NSMutableData data];
     NSKeyedArchiver* archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:itemData];
-    [archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
+    //PH comment out so archiver uses the default binary plist format
+    //[archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
     [archiver encodeObject:pointerArray forKey:@"ORObjArrayPtrPBType"];
     [archiver finishEncoding];
     [archiver release];

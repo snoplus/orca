@@ -426,7 +426,8 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[[ORGlobal sharedGlobal] saveParams:archiver];
 		
-		[archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
+		//PH comment out so archiver uses the default binary plist format
+		//[archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
 		
 		[archiver encodeInt:ORDocumentVersion forKey:ORDocumentVersionKey];
 		
