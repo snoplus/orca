@@ -18,6 +18,10 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+// compile-time test to check the size of a variable type
+// (see https://scaryreasoner.wordpress.com/2009/02/28/checking-sizeof-at-compile-time/)
+#define COMPILE_ERROR_IF(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+
 #pragma mark •••Imported Files
 #import "ORFec32Model.h"
 #import "ORXL1Model.h"
@@ -931,6 +935,8 @@ static int              sChannelsNotChangedCount = 0;
     int i;
     uint32_t *fecSettings;
     NSUInteger length;
+
+    COMPILE_ERROR_IF(sizeof(float) != 4);   // make sure float is 4 bytes
 
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
