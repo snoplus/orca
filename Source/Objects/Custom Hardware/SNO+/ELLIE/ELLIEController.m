@@ -436,26 +436,13 @@
     
     // Calulate settings
     BOOL inSlave = YES;
+    NSUInteger triggerDelay = 800;
     if([[tellieExpertOperationModePb titleOfSelectedItem] isEqual:@"Master"]){
         inSlave = NO;
+        triggerDelay = 650;
     }
     
-    ////////////////
-    // Find the max safe frequency to flash at, considering requested photons
-    float photons = [telliePhotonsTf floatValue];
-    float safe_gradient = -1.;
-    float safe_intercept = 1e6;
-    int freq = round(pow((photons / safe_intercept), safe_gradient));
-    if(freq > 1000){
-        freq = 1000;
-    }
-    
-    int noPulses = 100;
-    if(freq < noPulses){
-        noPulses = freq;
-    }
-    
-    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:freq withNPulses:noPulses withTriggerDelay:700 inSlave:(BOOL)inSlave isAMELLIE:NO];
+    NSMutableDictionary* settings = [model returnTellieFireCommands:[tellieExpertFibreSelectPb titleOfSelectedItem] withNPhotons:[telliePhotonsTf integerValue] withFireFrequency:1000 withNPulses:1000 withTriggerDelay:triggerDelay inSlave:(BOOL)inSlave isAMELLIE:NO];
     if(settings){
         float frequency = (1. / [[settings objectForKey:@"pulse_separation"] floatValue])*1000;
         //Set text fields appropriately
