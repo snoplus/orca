@@ -1488,23 +1488,12 @@
 {
     NSScanner* scanner = [NSScanner scannerWithString:currentText];
     int triggerDelayNumber = [currentText intValue];
-    //5ns discrete steps, so again, adjustment needed if user enters e.g. 1.0 ns)
-    int minimumNumberTriggerDelaySteps = 5;     //in ns
-    int minimumTriggerDelay = 0;                //in ns
-    int maxmiumTriggerDelay = 1275;             //in ns
-    int triggerDelayRemainder = (triggerDelayNumber  % minimumNumberTriggerDelaySteps);
-    
-    NSString* msg = @"[ELLIE_VALIDATION]: Valid trigger delay settings: 0-1275ns in steps of 5ns.\n";
+
+    NSString* msg = @"[ELLIE_VALIDATION]: Trigger delay must be a positive integer\n";
     if (![scanner scanInt:nil]){
         NSLog(msg);
         return msg;
-    } else if(triggerDelayNumber  > maxmiumTriggerDelay){
-        NSLog(msg);
-        return msg;
-    } else if (triggerDelayNumber  < minimumTriggerDelay){
-        NSLog(msg);
-        return msg;
-    } else if (triggerDelayRemainder != 0){
+    } else if (triggerDelayNumber < 0){
         NSLog(msg);
         return msg;
     }
