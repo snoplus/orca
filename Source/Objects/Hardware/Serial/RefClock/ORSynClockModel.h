@@ -30,7 +30,7 @@
         ORRefClockModel*    refClock;
         int                 trackMode;
         int                 syncMode;
-        unsigned long       alarmWindow;
+        unsigned int       alarmWindow;
         // int reTxCount;  // in case of errors or timeout retransmit; if retransmit
         // // is required, put last command to cmdQueue and dequeueFromBottom
         //
@@ -57,14 +57,14 @@
 - (int) syncMode;
 - (void) setSyncMode:(int)aMode;
 - (unsigned long) alarmWindow;
-- (void) setAlarmWindow:(unsigned long)aValue;
+- (void) setAlarmWindow:(unsigned int)aValue;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
 - (void) processResponse:(NSData*)someData forRequest:(NSDictionary*)lastRequest;
 - (NSDictionary*) resetCommand;
 - (NSDictionary*) errMessgOffCommand;
-- (NSDictionary*) alarmWindowCommand;
+- (NSDictionary*) alarmWindowCommand:(unsigned int)nanoseconds;
 - (NSDictionary*) statusCommand;
 - (NSDictionary*) iDCommand;
 

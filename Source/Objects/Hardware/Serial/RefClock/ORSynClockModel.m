@@ -134,19 +134,26 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
 
 - (unsigned long) alarmWindow
 {
-    if(alarmWindow<50)          return 50;
-    else if(alarmWindow>12650)  return 12650;
-    else                        return alarmWindow;
+    int err = alarmWindow % 50;  // make the alarm windown divisible by 50 according to datasheet..
+    if (err > 25){
+        err = 50 - err;
+        alarmWindow += err;
+    }else alarmWindow -= err;
+    if(alarmWindow<50)          alarmWindow = 50;
+    else if(alarmWindow>12750)  alarmWindow = 12750;
+    
+    return alarmWindow;
 }
 
-- (void) setAlarmWindow:(unsigned long)aValue
+- (void) setAlarmWindow:(unsigned int)aValue
 {
     if(aValue<50)           aValue = 50;
-    else if(aValue>127050)  aValue = 12750;
+    else if(aValue>12750)  aValue = 12750;
     
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmWindow:alarmWindow];
     alarmWindow = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockModelAlarmWindowChanged object:self];
+    [self writeData:[self alarmWindowCommand:[self alarmWindow]]];//todo: alarmWindowCommand here?
 }
 
 //put our parameters into any run header
@@ -217,6 +224,9 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
             [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockIDChanged object:self];
             NSLog(@"clockID: notifying... \n");
         }
+        else if([lastRequest isEqualToDictionary:[self alarmWindowCommand:alarmWindow]]){ // alarmWindow is assumed the same from issuing to receiving
+            NSLog(@"alarm Window %u was set. \n", alarmWindow);
+        }
         
         else{
             NSLog(@"Warning (SynClockModel::dataAvailable): unsupported command \n");
@@ -269,11 +279,17 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     return commandDict;
 }
 
-- (NSDictionary*) alarmWindowCommand
+- (NSDictionary*) alarmWindowCommand:(unsigned int)nanoseconds
 {
-    unsigned char cmdData[0];
+    unsigned char cmdData[9];
+    cmdData[0] = 'A';
+    cmdData[1] = 'W';
+    sprintf(&cmdData[2], "%.5u", nanoseconds);
+    cmdData[7] = '\r';
+    cmdData[8] = '\n';
+    NSLog(@"alarmWindowCommand: %9s \n", cmdData);
     NSDictionary * commandDict = @{
-                                   @"data"      : [NSData dataWithBytes:cmdData length:0],
+                                   @"data"      : [NSData dataWithBytes:cmdData length:9],
                                    @"device"    : @"SynClock",
                                    @"replySize" : @7
                                    };
