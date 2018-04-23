@@ -42,7 +42,6 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
 @end
 
 @implementation ORSynClockModel
-
 - (void) dealloc
 {
     [previousStatusMessages dealloc];
@@ -138,16 +137,18 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     if (err > 25){
         err = 50 - err;
         alarmWindow += err;
-    }else alarmWindow -= err;
-    if(alarmWindow<50)          alarmWindow = 50;
+    }
+    else alarmWindow -= err;
+    if(alarmWindow==0)          alarmWindow = 2000; //special case on start-up
+    else if(alarmWindow<50)     alarmWindow = 50;
     else if(alarmWindow>12750)  alarmWindow = 12750;
     
     return alarmWindow;
 }
 
-- (void) setAlarmWindow:(unsigned int)aValue
+- (void) setAlarmWindow:(unsigned long)aValue
 {
-    if(aValue<50)           aValue = 50;
+    if(aValue<50)          aValue = 50;
     else if(aValue>12750)  aValue = 12750;
     
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmWindow:alarmWindow];
@@ -281,7 +282,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
 
 - (NSDictionary*) alarmWindowCommand:(unsigned int)nanoseconds
 {
-    unsigned char cmdData[9];
+    char cmdData[9];
     cmdData[0] = 'A';
     cmdData[1] = 'W';
     sprintf(&cmdData[2], "%.5u", nanoseconds);
@@ -343,7 +344,10 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     [[self undoManager] disableUndoRegistration];
     [self setTrackMode:  [decoder decodeIntForKey:  @"trackMode"]];
     [self setSyncMode:   [decoder decodeIntForKey:  @"syncMode"]];
-    [self setAlarmWindow:[decoder decodeInt32ForKey:@"alarmWindow"]];
+    
+    unsigned long aValue = [decoder decodeInt32ForKey:@"alarmWindow"];
+    if(aValue == 0)aValue = 2000; //0 is illegal and means first start, so set to default value
+    [self setAlarmWindow:aValue];
     
     previousStatusMessages = [[decoder decodeObjectForKey:@"previousStatusMessages"] retain];
     if(!previousStatusMessages){

@@ -57,7 +57,7 @@
 - (int) syncMode;
 - (void) setSyncMode:(int)aMode;
 - (unsigned long) alarmWindow;
-- (void) setAlarmWindow:(unsigned int)aValue;
+- (void) setAlarmWindow:(unsigned long)aValue;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
