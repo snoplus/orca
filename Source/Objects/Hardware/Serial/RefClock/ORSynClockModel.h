@@ -67,6 +67,8 @@
 - (NSDictionary*) alarmWindowCommand:(unsigned int)nanoseconds;
 - (NSDictionary*) statusCommand;
 - (NSDictionary*) iDCommand;
+- (NSDictionary*) trackModeCommand:(unsigned int)mode;
+- (NSDictionary*) syncModeCommand:(unsigned int)mode;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

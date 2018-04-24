@@ -116,6 +116,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     trackMode = aMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockModelTrackModeChanged object:self];
     [self updatePoll];
+    [self writeData:[self trackModeCommand:[self trackMode]]];
 }
 
 - (int) syncMode
@@ -129,6 +130,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     syncMode = aMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockModelSyncChanged object:self];
     [self updatePoll];
+    [self writeData:[self syncModeCommand:[self syncMode]]];
 }
 
 - (unsigned long) alarmWindow
@@ -185,7 +187,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     //use [refClock lastRequest] to get the orginal command
     
     //if([refClock verbose]) NSLog(@"received synClock response\n");
-    NSLog(@"received synClock response\n");
+    //NSLog(@"received synClock response\n");
     
     ///MAH -- I didn't attempt to do anything to the old processing code below since I don't know the format
     //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
@@ -199,7 +201,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
         
         if([refClock verbose]){
             //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
-            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
+            NSLog(@"SynClock data received: %s ; size: %d \n", bytes, nBytes);
         }
         if([lastRequest isEqualToDictionary:[self statusCommand]]){
             NSString* statusMessage = nil;
@@ -228,6 +230,18 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
         else if([lastRequest isEqualToDictionary:[self alarmWindowCommand:alarmWindow]]){ // alarmWindow is assumed the same from issuing to receiving
             NSLog(@"alarm Window %u was set. \n", alarmWindow);
         }
+        else if([lastRequest isEqualToDictionary:[self resetCommand]]){
+            NSLog(@"SynClock reset. \n");
+        }
+        else if([lastRequest isEqualToDictionary:[self errMessgOffCommand]]){
+            NSLog(@"SynClock Error Message switched off \n");
+        }
+        else if([lastRequest isEqualToDictionary:[self trackModeCommand:trackMode]]){
+            NSLog(@"SynClock track mode set \n");
+        }
+        else if([lastRequest isEqualToDictionary:[self syncModeCommand:syncMode]]){
+            NSLog(@"SynClock  sync mode set \n");
+        }
         
         else{
             NSLog(@"Warning (SynClockModel::dataAvailable): unsupported command \n");
@@ -253,7 +267,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
                                    @"device"    : ORSynClock,
                                    @"replySize" : @20
                                    };
-    NSLog(@"SynClockModel::resetCommand! \n");
+    //NSLog(@"SynClockModel::resetCommand! \n");
     
     return commandDict;
 }
@@ -275,7 +289,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
                                    @"device"    : ORSynClock,
                                    @"replySize" : @2 // todo
                                    };
-    NSLog(@"SynClockModel::errMessgOffCommand! (!'?') \n");
+    //NSLog(@"SynClockModel::errMessgOffCommand! (!'?') \n");
     
     return commandDict;
 }
@@ -288,7 +302,7 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     sprintf(&cmdData[2], "%.5u", nanoseconds);
     cmdData[7] = '\r';
     cmdData[8] = '\n';
-    NSLog(@"alarmWindowCommand: %9s \n", cmdData);
+    //NSLog(@"alarmWindowCommand: %9s \n", cmdData);
     NSDictionary * commandDict = @{
                                    @"data"      : [NSData dataWithBytes:cmdData length:9],
                                    @"device"    : @"SynClock",
@@ -328,6 +342,40 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
                                    @"replySize" : @20
                                    };
     //NSLog(@"SynClockModel::iDCommand! \n");
+    
+    return commandDict;
+}
+
+
+- (NSDictionary*) trackModeCommand:(unsigned int)mode{
+    unsigned char cmdData[5];
+    cmdData[0] = 'T';
+    cmdData[1] = 'R';
+    cmdData[2] = 0x30 + mode;  // generate char digit
+    cmdData[3] = '\r';
+    cmdData[4] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:5],
+                                   @"device"    : ORSynClock,
+                                   @"replySize" : @3
+                                   };
+    
+    return commandDict;
+}
+- (NSDictionary*) syncModeCommand:(unsigned int)mode{
+    unsigned char cmdData[5];
+    cmdData[0] = 'S';
+    cmdData[1] = 'Y';
+    cmdData[2] = 0x30 + mode;  // generate char digit
+    cmdData[3] = '\r';
+    cmdData[4] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:5],
+                                   @"device"    : ORSynClock,
+                                   @"replySize" : @3
+                                   };
     
     return commandDict;
 }

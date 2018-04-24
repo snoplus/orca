@@ -127,12 +127,16 @@
 
 - (void) trackModeChanged:(NSNotification*)aNote
 {
-    [trackModePU selectItemAtIndex:[model trackMode]];
+    if([model trackMode] == 3){
+        [trackModePU selectItemAtIndex:1];
+    } else [trackModePU selectItemAtIndex:0];
 }
 
 - (void) syncChanged:(NSNotification*)aNote
 {
-    [syncPU selectItemAtIndex:[model syncMode]];
+    if([model syncMode] == 3){
+        [syncPU selectItemAtIndex:1];
+    }else [syncPU selectItemAtIndex:0];
 }
 
 - (void) alarmWindowChanged:(NSNotification*)aNote
@@ -168,12 +172,24 @@
 #pragma mark ***Actions
 - (IBAction) trackModeAction:(id)sender
 {
-    [model setTrackMode:[sender indexOfSelectedItem]];
+    if([sender indexOfSelectedItem] == 0){
+        [model setTrackMode:0];
+    }
+    else if([sender indexOfSelectedItem] == 1){
+        [model setTrackMode:3];
+    }
+    else {NSLog(@"Warning: track mode not supported! \n");}
 }
 
 - (IBAction) syncAction:(id)sender
 {
-    [model setSyncMode:[sender indexOfSelectedItem]];
+    if([sender indexOfSelectedItem] == 0){
+        [model setSyncMode:0];
+    }
+    else if([sender indexOfSelectedItem] == 1){
+        [model setSyncMode:3];
+    }
+    else {NSLog(@"Warning: sync mode not supported! \n");}
 }
 
 - (IBAction) alarmWindowAction:(id)sender
