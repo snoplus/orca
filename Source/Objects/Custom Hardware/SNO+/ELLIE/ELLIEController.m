@@ -314,7 +314,7 @@
     
     [tellieGeneralFireButton setEnabled:NO];
     [tellieGeneralStopButton setEnabled:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORTELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
     [tellieGeneralValidationStatusTf setStringValue:@""];
 }
 
@@ -328,7 +328,7 @@
     }
     
     [tellieExpertStopButton setEnabled:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORTELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
     [tellieExpertFireButton setEnabled:NO];
     [tellieExpertValidationStatusTf setStringValue:@""];
 }
@@ -548,7 +548,7 @@
 
     [amellieFireButton setEnabled:NO];
     [amellieStopButton setEnabled:YES];
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAMELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAMELLIERunStartNotification object:nil userInfo:[self guiFireSettings]];
     [amellieValidationStatusTf setStringValue:@""];
 }
 
