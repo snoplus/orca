@@ -144,6 +144,9 @@ enum {
     int   doneChanCount;
     int   workingChanCount;
 
+    struct timeval findert0;
+    struct timeval findert1;
+    
 }
 
 #pragma mark •••Initialization
@@ -409,6 +412,7 @@ enum {
 
 //for sync of HW histogramming with sub-runs
 - (BOOL) setFromDecodeStageReceivedHistoForChan:(short)aChan;
+
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

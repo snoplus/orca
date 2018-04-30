@@ -808,12 +808,12 @@ static double table[32]={
 
 - (unsigned  long) startingUpperBound
 {
-    if(startingUpperBound==0)startingUpperBound = 65535;
+    if(startingUpperBound==0)startingUpperBound = 4096;
     return startingUpperBound;
 }
 - (void) setStartingUpperBound:(unsigned  long)aValue
 {
-    if(aValue == 0) aValue = 65535;
+    if(aValue == 0) aValue = 4096;
     [[[self undoManager] prepareWithInvocationTarget:self] setStartingUpperBound:startingUpperBound];
     startingUpperBound = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTStartingUpperBoundChanged object:self];
@@ -3442,10 +3442,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
 	[[self undoManager] disableUndoRegistration];
 	int i;
-	float           maxThreshold     = [self startingUpperBound];
+    float           maxThreshold     = [self startingUpperBound] * [self filterShapingLengthInBins];
     unsigned long   newHitMask       = 0x0;
     BOOL            progress         = NO;
+    float           updateSpeed      = 0.8; // 0 no progress ... 1 maximum speed
     id slt = [[self crate] adapter];
+    struct timezone tz;
     
     @try {
 		switch(noiseFloorState){
@@ -3453,6 +3455,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 noiseFloorRunning = YES;
                 workingChanCount = 0;
 
+                // Read start time
+                gettimeofday(&findert0,&tz);
+                
                 // Save inhibit state
                 if ([slt numberOfActiveThresholdFinder] == 1){ // this one is the first one
                     //inhibitBeforeThresholdFinder = [slt readStatusReg] & kStatusInh;
@@ -3479,10 +3484,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 if(workingChanCount) {
                     doneChanCount = 0;
                     noiseFloorState = eSetThresholds;
-                    NSLog(@"%@ Threshold Finder Started\n",[self fullID]);
+                    NSLog(@"%@ Threshold Finder started\n",[self fullID]);
                     NSLog(@"%@ Working on %d channel%@\n",[self fullID] ,workingChanCount,workingChanCount>1?@"s":@"");
                 }
-				else			     noiseFloorState = eNothingToDo; //nothing to do
+				else
+                    noiseFloorState = eNothingToDo; //nothing to do
 			break;
                 
             case eIntegrating:
@@ -3496,30 +3502,26 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 for(i=0;i<kNumV4FLTChannels;i++) {
                     BOOL doneWithChannel = NO;
                     if([self hitRateEnabled:i]) {
-                        if(fabs(upperThresholdBound[i]-lowerThresholdBound[i])<0.001){
+                        if(fabs(upperThresholdBound[i]-lowerThresholdBound[i])<1){ // This value depends on the filter length !!!
                             //case 0: not necessarily done, but the upper and lower bounds have converged
                             doneWithChannel = YES;
                         }
-                        else if([self hitRate:i] == 0) {
+                        else if([self hitRate:i] < targetRate) {
                             //case 1: rate is zero. Lower the upper bound
                             lastThresholdWithNoRate[i] = upperThresholdBound[i];
+                            upperThresholdBound[i]     = upperThresholdBound[i] - updateSpeed * (upperThresholdBound[i] - thresholdToTest[i]);
                             thresholdToTest[i]         = lowerThresholdBound[i] + ((upperThresholdBound[i]-lowerThresholdBound[i])/2.);
-                            upperThresholdBound[i]     = thresholdToTest[i];
-                        }
-                        else if([self hitRate:i] > targetRate) {
-                            //case 2: rate too high. Reset the lower bound and try again
-                            lowerThresholdBound[i] = upperThresholdBound[i];
-                            upperThresholdBound[i] = lastThresholdWithNoRate[i];
-                            thresholdToTest[i]     = upperThresholdBound[i];
                         }
                         else {
-                            //case 3: rate is exactly right
-                            doneWithChannel = YES;
+                            //case 2: rate too high. Reset the lower bound and try again
+                            lowerThresholdBound[i] = lowerThresholdBound[i] + updateSpeed * (thresholdToTest[i] - lowerThresholdBound[i]);
+                            thresholdToTest[i]     = lowerThresholdBound[i] + ((upperThresholdBound[i]-lowerThresholdBound[i])/2.);
                         }
+                        
                         if(doneWithChannel){
                             newHitMask &= ~(1L<<i);
                             [self setHitRateEnabledMask:newHitMask];
-                            oldThresholds[i]   = [self scaledThreshold:i];
+                            oldThresholds[i] = [self scaledThreshold:i];
                             doneChanCount++;
                             progress = YES;
                         }
@@ -3536,7 +3538,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 			case eSetThresholds:
 				for(i=0;i<kNumV4FLTChannels;i++){
 					if([self hitRateEnabled:i]){
-                        [self setScaledThreshold:i withValue:thresholdToTest[i]];
+                        [self setFloatThreshold:i withValue:thresholdToTest[i]];
 					}
 				}
 				[self initBoard];
@@ -3551,7 +3553,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                 if ([slt numberOfActiveThresholdFinder] == 0){
                     [slt restoreInhibitStatus];
                 }
-                NSLog(@"%@ Threshold Finder Done\n",[self fullID]);
+                
+                // Read stop time
+                gettimeofday(&findert1,&tz);
+                NSLog(@"%@ Threshold Finder done in %d seconds\n",[self fullID], findert1.tv_sec - findert0.tv_sec);
                 noiseFloorRunning = NO;
 			break;
                 
