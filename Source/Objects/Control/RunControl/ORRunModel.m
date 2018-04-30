@@ -1672,13 +1672,14 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
         [self setElapsedRunTime:deltaTime];
 		
         if(!remoteControl || remoteInterface){
-            [self setTimeToGo:(timeLimit - deltaTime)+1];
+            NSTimeInterval t = (timeLimit - deltaTime)+1;
+            if(t<0)t=0; //prevent negative values
+            [self setTimeToGo:t];
             if(!_ignoreRunTimeout && timedRun &&(deltaTime >= timeLimit)){
                 if(repeatRun){
                     [self setNextRunWillQuickStart:YES];
                     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunIsAboutToRollOver
                                                                         object:self];
-
                 }
                 [self stopRun];
             }
