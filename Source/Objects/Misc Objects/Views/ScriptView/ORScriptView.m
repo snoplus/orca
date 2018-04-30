@@ -126,6 +126,28 @@
                     int i;
                     int level = 0;
                     switch(c){
+                        case '[':
+                            for(i=start;i<len;i++){
+                                NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
+                                if([s1 isEqualToString:@"]"]){
+                                    if(level == 1)return NSMakeRange(start,i-start+1);
+                                    else level--;
+                                }
+                                else if([s1 isEqualToString:@"["])level++;
+                            }
+                            break;
+                            
+                        case ']':
+                            for(i=start;i>0;i--){
+                                NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
+                                if([s1 isEqualToString:@"["]){
+                                    if(level == 1)return NSMakeRange(i,startRange.location-i+1);
+                                    else level--;
+                                }
+                                else if([s1 isEqualToString:@"]"])level++;
+                            }
+                            break;
+                            
                         case '(':
                             for(i=start;i<len;i++){
                                 NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
@@ -136,6 +158,7 @@
                                 else if([s1 isEqualToString:@"("])level++;
                             }
                             break;
+                            
                         case ')':
                             for(i=start;i>0;i--){
                                 NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
@@ -145,7 +168,8 @@
                                 }
                                 else if([s1 isEqualToString:@")"])level++;
                             }
-                           break;
+                            break;
+                            
                         case '{':
                             for(i=start;i<len;i++){
                                 NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
@@ -156,6 +180,7 @@
                                 else if([s1 isEqualToString:@"{"])level++;
                             }
                             break;
+                            
                         case '}':
                             for(i=start;i>0;i--){
                                 NSString* s1 = [scriptString substringWithRange:NSMakeRange(i,1)];
