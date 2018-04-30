@@ -42,12 +42,14 @@
     id                   userResult;
     NSWindowController*  userDialogController;
     NSMutableDictionary* variableCheckDictionary;
+    NSMutableArray*      statusDialogs;
 }
 
 #pragma mark •••Initialization
 - (id) initWithFunctionTable:(id)aFunctionTable functionName:(NSString*)aFunctionName;
 - (void) dealloc; 
 - (NSUndoManager*) undoManager;
+- (void) closeStatusDialogs;
 
 #pragma mark •••Accessors
 - (ORNodeEvaluator*) functionEvaluator;

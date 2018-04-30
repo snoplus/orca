@@ -148,9 +148,20 @@
 	[symbolTableLock release];
 	[functionName release];
     [variableCheckDictionary release];
+    for(ORStatusController* aShowDialog in statusDialogs){
+        [aShowDialog close];
+    }
+    [statusDialogs release];
 	[super dealloc];
 }
-
+- (void) closeStatusDialogs
+{
+    for(ORStatusController* aDialog in statusDialogs){
+        [aDialog close];
+    }
+    [statusDialogs release];
+    statusDialogs = nil;
+}
 - (NSUndoManager*) undoManager
 {
 	return [(ORAppDelegate*)[NSApp delegate] undoManager];
@@ -1098,6 +1109,8 @@
 {
     NSWindowController* statusDialogController = [[ORScriptUserStatusController alloc] initWithDelegate:self variableList:NodeValue(0)];
 	[statusDialogController performSelectorOnMainThread:@selector(showWindow:) withObject:self waitUntilDone:YES];
+    if(!statusDialogs)statusDialogs = [[NSMutableArray array] retain];
+    [statusDialogs addObject:statusDialogController];
     return [statusDialogController autorelease];
 }
 
