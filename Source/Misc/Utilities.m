@@ -533,9 +533,17 @@ kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices)
 	
     return kernResult;
 }
-        
+static BOOL reportedOnce;
 BOOL ORRunAlertPanel(NSString* mainMessage, NSString* msg, NSString* defaultButtonTitle, NSString* alternateButtonTitle,NSString* otherButtonTitle, ...)
 {
+    if(![NSThread isMainThread] ){
+        if(!reportedOnce){
+            //Just report this once in case we are in a loop. Programmers can work thru these errors one-by-one
+            NSLogColor([NSColor redColor],@"Programmer error: ORRunAlertPanel called from non-main thread\n");
+            reportedOnce = YES;
+        }
+        return NO;
+    }
     
     va_list ap;
     va_start(ap, otherButtonTitle);
