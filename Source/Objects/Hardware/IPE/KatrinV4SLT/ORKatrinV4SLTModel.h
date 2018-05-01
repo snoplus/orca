@@ -327,8 +327,6 @@
 - (void)		writeClrCnt;
 - (void)		writeEnCnt;
 - (void)		writeDisCnt;
-- (void)		writeReleasePage;		
-- (void)		writePageManagerReset;
 - (void)		clearAllStatusErrorBits;
 - (void)		writeFIFOcsrReset;
 

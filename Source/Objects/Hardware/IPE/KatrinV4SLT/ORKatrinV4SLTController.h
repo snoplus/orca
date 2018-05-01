@@ -59,15 +59,12 @@
 		IBOutlet NSButton*		readBoardButton;
 		IBOutlet NSMatrix*		interruptMaskMatrix;
 		IBOutlet NSPopUpButton* secStrobeSrcPU;
-		IBOutlet NSTextField*   pageSizeField;
-		IBOutlet NSStepper*     pageSizeStepper;
         IBOutlet NSButton*      haltSBCButton;
         IBOutlet NSButton*      initOnConnectButton;
         IBOutlet NSButton*      setCodeLocationButton;
 
 		//status reg
 		IBOutlet NSMatrix*		statusMatrix;
-		IBOutlet NSButton*		resetPageManagerButton;
 		IBOutlet NSButton*		clearAllStatusErrorBitsButton;
         
         //low level
@@ -170,9 +167,7 @@
 - (IBAction) testPatternEnableAction:(id)sender;
 - (IBAction) miscCntrlBitsAction:(id)sender;
 - (IBAction) hwVersionAction: (id) sender;
-- (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) clearAllStatusErrorBitsAction:(id)sender;
-- (IBAction) dumpPageStatus:(id)sender;
 - (IBAction) pollRateAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readStatus:(id)sender;
@@ -200,8 +195,6 @@
 - (IBAction) resetSLTAction:(id)sender;
 - (IBAction) writeClrInhibitAction:(id)sender;
 - (IBAction) writeSetInhibitAction:(id)sender;
-- (IBAction) resetPageManagerAction:(id)sender;
-- (IBAction) resetPageManagerAction:(id)sender;
 - (IBAction) sendCommandScript:(id)sender;
 - (IBAction) sendSimulationConfigScriptON:(id)sender;
 - (IBAction) sendSimulationConfigScriptOFF:(id)sender;

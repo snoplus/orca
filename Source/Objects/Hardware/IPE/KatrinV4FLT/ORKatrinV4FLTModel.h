@@ -95,8 +95,6 @@ enum {
 {
     // Hardware configuration
     int shipSumHistogram;
-//    int vetoOverlapTime;
-//    int nfoldCoincidence;
     int fifoLength;
     int filterShapingLength;  
 	BOOL activateDebuggingDisplays;
@@ -116,8 +114,6 @@ enum {
 
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     unsigned short lastHitRateLength;
-    //buffer for summed histograms
-    //katrinV4FltFullHistogramDataStruct histoBuf[24]; // REMOVE - sum histograms are calculated at the crate PC (ak)
     int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
@@ -379,6 +375,7 @@ enum {
 - (void) printEventFIFOs;
 - (void) writeHistogramControl;
 - (void) resetHistogramMode;
+- (BOOL) waitOnBusyFlag;
 
 - (void) writeThreshold:(int)i value:(unsigned int)aValue;
 - (unsigned int) readThreshold:(int)i;

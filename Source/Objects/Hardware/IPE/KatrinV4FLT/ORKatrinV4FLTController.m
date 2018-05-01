@@ -1031,6 +1031,10 @@
 
 - (void) hitRateChanged:(NSNotification*)aNote
 {
+    if(![NSThread isMainThread]){
+        [self performSelectorOnMainThread:@selector(hitRateChanged:) withObject:aNote waitUntilDone:NO];
+        return;
+    }
 	int chan;
 	for(chan=0;chan<kNumV4FLTChannels;chan++){
 		id theCell = [rateTextFields cellWithTag:chan];
@@ -1052,6 +1056,10 @@
 
 - (void) totalRateChanged:(NSNotification*)aNote
 {
+    if(![NSThread isMainThread]){
+        [self performSelectorOnMainThread:@selector(totalRateChanged:) withObject:aNote waitUntilDone:NO];
+        return;
+    }
 	if(aNote==nil || [aNote object] == [model totalRate]){
 		[timeRatePlot setNeedsDisplay:YES];
 	}
@@ -1681,11 +1689,12 @@
 
 - (IBAction) compareRegisters:(id)sender
 {
-    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-    NSLogFont(aFont,@"Register Compare report for %@\n",[model fullID]);
+    NSString* s = [NSString stringWithFormat:@"Register Compare report for %@\n",[model fullID]];
+    NSLogStartTable(s,58);
     [model compareThresholdsAndGains];
     [model compareHitRateMask];
     [model compareFilter];
+    NSLogDivider(@"=", 58);
 }
 
 #pragma mark •••Plot DataSource

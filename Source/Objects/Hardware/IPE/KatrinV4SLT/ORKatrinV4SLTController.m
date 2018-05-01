@@ -414,7 +414,6 @@
 	[definePatternFileButton    setEnabled:!lockedOrRunningMaintenance];
 	[setSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
 	[relSWInhibitButton         setEnabled:!lockedOrRunningMaintenance];
-	[resetPageManagerButton     setEnabled:!lockedOrRunningMaintenance];
 	[forceTriggerButton         setEnabled:!lockedOrRunningMaintenance];
     [initAllBoardsButton         setEnabled:!lockedOrRunningMaintenance];
     [initAllBoards1Button         setEnabled:!lockedOrRunningMaintenance];
@@ -435,10 +434,6 @@
 	[resetHWButton setEnabled:!isRunning];
 	
 	[pulserAmpField setEnabled:!locked];
-		
-	[pageSizeField setEnabled:!lockedOrRunningMaintenance];
-	[pageSizeStepper setEnabled:!lockedOrRunningMaintenance];
-	
     
 	[self enableRegControls];
 }
@@ -622,22 +617,6 @@
 }
 
 //----------------------------------
-
-- (IBAction) dumpPageStatus:(id)sender
-{
-	if([[NSApp currentEvent] clickCount] >=2){
-		//int pageIndex = [sender selectedRow]*32 + [sender selectedColumn];
-		@try {
-			//[model dumpTriggerRAM:pageIndex];
-		}
-		@catch(NSException* localException) {
-			NSLog(@"Exception doing SLT dump trigger RAM page\n");
-			ORRunAlertPanel([localException name], @"%@\nSLT%d dump trigger RAM failed", @"OK", nil, nil,
-							localException,[model stationNumber]);
-		}
-	}
-}
-
 - (IBAction) pollNowAction:(id)sender
 {
 	[model readAllStatus];
@@ -786,19 +765,17 @@
 }
 
 //most of these are not currently connected to anything.. used during testing..
-- (IBAction) enableCountersAction:(id)sender          { [self do:@selector(writeEnCnt)              name:@"Enable Counters"];                  }
-- (IBAction) disableCountersAction:(id)sender         { [self do:@selector(writeDisCnt)             name:@"Disable Counters"];                 }
-- (IBAction) clearCountersAction:(id)sender           { [self do:@selector(writeClrCnt)             name:@"Clear Counters"];                   }
-- (IBAction) activateSWRequestAction:(id)sender       { [self do:@selector(writeSwRq)               name:@"Active SW Request Interrupt"];      }
-- (IBAction) configureFPGAsAction:(id)sender          { [self do:@selector(writeFwCfg)              name:@"Config FPGAs"];                     }
-- (IBAction) tpStartAction:(id)sender                 { [self do:@selector(writeTpStart)            name:@"Test Pattern Start"];               }
-- (IBAction) resetFLTAction:(id)sender                { [self do:@selector(writeFltReset)           name:@"FLT Reset"];                        }
-- (IBAction) resetSLTAction:(id)sender                { [self do:@selector(writeSltReset)           name:@"SLT Reset"];                        }
-- (IBAction) writeClrInhibitAction:(id)sender         { [self do:@selector(writeClrInhibit)         name:@"Clr Inhibit"];                      }
-- (IBAction) writeSetInhibitAction:(id)sender         { [self do:@selector(writeSetInhibit)         name:@"Set Inhibit"];                      }
-- (IBAction) resetPageManagerAction:(id)sender        { [self do:@selector(writePageManagerReset)   name:@"Reset Page Manager"];               }
-- (IBAction) releaseAllPagesAction:(id)sender         { [self do:@selector(writeReleasePage)        name:@"Release Pages"];                    }
-- (IBAction) clearAllStatusErrorBitsAction:(id)sender { [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"]; }
+- (IBAction) enableCountersAction:(id)sender          { [self do:@selector(writeEnCnt)              name:@"Enable Counters"];                   }
+- (IBAction) disableCountersAction:(id)sender         { [self do:@selector(writeDisCnt)             name:@"Disable Counters"];                  }
+- (IBAction) clearCountersAction:(id)sender           { [self do:@selector(writeClrCnt)             name:@"Clear Counters"];                    }
+- (IBAction) activateSWRequestAction:(id)sender       { [self do:@selector(writeSwRq)               name:@"Active SW Request Interrupt"];       }
+- (IBAction) configureFPGAsAction:(id)sender          { [self do:@selector(writeFwCfg)              name:@"Config FPGAs"];                      }
+- (IBAction) tpStartAction:(id)sender                 { [self do:@selector(writeTpStart)            name:@"Test Pattern Start"];                }
+- (IBAction) resetFLTAction:(id)sender                { [self do:@selector(writeFltReset)           name:@"FLT Reset"];                         }
+- (IBAction) resetSLTAction:(id)sender                { [self do:@selector(writeSltReset)           name:@"SLT Reset"];                         }
+- (IBAction) writeClrInhibitAction:(id)sender         { [self do:@selector(writeClrInhibit)         name:@"Clr Inhibit"];                       }
+- (IBAction) writeSetInhibitAction:(id)sender         { [self do:@selector(writeSetInhibit)         name:@"Set Inhibit"];                       }
+- (IBAction) clearAllStatusErrorBitsAction:(id)sender { [self do:@selector(clearAllStatusErrorBits) name:@"Clear All Status Error+Flag Bits"];  }
 
 - (IBAction) sendCommandScript:(id)sender
 {

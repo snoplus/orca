@@ -695,20 +695,12 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             [obj writeClrCnt];
         }
     }
-    
-    
 }
 - (void) writeEnCnt				{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdEnCnt];           }
 - (void) writeDisCnt			{ [self writeReg:kKatrinV4SLTCommandReg value:kCmdDisCnt];          }
 - (void) clearAllStatusErrorBits{ [self writeReg:kKatrinV4SLTStatusReg  value:kStatusClearAllMask]; }
 - (void) writeFIFOcsrReset      { [self writeReg:kKatrinV4SLTFIFOCsrReg value:kFIFOcsrResetMask];   }
 
-- (void) writeReleasePage		{
-    NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-}
-- (void) writePageManagerReset	{
-    NSLog(@"WARNING: you called %@::%@ - this is a Auger register and is of no use for KATRIN - access rejected!\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
-}
 
 
 - (id) controllerCard		{ return self;	  }
@@ -1306,6 +1298,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     if(aState) controlRegValue |= kCtrlRunMask;
     else       controlRegValue &= ~kCtrlRunMask;
 	[self writeReg:kKatrinV4SLTControlReg value:controlRegValue];
+    usleep(2);
     [self readStatusReg];
 }
 
@@ -1519,18 +1512,15 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 - (void) initBoard
 {
     // Todo: Check that all Slt parameters are included
-    
-    if (countersEnabled){
-        [self writeEnCnt];
-    } else {
-        [self writeDisCnt];
-    }
+    [self writeFIFOcsrReset];
+
+    if (countersEnabled) [self writeEnCnt];
+    else                 [self writeDisCnt];
     [self loadSecondsReg];
     [self writeControlReg];
     [self writeInterruptMask];
     [self clearAllStatusErrorBits];
     [self writePixelBusEnableReg];
-    [self writeFIFOcsrReset];
     [self clearRunTime];
 
     //-----------------------------------------------
@@ -1864,7 +1854,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     // Stop crate
     [self saveInhibitStatus];
     [self writeSetInhibit];
-    
+
     // Wait for inhibit; changes state with the next second strobe
     unsigned long lStatus;
     int i = 0;
@@ -1911,7 +1901,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     [self writeClrCnt];
     [self readAllStatus];
     
-	actualPageIndex     = 0;
 	eventCounter        = 0;
 	first               = YES;
 	lastDisplaySec      = 0;
@@ -1971,6 +1960,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
+    
     unsigned long subseconds;
     unsigned long seconds;
     unsigned long subsec2;

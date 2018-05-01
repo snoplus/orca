@@ -711,7 +711,7 @@ static double table[32]={
 - (void) setTargetRate:(int)aTargetRate
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTargetRate:targetRate];
-    targetRate = [self restrictIntValue:aTargetRate min:1 max:100];
+    targetRate = [self restrictIntValue:aTargetRate min:1 max:6000];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelTargetRateChanged object:self];
 }
 
@@ -1451,18 +1451,36 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		if( !(triggerEnabledMask & (0x1<<i)) )	thres = 0xfffff;
 		else									thres = [self threshold:i];
         //DEBUG: FOR TESTING!!! 2013-11-21 added for polar energy
-		unsigned long threshPolar;
-        threshPolar = bipolarEnergyThreshTest & 0xfff;
+       // unsigned long  threshPolar = bipolarEnergyThreshTest & 0xfff;
         thres = thres & 0xFFFFF;
-		[aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value: ((threshPolar<<20) | thres)]];
+        //[aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value: ((threshPolar<<20) | thres)]];
+        [aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  thres]];
 		[aList addCommand: [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF]];
 	}
 	[aList addCommand: [self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains]];
 	
 	[self executeCommandList:aList];
-    
-    //TODO: now we should wait 180 usec or check the busy flag before other write/read accesses -tb-
-    // (usually (but not guaranteed!) access via TCP/IP is slow enought to produce a 180 usec timeout)
+
+    [self waitOnBusyFlag];
+}
+
+- (BOOL) waitOnBusyFlag
+{
+    unsigned long statusReg;
+    NSTimeInterval dt;
+    NSDate* start = [NSDate date];
+    do {
+        statusReg = [self readReg:kFLTV4StatusReg];
+        if(!((statusReg >> 8) & 0x1)){
+            return YES;
+        }
+        else {
+            dt = [[NSDate date] timeIntervalSinceDate:start];
+            if(dt>1){
+                return NO;
+            }
+        }
+    } while(YES);
 }
 
 - (int) restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue
@@ -1485,10 +1503,14 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self writeClrCnt];                     // Clear lost event counters
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
 	[self writeReg: kFLTV4HrControlReg     value:hitRateLength];
+    [self waitOnBusyFlag];
+
 	[self writeReg: kFLTV4PostTriggerReg   value:postTriggerTime];
+    [self waitOnBusyFlag];
 	[self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
-	[self loadThresholdsAndGains];
+    [self waitOnBusyFlag];
 	[self writeReg:kFLTV4AnalogOffsetReg   value:analogOffset];
+    [self waitOnBusyFlag];
 	[self writeTriggerControl];			//TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
 	[self writeHitRateMask];			//set hitRage control mask
 	
@@ -1503,8 +1525,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 */
 		[self writeHistogramControl];
 	}
+    [self loadThresholdsAndGains];
+
     [self writeRunControl:YES];
     [self writeControl];                //come out of standby mode
+    [self waitOnBusyFlag];
 }
 
 - (unsigned long) readStatus
@@ -1522,7 +1547,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	unsigned long aValue = 
 	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
-	(((boxcarLength)        & 0x3)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
+//	(((boxcarLength)        & 0x7)<<14)	|		//boxcarLength is the register value and the popup item tag -tb-
 	(((filterShapingLength) & 0xf)<<8)	|		//filterShapingLength is the register value and the popup item tag -tb-
 	((gapLength & 0xf)<<4)              |
 	((startSampling & 0x1)<<3)          |		// run trigger unit
@@ -1530,7 +1555,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	((startSampling & 0x1)<<1)          |		// start ADC sampling
 	 (startSampling & 0x1);                     // store data in QDRII RAM
 	
-	[self writeReg:kFLTV4RunControlReg value:aValue];					
+	[self writeReg:kFLTV4RunControlReg value:aValue];
+    [self waitOnBusyFlag];
 }
 
 - (void) writeControl
@@ -1547,6 +1573,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     //aValue = aValue | 0x40000;
     
 	[self writeReg: kFLTV4ControlReg value:aValue];
+    [self waitOnBusyFlag];
 }
 
 /** Possible values are (see SLTv4_HW_Definitions.h):
@@ -1563,6 +1590,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                             ((fifoBehaviour & 0x1)<<24) |
                             ((ledOff        & 0x1)<<1 );
 	[self writeReg: kFLTV4ControlReg value:aValue];
+    [self waitOnBusyFlag];
+
 }
 
 //! Write FLTv4 control register with flt run mode 'Standby' (=0).
@@ -1750,6 +1779,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) writeHitRateMask
 {
 	[self writeReg:kFLTV4HrMeasEnableReg value:hitRateEnabledMask];
+    [self waitOnBusyFlag];
 }
 
 - (unsigned long) readHitRateMask
@@ -1804,6 +1834,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[self writeReg:kFLTV4PixelSettings1Reg value:0]; //must be handled by readout, single pixels cannot be disabled for KATRIN - OK, FIRMWARE FIXED -tb-
 	uint32_t mask = (~triggerEnabledMask) & 0xffffff;
 	[self writeReg:kFLTV4PixelSettings2Reg value: mask];
+    [self waitOnBusyFlag];
+
 }
 
 - (void) readHitRates
@@ -1946,7 +1978,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                     }
                     
                     if ((sltSec > sltRunEndSec) && (nHitrateCount > 0)){
-                        NSLog(@"NUmber of counts in slot %d: %d \n", [self stationNumber], nHitrateCount);
+                        NSLog(@"Number of counts in slot %d: %d \n", [self stationNumber], nHitrateCount);
                         nHitrateCount = 0;
                     }
                     
@@ -3095,13 +3127,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     unsigned long regValue = [self readReg:kFLTV4RunControlReg];
     int hwBoxCarLength1      = (regValue>>28) & 0x7;
     int hwPoleZeroCorrection = (regValue>>24) & 0xf;
-    int hwBoxcarLength2      = (regValue>>14) & 0x3;
+    //int hwBoxcarLength2      = (regValue>>14) & 0x3;
     int hwFilterShapingLength= (regValue>>8)  & 0xf;
     int hwGapLength          = (regValue>>4)  & 0xf;
     BOOL differencesExist = NO;
     differencesExist |= [self checkForDifferencesInName:@"BoxcarLength1"      orcaValue:[self boxcarLength]        hwValue:hwBoxCarLength1];
     differencesExist |= [self checkForDifferencesInName:@"PoleZeroCorrection" orcaValue:[self poleZeroCorrection]  hwValue:hwPoleZeroCorrection];
-    differencesExist |= [self checkForDifferencesInName:@"BoxcarLength2"      orcaValue:[self boxcarLength]        hwValue:hwBoxcarLength2];
+    //differencesExist |= [self checkForDifferencesInName:@"BoxcarLength2"      orcaValue:[self boxcarLength]        hwValue:hwBoxcarLength2];
     differencesExist |= [self checkForDifferencesInName:@"FilterShapingLength"orcaValue:[self filterShapingLength] hwValue:hwFilterShapingLength];
     differencesExist |= [self checkForDifferencesInName:@"GapLength"          orcaValue:[self gapLength]           hwValue:hwGapLength];
     
