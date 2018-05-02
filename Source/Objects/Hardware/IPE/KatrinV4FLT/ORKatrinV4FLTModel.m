@@ -1454,7 +1454,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
             [self writeThreshold:i value:newThres];
         }
         unsigned long newGain = [self gain:i];
-        if([self readGain:i] & 0xFFF != newGain){
+        if([self readGain:i] != newGain){
             [self writeGain:i value:newGain];
             gainChanged = YES;
         }
