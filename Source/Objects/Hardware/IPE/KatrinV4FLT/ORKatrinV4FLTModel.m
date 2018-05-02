@@ -1449,7 +1449,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         unsigned long newThres;
         if( !(triggerEnabledMask & (0x1<<i)) )  newThres = 0xFFFFF;
         else                                    newThres = ((unsigned long)[self threshold:i])& 0xFFFFF;
-        if([self readThreshold:i] != newThres){
+        unsigned long hw = [self readThreshold:i];
+        if( hw != newThres){
             [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  newThres];
             changed = YES;
         }
