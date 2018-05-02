@@ -1446,16 +1446,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     BOOL changed = NO;
     int i;
     for(i=0;i<kNumV4FLTChannels;i++){
-        unsigned long thres;
-        if( !(triggerEnabledMask & (0x1<<i)) )  thres = 0xfffff;
-        else                                    thres = [self threshold:i];
-        if([self readThreshold:i] != thres){
-            [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  thres & 0xFFFFF];
+        unsigned long newThres;
+        if( !(triggerEnabledMask & (0x1<<i)) )  newThres = 0xFFFFF;
+        else                                    newThres = ((unsigned long)[self threshold:i])& 0xFFFFF;
+        if([self readThreshold:i] != newThres){
+            [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  newThres];
             changed = YES;
         }
-        if([self readGain:i] != [self gain:i]){
+        unsigned long newGain = [self gain:i] & 0xFFF;
+        if([self readGain:i] & 0xFFF != newGain){
+            [self writeRegCmd:kFLTV4GainReg channel:i value:newGain];
             changed = YES;
-            [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF];
         }
     }
     
