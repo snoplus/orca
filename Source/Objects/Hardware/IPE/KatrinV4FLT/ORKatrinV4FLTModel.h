@@ -207,6 +207,7 @@ enum {
 - (void) setStoreDataInRam:(BOOL)aStoreDataInRam;
 - (int) filterShapingLength;
 - (int) filterShapingLengthInBins;
+- (int) filterLengthInBins;
 - (void) setFilterShapingLengthOnInit:(int)aFilterShapingLength;
 - (void) setFilterShapingLength:(int)aFilterShapingLength;
 - (int) gapLength;

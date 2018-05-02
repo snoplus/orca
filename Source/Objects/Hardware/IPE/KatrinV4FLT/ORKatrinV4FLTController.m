@@ -444,7 +444,7 @@
 
 - (void) energyOffsetChanged:(NSNotification*)aNote
 {
-	[energyOffsetTextField setIntValue: [model energyOffset] >> [model filterShapingLength]];
+	[energyOffsetTextField setIntValue: [model energyOffset] / [model filterLengthInBins]];
 }
 
 - (void) forceFLTReadoutChanged:(NSNotification*)aNote
@@ -1116,7 +1116,7 @@
 
 - (IBAction) energyOffsetTextFieldAction:(id)sender
 {
-	[model setEnergyOffset:[sender intValue] << [model filterShapingLength]];
+	[model setEnergyOffset:[sender intValue] * [model filterLengthInBins]];
 }
 
 - (IBAction) forceFLTReadoutCBAction:(id)sender

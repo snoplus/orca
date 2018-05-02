@@ -393,12 +393,27 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 - (void) setBoxcarLength:(int)aBoxcarLength
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setBoxcarLength:boxcarLength];
-    
+
+    float old = 1<<boxcarLength;
+    float new = 1<<aBoxcarLength;
+    float ratio = new/old;
+    int chan;
+  
     boxcarLength = aBoxcarLength;
 	if(boxcarLength<0) boxcarLength=0;
-	//if(boxcarLength>3) boxcarLength=3; new firmware 2016 -tb-
 	if(boxcarLength>7) boxcarLength=7;
 
+    // Adjust all ADC related parameters according to the boxcar length
+    for(chan=0;chan<kNumV4FLTChannels;chan++){
+        float currentThreshold = [self threshold:chan];
+        [self setFloatThreshold:chan withValue:currentThreshold*ratio];
+    }
+    
+    long currentOffset = [self energyOffset];
+    [self setEnergyOffset:currentOffset*ratio];
+    
+    // There is no histogramming option in veto mode; so left out here
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelBoxcarLengthChanged object:self];
 }
 
@@ -912,6 +927,31 @@ static double table[32]={
 
 - (int) filterShapingLength { return filterShapingLength; }
 - (int) filterShapingLengthInBins { return ( 0x1 << filterShapingLength ); }
+- (int) filterLengthInBins {
+    int bins;
+    
+    switch (runMode) {
+        case kKatrinV4Flt_EnergyDaqMode:
+        case kKatrinV4Flt_EnergyTraceDaqMode:
+        case kKatrinV4Flt_Histogram_DaqMode:
+        case kKatrinV4Flt_BipolarEnergyDaqMode:
+        case kKatrinV4Flt_BipolarEnergyTraceDaqMode:
+            bins = [self filterShapingLengthInBins];
+            break;
+            
+        case kKatrinV4Flt_VetoEnergyDaqMode:
+        case kKatrinV4Flt_VetoEnergyTraceDaqMode:
+            bins = [self boxcarLength] +1;
+            break;
+            
+        default:
+            bins = 0;
+            NSLog(@"ORKatrinV4FLTModel WARNING: unknown DAQ run mode (%i)!\n",runMode);
+            break;
+    }
+    
+    return(bins);
+}
 - (void) setFilterShapingLengthOnInit:(int)aFilterShapingLength
 {
     filterShapingLength = [self restrictIntValue:aFilterShapingLength min:2 max:8];
@@ -1075,17 +1115,39 @@ static double table[32]={
 //for HardwareWizard access
 - (void) setScaledThreshold:(short)aChan withValue:(float)aValue
 {
-    [self setFloatThreshold:aChan withValue:aValue * [self actualFilterLength]];
+    switch (runMode) {
+        case kKatrinV4Flt_EnergyDaqMode:
+        case kKatrinV4Flt_EnergyTraceDaqMode:
+        case kKatrinV4Flt_Histogram_DaqMode:
+        case kKatrinV4Flt_BipolarEnergyDaqMode:
+        case kKatrinV4Flt_BipolarEnergyTraceDaqMode:
+
+            [self setFloatThreshold:aChan withValue:aValue * [self filterLengthInBins]];
+            break;
+            
+        case kKatrinV4Flt_VetoEnergyDaqMode:
+        case kKatrinV4Flt_VetoEnergyTraceDaqMode:
+
+            [self setFloatThreshold:aChan withValue:aValue * ( [self boxcarLength] +1)];
+            break;
+
+            
+        default:
+            NSLog(@"ORKatrinV4FLTModel WARNING: unknown DAQ run mode (%i)!\n",runMode);
+            break;
+        
+    }
 }
 
 - (float) actualFilterLength
 {
-    return powf(2.,[self filterShapingLength]);
+    //return powf(2.,[self filterShapingLength]);
+    return ( [self filterShapingLengthInBins]);
 }
                 
 - (float) scaledThreshold:(short)aChan
 {
-    return [self threshold:aChan] / [self actualFilterLength];
+    return [self threshold:aChan] / [self filterLengthInBins];
 }
 
 - (float) threshold:(unsigned short) aChan
@@ -1131,7 +1193,7 @@ static double table[32]={
 
 - (unsigned long) thresholdForDisplay:(unsigned short) aChan
 {
-    return [[thresholds objectAtIndex:aChan] floatValue] / [self actualFilterLength];
+    return [[thresholds objectAtIndex:aChan] floatValue] / [self filterLengthInBins];
 }
 
 - (unsigned short) gainForDisplay:(unsigned short) aChan
@@ -3451,7 +3513,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
 	[[self undoManager] disableUndoRegistration];
 	int i;
-    float           maxThreshold     = [self startingUpperBound] * [self filterShapingLengthInBins];
+    float           maxThreshold     = [self startingUpperBound] * [self filterLengthInBins];
     unsigned long   newHitMask       = 0x0;
     BOOL            progress         = NO;
     float           updateSpeed      = 0.8; // 0 no progress ... 1 maximum speed
