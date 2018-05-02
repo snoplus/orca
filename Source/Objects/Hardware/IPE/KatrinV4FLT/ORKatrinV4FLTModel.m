@@ -1095,7 +1095,7 @@ static double table[32]={
 
 -(unsigned short) gain:(unsigned short) aChan
 {
-    return [[gains objectAtIndex:aChan] shortValue];
+    return [[gains objectAtIndex:aChan] shortValue]  & 0xFFF;
 }
 
 -(void) setFloatThreshold:(unsigned short) aChan withValue:(float) aThreshold
@@ -1443,25 +1443,24 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) loadThresholdsAndGains
 {
-    BOOL changed = NO;
+    BOOL gainChanged = NO;
     int i;
     for(i=0;i<kNumV4FLTChannels;i++){
         unsigned long newThres;
         if( !(triggerEnabledMask & (0x1<<i)) )  newThres = 0xFFFFF;
-        else                                    newThres = ((unsigned long)[self threshold:i])& 0xFFFFF;
+        else                                    newThres = [self threshold:i];
         unsigned long hw = [self readThreshold:i];
         if( hw != newThres){
-            [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  newThres];
-            changed = YES;
+            [self writeThreshold:i value:newThres];
         }
-        unsigned long newGain = [self gain:i] & 0xFFF;
+        unsigned long newGain = [self gain:i];
         if([self readGain:i] & 0xFFF != newGain){
-            [self writeRegCmd:kFLTV4GainReg channel:i value:newGain];
-            changed = YES;
+            [self writeGain:i value:newGain];
+            gainChanged = YES;
         }
     }
     
-    if(changed)[self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains];
+    if(gainChanged)[self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains];
 }
 
 - (BOOL) waitOnBusyFlag
