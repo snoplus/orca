@@ -1506,6 +1506,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (void) initBoard
 {
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
+    [self loadThresholdsAndGains];
     [self writeClrCnt];                     // Clear lost event counters
     [self writeReg: kFLTV4HrControlReg     value:hitRateLength];
     [self writeReg: kFLTV4PostTriggerReg   value:postTriggerTime];
@@ -1517,7 +1518,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
 		[self writeHistogramControl];
 	}
-    [self loadThresholdsAndGains];
 
     [self writeRunControl:YES];
     [self writeControl];                //come out of standby mode
@@ -1546,13 +1546,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	 (startSampling & 0x1);                     // store data in QDRII RAM
 	
 	[self writeReg:kFLTV4RunControlReg value:aValue];
+    [self waitOnBusyFlag];
 }
 
 - (void) writeControl
 {
 	//TODO: add fifo length -tb- <---------------------------------------------
 	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
-	//((useBipolarEnergy & 0x1)<<18) |
 	((fifoLength       & 0x1)<<25) |
 	((fifoBehaviour    & 0x1)<<24) |
 	((ledOff & 0x1)<<1 );
