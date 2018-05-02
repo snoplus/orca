@@ -1443,31 +1443,23 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) loadThresholdsAndGains
 {
-    //use the command list to load all the thresholds and gains with one PMC command packet
-//    int i;
-//    ORCommandList* aList = [ORCommandList commandList];
-//    for(i=0;i<kNumV4FLTChannels;i++){
-//        unsigned long thres;
-//        if( !(triggerEnabledMask & (0x1<<i)) )  thres = 0xfffff;
-//        else                                    thres = [self threshold:i];
-//        [aList addCommand: [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  thres & 0xFFFFF]];
-//        [aList addCommand: [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF]];
-//    }
-//
-//    [self executeCommandList:aList];
-    
+    BOOL changed = NO;
     int i;
     for(i=0;i<kNumV4FLTChannels;i++){
         unsigned long thres;
         if( !(triggerEnabledMask & (0x1<<i)) )  thres = 0xfffff;
         else                                    thres = [self threshold:i];
-        [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  thres & 0xFFFFF];
-        [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF];
+        if([self readThreshold:i] != thres){
+            [self writeRegCmd:kFLTV4ThresholdReg channel:i value:  thres & 0xFFFFF];
+            changed = YES;
+        }
+        if([self readGain:i] != [self gain:i]){
+            changed = YES;
+            [self writeRegCmd:kFLTV4GainReg channel:i value:[self gain:i] & 0xFFF];
+        }
     }
-
-    [self waitOnBusyFlag]; //needed??
-    [self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains];
-    [self waitOnBusyFlag]; //needed??
+    
+    if(changed)[self writeRegCmd:kFLTV4CommandReg value:kIpeFlt_Cmd_LoadGains];
 }
 
 - (BOOL) waitOnBusyFlag
@@ -1505,15 +1497,17 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) initBoard
 {
+    //to minimize init errors only load values that are different from HW values
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
     [self loadThresholdsAndGains];
-    [self writeClrCnt];                     // Clear lost event counters
-    [self writeReg: kFLTV4HrControlReg     value:hitRateLength];
-    [self writeReg: kFLTV4PostTriggerReg   value:postTriggerTime];
-    [self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];//new 2016-07 - is it OK for old firmware? -tb-
-    [self writeReg:kFLTV4AnalogOffsetReg   value:analogOffset];
-    [self writeTriggerControl];             //TODO:   (for v4 this needs to be implemented by DENIS)-tb- //set trigger mask
-	[self writeHitRateMask];			    //set hitRage control mask
+    [self writeClrCnt];// Clear lost event counters
+    if([self readReg:kFLTV4HrControlReg]&0xf != hitRateLength) [self writeReg: kFLTV4HrControlReg value:hitRateLength];
+    
+    if([self readReg:kFLTV4PostTriggerReg]  & 0x0003ff != postTriggerTime) [self writeReg: kFLTV4PostTriggerReg   value:postTriggerTime];
+    if([self readReg:kFLTV4EnergyOffsetReg] & 0x0fffff != energyOffset)    [self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];
+    if([self readReg:kFLTV4AnalogOffsetReg] & 0x000fff != analogOffset)    [self writeReg: kFLTV4AnalogOffsetReg  value:analogOffset];
+    [self writeTriggerControl];
+	if([self readHitRateMask]               & 0xFFFFFF != hitRateEnabledMask)[self writeHitRateMask];
 	
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
 		[self writeHistogramControl];
@@ -1535,6 +1529,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) writeRunControl:(BOOL)startSampling
 {
+    unsigned long hwValue = [self readReg:kFLTV4RunControlReg];
+    
 	unsigned long aValue = 
 	(((boxcarLength)        & 0x7)<<28)	|		//boxcarLength is the register value and the popup item tag. extended to 3 bits in 2016, needed to be shifted to bit 28
     (((poleZeroCorrection)  & 0xf)<<24) |		//poleZeroCorrection is stored as the popup index -- NEW since 2011-06-09 -tb-
@@ -1544,24 +1540,30 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	((startSampling & 0x1)<<2)          |		// run filter unit
 	((startSampling & 0x1)<<1)          |		// start ADC sampling
 	 (startSampling & 0x1);                     // store data in QDRII RAM
-	
-	[self writeReg:kFLTV4RunControlReg value:aValue];
-    [self waitOnBusyFlag];
+    
+    unsigned long aMask =   (0x7<<28) |
+                            (0xf<<24) |
+                            (0x3f<<8) |
+                            (0xf<<4)  |
+                            (0x1<<3)  |
+                            (0x1<<2)  |
+                            (0x1<<1)  |
+                            (0x1<<0);
+    if((hwValue & aMask) != aValue){
+        [self writeReg:kFLTV4RunControlReg value:aValue];
+        [self waitOnBusyFlag];
+    }
 }
 
 - (void) writeControl
 {
-	//TODO: add fifo length -tb- <---------------------------------------------
-	unsigned long aValue =	((fltRunMode & 0xf)<<16) | 
-	((fifoLength       & 0x1)<<25) |
-	((fifoBehaviour    & 0x1)<<24) |
-	((ledOff & 0x1)<<1 );
+	unsigned long aValue =	((fltRunMode    & 0xf)<<16) |
+                            ((fifoLength    & 0x1)<<25) |
+                            ((fifoBehaviour & 0x1)<<24) |
+                            ((ledOff        & 0x1)<<1 );
     
-    
-    //TODO: force polar energy flag -tb-
-    //aValue = aValue | 0x40000;
-    
-	[self writeReg: kFLTV4ControlReg value:aValue];
+
+    [self writeReg: kFLTV4ControlReg value:aValue];
 }
 
 /** Possible values are (see SLTv4_HW_Definitions.h):
@@ -1809,18 +1811,19 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 }
 
 //TODO: TBD after firmware update -tb- 2010-01-28
-- (void) writeTriggerControl  //TODO: must be handled by readout, single pixels cannot be disabled for KATRIN ; this is fixed now, remove workaround after all crates are updated -tb-
+- (void) writeTriggerControl
 {
     //PixelSetting....
-	//2,1:
-	//0,0 Normal
-	//0,1 test pattern
-	//1,0 always 0
-	//1,1 always 1
-	[self writeReg:kFLTV4PixelSettings1Reg value:0]; //must be handled by readout, single pixels cannot be disabled for KATRIN - OK, FIRMWARE FIXED -tb-
-	uint32_t mask = (~triggerEnabledMask) & 0xffffff;
-	[self writeReg:kFLTV4PixelSettings2Reg value: mask];
-
+    //2,1:
+    //0,0 Normal
+    //0,1 test pattern
+    //1,0 always 0
+    //1,1 always 1
+    unsigned long hwValue = [self readReg:kFLTV4PixelSettings1Reg] & 0xFFFFFF;
+    if(hwValue!=0)[self writeReg:kFLTV4PixelSettings1Reg value:0];
+    uint32_t mask = (~triggerEnabledMask) & 0xffffff;
+    hwValue = [self readReg:kFLTV4PixelSettings2Reg] & 0xFFFFFF;
+    if(hwValue!=mask)[self writeReg:kFLTV4PixelSettings2Reg value: mask];
 }
 
 - (void) readHitRates
@@ -2255,9 +2258,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 //this goes to the Run header ...
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
-    //TO DO....other things need to be added here.....
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
-    [objDictionary setObject:thresholds										forKey:@"thresholds"];
+    NSMutableArray* intThresholdArray = [NSMutableArray array];
+    for(NSNumber* aValue in thresholds){
+        [intThresholdArray addObject:[NSNumber numberWithUnsignedLong:[aValue unsignedLongValue]]];
+    }
+    [objDictionary setObject:intThresholdArray							    forKey:@"thresholds"];
     [objDictionary setObject:gains											forKey:@"gains"];
     [objDictionary setObject:[NSNumber numberWithInt:runMode]				forKey:@"runMode"];
     [objDictionary setObject:[NSNumber numberWithLong:hitRateEnabledMask]	forKey:@"hitRateEnabledMask"];
