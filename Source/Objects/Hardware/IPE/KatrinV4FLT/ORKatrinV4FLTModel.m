@@ -1501,7 +1501,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 {
     //to minimize init errors only load values that are different from HW values
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
-    [self loadThresholdsAndGains];
     [self writeClrCnt];// Clear lost event counters
     if([self readReg:kFLTV4HrControlReg]&0xf != hitRateLength) [self writeReg: kFLTV4HrControlReg value:hitRateLength];
     
@@ -1509,11 +1508,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if([self readReg:kFLTV4EnergyOffsetReg] & 0x0fffff != energyOffset)    [self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];
     if([self readReg:kFLTV4AnalogOffsetReg] & 0x000fff != analogOffset)    [self writeReg: kFLTV4AnalogOffsetReg  value:analogOffset];
     [self writeTriggerControl];
-	if([self readHitRateMask]               & 0xFFFFFF != hitRateEnabledMask)[self writeHitRateMask];
+	[self writeHitRateMask];
 	
 	if(fltRunMode == kKatrinV4FLT_Histo_Mode){
 		[self writeHistogramControl];
 	}
+    [self loadThresholdsAndGains];
 
     [self writeRunControl:YES];
     [self writeControl];                //come out of standby mode
@@ -1769,7 +1769,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) writeHitRateMask
 {
-	[self writeReg:kFLTV4HrMeasEnableReg value:hitRateEnabledMask];
+    if([self readHitRateMask] != hitRateEnabledMask){
+        [self writeReg:kFLTV4HrMeasEnableReg value:hitRateEnabledMask];
+    }
 }
 
 - (unsigned long) readHitRateMask
