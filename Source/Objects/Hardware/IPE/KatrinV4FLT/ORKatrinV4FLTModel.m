@@ -1625,7 +1625,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                             ((fifoBehaviour & 0x1)<<24) |
                             ((ledOff        & 0x1)<<1 );
     
-
     [self writeReg: kFLTV4ControlReg value:aValue];
 }
 
@@ -2933,34 +2932,39 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) printPStatusRegs
 {
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	unsigned long pAData = [self readReg:kFLTV4pStatusAReg];
 	unsigned long pBData = [self readReg:kFLTV4pStatusBReg];
 	unsigned long pCData = [self readReg:kFLTV4pStatusCReg];
-	NSLogFont(aFont,@"----------------------------------------\n");
-	NSLogFont(aFont,@"PStatus      A          B         C\n");
-	NSLogFont(aFont,@"----------------------------------------\n");
-	NSLogFont(aFont,@"Filter:  %@   %@   %@\n", (pAData>>2)&0x1 ? @" InValid": @"   OK   ",
-			  (pBData>>2)&0x1 ? @" InValid": @"   OK   ",
-			  (pCData>>2)&0x1 ? @" InValid": @"   OK   ");
+    int width = 38;
+    NSLogStartTable([NSString stringWithFormat:@"%@ PStatus",[self fullID]], width);
+	NSLogMono(@" PStatus |   A    |    B   |   C\n");
+    NSLogDivider(@"-",width);
+	NSLogMono(@"  Filter |%@|%@|%@\n",
+              [(pAData>>2)&0x1 ? @"InValid" : @"OK" centered:8],
+			  [(pBData>>2)&0x1 ? @"InValid" : @"OK" centered:8],
+			  [(pCData>>2)&0x1 ? @"InValid" : @"OK" centered:8]);
 	
-	NSLogFont(aFont,@"PLL1  :  %@   %@   %@\n", (pAData>>8)&0x1 ? @"Unlocked": @"  Locked",
-			  (pBData>>8)&0x1 ? @"Unlocked": @"  Locked",
-			  (pCData>>8)&0x1 ? @"Unlocked": @"  Locked");
+	NSLogMono(@"  PLL1   |%@|%@|%@\n",
+              [(pAData>>8)&0x1 ? @"Unlocked" : @"Locked" centered:8],
+			  [(pBData>>8)&0x1 ? @"Unlocked" : @"Locked" centered:8],
+			  [(pCData>>8)&0x1 ? @"Unlocked" : @"Locked" centered:8]);
 	
-	NSLogFont(aFont,@"PLL2  :  %@   %@   %@\n", (pAData>>9)&0x1 ? @"Unlocked": @"  Locked",
-			  (pBData>>9)&0x1 ? @"Unlocked": @"  Locked",
-			  (pCData>>9)&0x1 ? @"Unlocked": @"  Locked");
+	NSLogMono(@"  PLL2   |%@|%@|%@\n",
+              [(pAData>>9)&0x1 ? @"Unlocked" : @"Locked" centered:8],
+			  [(pBData>>9)&0x1 ? @"Unlocked" : @"Locked" centered:8],
+			  [(pCData>>9)&0x1 ? @"Unlocked" : @"Locked" centered:8]);
 	
-	NSLogFont(aFont,@"QDR-II:  %@   %@   %@\n", (pAData>>10)&0x1 ? @"Unlocked": @"  Locked",
-			  (pBData>>10)&0x1 ? @"Unlocked": @"  Locked",
-			  (pCData>>10)&0x1 ? @"Unlocked": @"  Locked");
+	NSLogMono(@"  QDR-II |%@|%@|%@\n",
+              [(pAData>>10)&0x1 ? @"Unlocked" : @"Locked" centered:8],
+			  [(pBData>>10)&0x1 ? @"Unlocked" : @"Locked" centered:8],
+			  [(pCData>>10)&0x1 ? @"Unlocked" : @"Locked" centered:8]);
 	
-	NSLogFont(aFont,@"QDR-Er:  %@   %@   %@\n", (pAData>>11)&0x1 ? @"   Error": @"  Clear ",
-			  (pBData>>11)&0x1 ? @"   Error": @"  Clear ",
-			  (pCData>>11)&0x1 ? @"   Error": @"  Clear ");
+	NSLogMono(@"  QDR-Er |%@|%@|%@\n",
+              [(pAData>>11)&0x1 ? @"Error" : @"Clear" centered:8],
+			  [(pBData>>11)&0x1 ? @"Error" : @"Clear" centered:8],
+			  [(pCData>>11)&0x1 ? @"Error" : @"Clear" centered:8]);
 	
-	NSLogFont(aFont,@"----------------------------------------\n");
+	NSLogDivider(@"=",width);
 }
 
 - (NSString*) boardTypeName:(int)aType
@@ -2995,23 +2999,22 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 		return;
 	}
 	//versionCFPGA=data;
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"%@ versions:\n",[self fullID]);
-	NSLogFont(aFont,@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
+	NSLogMono(@"%@ versions:\n",[self fullID]);
+	NSLogMono(@"CFPGA Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
 	data = [self readpVersion];
-	NSLogFont(aFont,@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
+	NSLogMono(@"FPGA8 Version %u.%u.%u.%u\n",((data>>28)&0xf),((data>>16)&0xfff),((data>>8)&0xff),((data>>0)&0xff));
 	//versionFPGA8=data;
 
 
 	switch ( ((data>>28)&0xf) ) {
 		case 1: //AUGER
-			NSLogFont(aFont,@"    This is a Auger FLTv4 firmware configuration! (WARNING: You are using a KATRIN V4 FLT object!)\n");
+			NSLogMono(@"    This is a Auger FLTv4 firmware configuration! (WARNING: You are using a KATRIN V4 FLT object!)\n");
 			break;
 		case 2: //KATRIN
-			NSLogFont(aFont,@"    This is a KATRIN FLTv4 firmware configuration!\n");
+			NSLogMono(@"    This is a KATRIN FLTv4 firmware configuration!\n");
 			break;
 		default:
-			NSLogFont(aFont,@"    This is a Unknown FLTv4 firmware configuration!\n");
+			NSLogMono(@"    This is a Unknown FLTv4 firmware configuration!\n");
 			break;
 	}
 	//NSLog(@"CFPGA,FPGA8:%8x,%8x\n",versionCFPGA,versionFPGA8);
@@ -3020,35 +3023,38 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	ORIpeV4SLTModel* slt = [[self crate] adapter];
 	long fdhwlibVersion = [slt getFdhwlibVersion];
 	int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
-	//NSLogFont(aFont,@"%@ fdhwlib Library version: 0x%08x / %i.%i.%i\n",[self fullID], fdhwlibVersion,ver,maj,min);
-	NSLogFont(aFont,@"SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",ver,maj,min, fdhwlibVersion);
-	NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [slt getSBCCodeVersion]);
+	//NSLogMono(@"%@ fdhwlib Library version: 0x%08x / %i.%i.%i\n",[self fullID], fdhwlibVersion,ver,maj,min);
+	NSLogMono(@"SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",ver,maj,min, fdhwlibVersion);
+	NSLogMono(@"SBC PrPMC readout code version: %i \n", [slt getSBCCodeVersion]);
 }
 
 - (void) printStatusReg
 {
 	unsigned long status = [self readStatus];
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,@"FLT %d status Reg (address:0x%08x): 0x%08x\n", [self stationNumber],[self regAddress:kFLTV4StatusReg],status);
-	NSLogFont(aFont,@"Power           : %@\n",	((status>>0) & 0x1) ? @"FAILED":@"OK");
-	NSLogFont(aFont,@"PLL1            : %@\n",	((status>>1) & 0x1) ? @"UNLOCKED":@"OK");
-	NSLogFont(aFont,@"PLL2            : %@\n",	((status>>2) & 0x1) ? @"UNLOCKED":@"OK");
-	NSLogFont(aFont,@"10MHz Phase     : %@\n",	((status>>3) & 0x1) ? @"UNLOCKED":@"OK");
-	NSLogFont(aFont,@"Firmware Type   : %@\n",	[self boardTypeName:((status>>4) & 0x3)]);
-	NSLogFont(aFont,@"Hardware Type   : %@\n",	[self boardTypeName:((status>>6) & 0x3)]);
-	NSLogFont(aFont,@"Busy            : %@\n",	((status>>8) & 0x1) ? @"BUSY":@"IDLE");
-	NSLogFont(aFont,@"Interrupt Srcs  : 0x%x\n",	(status>>16) &0xff);
-	NSLogFont(aFont,@"FIFO Status     : %@\n",	[self fifoStatusString:((status>>24) & 0xf)]);
-	NSLogFont(aFont,@"Histo Toggle Bit: %d\n",	((status>>28) & 0x1));
-	NSLogFont(aFont,@"Histo Toggle Clr: %d\n",	((status>>29) & 0x1));
-	NSLogFont(aFont,@"IRQ             : %d\n",	((status>>31) & 0x1));
+    int width = 74;
+    NSLogStartTable([NSString stringWithFormat:@"%@ Status Reg (address:0x%08lx): 0x%08lx\n", [self fullID],[self regAddress:kFLTV4StatusReg],status],width);
+	NSLogMono(@"Power            | %@\n",	((status>>0) & 0x1) ? @"FAILED":@"OK");
+	NSLogMono(@"PLL1             | %@\n",	((status>>1) & 0x1) ? @"UNLOCKED":@"OK");
+	NSLogMono(@"PLL2             | %@\n",	((status>>2) & 0x1) ? @"UNLOCKED":@"OK");
+	NSLogMono(@"10MHz Phase      | %@\n",	((status>>3) & 0x1) ? @"UNLOCKED":@"OK");
+	NSLogMono(@"Firmware Type    | %@\n",	[self boardTypeName:((status>>4) & 0x3)]);
+	NSLogMono(@"Hardware Type    | %@\n",	[self boardTypeName:((status>>6) & 0x3)]);
+	NSLogMono(@"Busy             | %@\n",	((status>>8) & 0x1) ? @"BUSY":@"IDLE");
+	NSLogMono(@"Interrupt Srcs   | 0x%x\n",	(status>>16) &0xff);
+	NSLogMono(@"FIFO Status      | %@\n",	[self fifoStatusString:((status>>24) & 0xf)]);
+	NSLogMono(@"Histo Toggle Bit | %d\n",	((status>>28) & 0x1));
+	NSLogMono(@"Histo Toggle Clr | %d\n",	((status>>29) & 0x1));
+	NSLogMono(@"IRQ              | %d\n",	((status>>31) & 0x1));
+    NSLogDivider(@"=",width);
 }
 
 - (void) printValueTable
 {
-	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-	NSLogFont(aFont,   @"chan | HitRate  | Gain | Threshold\n");
-	NSLogFont(aFont,   @"----------------------------------\n");
+    int width = 46;
+    NSLogStartTable([NSString stringWithFormat:@"%@ Threshold/Gains",[self fullID]], width);
+    NSLogDivider(@"-", width);
+	NSLogMono(@"chan |  Trigger |  HitRate | Gain | Threshold\n");
+	NSLogDivider(@"-",width);
 	unsigned long aHitRateMask = [self readHitRateMask];
 
 	//grab all the thresholds and gains using one command packet
@@ -3062,9 +3068,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[self executeCommandList:aList];
 	
 	for(i=0;i<kNumV4FLTChannels;i++){
-		NSLogFont(aFont,@"%4d | %@ | %4d | %4d \n",i,(aHitRateMask>>i)&0x1 ? @" Enabled":@"Disabled",[aList longValueForCmd:i*2],[aList longValueForCmd:1+i*2]);
+		NSLogMono(@"%4d | %@ | %@ | %4d | %4d \n",i,(triggerEnabledMask>>i)&0x1 ? @" Enabled":@"Disabled",(aHitRateMask>>i)&0x1 ? @" Enabled":@"Disabled",[aList longValueForCmd:i*2],[aList longValueForCmd:1+i*2]);
 	}
-	NSLogFont(aFont,   @"---------------------------------\n");
+    NSLogDivider(@"=", width);
 }
 
 
@@ -3125,7 +3131,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (BOOL) compareThresholdsAndGains
 {
     int i;
-    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     BOOL differencesExist = NO;
     for(i=0;i<kNumV4FLTChannels;i++){
         if( triggerEnabledMask & (0x1<<i) ){
@@ -3140,7 +3145,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
     }
     if(!differencesExist) {
-        NSLogFont(aFont,      @"ALL Gains, Thresholds in ORCA match HW\n");
+        NSLogMono(      @"ALL Gains, Thresholds in ORCA match HW\n");
     }
     
     return(differencesExist);
@@ -3152,8 +3157,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     BOOL differencesExist = NO;
 
     if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
-        NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
-        NSLogFont(aFont, @"HitRateMask in ORCA Matches HW\n");
+        NSLogMono( @"HitRateMask in ORCA Matches HW\n");
     } else {
         differencesExist = true;
     }
@@ -3163,7 +3167,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (BOOL) compareFilter
 {
-    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     unsigned long regValue = [self readReg:kFLTV4RunControlReg];
     int hwBoxCarLength1      = (regValue>>28) & 0x7;
     int hwPoleZeroCorrection = (regValue>>24) & 0xf;
@@ -3172,12 +3175,11 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     BOOL differencesExist = NO;
     differencesExist |= [self checkForDifferencesInName:@"BoxcarLength1"      orcaValue:[self boxcarLength]        hwValue:hwBoxCarLength1];
     differencesExist |= [self checkForDifferencesInName:@"PoleZeroCorrection" orcaValue:[self poleZeroCorrection]  hwValue:hwPoleZeroCorrection];
-    //differencesExist |= [self checkForDifferencesInName:@"BoxcarLength2"      orcaValue:[self boxcarLength]        hwValue:hwBoxcarLength2];
     differencesExist |= [self checkForDifferencesInName:@"FilterShapingLength"orcaValue:[self filterShapingLength] hwValue:hwFilterShapingLength];
     differencesExist |= [self checkForDifferencesInName:@"GapLength"          orcaValue:[self gapLength]           hwValue:hwGapLength];
     
     if(!differencesExist){
-        NSLogFont(aFont, @"All RunControl reg values in ORCA match HW\n");
+        NSLogMono( @"All RunControl reg values in ORCA match HW\n");
     }
     
     return(differencesExist);
@@ -3185,9 +3187,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue
 {
-    NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
     if(hwValue != orcaValue){
-        NSLogFont(aFont, @"%@: ORCA:0x%0X != HW:0x%0X\n",aName,orcaValue,hwValue);
+        NSLogMono( @"%@: ORCA:0x%0X != HW:0x%0X\n",aName,orcaValue,hwValue);
         return YES;
     }
     else return NO;
