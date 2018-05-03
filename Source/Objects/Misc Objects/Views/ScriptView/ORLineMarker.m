@@ -28,26 +28,15 @@
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-	if ((self = [super initWithCoder:decoder]) != nil) {
-		if ([decoder allowsKeyedCoding]) {
-			lineNumber = [[decoder decodeObjectForKey:@"line"] unsignedIntValue];
-		}
-		else {
-			lineNumber = [[decoder decodeObject] unsignedIntValue];
-		}
-	}
+    self = [super initWithCoder:decoder];
+    lineNumber = [[decoder decodeObjectForKey:@"line"] unsignedIntValue];
 	return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
 	[super encodeWithCoder:encoder];	
-	if ([encoder allowsKeyedCoding]) {
-		[encoder encodeObject:[NSNumber numberWithUnsignedInt:lineNumber] forKey:@"line"];
-	}
-	else {
-		[encoder encodeObject:[NSNumber numberWithUnsignedInt:lineNumber]];
-	}
+    [encoder encodeObject:[NSNumber numberWithUnsignedInt:lineNumber] forKey:@"line"];
 }
 
 
