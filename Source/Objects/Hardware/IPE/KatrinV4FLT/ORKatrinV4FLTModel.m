@@ -1626,6 +1626,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                             ((ledOff        & 0x1)<<1 );
     
     [self writeReg: kFLTV4ControlReg value:aValue];
+    [self waitOnBusyFlag];
 }
 
 /** Possible values are (see SLTv4_HW_Definitions.h):
@@ -1642,7 +1643,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                             ((fifoBehaviour & 0x1)<<24) |
                             ((ledOff        & 0x1)<<1 );
 	[self writeReg: kFLTV4ControlReg value:aValue];
-
+    [self waitOnBusyFlag];
 }
 
 //! Write FLTv4 control register with flt run mode 'Standby' (=0).
