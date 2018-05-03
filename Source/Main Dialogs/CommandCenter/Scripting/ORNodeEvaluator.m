@@ -2438,8 +2438,8 @@
         if([theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")])    className = @"NSDecimalNumber";
         else if([theObj isKindOfClass:NSClassFromString(@"NSString")])      className = @"NSString";
         
-        NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,75,20)];
-        NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+80,y,75,20)];
+        NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,175,20)];
+        NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+85,y,75,20)];
         
         [labelField setAutoresizingMask: NSViewMinYMargin];
         [textField setAutoresizingMask: NSViewMinYMargin];
@@ -2464,7 +2464,7 @@
         [textField release];
         y -= dy;
         if(!reset && (++count >= (int)(variableCount/2. +.5))){
-            x = 85 + 75 + 10;
+            x = 85 + 175 + 10;
             y = yStart;
             reset = YES;
         }
@@ -2541,12 +2541,11 @@
         if(![theObj isKindOfClass:NSClassFromString(@"NSDecimalNumber")] &&
            ![theObj isKindOfClass:NSClassFromString(@"NSString")])continue;
                 
-        NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,75,20)];
-        NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+80,y,75,20)];
+        NSTextField* labelField = [[NSTextField alloc] initWithFrame:NSMakeRect(x,y,120,20)];
+        NSTextField* textField = [[NSTextField alloc] initWithFrame:NSMakeRect(x+122,y,75,20)];
         
         [labelField setAutoresizingMask: NSViewMinYMargin];
         [textField setAutoresizingMask: NSViewMinYMargin];
-        
         
         [self.window.contentView addSubview:labelField];
         [self.window.contentView addSubview:textField];
@@ -2570,8 +2569,9 @@
         [labelField release];
         [textField release];
         y -= dy;
+        
         if(!reset && (++count >= (int)(variableCount/2. +.5))){
-            x = 85 + 75 + 10;
+            x = 120 + 75 + 25;
             y = yStart;
             reset = YES;
         }
@@ -2579,7 +2579,7 @@
     float windowX = windowFrame.origin.x;
     float windowY = windowFrame.origin.y;
     float h = windowFrame.size.height + count * dy - 4;
-    float w = windowFrame.size.width;
+    float w = variableCount>=2 ? 2*x - 10 : x-10;
     [[self window] setFrame:NSMakeRect(windowX,windowY,w,h) display:YES];
     [[self window]center];
     [super awakeFromNib];
