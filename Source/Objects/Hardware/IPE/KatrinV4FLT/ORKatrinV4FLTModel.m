@@ -394,8 +394,8 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setBoxcarLength:boxcarLength];
 
-    float old = 1<<boxcarLength;
-    float new = 1<<aBoxcarLength;
+    float old = boxcarLength + 1;
+    float new = aBoxcarLength + 1;
     float ratio = new/old;
     int chan;
   
@@ -1164,7 +1164,7 @@ static double table[32]={
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setFloatThreshold:aChan withValue:[self threshold:aChan]];
     if(aThreshold<=0)aThreshold=0;
-    else if(aThreshold>65535.)aThreshold = 65535.;
+    else if(aThreshold> (4096. * [self filterLengthInBins] -1 )) aThreshold = 4096. * [self filterLengthInBins] - 1;
     [thresholds replaceObjectAtIndex:aChan withObject:[NSNumber numberWithFloat:aThreshold]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
