@@ -135,8 +135,6 @@ enum {
     float lastThresholdWithNoRate[kNumV4FLTChannels];
     float thresholdToTest[kNumV4FLTChannels];
     float oldThresholds[kNumV4FLTChannels];
-    int startingUpperBound;
-    float finalThresholdOffset;
     int   doneChanCount;
     int   workingChanCount;
 
@@ -225,10 +223,6 @@ enum {
 - (unsigned short) hitRateLength;
 - (void) setHitRateLength:(unsigned short)aHitRateLength;
 - (BOOL) noiseFloorRunning;
-- (unsigned  long) startingUpperBound;
-- (void) setStartingUpperBound:(unsigned  long)aValue;
-- (float) finalThresholdOffset;
-- (void) setFinalThresholdOffset:(float)anOffset;
 - (void) findNoiseFloors;
 - (NSString*) noiseFloorStateString;
 
@@ -514,7 +508,6 @@ extern NSString* ORKatrinV4FLTModelModeChanged;
 extern NSString* ORKatrinV4FLTSettingsLock;
 extern NSString* ORKatrinV4FLTModelEventMaskChanged;
 extern NSString* ORKatrinV4FLTNoiseFloorChanged;
-extern NSString* ORKatrinV4FLTFinalThresholdOffsetChanged;
 extern NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged;
 extern NSString* ORKatrinV4FLTModelHitRateModeChanged;
 extern NSString* ORKatrinV4FLTModelLostEventsChanged;

@@ -142,7 +142,6 @@
 		IBOutlet NSButton*				startNoiseFloorButton;
 		IBOutlet NSProgressIndicator*	noiseFloorProgress;
         IBOutlet NSTextField*           noiseFloorStateField2;
-        IBOutlet NSTextField*           startingUpperBoundField;
 	
 		IBOutlet NSMatrix*				fifoDisplayMatrix;
     
@@ -227,7 +226,6 @@
 - (void) hitRateModeChanged:(NSNotification*)aNote;
 - (void) lostEventsChanged:(NSNotification*)aNote;
 - (void) lostEventsTrChanged:(NSNotification*)aNote;
-- (void) startingUpperBoundChanged:(NSNotification*)aNote;
 
 #pragma mark •••Actions
 - (IBAction) hitRateModeAction:(id)sender;
@@ -295,7 +293,6 @@
 - (IBAction) closeNoiseFloorPanel:(id)sender;
 - (IBAction) findNoiseFloors:(id)sender;
 - (IBAction) finalThresholdOffsetAction:(id)sender;
-- (IBAction) startingUpperBoundAction:(id)sender;
 
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 - (IBAction) devTest1ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis

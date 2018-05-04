@@ -91,7 +91,6 @@ NSString* ORKatrinV4FLTSelectedRegIndexChanged              = @"ORKatrinV4FLTSel
 NSString* ORKatrinV4FLTWriteValueChanged                    = @"ORKatrinV4FLTWriteValueChanged";
 NSString* ORKatrinV4FLTSelectedChannelValueChanged          = @"ORKatrinV4FLTSelectedChannelValueChanged";
 NSString* ORKatrinV4FLTNoiseFloorChanged                    = @"ORKatrinV4FLTNoiseFloorChanged";
-NSString* ORKatrinV4FLTFinalThresholdOffsetChanged          = @"ORKatrinV4FLTNoiseFloorOffsetChanged";
 NSString* ORKatrinV4FLTModelActivateDebuggingDisplaysChanged = @"ORKatrinV4FLTModelActivateDebuggingDisplaysChanged";
 NSString* ORKatrinV4FLTModeFifoFlagsChanged                 = @"ORKatrinV4FLTModeFifoFlagsChanged";
 NSString* ORKatrinV4FLTModelHitRateModeChanged              = @"ORKatrinV4FLTModelHitRateModeChanged";
@@ -722,7 +721,7 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelShipSumHistogramChanged object:self];
 }
 
-- (int) targetRate { return targetRate; }
+- (int) targetRate { if(targetRate<1)return 1; else return targetRate; }
 - (void) setTargetRate:(int)aTargetRate
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTargetRate:targetRate];
@@ -812,27 +811,6 @@ static double table[32]={
 }
 
 - (BOOL) noiseFloorRunning { return noiseFloorRunning; }
-
-- (float) finalThresholdOffset { return finalThresholdOffset; }
-- (void) setFinalThresholdOffset:(float)anOffset
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setFinalThresholdOffset:finalThresholdOffset];
-    finalThresholdOffset = anOffset;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTFinalThresholdOffsetChanged object:self];
-}
-
-- (unsigned  long) startingUpperBound
-{
-    if(startingUpperBound==0)startingUpperBound = 4096;
-    return startingUpperBound;
-}
-- (void) setStartingUpperBound:(unsigned  long)aValue
-{
-    if(aValue == 0) aValue = 4096;
-    [[[self undoManager] prepareWithInvocationTarget:self] setStartingUpperBound:startingUpperBound];
-    startingUpperBound = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTStartingUpperBoundChanged object:self];
-}
 
 - (unsigned long) histLastEntry { return histLastEntry; }
 - (void) setHistLastEntry:(unsigned long)aHistLastEntry
@@ -2191,8 +2169,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self setHitRateMode:               [decoder decodeIntForKey:   @"hitRateMode"]];
     [self setForceFLTReadout:           [decoder decodeBoolForKey:  @"forceFLTReadout"]];
     [self setFilterShapingLengthOnInit: [decoder decodeIntForKey:   @"filterShapingLength"]];
-    [self setFinalThresholdOffset:      [decoder decodeFloatForKey: @"finalThresholdOffset"]];
-    [self setStartingUpperBound:        [decoder decodeInt32ForKey: @"startingUpperBound"]];
 
     int i;
     for(i=0;i<kNumV4FLTChannels;i++){
@@ -2221,12 +2197,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [encoder encodeInt:poleZeroCorrection           forKey:@"poleZeroCorrection"];
     [encoder encodeInt:customVariable               forKey:@"customVariable"];
     [encoder encodeInt:fifoLength                   forKey:@"fifoLength"];
-    [encoder encodeFloat:finalThresholdOffset       forKey:@"finalThresholdOffset"];
     [encoder encodeInt:shipSumHistogram             forKey:@"shipSumHistogram"];
     [encoder encodeBool:activateDebuggingDisplays   forKey:@"activateDebuggingDisplays"];
     [encoder encodeInt:hitRateMode                  forKey:@"hitRateMode"];
     [encoder encodeInt:filterShapingLength          forKey:@"filterShapingLength"];
-    [encoder encodeInt32:startingUpperBound         forKey:@"startingUpperBound"];
     
     int i;
     for(i=0;i<kNumV4FLTChannels;i++){
@@ -2804,11 +2778,22 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [p setSetMethod:@selector(setHistClrMode:) getMethod:@selector(histClrMode)];
     [a addObject:p];			
 	//----------------
-	
-	
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setName:@"Target Rate"];
+    [p setFormat:@"##0" upperLimit:100 lowerLimit:1 stepSize:1 units:@""];
+    [p setSetMethod:@selector(setTargetRate:) getMethod:@selector(targetRate)];
+    [a addObject:p];
+
+    p = [[[ORHWWizParam alloc] init] autorelease];
+    [p setUseValue:NO];
+    [p setName:@"Run Threshold Finder"];
+    [p setSetMethodSelector:@selector(findNoiseFloors)];
+    [a addObject:p];
+    
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
     [p setName:@"Init"];
+    [p setOncePerCard:YES];
     [p setSetMethodSelector:@selector(initBoard)];
     [a addObject:p];
     
@@ -3090,7 +3075,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	}
 	else {
         if ([gOrcaGlobals runInProgress]){
-            NSLog(@"Error: Can't run threshold finder during run\n");
+            NSLogColor([NSColor redColor],@"Error: Can't run threshold finder during run\n");
         }
         else {
             noiseFloorState   = eInitializing;
@@ -3511,11 +3496,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 @implementation ORKatrinV4FLTModel (private)
 
+#define kThresholdFinderStart 4096
+
 - (void) stepNoiseFloor
 {
 	[[self undoManager] disableUndoRegistration];
 	int i;
-    float           maxThreshold     = [self startingUpperBound] * [self filterLengthInBins];
+    float           maxThreshold     = kThresholdFinderStart * [self filterLengthInBins];
     unsigned long   newHitMask       = 0x0;
     BOOL            progress         = NO;
     float           updateSpeed      = 0.8; // 0 no progress ... 1 maximum speed
@@ -3527,6 +3514,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 			case eInitializing:
                 noiseFloorRunning = YES;
                 workingChanCount = 0;
+                [[ORGlobal sharedGlobal] addRunVeto:[NSString stringWithFormat:@"TF %@",[self fullID]] comment:@"Threshold Finder is Running"];
 
                 // Read start time
                 gettimeofday(&findert0,&tz);
@@ -3663,6 +3651,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
             
 			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:timeToWait];
 		}
+        else {
+            NSLog(@"%@ Threshold Finder exited\n",[self fullID]);
+            [[ORGlobal sharedGlobal] removeRunVeto:[NSString stringWithFormat:@"TF %@",[self fullID]]];
+        }
         
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTNoiseFloorChanged object:self];
     }

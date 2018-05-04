@@ -301,11 +301,6 @@
                      selector : @selector(noiseFloorChanged:)
                          name : ORKatrinV4FLTNoiseFloorChanged
                        object : model];
-	
-    [notifyCenter addObserver : self
-                     selector : @selector(finalThresholdOffsetChanged:)
-                         name : ORKatrinV4FLTFinalThresholdOffsetChanged
-                       object : model];
     
     [notifyCenter addObserver : self
                      selector : @selector(histPageABChanged:)
@@ -421,21 +416,10 @@
                      selector : @selector(lostEventsTrChanged:)
                          name : ORKatrinV4FLTModelLostEventsTrChanged
                         object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(startingUpperBoundChanged:)
-                         name : ORKatrinV4FLTStartingUpperBoundChanged
-                        object: model];
-
     
 }
 
 #pragma mark •••Interface Management
-
-- (void) startingUpperBoundChanged:(NSNotification*)aNote
-{
-    [startingUpperBoundField setIntValue:[model startingUpperBound]];
-}
 
 - (void) hitRateModeChanged:(NSNotification*)aNote
 {
@@ -696,7 +680,6 @@
 	[self histFirstEntryChanged:nil];
 	[self histLastEntryChanged:nil];
 	[self noiseFloorChanged:nil];
-	[self finalThresholdOffsetChanged:nil];
 	[self histPageABChanged:nil];
 	[self histMaxEnergyChanged:nil];
 	[self targetRateChanged:nil];
@@ -722,7 +705,6 @@
     [self lostEventsChanged:nil];
     [self lostEventsTrChanged:nil];
     [self thresholdChanged:nil];
-    [self startingUpperBoundChanged:nil];
 }
 
 - (void) checkGlobalSecurity
@@ -846,11 +828,6 @@
 	}
 	[noiseFloorStateField setStringValue:[model noiseFloorStateString]];
 	[noiseFloorStateField2 setStringValue:[model noiseFloorStateString]];
-}
-
-- (void) finalThresholdOffsetChanged:(NSNotification*)aNote
-{
-	[finalThresholdOffsetField setFloatValue:[model finalThresholdOffset]];
 }
 
 
@@ -1240,11 +1217,6 @@
                         localException);
     }
 }
-- (IBAction) finalThresholdOffsetAction:(id)sender
-{
-    [model setFinalThresholdOffset:[sender floatValue]];
-}
-
 - (IBAction) histClrModeAction:(id)sender
 {
 	[model setHistClrMode:[sender indexOfSelectedItem]];	
@@ -1680,11 +1652,6 @@
         NSLog(@"   resetTPButton: Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 	    [model testButtonLowLevelResetTP];
 	}
-}
-
-- (IBAction) startingUpperBoundAction:(id)sender
-{
-    [model setStartingUpperBound:[sender intValue]];
 }
 
 - (IBAction) compareRegisters:(id)sender
