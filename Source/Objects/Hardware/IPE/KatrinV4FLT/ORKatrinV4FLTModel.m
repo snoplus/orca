@@ -3175,12 +3175,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (BOOL) compareControlReg:(BOOL)verbose
 {
     unsigned long regValue = [self readReg:kFLTV4ControlReg] & 0x00300F00;
-    int hwMode          = (regValue>>16) & 0xf;
+    //int hwMode          = (regValue>>16) & 0xf;
     int hwFifoLength    = (regValue>>25) & 0x1;
     int hwFifoBehaviour = (regValue>>24) & 0x1;
     
     BOOL differencesExist = NO;
-    differencesExist |= [self checkForDifferencesInName:@"RunMode"      orcaValue:[self runMode]        hwValue:hwMode];
+    //differencesExist |= [self checkForDifferencesInName:@"RunMode"      orcaValue:[self fltRunMode]        hwValue:hwMode];
     differencesExist |= [self checkForDifferencesInName:@"FifoLength"   orcaValue:[self fifoLength]     hwValue:hwFifoLength];
     differencesExist |= [self checkForDifferencesInName:@"FifoBehavious" orcaValue:[self fifoBehaviour] hwValue:hwFifoBehaviour];
     
@@ -3190,6 +3190,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     
     return(differencesExist);
 }
+
 - (BOOL) comparePostTrigger:(BOOL)verbose
 {
     if( ![self checkForDifferencesInName:@"PostTrigger" orcaValue:[self postTriggerTime] hwValue:[self readReg:kFLTV4PostTriggerReg] & 0x7ff]){
