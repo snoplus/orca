@@ -179,7 +179,6 @@
 - (void) histMaxEnergyChanged:(NSNotification*)aNote;
 - (void) histPageABChanged:(NSNotification*)aNote;
 - (void) noiseFloorChanged:(NSNotification*)aNote;
-- (void) finalThresholdOffsetChanged:(NSNotification*)aNote;
 - (void) histLastEntryChanged:(NSNotification*)aNote;
 - (void) histFirstEntryChanged:(NSNotification*)aNote;
 - (void) histClrModeChanged:(NSNotification*)aNote;
@@ -292,7 +291,6 @@
 - (IBAction) openNoiseFloorPanel:(id)sender;
 - (IBAction) closeNoiseFloorPanel:(id)sender;
 - (IBAction) findNoiseFloors:(id)sender;
-- (IBAction) finalThresholdOffsetAction:(id)sender;
 
 - (IBAction) testButtonAction: (id) sender; //temp routine to hook up to any on a temp basis
 - (IBAction) devTest1ButtonAction: (id) sender; //temp routine to hook up to any on a temp basis

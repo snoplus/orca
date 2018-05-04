@@ -428,9 +428,13 @@ enum {
 
 - (void) testReadHisto;
 - (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue;
-- (BOOL) compareThresholdsAndGains;
-- (BOOL) compareHitRateMask;
-- (BOOL) compareFilter;
+- (BOOL) compareRegisters:(BOOL)verbose;
+- (BOOL) compareThresholdsAndGains:(BOOL)verbose;
+- (BOOL) compareHitRateMask:(BOOL)verbose;
+- (BOOL) compareFilter:(BOOL)verbose;
+- (BOOL) comparePostTrigger:(BOOL)verbose;
+- (BOOL) compareEnergyOffset:(BOOL)verbose;
+- (BOOL) compareAnalogOffset:(BOOL)verbose;
 
 @end
 

@@ -304,7 +304,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 #pragma mark •••Accessors
 - (int) energyOffset
 {
-    return energyOffset;
+    return energyOffset & 0xFFFFF;
 }
 
 - (void) setEnergyOffset:(int)aEnergyOffset
@@ -992,11 +992,11 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelGapLengthChanged object:self];
 }
 
-- (unsigned long) postTriggerTime { return postTriggerTime; }
+- (unsigned long) postTriggerTime { return postTriggerTime & 0x0003ff; }
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:2046];//min 6 is found 'experimental' -tb-
+    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:0x0003ff];//min 6 is found 'experimental' -tb-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -1015,7 +1015,7 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelEventMaskChanged object:self];
 }
 
-- (int) analogOffset{ return analogOffset; }
+- (int) analogOffset{ return analogOffset & 0xfff; }
 - (void) setAnalogOffset:(int)aAnalogOffset
 {
 	
@@ -1543,9 +1543,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     [self writeClrCnt];// Clear lost event counters
     if([self readReg:kFLTV4HrControlReg]&0xf != hitRateLength) [self writeReg: kFLTV4HrControlReg value:hitRateLength];
     
-    if([self readReg:kFLTV4PostTriggerReg]  & 0x0003ff != postTriggerTime) [self writeReg: kFLTV4PostTriggerReg   value:postTriggerTime];
-    if([self readReg:kFLTV4EnergyOffsetReg] & 0x0fffff != energyOffset)    [self writeReg: kFLTV4EnergyOffsetReg  value:energyOffset];
-    if([self readReg:kFLTV4AnalogOffsetReg] & 0x000fff != analogOffset)    [self writeReg: kFLTV4AnalogOffsetReg  value:analogOffset];
+    if([self readReg:kFLTV4PostTriggerReg]  & 0x0003ff != [self postTriggerTime]) [self writeReg: kFLTV4PostTriggerReg   value:[self postTriggerTime]];
+    if([self readReg:kFLTV4EnergyOffsetReg] & 0x0fffff != [self energyOffset])    [self writeReg: kFLTV4EnergyOffsetReg  value:[self energyOffset]];
+    if([self readReg:kFLTV4AnalogOffsetReg] & 0x000fff != [self analogOffset])    [self writeReg: kFLTV4AnalogOffsetReg  value:[self analogOffset]];
     [self writeTriggerControl];
 	[self writeHitRateMask];
 	
@@ -2619,7 +2619,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	configStruct->card_info[index].hw_mask[2] 	= histogramId;				//record id for the histograms
 	configStruct->card_info[index].slot			= [self stationNumber];		//PMC readout (fdhwlib) uses col 0->n-1; stationNumber is from 1->n (FLT register entry SlotID too)
 	configStruct->card_info[index].crate		= [self crateNumber];
-	configStruct->card_info[index].deviceSpecificData[0] = postTriggerTime;	//needed to align the waveforms
+	configStruct->card_info[index].deviceSpecificData[0] = [self postTriggerTime];	//needed to align the waveforms
 	unsigned long eventTypeMask = 0;
 	if(readWaveforms) eventTypeMask |= kReadWaveForms;
 	configStruct->card_info[index].deviceSpecificData[1] = eventTypeMask;	
@@ -2786,6 +2786,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
     p = [[[ORHWWizParam alloc] init] autorelease];
     [p setUseValue:NO];
+    [p setOncePerCard:YES];
     [p setName:@"Run Threshold Finder"];
     [p setSetMethodSelector:@selector(findNoiseFloors)];
     [a addObject:p];
@@ -3114,7 +3115,47 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     return [[ORKatrinV4FLTRegisters sharedRegSet] accessType:anIndex];
 }
 
-- (BOOL) compareThresholdsAndGains
+- (BOOL) compareRegisters:(BOOL)verbose
+{
+    BOOL thresholdsAndGainsDiff = [self compareThresholdsAndGains:NO];
+    BOOL hitRateDiff            = [self compareHitRateMask:NO];
+    BOOL filterDiff             = [self compareFilter:NO];
+    BOOL postTriggerDiff        = [self comparePostTrigger:NO];
+    BOOL energyOffsetDiff       = [self compareEnergyOffset:NO];
+    BOOL analogDiff             = [self compareAnalogOffset:NO];
+    if(verbose){
+        NSString* s = [NSString stringWithFormat:@"Register Compare report for %@\n",[self fullID]];
+        NSLogStartTable(s,58);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Thresholds/Gains" rightJustified:18],
+                  [!thresholdsAndGainsDiff?@"OK":@"Mismatch" centered:8]);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Hit Rate" rightJustified:18],
+                  [!hitRateDiff?@"OK":@"Mismatch" centered:8]);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Filter" rightJustified:18],
+                  [!filterDiff?@"OK":@"Mismatch" centered:8]);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Post Trigger" rightJustified:18],
+                  [!postTriggerDiff?@"OK":@"Mismatch" centered:8]);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Energy Offset" rightJustified:18],
+                  [!energyOffsetDiff?@"OK":@"Mismatch" centered:8]);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Analog Offset" rightJustified:18],
+                  [!analogDiff?@"OK":@"Mismatch" centered:8]);
+        NSLogDivider(@"=", 58);
+
+    }
+    return  !thresholdsAndGainsDiff &
+            !hitRateDiff            &
+            !filterDiff             &
+            !postTriggerDiff        &
+            !energyOffsetDiff       &
+            !analogDiff;
+}
+
+- (BOOL) compareThresholdsAndGains:(BOOL)verbose
 {
     int i;
     BOOL differencesExist = NO;
@@ -3131,19 +3172,44 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
     }
     if(!differencesExist) {
-        NSLogMono(      @"ALL Gains, Thresholds in ORCA match HW\n");
+        if(verbose)NSLogMono(      @"ALL Gains, Thresholds in ORCA match HW\n");
     }
     
     return(differencesExist);
 }
+- (BOOL) comparePostTrigger:(BOOL)verbose
+{
+    if( ![self checkForDifferencesInName:@"postTrigger" orcaValue:[self postTriggerTime] hwValue:[self readReg:kFLTV4PostTriggerReg] & 0x0003ff]){
+        if(verbose)NSLogMono( @"PostTrigger in ORCA Matches HW\n");
+        return NO;
+    }
+    else return YES;
+}
 
-- (BOOL) compareHitRateMask
+- (BOOL) compareEnergyOffset:(BOOL)verbose
+{
+    if( ![self checkForDifferencesInName:@"EnergyOffet" orcaValue:[self energyOffset] hwValue:[self readReg:kFLTV4EnergyOffsetReg] & 0x0fffff]){
+        if(verbose)NSLogMono( @"EnergyOffet in ORCA Matches HW\n");
+        return NO;
+    }
+    else return YES;
+}
+- (BOOL) compareAnalogOffset:(BOOL)verbose
+{
+    if( ![self checkForDifferencesInName:@"AnalogOffet" orcaValue:[self analogOffset] hwValue:[self readReg:kFLTV4AnalogOffsetReg] & 0x000fff]){
+        if(verbose)NSLogMono( @"AnalogOffet in ORCA Matches HW\n");
+        return NO;
+    }
+    else return YES;
+}
+
+- (BOOL) compareHitRateMask:(BOOL)verbose
 {
     unsigned long aMask = [self readHitRateMask];
     BOOL differencesExist = NO;
 
     if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
-        NSLogMono( @"HitRateMask in ORCA Matches HW\n");
+        if(verbose)NSLogMono( @"HitRateMask in ORCA Matches HW\n");
     } else {
         differencesExist = true;
     }
@@ -3151,7 +3217,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     return(differencesExist);
 }
 
-- (BOOL) compareFilter
+- (BOOL) compareFilter:(BOOL)verbose
 {
     unsigned long regValue = [self readReg:kFLTV4RunControlReg];
     int hwBoxCarLength1      = (regValue>>28) & 0x7;
@@ -3165,7 +3231,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     differencesExist |= [self checkForDifferencesInName:@"GapLength"          orcaValue:[self gapLength]           hwValue:hwGapLength];
     
     if(!differencesExist){
-        NSLogMono( @"All RunControl reg values in ORCA match HW\n");
+        if(verbose)NSLogMono( @"All RunControl reg values in ORCA match HW\n");
     }
     
     return(differencesExist);
@@ -3652,7 +3718,6 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 			[self performSelector:@selector(stepNoiseFloor) withObject:self afterDelay:timeToWait];
 		}
         else {
-            NSLog(@"%@ Threshold Finder exited\n",[self fullID]);
             [[ORGlobal sharedGlobal] removeRunVeto:[NSString stringWithFormat:@"TF %@",[self fullID]]];
         }
         

@@ -1656,13 +1656,8 @@
 
 - (IBAction) compareRegisters:(id)sender
 {
-    NSString* s = [NSString stringWithFormat:@"Register Compare report for %@\n",[model fullID]];
-    NSLogStartTable(s,58);
-    [model compareThresholdsAndGains];
-    [model compareHitRateMask];
-    [model compareFilter];
-    NSLogDivider(@"=", 58);
-}
+    [(ORKatrinV4FLTModel*) model compareRegisters:YES];
+ }
 
 #pragma mark •••Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
