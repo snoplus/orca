@@ -311,7 +311,6 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setEnergyOffset:energyOffset];
     energyOffset = [self restrictIntValue:aEnergyOffset min:-1048576 max:0xfffff];//2018-02-12 added negative EnergyOffset (21 bit) -tb-
-    //energyOffset = aEnergyOffset;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelEnergyOffsetChanged object:self];
 }
 
@@ -664,7 +663,7 @@ static double table[32]={
 
 - (void) setFifoLength:(int)aFifoLength
 {
-	if(aFifoLength != kFifoLength512 && aFifoLength != kFifoLength64) aFifoLength = kFifoLength512;
+	if((aFifoLength != kFifoLength512) && (aFifoLength != kFifoLength64)) aFifoLength = kFifoLength512;
     [[[self undoManager] prepareWithInvocationTarget:self] setFifoLength:fifoLength];
     fifoLength = aFifoLength;
 	//NSLog(@"%@::%@: set setFifoLength to %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),aFifoLength);//-tb-NSLog-tb-
@@ -992,11 +991,11 @@ static double table[32]={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelGapLengthChanged object:self];
 }
 
-- (unsigned long) postTriggerTime { return postTriggerTime & 0x0003ff; }
+- (unsigned long) postTriggerTime { return postTriggerTime & 0x0007ff; }
 - (void) setPostTriggerTime:(unsigned long)aPostTriggerTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerTime:postTriggerTime];
-    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:0x0003ff];//min 6 is found 'experimental' -tb-
+    postTriggerTime = [self restrictIntValue:aPostTriggerTime min:6 max:0x0007ff];//min 6 is found 'experimental' -tb-
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinV4FLTModelPostTriggerTimeChanged object:self];
 }
 
@@ -1541,11 +1540,10 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     //to minimize init errors only load values that are different from HW values
     [self writeControlWithStandbyMode];     //standby mode so the HW is stable for the following writes
     [self writeClrCnt];// Clear lost event counters
-    if([self readReg:kFLTV4HrControlReg]&0xf != hitRateLength) [self writeReg: kFLTV4HrControlReg value:hitRateLength];
-    
-    if([self readReg:kFLTV4PostTriggerReg]  & 0x0003ff != [self postTriggerTime]) [self writeReg: kFLTV4PostTriggerReg   value:[self postTriggerTime]];
-    if([self readReg:kFLTV4EnergyOffsetReg] & 0x0fffff != [self energyOffset])    [self writeReg: kFLTV4EnergyOffsetReg  value:[self energyOffset]];
-    if([self readReg:kFLTV4AnalogOffsetReg] & 0x000fff != [self analogOffset])    [self writeReg: kFLTV4AnalogOffsetReg  value:[self analogOffset]];
+    if(([self readReg:kFLTV4HrControlReg]      & 0x00000f) != [self hitRateLength])   [self writeReg: kFLTV4HrControlReg     value:[self hitRateLength]];
+    if(([self readReg:kFLTV4PostTriggerReg]    & 0x0007ff) != [self postTriggerTime]) [self writeReg: kFLTV4PostTriggerReg   value:[self postTriggerTime]];
+    if((([self readReg:kFLTV4EnergyOffsetReg]  & 0x0fffff) / [self filterLengthInBins]) != [self energyOffset] )    [self writeReg: kFLTV4EnergyOffsetReg  value:[self energyOffset]];
+    if(([self readReg:kFLTV4AnalogOffsetReg]   & 0x000fff) != [self analogOffset])    [self writeReg: kFLTV4AnalogOffsetReg  value:[self analogOffset]];
     [self writeTriggerControl];
 	[self writeHitRateMask];
 	
@@ -1598,13 +1596,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 
 - (void) writeControl
 {
-	unsigned long aValue =	((fltRunMode    & 0xf)<<16) |
-                            ((fifoLength    & 0x1)<<25) |
-                            ((fifoBehaviour & 0x1)<<24) |
-                            ((ledOff        & 0x1)<<1 );
-    
-    [self writeReg: kFLTV4ControlReg value:aValue];
-    [self waitOnBusyFlag];
+    [self writeControlWithFltRunMode:fltRunMode];
 }
 
 /** Possible values are (see SLTv4_HW_Definitions.h):
@@ -1615,10 +1607,9 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
   */
 - (void) writeControlWithFltRunMode:(int)aMode
 {
-	//TODO: add fifo length -tb- <---------------------------------------------
-	unsigned long aValue =  ((aMode         & 0xf)<<16)         |
+	unsigned long aValue =  ((aMode         & 0xf)<<16)    |
                             ((fifoLength    & 0x1)<<25)    |
-                            ((fifoBehaviour & 0x1)<<24) |
+                            ((fifoBehaviour & 0x1)<<24)    |
                             ((ledOff        & 0x1)<<1 );
 	[self writeReg: kFLTV4ControlReg value:aValue];
     [self waitOnBusyFlag];
@@ -3123,9 +3114,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     BOOL postTriggerDiff        = [self comparePostTrigger:NO];
     BOOL energyOffsetDiff       = [self compareEnergyOffset:NO];
     BOOL analogDiff             = [self compareAnalogOffset:NO];
+    BOOL controlDiff            = [self compareControlReg:NO];
     if(verbose){
         NSString* s = [NSString stringWithFormat:@"Register Compare report for %@\n",[self fullID]];
         NSLogStartTable(s,58);
+        NSLogMono(@"|%@ |%@|\n",
+                  [@"Control Reg" rightJustified:18],
+                  [!controlDiff?@"OK":@"Mismatch" centered:8]);
         NSLogMono(@"|%@ |%@|\n",
                   [@"Thresholds/Gains" rightJustified:18],
                   [!thresholdsAndGainsDiff?@"OK":@"Mismatch" centered:8]);
@@ -3147,7 +3142,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         NSLogDivider(@"=", 58);
 
     }
-    return  thresholdsAndGainsDiff |
+    return  controlDiff |
+            thresholdsAndGainsDiff |
             hitRateDiff            |
             filterDiff             |
             postTriggerDiff        |
@@ -3176,9 +3172,27 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     return(differencesExist);
 }
 
+- (BOOL) compareControlReg:(BOOL)verbose
+{
+    unsigned long regValue = [self readReg:kFLTV4ControlReg] & 0x00300F00;
+    int hwMode          = (regValue>>16) & 0xf;
+    int hwFifoLength    = (regValue>>25) & 0x1;
+    int hwFifoBehaviour = (regValue>>24) & 0x1;
+    
+    BOOL differencesExist = NO;
+    differencesExist |= [self checkForDifferencesInName:@"RunMode"      orcaValue:[self runMode]        hwValue:hwMode];
+    differencesExist |= [self checkForDifferencesInName:@"FifoLength"   orcaValue:[self fifoLength]     hwValue:hwFifoLength];
+    differencesExist |= [self checkForDifferencesInName:@"FifoBehavious" orcaValue:[self fifoBehaviour] hwValue:hwFifoBehaviour];
+    
+    if(!differencesExist){
+        if(verbose)NSLogMono( @"All Control reg values in ORCA match HW\n");
+    }
+    
+    return(differencesExist);
+}
 - (BOOL) comparePostTrigger:(BOOL)verbose
 {
-    if( ![self checkForDifferencesInName:@"postTrigger" orcaValue:[self postTriggerTime] hwValue:[self readReg:kFLTV4PostTriggerReg] & 0x0003ff]){
+    if( ![self checkForDifferencesInName:@"PostTrigger" orcaValue:[self postTriggerTime] hwValue:[self readReg:kFLTV4PostTriggerReg] & 0x7ff]){
         if(verbose)NSLogMono( @"PostTrigger in ORCA Matches HW\n");
         return NO;
     }
@@ -3208,7 +3222,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     unsigned long aMask = [self readHitRateMask];
     BOOL differencesExist = NO;
 
-    if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
+    if( ![self checkForDifferencesInName:@"HitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
         if(verbose)NSLogMono( @"HitRateMask in ORCA Matches HW\n");
     } else {
         differencesExist = YES;
@@ -3239,7 +3253,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 - (BOOL) checkForDifferencesInName:(NSString*)aName orcaValue:(unsigned long)orcaValue hwValue:(unsigned long)hwValue
 {
     if(hwValue != orcaValue){
-        NSLogMono( @"%@: ORCA:0x%0X != HW:0x%0X\n",aName,orcaValue,hwValue);
+        NSLogMono( @"%@ : %@: ORCA:0x%08X != HW:0x%08X\n",[self fullID],[aName rightJustified:20],orcaValue,hwValue);
         return YES;
     }
     else return NO;

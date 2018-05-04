@@ -435,6 +435,7 @@ enum {
 - (BOOL) comparePostTrigger:(BOOL)verbose;
 - (BOOL) compareEnergyOffset:(BOOL)verbose;
 - (BOOL) compareAnalogOffset:(BOOL)verbose;
+- (BOOL) compareControlReg:(BOOL)verbose;
 
 @end
 
