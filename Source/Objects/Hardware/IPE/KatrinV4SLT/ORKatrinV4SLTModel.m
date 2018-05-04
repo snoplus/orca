@@ -1636,17 +1636,14 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 }
 
 
-- (BOOL) compareRegisters
+- (BOOL) compareRegisters:(BOOL)verbose
 {
     BOOL differencesExist = NO;
-
     for(id obj in dataTakers){
-        differencesExist |= [obj compareThresholdsAndGains];
-        differencesExist |= [obj compareHitRateMask];
-        differencesExist |= [obj compareFilter];
+        differencesExist |= [obj compareRegisters:verbose];
     }
     
-    return (differencesExist);
+    return differencesExist;
 }
 
 #pragma mark ***Archival

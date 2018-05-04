@@ -293,7 +293,7 @@
 - (void) restoreInhibitStatus;
 - (void) saveInhibitStatus;
 
-- (BOOL) compareRegisters;
+- (BOOL) compareRegisters:(BOOL)verbose;
 
 
 #pragma mark ***Polling
