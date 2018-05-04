@@ -3147,12 +3147,12 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         NSLogDivider(@"=", 58);
 
     }
-    return  !thresholdsAndGainsDiff &
-            !hitRateDiff            &
-            !filterDiff             &
-            !postTriggerDiff        &
-            !energyOffsetDiff       &
-            !analogDiff;
+    return  thresholdsAndGainsDiff |
+            hitRateDiff            |
+            filterDiff             |
+            postTriggerDiff        |
+            energyOffsetDiff       |
+            analogDiff;
 }
 
 - (BOOL) compareThresholdsAndGains:(BOOL)verbose
@@ -3169,14 +3169,13 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
                                                       orcaValue:[self gain:i]
                                                         hwValue:[self readGain:i]];
         }
-
     }
     if(!differencesExist) {
         if(verbose)NSLogMono(      @"ALL Gains, Thresholds in ORCA match HW\n");
     }
-    
     return(differencesExist);
 }
+
 - (BOOL) comparePostTrigger:(BOOL)verbose
 {
     if( ![self checkForDifferencesInName:@"postTrigger" orcaValue:[self postTriggerTime] hwValue:[self readReg:kFLTV4PostTriggerReg] & 0x0003ff]){
@@ -3194,6 +3193,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     }
     else return YES;
 }
+
 - (BOOL) compareAnalogOffset:(BOOL)verbose
 {
     if( ![self checkForDifferencesInName:@"AnalogOffet" orcaValue:[self analogOffset] hwValue:[self readReg:kFLTV4AnalogOffsetReg] & 0x000fff]){
@@ -3211,9 +3211,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
     if( ![self checkForDifferencesInName:@"hitRateEnabled" orcaValue:[self hitRateEnabledMask] hwValue:aMask]){
         if(verbose)NSLogMono( @"HitRateMask in ORCA Matches HW\n");
     } else {
-        differencesExist = true;
+        differencesExist = YES;
     }
-    
     return(differencesExist);
 }
 
