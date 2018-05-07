@@ -803,6 +803,7 @@ static double table[32]={
 			
 		default:
 			NSLog(@"ORKatrinV4FLTModel WARNING: setRunMode: received a unknown DAQ run mode (%i)!\n",aRunMode);
+            [self setFltRunMode:kKatrinV4FLT_Run_Mode];
 			break;
 	}
     //    -> removed automatic settings of FIFO length (64) and FIFO behaviour (stop on full) 2013-05 -tb-
