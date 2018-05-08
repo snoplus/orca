@@ -66,9 +66,11 @@
 - (void) setDefaults;
 - (void) autoSurvey;
 - (void) requestStatus;
+- (void) cableDelayCorrection:(int)nanoseconds;
 - (NSDictionary*) defaultsCommand;
 - (NSDictionary*) autoSurveyCommand;
 - (NSDictionary*) statusCommand;
+- (NSDictionary*) cableCorrCommand:(int)nanoseconds;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

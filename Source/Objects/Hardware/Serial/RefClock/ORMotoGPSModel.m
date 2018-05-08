@@ -228,6 +228,10 @@ extern NSString* ORMotoGPS;
     [self writeData:[self statusCommand]];
 }
 
+- (void) cableDelayCorrection:(int)nanoseconds{
+    [self writeData:[self cableCorrCommand:nanoseconds]];
+}
+
 - (NSDictionary*) defaultsCommand
 {
     unsigned char cmdData[7];
@@ -244,7 +248,7 @@ extern NSString* ORMotoGPS;
                                @"device"    : ORMotoGPS,
                                @"replySize" : @7
                                };
-    NSLog(@"MotoGPSModel::statusCommand! \n");
+    NSLog(@"MotoGPSModel::defaultsCommand! \n");
 
     return commandDict;
 }
@@ -287,6 +291,30 @@ extern NSString* ORMotoGPS;
                                    @"replySize" : @154
                                    };
     NSLog(@"MotoGPSModel::statusCommand! \n");
+    
+    return commandDict;
+}
+
+- (NSDictionary*) cableCorrCommand:(int)nanoseconds{
+    unsigned char cmdData[11];
+    cmdData[0] = '@';
+    cmdData[1] = '@';
+    cmdData[2] = 'A';
+    cmdData[3] = 'z';
+    cmdData[4] = nanoseconds >> 24;
+    cmdData[5] = nanoseconds >> 16;
+    cmdData[6] = nanoseconds >> 8;
+    cmdData[7] = nanoseconds;
+    cmdData[8] = cmdData[2] ^ cmdData[3] ^ cmdData[4] ^ cmdData[5] ^ cmdData[6] ^ cmdData[7];  //checksum
+    cmdData[9] =  '\r';
+    cmdData[10] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:11],
+                                   @"device"    : ORMotoGPS,
+                                   @"replySize" : @11
+                                   };
+    NSLog(@"MotoGPSModel::cableCorrCommand: %11s (%d nanoseconds) \n", cmdData, nanoseconds);
     
     return commandDict;
 }

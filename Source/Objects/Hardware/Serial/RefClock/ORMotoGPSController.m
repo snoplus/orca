@@ -186,6 +186,13 @@
 
 - (IBAction) cableDelayCorAction:(id)sender
 {
+    int delayNanoseconds = [cableDelayCorField intValue];
+    // assume speed of light divided by 1.5 to get approximate cable signal speed
+    // (see for instance https://electronics.stackexchange.com/questions/178173/true-gps-location-at-the-antenna-or-receiver-chip/178190 )
+    float approxCableLength = 0.3/1.5*delayNanoseconds;
+    NSString* cableLengthString = [[[NSString alloc]init]stringByAppendingFormat:@"%.1f m", approxCableLength];
+    [approxCableLengthField setStringValue:cableLengthString];
+    [model cableDelayCorrection:delayNanoseconds];
 }
 
 @end
