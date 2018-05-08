@@ -192,8 +192,17 @@ extern NSString* ORMotoGPS;
 //            //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
 //            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
 //        }
+        else if([lastRequest isEqualToDictionary:[self defaultsCommand]]){
+            NSLog(@"set GPS defaults complete \n");
+        }
+        else if([lastRequest isEqualToDictionary:[self autoSurveyCommand]]){
+            NSLog(@"started GPS autoSurvey for stationary precision \n");
+        }
         else if([lastRequest isEqualToDictionary:[self cableCorrCommand:[self cableDelay]]]){
             NSLog(@"set GPS cable delay complete \n");
+        }
+        else if([lastRequest isEqualToDictionary:[self deviceInfoCommand]]){
+            NSLog(@"recived GPS device info \n");
         }
         
         else {
@@ -235,6 +244,10 @@ extern NSString* ORMotoGPS;
 
 - (void) cableDelayCorrection:(int)nanoseconds{
     [self writeData:[self cableCorrCommand:nanoseconds]];
+}
+
+- (void) deviceInfo{
+    [self writeData:[self deviceInfoCommand]];
 }
 
 - (NSDictionary*) defaultsCommand
@@ -323,6 +336,27 @@ extern NSString* ORMotoGPS;
     
     return commandDict;
 }
+
+- (NSDictionary*) deviceInfoCommand{
+    unsigned char cmdData[7];
+    cmdData[0] = '@';
+    cmdData[1] = '@';
+    cmdData[2] = 'C';
+    cmdData[3] = 'j';
+    cmdData[4] = 0x29;  // checksum
+    cmdData[5] = '\r';
+    cmdData[6] = '\n';
+    
+    NSDictionary * commandDict = @{
+                                   @"data"      : [NSData dataWithBytes:cmdData length:7],
+                                   @"device"    : ORMotoGPS,
+                                   @"replySize" : @294
+                                   };
+    NSLog(@"MotoGPSModel::idGPSCommand (device information)! \n");
+    
+    return commandDict;
+}
+
 
 - (NSUndoManager*) undoManager
 {

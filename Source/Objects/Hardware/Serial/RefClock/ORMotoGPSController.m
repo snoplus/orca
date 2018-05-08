@@ -182,6 +182,7 @@
 
 - (void) deviceIDAction:(id)sender
 {
+    [model deviceInfo];
 }
 
 - (IBAction) cableDelayCorAction:(id)sender
