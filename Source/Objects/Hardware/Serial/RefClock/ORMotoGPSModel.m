@@ -84,7 +84,7 @@ extern NSString* ORMotoGPS;
     return [refClock portIsOpen];
 }
 
-- (int) CableDelay
+- (int) cableDelay
 {
     return cableDelayNs;
 }
@@ -192,13 +192,18 @@ extern NSString* ORMotoGPS;
 //            //NSLog(@"last command: %s (synClock dataAvailable) \n", lastCmd);
 //            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
 //        }
+        else if([lastRequest isEqualToDictionary:[self cableCorrCommand:[self cableDelay]]]){
+            NSLog(@"set GPS cable delay complete \n");
+        }
+        
+        else {
+            NSLog(@"Warning (MotoGPSModel::dataAvailable): unsupported command \n");
+        }
+
 
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMotoGPSModelReceivedMessageChanged object:self];
     }
-    else {
-        NSLog(@"Warning (MotoGPSModel::dataAvailable): unsupported command \n");
-    }
-
+    
 }
 
 - (NSString*) bytesToPrintable:(unsigned char *)bytes length:(unsigned short)aLength{

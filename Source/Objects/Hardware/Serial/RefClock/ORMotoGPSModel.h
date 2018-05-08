@@ -49,7 +49,7 @@
 - (BOOL) portIsOpen;
 - (BOOL) statusPoll;
 - (void) setStatusPoll:(BOOL)aStatusPoll;
-- (int) CableDelay;
+- (int) cableDelay;
 - (void) setCableDelay:(int)aDelay;
 - (NSString*) lastReceived;
 
