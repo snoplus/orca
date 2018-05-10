@@ -2024,7 +2024,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
         // Call readHitrate in all Flt
         for(id obj in dataTakers){
-            [obj readHitRates];
+            [obj performSelectorOnMainThread:@selector(readHitRates) withObject:nil waitUntilDone:NO ];
         }
     }
     
