@@ -39,6 +39,7 @@
         unsigned int    accSignalStrength;
         NSString*       antennaSense;
         float           oscTemperature;
+        NSString*       modelInfo;
 }
 
 #pragma mark ***Initialization
@@ -57,7 +58,9 @@
 - (unsigned int) trackedSatellites;
 - (unsigned int) accSignalStrength;
 - (NSString*) antennaSense;
-- (float) oscTemperature;
+- (NSString*) oscTemperature;
+- (NSString*) modelInfo;
+- (ORRefClockModel*) refClockModel;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;
@@ -87,4 +90,5 @@ extern NSString* ORMotoGPSModelStatusChanged;
 extern NSString* ORMotoGPSModelStatusPollChanged;
 extern NSString* ORMotoGPSStatusValuesReceived;
 extern NSString* ORMotoGPSModelReceivedMessageChanged;
+extern NSString* ORMotoGPSModelDeviceModelInfoChanged;
 

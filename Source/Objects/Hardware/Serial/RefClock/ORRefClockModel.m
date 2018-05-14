@@ -243,14 +243,17 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
                 bytes  = (unsigned char *)[inComingData bytes];
             }else break;
     }
-    NSLog(@"receiving... (so far %d bytes ) \n", nBytes);
+    if([self verbose]){
+        NSLog(@"receiving... (so far %d bytes ) \n", nBytes);
+    }
     //[self startTimeout:3]; //reset incase there is a lot of data
     if([[lastRequest objectForKey:@"replySize"] intValue] <= nBytes){
         //if([inComingData length] >= 7) {
         if(bytes[nBytes - 2] == '\r' && bytes[nBytes - 1] == '\n' ) { // check for trailing \n (LF)
             NSString* incomingStr = [[NSString alloc]initWithBytes:bytes length:nBytes encoding:NSASCIIStringEncoding];
-            NSLog(@"received %@ \n", incomingStr);
-        
+            if([self verbose]){
+                NSLog(@"received %@ \n", incomingStr);
+            }
             //NSLog(@"lastRequest contains %d bytes", [lastRequest length]);
             //       char* lastCmd;
             //
@@ -284,7 +287,8 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 - (void) timeout  // todo
 {
 	@synchronized (self){
-        NSLog(@"Warning: timeout (RefClock)! \n");
+            NSLog(@"Warning: timeout (RefClock)! \n");
+        
         // reTxCount++;  // schedule retransmission
         // if([self verbose]){
         //   NSLog(@"Warning: timeout (RefClock)! trying(%d) retransmit. \n", reTxCount);  //Request was: %@ \n", lastRequest);
@@ -294,7 +298,9 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 
         
         //Don't dump the cmdQueue if you re-sent last request above!!!
-        NSLog(@"Emptying remaining commands to RefClock... \n");
+        if([self verbose]){
+            NSLog(@"Emptying remaining commands to RefClock... \n");
+        }
         [cmdQueue removeAllObjects];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORRefClockModelUpdatedQueue object:self];
         [self setLastRequest:nil];

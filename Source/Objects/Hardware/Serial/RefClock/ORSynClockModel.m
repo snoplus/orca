@@ -159,6 +159,10 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
     [self writeData:[self alarmWindowCommand:[self alarmWindow]]];//todo: alarmWindowCommand here?
 }
 
+- (ORRefClockModel*) refClockModel{
+    return refClock;
+}
+
 //put our parameters into any run header
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
 {
@@ -219,28 +223,42 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
                 default: statusMessage = @"warning: SynClock default message"; break;
             }
             [self updateStatusHistory:statusMessage];
-            NSLog(@"statusMessage: notifying... \n");
+            if([refClock verbose]){
+                NSLog(@"statusMessage: notifying... \n");
+            }
         //displayStatus(bytes[0]);
         }
         else if([lastRequest isEqualToDictionary:[self iDCommand]]){
             clockID = [[NSString alloc]initWithBytes:bytes length:nBytes - 2 encoding:NSASCIIStringEncoding];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockIDChanged object:self];
-            NSLog(@"clockID: notifying... \n");
+            if([refClock verbose]){
+                NSLog(@"clockID: notifying... \n");
+            }
         }
         else if([lastRequest isEqualToDictionary:[self alarmWindowCommand:alarmWindow]]){ // alarmWindow is assumed the same from issuing to receiving
-            NSLog(@"alarm Window %u was set. \n", alarmWindow);
+            if([refClock verbose]){
+                NSLog(@"alarm Window %u was set. \n", alarmWindow);
+            }
         }
         else if([lastRequest isEqualToDictionary:[self resetCommand]]){
-            NSLog(@"SynClock reset. \n");
+            if([refClock verbose]){
+                NSLog(@"SynClock reset. \n");
+            }
         }
         else if([lastRequest isEqualToDictionary:[self errMessgOffCommand]]){
-            NSLog(@"SynClock Error Message switched off \n");
+            if([refClock verbose]){
+                NSLog(@"SynClock Error Message switched off \n");
+            }
         }
         else if([lastRequest isEqualToDictionary:[self trackModeCommand:trackMode]]){
-            NSLog(@"SynClock track mode set \n");
+            if([refClock verbose]){
+                NSLog(@"SynClock track mode set \n");
+            }
         }
         else if([lastRequest isEqualToDictionary:[self syncModeCommand:syncMode]]){
-            NSLog(@"SynClock  sync mode set \n");
+            if([refClock verbose]){
+                NSLog(@"SynClock  sync mode set \n");
+            }
         }
         
         else{
@@ -441,7 +459,9 @@ NSString* ORSynClockIDChanged                   = @"ORSynClockIDChanged";
         }
     }
     if([previousStatusMessages count])[previousStatusMessages replaceObjectAtIndex:0 withObject:aMessage];
-    NSLog(@"%@\n",previousStatusMessages);
+    if([refClock verbose]){
+        NSLog(@"%@\n",previousStatusMessages);
+    }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSynClockStatusUpdated object:self];
 }
 - (void) updatePoll

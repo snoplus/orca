@@ -58,6 +58,7 @@
 - (void) setSyncMode:(int)aMode;
 - (unsigned long) alarmWindow;
 - (void) setAlarmWindow:(unsigned long)aValue;
+- (ORRefClockModel*) refClockModel;
 
 #pragma mark ***Commands
 - (void) writeData:(NSDictionary*)aDictionary;

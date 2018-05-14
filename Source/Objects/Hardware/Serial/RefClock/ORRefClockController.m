@@ -33,7 +33,7 @@
 {
 	self = [super initWithWindowNibName:@"RefClock"];
     
-    NSLog(@"RefClockController::init B\n");
+    //NSLog(@"RefClockController::init B\n");
     
 	return self;
 }

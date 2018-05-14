@@ -64,6 +64,7 @@
 #pragma mark ***Interface Management
 - (void) receivedMessageChanged:(NSNotification*)aNote;
 - (void) updateStatusDisplay:(NSNotification*)aNote;
+- (void) updateDeviceIDDisplay:(NSNotification*)aNote;
 - (void) autoSurveyChanged:(NSNotification*)aNote;
 - (void) statusChanged:(NSNotification*)aNote;
 - (void) statusPollChanged:(NSNotification*)aNote;

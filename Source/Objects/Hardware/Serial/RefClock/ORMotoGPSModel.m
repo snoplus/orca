@@ -32,6 +32,7 @@ NSString* ORMotoGPSModelStatusPollChanged       = @"ORMotoGPSModelStatusPollChan
 NSString* ORMotoGPSModelReceivedMessageChanged  = @"ORMotoGPSModelReceivedMessageChanged";
 NSString* ORMotoGPSStatusValuesReceived =
     @"ORMotoGPSStatusValuesReceived";
+NSString* ORMotoGPSModelDeviceModelInfoChanged = @"ORMotoGPSModelDeviceModelInfoChanged";
 
 extern NSString* ORMotoGPS;
 
@@ -109,8 +110,19 @@ extern NSString* ORMotoGPS;
 - (NSString*) antennaSense{
     return antennaSense;
 }
-- (float) oscTemperature{
-    return oscTemperature;
+- (NSString*) oscTemperature{
+    if(oscTemperature > -110.0){
+        return [NSString stringWithFormat:@"%.1f", oscTemperature];
+    }
+    else return @"invalid";
+}
+
+- (NSString*) modelInfo{
+    return modelInfo;
+}
+
+- (ORRefClockModel*) refClockModel{
+    return refClock;
 }
 
 #pragma mark *** Commands
@@ -133,7 +145,7 @@ extern NSString* ORMotoGPS;
     //Here is where the data is decoded into something meaningful for this object
     
     //use [refClock lastRequest] to get the orginal command
-    NSLog(@"debug Moto \n");
+    //NSLog(@"debug Moto \n");
      if([refClock verbose]) NSLog(@"Received Moto GPS response \n");
     
     ///MAH -- I didn't attempt to do anything to the old processing code below since I don't know the format
@@ -148,7 +160,7 @@ extern NSString* ORMotoGPS;
         lastRecTelegram = [self bytesToPrintable:bytes length:nBytes];
         
         if([lastRequest isEqualToDictionary:[self statusCommand]]){
-            NSLog(@"processing GPS status...\n");
+            if([refClock verbose])NSLog(@"processing GPS status...\n");
 //#define visSatIdx 55
 //#define trSatIdx 56
 //#define chanDatIdx 57
@@ -193,16 +205,18 @@ extern NSString* ORMotoGPS;
 //            NSLog(@"Data received: %s ; size: %d \n", bytes, nBytes);
 //        }
         else if([lastRequest isEqualToDictionary:[self defaultsCommand]]){
-            NSLog(@"set GPS defaults complete \n");
+            if([refClock verbose])NSLog(@"set GPS defaults complete \n");
         }
         else if([lastRequest isEqualToDictionary:[self autoSurveyCommand]]){
-            NSLog(@"started GPS autoSurvey for stationary precision \n");
+            if([refClock verbose])NSLog(@"started GPS autoSurvey for stationary precision \n");
         }
         else if([lastRequest isEqualToDictionary:[self cableCorrCommand:[self cableDelay]]]){
-            NSLog(@"set GPS cable delay complete \n");
+            if([refClock verbose])NSLog(@"set GPS cable delay complete \n");
         }
         else if([lastRequest isEqualToDictionary:[self deviceInfoCommand]]){
-            NSLog(@"recived GPS device info \n");
+            modelInfo = [[NSString alloc] initWithBytes:bytes + 164 length:14 encoding:NSASCIIStringEncoding];
+            if([refClock verbose])NSLog(@"recived GPS device info (%@) \n", modelInfo);
+            [[NSNotificationCenter defaultCenter] postNotificationName:ORMotoGPSModelDeviceModelInfoChanged object:self];
         }
         
         else {
@@ -266,7 +280,7 @@ extern NSString* ORMotoGPS;
                                @"device"    : ORMotoGPS,
                                @"replySize" : @7
                                };
-    NSLog(@"MotoGPSModel::defaultsCommand! \n");
+    //NSLog(@"MotoGPSModel::defaultsCommand! \n");
 
     return commandDict;
 }
@@ -287,7 +301,7 @@ extern NSString* ORMotoGPS;
                                    @"device"    : ORMotoGPS,
                                    @"replySize" : @8
                                    };
-    NSLog(@"MotoGPSModel::autoSurveyCommand! \n");
+    //NSLog(@"MotoGPSModel::autoSurveyCommand! \n");
     
     return commandDict;
 }
@@ -308,7 +322,7 @@ extern NSString* ORMotoGPS;
                                    @"device"    : ORMotoGPS,
                                    @"replySize" : @154
                                    };
-    NSLog(@"MotoGPSModel::statusCommand! \n");
+    //NSLog(@"MotoGPSModel::statusCommand! \n");
     
     return commandDict;
 }
@@ -332,7 +346,7 @@ extern NSString* ORMotoGPS;
                                    @"device"    : ORMotoGPS,
                                    @"replySize" : @11
                                    };
-    NSLog(@"MotoGPSModel::cableCorrCommand: %11s (%d nanoseconds) \n", cmdData, nanoseconds);
+    //NSLog(@"MotoGPSModel::cableCorrCommand: %11s (%d nanoseconds) \n", cmdData, nanoseconds);
     
     return commandDict;
 }
@@ -352,7 +366,7 @@ extern NSString* ORMotoGPS;
                                    @"device"    : ORMotoGPS,
                                    @"replySize" : @294
                                    };
-    NSLog(@"MotoGPSModel::idGPSCommand (device information)! \n");
+    //NSLog(@"MotoGPSModel::idGPSCommand (device information)! \n");
     
     return commandDict;
 }

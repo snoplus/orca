@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1050" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -24,7 +24,6 @@
                 <outlet property="statusButton" destination="Z1f-bu-KCh" id="mR6-0Y-gjT"/>
                 <outlet property="statusPollCB" destination="PTL-qh-Owa" id="owt-rm-OG5"/>
                 <outlet property="trackedSatsField" destination="vSi-se-QWx" id="9bu-xk-pqO"/>
-                <outlet property="visibilityStatusField" destination="5BT-DC-znZ" id="66C-7v-i0E"/>
                 <outlet property="visibleSatsField" destination="Ahj-Lx-Dud" id="zG6-KO-cUL"/>
             </connections>
         </customObject>
@@ -129,24 +128,6 @@
                                                 <rect key="frame" x="94" y="93" width="105" height="19"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="wLj-JW-ihB">
-                                                    <font key="font" metaFont="smallSystem"/>
-                                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
-                                            <textField verticalHuggingPriority="750" misplaced="YES" id="Wlo-LI-MXv">
-                                                <rect key="frame" x="-2" y="66" width="90" height="15"/>
-                                                <autoresizingMask key="autoresizingMask"/>
-                                                <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Visibility status" id="mPH-cb-3s9">
-                                                    <font key="font" metaFont="label"/>
-                                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                </textFieldCell>
-                                            </textField>
-                                            <textField verticalHuggingPriority="750" misplaced="YES" id="5BT-DC-znZ">
-                                                <rect key="frame" x="94" y="44" width="105" height="43"/>
-                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="DhD-pb-p8l">
                                                     <font key="font" metaFont="smallSystem"/>
                                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>

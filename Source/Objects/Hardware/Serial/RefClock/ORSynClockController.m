@@ -160,12 +160,16 @@
 
 - (void) statusMessageChanged:(NSNotification*)aNote
 {
-    NSLog(@"statusMessageChanged!! updating... \n");
+    if([[model refClockModel] verbose]){
+        NSLog(@"statusMessageChanged!! updating... \n");
+    }
     [statusOutputField setStringValue:[model statusMessages]];
 }
 
 - (void) iDChanged:(NSNotification*)aNotification{
-    NSLog(@"iDChanged!! updating... \n");
+    if([[model refClockModel] verbose]){
+        NSLog(@"iDChanged!! updating... \n");
+    }
     [deviceIDField setStringValue:[model clockID]];
 }
 
