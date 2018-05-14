@@ -59,11 +59,6 @@
                             <action selector="lockAction:" target="-2" id="1331"/>
                         </connections>
                     </button>
-                    <imageView misplaced="YES" id="5Ml-P8-820">
-                        <rect key="frame" x="20" y="705" width="39" height="54"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="RefClock" id="97A-Mp-Zf5"/>
-                    </imageView>
                     <button misplaced="YES" id="giU-1v-5T2">
                         <rect key="frame" x="107" y="8" width="72" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -164,6 +159,11 @@
                             </subviews>
                         </view>
                     </box>
+                    <imageView misplaced="YES" id="5Ml-P8-820">
+                        <rect key="frame" x="766" y="762" width="130" height="32"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="RefClock" id="97A-Mp-Zf5"/>
+                    </imageView>
                 </subviews>
             </view>
             <connections>
@@ -186,7 +186,7 @@
     </objects>
     <resources>
         <image name="Locked" width="33" height="36"/>
-        <image name="RefClock" width="49" height="100"/>
+        <image name="RefClock" width="114.88086700439453" height="18.344249725341797"/>
         <image name="Unlocked" width="33" height="36"/>
     </resources>
 </document>
