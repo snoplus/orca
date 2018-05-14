@@ -154,7 +154,7 @@
 }
 - (void) postRegulationFileChanged:(NSNotification*)aNote
 {
-    [postRegulationFileField setStringValue:[model postRegulationFile]];
+    [postRegulationFileField setStringValue:[[model postRegulationFile] stringByAbbreviatingWithTildeInPath] ];
 }
 - (void) postRegulationPointAdded:(NSNotification*)aNote
 {

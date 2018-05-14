@@ -119,6 +119,8 @@
 
 - (double) vesselVolageSetPoint:(int)anIndex;
 - (double) postRegulationSetPoint:(int)anIndex;
+- (void) setPostRegulationSetPoint:(int)anIndex withValue:(double)aValue;
+
 @end
 
 @interface NSObject (ORHistModel)

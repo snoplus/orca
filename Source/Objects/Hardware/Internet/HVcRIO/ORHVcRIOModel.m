@@ -1446,15 +1446,31 @@ static NSString* measuredValueList[] = {
 {
     [self setPostRegulationFile:aPath];
     [postRegulationArray release];
-    NSArray* contents = [NSKeyedUnarchiver unarchiveObjectWithFile:[aPath stringByExpandingTildeInPath]];
-    postRegulationArray = [contents mutableCopy];
+    postRegulationArray = [[NSMutableArray array] retain];
+    NSString* s = [NSString stringWithContentsOfFile:[aPath stringByExpandingTildeInPath]  encoding:NSASCIIStringEncoding error:nil];
+    NSArray* lines = [s componentsSeparatedByString:@"\n"];
+    for(NSString* aLine in lines){
+        NSArray* parts = [aLine componentsSeparatedByString:@","];
+        if([parts count]==2){
+            NSString* vess = [parts objectAtIndex:0];
+            NSString* post = [parts objectAtIndex:1];
+            [postRegulationArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:vess,kVesselVoltageSetPt,post, kPostRegulationSetPt,nil]];
+        }
+    }
+    
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
 }
 
 - (void) savePostRegulationFile:(NSString*) aPath
 {
     NSString* fullFileName = [aPath stringByExpandingTildeInPath];
-    [NSKeyedArchiver archiveRootObject:postRegulationArray toFile:fullFileName];
+    NSString* s = @"";
+    for(NSDictionary* anEntry in postRegulationArray){
+        s = [s stringByAppendingFormat:@"%f,%f\n",[[anEntry objectForKey:kVesselVoltageSetPt]doubleValue],[[anEntry objectForKey:kPostRegulationSetPt]doubleValue]];
+    }
+    [s writeToFile:fullFileName atomically:YES encoding:NSASCIIStringEncoding error:nil];
+    [self setPostRegulationFile:fullFileName];
 }
 
 - (NSString*) postRegulationFile
@@ -1519,7 +1535,35 @@ static NSString* measuredValueList[] = {
     }
     return 0;
 }
+- (void) setPostRegulationSetPoint:(int)anIndex withValue:(double)aValue
+{
+    NSMutableDictionary* anEntry = nil;
+    if(anIndex<[postRegulationArray count]){
+        anEntry = [postRegulationArray objectAtIndex:anIndex];
+    }
+    else {
+        anEntry = [NSMutableDictionary dictionary];
+        [postRegulationArray addObject:anEntry];
 
+    }
+    [anEntry setObject:[NSNumber numberWithDouble:aValue] forKey:kPostRegulationSetPt];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
+}
+
+- (void) setVesselVolageSetPoint:(int)anIndex withValue:(double)aValue
+{
+    NSMutableDictionary* anEntry = nil;
+    if(anIndex<[postRegulationArray count]){
+        anEntry = [postRegulationArray objectAtIndex:anIndex];
+    }
+    else {
+        anEntry = [NSMutableDictionary dictionary];
+        [postRegulationArray addObject:anEntry];
+        
+    }
+    [anEntry setObject:[NSNumber numberWithDouble:aValue] forKey:kVesselVoltageSetPt];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
+}
 @end
 
 
