@@ -33,10 +33,14 @@
 		
 	IBOutlet NSButton*		readSetPointFileButton;
 	IBOutlet NSButton*		writeSetPointFileButton;
-
+    
 	IBOutlet NSTableView*	setPointTableView;
-	IBOutlet NSTableView*	measuredValueTableView;
-
+    IBOutlet NSTableView*   measuredValueTableView;
+    IBOutlet NSTableView*   postRegulationTableView;
+    IBOutlet NSButton*      addPostRegulationPointButton;
+    IBOutlet NSButton*      removePostRegulationPointButton;
+    IBOutlet NSTextField*   postRegulationFileField;
+    
     IBOutlet NSTextField* expertPCControlOnlyField;
     IBOutlet NSTextField* zeusHasControlField;
     IBOutlet NSTextField* orcaHasControlField;
@@ -63,6 +67,10 @@
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) measuredValuesChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
+- (void) setButtonStates;
+- (void) postRegulationPointAdded:(NSNotification*)aNote;
+- (void) postRegulationPointRemoved:(NSNotification*)aNote;
+- (void) updatePostRegulationTable;
 
 #pragma mark ***Actions
 
@@ -78,7 +86,10 @@
 - (IBAction) connectAction: (id) aSender;
 - (IBAction) flushQueueAction: (id) aSender;
 - (IBAction) verboseAction: (id) aSender;
-
+- (IBAction) addPostRegulationPoint: (id) aSender;
+- (IBAction) removePostRegulationPoint: (id) aSender;
+- (IBAction) readPostRegulationSetPoints: (id) aSender;
+- (IBAction) savePostRegulationSetPoints: (id) aSender;
 - (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
 @end
 

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13196" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13196"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORHVcRIOController">
             <connections>
+                <outlet property="addPostRegulationPointButton" destination="R0A-8B-EPL" id="7CO-eG-FeO"/>
                 <outlet property="cmdQueCountField" destination="2730" id="2732"/>
                 <outlet property="expertPCControlOnlyField" destination="DQV-xl-B5H" id="ugB-bV-m2C"/>
                 <outlet property="ipAddressTextField" destination="5qs-rT-FIz" id="BGN-Ty-Rfs"/>
@@ -16,8 +17,11 @@
                 <outlet property="lockButton" destination="2127" id="2135"/>
                 <outlet property="measuredValueTableView" destination="YXo-Eh-RZ3" id="q3q-uX-PlL"/>
                 <outlet property="orcaHasControlField" destination="V0H-WK-9WT" id="yMG-eq-GDs"/>
+                <outlet property="postRegulationFileField" destination="zNs-S4-3tk" id="Tw6-Xh-GgB"/>
+                <outlet property="postRegulationTableView" destination="kBf-96-6fY" id="i7T-iE-aS6"/>
                 <outlet property="queueValueBar" destination="3078" id="3080"/>
                 <outlet property="readSetPointFileButton" destination="Ymd-sD-4Jp" id="8c0-hj-HO4"/>
+                <outlet property="removePostRegulationPointButton" destination="Pj2-5O-9nA" id="nx8-ER-d1X"/>
                 <outlet property="setPointFileField" destination="Pv7-wH-aAd" id="jP6-fx-hbx"/>
                 <outlet property="setPointTableView" destination="VQ0-Pu-OqC" id="qmh-As-C4k"/>
                 <outlet property="showFormattedDatesCB" destination="EiM-OL-qJj" id="wDX-56-Euh"/>
@@ -33,12 +37,12 @@
         <window title="HV-cRIO-Control" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="142" y="159" width="1103" height="555"/>
+            <rect key="contentRect" x="142" y="159" width="1433" height="555"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
             <value key="minSize" type="size" width="1103" height="555"/>
             <value key="maxSize" type="size" width="1103" height="555"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="1103" height="555"/>
+                <rect key="frame" x="0.0" y="0.0" width="1433" height="555"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button misplaced="YES" id="2127">
@@ -128,10 +132,50 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <button verticalHuggingPriority="750" misplaced="YES" id="ZIk-CZ-Kmh">
+                        <rect key="frame" x="1107" y="503" width="132" height="28"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Read SetPoint File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="mKv-40-jYn">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="readPostRegulationSetPoints:" target="-2" id="8A9-dD-ehG"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" misplaced="YES" id="Xpn-tq-0Oi">
+                        <rect key="frame" x="1108" y="467" width="131" height="28"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Save SetPoint File..." bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ak8-yY-Qto">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="smallSystem"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="savePostRegulationSetPoints:" target="-2" id="c3w-xC-rCW"/>
+                        </connections>
+                    </button>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="zNs-S4-3tk">
+                        <rect key="frame" x="1251" y="511" width="164" height="14"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="--" id="Pvv-l7-skE">
+                            <font key="font" metaFont="smallSystem"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                     <textField verticalHuggingPriority="750" misplaced="YES" id="00F-Bs-MMl">
                         <rect key="frame" x="572" y="407" width="513" height="40"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Measured Values" id="4Do-hN-9Gj">
+                            <font key="font" size="23" name="Papyrus"/>
+                            <color key="textColor" red="0.078694656449999997" green="0.1157358394" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" misplaced="YES" id="P8V-AR-RMN">
+                        <rect key="frame" x="1098" y="407" width="317" height="44"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Post Regulation Set Points" id="zFS-6j-ZMR">
                             <font key="font" size="23" name="Papyrus"/>
                             <color key="textColor" red="0.078694656449999997" green="0.1157358394" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -233,6 +277,81 @@
                         </scroller>
                         <tableHeaderView key="headerView" id="1uJ-cE-VfX">
                             <rect key="frame" x="0.0" y="0.0" width="483" height="23"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </tableHeaderView>
+                    </scrollView>
+                    <scrollView misplaced="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="V3n-pB-Yg8">
+                        <rect key="frame" x="1103" y="59" width="310" height="345"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <clipView key="contentView" id="CcP-Rm-WGU">
+                            <rect key="frame" x="1" y="23" width="293" height="306"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" headerView="AJ2-cn-67M" id="kBf-96-6fY">
+                                    <rect key="frame" x="0.0" y="0.0" width="293" height="306"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <size key="intercellSpacing" width="3" height="2"/>
+                                    <color key="backgroundColor" red="0.40000000600000002" green="0.40000000600000002" blue="1" alpha="0.1034482759" colorSpace="calibratedRGB"/>
+                                    <tableViewGridLines key="gridStyleMask" vertical="YES" horizontal="YES"/>
+                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                    <tableColumns>
+                                        <tableColumn identifier="index" editable="NO" width="42.87890625" minWidth="40" maxWidth="1000" id="Bje-YX-h6L">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Index">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="center" title="Text Cell" id="Ion-Wt-hPa">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
+                                        </tableColumn>
+                                        <tableColumn identifier="kVesselVoltageSetPt" width="128" minWidth="40" maxWidth="1000" id="Dq5-M3-2zg">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Vessel Voltage">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="center" title="Text Cell" id="2yu-tK-WBT">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                        </tableColumn>
+                                        <tableColumn identifier="kPostRegulationSetPt" width="112.51953125" minWidth="10" maxWidth="3.4028234663852886e+38" id="0Fy-FV-IZ0">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="center" title="Post Regulation">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" controlSize="small" lineBreakMode="truncatingTail" selectable="YES" editable="YES" alignment="center" title="Text Cell" id="Gp7-p7-aht">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                        </tableColumn>
+                                    </tableColumns>
+                                    <connections>
+                                        <outlet property="dataSource" destination="-2" id="aY0-4f-Gfu"/>
+                                        <outlet property="delegate" destination="-2" id="u5D-Ff-hmh"/>
+                                    </connections>
+                                </tableView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="ItM-nG-y0X">
+                            <rect key="frame" x="1" y="329" width="293" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="PE0-WF-det">
+                            <rect key="frame" x="294" y="23" width="15" height="306"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <tableHeaderView key="headerView" id="AJ2-cn-67M">
+                            <rect key="frame" x="0.0" y="0.0" width="293" height="23"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </tableHeaderView>
                     </scrollView>
@@ -384,11 +503,11 @@
                         </connections>
                     </button>
                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="qOr-Fs-WER">
-                        <rect key="frame" x="20" y="448" width="1063" height="5"/>
+                        <rect key="frame" x="20" y="448" width="1393" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <box verticalHuggingPriority="750" misplaced="YES" boxType="separator" id="jzY-p7-ABZ">
-                        <rect key="frame" x="20" y="105" width="1011" height="5"/>
+                        <rect key="frame" x="20" y="105" width="1072" height="5"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
                     <button verticalHuggingPriority="750" misplaced="YES" tag="4" id="eij-uj-eZO">
@@ -477,12 +596,38 @@
                         <rect key="frame" x="549" y="27" width="5" height="426"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </box>
+                    <box horizontalHuggingPriority="750" misplaced="YES" boxType="separator" id="st5-k8-3BU">
+                        <rect key="frame" x="1089" y="21" width="5" height="515"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </box>
+                    <button misplaced="YES" id="R0A-8B-EPL">
+                        <rect key="frame" x="1382" y="35" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="square" title="+" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" inset="2" id="cGF-yA-DL6">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="label"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="addPostRegulationPoint:" target="-2" id="YxF-Oy-B1n"/>
+                        </connections>
+                    </button>
+                    <button misplaced="YES" id="Pj2-5O-9nA">
+                        <rect key="frame" x="1397" y="35" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="square" title="-" bezelStyle="shadowlessSquare" alignment="center" borderStyle="border" inset="2" id="OLL-DB-EtE">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="label"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="removePostRegulationPoint:" target="-2" id="tYg-b6-7Vo"/>
+                        </connections>
+                    </button>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="2744"/>
             </connections>
-            <point key="canvasLocation" x="223.5" y="-51.5"/>
+            <point key="canvasLocation" x="388.5" y="-51.5"/>
         </window>
         <customObject id="2377" userLabel="Hex Formatter" customClass="OHexFormatter"/>
     </objects>

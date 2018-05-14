@@ -22,18 +22,22 @@
 #import "NetSocket.h"
 
 #pragma mark ***External Strings
-NSString* ORHVcRIOModelIsConnectedChanged       = @"ORHVcRIOModelIsConnectedChanged";
-NSString* ORHVcRIOModelIpAddressChanged         = @"ORHVcRIOModelIpAddressChanged";
-NSString* ORHVcRIOModelSetPointChanged          = @"ORHVcRIOModelSetPointChanged";
-NSString* ORHVcRIOModelReadBackChanged          = @"ORHVcRIOModelReadBackChanged";
-NSString* ORHVcRIOModelQueCountChanged          = @"ORHVcRIOModelQueCountChanged";
-NSString* ORHVcRIOModelSetPointsChanged         = @"ORHVcRIOModelSetPointsChanged";
-NSString* ORHVcRIOModelMeasuredValuesChanged    = @"ORHVcRIOModelMeasuredValuesChanged";
-NSString* ORHVcRIOModelSetPointFileChanged      = @"ORHVcRIOModelSetPointFileChanged";
-NSString* ORHVcRIOModelVerboseChanged           = @"ORHVcRIOModelVerboseChanged";
-NSString* ORHVcRIOModelShowFormattedDatesChanged= @"ORHVcRIOModelShowFormattedDatesChanged";
+NSString* ORHVcRIOModelIsConnectedChanged           = @"ORHVcRIOModelIsConnectedChanged";
+NSString* ORHVcRIOModelIpAddressChanged             = @"ORHVcRIOModelIpAddressChanged";
+NSString* ORHVcRIOModelSetPointChanged              = @"ORHVcRIOModelSetPointChanged";
+NSString* ORHVcRIOModelReadBackChanged              = @"ORHVcRIOModelReadBackChanged";
+NSString* ORHVcRIOModelQueCountChanged              = @"ORHVcRIOModelQueCountChanged";
+NSString* ORHVcRIOModelSetPointsChanged             = @"ORHVcRIOModelSetPointsChanged";
+NSString* ORHVcRIOModelMeasuredValuesChanged        = @"ORHVcRIOModelMeasuredValuesChanged";
+NSString* ORHVcRIOModelSetPointFileChanged          = @"ORHVcRIOModelSetPointFileChanged";
+NSString* ORHVcRIOModelPostRegulationFileChanged    = @"ORHVcRIOModelPostRegulationFileChanged";
+NSString* ORHVcRIOModelVerboseChanged               = @"ORHVcRIOModelVerboseChanged";
+NSString* ORHVcRIOModelShowFormattedDatesChanged    = @"ORHVcRIOModelShowFormattedDatesChanged";
+NSString* ORHVcRIOModelPostRegulationPointAdded     = @"ORHVcRIOModelPostRegulationPointAdded";
+NSString* ORHVcRIOModelPostRegulationPointRemoved   = @"ORHVcRIOModelPostRegulationPointRemoved";
+NSString* ORHVcRIOModelUpdatePostRegulationTable    = @"ORHVcRIOModelUpdatePostRegulationTable";
+NSString* ORHVcRIOLock						        = @"ORHVcRIOLock";
 
-NSString* ORHVcRIOLock						    = @"ORHVcRIOLock";
 
 //new lists from 10/17/2017   -mah-
 static NSString* setPointList[] = {
@@ -917,6 +921,7 @@ static NSString* measuredValueList[] = {
 	[cmdQueue release];
 	[lastRequest release];
     [setPoints release];
+    [postRegulationArray release];
     [measuredValues release];
     if([self isConnected]){
         [socket close];
@@ -960,6 +965,7 @@ static NSString* measuredValueList[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
     
 }
+
 - (void) createSetPointArray
 {
     if(setPoints)[setPoints release];
@@ -975,7 +981,6 @@ static NSString* measuredValueList[] = {
         if([setPointList[index] isEqualToString:@""])break;
     }
 }
-
 - (NSInteger) numSetPoints
 {
     return [setPoints count];
@@ -1343,6 +1348,8 @@ static NSString* measuredValueList[] = {
     [self setSetPoints:         [decoder decodeObjectForKey: @"setPoints"]];
     [self setVerbose:           [decoder decodeBoolForKey:   @"verbose"]];
     [self setShowFormattedDates:[decoder decodeBoolForKey:   @"showFormattedDates"]];
+    [self setPostRegulationFile:[decoder decodeObjectForKey: @"postRegulationFile"]];
+    [self setPostRegulationArray:[decoder decodeObjectForKey:@"postRegulationArray"]];
     
     if(!setPoints)[self createSetPointArray];
     
@@ -1358,13 +1365,14 @@ static NSString* measuredValueList[] = {
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:setPointFile       forKey:@"setPointFile"];
-    [encoder encodeBool:  wasConnected       forKey:@"wasConnected"];
-    [encoder encodeBool:  verbose            forKey:@"verbose"];
-    [encoder encodeObject:ipAddress          forKey:@"ORHVcRIOModelIpAddress"];
-    [encoder encodeObject:setPoints          forKey:@"setPoints"];
-    [encoder encodeBool:showFormattedDates forKey:@"showFormattedDates"];
-    
+    [encoder encodeObject:setPointFile        forKey:@"setPointFile"];
+    [encoder encodeBool:  wasConnected        forKey:@"wasConnected"];
+    [encoder encodeBool:  verbose             forKey:@"verbose"];
+    [encoder encodeObject:ipAddress           forKey:@"ORHVcRIOModelIpAddress"];
+    [encoder encodeObject:setPoints           forKey:@"setPoints"];
+    [encoder encodeBool:showFormattedDates    forKey:@"showFormattedDates"];
+    [encoder encodeObject:postRegulationFile  forKey: @"postRegulationFile"];
+    [encoder encodeObject:postRegulationArray forKey: @"postRegulationArray"];
 }
 
 #pragma mark *** Commands
@@ -1426,7 +1434,94 @@ static NSString* measuredValueList[] = {
 	NSString* s = [NSString stringWithFormat:@"%@",setPoints];
 	[s writeToFile:fullFileName atomically:NO encoding:NSASCIIStringEncoding error:nil];
 }
+
+- (void) setPostRegulationArray:(NSMutableArray*)anArray
+{
+    [anArray retain];
+    [postRegulationArray release];
+    postRegulationArray = anArray;
+}
+
+- (void) readPostRegulationFile:(NSString*) aPath
+{
+    [self setPostRegulationFile:aPath];
+    [postRegulationArray release];
+    NSArray* contents = [NSKeyedUnarchiver unarchiveObjectWithFile:[aPath stringByExpandingTildeInPath]];
+    postRegulationArray = [contents mutableCopy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
+}
+
+- (void) savePostRegulationFile:(NSString*) aPath
+{
+    NSString* fullFileName = [aPath stringByExpandingTildeInPath];
+    [NSKeyedArchiver archiveRootObject:postRegulationArray toFile:fullFileName];
+}
+
+- (NSString*) postRegulationFile
+{
+    if(!postRegulationFile)return @"";
+    else return postRegulationFile;
+}
+
+- (void) setPostRegulationFile:(NSString*)aPath
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPostRegulationFile:postRegulationFile];
+    [aPath retain];
+    [postRegulationFile release];
+    postRegulationFile = aPath;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelPostRegulationFileChanged object:self];
+}
+
+- (void) addPostRegulationPoint
+{
+    if(!postRegulationArray)postRegulationArray = [[NSMutableArray array] retain];
+    [postRegulationArray addObject:[PostRegulationPoint postRegulationPoint]];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelPostRegulationPointAdded object:self];
+}
+
+- (void) removeAllPostRegulationPoints
+{
+    [postRegulationArray release];
+    postRegulationArray = nil;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
+}
+
+- (void) removePostRegulationPointAtIndex:(int) anIndex
+{
+    if(anIndex < [postRegulationArray count]){
+        [postRegulationArray removeObjectAtIndex:anIndex];
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelPostRegulationPointRemoved object:self userInfo:userInfo];
+    }
+}
+
+- (unsigned long) numPostRegulationPoints { return [postRegulationArray count]; }
+- (id) postRegulationPointAtIndex:(int)anIndex
+{
+    if(anIndex>=0 && anIndex<[postRegulationArray count])return [postRegulationArray objectAtIndex:anIndex];
+    else return nil;
+}
+//script convenience methods
+- (double) vesselVolageSetPoint:(int)anIndex
+{
+    if(anIndex<[postRegulationArray count]){
+        NSDictionary* anEntry = [postRegulationArray objectAtIndex:anIndex];
+        return [[anEntry objectForKey:kVesselVoltageSetPt] doubleValue];
+    }
+    return 0;
+}
+- (double) postRegulationSetPoint:(int)anIndex
+{
+    if(anIndex<[postRegulationArray count]){
+        NSDictionary* anEntry = [postRegulationArray objectAtIndex:anIndex];
+        return [[anEntry objectForKey:kPostRegulationSetPt] doubleValue];
+    }
+    return 0;
+}
+
 @end
+
 
 @implementation ORHVcRIOModel (private)
 - (void) timeout
@@ -1454,4 +1549,70 @@ static NSString* measuredValueList[] = {
         [self performSelector:@selector(timeout) withObject:nil afterDelay:10];//<----timeout !!!!!!!!!!!!!!!!!!!!
 	}
 }
+
 @end
+
+//------------------------------------------------------------------------
+
+@implementation PostRegulationPoint
+@synthesize data;
+
++ (id) postRegulationPoint
+{
+    PostRegulationPoint* aPoint = [[PostRegulationPoint alloc] init];
+    return [aPoint autorelease];
+}
+
+- (id) init
+{
+    self = [super init];
+    NSMutableDictionary* data        = [NSMutableDictionary dictionary];
+    [data setObject:@"" forKey:kVesselVoltageSetPt];
+    [data setObject:@"" forKey:kPostRegulationSetPt];
+    self.data = data;
+    return self;
+}
+
+- (void) dealloc
+{
+    self.data = nil;
+    [super dealloc];
+}
+
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    PostRegulationPoint* copy = [[PostRegulationPoint alloc] init];
+    copy.data = [[data copyWithZone:zone] autorelease];
+    return copy;
+}
+
+- (void) setValue:(id)anObject forKey:(id)aKey
+{
+    if(!anObject)anObject = @"";
+    [[[[ORGlobal sharedGlobal] undoManager] prepareWithInvocationTarget:self] setValue:[data objectForKey:aKey] forKey:aKey];
+    
+    [data setObject:anObject forKey:aKey];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
+}
+
+- (id) objectForKey:(id)aKey
+{
+    id obj =  [data objectForKey:aKey];
+    if(!obj)return @"-";
+    else return obj;
+}
+
+
+- (id) initWithCoder:(NSCoder*)decoder
+{
+    self = [super init];
+    self.data    = [decoder decodeObjectForKey:@"data"];
+    return self;
+}
+- (void) encodeWithCoder:(NSCoder*)encoder
+{
+    [encoder encodeObject:data  forKey:@"data"];
+}
+@end
+

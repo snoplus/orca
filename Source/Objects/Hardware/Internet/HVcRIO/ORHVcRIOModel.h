@@ -22,6 +22,9 @@
 @class ORSafeQueue;
 @class NetSocket;
 
+#define kVesselVoltageSetPt      @"kVesselVoltageSetPt"
+#define kPostRegulationSetPt     @"kPostRegulationSetPt"
+
 @interface ORHVcRIOModel : OrcaObject
 {
     @private
@@ -37,7 +40,9 @@
 		NSString*			setPointFile;
         NSMutableArray*     measuredValues;
         NSMutableArray*     setPoints;
-    
+        NSMutableArray*     postRegulationArray;
+        NSString*           postRegulationFile;
+
         BOOL                expertPCControlOnly;
         BOOL                zeusHasControl;
         BOOL                orcaHasControl;
@@ -90,6 +95,15 @@
 - (BOOL) zeusHasControl;
 - (BOOL) orcaHasControl;
 
+- (NSString*) postRegulationFile;
+- (void) setPostRegulationFile:(NSString*)aPath;
+- (void) addPostRegulationPoint;
+- (void) removePostRegulationPointAtIndex:(int)anIndex;
+- (void) removeAllPostRegulationPoints;
+- (void) setPostRegulationArray:(NSMutableArray*)anArray;
+- (unsigned long) numPostRegulationPoints;
+- (id) postRegulationPointAtIndex:(int)anIndex;
+
 #pragma mark ***Commands
 - (void) writeSetpoints;
 - (void) readBackSetpoints;
@@ -97,10 +111,14 @@
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+- (void) readPostRegulationFile:(NSString*) aPath;
+- (void) savePostRegulationFile:(NSString*) aPath;
 - (void) readSetPointsFile:(NSString*) aPath;
 - (void) saveSetPointsFile:(NSString*) aPath;
 - (void) pushReadBacksToSetPoints;
 
+- (double) vesselVolageSetPoint:(int)anIndex;
+- (double) postRegulationSetPoint:(int)anIndex;
 @end
 
 @interface NSObject (ORHistModel)
@@ -118,4 +136,20 @@ extern NSString* ORHVcRIOModelMeasuredValuesChanged;
 extern NSString* ORHVcRIOModelSetPointFileChanged;
 extern NSString* ORHVcRIOModelVerboseChanged;
 extern NSString* ORHVcRIOModelShowFormattedDatesChanged;
+extern NSString* ORHVcRIOModelPostRegulationFileChanged;
+extern NSString* ORHVcRIOModelPostRegulationPointAdded;
+extern NSString* ORHVcRIOModelPostRegulationPointRemoved;
+extern NSString* ORHVcRIOModelUpdatePostRegulationTable;
+
+@interface PostRegulationPoint : NSObject
+{
+    NSMutableDictionary* data;
+}
++ (id) postRegulationPoint;
+- (void) setValue:(id)anObject forKey:(id)aKey;
+- (id) objectForKey:(id)aKey;
+- (id)   initWithCoder:(NSCoder*)decoder;
+- (void) encodeWithCoder:(NSCoder*)encoder;
+@property   (retain) NSMutableDictionary* data;
+@end
 

@@ -104,7 +104,29 @@
                      selector : @selector(showFormattedDatesChanged:)
                          name : ORHVcRIOModelShowFormattedDatesChanged
                        object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(postRegulationPointAdded:)
+                         name : ORHVcRIOModelPostRegulationPointAdded
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(postRegulationPointRemoved:)
+                         name : ORHVcRIOModelPostRegulationPointRemoved
+                       object : model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(updatePostRegulationTable)
+                         name : ORHVcRIOModelUpdatePostRegulationTable
+                       object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(postRegulationFileChanged:)
+                         name : ORHVcRIOModelPostRegulationFileChanged
+                       object : nil];
 
+    
+    
 }
 
 - (void) setModel:(id)aModel
@@ -128,6 +150,34 @@
     [self verboseChanged:nil];
 	[self isConnectedChanged:nil];
     [self showFormattedDatesChanged:nil];
+    [self postRegulationFileChanged:nil];
+}
+- (void) postRegulationFileChanged:(NSNotification*)aNote
+{
+    [postRegulationFileField setStringValue:[model postRegulationFile]];
+}
+- (void) postRegulationPointAdded:(NSNotification*)aNote
+{
+    [postRegulationTableView reloadData];
+    NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:[model numPostRegulationPoints]];
+    [postRegulationTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+    [self setButtonStates];
+}
+
+- (void) postRegulationPointRemoved:(NSNotification*)aNote
+{
+    int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+    index = MIN(index,[model numPostRegulationPoints]-1);
+    index = MAX(index,0);
+    [postRegulationTableView reloadData];
+    NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
+    [postRegulationTableView selectRowIndexes:indexSet byExtendingSelection:NO];
+    [self setButtonStates];
+}
+
+- (void) updatePostRegulationTable
+{
+    [postRegulationTableView reloadData];
 }
 
 - (void) isConnectedChanged:(NSNotification*)aNote
@@ -234,6 +284,29 @@
     [model connect];
 }
 
+- (IBAction) addPostRegulationPoint: (id) aSender
+{
+    [model addPostRegulationPoint];
+}
+
+- (IBAction) removePostRegulationPoint: (id) aSender
+{
+    NSIndexSet* theSet = [postRegulationTableView selectedRowIndexes];
+    NSUInteger current_index = [theSet firstIndex];
+    if(current_index != NSNotFound){
+        [model removePostRegulationPointAtIndex:current_index];
+    }
+    [self setButtonStates];
+}
+
+- (void) setButtonStates
+{
+    BOOL locked = [gSecurity isLocked:ORHVcRIOLock];
+    
+    [addPostRegulationPointButton setEnabled:    !locked];
+    [removePostRegulationPointButton setEnabled: !locked];
+}
+
 #pragma mark ***Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
 {
@@ -277,7 +350,14 @@
             else return [model measuredValueItem:rowIndex forKey:[aTableColumn identifier]];
         }
     }
-
+    else if(postRegulationTableView == aTableView){
+        if([[aTableColumn identifier] isEqualToString:@"index"]){
+            return  [NSNumber numberWithInt:rowIndex];
+        }
+        else {
+            return [[model postRegulationPointAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
+        }
+    }
     else return nil;
 }
 
@@ -285,7 +365,8 @@
 - (int) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(setPointTableView == aTableView)return [model numSetPoints];
-	else if(measuredValueTableView == aTableView)return [model numMeasuredValues];
+    else if(measuredValueTableView == aTableView)return [model numMeasuredValues];
+    else if(postRegulationTableView == aTableView)return [model numPostRegulationPoints];
 	else return 0;
 }
 
@@ -301,6 +382,10 @@
             [model setSetPoint:rowIndex  withValue:[anObject floatValue]];
             return;
         }
+    }
+    else if(postRegulationTableView == aTableView){
+        id aPoint = [model postRegulationPointAtIndex:rowIndex];
+        [aPoint setValue:anObject forKey:[aTableColumn identifier]];
     }
 }
 
@@ -373,6 +458,57 @@
 - (IBAction) pushReadBacksToSetPointsAction:(id)sender
 {
     [model pushReadBacksToSetPoints];
+}
+
+- (IBAction) savePostRegulationSetPoints: (id) aSender
+{
+    NSSavePanel *savePanel = [NSSavePanel savePanel];
+    [savePanel setPrompt:@"Save As"];
+    [savePanel setCanCreateDirectories:YES];
+    
+    NSString* startingDir;
+    NSString* defaultFile;
+    
+    NSString* fullPath = [[model postRegulationFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+        defaultFile = [fullPath lastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+        defaultFile = [model setPointFile];
+        
+    }
+    [savePanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [savePanel setNameFieldLabel:defaultFile];
+    [savePanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model savePostRegulationFile:[[savePanel URL]path]];
+        }
+    }];
+}
+- (IBAction) readPostRegulationSetPoints:(id)sender
+{
+    NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setPrompt:@"Choose"];
+    NSString* startingDir;
+    NSString* fullPath = [[model postRegulationFile] stringByExpandingTildeInPath];
+    if(fullPath){
+        startingDir = [fullPath stringByDeletingLastPathComponent];
+    }
+    else {
+        startingDir = NSHomeDirectory();
+    }
+    
+    [openPanel setDirectoryURL:[NSURL fileURLWithPath:startingDir]];
+    [openPanel beginSheetModalForWindow:[self window] completionHandler:^(NSInteger result){
+        if (result == NSFileHandlingPanelOKButton){
+            [model readPostRegulationFile:[[openPanel URL] path]];
+        }
+    }];
 }
 
 #pragma  mark ***Delegate Responsiblities
