@@ -33,7 +33,8 @@
 		
 	IBOutlet NSButton*		readSetPointFileButton;
 	IBOutlet NSButton*		writeSetPointFileButton;
-    
+    IBOutlet NSButton*      readPostRegulationButton;
+
 	IBOutlet NSTableView*	setPointTableView;
     IBOutlet NSTableView*   measuredValueTableView;
     IBOutlet NSTableView*   postRegulationTableView;
@@ -44,6 +45,8 @@
     IBOutlet NSTextField* expertPCControlOnlyField;
     IBOutlet NSTextField* zeusHasControlField;
     IBOutlet NSTextField* orcaHasControlField;
+    IBOutlet NSPopUpButton* pollTimePU;
+    IBOutlet NSProgressIndicator* progressWheel;
     
     IBOutlet ORValueBarGroupView*  queueValueBar;
     IBOutlet NSButton*    verboseCB;
@@ -67,6 +70,7 @@
 - (void) isConnectedChanged:(NSNotification*)aNote;
 - (void) measuredValuesChanged:(NSNotification*)aNote;
 - (void) verboseChanged:(NSNotification*)aNote;
+- (void) pollTimeChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
 - (void) postRegulationPointAdded:(NSNotification*)aNote;
 - (void) postRegulationPointRemoved:(NSNotification*)aNote;
@@ -88,8 +92,9 @@
 - (IBAction) verboseAction: (id) aSender;
 - (IBAction) addPostRegulationPoint: (id) aSender;
 - (IBAction) removePostRegulationPoint: (id) aSender;
-- (IBAction) readPostRegulationSetPoints: (id) aSender;
-- (IBAction) savePostRegulationSetPoints: (id) aSender;
+- (IBAction) readPostRegulationScaleFactors: (id) aSender;
+- (IBAction) savePostRegulationScaleFactors: (id) aSender;
+- (IBAction) pollTimeAction: (id) aSender;
 - (BOOL) tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
 @end
 

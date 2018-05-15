@@ -22,8 +22,9 @@
 @class ORSafeQueue;
 @class NetSocket;
 
-#define kVesselVoltageSetPt      @"kVesselVoltageSetPt"
-#define kPostRegulationSetPt     @"kPostRegulationSetPt"
+#define kVesselVoltageSetPt            @"kVesselVoltageSetPt"
+#define kPostRegulationScaleFactor     @"kPostRegulationScaleFactor"
+#define kPowerSupplyOffset             @"kPowerSupplyOffset"
 
 @interface ORHVcRIOModel : OrcaObject
 {
@@ -49,6 +50,7 @@
         BOOL                verbose;
         NSMutableString*    stringBuffer;
         BOOL                showFormattedDates;
+        int                 pollTime;
 }
 
 #pragma mark ***Initialization
@@ -56,6 +58,8 @@
 - (NSString*) commonScriptMethods;
 
 #pragma mark ***Accessors
+- (int)  pollTime;
+- (void) setPollTime:(int)aPollTime;
 - (id) setPointItem:(int)i forKey:(NSString*)aKey;
 - (id) measuredValueItem:(int)i forKey:(NSString*)aKey;
 - (void) setSetPoint: (int)aIndex withValue: (double)value;
@@ -117,9 +121,13 @@
 - (void) saveSetPointsFile:(NSString*) aPath;
 - (void) pushReadBacksToSetPoints;
 
-- (double) vesselVolageSetPoint:(int)anIndex;
-- (double) postRegulationSetPoint:(int)anIndex;
-- (void) setPostRegulationSetPoint:(int)anIndex withValue:(double)aValue;
+#pragma mark •••Scripting Convenience Methods
+- (double) vesselVoltageSetPoint:(int)anIndex;
+- (double) postRegulationScaleFactor:(int)anIndex;
+- (double) powerSupplyOffset:(int)anIndex;
+- (void)   setPostRegulationScaleFactor:(int)anIndex withValue:(double)aValue;
+- (void)   setPowerSupplyOffset:(int)anIndex withValue:(double)aValue;
+- (void)   setVesselVoltageSetPoint:(int)anIndex withValue:(double)aValue;
 
 @end
 
@@ -142,6 +150,7 @@ extern NSString* ORHVcRIOModelPostRegulationFileChanged;
 extern NSString* ORHVcRIOModelPostRegulationPointAdded;
 extern NSString* ORHVcRIOModelPostRegulationPointRemoved;
 extern NSString* ORHVcRIOModelUpdatePostRegulationTable;
+extern NSString* ORHVcRIOModelPollTimeChanged;
 
 @interface PostRegulationPoint : NSObject
 {

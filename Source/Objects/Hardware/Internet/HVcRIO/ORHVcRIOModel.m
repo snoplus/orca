@@ -36,6 +36,8 @@ NSString* ORHVcRIOModelShowFormattedDatesChanged    = @"ORHVcRIOModelShowFormatt
 NSString* ORHVcRIOModelPostRegulationPointAdded     = @"ORHVcRIOModelPostRegulationPointAdded";
 NSString* ORHVcRIOModelPostRegulationPointRemoved   = @"ORHVcRIOModelPostRegulationPointRemoved";
 NSString* ORHVcRIOModelUpdatePostRegulationTable    = @"ORHVcRIOModelUpdatePostRegulationTable";
+NSString* ORHVcRIOModelPollTimeChanged              = @"ORHVcRIOModelPollTimeChanged";
+
 NSString* ORHVcRIOLock						        = @"ORHVcRIOLock";
 
 
@@ -905,6 +907,7 @@ static NSString* measuredValueList[] = {
 @interface ORHVcRIOModel (private)
 - (void) timeout;
 - (void) processNextCommandFromQueue;
+- (void) pollMeasuredValues;
 @end
 
 #define kBadHVcRIOValue -999
@@ -933,7 +936,19 @@ static NSString* measuredValueList[] = {
 	
 	[super dealloc];
 }
+- (void) wakeUp
+{
+    if(pollTime){
+        [self performSelector:@selector(pollMeasuredValues) withObject:nil afterDelay:2];
+    }
+    [super wakeUp];
+}
 
+- (void) sleep
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    [super sleep];
+}
 - (void) setUpImage
 {
 	[self setImage:[NSImage imageNamed:@"HVcRIO.tif"]];
@@ -1334,6 +1349,24 @@ static NSString* measuredValueList[] = {
         [self setSetPoint:i withValue:theReadBack];
     }
 }
+- (int) pollTime
+{
+    return pollTime;
+}
+
+- (void) setPollTime:(int)aPollTime
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setPollTime:pollTime];
+    pollTime = aPollTime;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelPollTimeChanged object:self];
+    
+    if(pollTime){
+        [self performSelector:@selector(pollMeasuredValues) withObject:nil afterDelay:.2];
+    }
+    else {
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMeasuredValues) object:nil];
+    }
+}
 
 #pragma mark ***Archival
 - (id) initWithCoder:(NSCoder*)decoder
@@ -1350,7 +1383,7 @@ static NSString* measuredValueList[] = {
     [self setShowFormattedDates:[decoder decodeBoolForKey:   @"showFormattedDates"]];
     [self setPostRegulationFile:[decoder decodeObjectForKey: @"postRegulationFile"]];
     [self setPostRegulationArray:[decoder decodeObjectForKey:@"postRegulationArray"]];
-    
+    [self setPollTime:          [decoder decodeIntForKey:@"pollTime"]];
     if(!setPoints)[self createSetPointArray];
     
     [self createMeasuredValueArray];
@@ -1373,6 +1406,7 @@ static NSString* measuredValueList[] = {
     [encoder encodeBool:showFormattedDates    forKey:@"showFormattedDates"];
     [encoder encodeObject:postRegulationFile  forKey: @"postRegulationFile"];
     [encoder encodeObject:postRegulationArray forKey: @"postRegulationArray"];
+    [encoder encodeInt:pollTime               forKey: @"pollTime"];
 }
 
 #pragma mark *** Commands
@@ -1451,11 +1485,14 @@ static NSString* measuredValueList[] = {
     NSArray* lines = [s componentsSeparatedByString:@"\n"];
     for(NSString* aLine in lines){
         NSArray* parts = [aLine componentsSeparatedByString:@","];
-        if([parts count]==2){
-            NSString* vess = [parts objectAtIndex:0];
-            NSString* post = [parts objectAtIndex:1];
-            [postRegulationArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:vess,kVesselVoltageSetPt,post, kPostRegulationSetPt,nil]];
-        }
+        NSString* vess      = @"";
+        NSString* post      = @"";
+        NSString* offset    = @"";
+        if([parts count]>=1)vess    = [parts objectAtIndex:0];
+        if([parts count]>=2)post    = [parts objectAtIndex:1];
+        if([parts count]>=3)offset  = [parts objectAtIndex:2];
+
+        [postRegulationArray addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:vess,kVesselVoltageSetPt,post, kPostRegulationScaleFactor,offset, kPowerSupplyOffset,nil]];
     }
     
     
@@ -1467,7 +1504,7 @@ static NSString* measuredValueList[] = {
     NSString* fullFileName = [aPath stringByExpandingTildeInPath];
     NSString* s = @"";
     for(NSDictionary* anEntry in postRegulationArray){
-        s = [s stringByAppendingFormat:@"%f,%f\n",[[anEntry objectForKey:kVesselVoltageSetPt]doubleValue],[[anEntry objectForKey:kPostRegulationSetPt]doubleValue]];
+        s = [s stringByAppendingFormat:@"%f,%f,%f\n",[[anEntry objectForKey:kVesselVoltageSetPt]doubleValue],[[anEntry objectForKey:kPostRegulationScaleFactor]doubleValue],[[anEntry objectForKey:kPowerSupplyOffset]doubleValue]];
     }
     [s writeToFile:fullFileName atomically:YES encoding:NSASCIIStringEncoding error:nil];
     [self setPostRegulationFile:fullFileName];
@@ -1519,7 +1556,7 @@ static NSString* measuredValueList[] = {
     else return nil;
 }
 //script convenience methods
-- (double) vesselVolageSetPoint:(int)anIndex
+- (double) vesselVoltageSetPoint:(int)anIndex
 {
     if(anIndex<[postRegulationArray count]){
         NSDictionary* anEntry = [postRegulationArray objectAtIndex:anIndex];
@@ -1527,15 +1564,25 @@ static NSString* measuredValueList[] = {
     }
     return 0;
 }
-- (double) postRegulationSetPoint:(int)anIndex
+
+- (double) postRegulationScaleFactor:(int)anIndex
 {
     if(anIndex<[postRegulationArray count]){
         NSDictionary* anEntry = [postRegulationArray objectAtIndex:anIndex];
-        return [[anEntry objectForKey:kPostRegulationSetPt] doubleValue];
+        return [[anEntry objectForKey:kPostRegulationScaleFactor] doubleValue];
     }
     return 0;
 }
-- (void) setPostRegulationSetPoint:(int)anIndex withValue:(double)aValue
+
+- (double) powerSupplyOffset:(int)anIndex
+{
+    if(anIndex<[postRegulationArray count]){
+        NSDictionary* anEntry = [postRegulationArray objectAtIndex:anIndex];
+        return [[anEntry objectForKey:kPowerSupplyOffset] doubleValue];
+    }
+    return 0;
+}
+- (void) setPostRegulationScaleFactor:(int)anIndex withValue:(double)aValue
 {
     NSMutableDictionary* anEntry = nil;
     if(anIndex<[postRegulationArray count]){
@@ -1546,11 +1593,11 @@ static NSString* measuredValueList[] = {
         [postRegulationArray addObject:anEntry];
 
     }
-    [anEntry setObject:[NSNumber numberWithDouble:aValue] forKey:kPostRegulationSetPt];
+    [anEntry setObject:[NSNumber numberWithDouble:aValue] forKey:kPostRegulationScaleFactor];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
 }
 
-- (void) setVesselVolageSetPoint:(int)anIndex withValue:(double)aValue
+- (void) setPowerSupplyOffset:(int)anIndex withValue:(double)aValue
 {
     NSMutableDictionary* anEntry = nil;
     if(anIndex<[postRegulationArray count]){
@@ -1561,9 +1608,24 @@ static NSString* measuredValueList[] = {
         [postRegulationArray addObject:anEntry];
         
     }
+    [anEntry setObject:[NSNumber numberWithDouble:aValue] forKey:kPowerSupplyOffset];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
+}
+
+- (void) setVesselVoltageSetPoint:(int)anIndex withValue:(double)aValue
+{
+    NSMutableDictionary* anEntry = nil;
+    if(anIndex<[postRegulationArray count]){
+        anEntry = [postRegulationArray objectAtIndex:anIndex];
+    }
+    else {
+        anEntry = [NSMutableDictionary dictionary];
+        [postRegulationArray addObject:anEntry];
+    }
     [anEntry setObject:[NSNumber numberWithDouble:aValue] forKey:kVesselVoltageSetPt];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
 }
+
 @end
 
 
@@ -1593,7 +1655,12 @@ static NSString* measuredValueList[] = {
         [self performSelector:@selector(timeout) withObject:nil afterDelay:10];//<----timeout !!!!!!!!!!!!!!!!!!!!
 	}
 }
-
+- (void) pollMeasuredValues
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMeasuredValues) object:nil];
+    [self readMeasuredValues];
+    if(pollTime)[self performSelector:@selector(pollMeasuredValues) withObject:nil afterDelay:pollTime];
+}
 @end
 
 //------------------------------------------------------------------------
@@ -1612,7 +1679,8 @@ static NSString* measuredValueList[] = {
     self = [super init];
     NSMutableDictionary* data        = [NSMutableDictionary dictionary];
     [data setObject:@"" forKey:kVesselVoltageSetPt];
-    [data setObject:@"" forKey:kPostRegulationSetPt];
+    [data setObject:@"" forKey:kPostRegulationScaleFactor];
+    [data setObject:@"" forKey:kPowerSupplyOffset];
     self.data = data;
     return self;
 }

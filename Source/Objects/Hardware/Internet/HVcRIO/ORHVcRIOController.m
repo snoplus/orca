@@ -126,13 +126,18 @@
                        object : nil];
 
     
+    [notifyCenter addObserver : self
+                     selector : @selector(pollTimeChanged:)
+                         name : ORHVcRIOModelPollTimeChanged
+                       object : nil];
+    
     
 }
 
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"HV-cRIO Control (Unit %lu)",[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"HV-cRIO Control (Unit %lu)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -151,7 +156,22 @@
 	[self isConnectedChanged:nil];
     [self showFormattedDatesChanged:nil];
     [self postRegulationFileChanged:nil];
+    [self pollTimeChanged:nil];
 }
+
+- (void) pollTimeChanged:(NSNotification*)aNote
+{
+    [pollTimePU selectItemWithTag:[model pollTime]];
+    if([model pollTime]){
+        [progressWheel startAnimation:nil];
+        [progressWheel setHidden:NO];
+    }
+    else                {
+        [progressWheel stopAnimation:nil];
+        [progressWheel setHidden:YES];
+    }
+}
+
 - (void) postRegulationFileChanged:(NSNotification*)aNote
 {
     [postRegulationFileField setStringValue:[[model postRegulationFile] stringByAbbreviatingWithTildeInPath] ];
@@ -244,9 +264,7 @@
 {
     BOOL locked = [gSecurity isLocked:ORHVcRIOLock];
     [lockButton setState: locked];
-    [readSetPointFileButton setEnabled:!locked];
-    [writeAllSetPointsButton setEnabled:!locked];
-    [setPointTableView setEnabled:!locked];
+    [self setButtonStates];
 }
 
 #pragma mark ***Actions
@@ -302,9 +320,12 @@
 - (void) setButtonStates
 {
     BOOL locked = [gSecurity isLocked:ORHVcRIOLock];
-    
-    [addPostRegulationPointButton setEnabled:    !locked];
-    [removePostRegulationPointButton setEnabled: !locked];
+    [readPostRegulationButton           setEnabled:    !locked];
+    [addPostRegulationPointButton       setEnabled:    !locked];
+    [removePostRegulationPointButton    setEnabled: !locked];
+    [readSetPointFileButton             setEnabled:!locked];
+    [writeAllSetPointsButton            setEnabled:!locked];
+    [setPointTableView                  setEnabled:!locked];
 }
 
 #pragma mark ***Table Data Source
@@ -460,8 +481,9 @@
     [model pushReadBacksToSetPoints];
 }
 
-- (IBAction) savePostRegulationSetPoints: (id) aSender
+- (IBAction) savePostRegulationScaleFactors: (id) aSender
 {
+    [self endEditing];
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     [savePanel setPrompt:@"Save As"];
     [savePanel setCanCreateDirectories:YES];
@@ -487,7 +509,7 @@
         }
     }];
 }
-- (IBAction) readPostRegulationSetPoints:(id)sender
+- (IBAction) readPostRegulationScaleFactors:(id)sender
 {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseDirectories:NO];
@@ -509,6 +531,10 @@
             [model readPostRegulationFile:[[openPanel URL] path]];
         }
     }];
+}
+- (IBAction) pollTimeAction: (id) aSender
+{
+    [model setPollTime:[[aSender selectedItem]tag]];
 }
 
 #pragma  mark ***Delegate Responsiblities
