@@ -167,11 +167,6 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
                        object : nil];
 
     [notifyCenter addObserver : self
-                     selector : @selector(restartKeepAlive:)
-                         name : @"TUBiiKeepAliveDied"
-                       object : nil];
-
-    [notifyCenter addObserver : self
                      selector : @selector(killKeepAlive:)
                          name : @"TELLIEEmergencyStop"
                        object : nil];

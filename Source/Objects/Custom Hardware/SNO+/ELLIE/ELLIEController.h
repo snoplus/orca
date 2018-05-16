@@ -203,7 +203,8 @@
 - (IBAction)telliePing:(id)sender;
 - (IBAction)smelliePing:(id)sender;
 - (IBAction)interlockPing:(id)sender;
-- (IBAction)tubiiPing:(id)sender;
+- (void)tubiiPing;
+- (IBAction)tubiiPingAction:(id)sender;
 - (IBAction)tubiiRestart:(id)sender;
 - (IBAction)serverSettingsChanged:(id)sender;
 -(void)killInterlock:(NSNotification *)aNote;
