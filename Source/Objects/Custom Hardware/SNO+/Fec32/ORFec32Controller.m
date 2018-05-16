@@ -546,7 +546,11 @@
 
 - (void) commentsChanged:(NSNotification*)aNote
 {
-	[commentsTextField setStringValue: [model comments]];
+    if (![model comments]){
+        [commentsTextField setStringValue: @""];
+    } else {
+        [commentsTextField setStringValue: [model comments]];
+    }
 }
 
 - (void) checkGlobalSecurity
@@ -623,7 +627,11 @@
 
 - (void) boardIdChanged:(NSNotification*)aNote
 {
-	[boardIdField setStringValue:[model boardID]];
+    if(![model boardID]){
+        [boardIdField setStringValue: @""];
+    } else {
+        [boardIdField setStringValue:[model boardID]];
+    }
 }
 
 - (void) cmosChanged:(NSNotification*)aNote
