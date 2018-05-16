@@ -15,6 +15,9 @@
 
 - (void) setTimeout: (long) _timeout
 {
+    /*
+     Timeout should be specified in ms using a long unsigned integer
+    */
     @synchronized(self) {
         timeout = _timeout;
         if (context) {
