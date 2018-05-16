@@ -89,6 +89,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         connection = [[RedisClient alloc] init]; // Connection must be allocated before port and host name are set
         portNumber = TUBII_DEFAULT_PORT;
         strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
+        [connection setTimeout:2];
     }
     return self;
 }
