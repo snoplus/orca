@@ -115,7 +115,13 @@
 	[[self window] setTitle:[NSString stringWithFormat:@"%@",[model identifier]]];
 	[memBaseAddressField setIntValue:[model memoryBaseAddress]];
 	[regBaseAddressField setIntValue:[model registerBaseAddress]];
-	[iPBaseAddressField setStringValue:[model iPAddress]];
+	
+    if (![model iPAddress]){
+        [iPBaseAddressField setStringValue: @""];
+    } else {
+        [iPBaseAddressField setStringValue:[model iPAddress]];
+    }
+    
 	[crateNumberField setIntValue:[model crateNumber]];
 }
 
