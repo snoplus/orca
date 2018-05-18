@@ -1652,7 +1652,9 @@ static NSString* measuredValueList[] = {
 
 - (NSString*) processingTitle
 {
-    return [self fullID];
+    NSString* s =  [[self fullID] substringFromIndex:2];
+    s = [s stringByReplacingOccurrencesOfString:@"Model" withString:@""];
+    return s;
 }
 
 - (void) setProcessOutput:(int)channel value:(int)value
