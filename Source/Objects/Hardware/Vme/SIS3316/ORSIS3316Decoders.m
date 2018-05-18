@@ -56,19 +56,21 @@
 	unsigned long length = ExtractLength(ptr[0]);
     int crate = (ptr[1]&0x01e00000)>>21;
     int card  = (ptr[1]&0x001f0000)>>16;
-	
+    int channel  = (ptr[1]&0x0000ff00)>>8;
+
 	NSString* crateKey		= [self getCrateKey: crate];
     NSString* cardKey       = [self getCardKey: card];
-    NSString* channelKey    = [self getChannelKey: 0];
+    NSString* channelKey    = [self getChannelKey: channel];
 
 	long numDataWords = length-2;
-    int channel = 0;;
     unsigned char* bPtr = (unsigned char*)&ptr[2]; //ORCA header + TBD !!! work out what the raw header is
     NSData* recordAsData = [NSData dataWithBytes:bPtr length:numDataWords*sizeof(long)];
 
+
     [aDataSet loadWaveform:recordAsData
-                    offset:0 //bytes!
-                  unitSize:2 //unit size in bytes!
+                    offset:9 * sizeof(unsigned long) //bytes!
+                  unitSize:4 //unit size in bytes!
+                      mask:0x3FFF
                     sender:self
                   withKeys:@"SIS3316", @"Waveforms",crateKey,cardKey,channelKey,nil];
     

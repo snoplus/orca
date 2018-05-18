@@ -1372,7 +1372,6 @@
     [acquisitionControlMatrix   setEnabled:!lockedOrRunningMaintenance];
     [nimControlStatusMatrix     setEnabled:!lockedOrRunningMaintenance];
     
-	[checkEventButton           setEnabled:!locked && !runInProgress];
 	[eventConfigMatrix          setEnabled:!locked && !runInProgress];
     [gainPU                     setEnabled:!locked && !runInProgress];
     [terminationPU              setEnabled:!locked && !runInProgress];
@@ -1841,36 +1840,12 @@
         [model setDacOffset:[[sender selectedCell] tag] withValue:[sender intValue]];
     }
 }
-- (IBAction) writeThresholdsAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeThresholds];
-        [model writeThresholdSum];
-        [model writeHeTrigThresholds];
-        [model writeHeTrigThresholdSum];
-        //[model writeFirTriggerSetup];
-        [model writeActiveTrigGateWindowLen];
-        [model writeFirEnergySetup];
-        [model writePreTriggerDelays];
-    }
-	@catch(NSException* localException) {
-        NSLog(@"SIS3316 Thresholds write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
 
-- (IBAction) readThresholdsAction:(id)sender
+- (IBAction) dumpThresholdsAction:(id)sender
 {
     @try {
-        [model readThresholds:YES];
-        [model readThresholdSum:YES];
-        [model readHeTrigThresholds:YES];
-        [model readHeTrigThresholdSum:YES];
-        [model readActiveTrigGateWindowLen:YES];
-        [model readPreTriggerDelays:YES];
-        [model readFirEnergySetup:YES];
+        [model dumpTriggerThreshold];
+        [model dumpSumTriggerThreshold];
     }
 	@catch(NSException* localException) {
         NSLog(@"SIS3316 Thresholds read FAILED.\n");
@@ -1878,6 +1853,44 @@
                         localException);
     }
 }
+
+- (IBAction) dumpDACsAction:(id)sender
+{
+    @try {
+        [model dumpAdcOffsetReadback];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 DACs read FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) dumpGainsAction:(id)sender
+{
+    @try {
+        [model dumpGainTerminationControl];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 Gains Dump FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
+- (IBAction) dumpFirTriggerAction:(id)sender
+{
+    @try {
+        [model dumpFirTriggerSetup];
+        [model dumpSumFirTriggerSetup];
+    }
+    @catch(NSException* localException) {
+        NSLog(@"SIS3316 FIR Trigger Dump FAILED.\n");
+        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+                        localException);
+    }
+}
+
 
 - (IBAction) writeEventConfigButton:(id)sender
 {
@@ -1929,7 +1942,6 @@
     @try {
         [self endEditing];
         [model readAccumulatorGates:YES];
-        [model readRawDataBufferConfig:YES];
     }
     @catch(NSException* localException) {
         NSLog(@"SIS3316 Accumulator Gate read FAILED.\n");
@@ -1965,11 +1977,6 @@
 
 }
 
-- (IBAction) checkEvent:(id)sender
-{
-	[self endEditing];
-	//[model testEventRead];
-}
 
 - (IBAction) gainAction:(id)sender
 {
@@ -2010,6 +2017,10 @@
 - (IBAction) rePileUpWindowLenAction:(id)sender
 {
     [model setRePileUpWindow:[rePileUpWindowLenField intValue]];
+}
+- (IBAction) dumpChan0Action:(id)sender
+{
+    [model dumpChan0];
 }
 
 #pragma mark •••Data Source

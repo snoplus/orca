@@ -112,7 +112,6 @@
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
     IBOutlet NSButton*      statusButton;
-	IBOutlet NSButton*		checkEventButton;
 
     //rate page
     IBOutlet NSMatrix*      rateTextFields;
@@ -275,8 +274,7 @@
 - (IBAction) readAccumulatorGateAction:(id)sender;
 - (IBAction) trigger:(id)sender;
 
-- (IBAction) writeThresholdsAction:(id)sender;
-- (IBAction) readThresholdsAction:(id)sender;
+- (IBAction) dumpThresholdsAction:(id)sender;
 
 - (IBAction) clockSourceAction:(id)sender;
 - (IBAction) baseAddressAction:(id)sender;
@@ -298,8 +296,10 @@
 - (IBAction) n1DivAction:(id)sender;
 - (IBAction) pileUpWindowLenAction:(id)sender;
 - (IBAction) rePileUpWindowLenAction:(id)sender;
-
-- (IBAction) checkEvent:(id)sender;
+- (IBAction) dumpChan0Action:(id)sender;
+- (IBAction) dumpDACsAction:(id)sender;
+- (IBAction) dumpGainsAction:(id)sender;
+- (IBAction) dumpFirTriggerAction:(id)sender;
 
 #pragma mark •••Data Source
 - (double)  getBarValue:(int)tag;

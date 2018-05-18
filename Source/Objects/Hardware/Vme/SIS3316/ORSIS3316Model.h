@@ -49,7 +49,7 @@ enum {
     kAdcFPGAsBootControllerReg,
     kSpiFlashControlStatusReg,
     kSpiFlashData,
-    kReservedforPROMReg,
+    kExternalVetoGateDelayReg,
     
     kAdcClockI2CReg,
     kMgt1ClockI2CReg,
@@ -166,28 +166,16 @@ enum {
     kAccGate3ConfigReg,
     kAccGate4ConfigReg,
     
-    kAccGate5ConfigReg,
-    kAccGate6ConfigReg,
-    kAccGate7ConfigReg,
-    kAccGate8ConfigReg,
+    kTofActiveWindowConfigReg,
+    kGenHistogramConfigReg,
     
-    kFirEnergySetupCh1Reg,
-    kFirEnergySetupCh2Reg,
-    kFirEnergySetupCh3Reg,
-    kFirEnergySetupCh4Reg,
-    
-    kEnergyHistoConfigCh1Reg,
-    kEnergyHistoConfigCh2Reg,
-    kEnergyHistoConfigCh3Reg,
-    kEnergyHistoConfigCh4Reg,
-    
-    kMawStartIndexConfigCh1Reg,
-    kMawStartIndexConfigCh2Reg,
-    kMawStartIndexConfigCh3Reg,
-    kMawStartIndexConfigCh4Reg,
+    kTofHistogramConfReg,
+    kShape2DXHistogramConfigReg,
+    kShape2DYHistogramConfigReg,
+    kPeakSumHistogramConfigReg,
     
     kAdcVersionReg,
-    kAdcVStatusReg,
+    kAdcStatusReg,
     kAdcOffsetReadbackReg,
     kAdcSpiReadbackReg,
     
@@ -310,7 +298,7 @@ enum {
 	id theController;       //cach to speed takedata
     unsigned short waitingOnChannelMask;
     unsigned short groupDataTransferedMask;
-
+    BOOL transferDone;
     NSString* revision;
     unsigned short  majorRev;
     unsigned short  minorRev;
@@ -323,6 +311,13 @@ enum {
     unsigned long   internalGateLen[kNumSIS3316Groups];       //6.24
     unsigned long   internalCoinGateLen[kNumSIS3316Groups];   //6.24
     unsigned long  dataBuffer[4096];
+    
+    unsigned char freqSI570_calibrated_value_125MHz[6]; // new 20.11.2013
+    unsigned char freqPreset62_5MHz[6];
+    unsigned char freqPreset125MHz[6];
+    unsigned char freqPreset250MHz[6];
+    unsigned int adc_125MHz_flag ;
+
 }
 
 - (id) init;
@@ -350,7 +345,10 @@ enum {
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
 - (unsigned short) majorRevision;
-- (void) readFirmwareVersion:(BOOL)verbose;
+- (void) dumpFirmwareVersion;
+- (void) dumpFPGAStatus;
+- (void) dumpFPGAStatus1;
+- (void) dumpFPGAStatus2;
 
 - (long) enabledMask;
 - (unsigned long) eventConfigMask;
@@ -538,9 +536,6 @@ enum {
 - (unsigned long) internalCoinGateLen:(unsigned short)aGroup;
 - (void) setInternalCoinGateLen:(unsigned short)aGroup withValue:(unsigned long)aValue;
 
-//-=**- (int) clockSource;
-//-=**- (void) setClockSource:(int)aClockSource;
-
 - (void) initParams;
 
 - (ORRateGroup*)    waveFormRateGroup;
@@ -572,44 +567,75 @@ enum {
 - (void) readTemperature:(BOOL)verbose;         //6.8
 - (void) readSerialNumber:(BOOL)verbose;        //6.10
 - (void) writeClockSource;                      //6.17
+- (void) readFpBusControl:(BOOL)verbose;        //6.19
 - (void) readClockSource:(BOOL)verbose;
 - (void) writeNIMControlStatus;                 //6.20
 - (void) readNIMControlStatus:(BOOL)verbose;
 - (void) writeAcquisitionRegister;              //6.21
+- (void) dumpAdcOffsetReadback;                 //6.9
 - (unsigned long) readAcquisitionRegister:(BOOL)verbose;
 - (BOOL) sampleLogicIsBusy;                     //6.21      //pg 119 and on
 - (void) writeEventConfig;                      //6.12 (section 2)
+- (void) dumpEventConfiguration;
 - (void) readEventConfig:(BOOL)verbose;
 - (void) writeExtendedEventConfig;              //6.13 (section 2)
+- (void) dumpExtendedEventConfiguration;
+- (void) dumpChannelHeaderID;                   //6.14
+- (void) dumpEndAddressThreshold;               //6.15
+- (void) dumpActiveTrigGateWindowLen;           //6.16
+- (void) dumpRawDataBufferConfig;               //6.17
+- (void) dumpPileupConfig;                      //6.18
+- (void) dumpPreTriggerDelay;                   //6.19
+- (void) dumpAveConfig;                         //6.20
+- (void) dumpDataFormatConfig;                  //6.21
+- (void) dumpMawTestBufferConfig;               //6.22
+- (void) dumpInternalTriggerDelayConfig;        //6.23
+- (void) dumpInternalGateLengthConfig;          //6.24
+- (void) dumpFirTriggerSetup;                   //6.25
+- (void) dumpSumFirTriggerSetup;                //6.25-1
+- (void) dumpTriggerThreshold;                  //6.26
+- (void) dumpSumTriggerThreshold;               //6.26-1
+- (void) dumpHeTriggerThreshold;                //6.27
+- (void) dumpHeSumTriggerThreshold;             //6.27-1
+- (void) dumpStatisticCounterMode;              //6.28
+- (void) dumpPeakChargeConfig;                  //6.29
+- (void) dumpExtededRawDataBufferConfig;        //6.30
+- (void) dumpAccumulatorGates;                  //6.31
+
 - (void) readExtendedEventConfig:(BOOL)verbose;
 - (void) writeEndAddress;                       //6.15 (section 2)
 - (void) readEndAddress:(BOOL)verbose;
 - (void) writeActiveTrigGateWindowLen;          //6.16 (section 2)
 - (void) readActiveTrigGateWindowLen:(BOOL)verbose;
 - (void) writeRawDataBufferConfig;              //6.17 (section 2)
-- (void) readRawDataBufferConfig:(BOOL)verbose;
 - (void) writePreTriggerDelays;                 //6.19 (section 2)
 - (void) readPreTriggerDelays:(BOOL)verbose;
 - (void) writeDataFormat;                       //6.21 (section 2)
+- (unsigned long) readTrigCoinLUControl:(BOOL)verbose; //6.22
+- (unsigned long) readTrigCoinLUAddress:(BOOL)verbose; //6.23
+- (unsigned long) readTrigCoinLUData:(BOOL)verbose;  //6.24
+- (unsigned long) readLemoOutCOSelect:(BOOL)verbose;  //6.25
+- (unsigned long) readLemoOutTOSelect:(BOOL)verbose; //6.26
+- (unsigned long) readLemoOutUOSelect:(BOOL)verbose; //6.27
+- (unsigned long) readIntTrigFeedBackSelect:(BOOL)verbose;//6.28
+- (unsigned long) readVmeFpgaAdcDataLinkStatus:(BOOL)verbose;//6.1
+- (unsigned long) readPrescalerOutPulseDivider:(BOOL)verbose;//6.3
+- (unsigned long) readPrescalerOutPulseLength:(BOOL)verbose; //6.4
+- (void) dumpGainTerminationControl;//6.7
+- (void) dumpInternalTriggerCounters;//6.5
+- (void) dumpFPGADataTransferStatus; //6:30
 - (void) writeTriggerDelay;                     //6.23 (section 2)
 - (void) readTriggerDelay:(BOOL)verbose;
 - (void) writeFirTriggerSetup;                  //6.25 (section 2)
 - (void) initBoard;
 - (void) writeThresholds;                       //6.26 (section 2)
 - (void) writeThresholdSum;
-- (void) readThresholds:(BOOL)verbose;          //6.26 (section 2)
-- (void) readThresholdSum: (BOOL)verbose;
 - (void) writeHeTrigThresholds;                 //6.27 (section 2)
 - (void) writeHeTrigThresholdSum;
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
 - (void) readHeTrigThresholdSum:(BOOL)verbose;
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
 - (void) readAccumulatorGates:(BOOL)verbose;
-- (void) writeFirEnergySetup;                   //6.32 (section 2)
-- (void) readFirEnergySetup:(BOOL)verbose;
-- (void) writeHistogramConfiguration;           //6.33 (section 2)
-- (void) readHistogramConfiguration:(BOOL)verbose;
-- (void) writeGainAndTermination;               //6.7
 - (void) configureAnalogRegisters;
 
 - (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
@@ -634,10 +660,16 @@ enum {
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
 - (void) readAddressCounts;
 
-//- (int) dataWord:(int)chan index:(int)index;
-//- (void) testEventRead;
-
-
+- (void) configure_all_adc_dac_offsets;
+- (void) poll_on_adc_dac_offset_busy;
+- (void) write_channel_header_ID:(unsigned int) channel_header_id_reg_value;
+- (int) adc_spi_write_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long) spi_data;
+- (int) adc_spi_read_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long*) spi_data;
+- (int) adcSpiSetup;
+- (void) getFrequency:(int)osc;
+- (void) write_all_adc_dac_offsets;
+- (void) write_all_gain_termination_values;
+- (void) dumpChan0;
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;

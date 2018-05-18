@@ -147,7 +147,7 @@ static ORSIS3316RegisterInformation singleRegister[kNumberSingleRegs] = {
     {0x00000030,    @"ADC FPGAs BOOT Controller",               YES,    YES,    NO,   kAdcFPGAsBootControllerReg},
     {0x00000034,    @"SPI FLASH CONTROL/Status",                YES,    YES,    NO,   kSpiFlashControlStatusReg},
     {0x00000038,    @"SPI Flash Data",                          YES,    YES,    NO,   kSpiFlashData},
-    {0x0000003C,    @"External Veto/Gate Delay",                YES,    YES,    NO,   kReservedforPROMReg},
+    {0x0000003C,    @"External Veto/Gate Delay",                YES,    YES,    NO,   kExternalVetoGateDelayReg},
     
     {0x00000040,    @"ADC Clock",                               YES,    YES,    NO,   kAdcClockI2CReg},
     {0x00000044,    @"MGT1 Clock",                              YES,    YES,    NO,   kMgt1ClockI2CReg},
@@ -264,28 +264,16 @@ static ORSIS3316RegisterInformation groupRegister[kADCGroupRegisters] = {
     {0x000010A8,    @"Accumulator Gate 3 Configuration",        YES,    YES,    YES,   kAccGate3ConfigReg},
     {0x000010AC,    @"Accumulator Gate 4 Configuration",        YES,    YES,    YES,   kAccGate4ConfigReg},
     
-    {0x000010B0,    @"Accumulator Gate 5 Configuration",        YES,    YES,    YES,   kAccGate5ConfigReg},
-    {0x000010B4,    @"Accumulator Gate 6 Configuration",        YES,    YES,    YES,   kAccGate6ConfigReg},
-    {0x000010B8,    @"Accumulator Gate 7 Configuration",        YES,    YES,    YES,   kAccGate7ConfigReg},
-    {0x000010BC,    @"Accumulator Gate 8 Configuration",        YES,    YES,    YES,   kAccGate8ConfigReg},
-    
-    {0x000010C0,    @"FIR Energy Setup Ch1",                    YES,    YES,    YES,   kFirEnergySetupCh1Reg},
-    {0x000010C4,    @"FIR Energy Setup Ch2",                    YES,    YES,    YES,   kFirEnergySetupCh2Reg},
-    {0x000010C8,    @"FIR Energy Setup Ch3",                    YES,    YES,    YES,   kFirEnergySetupCh3Reg},
-    {0x000010CC,    @"FIR Energy Setup Ch4",                    YES,    YES,    YES,   kFirEnergySetupCh4Reg},
+    {0x000010C0,    @"TOF Active Window Config",                YES,    YES,    YES,   kTofActiveWindowConfigReg},
+    {0x000010CC,    @"General Histogram Config",                YES,    YES,    YES,   kGenHistogramConfigReg},
 
-    {0x000010D0,    @"Energy Histogram Configuration Ch1",      YES,    YES,    YES,   kEnergyHistoConfigCh1Reg},
-    {0x000010D4,    @"Energy Histogram Configuration Ch2",      YES,    YES,    YES,   kEnergyHistoConfigCh2Reg},
-    {0x000010D8,    @"Energy Histogram Configuration Ch3",      YES,    YES,    YES,   kEnergyHistoConfigCh3Reg},
-    {0x000010DC,    @"Energy Histogram Configuration Ch4",      YES,    YES,    YES,   kEnergyHistoConfigCh4Reg},
-
-    {0x000010E0,    @"MAW Start Index/Energy Pickup Config Ch1",YES,    YES,    YES,   kMawStartIndexConfigCh1Reg},
-    {0x000010E4,    @"MAW Start Index/Energy Pickup Config Ch2",YES,    YES,    YES,   kMawStartIndexConfigCh2Reg},
-    {0x000010E8,    @"MAW Start Index/Energy Pickup Config Ch3",YES,    YES,    YES,   kMawStartIndexConfigCh3Reg},
-    {0x000010EC,    @"MAW Start Index/Energy Pickup Config Ch4",YES,    YES,    YES,   kMawStartIndexConfigCh4Reg},
+    {0x000010D0,    @"TOF Histogram Config",                    YES,    YES,    YES,   kTofHistogramConfReg},
+    {0x000010D4,    @"Shape 2D Histogram X-Axis Config",        YES,    YES,    YES,   kShape2DXHistogramConfigReg},
+    {0x000010D8,    @"Shape 2D Histogram Y-Axis Config",        YES,    YES,    YES,   kShape2DYHistogramConfigReg},
+    {0x000010DC,    @"Peak-Sum Histogram Config",               YES,    YES,    YES,   kPeakSumHistogramConfigReg},
 
     {0x00001100,    @"ADC FPGA Version",                        YES,    NO,    YES,   kAdcVersionReg},
-    {0x00001104,    @"ADC FPGA Status",                         YES,    NO,    YES,   kAdcVStatusReg},
+    {0x00001104,    @"ADC FPGA Status",                         YES,    NO,    YES,   kAdcStatusReg},
     {0x00001108,    @"ADC Offset (DAC) readback",               YES,    NO,    YES,   kAdcOffsetReadbackReg},
     {0x0000110C,    @"ADC SPI readback",                        YES,    NO,    YES,   kAdcSpiReadbackReg},
 
@@ -520,13 +508,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     return temperature;
 }
 
-
-//---------------------------------------------------------------------------
-//Energy Histogram Configuration
-
-
-//---------------------------------------------------------------------------
-
 - (ORRateGroup*) waveFormRateGroup
 {
     return waveFormRateGroup;
@@ -605,23 +586,81 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 //--------------------------------------------------------------
 //4.10 Firmware Version
-- (void) readFirmwareVersion:(BOOL)verbose
+- (void) dumpFPGAStatus
 {
-    int width = 41;
-    if(verbose){
-        NSLogStartTable(@"Firmware", width);
-        NSLogMono(@"|  ADC  |   Type   | Version | Revision |\n");
-        NSLogDivider(@"-",width);
-    }
+    [self dumpFPGAStatus1];
+    [self dumpFPGAStatus2];
+}
+- (void) dumpFPGAStatus1
+{
+    int width = 88;
+    unsigned long addr = [self groupRegister:kAdcStatusReg group:0];
+    NSString* title = [NSString stringWithFormat:@"ADC FPGA Status (0x%08lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"|  chan |   Address  | Hard | Soft | Frame | Chan Up | Lane Up | Hard  | Soft  | Frame |\n");
+    NSLogMono(@"|       |            |  Err | Err  |  Err  |   Flag  |  Flag   | Latch | Latch | Latch |\n");
+    NSLogDivider(@"-",width);
     int group;
     for(group=0;group<kNumSIS3316Groups;group++){
-        unsigned long result =  [self readLongFromAddress:[self groupRegister:kAdcVersionReg group:group]];
-        if(verbose){
-            NSLogMono(@"| %2d-%2d |  0x%04x  |   0x%02x  |   0x%02x   |\n",group*4+1, group*4+4, result>>16 & 0xffff,result>>8 & 0xff,result&0xff);
-        }
+        addr = [self groupRegister:kAdcStatusReg group:group];
+        unsigned long aValue =  [self readLongFromAddress:addr];
+        NSLogMono(@"| %2d-%-2d | 0x%08x |%@|%@|%@|%@|%@|%@|%@|%@|\n",
+                  group*4+1, group*4+4,
+                  addr,
+                  [(aValue>>0 & 0x1)?@"X":@" " centered:6],
+                  [(aValue>>1 & 0x1)?@"X":@" " centered:6],
+                  [(aValue>>2 & 0x1)?@"X":@" " centered:7],
+                  [(aValue>>3 & 0x1)?@"X":@" " centered:9],
+                  [(aValue>>4 & 0x1)?@"X":@" " centered:9],
+                  [(aValue>>5 & 0x1)?@"X":@" " centered:7],
+                  [(aValue>>6 & 0x1)?@"X":@" " centered:7],
+                  [(aValue>>7 & 0x1)?@"X":@" " centered:7]
+                  );
     }
-    if(verbose)NSLogDivider(@"=",width);
+    NSLogDivider(@"=",width);
+}
+- (void) dumpFPGAStatus2
+{
+    int width = 63;
+    unsigned long addr = [self groupRegister:kAdcStatusReg group:0];
+    NSString* title = [NSString stringWithFormat:@"ADC FPGA Status (0x%08lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"|  chan |   Address  | Data Link | Mem1 | Mem2 |  DCM |  DCM  |\n");
+    NSLogMono(@"|       |            |   Speed   |  OK  |  OK  |  OK  | Reset |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr = [self groupRegister:kAdcStatusReg group:group];
+        unsigned long aValue =  [self readLongFromAddress:addr];
+        NSLogMono(@"| %2d-%-2d | 0x%08x |%@|%@|%@|%@|%@|\n",
+                  group*4+1, group*4+4,
+                  addr,
+                  [(aValue>>8 & 0x1)?@"2.5 GHz":@"1.25 GHz" centered:11],
+                  [(aValue>>16 & 0x1)?@"X":@" " centered:6],
+                  [(aValue>>17 & 0x1)?@"X":@" " centered:6],
+                  [(aValue>>20 & 0x1)?@"X":@" " centered:6],
+                  [(aValue>>21 & 0x1)?@"X":@" " centered:7]
+                  );
+    }
+    NSLogDivider(@"=",width);
+}
 
+//4.1 ADC FPGA Status
+- (void) dumpFirmwareVersion
+{
+    int width = 41;
+    unsigned long addr = [self groupRegister:kAdcVersionReg group:0];
+    NSString* title = [NSString stringWithFormat:@"ADC Firmware (0x%08lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"|  Bit  |   Type   | Version | Revision |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        unsigned long result =  [self readLongFromAddress:addr];
+        NSLogMono(@"| %2d-%2d |  0x%04x  |   0x%02x  |   0x%02x   |\n",group*4+1, group*4+4, result>>16 & 0xffff,result>>8 & 0xff,result&0xff);
+    }
+    NSLogDivider(@"=",width);
+    
 }
 //6.1 Control/Status Register(0x0, write/read)
 
@@ -666,16 +705,23 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) readModuleID:(BOOL)verbose //*** readModuleID method ***//
 {
-    unsigned long result =  [self readLongFromAddress:[self singleRegister:kModuleIDReg]];
-    
+    unsigned long addr = [self singleRegister:kModuleIDReg];
+    unsigned long result =  [self readLongFromAddress:addr];
     moduleID = result >> 16;
     majorRev = (result >> 8) & 0xff;
     minorRev = result & 0xff;
     [self setRevision:[NSString stringWithFormat:@"%x.%x",majorRev,minorRev]];
-    if(verbose)             NSLog(@"ModuleID Reg: 0x%08x\n",result);
-    if(verbose)             NSLog(@"SIS3316 ID: %x  Firmware:%x\n",moduleID,revision);
-    if(majorRev == 0x20)    NSLog(@"Gamma Revision\n");
-    else                    NSLog(@"");
+    if(verbose){
+        int width = 31;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Module ID (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"|  ID   |  Firmware  |  Gamma  |\n");
+        NSLogDivider(@"-",width);
+        NSLogMono(@"| %05x | %5d.%-4d |  %@  |\n",moduleID,majorRev,minorRev,majorRev == 0x20?@" YES ":@"  NO ");
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+    }
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316IDChanged object:self]; //changes name if BOOL = true
 }
@@ -692,9 +738,19 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.7 Hardware Version Register
 - (void) readHWVersion:(BOOL)verbose
 {
-    unsigned long result =  [self readLongFromAddress:[self singleRegister:kHWVersionReg]];
+    unsigned long addr = [self singleRegister:kHWVersionReg];
+    unsigned long result =  [self readLongFromAddress:addr];
     result &= 0xf;
-    if(verbose)NSLog(@"%@ HW Version: %d\n",[self fullID],result);
+    if(verbose){
+        int width = 30;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"HW Version(0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"|            %2d              |\n",result);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+    }
+    
     hwVersion = result;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HWVersionChanged object:self];
@@ -709,26 +765,43 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.8 Temperature Register
 - (void) readTemperature:(BOOL)verbose
 {
-    temperature =  [self readLongFromAddress:[self singleRegister:kTemperatureReg]]/4.0;
+    unsigned long addr = [self singleRegister:kTemperatureReg];
+    temperature =  [self readLongFromAddress:addr]/4.0;
+    
+    if(verbose){
+        int width = 32;
+        NSString* title = [NSString stringWithFormat:@"Temperature (0x%lx)",addr];
+        NSLog(@"\n");
+        NSLogStartTable(title, width);
+        NSLogMono(@"|          %4.1f C              |\n",temperature);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+   }
 
-    if(verbose) NSLog(@"%@ Temp: %.1f\n",[self fullID],temperature);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316TemperatureChanged object:self];
 }
 
 //6.9 Onewire EEPROM Control register
 
 //6.10 Serial Number register  (ethernet mac address)
-- (void) readSerialNumber:(BOOL)verbose{
-    unsigned long result =  [self readLongFromAddress:[self singleRegister:kSerialNumberReg]];
-    BOOL isSerialNumberValid    = (result >> 16) & 0x1;
-    serialNumber = result & 0xFFFF;  //gives serial number
-   // unsigned short dhcpOption   = (result >> 24) & 0xFF; (checkbox?)
-    //unsigned short megaByteMemoryFlag512    =   (result >> 23);
+- (void) readSerialNumber:(BOOL)verbose
+{
+    unsigned long addr   = [self singleRegister:kSerialNumberReg];
+    unsigned long result =  [self readLongFromAddress:addr];
+    BOOL isValid         = (result >> 16) & 0x1;
+    serialNumber                 = result & 0xFFFF;  //gives serial number
+    unsigned short dhcpOption    = (result >> 24) & 0xFF;
+    unsigned short memoryFlag512 =   (result >> 23);
     
     if(verbose){
-        if(isSerialNumberValid) NSLog(@"%@ Serial Number: 0x%0x\n",[self fullID],serialNumber);
-        else                    NSLog(@"Serial Number is not valid\n");
-       // if (megaByteMemoryFlag512)NSLog(@"512 MByte Memory Flag\n");
+        NSString* mem = memoryFlag512?@"512 MB":@"256 MB";
+        int width = 36;
+        NSString* title = [NSString stringWithFormat:@"Serial Number (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| DHCP | Memory | Serial # | Valid |\n");
+        NSLogDivider(@"-",width);
+      NSLogMono(@"| 0x%02x |%@|  0x%04x  |  %@ |\n",dhcpOption,[mem centered:8],serialNumber,isValid?@"YES ":@" NO ");
+        NSLogDivider(@"=",width);
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316SerialNumberChanged object:self];
 }
@@ -740,14 +813,744 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 //6.11 Internal Transfer Speed register(not often needed)
 
-//6.12 ADC FPGA Boot control register
+//6.12 Event Configuration
+- (void) dumpEventConfiguration
+{
+    int width = 95;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kEventConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Event Configuration (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group | chan |   Address  |  Pol | SUM |    Type    | Int G1 | Int G2 | Ext Gate | Ext Veto |\n");
+    NSLogDivider(@"-",width);
+    NSString* type[4] = {
+        @"None",
+        @"Internal",
+        @"External",
+        @"Int OR Ext"
+    };
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kEventConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int i;
+        for(i=0;i<4;i++){
+            int c1 = group*4 + i;
+            NSLogMono(@"|   %d   |  %2d  | 0x%08x |%@|%@|%@|%@|%@|%@|%@|\n",
+                      group,
+                      c1 ,
+                      addr,
+                      [aValue>>(i*8)  &0x1 ? @"Neg":@"Pos" centered:6],
+                      [aValue>>(i*8+1)&0x1 ? @"Yes":@"No"  centered:5],
+                      [type[aValue>>(i*8+2)&0x3]  centered:12],
+                      [aValue>>(i*8+4)&0x1 ? @"Yes":@"No"  centered:8],
+                      [aValue>>(i*8+5)&0x1 ? @"Yes":@"No"  centered:8],
+                      [aValue>>(i*8+6)&0x1 ? @"Yes":@"No"  centered:10],
+                      [aValue>>(i*8+7)&0x1 ? @"Yes":@"No"  centered:10]
+                      );
+        }
+        if(group!=3) NSLogDivider(@"-",width);
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.13 Extended Config
+- (void) dumpExtendedEventConfiguration
+{
+    int width =43;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kExtEventConfigCh1Ch4Reg group:0];
+    NSString* title = [NSString stringWithFormat:@"Extended Event Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group | chan |   Address  |  Int Pileup |\n");
+    NSLogDivider(@"-",width);
 
-//6.13 SPI Flash Control/Status register
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kExtEventConfigCh1Ch4Reg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int i;
+        for(i=0;i<4;i++){
+            int c1 = group*4 + i;
+            NSLogMono(@"|   %d   |  %2d  | 0x%08x |%@|\n",
+                      group,
+                      c1 ,
+                      addr,
+                      [aValue>>(i*8)&0x1 ? @"Enabled":@"Disabled" centered:13]
+                       );
+        }
+        if(group!=3) NSLogDivider(@"-",width);
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.14 Channel Header ID
+- (void) dumpChannelHeaderID
+{
+    int width =47;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kChanHeaderIdReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Channel Header ID (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |    chan   |   Address  |    Value   |\n");
+    NSLogDivider(@"-",width);
+    
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kChanHeaderIdReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x | 0x%08x |\n",
+                  group,
+                  c1 , c2,
+                  addr,
+                  aValue>>20 & 0xFFF
+                  );
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.15
+- (void) dumpEndAddressThreshold
+{
+    int width =58;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kEndAddressThresholdReg group:0];
+    NSString* title = [NSString stringWithFormat:@"End Address (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  |  Single  |    Value   |\n");
+    NSLogDivider(@"-",width);
+    
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kEndAddressThresholdReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x | %@ | 0x%08x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [aValue>>31 & 0x1 ? @"Yes":@" No" centered:8],
+                  aValue & 0xFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.16
+- (void) dumpActiveTrigGateWindowLen
+{
+    int width =46;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kActTriggerGateWindowLenReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Active Trig Gate Window (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  |    Value   |\n");
+    NSLogDivider(@"-",width);
+    
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kActTriggerGateWindowLenReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x | 0x%08x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  aValue & 0xFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
 
-//6.14 6.14 SPI Flash Data register
+//6.18
+- (void) dumpPileupConfig
+{
+    int width =60;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kPileupConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Pileup Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  |   Pileup   |  re-Pileup |\n");
+    NSLogDivider(@"-",width);
+    
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kPileupConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x | 0x%08x | 0x%08x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  aValue & 0xFFFF,
+                  aValue>>16 & 0xFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.19
+- (void) dumpPreTriggerDelay
+{
+    int width =64;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kPreTriggerDelayReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Pre-Trigger Delay (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  | FIR P+G Bit | PreTrig Delay |\n");
+    NSLogDivider(@"-",width);
+    
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kPreTriggerDelayReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x |%@|   0x%08x  |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [(aValue>>15 & 0x1)?@"Yes":@"No" centered:13],
+                  aValue>>16 & 0xFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.20
+- (void) dumpAveConfig
+{
+    int width =62;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kAveConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Average Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  | Ave Mode | Ave Sample Len |\n");
+    NSLogDivider(@"-",width);
+    NSString* mode[8]={@"Disabled",@"4",@"8",@"16",@"32",@"64",@"128",@"256"};
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kAveConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x |%@|    0x%08x  |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [mode[(aValue>>28 & 0x7)] centered:10],
+                  aValue& 0xFFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.21
+- (void) dumpDataFormatConfig
+{
+    int width = 105;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kDataFormatConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Data Format(0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group | chan |   Address  |  Peak Hi | 2 x Acc | 3 x Acc | Start & Max MAW | Test Buffer | Energy MAW |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kDataFormatConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int i;
+        for(i=0;i<4;i++){
+            int c1 = group*4 + i;
+            NSLogMono(@"| %4d  |  %2d  | 0x%08x |%@|%@|%@|%@|%@|%@|\n",
+                        group,
+                        c1 ,
+                        addr,
+                        [aValue >> ((i*8)+0) & 0x1?@"X":@"-" centered:10],
+                        [aValue >> ((i*8)+1) & 0x1?@"X":@"-" centered:9],
+                        [aValue >> ((i*8)+2) & 0x1?@"X":@"-" centered:9],
+                        [aValue >> ((i*8)+3) & 0x1?@"X":@"-" centered:17],
+                        [aValue >> ((i*8)+4) & 0x1?@"X":@"-" centered:13],
+                        [aValue >> ((i*8)+5) & 0x1?@"X":@"-" centered:12]
+                      );
+        }
+        if(group!=3) NSLogDivider(@"-",width);
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.22
+- (void) dumpMawTestBufferConfig
+{
+    int width =69;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kMawTestBufferConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"MAW Test Buffer Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  | PreTrigger Delay | Buffer Length |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kMawTestBufferConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x |     0x%08x   |   0x%08x  |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  (aValue>>16 & 0x3FF),
+                  aValue & 0xFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.23
+- (void) dumpInternalTriggerDelayConfig
+{
+    int width = 47;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kInternalTrigDelayConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Int Trig Delay Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group | chan |   Address  |  Int Trig Delay |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kInternalTrigDelayConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int i;
+        for(i=0;i<4;i++){
+            int c1 = group*4 + i;
+            NSLogMono(@"| %4d  |  %2d  | 0x%08x |      0x%04x     |\n",
+                      group,
+                      c1 ,
+                      addr,
+                      aValue >> (i*8) & 0xFF
+                      );
+        }
+        if(group!=3) NSLogDivider(@"-",width);
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.24
+- (void) dumpInternalGateLengthConfig
+{
+    int width =100;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kInternalGateLenConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Internal Gate Len Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  |   Internal  | Internal Gate |  Gate 1 Enable  |  Gate 2 Enable  |\n");
+    NSLogMono(@"|       |           |            | Coincidence |     Length    | Ch4 Ch3 Ch2 Ch1 | Ch4 Ch3 Ch2 Ch1 |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kInternalGateLenConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x |      0x%01x    |      0x%02x     |       0x%02x      |       0x%01x       |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  (aValue & 0xF),
+                  aValue>>8 & 0xFF,
+                  aValue>>16 & 0xFF,
+                  aValue>>20 & 0xF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.25
+- (void) dumpFirTriggerSetup
+{
+    int width =56;
+    NSLog(@"\n");
+    unsigned long addr   = [self channelRegister:kFirTrigSetupCh1Reg channel:0];
+    NSString* title = [NSString stringWithFormat:@"FIR Trigger Setup (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| chan |   Address  |   Rise  |  Gap  |  Ext NIM Out   |\n");
+    NSLogMono(@"|      |            |   Time  |  Time | Trig Pulse Len |\n");
+    NSLogDivider(@"-",width);
+    int i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        addr   = [self channelRegister:kFirTrigSetupCh1Reg channel:i];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        NSLogMono(@"|  %2d  | 0x%08x |  0x%03x  | 0x%03x |       0x%02x     |\n",
+                  i ,
+                  addr,
+                  (aValue & 0xFFF),
+                  aValue>>12 & 0xFFF,
+                  aValue>>16 & 0xFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+//6.25.1
+- (void) dumpSumFirTriggerSetup
+{
+    int width =69;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kFirTrigSetupSumCh1Ch4Reg group:0];
+    NSString* title = [NSString stringWithFormat:@"SUM FIR Trigger Setup (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  |   Rise  |  Gap  |  Ext NIM Out   |\n");
+    NSLogMono(@"|       |           |            |   Time  |  Time | Trig Pulse Len |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kFirTrigSetupSumCh1Ch4Reg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x |  0x%03x  | 0x%03x |       0x%02x     |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  (aValue & 0xFFF),
+                  aValue>>12 & 0xFFF,
+                  aValue>>16 & 0xFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.26
+- (void) dumpTriggerThreshold
+{
+    int width =72;
+    NSLog(@"\n");
+    unsigned long addr   = [self channelRegister:kTrigThresholdCh1Reg channel:0];
+    NSString* title = [NSString stringWithFormat:@"FIR Trigger Threshold (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| chan |   Address  |   Trig   | HE Suppress |  CFD Cntrl |  Trigger   |\n");
+    NSLogMono(@"|      |            |  Enabled |     Mode    |     Bits   |  Threshold |\n");
+    NSLogDivider(@"-",width);
+    NSString* cfd[4] = {@"Disabled",@"Disabled",@"Zero Cross",@"50%"};
+    int i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        addr   = [self channelRegister:kTrigThresholdCh1Reg channel:i];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        NSLogMono(@"|  %2d  | 0x%08x |%@|%@|%@| 0x%08x |\n",
+                  i ,
+                  addr,
+                  [(aValue>>31 & 0x1)?@"YES":@"NO" centered:10],
+                  [(aValue>>30 & 0x1)?@"YES":@"NO" centered:13],
+                   [cfd[aValue>>28 & 0x3] centered:12],
+                  aValue & 0xFFFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.26.1
+- (void) dumpSumTriggerThreshold
+{
+    int width =81;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kTrigThreholdSumCh1Ch4Reg group:0];
+    NSString* title = [NSString stringWithFormat:@"SUM FIR Trigger Threshold (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |  chan   |   Address  |  Trig   | HE Suppress |  CFD Cntrl | Trigger   |\n");
+    NSLogMono(@"|       |         |            | Enabled |     Mode    |     Bits   | Threshold |\n");
+    NSLogDivider(@"-",width);
+    NSString* cfd[4] = {@"Disabled",@"Disabled",@"Zero Cross",@"50%"};
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kTrigThreholdSumCh1Ch4Reg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   | %2d - %-2d | 0x%08x |%@|%@|%@| 0x%07x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [(aValue>>31 & 0x1)?@"YES":@"NO" centered:9],
+                  [(aValue>>30 & 0x1)?@"YES":@"NO" centered:13],
+                  [cfd[aValue>>28 & 0x3] centered:12],
+                  aValue & 0xFFFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.27
+- (void) dumpHeTriggerThreshold
+{
+    int width =70;
+    NSLog(@"\n");
+    unsigned long addr   = [self channelRegister:kHiEnergyTrigThresCh1Reg channel:0];
+    NSString* title = [NSString stringWithFormat:@"FIR HE Trigger Threshold (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| chan |   Address  |  Both  | Int HE Trig |  Int Trig  | HE Trigger |\n");
+    NSLogMono(@"|      |            |  Edges |  Out Pulse  |  Out Pulse | Threshold  |\n");
+    NSLogDivider(@"-",width);
+    NSString* intTrigOut[4] = {@"Internal",@"HE Trigger",@"Pileup",@"Reserved"};
+    int i;
+    for(i=0;i<kNumSIS3316Channels;i++){
+        addr   = [self channelRegister:kHiEnergyTrigThresCh1Reg channel:i];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        NSLogMono(@"|  %2d  | 0x%08x |%@|%@|%@|  0x%07x |\n",
+                  i ,
+                  addr,
+                  [(aValue>>31 & 0x1)?@"YES":@"NO" centered:8],
+                  [(aValue>>30 & 0x1)?@"YES":@"NO" centered:13],
+                  [intTrigOut[aValue>>28 & 0x3] centered:12],
+                  aValue & 0xFFFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.27.1
+- (void) dumpHeSumTriggerThreshold
+{
+    int width =81;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kHiETrigThresSumCh1Ch4Reg group:0];
+    NSString* title = [NSString stringWithFormat:@"SUM FIR HE Trigger Threshold (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |  chan   |   Address  |  Both  | Int HE Trig |  Int Trig  | HE Trigger |\n");
+    NSLogMono(@"|       |         |            |  Edges |  Out Pulse  |  Out Pulse | Threshold  |\n");
+    NSLogDivider(@"-",width);
+    NSString* intTrigOut[4] = {@"Internal",@"HE Trigger",@"Pileup",@"Reserved"};
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kHiETrigThresSumCh1Ch4Reg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   | %2d - %-2d | 0x%08x |%@|%@|%@|  0x%07x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [(aValue>>31 & 0x1)?@"YES":@"NO" centered:8],
+                  [(aValue>>30 & 0x1)?@"YES":@"NO" centered:13],
+                  [intTrigOut[aValue>>28 & 0x3] centered:12],
+                  aValue & 0xFFFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.28
+- (void) dumpStatisticCounterMode
+{
+    int width =48;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kTrigStatCounterModeCh1Ch4Reg group:0];
+    NSString* title = [NSString stringWithFormat:@"Trig Statistic Counter Mode (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |  chan   |   Address  |   Mode  |\n");
+    NSLogDivider(@"-",42);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kTrigStatCounterModeCh1Ch4Reg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   | %2d - %-2d | 0x%08x |%@|\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [(aValue & 0x1)?@"Actual":@"Latched" centered:9]
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",42);
+    NSLog(@"\n");
+}
+//6.29
+- (void) dumpPeakChargeConfig
+{
+    int width =64;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kPeakChargeConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Peak/Charge Config (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |  chan   |   Address  |    Mode  |   Ave   | Baseline |\n");
+    NSLogMono(@"|       |         |            |          | Samples |   Delay  |\n");
+    NSLogDivider(@"-",width);
+    NSString* mode[4] = {@"32",@"64",@"128",@"256"};
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kPeakChargeConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   | %2d - %-2d | 0x%08x |%@|%@|   0x%03x  |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  [(aValue & 0x1)?@"Enabled":@"Disabled" centered:10],
+                  [mode[(aValue>>28 & 0x3)] centered:9],
+                  aValue>>16 & 0xFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.30
+- (void) dumpExtededRawDataBufferConfig
+{
+    int width =44;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kExtRawDataBufConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Extended Raw Buffer Len (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |  chan   |   Address  |   Value   |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kExtRawDataBufConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   | %2d - %-2d | 0x%08x | 0x%07x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  aValue & 0x1FFFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
+
+//6.31
+- (void) dumpAccumulatorGates
+{
+    int width =87;
+    NSLog(@"\n");
+    unsigned long addr1   = [self groupRegister:kAccGate1ConfigReg group:0];
+    unsigned long addr2   = [self groupRegister:kAccGate2ConfigReg group:0];
+    unsigned long addr3   = [self groupRegister:kAccGate3ConfigReg group:0];
+    unsigned long addr4   = [self groupRegister:kAccGate4ConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Accumulator Gates (0x%lx,0x%lx,0x%lx,0x%lx)",addr1,addr2,addr3,addr4];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |  chan   |     Gate1      |     Gate2      |     Gate3      |     Gate4      |\n");
+    NSLogMono(@"|       |         | Start |   Len  | Start |   Len  | Start |   Len  | Start |   Len  |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr1   = [self groupRegister:kAccGate1ConfigReg group:group];
+        addr2   = [self groupRegister:kAccGate2ConfigReg group:group];
+        addr3   = [self groupRegister:kAccGate3ConfigReg group:group];
+        addr4   = [self groupRegister:kAccGate4ConfigReg group:group];
+        unsigned long aValue1 = [self readLongFromAddress:addr1];
+        unsigned long aValue2 = [self readLongFromAddress:addr2];
+        unsigned long aValue3 = [self readLongFromAddress:addr3];
+        unsigned long aValue4 = [self readLongFromAddress:addr4];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   | %2d - %-2d | 0x%03x | 0x%04x | 0x%03x | 0x%04x | 0x%03x | 0x%04x | 0x%03x | 0x%04x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  aValue1>>16 & 0x1FF,
+                  aValue1 & 0xFFFF,
+                  aValue2>>16 & 0x1FF,
+                  aValue2 & 0xFFFF,
+                  aValue3>>16 & 0x1FF,
+                  aValue3 & 0xFFFF,
+                  aValue4>>16 & 0x1FF,
+                  aValue4 & 0xFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
 
 //6.15 External Veto/Gate Delay register
-
+- (void) readVetoGateDelayReg:(BOOL)verbose
+{
+    unsigned long addr   = [self singleRegister:kExternalVetoGateDelayReg];
+    unsigned long result =  [self readLongFromAddress:addr] & 0xFFFF;
+    
+    if(verbose){
+        int width = 40;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Ext Veto/Gate Delay (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"|                0x%04x                |\n",result);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316SerialNumberChanged object:self];
+}
 //6.16 Programmable Clock I2C registers
 
 - (unsigned short) hsDiv
@@ -802,26 +1605,52 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) readClockSource:(BOOL)verbose
 {
     NSString* clockSourceString[4] = {
-        @"Internal          ",
-        @"VXS               ",
+        @"Internal",
+        @"VXS",
         @"External from LVDS",
         @"External from NIM "
     };
 
+    unsigned long addr   = [self singleRegister:kAdcSampleClockDistReg];
+    unsigned long result =  [self readLongFromAddress:addr] & 0x3;
+    
     if(verbose){
-        NSLog(@"Reading Clock Source:\n");
-    }
-    unsigned long aValue =  [self readLongFromAddress:[self singleRegister:kAdcSampleClockDistReg]];
-    if(verbose){
-        unsigned long theClockSource  = (aValue & 0x3);
-        NSLog(@"%@ \n",clockSourceString[theClockSource]);
+        int width = 38;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Clock Distribution (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"|%@|\n",[clockSourceString[result] centered:36]);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
     }
 }
 
 //6.18 External NIM Clock Multiplier SPI register
 
 //6.19 FP-Bus control register
-
+- (void) readFpBusControl:(BOOL)verbose
+{
+    unsigned long addr   = [self singleRegister:kFPBusControlReg];
+    unsigned long result = [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* mux;
+        if(result>>5 & 0x1) mux = @"Onboard Osc ";
+        else                mux = @"Ext Clk From NIM";
+        NSString* en        = (result>>4 & 0x1)?@"Enabled":@"Disabled";
+        NSString* fpStatus  = (result>>4 & 0x1)?@"Enabled":@"Disabled";
+        NSString* fpControl = (result>>0 & 0x1)?@"Enabled":@"Disabled";
+        int width = 56;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"FP-Bus Control (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Sample Clk Out Mux | Clk Out | Status Out | Ctrl Out |\n");
+        NSLogDivider(@"-",width);
+        NSLogMono(@"|%@|%@|%@|%@|\n",[mux centered:20],[en centered:9],[fpStatus centered:12],[fpControl centered:10]);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+    }
+}
 //6.20 NIM Input Control/Status register
 - (long)  nimControlStatusMask                     {return nimControlStatusMask;         }
 
@@ -847,35 +1676,40 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) readNIMControlStatus:(BOOL)verbose
 {
-    NSString* nimControlStatusString[14] = {
-        @"NIM Input CI Enable"              ,
-        @"NIM Input CI Invert"              ,
-        @"NIM Input CI Level sensitive"     ,
-        @"Set NIM Input CI Function"        ,
-        @"NIM Input TI as Trigger Enable"   ,
-        @"NIM Input TI Invert"              ,
-        @"NIM Input TI Level sensitive"     ,
-        @"Set NIM Input TI Function"        ,
-        @"NIM Input UI as Timestamp Clear"  ,
-        @"NIM Input UI Invert"              ,
-        @"NIM Input UI Level sensitive"     ,
-        @"Set NIM Input UI Function"        ,
-        @"NIM Input UI as Veto Enable "     ,
-        @"NIM Input UI as PPS Enable "
-    };
-    
-    int i;
-    if(verbose){
-        NSLog(@"Reading NIM Control Status Register:\n");
-        NSLog(@" \n");
-    }
-    unsigned long aValue =  [self readLongFromAddress:[self singleRegister:kNimInControlReg]];
+    unsigned long addr   = [self singleRegister:kNimInControlReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
     
     if(verbose){
+        NSString* nimControlStatusString[14] = {
+            @"Input CI Enable",
+            @"Input CI Invert",
+            @"Input CI Level sensitive",
+            @"Set NIM Input CI Function",
+            @"Input TI as Trigger Enable",
+            @"Input TI Invert",
+            @"Input TI Level sensitive",
+            @"Set NIM Input TI Function",
+            @"Input UI as Timestamp Clear",
+            @"Input UI Invert",
+            @"Input UI Level sensitive",
+            @"Set NIM Input UI Function",
+            @"Input UI as Veto Enable",
+            @"Input UI as PPS Enable"
+        };
+        int width = 44;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"NIM Control (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |           Function           | Set |\n");
+        NSLogDivider(@"-",width);
+
+        int i;
         for(i =0; i < 14; i++) {
             unsigned long theNIMControlStatus  = ((aValue >> (i)) & 0x1);
-            NSLogFont([NSFont fontWithName:@"Monaco" size:12],@"%2d: %@ %@ \n",i, nimControlStatusString[i], theNIMControlStatus?@"YES":@" NO");
+            NSLogMono(@"|  %2d | %@ | %@ |\n",i,[nimControlStatusString[i] leftJustified:28],theNIMControlStatus?@"YES":@" NO");
         }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
     }
 }
 
@@ -908,61 +1742,143 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (unsigned long) readAcquisitionRegister:(BOOL)verbose
 {
-    NSString* acquisitionString[32] = {
-        @"Single Bank Mode (reserved)                                   ",
-        @"Reserved                                                      ",
-        @"Reserved                                                      ",
-        @"Reserved                                                      ",
-        @"FP-Bus-In Control 1 as Trigger Enable                         ",
-        @"FP-Bus-In Control 1 as Veto Enable                            ",
-        @"FP-Bus–In Control 2 Enable                                    ",
-        @"FP-Bus-In Sample Control Enable                               ",
-        @"External Trigger function as Trigger Enable                   ",
-        @"External Trigger function as Veto Enable                      ",
-        @"External Timestamp-Clear function Enable                      ",
-        @"Local Veto function as Veto Enable                            ",
-        @"NIM Input TI as Switch Banks Enable                           ",
-        @"NIM Input UI as Switch Banks Enable                           ",
-        @"Feedback Selected Internal Trigger as Ext Trigger Enable      ",
-        @"External Trigger Disable with Int Busy select                 ",
-        @"ADC Sample Logic Armed                                        ",
-        @"ADC Sample Logic Armed On Bank2 flag                          ",
-        @"Sample Logic Busy (OR)                                        ",
-        @"Memory Address Threshold flag (OR)                            ",
-        @"FP-Bus-In Status 1: Sample Logic busy                         ",
-        @"FP-Bus-In Status 2: Address Threshold flag                    ",
-        @"Sample Bank Swap Control with NIM Input TI/UI Logic Enabled   ",
-        @"PPS Latch Bit                                                 ",
-        @"Sample Logic Busy Ch 1-4                                      ",
-        @"Memory Address Threshold Flag Ch 1-4                          ",
-        @"Sample Logic Busy Ch 5-8                                      ",
-        @"Memory Address Threshold Flag Ch 5-8                          ",
-        @"Sample Logic Busy Ch 9-12                                     ",
-        @"Memory Address Threshold Flag Ch 9-12                         ",
-        @"Sample Logic Busy Ch 13-16                                    ",
-        @"Memory Address Threshold Flag Ch 13-16                        ",
-    };
-
-    int i;
-    if(verbose){
-        NSLogFont([NSFont fontWithName:@"Monaco" size:12],@"Reading Acquisition Control Register:\n");
-    }
-    unsigned long aValue =  [self readLongFromAddress:[self singleRegister:kAcqControlStatusReg]];
+    unsigned long addr = [self singleRegister:kAcqControlStatusReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
 
     if(verbose){
+        NSString* acquisitionString[32] = {
+            @"Single Bank Mode (reserved)",
+            @"Reserved",
+            @"Reserved",
+            @"Reserved",
+            @"FP-Bus-In Control 1 as Trigger Enable ",
+            @"FP-Bus-In Control 1 as Veto Enable",
+            @"FP-Bus–In Control 2 Enable",
+            @"FP-Bus-In Sample Control Enable",
+            @"External Trigger function as Trigger Enable",
+            @"External Trigger function as Veto Enable ",
+            @"External Timestamp-Clear function Enable ",
+            @"Local Veto function as Veto Enable",
+            @"NIM Input TI as Switch Banks Enable",
+            @"NIM Input UI as Switch Banks Enable",
+            @"Feedback Selected Internal Trigger as Ext Trigger Enable",
+            @"External Trigger Disable with Int Busy select",
+            @"ADC Sample Logic Armed",
+            @"ADC Sample Logic Armed On Bank2 flag",
+            @"Sample Logic Busy (OR)",
+            @"Memory Address Threshold flag (OR)",
+            @"FP-Bus-In Status 1: Sample Logic busy",
+            @"FP-Bus-In Status 2: Address Threshold flag",
+            @"Sample Bank Swap Control with NIM Input TI/UI Logic Enabled",
+            @"PPS Latch Bit",
+            @"Sample Logic Busy Ch 1-4",
+            @"Memory Address Threshold Flag Ch 1-4",
+            @"Sample Logic Busy Ch 5-8",
+            @"Memory Address Threshold Flag Ch 5-8",
+            @"Sample Logic Busy Ch 9-12",
+            @"Memory Address Threshold Flag Ch 9-12",
+            @"Sample Logic Busy Ch 13-16",
+            @"Memory Address Threshold Flag Ch 13-16",
+        };
+        int width = 75;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Acquistion Control (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |                           Function                          | Set |\n");
+        NSLogDivider(@"-",width);
+        
+        int i;
         for(i =0; i < 32; i++) {
-            unsigned long theAcquisitionControl  = ((aValue >> i) & 0x1);
-            NSLogMono( @"%2d: %@ %@ \n",i, acquisitionString[i], theAcquisitionControl?@"YES":@" NO");
+            unsigned long theBit  = ((aValue >> (i)) & 0x1);
+            NSLogMono(@"|  %2d | %@ | %@ |\n",i,[acquisitionString[i] leftJustified:59],theBit?@"YES":@" NO");
         }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+
     }
     return aValue;
 }
 
-//6.22 MAW Test Buffer Configuration register
+//6.22 Trigger Copincidence Lookup Table Control
+- (unsigned long) readTrigCoinLUControl:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kTrigCoinLUTControlReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[3] = {
+            @"Table 2 Out Pulse Len",
+            @"Table 1 Out Pulse Len",
+            @"Status Clear Busy",
+        };
+        int width = 41;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Trig Coin LU Table (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bits |          Name         | Value  |\n");
+        NSLogDivider(@"-",width);
+        
+        NSLogMono(@"| 0-7  | %@ | 0x%04x |\n",[name[0] leftJustified:21],(aValue>>0&0xf));
+        NSLogMono(@"| 8-15 | %@ | 0x%04x |\n",[name[1] leftJustified:21],(aValue>>8&0xf));
+        NSLogMono(@"|  31  | %@ | 0x%04x |\n",[name[2] leftJustified:21],(aValue>>31&0x1));
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 
-//6.23 Internal Trigger Delay Configruation register
-
-//6.24 Internal Gate Length Configuration register
+//6.23 Trigger Copincidence Lookup Table Address
+- (unsigned long) readTrigCoinLUAddress:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kTrigCoinLUTAddReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[2] = {
+            @"Table R/W Address",
+            @"Table Chan Trig Mask",
+        };
+        int width = 46;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Trig Coin LU Addr (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bits  |          Name         |   Value    |\n");
+        NSLogDivider(@"-",width);
+        
+        NSLogMono(@"| 0-15  | %@ | 0x%08x |\n",[name[0] leftJustified:21],(aValue>>0&0xff));
+        NSLogMono(@"| 16-31 | %@ | 0x%08x |\n",[name[1] leftJustified:21],(aValue>>16&0xff));
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
+//6.24 Trig Coin LU Table Data
+- (unsigned long) readTrigCoinLUData:(BOOL)verbose
+{
+    unsigned long addr   = [self singleRegister:kTrigCoinLUTAddReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[2] = {
+            @"Table 1 Coin Validation",
+            @"Table 2 Coin Validation",
+        };
+        int width = 42;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Trig Coin LU Addr (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |           Name          | Value |\n");
+        NSLogDivider(@"-",width);
+        NSLogMono(@"|  0  | %@ |   0x%01x |\n",[name[0] leftJustified:21],(aValue>>0&0x1));
+        NSLogMono(@"|  1  | %@ |   0x%01x |\n",[name[1] leftJustified:21],(aValue>>16&0x1));
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 
 - (unsigned long) internalGateLen:(unsigned short)aGroup;
 {
@@ -1007,7 +1923,43 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     [self writeLong:lemoCoMask toAddress: [self singleRegister:kLemoOutCOSelectReg]];
 }
-
+- (unsigned long) readLemoOutCOSelect:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kLemoOutCOSelectReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[9] = {
+            @"Sample Clock",
+            @"Int HE Trig Stretched Pulse ch0-3",
+            @"Int HE Trig Stretched Pulse ch4-7",
+            @"Int HE Trig Stretched Pulse ch8-11",
+            @"Int HE Trig Stretched Pulse ch12-16",
+            @"Bank Swap Cntrl NIM In TI/UI Logic",
+            @"Sample Logic Bankx Armed",
+            @"Sample Logic Bank2 Flag",
+            @"Set",
+        };
+        int bit[9] ={0,16,17,18,19,20,21,22,30};
+        int width = 58;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"LEMO Out CO Select (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |               Functtion             |    Value   |\n");
+        NSLogDivider(@"-",width);
+        
+        int i;
+        for(i =0; i < 9; i++) {
+            unsigned long theBit  = ((aValue >> bit[i]) & 0x1);
+            if(i != 8)NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:35],[theBit?@"Selected":@" -- " centered:10]);
+            else      NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:35],[theBit?@"Set     ":@" -- " centered:10]);
+        }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 //6.26 LEMO Out “TO” Select register
 - (unsigned long) lemoToMask { return lemoToMask; }
 - (void) setLemoToMask:(unsigned long)aMask
@@ -1021,7 +1973,61 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     [self writeLong:lemoToMask toAddress: [self singleRegister:kLemoOutTOSelectReg]];
 }
-
+- (unsigned long) readLemoOutTOSelect:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kLemoOutTOSelectReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[27] = {
+            @"Int Trig Stretched Pulse ch0",
+            @"Int Trig Stretched Pulse ch1",
+            @"Int Trig Stretched Pulse ch2",
+            @"Int Trig Stretched Pulse ch3",
+            @"Int Trig Stretched Pulse ch4",
+            @"Int Trig Stretched Pulse ch5",
+            @"Int Trig Stretched Pulse ch6",
+            @"Int Trig Stretched Pulse ch7",
+            @"Int Trig Stretched Pulse ch8",
+            @"Int Trig Stretched Pulse ch9",
+            @"Int Trig Stretched Pulse ch10",
+            @"Int Trig Stretched Pulse ch11",
+            @"Int Trig Stretched Pulse ch12",
+            @"Int Trig Stretched Pulse ch13",
+            @"Int Trig Stretched Pulse ch14",
+            @"Int Trig Stretched Pulse ch15",
+            @"Int Sum-Trig Stretched Pulse 0-3",
+            @"Int Sum-Trig Stretched Pulse 4-7",
+            @"Int Sum-Trig Stretched Pulse 8-11",
+            @"Int Sum-Trig Stretched Pulse 12-15",
+            @"Sample Bank Swap Cntrl NIM TI/UI Logic",
+            @"Sample Logic Bankx Armed",
+            @"Sample Logic Bank2 flag",
+            @"LU Table 1 Coin Stretched OUt Pulse",
+            @"Ext Trig to ADC FPGA ",
+            @"Set",
+            @"Select and Generate Pulse",
+        };
+        int bit[27] ={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,24,25,30,31};
+        int width = 61;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"LEMO Out TO Select (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |                Functtion               |    Value   |\n");
+        NSLogDivider(@"-",width);
+        
+        int i;
+        for(i =0; i < 27; i++) {
+            unsigned long theBit  = ((aValue >> bit[i]) & 0x1);
+            if(bit[i] != 30)NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:38],[theBit?@"Selected":@" -- " centered:10]);
+            else      NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:38],[theBit?@"Set":@" -- " centered:10]);
+        }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 //6.27 LEMO Out “UO” Select register
 - (unsigned long) lemoUoMask { return lemoUoMask; }
 - (void) setLemoUoMask:(unsigned long)aMask
@@ -1035,25 +2041,259 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     [self writeLong:lemoUoMask toAddress: [self singleRegister:kLemoOutUOSelectReg]];
 }
-
+- (unsigned long) readLemoOutUOSelect:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kLemoOutUOSelectReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[17] = {
+            @"Sample Logic Bankx Armed",
+            @"Sample Logic Busy",
+            @"Address Thres Flag",
+            @"Sample Event Active",
+            @"Sample Logic Ready (Gate)",
+            @"Sample Logic NOT Ready (Veto)",
+            @"OR Int HE-Trig Stretchd Pulse ch0-3",
+            @"OR Int HE-Trig Stretchd Pulse ch4-7",
+            @"OR Int HE-Trig Stretchd Pulse ch8-11",
+            @"OR Int HE-Trig Stretchd Pulse ch12-15",
+            @"Sample Bankx Swap Cntrl NIM TI/UI Logic",
+            @"Sample Logic Bankx Armed",
+            @"Sample Logic Bank2 Flag",
+            @"LU Table 2 Coin stretched Out Pulse",
+            @"Prescaler Output Pulse",
+            @"Set",
+            @"Select and Generate Pulse",
+        };
+        int bit[17] ={1,2,3,4,8,9,16,17,18,19,20,21,22,24,25,30,31};
+        int width = 62;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"LEMO Out UO Select (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |                 Function                |    Value   |\n");
+        NSLogDivider(@"-",width);
+        
+        int i;
+        for(i =0; i < 17; i++) {
+            unsigned long theBit  = ((aValue >> bit[i]) & 0x1);
+            if(bit[i] != 30)NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:39],[theBit?@"Selected":@" -- " centered:10]);
+            else            NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:39],[theBit?@"Set":@" -- " centered:10]);
+        }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 //6.28 Internal Trigger Feedback Select register
-
+- (unsigned long) readIntTrigFeedBackSelect:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kIntTrigFeedBackSelReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[21] = {
+            @"Internal Trig Stretched Pulse Ch0",
+            @"Internal Trig Stretched Pulse Ch1",
+            @"Internal Trig Stretched Pulse Ch2",
+            @"Internal Trig Stretched Pulse Ch3",
+            @"Internal Trig Stretched Pulse Ch4",
+            @"Internal Trig Stretched Pulse Ch5",
+            @"Internal Trig Stretched Pulse Ch6",
+            @"Internal Trig Stretched Pulse Ch7",
+            @"Internal Trig Stretched Pulse Ch8",
+            @"Internal Trig Stretched Pulse Ch9",
+            @"Internal Trig Stretched Pulse Ch10",
+            @"Internal Trig Stretched Pulse Ch11",
+            @"Internal Trig Stretched Pulse Ch12",
+            @"Internal Trig Stretched Pulse Ch13",
+            @"Internal Trig Stretched Pulse Ch14",
+            @"Internal Trig Stretched Pulse Ch15",
+            @"Internal SUM-Trig Stretched Pulse Ch0-3",
+            @"Internal SUM-Trig Stretched Pulse Ch4-7",
+            @"Internal SUM-Trig Stretched Pulse Ch8-11",
+            @"Internal SUM-Trig Stretched Pulse Ch12-15",
+            @"LU Table 1 Coin Stretched Output Pulse",
+         };
+        int bit[21] ={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,24};
+        int width = 62;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Internal Trig Feedback Select (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |                 Function                |    Value   |\n");
+        NSLogDivider(@"-",width);
+        
+        int i;
+        for(i =0; i < 21; i++) {
+            unsigned long theBit  = ((aValue >> bit[i]) & 0x1);
+            NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:39],[theBit?@"Selected":@" -- " centered:10]);
+        }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 //6.29 ADC FPGA Data Transfer Control registers
 
 //6.30 ADC FPGA Data Transfer Status registers
-
+- (void) dumpFPGADataTransferStatus
+{
+    
+    int width = 94;
+    NSLog(@"\n");
+    unsigned long addr = [self singleRegister:kAdcCh1_Ch4DataStatusReg];
+    NSString* title = [NSString stringWithFormat:@"Internal Trig Feedback Select (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| Channels | Transfer Address | Pending | Max Pending | FIFO Almost Full |  Direction | Busy |\n");
+    NSLogDivider(@"-",width);
+    int i;
+    for(i=0;i<4;i++){
+        unsigned long addr = [self singleRegister:kAdcCh1_Ch4DataStatusReg + i*4];
+        unsigned long aValue =  [self readLongFromAddress:addr];
+        
+        NSLogMono(@"|  %2d -%2d  |    0x%07x    |%@|%@|%@|%@|%@|\n",
+                  i*4,i*4+3,
+                  aValue&0x3FFF,
+                  [aValue>>26&0x1 ? @"None":@"Yes"            centered:10],//pending
+                  [aValue>>27&0x1 ? @"Yes":@"No"              centered:13],//max
+                  [aValue>>28&0x1 ? @"Yes":@"No"              centered:18],//almost full
+                  [aValue>>30&0x1 ? @"FPGA->Mem":@"Mem->FPGA" centered:12],//direction
+                  [aValue>>31&0x1 ? @"YES":@"NO"              centered:6] //busy
+                  );
+        
+    }
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
 //pg 119 and on. section 2
 
 //6.1 VME FPGA – ADC FPGA Data Link Status register (page 119 and on)
-
+- (unsigned long) readVmeFpgaAdcDataLinkStatus:(BOOL)verbose
+{
+    unsigned long addr = [self singleRegister:kAdcDataLinkStatusReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        NSString* name[32] = {
+            @"ADC FPGA 1 : Hard Error",
+            @"ADC FPGA 1 : Soft Error",
+            @"ADC FPGA 1 : Frame Error",
+            @"ADC FPGA 1 : Chan up Error",
+            @"ADC FPGA 1 : Lane up Error",
+            @"ADC FPGA 1 : Hard Error Latch",
+            @"ADC FPGA 1 : Soft Error Latch",
+            @"ADC FPGA 1 : Frame Error Latch",
+            @"ADC FPGA 2 : Hard Error",
+            @"ADC FPGA 2 : Soft Error",
+            @"ADC FPGA 2 : Frame Error",
+            @"ADC FPGA 2 : Chan up Error",
+            @"ADC FPGA 2 : Lane up Error",
+            @"ADC FPGA 2 : Hard Error Latch",
+            @"ADC FPGA 2 : Soft Error Latch",
+            @"ADC FPGA 2 : Frame Error Latch",
+            @"ADC FPGA 3 : Hard Error",
+            @"ADC FPGA 3 : Soft Error",
+            @"ADC FPGA 3 : Frame Error",
+            @"ADC FPGA 3 : Chan up Error",
+            @"ADC FPGA 3 : Lane up Error",
+            @"ADC FPGA 3 : Hard Error Latch",
+            @"ADC FPGA 3 : Soft Error Latch",
+            @"ADC FPGA 3 : Frame Error Latch",
+            @"ADC FPGA 4 : Hard Error",
+            @"ADC FPGA 4 : Soft Error",
+            @"ADC FPGA 4 : Frame Error",
+            @"ADC FPGA 4 : Chan up Error",
+            @"ADC FPGA 4 : Lane up Error",
+            @"ADC FPGA 4 : Hard Error Latch",
+            @"ADC FPGA 4 : Soft Error Latch",
+            @"ADC FPGA 4 : Frame Error Latch"
+        };
+        int width = 51;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"VME FPGA-ADC Data Link Status (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"| Bit |             Name               |   Flag   |\n");
+        NSLogDivider(@"-",width);
+        
+        int i;
+        for(i =0; i < 32; i++) {
+            unsigned long theBit  = ((aValue >> i) & 0x1);
+            NSLogMono(@"|  %2d | %@ |%@|\n",i,[name[i] leftJustified:30],[theBit?@"X":@"-" centered:10]);
+        }
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 //6.2 ADC FPGA SPI BUSY Status register
 
 //6.3 Prescaler Output Pulse Divider register
-
+- (unsigned long) readPrescalerOutPulseDivider:(BOOL)verbose
+{
+    unsigned long addr   = [self singleRegister:kPrescalerOutDivReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        int width = 51;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Prescaler Output Pulse Divider (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSString* s;
+        if(aValue ==0) s = @"Disabled";
+        else           s = [NSString stringWithFormat:@"0x%08lX",aValue];
+        NSLogMono(@" Divider Value : %@\n",s);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+        
+    }
+    return aValue;
+}
 //6.4 Prescaler Output Pulse Length register
-
+- (unsigned long) readPrescalerOutPulseLength:(BOOL)verbose
+{
+    unsigned long addr   = [self singleRegister:kPrescalerOutLenReg];
+    unsigned long aValue =  [self readLongFromAddress:addr];
+    
+    if(verbose){
+        int width = 51;
+        NSLog(@"\n");
+        NSString* title = [NSString stringWithFormat:@"Prescaler Output Pulse Length (0x%lx)",addr];
+        NSLogStartTable(title, width);
+        NSString* s = [NSString stringWithFormat:@"0x%08lX",aValue];
+        NSLogMono(@" Output Pulse Length : %@\n",s);
+        NSLogDivider(@"=",width);
+        NSLog(@"\n");
+    }
+    return aValue;
+}
 //6.5 Channel 1 to 16 Internal Trigger Counters
-
+- (void) dumpInternalTriggerCounters
+{
+    unsigned long offset[16] =
+    {
+        kChan1TrigCounterReg, kChan2TrigCounterReg,  kChan3TrigCounterReg,  kChan4TrigCounterReg,
+        kChan5TrigCounterReg, kChan6TrigCounterReg,  kChan7TrigCounterReg,  kChan8TrigCounterReg,
+        kChan9TrigCounterReg, kChan10TrigCounterReg, kChan11TrigCounterReg, kChan12TrigCounterReg,
+        kChan13TrigCounterReg ,kChan14TrigCounterReg,kChan15TrigCounterReg, kChan16TrigCounterReg
+    };
+    int width = 46;
+    NSLog(@"\n");
+    unsigned long addr   = [self singleRegister:kChan1TrigCounterReg];
+    NSString* title = [NSString stringWithFormat:@"Internal Trigger Counters (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| chan |   Address  |    Count   |\n");
+    NSLogDivider(@"-",34);
+    int i;
+    for(i=0;i<16;i++){
+        unsigned long aValue =  [self readLongFromAddress:[self singleRegister:offset[i]]];
+        NSLogMono(@"| %4d | 0x%08x | 0x%08x |\n",i,[self singleRegister:offset[i]],aValue);
+    }
+    NSLogDivider(@"=",34);
+    NSLog(@"\n");
+}
 //6.6 ADC Input tap delay registers
 - (void) setSharing:(int)aValue
 {
@@ -1196,7 +2436,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) setGain:(unsigned short)aGain
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setGain:gain];
-    gain = aGain;
+    gain = aGain & 0x3;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ModelGainChanged object:self];
 }
 
@@ -1208,24 +2448,41 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) setTermination:(unsigned short)aTermination
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setTermination:termination];
-    termination = aTermination;
+    termination = aTermination & 0x1;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316ModelTerminationChanged object:self];
 }
-- (void) writeGainAndTermination
+- (void) dumpGainTerminationControl
 {
-    //for now use the same gain and termination for all channels
-    unsigned long adata = 0;
-    int iadc;
-    for( iadc = 0; iadc<kNumSIS3316Groups; iadc++){
-        for(int ic = 0; ic<kNumSIS3316ChansPerGroup; ic++){
-            unsigned int         tdata = gain  & 0x3;
-            if(termination == 0) tdata = tdata | 0x4;
-            adata |= (tdata<<(ic*8));
+    int width = 51;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kAdcGainTermCntrlReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Gain & Termination (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group | chan |   Address  |  Gain | Termination |\n");
+    NSLogDivider(@"-",width);
+    NSString* gain[4] = {
+        @"5 V",
+        @"2 V",
+        @"1.9 V",
+        @"1.9 V"
+    };
+    NSString* term[2] = {@"1K Ohm",@"50 Ohm"};
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kAdcGainTermCntrlReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int i;
+        for(i=0;i<4;i++){
+            int c1 = group*4 + i;
+            NSLogMono(@"| %4d  |  %2d  | 0x%08x |%@|%@|\n",group,c1 ,addr,[gain[aValue >> (i*8) & 0x3] centered:7],[term[aValue >> ((i*8)+2) & 0x1] centered:13]);
         }
-        [self writeLong:adata toAddress:[self groupRegister:kAdcGainTermCntrlReg group:iadc]];
-    }
-}
+       if(group!=3) NSLogDivider(@"-",width);
 
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
 //6.8 ADC Offset (DAC) Control registers
 - (unsigned short) dacOffset:(unsigned short)aGroup
 {
@@ -1242,7 +2499,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     dacOffsets[aGroup] = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316DacOffsetChanged object:self];
 }
-
+//6.9 ADC Offset
 - (void) configureAnalogRegisters
 {
     // set ADC chips via SPI
@@ -1261,10 +2518,10 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     //  set ADC offsets (DAC)
     //dacoffset[iadc] = 0x8000; //2V Range: -1 to 1V 0x8000, -2V to 0V 13000
     for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
-        [self writeLong:0x80000000 + 0x8000000 +  0xf00000 + 0x1
+        [self writeLong:0x88f00001
               toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:iadc]]; // set internal Reference
         usleep(1);
-        [self writeLong:0x80000000 + 0x2000000 +  0xf00000 + ([self dacOffset:iadc] << 4)
+        [self writeLong:0x82f00000  + ([self dacOffset:iadc] << 4)
               toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:iadc]];// clear error Latch bits
         usleep(1);
         [self writeLong:0xC0000000
@@ -1273,7 +2530,27 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
 }
 
+- (void) dumpAdcOffsetReadback
+{
+    int width = 45;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kAdcOffsetReadbackReg group:0];
+    NSString* title = [NSString stringWithFormat:@"ADC Offset (DAC) (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan  |   Address  |   Offset   |\n");
+    NSLogDivider(@"-",width);
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kAdcOffsetReadbackReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"| %4d  | %2d - %-2d | 0x%08x | 0x%08x |\n",group, c1,c2 ,addr,aValue  & 0xFFFF);
+    }
 
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
 //6.10 ADC SPI Control register
 
 //6.11 ADC SPI Readback registers
@@ -1311,9 +2588,9 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 - (void) readEventConfig:(BOOL)verbose
 {
     NSString* eventConfigString[3] = {
-        @"Input Invert Bit     ",
-        @"Internal Trigger Enable bit           ",
-        @"External Trigger Enable bit           ",
+        @"Input Invert Bit ",
+        @"Internal Trigger Enable bit",
+        @"External Trigger Enable bit",
     };
     
     if(verbose){
@@ -1503,23 +2780,38 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     }
 }
 
-- (void) readRawDataBufferConfig:(BOOL)verbose
-{
-    int i;
-    if(verbose){
-        NSLog(@"Reading Raw Data Buffer Config Sum:\n");
-        NSLog(@"rawDataLen rawDataStart:\n");
-    }
-    for(i = 0; i < kNumSIS3316Groups; i++){
-        unsigned long aValue =  [self readLongFromAddress:[self groupRegister:kRawDataBufferConfigReg group:i]];
-        if(verbose){
-            unsigned long rawDataLen   =    ((aValue >> 16) & 0xFFFF);
-            unsigned long rawDataStart =    ((aValue >> 0 ) & 0xFFFF);
-            NSLog(@"%2d: 0x%04x 0x%04x\n", i, rawDataLen, rawDataStart);
-        }
-    }
-}
 
+//6.16
+- (void) dumpRawDataBufferConfig
+{
+    int width =60;
+    NSLog(@"\n");
+    unsigned long addr   = [self groupRegister:kRawDataBufferConfigReg group:0];
+    NSString* title = [NSString stringWithFormat:@"Active Trig Gate Window (0x%lx)",addr];
+    NSLogStartTable(title, width);
+    NSLogMono(@"| group |   chan    |   Address  |    Start   |    Length   |\n");
+    NSLogDivider(@"-",width);
+    
+    int group;
+    for(group=0;group<kNumSIS3316Groups;group++){
+        addr   = [self groupRegister:kRawDataBufferConfigReg group:group];
+        unsigned long aValue = [self readLongFromAddress:addr];
+        int c1 = group*4;
+        int c2 = group*4+3;
+        NSLogMono(@"|   %d   |  %2d - %-2d  | 0x%08x | 0x%08x |  0x%08x |\n",
+                  group,
+                  c1 ,
+                  c2 ,
+                  addr,
+                  aValue     & 0xFFFF,
+                  aValue>>16 & 0xFFFF
+                  );
+        
+    }
+    
+    NSLogDivider(@"=",width);
+    NSLog(@"\n");
+}
 //6.18 Pileup Configuration registers
 - (unsigned long)   pileUpWindowLength
 {
@@ -1818,56 +3110,18 @@ NSString* cfdCntrlString[4] = {
 //6.25 FIR Trigger Setup registers
 - (void) configureFIR
 {
-    unsigned long data;
-    // set FIR Trigger Setup
-    int ichan;
-    for (ichan=0;ichan<kNumSIS3316Channels;ichan++) {
-
-        [self writeLong:(riseTime[ichan]&0xFFF) | ((gapTime[ichan]&0xFFF) << 12) toAddress:[self channelRegister:kFirTrigSetupCh1Reg channel:ichan]];
-        
-        //FIR Thresh
-
-        data =  ([self enabled:ichan]              << 31)       |
-                ([self heSuppressTriggerBit:ichan] << 30)       |
-                ((0x3 & (cfdControlBits[ichan]+1)) << 28)       |
-                (0x08000000 + (riseTime[ichan]*threshold[ichan]));
-        [self writeLong:data toAddress:[self channelRegister:kTrigThresholdCh1Reg channel:ichan]];
-        
-        //High Energy Threshold
-        data= 0xFFF & heTrigThreshold[ichan];
-        
-        
-        [self writeLong:data toAddress:[self channelRegister:kHiEnergyTrigThresCh1Reg channel:ichan]];
-    }
-    
-    // set FIR Block Trigger Setup
-    int iadc;
-    for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
-        unsigned long rootAdd = [self baseAddress] + (iadc + 1)*kSIS3316FpgaAdcRegOffset;
-        // sum dir trigger setup
-        [self writeLong:0 toAddress:rootAdd + 0x80];
-        [self writeLong:(riseTimeSum[iadc]&0xFFF) | ((gapTimeSum[iadc]&0xFFF) << 12) toAddress:rootAdd + 0x80];
-
-        //FIR Thresh
-        data= ((0x1 & enableSum[iadc]) << 31)                   |
-              ((0x1 & [self heSuppressTriggerBit:iadc]) << 30)  |
-              ((0x3 & cfdControlBitsSum[iadc]) << 28 )          |
-              (0x08000000 + (riseTimeSum[iadc] * thresholdSum[iadc]) );
-        [self writeLong:data toAddress:rootAdd + 0x84];
-
-        //High Energy Threshold
-        data = 0xFFF & heTrigThresholdSum[iadc];
-        [self writeLong:data toAddress:rootAdd + 0x88];
+    [self writeThresholds];
+    [self writeHeTrigThresholds];
+    [self writeHeTrigThresholdSum];
+    [self writeThresholdSum];
+    [self writeFirTriggerSetup];
 
 //        addr = [self baseAddress]
 //        + kSIS3316FpgaAdcRegOffset*iadc
-//        + 0x1090;
+//        + 0xc090;
 //
 //        data=triggerstatmode_block[iadc];
 //        [self writeLong:data toAddress:addr];
-    }
-    
-    
 }
 
 - (void) writeFirTriggerSetup
@@ -1885,9 +3139,10 @@ NSString* cfdCntrlString[4] = {
     int i;
     for(i = 0; i < kNumSIS3316Channels; i++) {
         unsigned long aValue =  ((unsigned long)((enabledMask>>i) & 0x1) << 31)  |
-                                (((heSuppressTriggerMask>>i) & 0x1) << 30)  |
+                                ((unsigned long)((heSuppressTriggerMask>>i) & 0x1) << 30)  |
                                 ((cfdControlBits[i]+1        & 0x3) << 28)  |
-                                (0x08000000 + (riseTime[i] * threshold[i]));
+                                // (0x08000000 + (riseTime[i] * threshold[i]));
+                                (0x08000000 + [self threshold:i]);
         [self writeLong:aValue toAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]];
     }
 }
@@ -1922,57 +3177,17 @@ NSString* cfdCntrlString[4] = {
         unsigned long data= ((0x1 & enableSum[i]) << 31)                   |
                             ((0x1 & [self heSuppressTriggerBit:i]) << 30)  |
                             ((0x3 & cfdControlBitsSum[i]) << 28 )          |
-                             (0x08000000 + (riseTimeSum[i] * thresholdSum[i]) );
+                            //(0x08000000 + (riseTimeSum[i] * thresholdSum[i]) );
+                            (0x08000000 + [self thresholdSum:i]);
         [self writeLong:data toAddress:[self groupRegister:kTrigThreholdSumCh1Ch4Reg group:i]];
     }
 }
 
-- (void) readThresholds:(BOOL)verbose
-{
-    int i;
-    if(verbose){
-        NSLogStartTable(@"FIR Trigger Reg",54);
-        NSLogMono(@"| Ch | Enabled | HESupp |      CDF      |  Threshold |\n");
-        NSLogDivider(@"-",54);
 
-    }
-    for(i =0; i < kNumSIS3316Channels; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self channelRegister:kTrigThresholdCh1Reg channel:i]];
-         if(verbose){
-            unsigned long thres  = (aValue & 0x0FFFFFFF);
-            unsigned long cfdCnt = ((aValue>>28) & 0x3);
-            unsigned long heSup  = ((aValue>>30) & 0x1);
-            unsigned long enabl  = ((aValue>>31) & 0x1);
-            NSLogMono(@"| %2d | %@ | %@ | %@ | 0x%08x |\n",i,
-                      [enabl?@"YES":@" NO" centered:7],
-                      [heSup?@"YES":@" NO" centered:6],
-                      [cfdCntrlString[cfdCnt] centered:13],
-                      thres);
-        }
-    }
-    if(verbose){
-        NSLogDivider(@"=",54);
-    }
-}
-
-- (void) readThresholdSum:(BOOL)verbose
-{
-    int i;
-    if(verbose){
-        NSLog(@"Reading Threshold Sum:\n");
-    }
-    for(i = 0; i < kNumSIS3316Groups; i++){
-        unsigned long aValue =  [self readLongFromAddress:[self groupRegister:kTrigThreholdSumCh1Ch4Reg group:i]];
-        if(verbose){
-            unsigned long threshSum = (aValue & 0xFFFFFFFF);
-            NSLog(@"%2d: 0x%08x\n", i, threshSum);
-        }
-    }
-}
 
 //6.27 High Energy Trigger Threshold registers
 NSString* intTrigOutPulseString[3] = {
-    @"Internal    ",
+    @"Internal",
     @"High Energy ",
     @"Pileup Pulse"
 };
@@ -2353,47 +3568,6 @@ NSString* intTrigOutPulseString[3] = {
             NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate4Len, gate4Start)  ;
         }
     }
-//---------------------------------------------------------------------
-    if(verbose)NSLog(@"gate5Len gate5Start:\n");
-    for(i =0; i < kNumSIS3316Groups; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self groupRegister:kAccGate5ConfigReg group:i]];
-          if(verbose){
-             unsigned long gate5Len      = ((aValue >> 16) & 0x1FF)  ;
-             unsigned long gate5Start    = ((aValue >> 0 ) & 0xFFFF)  ;
-             NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate5Len, gate5Start)  ;
-         }
-    }
-//--------------------------------------------------------------------
-    if(verbose)NSLog(@"gate6Len gate6Start:\n");
-    for(i =0; i < kNumSIS3316Groups; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self groupRegister:kAccGate6ConfigReg group:i]];
-        if(verbose){
-            unsigned long gate6Len      = ((aValue >> 16) & 0x1FF)  ;
-            unsigned long gate6Start    = ((aValue >> 0 ) & 0xFFFF)  ;
-            NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate6Len, gate6Start)  ;
-        }
-    }
-//--------------------------------------------------------------------
-    if(verbose)NSLog(@"gate7Len gate7Start:\n");
-    for(i =0; i < kNumSIS3316Groups; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self groupRegister:kAccGate7ConfigReg group:i]];
-        if(verbose){
-            unsigned long gate7Len      = ((aValue >> 16) & 0x1FF)  ;
-            unsigned long gate7Start    = ((aValue >> 0 ) & 0xFFFF)  ;
-            NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate7Len, gate7Start)  ;
-        }
-    }
-//---------------------------------------------------------------------
-    if(verbose)NSLog(@"gate8Len gate8Start:\n");
-    for(i =0; i < kNumSIS3316Groups; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self groupRegister:kAccGate8ConfigReg group:i]];
-       if(verbose){
-           unsigned long gate8Len      = ((aValue >> 16) & 0x1FF)  ;
-           unsigned long gate8Start    = ((aValue >> 0 ) & 0xFFFF)  ;
-           NSLog(@"%2d: 0x%03x 0x%03x \n ",i, gate8Len, gate8Start)  ;
-       }
-    }
-//--------------------------------------------------------------------
 }
 
 //6.32 FIR Energy Setup registers
@@ -2488,41 +3662,6 @@ NSString* tauTable[4] ={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316GapTimeChanged object:self userInfo:userInfo];
 }
 
-- (void) writeFirEnergySetup
-{
-    int i;
-    for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long aValue =  ([self tauTableBits:i]    << 30) |
-                                ([self extraFilterBits:i] << 22) |
-                                ([self tauFactor:i]       << 24) |
-                                ([self gapTime:i]         << 12) |
-                                [self riseTime:i];
-
-
-        [self writeLong:0 toAddress:[self channelRegisterVersionTwo:kFirEnergySetupCh1Reg channel:i]];
-        [self writeLong:aValue toAddress:[self channelRegisterVersionTwo:kFirEnergySetupCh1Reg channel:i]];
-    }
-}
-
-- (void) readFirEnergySetup:(BOOL)verbose
-{
-    int i;
-    if(verbose){
-        NSLog(@"Reading FIR Energy Setup:\n");
-        NSLogFont([NSFont fontWithName:@"Monaco" size:12],@"TauTable TauFactor GapTime PeakingTime  ExtraFilter \n");
-    }
-    for(i =0; i < kNumSIS3316Channels; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self channelRegisterVersionTwo:kFirEnergySetupCh1Reg channel:i]];
-        if(verbose){
-            unsigned long theTauTable    = ((aValue >> 30) & 0x003);
-            unsigned long theTauFactor   = ((aValue >> 24) & 0x03F);
-            unsigned long theExtraFilter = ((aValue >> 22) & 0x003);
-            unsigned long theGapTime     = ((aValue >> 12) & 0xFFF);
-            unsigned long thePeakTime    = ((aValue >>  0) & 0xFFF);
-            NSLogFont([NSFont fontWithName:@"Monaco" size:12],@"%2d: %@ 0x%08x 0x%08x 0x%08x %@\n",i, tauTable[theTauTable], theTauFactor , theGapTime, thePeakTime, extraFilter[theExtraFilter]);
-        }
-    }
-}
 
 //6.33 Energy Histogram Configuration registers
 - (long) histogramsEnabledMask                       { return histogramsEnabledMask;                             }
@@ -2630,40 +3769,6 @@ NSString* tauTable[4] ={
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnergySubtractorChanged object:self userInfo:userInfo];
 }
 
-- (void) writeHistogramConfiguration
-{
-    int i;
-    for(i = 0; i < kNumSIS3316Channels; i++) {
-        unsigned long aValue =  (((histogramsEnabledMask>>i)     & 0x1)     << 0 )  |
-                                (((pileupEnabledMask>>i)         & 0x1)     << 1 )  |
-                                ((energySubtractor[i]            & 0xFF)    << 8 )  |
-                                ((energyDivider[i]               & 0xFFF)   << 16)  |
-                                (((clrHistogramsWithTSMask>>i)   & 0x1)     << 30)  |
-                                ((writeHitsToEventMemoryMask>>i  & 0x1)     << 31)  ;
-        [self writeLong:aValue toAddress:[self channelRegisterVersionTwo:kEnergyHistoConfigCh1Reg channel:i]];
-    }
-}
-
-- (void) readHistogramConfiguration:(BOOL)verbose
-{
-    int i;
-    if(verbose){
-        NSLog(@"Reading Histogram Configuration:\n");
-        NSLog(@"Enabled PU ClrW/TS Hits division subtraction \n");
-    }
-    for(i =0; i < kNumSIS3316Channels; i++) {
-        unsigned long aValue =  [self readLongFromAddress:[self channelRegisterVersionTwo:kEnergyHistoConfigCh1Reg channel:i]];
-        if(verbose){
-            BOOL theHistogramsEnabled           = ((aValue >> 0) & 0x1)     ;
-            BOOL thePileupEnabled               = ((aValue >> 1) & 0x1)     ;
-            BOOL theClrHistogramsWithTS         = ((aValue >> 30) & 0x1)    ;
-            BOOL theWriteHitsToEventMemory      = ((aValue >> 31) & 0x1)    ;
-            unsigned short theEnergyDivider     = ((aValue >> 16) & 0xFFF)  ;
-            unsigned short theEnergySubtractor  = ((aValue >> 8 ) & 0xFF)   ;
-            NSLog(@"%2d: %@ %@ %@ %@  0x%08x 0x%08x\n",i, theHistogramsEnabled?@"YES":@" NO ", thePileupEnabled?@"YES":@" NO ", theClrHistogramsWithTS?@"YES":@" NO ", theWriteHitsToEventMemory?@"YES":@" NO ", theEnergyDivider,theEnergySubtractor);
-        }
-    }
-}
 
 //6.34 MAW Start Index and Energy Pickup Configuration registers
 
@@ -2809,7 +3914,7 @@ NSString* tauTable[4] ={
 
 - (void) writeGateLengthConfiguration
 {
-    unsigned int internalGateConfigRegisterAddresses[kNumSIS3316Groups] = {
+    unsigned long internalGateConfigRegisterAddresses[kNumSIS3316Groups] = {
         kInternalGateLenConfigReg,
         kInternalGateLenConfigReg,
         kInternalGateLenConfigReg,
@@ -2838,10 +3943,17 @@ NSString* tauTable[4] ={
 - (void) initBoard
 {
     [self reset];
+    //setup from the 3316 examples
+    [self getFrequency:0];
+    [self write_channel_header_ID:[self baseAddress] & 0xff000000] ;
+    [self adcSpiSetup];
+    //[self configure_all_adc_dac_offsets];
+    //[self write_all_adc_dac_offsets];
+    //[self configureAnalogRegisters];
+    [self write_all_gain_termination_values];
+    
     [self resetADCClockDCM];
     [self setClockFreq];
-    [self writeGainAndTermination];
-    [self configureAnalogRegisters];
     [self writePileUpRegisters];
     [self writeActiveTrigGateWindowLen];
     [self writePreTriggerDelays];
@@ -2855,17 +3967,266 @@ NSString* tauTable[4] ={
     
     [self configureFIR];
     
-    [self writeFirEnergySetup];
     [self writeFirTriggerSetup];
     [self writeTriggerDelay];
     [self writeNIMControlStatus];
-    [self writeHistogramConfiguration];
     [self writeExtendedEventConfig];
     [self writeLemoCoMask];
     [self writeLemoToMask];
     [self writeLemoUoMask];
     
     [self writeGateLengthConfiguration];
+}
+#pragma mark •••Setup Utilities
+- (void) getFrequency:(int)osc
+{
+    [self si570ReadDivider:osc data:freqSI570_calibrated_value_125MHz];
+
+    //---------------------------------------------------------------------------------
+    //???? not used in the 3316 example code. Included here but not used in ORCA either
+    freqPreset62_5MHz[0] = 0x23;
+    freqPreset62_5MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
+    freqPreset62_5MHz[2] = freqSI570_calibrated_value_125MHz[2];
+    freqPreset62_5MHz[3] = freqSI570_calibrated_value_125MHz[3];
+    freqPreset62_5MHz[4] = freqSI570_calibrated_value_125MHz[4];
+    freqPreset62_5MHz[5] = freqSI570_calibrated_value_125MHz[5];
+    
+    freqPreset125MHz[0] = 0x21;
+    freqPreset125MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
+    freqPreset125MHz[2] = freqSI570_calibrated_value_125MHz[2];
+    freqPreset125MHz[3] = freqSI570_calibrated_value_125MHz[3];
+    freqPreset125MHz[4] = freqSI570_calibrated_value_125MHz[4];
+    freqPreset125MHz[5] = freqSI570_calibrated_value_125MHz[5];
+    
+    freqPreset250MHz[0] = 0x20;
+    freqPreset250MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
+    freqPreset250MHz[2] = freqSI570_calibrated_value_125MHz[2];
+    freqPreset250MHz[3] = freqSI570_calibrated_value_125MHz[3];
+    freqPreset250MHz[4] = freqSI570_calibrated_value_125MHz[4];
+    freqPreset250MHz[5] = freqSI570_calibrated_value_125MHz[5];
+    //---------------------------------------------------------------------------------
+}
+
+- (int) adcSpiSetup
+{
+    unsigned long adc_chip_id;
+    unsigned long addr, data;
+    unsigned i_adc_fpga_group;
+    unsigned i_adc_chip;
+    
+    // disable ADC output
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        [self writeLong:0x0 toAddress:[self groupRegister:kAdcSpiControlReg group:i_adc_fpga_group]];
+    }
+    
+    // dummy loop to access each adc chip one time after power up -- add 12.02.2015
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
+            [self adc_spi_read_group:i_adc_fpga_group chip:i_adc_chip address:1 data:&data];
+        }
+    }
+    
+    // reset
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
+            [self adc_spi_write_group:i_adc_fpga_group chip:i_adc_chip address: 0x0 data:0x24]; // soft reset
+        }
+        usleep(10) ; // after reset
+    }
+    
+    [self adc_spi_read_group:0 chip:0 address:1 data:&adc_chip_id]; // read chip Id from adc chips ch1/2
+    
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
+            [self adc_spi_read_group:i_adc_fpga_group chip: i_adc_chip address: 1 data:&data];
+            if (data != adc_chip_id) {
+                NSLog(@"i_adc_fpga_group = %d   i_adc_chip = %d    data = 0x%08x     adc_chip_id = 0x%08x     \n", i_adc_fpga_group, i_adc_chip, data, adc_chip_id);
+                return -1 ;
+            }
+        }
+    }
+    
+    adc_125MHz_flag = 0;
+    if ((adc_chip_id&0xff) == 0x32) {
+        adc_125MHz_flag = 1;
+    }
+    
+    
+    // reg 0x14 : Output mode
+    if (adc_125MHz_flag == 0) { // 250 MHz chip AD9643
+        data = 0x04 ;     //  Output inverted (bit2 = 1)
+    }
+    else { // 125 MHz chip AD9268
+        data = 0x40 ;     // Output type LVDS (bit6 = 1), Output inverted (bit2 = 0) !
+    }
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
+            [self adc_spi_write_group:i_adc_fpga_group chip:i_adc_chip address: 0x14 data: data];
+        }
+    }
+    
+    
+    // reg 0x18 : Reference Voltage / Input Span
+    if (adc_125MHz_flag == 0) { // 250 MHz chip AD9643
+        data = 0x0 ;     //  1.75V
+    }
+    else { // 125 MHz chip AD9268
+        //data = 0x8 ;     //  1.75V
+        data = 0xC0 ;     //  2.0V
+    }
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
+            [self adc_spi_write_group: i_adc_fpga_group chip:i_adc_chip address: 0x18 data: data];
+        }
+    }
+
+    // reg 0xff : register update
+    data = 0x01 ;     // update
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
+            [self adc_spi_write_group:i_adc_fpga_group chip: i_adc_chip address: 0xff data: data];
+        }
+    }
+    
+    // enable ADC output
+    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
+        addr = [self groupRegister:kAdcSpiControlReg group:i_adc_fpga_group];
+        [self writeLong:0x1000000 toAddress:addr];
+    }
+    
+    
+    return 0 ;
+}
+
+- (int) adc_spi_read_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long*) spi_data
+{
+    unsigned int pollcounter = 1000;
+    
+    if (adc_fpga_group > 4) {return -1;}
+    if (adc_chip > 2)       {return -1;}
+    if (spi_addr > 0x1fff)  {return -1;}
+    
+    unsigned long uint_adc_mux_select;
+    if (adc_chip == 0)  uint_adc_mux_select = 0 ;    // adc chip ch1/ch2
+    else                uint_adc_mux_select = 0x400000 ; // adc chip ch3/ch4
+    
+    // read register to get the information of bit 24 (adc output enabled)
+    unsigned long data = [self readLongFromAddress:[self groupRegister:kAdcSpiControlReg group:adc_fpga_group]];
+    data = data & 0x01000000 ; // save bit 24
+    
+    data =  data + 0xC0000000 + uint_adc_mux_select + ((spi_addr & 0x1fff) << 8);
+    [self writeLong:data toAddress:[self groupRegister:kAdcSpiControlReg group:adc_fpga_group]];
+
+    unsigned long addr = [self singleRegister: kAdcSpiBusyStatusReg] ;
+    do { // the logic is appr. 20us busy
+        data = [self readLongFromAddress:addr];
+        pollcounter--;
+    } while (((data & 0x0000000f) != 0x00000000) && (pollcounter > 0));
+
+    if (pollcounter == 0) return -2 ;
+    
+    usleep(20) ; //
+    
+    data = [self readLongFromAddress:[self groupRegister:kAdcSpiReadbackReg group:adc_fpga_group]];
+    
+    *spi_data = data & 0xff ;
+    return 0 ;
+}
+- (int) adc_spi_write_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long) spi_data
+{
+    unsigned int  pollcounter = 1000;
+    
+    if (adc_fpga_group > 4) {return -1;}
+    if (adc_chip > 2)       {return -1;}
+    if (spi_addr > 0xffff)  {return -1;}
+    
+    unsigned int uint_adc_mux_select;
+    if (adc_chip == 0)  uint_adc_mux_select = 0 ;    // adc chip ch1/ch2
+    else                uint_adc_mux_select = 0x400000 ; // adc chip ch3/ch4
+    
+    // read register to get the information of bit 24 (adc output enabled)
+    unsigned long data = [self readLongFromAddress:[self groupRegister:kAdcSpiControlReg group:adc_fpga_group]];
+    data = data & 0x01000000 ; // save bit 24
+    data =  data + 0x80000000 + uint_adc_mux_select + ((spi_addr & 0xffff) << 8) + (spi_data & 0xff) ;
+    [self writeLong:data toAddress:[self groupRegister:kAdcSpiControlReg group:adc_fpga_group]];
+    
+    unsigned long addr = [self singleRegister: kAdcSpiBusyStatusReg] ;
+    do { // the logic is appr. 20us busy
+        data = [self readLongFromAddress:addr];
+        pollcounter--;
+    } while (((data & 0x0000000f) != 0x00000000) && (pollcounter > 0));
+
+    if (pollcounter == 0) {return -2 ; }
+    return 0 ;
+}
+
+- (void) write_channel_header_ID:(unsigned int) channel_header_id_reg_value
+{
+    // Channel Header ID register
+    unsigned long data =   channel_header_id_reg_value;
+    [self writeLong:data            toAddress:[self groupRegister:kChanHeaderIdReg group:0]];
+    [self writeLong:data + 0x400000 toAddress:[self groupRegister:kChanHeaderIdReg group:1]];
+    [self writeLong:data + 0x800000 toAddress:[self groupRegister:kChanHeaderIdReg group:2]];
+    [self writeLong:data + 0xC00000 toAddress:[self groupRegister:kChanHeaderIdReg group:3]];
+}
+
+- (void) configure_all_adc_dac_offsets
+{
+    unsigned int dac_offset ;
+    unsigned int i_adc_fpga_group;
+    
+    for (i_adc_fpga_group=0;i_adc_fpga_group<4;i_adc_fpga_group++) {
+        dac_offset = dacOffsets[i_adc_fpga_group];
+        [self writeLong:0x88f00000 + 0x1 toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:i_adc_fpga_group]];// Standalone mode, set Internal Reference
+        [self poll_on_adc_dac_offset_busy];
+        [self writeLong:0xC0000000       toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:i_adc_fpga_group]];// CMD: DAC LDAC (load)
+        [self poll_on_adc_dac_offset_busy];
+    }
+}
+
+- (void) poll_on_adc_dac_offset_busy
+{
+    unsigned int poll_counter = 1000 ;
+    unsigned long data;
+    do {
+        poll_counter-- ;
+        data = [self readLongFromAddress:[self singleRegister:kAdcSpiBusyStatusReg]];
+    } while ( ((data & 0xf) != 0) && (poll_counter > 0)) ;
+}
+
+- (void) write_all_adc_dac_offsets
+{
+    unsigned int i_adc_fpga_group;
+    
+    for (i_adc_fpga_group=0;i_adc_fpga_group<4;i_adc_fpga_group++) {
+        
+        unsigned long addr = [self groupRegister:kAdcOffsetDacCntrlReg group:i_adc_fpga_group]; //group address
+        
+        [self writeLong:0x82000000 + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ A
+        [self poll_on_adc_dac_offset_busy];
+        
+        [self writeLong:0x82100000 + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ B
+        [self poll_on_adc_dac_offset_busy];
+        
+        [self writeLong:0x82200000  + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ C
+        [self poll_on_adc_dac_offset_busy];
+        
+        [self writeLong:0x82300000  + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ D
+        [self poll_on_adc_dac_offset_busy];
+        
+        [self writeLong:0xC0000000 toAddress:addr]; //LOAD
+        [self poll_on_adc_dac_offset_busy];
+    }
+}
+
+- (void) write_all_gain_termination_values
+{
+    unsigned int i_adc_fpga_group;
+    unsigned long all = termination<<2 | gain;
+    unsigned long aValue = all | (all<<8) | (all<<16) | (all<<24);
+    for (i_adc_fpga_group=0; i_adc_fpga_group<4; i_adc_fpga_group++) {
+        [self writeLong:aValue toAddress:[self groupRegister:kAdcGainTermCntrlReg group:i_adc_fpga_group]];
+    }
 }
 
 #pragma mark •••Data Taker
@@ -3121,7 +4482,9 @@ NSString* tauTable[4] ={
 //                } (run == 1)
 //    9. Disarm command
     
-
+    unsigned long bankSampleAddr[4] = {0x1120,0x1124,0x1128,0x112c};
+    unsigned long dataOffsetBank1[4] = {0x00000000,0x02000000,0x00000000,0x02000000};
+    unsigned long dataOffsetBank2[4] = {0x01000000,0x03000000,0x01000000,0x03000000};
     @try {
         isRunning = YES;
         if(waitingOnChannelMask == 0x0){
@@ -3136,44 +4499,35 @@ NSString* tauTable[4] ={
             int i;
             for(i=0;i<kNumSIS3316Channels;i++){
                 if((enabledMask>>i) & 0x1){
-                    unsigned long prevBankEndingAddress = [self readLongFromAddress:[self channelRegisterVersionTwo:kPreviousBankSampleCh1Reg channel:i]];
+                    int group = i%4;
+                    unsigned long prevBankEndingAddress = [self readLongFromAddress:[self baseAddress]+bankSampleAddr[group]];
                     //bit 24 is 0 for bank1, 1 for bank2. currentBank is 1 or 2
                     if(((prevBankEndingAddress>>24) & 0x1) != currentBank-1){
                         waitingOnChannelMask &= ~(0x1L << i);
                     }
                 
-  
                     if(!((waitingOnChannelMask>>i) & 0x1)){
-                        unsigned int memory_bank_offset_addr ;
-
-                        if (currentBank == 1) memory_bank_offset_addr = 0x01000000; // Bank2 offset
-                        else                  memory_bank_offset_addr = 0x00000000; // Bank1 offset
-                        
-                        if ((i & 0x1) != 0x1) { // 0,1
-                                memory_bank_offset_addr = memory_bank_offset_addr + 0x00000000; // channel 1 , 3, ..... 15
-                        }
-                        else {
-                            memory_bank_offset_addr = memory_bank_offset_addr + 0x02000000; // channel 2 , 4, ..... 16
-                        }
-                        
-                        if ((i & 0x2) != 0x2) { // 0,2
-                            memory_bank_offset_addr = memory_bank_offset_addr + 0x00000000; // channel 0,1 , 4,5, .....
-                        }
-                        else {
-                            memory_bank_offset_addr = memory_bank_offset_addr + 0x10000000; // channel 2,3 , 6,7 .....
-                        }
-                        //transfer data to fifo
-                        unsigned long addr = 0x80 + (((i >> 2) & 0x3) * 4) ;
-                        unsigned long data = 0x80000000 + memory_bank_offset_addr ;
-                        [self writeLong:data toAddress: [self baseAddress] + addr];
-                        [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
                         
                         unsigned long expectedNumberOfWords = prevBankEndingAddress & 0x00FFFFFF;
                         if(expectedNumberOfWords>0 ){
-                            if(expectedNumberOfWords>4096)expectedNumberOfWords = 4096;
-                            addr = 0x100000 + (((i >> 2) & 0x3 )* 0x100000)  ;
+                            if(i&0x1 == 0){
+                                //only transfer once for 0,1  | 2,3 | etc...
+                                unsigned long memory_bank_offset_addr ;
+                                if (currentBank == 1) memory_bank_offset_addr = dataOffsetBank1[i]; // Bank1 offset
+                                else                  memory_bank_offset_addr = dataOffsetBank2[i]; // Bank2 offset
+                            
+                                //transfer data to fifo
+                                unsigned long addr = 0x80 + (group * 4) ;
+                                unsigned long data = 0x80000000 + memory_bank_offset_addr ;
+                                [self writeLong:data toAddress: [self baseAddress] + addr];
+                                //NSLog(@"Transfer | addr: 0x%0x data: 0x%08x\n",addr,data);
+                                [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
+                            }
+                           // NSLog(@"chan: %d getting %d words\n",i,expectedNumberOfWords);
+                            if(expectedNumberOfWords>4096)expectedNumberOfWords = 4096; //tmp TBD..make variable
+                            unsigned long addr = 0x100000 + (group * 0x100000)  ;
                             dataBuffer[0] = dataId | rawDataBufferLen+2;
-                            dataBuffer[1] = location;
+                            dataBuffer[1] = location | ((i & 0x000000ff)<<8); //add in the channel
                             [[self adapter] readLongBlock:&dataBuffer[2]
                                                 atAddress:addr
                                                 numToRead:rawDataBufferLen
@@ -3181,15 +4535,15 @@ NSString* tauTable[4] ={
                                             usingAddSpace:0x01];
                             
                             //----test output------
-                            unsigned long formatBits     = dataBuffer[2] & 0xf;
-                            unsigned long chanID         = dataBuffer[2]>>4 & 0xfff;
-                            unsigned long long tsHi      = (dataBuffer[2]>>16);
-                            unsigned long long timeStamp = (tsHi << 32) | dataBuffer[3];
-                            NSLog(@"=========================\n");
-                            NSLog(@"rawDataBufferLen: %d\n",rawDataBufferLen);
-                            NSLog(@"formatBits: 0x%x\n",formatBits);
-                            NSLog(@"chanID: 0x%x\n",chanID);
-                            NSLog(@"timeStamp: 0x%llx\n",timeStamp);
+//                            unsigned long formatBits     = dataBuffer[2] & 0xf;
+//                            unsigned long chanID         = dataBuffer[2]>>4 & 0xfff;
+//                            unsigned long long tsHi      = (dataBuffer[2]>>16);
+//                            unsigned long long timeStamp = (tsHi << 32) | dataBuffer[3];
+//                            NSLog(@"=========================\n");
+//                            NSLog(@"rawDataBufferLen: %d\n",rawDataBufferLen);
+//                            NSLog(@"formatBits: 0x%x\n",formatBits);
+//                            NSLog(@"chanID: 0x%x\n",chanID);
+//                            NSLog(@"timeStamp: 0x%llx\n",timeStamp);
                             //------------------------
                             
                             [aDataPacket addLongsToFrameBuffer:dataBuffer length:rawDataBufferLen+2];
@@ -3633,6 +4987,60 @@ NSString* tauTable[4] ={
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
     return aValue;
+}
+
+#pragma mark •••Reporting
+- (void) dumpChan0
+{
+    [self readModuleID:YES];
+    [self readHWVersion:YES];
+    [self readTemperature:YES];
+    [self readSerialNumber:YES];
+    [self readVetoGateDelayReg:YES];
+    [self readClockSource:YES];
+    [self readFpBusControl:YES];
+    [self readNIMControlStatus:YES];
+    [self readAcquisitionRegister:YES];
+    [self readTrigCoinLUControl:YES];
+    [self readTrigCoinLUAddress:YES];
+    [self readTrigCoinLUData:YES];
+    [self readLemoOutCOSelect:YES];
+    [self readLemoOutTOSelect:YES];
+    [self readLemoOutUOSelect:YES];
+    [self readIntTrigFeedBackSelect:YES];
+    
+    [self dumpFPGADataTransferStatus];
+    [self readVmeFpgaAdcDataLinkStatus:YES];
+    [self readPrescalerOutPulseDivider:YES];
+    [self readPrescalerOutPulseLength:YES];
+    [self dumpInternalTriggerCounters];
+    [self dumpGainTerminationControl];
+    [self dumpAdcOffsetReadback];
+    [self dumpEventConfiguration];
+    [self dumpExtendedEventConfiguration];
+    [self dumpChannelHeaderID];
+    [self dumpEndAddressThreshold];
+    [self dumpActiveTrigGateWindowLen];
+    [self dumpRawDataBufferConfig];
+    [self dumpPileupConfig];
+    [self dumpPreTriggerDelay];
+    [self dumpAveConfig];
+    [self dumpDataFormatConfig];
+    [self dumpMawTestBufferConfig];
+    [self dumpInternalTriggerDelayConfig];
+    [self dumpInternalGateLengthConfig];
+    [self dumpFirTriggerSetup];
+    [self dumpSumFirTriggerSetup];
+    [self dumpTriggerThreshold];
+    [self dumpSumTriggerThreshold];
+    [self dumpHeTriggerThreshold];
+    [self dumpHeSumTriggerThreshold];
+    [self dumpStatisticCounterMode];
+    [self dumpPeakChargeConfig];
+    [self dumpExtededRawDataBufferConfig];
+    [self dumpAccumulatorGates];
+    [self dumpFirmwareVersion];
+    [self dumpFPGAStatus];
 }
 
 @end

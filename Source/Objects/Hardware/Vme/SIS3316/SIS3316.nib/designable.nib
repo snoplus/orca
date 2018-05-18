@@ -2,7 +2,6 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment version="1060" identifier="macosx"/>
-        <development version="8000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -97,7 +96,6 @@
                 <outlet property="writeEventConfigButton" destination="IFo-Mx-NHl" id="hgh-dd-g8q"/>
                 <outlet property="writeHistogramConfigurationButton" destination="7OC-q6-dxU" id="L3I-zF-ejv"/>
                 <outlet property="writeHitsIntoEventMemoryMatrix" destination="uag-t6-WK9" id="6gd-SD-YY2"/>
-                <outlet property="writeThresholdButton" destination="2188" id="2193"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
@@ -1067,7 +1065,6 @@
                                                                 </cells>
                                                                 <connections>
                                                                     <action selector="thresholdAction:" target="-2" id="2008"/>
-                                                                    <outlet property="formatter" destination="387" id="1657"/>
                                                                 </connections>
                                                             </matrix>
                                                             <matrix verticalHuggingPriority="750" misplaced="YES" mode="track" allowsEmptySelection="NO" autosizesCells="NO" id="ZIG-r5-1fr">
@@ -1759,28 +1756,6 @@
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <button verticalHuggingPriority="750" misplaced="YES" id="2188">
-                                                                <rect key="frame" x="557" y="1" width="61" height="28"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Write" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2879">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="writeThresholdsAction:" target="-2" id="2194"/>
-                                                                </connections>
-                                                            </button>
-                                                            <button verticalHuggingPriority="750" misplaced="YES" id="2190">
-                                                                <rect key="frame" x="482" y="1" width="61" height="28"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Read" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2880">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="readThresholdsAction:" target="-2" id="2195"/>
-                                                                </connections>
-                                                            </button>
                                                             <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="s7x-Eg-Umi">
                                                                 <rect key="frame" x="86" y="40" width="96" height="352"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -3446,6 +3421,50 @@
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
+                                                            <button verticalHuggingPriority="750" misplaced="YES" id="2190">
+                                                                <rect key="frame" x="251" y="-2" width="119" height="28"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Dump Thresholds" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2880">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="dumpThresholdsAction:" target="-2" id="RIM-9b-TsT"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button verticalHuggingPriority="750" misplaced="YES" id="KIb-sf-HTC">
+                                                                <rect key="frame" x="396" y="-2" width="89" height="28"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Dump DACs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="bcO-xx-6Po">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="dumpDACsAction:" target="-2" id="Eue-rc-81k"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button verticalHuggingPriority="750" misplaced="YES" id="yj9-S2-8ni">
+                                                                <rect key="frame" x="499" y="-2" width="90" height="28"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Dump Gains" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="8vM-Eb-ae5">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="dumpGainsAction:" target="-2" id="ltE-05-3ub"/>
+                                                                </connections>
+                                                            </button>
+                                                            <button verticalHuggingPriority="750" misplaced="YES" id="19e-iR-Jua">
+                                                                <rect key="frame" x="592" y="-2" width="132" height="28"/>
+                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                                <buttonCell key="cell" type="push" title="Dump Trigger Setup" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="aKg-w6-Nlq">
+                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                                    <font key="font" metaFont="smallSystem"/>
+                                                                </buttonCell>
+                                                                <connections>
+                                                                    <action selector="dumpFirTriggerAction:" target="-2" id="gvj-yf-6Ix"/>
+                                                                </connections>
+                                                            </button>
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
@@ -5488,6 +5507,17 @@
                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                         </textField>
+                                        <button verticalHuggingPriority="750" misplaced="YES" id="FDi-s3-OkB">
+                                            <rect key="frame" x="1047" y="892" width="103" height="28"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="push" title="Dump All Regs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7jw-il-YbY">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="dumpChan0Action:" target="-2" id="xJs-Aa-sBg"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
