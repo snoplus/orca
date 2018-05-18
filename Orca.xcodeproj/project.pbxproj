@@ -1627,6 +1627,12 @@
 		8461CB021CB2D8DB001E4044 /* ORPulseCheckModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 8461CAFC1CB2D8DB001E4044 /* ORPulseCheckModel.m */; };
 		8461CB031CB2D8DB001E4044 /* PulseCheck.nib in Resources */ = {isa = PBXBuildFile; fileRef = 8461CAFD1CB2D8DB001E4044 /* PulseCheck.nib */; };
 		8461CB041CB2D8DB001E4044 /* PulseCheck.tif in Resources */ = {isa = PBXBuildFile; fileRef = 8461CAFE1CB2D8DB001E4044 /* PulseCheck.tif */; };
+		846298B820A369A90024C081 /* TDS2024.tif in Resources */ = {isa = PBXBuildFile; fileRef = 846298AE20A369A80024C081 /* TDS2024.tif */; };
+		846298BA20A369A90024C081 /* TDS2024.nib in Resources */ = {isa = PBXBuildFile; fileRef = 846298B020A369A80024C081 /* TDS2024.nib */; };
+		846298BB20A369A90024C081 /* ORTDS2024Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 846298B120A369A80024C081 /* ORTDS2024Controller.h */; };
+		846298BD20A369A90024C081 /* ORTDS2024Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 846298B320A369A80024C081 /* ORTDS2024Model.m */; };
+		846298C020A369A90024C081 /* ORTDS2024Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 846298B620A369A80024C081 /* ORTDS2024Controller.m */; };
+		846298C120A369A90024C081 /* ORTDS2024Model.h in Headers */ = {isa = PBXBuildFile; fileRef = 846298B720A369A80024C081 /* ORTDS2024Model.h */; };
 		8465BE5A05DBCEFC00870151 /* NSInvocation+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 8465BE5805DBCEFC00870151 /* NSInvocation+Extensions.h */; };
 		8465BE5B05DBCEFD00870151 /* NSInvocation+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */; };
 		84662A68070A3249001CDA7E /* BiStateView.h in Headers */ = {isa = PBXBuildFile; fileRef = 84662A66070A3249001CDA7E /* BiStateView.h */; };
@@ -5188,6 +5194,12 @@
 		8461CAFC1CB2D8DB001E4044 /* ORPulseCheckModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPulseCheckModel.m; sourceTree = "<group>"; };
 		8461CAFD1CB2D8DB001E4044 /* PulseCheck.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = PulseCheck.nib; sourceTree = "<group>"; };
 		8461CAFE1CB2D8DB001E4044 /* PulseCheck.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = PulseCheck.tif; sourceTree = "<group>"; };
+		846298AE20A369A80024C081 /* TDS2024.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = TDS2024.tif; sourceTree = "<group>"; };
+		846298B020A369A80024C081 /* TDS2024.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = TDS2024.nib; sourceTree = "<group>"; };
+		846298B120A369A80024C081 /* ORTDS2024Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTDS2024Controller.h; sourceTree = "<group>"; };
+		846298B320A369A80024C081 /* ORTDS2024Model.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTDS2024Model.m; sourceTree = "<group>"; };
+		846298B620A369A80024C081 /* ORTDS2024Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORTDS2024Controller.m; sourceTree = "<group>"; };
+		846298B720A369A80024C081 /* ORTDS2024Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORTDS2024Model.h; sourceTree = "<group>"; };
 		846574BF1F9D449500B4BAA9 /* Orca.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Orca.entitlements; sourceTree = "<group>"; };
 		8465BE5805DBCEFC00870151 /* NSInvocation+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSInvocation+Extensions.h"; sourceTree = "<group>"; };
 		8465BE5905DBCEFC00870151 /* NSInvocation+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSInvocation+Extensions.m"; sourceTree = "<group>"; };
@@ -10222,6 +10234,19 @@
 			path = PulseCheck;
 			sourceTree = "<group>";
 		};
+		846298AD20A369A80024C081 /* TDS2024 */ = {
+			isa = PBXGroup;
+			children = (
+				846298B320A369A80024C081 /* ORTDS2024Model.m */,
+				846298B720A369A80024C081 /* ORTDS2024Model.h */,
+				846298B620A369A80024C081 /* ORTDS2024Controller.m */,
+				846298B120A369A80024C081 /* ORTDS2024Controller.h */,
+				846298AE20A369A80024C081 /* TDS2024.tif */,
+				846298B020A369A80024C081 /* TDS2024.nib */,
+			);
+			path = TDS2024;
+			sourceTree = "<group>";
+		};
 		84662A63070A3231001CDA7E /* BiStateView */ = {
 			isa = PBXGroup;
 			children = (
@@ -11920,6 +11945,7 @@
 				84A4E8950C287CA900CBC222 /* USBtoGPIB */,
 				84B28E2A0F4C7FD400E2B056 /* LDA102 */,
 				8475EC251475A66F003A165D /* LabJack */,
+				846298AD20A369A80024C081 /* TDS2024 */,
 				84CED38C1732FB9D000A84C2 /* LakeShore336 */,
 			);
 			path = USB;
@@ -15154,6 +15180,7 @@
 				8434A1CF055B3287002D3102 /* NcdMuxController.h in Headers */,
 				8434A1D1055B3287002D3102 /* NcdMuxModel.h in Headers */,
 				8434A1D2055B3287002D3102 /* NcdMuxHWModel.h in Headers */,
+				846298BB20A369A90024C081 /* ORTDS2024Controller.h in Headers */,
 				8438C3731845092600A6F4D6 /* ORRegexConditionalStep.h in Headers */,
 				8434A1D3055B3287002D3102 /* ORVmeIPCard.h in Headers */,
 				8434A1D5055B3287002D3102 /* NcdMuxBoxModel.h in Headers */,
@@ -16268,6 +16295,7 @@
 				2D2AED671696284D0057E424 /* ipe4structure.h in Headers */,
 				8438C36D1845092600A6F4D6 /* ORConditionalStep.h in Headers */,
 				2DD81EA616A6E49700F50F0F /* ipe4tbtools.h in Headers */,
+				846298C120A369A90024C081 /* ORTDS2024Model.h in Headers */,
 				8449A53816AEDF5B00296104 /* ORCV1721Controller.h in Headers */,
 				4AB9E53B1DE5D955007C75E0 /* ORPQConnection.h in Headers */,
 				8449A53A16AEDF5B00296104 /* ORCV1721Decoder.h in Headers */,
@@ -16731,6 +16759,7 @@
 				840E00090944B29000049827 /* Process.tif in Resources */,
 				840E001C0944B29000049827 /* SPDTRelay.nib in Resources */,
 				840E001D0944B29000049827 /* SPDTRelayOff.tif in Resources */,
+				846298BA20A369A90024C081 /* TDS2024.nib in Resources */,
 				840E001E0944B29000049827 /* SPDTRelayOn.tif in Resources */,
 				840E00230944B29000049827 /* SPSTRelay.nib in Resources */,
 				0FF177C91DF7AEA000BA783B /* run_dog_frame_6.tiff in Resources */,
@@ -17354,6 +17383,7 @@
 				8458EA3C15DBCFF6005C43A9 /* MPodCrateSmall.tif in Resources */,
 				8404EB771E3F818F00370C33 /* LabJackU6.tif in Resources */,
 				2DAB012115EF988C00BC2540 /* EdelweissLogo.tif in Resources */,
+				846298B820A369A90024C081 /* TDS2024.tif in Resources */,
 				2DAB012215EF988C00BC2540 /* KITLogo.tif in Resources */,
 				84150EDC1615FF9C0054FF08 /* Rad7Buttons.png in Resources */,
 				84DF4A08162DCE6B00261144 /* Gretina4M.nib in Resources */,
@@ -17602,6 +17632,7 @@
 				8434A340055B3287002D3102 /* ORCaen775Model.m in Sources */,
 				8434A343055B3287002D3102 /* ORCaenCardController.m in Sources */,
 				8434A344055B3287002D3102 /* ORCaen785Controller.m in Sources */,
+				846298C020A369A90024C081 /* ORTDS2024Controller.m in Sources */,
 				8434A346055B3287002D3102 /* ORCaen785Model.m in Sources */,
 				8434A347055B3287002D3102 /* ORHWWizardController.m in Sources */,
 				8438C3741845092600A6F4D6 /* ORRegexConditionalStep.m in Sources */,
@@ -18568,6 +18599,7 @@
 				841DACE6175CF05B002542BD /* Katrin3DView.m in Sources */,
 				8499517B1D5CE50700A6FA40 /* ORMJDBiasWatcherModel.m in Sources */,
 				B3808A8F1700F84B0019C27D /* ORCouchDBListenerController.m in Sources */,
+				846298BD20A369A90024C081 /* ORTDS2024Model.m in Sources */,
 				B3808A911700F84B0019C27D /* ORCouchDBListenerModel.m in Sources */,
 				841DACF2175E2CB5002542BD /* OR3DScanPlatformView.m in Sources */,
 				43D7CB8A177C84AC00ED4736 /* OROpenGLObject.m in Sources */,
