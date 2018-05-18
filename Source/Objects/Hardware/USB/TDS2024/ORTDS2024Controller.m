@@ -173,7 +173,7 @@
 	@try {
 		[self endEditing];
 		NSString* cmd = [commandField stringValue];
-        [model writeToDevice:cmd];
+        [model writeCommand:cmd];
 	}
 	@catch(NSException* localException) {
         NSLog( [ localException reason ] );

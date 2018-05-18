@@ -72,6 +72,7 @@
 - (void) interfaceRemoved:(NSNotification*)aNote;
 - (long) readFromDevice: (char*) aData maxLength: (long) aMaxLength;
 - (void) writeToDevice: (NSString*) aCommand;
+- (void) writeCommand:(NSString*)aCmd;
 - (void) queryAll;
 
 - (void) readIDString;

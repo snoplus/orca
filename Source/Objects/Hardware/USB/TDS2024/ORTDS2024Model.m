@@ -363,6 +363,27 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 	[self performSelector:@selector(timeout) withObject:nil afterDelay:aDelay];
 }
 
+- (void) writeCommand:(NSString*)aCmd
+{
+    if([aCmd rangeOfString:@"?"].location != NSNotFound){
+        char  reply[256];
+        long n = [self writeReadFromDevice: @"WFMPre?"
+                                      data: reply
+                                 maxLength: 256 ];
+        n = MIN(256,n);
+        reply[n] = "\n";
+        NSString* s =  [NSString stringWithCString:reply encoding:NSASCIIStringEncoding];
+        long nlPos = [s rangeOfString:@"\n"].location;
+        if(nlPos != NSNotFound){
+            s = [s substringWithRange:NSMakeRange(0,nlPos)];
+            NSLog(@"%@\n",s);
+        }
+    }
+    else {
+        [self writeToDevice: aCmd];
+    }
+}
+
 - (void) readWaveformPreamble
 {
     char  reply[256];
