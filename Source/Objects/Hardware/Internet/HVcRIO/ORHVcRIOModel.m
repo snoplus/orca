@@ -1626,6 +1626,77 @@ static NSString* measuredValueList[] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelUpdatePostRegulationTable object:self];
 }
 
+
+#pragma mark •••Adc or Bit Processing Protocol
+- (void) processIsStarting
+{
+    //called when processing is started. nothing to do for now.
+    //called at the HW polling rate in the process dialog.
+    //For now we just use the local polling
+}
+
+- (void)processIsStopping
+{
+    //called when processing is stopping. nothing to do for now.
+}
+
+- (void) startProcessCycle
+{
+    //called at the HW polling rate in the process dialog.
+    //ignore for now.
+}
+
+- (void) endProcessCycle
+{
+}
+
+- (NSString*) processingTitle
+{
+    return [self fullID];
+}
+
+- (void) setProcessOutput:(int)channel value:(int)value
+{
+    //nothing to do
+}
+
+- (BOOL) processValue:(int)channel
+{
+    return [self convertedValue:channel]!=0;
+}
+
+//!convertedValue: and valueForChan: are the same.
+- (double) convertedValue:(int)channel
+{
+    return [[self measuredValueAtIndex:channel] doubleValue];
+}
+
+- (double) maxValueForChan:(int)channel
+{
+    return 1000; // return something if channel number out of range
+}
+
+- (double) lowAlarm:(int)channel
+{
+    return 0;
+}
+
+- (double) highAlarm:(int)channel
+{
+    return 0;
+}
+
+- (double) minValueForChan:(int)channel
+{
+    return 0; // return something if channel number out of range
+}
+
+//alarm limits for the processing framework.
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel
+{
+    *theLowLimit  =  0 ;
+    *theHighLimit = 0 ;
+}
 @end
 
 
@@ -1655,6 +1726,7 @@ static NSString* measuredValueList[] = {
         [self performSelector:@selector(timeout) withObject:nil afterDelay:10];//<----timeout !!!!!!!!!!!!!!!!!!!!
 	}
 }
+
 - (void) pollMeasuredValues
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(pollMeasuredValues) object:nil];

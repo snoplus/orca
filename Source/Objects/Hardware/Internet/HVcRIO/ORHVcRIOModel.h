@@ -17,6 +17,7 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
+#import "ORAdcProcessing.h"
 
 @class ORTimeRate;
 @class ORSafeQueue;
@@ -26,7 +27,7 @@
 #define kPostRegulationScaleFactor     @"kPostRegulationScaleFactor"
 #define kPowerSupplyOffset             @"kPowerSupplyOffset"
 
-@interface ORHVcRIOModel : OrcaObject
+@interface ORHVcRIOModel : OrcaObject <ORAdcProcessing>
 {
     @private
         NSString*           ipAddress;
@@ -129,6 +130,17 @@
 - (void)   setPowerSupplyOffset:(int)anIndex withValue:(double)aValue;
 - (void)   setVesselVoltageSetPoint:(int)anIndex withValue:(double)aValue;
 
+#pragma mark •••Adc or Bit Processing Protocol
+- (void)processIsStarting;
+- (void)processIsStopping;
+- (void) startProcessCycle;
+- (void) endProcessCycle;
+- (BOOL) processValue:(int)channel;
+- (NSString*) processingTitle;
+- (double) convertedValue:(int)channel;
+- (double) maxValueForChan:(int)channel;
+- (double) minValueForChan:(int)channel;
+- (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit  channel:(int)channel;
 @end
 
 @interface NSObject (ORHistModel)
