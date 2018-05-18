@@ -350,14 +350,14 @@ readon:
 	int bytesRead = 0;
 	[usbLock lock];
 	@try {
-		char buffer[512];
+		char buffer[amountRead];
 		USB488Header* hp = (USB488Header*)buffer;
-		unsigned long len = 512;
-		memset(buffer,0,512);
+		//unsigned long len = amountRead;
+		memset(buffer,0,amountRead);
 		hp->messageID = 0x02;
 		hp->bTag = tag;
 		hp->bTagInverse = ~tag;
-		hp->transferLength = CFSwapInt32HostToLittle(len);
+		hp->transferLength = CFSwapInt32HostToLittle(amountRead);
 		hp->eom = 0x00;
 		tag++;
 		
@@ -399,7 +399,7 @@ readon:
 				[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe stalled and unable to clear for <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
 			}
 			else {
-				kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead,100,100);
+				kr = (*interface)->ReadPipeTO(interface, pipe, bytes, &actualRead,1000,1000);
 				if(kr){
 					[usbLock unlock];
 					[NSException raise:@"USB Read" format:@"ORUSBInterface.m %u: ReadPipe failed on second try <%@> error: 0x%x\n", __LINE__,NSStringFromClass([self class]),kr];
