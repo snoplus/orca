@@ -89,6 +89,9 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         connection = [[RedisClient alloc] init]; // Connection must be allocated before port and host name are set
         portNumber = TUBII_DEFAULT_PORT;
         strHostName = [[NSString alloc]initWithUTF8String:TUBII_DEFAULT_IP];
+        // Timeout is extended from 1s to 2s in an attempt to prevent the
+        // latency from remote shift stations causing timeouts
+        [connection setTimeout:2000];
     }
     return self;
 }
@@ -141,6 +144,9 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 
         //Connection must be made before port and host name are set.
         connection = [[RedisClient alloc] initWithHostName:strHostName withPort:portNumber];
+        // Timeout is extended from 1s to 2s in an attempt to prevent the
+        // latency from remote shift stations causing timeouts
+        [connection setTimeout:2000];
     }
     return self;
 }
@@ -164,11 +170,6 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     [notifyCenter addObserver : self
                      selector : @selector(runAboutToStart:)
                          name : ORRunAboutToStartNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(restartKeepAlive:)
-                         name : @"TUBiiKeepAliveDied"
                        object : nil];
 
     [notifyCenter addObserver : self
@@ -962,27 +963,13 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         counter = counter + 1;
     }
 
-    NSLog(@"[TUBii]: Stopped sending keep-alive to TUBii - ELLIE pulses will be shut off\n");
-
-    // This thread should always be running. If it's died, post a note to get it automatically restarted.
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"TUBiiKeepAliveDied" object:nil];
+    NSLogColor([NSColor redColor],@"[TUBii]: Stopped sending keep-alive to TUBii\n");
+    NSLogColor([NSColor redColor],@"[TUBii]: Unless you restart this process the ELLIE systems will not be able to trigger through TUBii. If you'd like to restart at a later time please do so from the servers tab of the ELLIE gui\n");
 
     // release memory
     [pool release];
 }
 
--(void)restartKeepAlive:(NSNotification*)aNote{
-    /*
-     If the keep alive has died, as a user to re-start it.
-     */
-    BOOL restart = ORRunAlertPanel(@"The keep alive pulse to TUBii has died.",
-                                   @"Unless you restart this process the ELLIE systems will not be able to trigger through TUBii. If you'd like to restart at a later time please do so from the servers tab of the ELLIE gui",
-                                    @"Restart",
-                                    @"Cancel",nil);
-    if(restart){
-        [self activateKeepAlive];
-    }
-}
 
 -(void)killKeepAlive:(NSNotification*)aNote
 {

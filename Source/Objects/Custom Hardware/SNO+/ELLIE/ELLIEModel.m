@@ -980,11 +980,15 @@ err:
         }
     }
 
+    ////////////////////////
+    // Check keep alive is running.
+    if(![[theTubiiModel keepAliveThread] isExecuting]){
+        NSLog(@"The keep alive thread between ORCA and TUBii was inactive. Relaunching.\n");
+        [theTubiiModel activateKeepAlive];
+    }
+
     ///////////////////////
     // Check trigger is being sent to asyncronus port of the MTC/D (EXT_A)
-    if([[theTubiiModel keepAliveThread] isCancelled]){
-        [theTubiiModel restartKeepAlive:nil];
-    }
     NSUInteger asyncTrigMask;
     @try{
         asyncTrigMask = [theTubiiModel asyncTrigMask];
@@ -1988,6 +1992,13 @@ err:{
         NSLogColor([NSColor redColor], @"[SMELLIE] SMELLIE bit is not masked into the run type word\n");
         NSLogColor([NSColor redColor], @"[SMELLIE]: Please load the SMELLIE standard run type.\n");
         goto err;
+    }
+
+    ////////////////////////
+    // Check keep alive is running.
+    if(![[theTubiiModel keepAliveThread] isExecuting]){
+        NSLog(@"The keep alive thread between ORCA and TUBii was inactive. Relaunching.\n");
+        [theTubiiModel activateKeepAlive];
     }
 
     ///////////////////////
