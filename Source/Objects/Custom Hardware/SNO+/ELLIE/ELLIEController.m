@@ -1561,22 +1561,19 @@
     }
     TUBiiModel* theTubiiModel = [tubiiModels objectAtIndex:0];
     if([[theTubiiModel keepAliveThread] isExecuting]){
-        NSString* response = @"TUBii keep alive thread is already active, restarting.\n";
+        NSString* response = @"TUBii keep alive thread is already active.\n";
         [tubiiThreadResponseTf setStringValue:response];
-        // This method will cancel the thread, causing a break statement to
-        // be called, ending a while loop. Once outside the loop the memory
-        // is tidied up and the user is promped (via a pop-up box) to
-        // re-activate the thread.
-        [theTubiiModel killKeepAlive:nil];
     } else {
         NSString* response = @"TUBii keep alive thread is getting a cold start.\n";
         [tubiiThreadResponseTf setStringValue:response];
         [theTubiiModel activateKeepAlive];
+        // Send a ping after a short delay
+        [self performSelector:@selector(tubiiPing) withObject:self afterDelay:1];
     }
-    [self tubiiPing:self];
 }
 
-- (IBAction)tubiiPing:(id)sender {
+- (void) tubiiPing
+{
     //////////////
     //Get a Tubii object
     NSArray*  tubiiModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"TUBiiModel")];
@@ -1594,6 +1591,10 @@
     } else {
         [self tubiiDied:nil];
     }
+}
+
+- (IBAction)tubiiPingAction:(id)sender {
+    [self tubiiPing];
 }
 
 -(void)tubiiDied:(NSNotification*)note{
