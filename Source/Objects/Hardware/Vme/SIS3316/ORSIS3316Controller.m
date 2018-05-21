@@ -1950,32 +1950,32 @@
     }
 }
 
-- (IBAction) writeHistogramConfigurationAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeHistogramConfiguration];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Histogram Configuration Write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) readHistogramConfigurationAction:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model readHistogramConfiguration:YES];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Histogram Configuration read FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
-
-}
+//- (IBAction) writeHistogramConfigurationAction:(id)sender
+//{
+//    @try {
+//        [self endEditing];
+//        [model writeHistogramConfiguration];
+//    }
+//    @catch(NSException* localException) {
+//        NSLog(@"SIS3316 Histogram Configuration Write FAILED.\n");
+//        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
+//                        localException);
+//    }
+//}
+//
+//- (IBAction) readHistogramConfigurationAction:(id)sender
+//{
+//    @try {
+//        [self endEditing];
+//        [model readHistogramConfiguration:YES];
+//    }
+//    @catch(NSException* localException) {
+//        NSLog(@"SIS3316 Histogram Configuration read FAILED.\n");
+//        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
+//                        localException);
+//    }
+//
+//}
 
 
 - (IBAction) gainAction:(id)sender
