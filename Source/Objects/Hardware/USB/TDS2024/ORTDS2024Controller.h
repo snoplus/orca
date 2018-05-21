@@ -22,11 +22,10 @@
 @interface ORTDS2024Controller : OrcaObjectController 
 {
     IBOutlet NSButton* 		readIdButton;
-    IBOutlet NSTextField*   lockDocField;
     IBOutlet NSButton*		lockButton;
-    
+    IBOutlet NSProgressIndicator* busyIndicator;
     IBOutlet NSPopUpButton* serialNumberPopup;
-    IBOutlet NSPopUpButton* selectedChannelPopup;
+    IBOutlet NSMatrix*      chanEnabledMatrix;
     IBOutlet NSTextField*   commandField;
     IBOutlet NSButton*		sendCommandButton;
 	IBOutlet NSPopUpButton* pollTimePopup;
@@ -36,10 +35,11 @@
 #pragma mark •••Notifications
 
 #pragma mark ***Interface Management
-- (void) selectedChannelChanged:(NSNotification*)aNote;
+- (void) chanEnabledChanged:(NSNotification*)aNote;
 - (void) interfacesChanged:(NSNotification*)aNote;
 - (void) serialNumberChanged:(NSNotification*)aNote;
 - (void) pollTimeChanged:(NSNotification*)aNote;
+- (void) busyChanged:(NSNotification*)aNote;
 - (void) setButtonStates;
 
 #pragma mark •••Actions
@@ -50,9 +50,7 @@
 - (IBAction) pollTimeAction:(id)sender;
 - (IBAction) pollNowAction:(id)sender;
 - (IBAction) readIdAction:(id)sender;
-- (IBAction) autoScale:(id)sender;
-
-- (void) populateInterfacePopup;
+- (IBAction) chanEnabledAction:(id)sender;
 - (void) validateInterfacePopup;
 
 - (NSColor*) colorForDataSet:(int)set;

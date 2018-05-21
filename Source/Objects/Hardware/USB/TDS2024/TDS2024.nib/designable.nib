@@ -9,16 +9,15 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ORTDS2024Controller">
             <connections>
+                <outlet property="busyIndicator" destination="JU4-Pj-QCX" id="Zbd-Sl-KDh"/>
+                <outlet property="chanEnabledMatrix" destination="i2i-r7-DaM" id="5W8-6j-4py"/>
                 <outlet property="commandField" destination="345" id="347"/>
                 <outlet property="lockButton" destination="152" id="154"/>
-                <outlet property="lockDocField" destination="153" id="155"/>
                 <outlet property="plotter" destination="uJd-YL-kfE" id="q0X-6G-THj"/>
                 <outlet property="pollTimePopup" destination="701" id="717"/>
                 <outlet property="readIdButton" destination="259" id="299"/>
-                <outlet property="selectedChannelPopup" destination="q12-fr-yd0" id="LaI-mT-6k0"/>
                 <outlet property="sendCommandButton" destination="346" id="348"/>
                 <outlet property="serialNumberPopup" destination="313" id="1ms-tF-GPp"/>
-                <outlet property="warningField" destination="335" id="336"/>
                 <outlet property="window" destination="5" id="7"/>
             </connections>
         </customObject>
@@ -27,101 +26,20 @@
         <window title="LakeShore336" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="439" y="585" width="628" height="503"/>
+            <rect key="contentRect" x="439" y="585" width="749" height="445"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1578"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" misplaced="YES" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="628" height="503"/>
+                <rect key="frame" x="0.0" y="0.0" width="749" height="445"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button misplaced="YES" id="152">
-                        <rect key="frame" x="13" y="20" width="36" height="41"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="573">
-                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="label"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="lockAction:" target="-2" id="156"/>
-                        </connections>
-                    </button>
-                    <textField verticalHuggingPriority="750" misplaced="YES" id="153">
-                        <rect key="frame" x="53" y="26" width="126" height="13"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Not In Maintenance Run" id="574">
-                            <font key="font" metaFont="label"/>
-                            <color key="textColor" red="0.037237584999999997" green="0.045257747000000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <box misplaced="YES" title="Functions" titlePosition="noTitle" id="264">
-                        <rect key="frame" x="16" y="61" width="247" height="44"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="RQ7-SG-RjS">
-                            <rect key="frame" x="2" y="2" width="243" height="40"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <button verticalHuggingPriority="750" id="259">
-                                    <rect key="frame" x="63" y="7" width="94" height="28"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <buttonCell key="cell" type="push" title="Device ID" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="584">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="readIdAction:" target="-2" id="293"/>
-                                    </connections>
-                                </button>
-                            </subviews>
-                        </view>
-                        <font key="titleFont" metaFont="label"/>
-                    </box>
-                    <textField verticalHuggingPriority="750" misplaced="YES" id="335" customClass="ORTimedTextField">
-                        <rect key="frame" x="53" y="69" width="330" height="13"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" id="598">
-                            <font key="font" metaFont="label"/>
-                            <color key="textColor" red="0.82142853999999998" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
                     <imageView id="341">
-                        <rect key="frame" x="13" y="441" width="107" height="42"/>
+                        <rect key="frame" x="13" y="383" width="107" height="42"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="TDS2024" id="599"/>
                     </imageView>
-                    <box misplaced="YES" title="Command Interface" id="343">
-                        <rect key="frame" x="264" y="61" width="289" height="57"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <view key="contentView" id="Yq3-JF-JWC">
-                            <rect key="frame" x="2" y="2" width="285" height="40"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <textField verticalHuggingPriority="750" id="345">
-                                    <rect key="frame" x="8" y="12" width="191" height="19"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="600">
-                                        <font key="font" metaFont="smallSystem"/>
-                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    </textFieldCell>
-                                </textField>
-                                <button verticalHuggingPriority="750" id="346">
-                                    <rect key="frame" x="207" y="6" width="61" height="28"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <buttonCell key="cell" type="push" title="Send" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="601">
-                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                        <font key="font" metaFont="smallSystem"/>
-                                    </buttonCell>
-                                    <connections>
-                                        <action selector="sendCommandAction:" target="-2" id="349"/>
-                                    </connections>
-                                </button>
-                            </subviews>
-                        </view>
-                    </box>
                     <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Polling and Shipping" id="700">
-                        <rect key="frame" x="458" y="402" width="153" height="81"/>
+                        <rect key="frame" x="579" y="353" width="153" height="81"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="aKO-RQ-EA7">
                             <rect key="frame" x="1" y="1" width="151" height="65"/>
@@ -168,51 +86,12 @@
                             </subviews>
                         </view>
                     </box>
-                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="q12-fr-yd0">
-                        <rect key="frame" x="99" y="369" width="77" height="22"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <popUpButtonCell key="cell" type="push" title="0" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="RQe-Cq-uyw" id="JtF-Fr-LdV">
-                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
-                            <menu key="menu" id="bWC-pu-D9b">
-                                <items>
-                                    <menuItem title="0" state="on" id="RQe-Cq-uyw"/>
-                                    <menuItem title="1" id="9sx-pZ-iN7"/>
-                                    <menuItem title="2" id="RMd-wP-HH8"/>
-                                    <menuItem title="3" id="uE6-Cf-fra"/>
-                                </items>
-                            </menu>
-                        </popUpButtonCell>
-                        <connections>
-                            <action selector="selectChannelAction:" target="-2" id="s8p-pE-99X"/>
-                        </connections>
-                    </popUpButton>
-                    <textField verticalHuggingPriority="750" misplaced="YES" id="wqk-RT-xJe">
-                        <rect key="frame" x="30" y="374" width="57" height="14"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Chan:" id="z33-Ny-A0J">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <button verticalHuggingPriority="750" misplaced="YES" id="v1Q-CQ-6GV">
-                        <rect key="frame" x="187" y="366" width="101" height="28"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Get Waveform" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="luy-R4-psf">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="getCurve:" target="-2" id="t5m-Ni-j6D"/>
-                        </connections>
-                    </button>
                     <customView misplaced="YES" id="uJd-YL-kfE" customClass="ORCompositePlotView">
-                        <rect key="frame" x="19" y="123" width="596" height="241"/>
+                        <rect key="frame" x="26" y="76" width="703" height="273"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     </customView>
                     <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="USB" id="Zes-wn-Dcc">
-                        <rect key="frame" x="108" y="418" width="220" height="74"/>
+                        <rect key="frame" x="108" y="360" width="220" height="74"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" id="bEu-lg-qSk">
                             <rect key="frame" x="1" y="1" width="218" height="58"/>
@@ -237,23 +116,139 @@
                             </subviews>
                         </view>
                     </box>
-                    <button verticalHuggingPriority="750" misplaced="YES" id="HV5-93-sb6">
-                        <rect key="frame" x="327" y="366" width="179" height="28"/>
+                    <box misplaced="YES" title="Command Interface" id="343">
+                        <rect key="frame" x="340" y="360" width="224" height="74"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="push" title="Auto Scale Highlighted Trace" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bAl-4G-8BR">
-                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                            <font key="font" metaFont="smallSystem"/>
+                        <view key="contentView" id="Yq3-JF-JWC">
+                            <rect key="frame" x="2" y="2" width="220" height="57"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textField verticalHuggingPriority="750" misplaced="YES" id="345">
+                                    <rect key="frame" x="10" y="31" width="191" height="19"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="600">
+                                        <font key="font" metaFont="smallSystem"/>
+                                        <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <button verticalHuggingPriority="750" misplaced="YES" id="346">
+                                    <rect key="frame" x="145" y="-1" width="61" height="28"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <buttonCell key="cell" type="push" title="Send" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="601">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="sendCommandAction:" target="-2" id="349"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </view>
+                    </box>
+                    <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Waveforms to Get" id="RZz-VG-al3">
+                        <rect key="frame" x="355" y="16" width="377" height="59"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView" id="UVL-1P-cn7">
+                            <rect key="frame" x="1" y="1" width="375" height="43"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <button verticalHuggingPriority="750" misplaced="YES" id="v1Q-CQ-6GV">
+                                    <rect key="frame" x="266" y="7" width="107" height="28"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                    <buttonCell key="cell" type="push" title="Get Waveforms" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="luy-R4-psf">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="getCurve:" target="-2" id="t5m-Ni-j6D"/>
+                                    </connections>
+                                </button>
+                                <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="i2i-r7-DaM">
+                                    <rect key="frame" x="8" y="12" width="252" height="20"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    <size key="cellSize" width="63" height="20"/>
+                                    <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="KUQ-gu-RBW">
+                                        <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <cells>
+                                        <column>
+                                            <buttonCell type="check" title="Chan 0" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="QYp-4k-b6c">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                        </column>
+                                        <column>
+                                            <buttonCell type="check" title="Chan 1" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="zWD-7e-Gnr">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                        </column>
+                                        <column>
+                                            <buttonCell type="check" title="Chan 2" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="XLE-2y-1eV">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                        </column>
+                                        <column>
+                                            <buttonCell type="check" title="Chan 3" bezelStyle="regularSquare" imagePosition="left" controlSize="small" state="on" inset="2" id="MGB-LD-gv8">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="smallSystem"/>
+                                            </buttonCell>
+                                        </column>
+                                    </cells>
+                                    <connections>
+                                        <action selector="chanEnabledAction:" target="-2" id="140-Ef-6mt"/>
+                                    </connections>
+                                </matrix>
+                            </subviews>
+                        </view>
+                    </box>
+                    <button misplaced="YES" id="152">
+                        <rect key="frame" x="26" y="27" width="36" height="41"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="only" alignment="center" alternateImage="Locked" inset="2" id="573">
+                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="label"/>
                         </buttonCell>
                         <connections>
-                            <action selector="autoScale:" target="-2" id="ANp-ul-wem"/>
+                            <action selector="lockAction:" target="-2" id="156"/>
                         </connections>
                     </button>
+                    <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" maxValue="100" bezeled="NO" indeterminate="YES" controlSize="small" style="spinning" id="JU4-Pj-QCX">
+                        <rect key="frame" x="53" y="364" width="16" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    </progressIndicator>
+                    <box misplaced="YES" title="Functions" titlePosition="noTitle" id="264">
+                        <rect key="frame" x="94" y="16" width="153" height="45"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <view key="contentView" id="RQ7-SG-RjS">
+                            <rect key="frame" x="2" y="2" width="149" height="41"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <button verticalHuggingPriority="750" misplaced="YES" id="259">
+                                    <rect key="frame" x="9" y="6" width="131" height="28"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                    <buttonCell key="cell" type="push" title="Device ID" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="584">
+                                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                        <font key="font" metaFont="smallSystem"/>
+                                    </buttonCell>
+                                    <connections>
+                                        <action selector="readIdAction:" target="-2" id="293"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </view>
+                        <font key="titleFont" metaFont="label"/>
+                    </box>
                 </subviews>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="8"/>
             </connections>
-            <point key="canvasLocation" x="-355" y="65.5"/>
+            <point key="canvasLocation" x="-294.5" y="36.5"/>
         </window>
     </objects>
     <resources>

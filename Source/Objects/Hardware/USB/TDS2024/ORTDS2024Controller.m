@@ -65,8 +65,8 @@
 						object: model];
  
     [notifyCenter addObserver : self
-                     selector : @selector(selectedChannelChanged:)
-                         name : ORTDS2024SelectedChannelChanged
+                     selector : @selector(chanEnabledChanged:)
+                         name : ORTDS2024ChanEnabledMaskChanged
                         object: model];
     
     [notifyCenter addObserver : self
@@ -74,11 +74,16 @@
                          name : ORWaveFormDataChanged
                         object: model];
     
+    [notifyCenter addObserver : self
+                     selector : @selector(busyChanged:)
+                         name : ORTDS2024BusyChanged
+                        object: model];
+
 }
 
 - (void) awakeFromNib
 {
-	[self populateInterfacePopup];
+    [self populateInterfacePopup];
 	[super awakeFromNib];
     [[plotter yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
     int i;
@@ -98,33 +103,57 @@
     [[plotter yAxis] setRngLimitsLow:-65535/2 withHigh:65535/2 withMinRng:25];
     [[plotter yAxis] setRngDefaultsLow:-65535/2 withHigh:65535/2];
     [[plotter yAxis] setAllowNegativeValues:YES];
+    
+    for(i=0;i<4;i++){
+        [[chanEnabledMatrix cellAtRow:0 column:i]setTag:i];
+    }
 }
 
 - (NSColor*) colorForDataSet:(int)set
 {
-    if(set==0)return [NSColor redColor];
-    else if(set==1)return [NSColor darkGrayColor];
-    else if(set==2)return [NSColor blueColor];
-    else return [NSColor blackColor];
+    if(set==0)      return [NSColor redColor];
+    else if(set==1) return [NSColor orangeColor];
+    else if(set==2) return [NSColor blueColor];
+    else            return [NSColor blackColor];
 }
+
 - (void) updateWindow
 {
     [ super updateWindow ];
     
-    [self selectedChannelChanged:nil];
+    [self chanEnabledChanged:nil];
     [self serialNumberChanged:nil];
 	[self pollTimeChanged:nil];
     [self waveFormDataChanged:nil];
+    [self busyChanged:nil];
 }
 
 #pragma mark •••Notifications
+- (void) busyChanged:(NSNotification*)aNote
+{
+    if([model curveIsBusy]) {
+        [busyIndicator setHidden:NO];
+        [busyIndicator startAnimation:nil];
+    }
+    else {
+        [busyIndicator stopAnimation:nil];
+        [busyIndicator setHidden:YES];
+
+   }
+}
+
 - (void) waveFormDataChanged:(NSNotification*)aNote
 {
     [plotter setNeedsDisplay:YES];
 }
-- (void) selectedChannelChanged:(NSNotification*)aNote
+
+- (void) chanEnabledChanged:(NSNotification*)aNote
 {
-    [selectedChannelPopup selectItemAtIndex:[model selectedChannel]];
+    unsigned long aMask = [model chanEnabledMask];
+    int i;
+    for(i=0;i<4;i++){
+        [[chanEnabledMatrix cellWithTag:i] setState: aMask & (0x1<<i)];
+    }
 }
 
 - (void) serialNumberChanged:(NSNotification*)aNote
@@ -141,8 +170,9 @@
 
 - (IBAction) pollNowAction:(id)sender
 {
-    [model queryAll];
+    [model getCurves];
 }
+
 - (void) interfacesChanged:(NSNotification*)aNote
 {
 	[self populateInterfacePopup];
@@ -156,11 +186,12 @@
 - (void) setButtonStates
 {	
     BOOL locked			= [gSecurity isLocked:ORTDS2024Lock];
-	[serialNumberPopup setEnabled:!locked];
+	[serialNumberPopup  setEnabled:!locked];
 	[pollTimePopup		setEnabled:!locked];
+    [chanEnabledMatrix  setEnabled: !locked];
+    [commandField       setEnabled: !locked];
+    [sendCommandButton  setEnabled: !locked];
 }
-
-#pragma mark •••Plot DataSource
 
 #pragma mark •••Actions
 - (IBAction) pollTimeAction:(id)sender
@@ -236,14 +267,14 @@
 	}
 }
 
-- (IBAction) selectChannelAction:(id)sender
+- (IBAction) chanEnabledAction:(id)sender;
 {
-    [model setSelectedChannel:[selectedChannelPopup indexOfSelectedItem]];
+    [model setChanEnabled:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) getCurve:(id)sender
 {
-    [model getCurve];
+    [model getCurves];
 }
 
 - (IBAction) autoScale:(id)sender

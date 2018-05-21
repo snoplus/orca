@@ -19,7 +19,7 @@
 #pragma mark •••Imported Files
 #import "ORTDS2024Model.h"
 #import "ORUSBInterface.h"
-#import "ORSafeQueue.h"
+#import "ThreadWorker.h"
 
 #define kMaxNumberOfPoints33220 0xFFFF
 
@@ -29,16 +29,15 @@ NSString* ORTDS2024USBNextConnection       = @"ORTDS2024USBNextConnection";
 NSString* ORTDS2024USBInterfaceChanged     = @"ORTDS2024USBInterfaceChanged";
 NSString* ORTDS2024Lock                    = @"ORTDS2024Lock";
 NSString* ORTDS2024IsValidChanged		   = @"ORTDS2024IsValidChanged";
-NSString* ORTDS2024PortClosedAfterTimeout  = @"ORTDS2024PortClosedAfterTimeout";
-NSString* ORTDS2024TimeoutCountChanged     = @"ORTDS2024TimeoutCountChanged";
 NSString* ORTDS2024PollTimeChanged         = @"ORTDS2024PollTimeChanged";
-NSString* ORTDS2024SelectedChannelChanged  = @"ORTDS2024SelectedChannelChanged";
+NSString* ORTDS2024ChanEnabledMaskChanged  = @"ORTDS2024ChanEnabledMaskChanged";
+NSString* ORTDS2024BusyChanged             = @"ORTDS2024BusyChanged";
 NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 @interface ORTDS2024Model (private)
 - (long) writeReadFromDevice: (NSString*) aCommand data: (char*) aData
                    maxLength: (long) aMaxLength;
-- (void) curveThread;
+- (id) threadToGetCurves:(id)userInfo thread:tw;
 @end
 
 @implementation ORTDS2024Model
@@ -46,8 +45,11 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 - (void) dealloc
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	[timeoutAlarm clearAlarm];
-	[timeoutAlarm release];
+    
+    [curvesThread markAsCancelled];
+    [curvesThread release];
+    curvesThread = nil;
+    
 	[noUSBAlarm clearAlarm];
 	[noUSBAlarm release];
     [serialNumber release];
@@ -202,18 +204,20 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 #pragma mark ***Accessors
 
-- (int)  selectedChannel
+- (unsigned short) chanEnabledMask { return chanEnabledMask; }
+- (void) setChanEnabledMask:(unsigned short)aMask
 {
-    return selectedChannel;
+    [[[self undoManager] prepareWithInvocationTarget:self] setChanEnabledMask:chanEnabledMask];
+    chanEnabledMask = aMask;
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024ChanEnabledMaskChanged object:self];
 }
-- (void) setSelectedChannel:(int)aChan
+- (void) setChanEnabled:(unsigned short) aChan withValue:(BOOL) aState
 {
-    if(aChan<0)aChan = 0;
-    if(aChan>3)aChan = 3;
-    [[[self undoManager] prepareWithInvocationTarget:self] setSelectedChannel:selectedChannel];
-    selectedChannel = aChan;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024SelectedChannelChanged object:self];
-
+    [[[self undoManager] prepareWithInvocationTarget:self] setChanEnabled:aChan withValue:(chanEnabledMask>>aChan)&0x1];
+    if(aState) chanEnabledMask |= (1L<<aChan);
+    else chanEnabledMask &= ~(1L<<aChan);
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024ChanEnabledMaskChanged object:self];
 }
 
 - (int) pollTime
@@ -229,24 +233,12 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024PollTimeChanged object:self];
 }
 
-- (void) setTimeoutCount:(int)aValue
-{
-    timeoutCount=aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024TimeoutCountChanged object:self];
-    
-}
-
 - (void) pollHardware
 {
 	[NSObject cancelPreviousPerformRequestsWithTarget:self];
     if(pollTime==0)return;
-    [self getCurve];
+    [self getCurves];
     [self performSelector:@selector(pollHardware) withObject:nil afterDelay:pollTime];
-}
-
-- (int) timeoutCount
-{
-	return timeoutCount;
 }
 
 - (NSString*) serialNumber
@@ -352,22 +344,12 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 }
 
 #pragma mark •••Hardware Access
-- (void) cancelTimeout
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-}
-
-- (void) startTimeout:(int)aDelay
-{
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	[self performSelector:@selector(timeout) withObject:nil afterDelay:aDelay];
-}
 
 - (void) writeCommand:(NSString*)aCmd
 {
     if([aCmd rangeOfString:@"?"].location != NSNotFound){
         char  reply[256];
-        long n = [self writeReadFromDevice: @"WFMPre?"
+        long n = [self writeReadFromDevice: aCmd
                                       data: reply
                                  maxLength: 256 ];
         n = MIN(256,n);
@@ -427,16 +409,71 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     }
 }
 
-- (void) getCurve
+- (void) getCurves
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(!curveIsBusy){
-            [self curveThread];
-    //[self performSelectorOnMainThread:@selector(postCouchDB) withObject:nil waitUntilDone:NO];
+    if(!curvesThread){
+        int i,chan;
+        for(chan=0;chan<4;chan++){
+            for(i=0;i<2500;i++)waveForm[chan][i] = 0;
+            wfmPre[chan][0] = '\0';
         }
-    });
+
+        curvesThread = [[ThreadWorker workOn:self
+                                withSelector:@selector(threadToGetCurves:thread:)
+                                         withObject:nil
+                                     didEndSelector:@selector(curvesThreadFinished:)] retain];
+        [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024BusyChanged object: self];
+    }
 }
 
+- (void) curvesThreadFinished:(id)userInfo
+{
+
+    [curvesThread release];
+    curvesThread = nil;
+    [[NSNotificationCenter defaultCenter]  postNotificationName:ORWaveFormDataChanged object:self];
+    [self postCouchDB];
+    [[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024BusyChanged object: self];
+}
+
+- (void) postCouchDB
+{
+    NSMutableString* curveStr[4];;
+    int curve;
+    for(curve = 0;curve<4;curve++){
+        curveStr[curve] = [NSMutableString stringWithCapacity:2500];
+        int i;
+        if(chanEnabledMask & (0x1<<curve)){
+            for(i=6;i<2500-6;i++){
+                [curveStr[curve] appendFormat:@"%ld,",[self dataSet:curve valueAtChannel:i]];
+                if(i<10)NSLog(@"%d\n",waveForm[curve][i-6]);
+                
+            }
+        }
+        else {
+            [curveStr[curve] appendString:@"0"];
+        }
+    }
+    NSDictionary* values = [NSDictionary dictionaryWithObjectsAndKeys:
+                                [self fullID],   @"name",
+                                [NSArray arrayWithObjects:
+                                 curveStr[0],
+                                 curveStr[1],
+                                 curveStr[2],
+                                 curveStr[3],
+                                 nil], @"waveforms",
+                            [NSArray arrayWithObjects:
+                             [NSString stringWithCString:wfmPre[0] encoding:NSASCIIStringEncoding],
+                             [NSString stringWithCString:wfmPre[1] encoding:NSASCIIStringEncoding],
+                             [NSString stringWithCString:wfmPre[2] encoding:NSASCIIStringEncoding],
+                             [NSString stringWithCString:wfmPre[3] encoding:NSASCIIStringEncoding],
+                             nil], @"wfmPre",
+                                [NSNumber numberWithInt:    chanEnabledMask], @"enabledMask",
+                                
+                                nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:values];
+
+}
 
 #pragma mark ***Archival
 - (id)initWithCoder:(NSCoder*)decoder
@@ -446,7 +483,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     [[self undoManager] disableUndoRegistration];
     [self setSerialNumber:          [decoder decodeObjectForKey:    @"serialNumber"]];
     [self setPollTime:              [decoder decodeIntForKey:       @"pollTime"]];
-    [self setSelectedChannel:       [decoder decodeIntForKey:       @"selectedChannel"]];
+    [self setChanEnabledMask:       [decoder decodeIntForKey:       @"chanEnabledMask"]];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -457,7 +494,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:serialNumber      forKey:@"serialNumber"];
     [encoder encodeInt:pollTime             forKey:@"pollTime"];
-    [encoder encodeInt:selectedChannel      forKey:@"selectedChannel"];
+    [encoder encodeInt:chanEnabledMask      forKey:@"chanEnabledMask"];
 }
 
 #pragma mark ***Comm methods
@@ -488,116 +525,90 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
         [NSException raise: @"TDS2024 Error" format:@"%@", errorMsg];
     }
 }
-- (void) queryAll
-{
-    
-}
+
 - (void) makeUSBClaim:(NSString*)aSerialNumber
 {
     NSLog(@"claimed\n");
 }
 
-- (void) timeout
+- (int) numPoints:(int)chan
 {
-	[self setTimeoutCount: timeoutCount+1];
-	if(timeoutCount>10){
-		[self postTimeoutAlarm];
-	}
-	
-	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
-	NSLogError(@"command timeout",[self fullID],nil);
+    return numPoints[chan]-6;
 }
 
-
-- (void) clearTimeoutAlarm
+- (long) dataSet:(int)chan valueAtChannel:(int)x
 {
-	[timeoutAlarm clearAlarm];
-	[timeoutAlarm release];
-	timeoutAlarm = nil;
+    return waveForm[chan][x+6]; //first 6 bytes are '#42500'
 }
 
-- (void) postTimeoutAlarm
-{
-	if(!timeoutAlarm){
-		NSString* alarmName = [NSString stringWithFormat:@"%@ Serial Port Timeout",[self fullID]];
-		timeoutAlarm = [[ORAlarm alloc] initWithName:alarmName severity:kHardwareAlarm];
-		[timeoutAlarm setSticky:NO];
-		[timeoutAlarm setHelpString:@"The serial port is not working. The port was closed. Acknowledging this alarm will clear it. You will need to reopen the serial port to try again."];
-		[[NSNotificationCenter defaultCenter] postNotificationName:ORTDS2024PortClosedAfterTimeout object:self];
-	}
-	[timeoutAlarm postAlarm];
-}
-
-- (int) numPoints:(int)index
-{
-    return numPoints[index];
-}
-
-- (long) dataSet:(int)index valueAtChannel:(int)x
-{
-    return waveForm[index][x+6];
-}
 - (BOOL) curveIsBusy
 {
-    return curveIsBusy;
+    return curvesThread!=nil;
 }
+
 @end
 
 @implementation ORTDS2024Model (private)
-- (void) curveThread
+
+- (id) threadToGetCurves:(id)userInfo thread:tw
+
 {
-    curveIsBusy = YES;
-    int i;
-    for(i=0;i<2500;i++){
-        waveForm[selectedChannel][i] = 0;
-    }
-    @try {
-        [self writeToDevice:[NSString stringWithFormat:@"DAT:SOU CH%d",selectedChannel+1]];
-        [self writeToDevice:@"DATa:ENCdg RPBINARY"];
-        [self writeToDevice:@"DATa:WIDth 1"];
+    int chan;
+    for(chan=0;chan<4;chan++){
+        if([tw cancelled])break;
 
-        [self writeToDevice:@"DATa:START 1"];
-        [self writeToDevice:@"DATa:STOP 2500"];
-        //[self readWaveformPreamble]; //<--- remove or decode
-        //[self readDataInfo];         //<--- remove or decode
-        unsigned char  reply[2600];
-        long n1 = 0;
-        long n2 = 0;
-        long n3 = 0;
-        n1 = [self writeReadFromDevice: @"CURVE?"
-                                  data: (char*)reply
-                             maxLength: 2500];
-        n1 = MIN(1024,n1);
-        if(n1!=0){
-            for(i=0;i<n1;i++){
-                waveForm[selectedChannel][i] = reply[i];
-            }
-            
-            n2 = [self readFromDevice: (char*)reply maxLength:2500];
-            n2 = MIN(1024,n2);
-            if(n2!=0){
-                for(i=0;i<n2;i++){
-                    waveForm[selectedChannel][i+n1] = reply[i];
-                }
-                n3 = [self readFromDevice: (char*)reply maxLength:2500 ];
-                n3 = MIN(452,n3);
-
-                for(i=0;i<n3;i++){
-                    waveForm[selectedChannel][i+n1+n2] = reply[i];
-                }
-            }
+        int i;
+        if(!(chanEnabledMask & (0x1<<chan))){
+            continue;
         }
-        long total = n1+n2+n3;
-        if(total > 2500)total = 2500;
-        numPoints[selectedChannel] = total;
-    }
-    @catch(NSException* e){
-        
-    }
-    
-    [[NSNotificationCenter defaultCenter]  postNotificationOnMainThreadWithName:ORWaveFormDataChanged object:self];
 
-    curveIsBusy = NO;
+        @try {
+            [self writeToDevice:[NSString stringWithFormat:@"DAT:SOU CH%d",chan+1]];
+            [self writeToDevice:@"DATa:ENCdg RPBINARY"];
+            [self writeToDevice:@"DATa:WIDth 1"];
+
+            [self writeToDevice:@"DATa:START 1"];
+            [self writeToDevice:@"DATa:STOP 2500"];
+            
+            int numBtyes = [self writeReadFromDevice: @"WFMPre?"
+                                      data: wfmPre[chan]
+                                 maxLength: 256];
+            wfmPre[chan][numBtyes] = "\0";
+            
+            unsigned char  reply[2600];
+            long n1 = 0;
+            long n2 = 0;
+            long n3 = 0;
+            n1 = [self writeReadFromDevice: @"CURVE?"
+                                      data: (char*)reply
+                                 maxLength: 2500];
+            n1 = MIN(1024,n1);
+            if([tw cancelled])break;
+
+            if(n1!=0){
+                for(i=0;i<n1;i++)waveForm[chan][i] = reply[i];
+                
+                n2 = [self readFromDevice: (char*)reply maxLength:2500];
+                n2 = MIN(1024,n2);
+                if([tw cancelled])break;
+
+                if(n2!=0){
+                    for(i=0;i<n2;i++) waveForm[chan][i+n1] = reply[i];
+                    n3 = [self readFromDevice: (char*)reply maxLength:2500 ];
+                    n3 = MIN(452,n3);
+                    if([tw cancelled])break;
+
+                    for(i=0;i<n3;i++)waveForm[chan][i+n1+n2] = reply[i];
+                }
+            }
+            long total = n1+n2+n3;
+            if(total > 2500)total = 2500;
+            numPoints[chan] = total;
+        }
+        @catch(NSException* e){
+        }
+    }
+    return @"done";
 }
 
 - (long) writeReadFromDevice: (NSString*) aCommand data: (char*) aData

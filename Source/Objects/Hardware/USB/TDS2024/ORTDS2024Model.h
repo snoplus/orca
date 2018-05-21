@@ -23,20 +23,21 @@
 
 @class ORUSBInterface;
 @class ORAlarm;
+@class ThreadWorker;
 
 @interface ORTDS2024Model : ORGroup <USBDevice> {
-    BOOL curveIsBusy;
+    ThreadWorker*   curvesThread;
 	NSLock*         localLock;
 	ORUSBInterface* usbInterface;
     NSString*       serialNumber;
 	ORAlarm*        noUSBAlarm;
 	BOOL            okToCheckUSB;
-	ORAlarm*		timeoutAlarm;
-	int				timeoutCount;
     int             pollTime;
-    int             selectedChannel;
+    int             chanEnabledMask;
     int             numPoints[4];
-    int             waveForm[4][2600];
+    unsigned char   waveForm[4][2600];
+    char            wfmPre[4][512];
+     NSMutableString* curveStr[4];
 }
 
 - (id) getUSBController;
@@ -44,8 +45,9 @@
 - (void) checkNoUsbAlarm;
 
 #pragma mark ***Accessors
-- (int)  selectedChannel;
-- (void) setSelectedChannel:(int)aChan;
+- (unsigned short) chanEnabledMask;
+- (void) setChanEnabledMask:(unsigned short)aMask;
+- (void) setChanEnabled:(unsigned short) aChan withValue:(BOOL) aState;
 - (int)  pollTime;
 - (void) setPollTime:(int)aPollTime;
 - (ORUSBInterface*) usbInterface;
@@ -53,6 +55,7 @@
 - (NSString*) serialNumber;
 - (void) setSerialNumber:(NSString*)aSerialNumber;
 - (BOOL) curveIsBusy;
+- (void) postCouchDB;
 
 - (unsigned long) vendorID;
 - (unsigned long) productID;
@@ -60,39 +63,31 @@
 - (void) connectionChanged;
 
 #pragma mark •••Cmd Handling
-- (void) cancelTimeout;
-- (void) startTimeout:(int)aDelay;
-- (void) setTimeoutCount:(int)aValue;
-- (void) timeout;
-- (void) clearTimeoutAlarm;
-- (void) postTimeoutAlarm;
-- (int) timeoutCount;
-
 - (void) interfaceAdded:(NSNotification*)aNote;
 - (void) interfaceRemoved:(NSNotification*)aNote;
 - (long) readFromDevice: (char*) aData maxLength: (long) aMaxLength;
 - (void) writeToDevice: (NSString*) aCommand;
 - (void) writeCommand:(NSString*)aCmd;
-- (void) queryAll;
 
 - (void) readIDString;
 - (void) readWaveformPreamble;
 - (void) pollHardware;
-- (void) getCurve;
+- (void) getCurves;
 - (void) readDataInfo;
 - (int) numPoints:(int)index;
 - (long) dataSet:(int)index valueAtChannel:(int)x;
+- (void) curvesThreadFinished:(id)userInfo;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 @end
 
-extern NSString* ORTDS2024SelectedChannelChanged;
+extern NSString* ORTDS2024ChanEnabledMaskChanged;
 extern NSString* ORTDS2024SerialNumberChanged;
 extern NSString* ORTDS2024USBInterfaceChanged;
 extern NSString* ORTDS2024Lock;
-extern NSString* ORTDS2024PortClosedAfterTimeout;
-extern NSString* ORTDS2024TimeoutCountChanged;
 extern NSString* ORTDS2024PollTimeChanged;
+extern NSString* ORTDS2024BusyChanged;
+
 extern NSString* ORWaveFormDataChanged;
