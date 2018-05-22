@@ -85,13 +85,14 @@
 {
     [self populateInterfacePopup];
 	[super awakeFromNib];
-    [[plotter yAxis] setRngLimitsLow:0 withHigh:5E9 withMinRng:25];
+    [[plotter yAxis] setRngLimitsLow:0 withHigh:300 withMinRng:10];
     int i;
     for(i=0;i<4;i++){
         ORXYPlot* aPlot= [[ORXYPlot alloc] initWithTag:i andDataSource:self];
         [plotter addPlot: aPlot];
         [aPlot setLineColor:[self colorForDataSet:i]];
         [aPlot setName:[NSString stringWithFormat:@"Ch %d",i]];
+        [aPlot setLineWidth:2];
         [aPlot release];
     }
     [plotter setShowLegend:YES];
@@ -100,9 +101,9 @@
     [[plotter xAxis] setRngDefaultsLow:0 withHigh:2500];
     [[plotter xAxis] setAllowNegativeValues:NO];
     
-    [[plotter yAxis] setRngLimitsLow:-65535/2 withHigh:65535/2 withMinRng:25];
-    [[plotter yAxis] setRngDefaultsLow:-65535/2 withHigh:65535/2];
-    [[plotter yAxis] setAllowNegativeValues:YES];
+    [[plotter yAxis] setRngLimitsLow:0 withHigh:300 withMinRng:25];
+    [[plotter yAxis] setRngDefaultsLow:0 withHigh:300];
+    [[plotter yAxis] setAllowNegativeValues:NO];
     
     for(i=0;i<4;i++){
         [[chanEnabledMatrix cellAtRow:0 column:i]setTag:i];

@@ -446,7 +446,6 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
         if(chanEnabledMask & (0x1<<curve)){
             for(i=6;i<2500-6;i++){
                 [curveStr[curve] appendFormat:@"%ld,",[self dataSet:curve valueAtChannel:i]];
-                if(i<10)NSLog(@"%d\n",waveForm[curve][i-6]);
                 
             }
         }
