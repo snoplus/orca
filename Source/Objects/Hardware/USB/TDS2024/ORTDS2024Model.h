@@ -57,8 +57,8 @@
 - (BOOL) curveIsBusy;
 - (void) postCouchDB;
 
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSArray*) vendorIDs;
+- (NSArray*) productIDs;
 - (NSString*) usbInterfaceDescription;
 - (void) connectionChanged;
 

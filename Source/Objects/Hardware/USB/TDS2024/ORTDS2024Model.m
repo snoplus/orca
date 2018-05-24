@@ -122,7 +122,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 - (void) connectionChanged
 {
-	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorID] product:[self productID]];
+	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorIDs] product:[self productIDs]];
 	NSString* sn = serialNumber;
 	if([interfaces count] == 1 && ![sn length]){
 		sn = [[interfaces objectAtIndex:0] serialNumber];
@@ -179,14 +179,14 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
    return [NSString stringWithFormat:@"TDS2024 (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSArray*) vendorIDs
 {
-	return 0x0699;
+	return @[@0x0699,@0x0699];
 }
 
-- (unsigned long) productID
+- (NSArray*) productIDs
 {
-	return 0x036a;
+	return @[@0x036a,@0x03a2];
 }
 
 - (id) getUSBController
@@ -319,7 +319,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 - (NSArray*) usbInterfaces
 {
-	return [[self getUSBController]  interfacesForVender:[self vendorID] product:[self productID]];
+    return [[self getUSBController]  interfacesForVenders:[self vendorIDs] products:[self productIDs]];
 }
 
 - (NSString*) usbInterfaceDescription
@@ -438,7 +438,6 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 - (void) postCouchDB
 {
-    NSMutableString* curveStr[4];;
     int curve;
     for(curve = 0;curve<4;curve++){
         curveStr[curve] = [NSMutableString stringWithCapacity:2500];
