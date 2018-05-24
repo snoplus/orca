@@ -21,7 +21,7 @@
 //-------------------------------------------------------------
 
 //If adding a device, don't forget to increment the following
-#define kNumberSupportedDevices 14
+#define kNumberSupportedDevices 15
 
 static struct supportedUSbDevices {
 	unsigned long vendorID;
@@ -42,7 +42,8 @@ static struct supportedUSbDevices {
 	{ 0x1fb9,	0x301,	@"ORLakeShore336"       },
     { 0x21E1,	0x0,	@"ORDT5720Model"        },
     { 0x21E1,   0x0,    @"ORDT5725Model"        },
-    { 0x0699,   0x036a, @"ORDT5725Model"        }
+    { 0x0699,   0x036a, @"ORTDS2024Model"       },
+    { 0x0699,   0x03a2, @"ORTDS2004Model"       }
     //If adding a device, don't forget to increment kNumberSupportedDevices above...
 };
 
