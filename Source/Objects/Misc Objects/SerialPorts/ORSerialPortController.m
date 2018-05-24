@@ -204,11 +204,20 @@
     [portListPopup addItemWithTitle:@"--"];
     NSArray* serialPorts = [[ORSerialPortList sharedSerialPortList] portList];
 	for (ORSerialPort* aPort in serialPorts) {
-        [portListPopup addItemWithTitle:[aPort name]];
+        NSString* portName = [aPort name];
+        if([portName length]!=0){
+            [portListPopup addItemWithTitle:[aPort name]];
+        }
 	}
-    int index = [portListPopup indexOfItemWithTitle:[[owner model] portName]];
-    if(index>0)[portListPopup selectItemWithTitle:[[owner model] portName]];
-    else [portListPopup selectItemAtIndex:0];
+    NSString* portName = [[owner model] portName];
+    if([portName length]!=0){
+        int index = [portListPopup indexOfItemWithTitle:portName];
+        if(index>0)[portListPopup selectItemWithTitle:portName];
+        else [portListPopup selectItemAtIndex:0];
+    }
+    else {
+        [portListPopup selectItemAtIndex:0];
+    }
 }
 @end
 
