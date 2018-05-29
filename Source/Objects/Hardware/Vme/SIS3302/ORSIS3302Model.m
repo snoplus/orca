@@ -3192,7 +3192,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	
 	int group;
 	for(group=0;group<4;group++){
-		if(dataRecord){
+		if(dataRecord[group]){
 			free(dataRecord[group]);
 			dataRecord[group] = nil;
 		}
