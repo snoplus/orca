@@ -105,7 +105,6 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 - (id) initWithCoder:(NSCoder *)aCoder {
     self = [super initWithCoder:aCoder];
     [self registerNotificationObservers];
-    [self activateKeepAlive];
     if (self) {
         //  Initialize model member variables
         currentModelState.smellieRate = 0;
@@ -150,6 +149,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         // latency from remote shift stations causing timeouts
         [connection setTimeout:2000];
     }
+    [self activateKeepAlive];
     return self;
 }
 - (void) encodeWithCoder:(NSCoder *)aCoder{
