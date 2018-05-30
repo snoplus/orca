@@ -1296,34 +1296,37 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 {
     id       aTask = [taskData objectForKey:@"Task"];
     NSString* text = [taskData objectForKey:@"Text"];
-    if(aTask != pingTask) return;
-    //NSLog(@"%@\n",text);
-	if([text rangeOfString:@"error:"].location!=NSNotFound){
-		[self setCompilerErrors:compilerErrors+1];
-		NSLogColor([NSColor redColor], @"%@\n",text);
-	}
-    else if([text rangeOfString:@"Permission denied"].location!= NSNotFound){
-        permissionDenied = YES;
+    if(aTask != pingTask){
+        //NSLog(@"%@\n",text);
+        if([text rangeOfString:@"error:"].location!=NSNotFound){
+            [self setCompilerErrors:compilerErrors+1];
+            NSLogColor([NSColor redColor], @"%@\n",text);
+        }
+        else if([text rangeOfString:@"Permission denied"].location!= NSNotFound){
+            permissionDenied = YES;
+        }
+        else if([text rangeOfString:@"warning"].location!=NSNotFound){
+            [self setCompilerWarnings:compilerWarnings+1];
+            NSLogColor([NSColor redColor], @"%@\n",text);
+        }
+        else if([text rangeOfString:@"goScript:"].location != NSNotFound){
+            [self setGoScriptFailed:YES];
+            NSLogColor([NSColor redColor], @"%@\n",text);
+        }
     }
-	else if([text rangeOfString:@"warning"].location!=NSNotFound){
-		[self setCompilerWarnings:compilerWarnings+1];
-		NSLogColor([NSColor redColor], @"%@\n",text);
-	}
-	else if([text rangeOfString:@"goScript:"].location != NSNotFound){
-		[self setGoScriptFailed:YES];
-		NSLogColor([NSColor redColor], @"%@\n",text);
-	}
-    else if([text rangeOfString:@" 0.0% packet loss"].location != NSNotFound){
-        pingedSuccessfully = YES;
-    }
-    else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
-        [self disconnectFromPingFailure];
-    }
-    else if([text rangeOfString:@"Host is down"].location != NSNotFound){
-        [self disconnectFromPingFailure];
-    }
-    else if([text rangeOfString:@"No route to host"].location != NSNotFound){
-        [self disconnectFromPingFailure];
+    else {
+        if([text rangeOfString:@" 0.0% packet loss"].location != NSNotFound){
+            pingedSuccessfully = YES;
+        }
+        else if([text rangeOfString:@"100.0% packet loss"].location != NSNotFound){
+            [self disconnectFromPingFailure];
+        }
+        else if([text rangeOfString:@"Host is down"].location != NSNotFound){
+            [self disconnectFromPingFailure];
+        }
+        else if([text rangeOfString:@"No route to host"].location != NSNotFound){
+            [self disconnectFromPingFailure];
+        }
     }
 }
 
