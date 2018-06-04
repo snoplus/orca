@@ -854,8 +854,8 @@
                     </connections>
                 </button>
                 <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="1926">
-                    <rect key="frame" x="15" y="52" width="464" height="123"/>
-                    <autoresizingMask key="autoresizingMask"/>
+                    <rect key="frame" x="10" y="52" width="496" height="123"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     <size key="cellSize" width="116" height="18"/>
                     <size key="intercellSpacing" width="0.0" height="-3"/>
