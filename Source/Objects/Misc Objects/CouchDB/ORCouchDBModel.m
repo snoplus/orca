@@ -1287,33 +1287,35 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 {
  //these are special records that any object can insert into the database via this notification
  //the userInfo should just be a dictionary that you want to go into the database
-    
-    [self checkDataBaseExists:aDataBaseRef];
+    if(!stealthMode){
 
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-    
-    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-    [dateFormatter setTimeZone:gmt];
-    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
-    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
-    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
-    [dateFormatter release];
-    
-    NSString* anId = [anObj fullID];
-    if([anId length] && aDictionary){
-        if(![lastTimeStamp length]) lastTimeStamp = @"0";
+        [self checkDataBaseExists:aDataBaseRef];
+
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
         
-        NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            anId,           @"_id",
-                                            anId,           @"name",
-                                            anId,			@"title",
-                                            lastTimeStamp,	@"timestamp",
-                                            [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-                                            nil];
+        NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+        [dateFormatter setTimeZone:gmt];
+        NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+        NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+        unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+        [dateFormatter release];
         
-        [aRecord addEntriesFromDictionary:aDictionary];
-        [aDataBaseRef updateDocument:aRecord documentId:anId tag:kDocumentAdded];
+        NSString* anId = [anObj fullID];
+        if([anId length] && aDictionary){
+            if(![lastTimeStamp length]) lastTimeStamp = @"0";
+            
+            NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                                anId,           @"_id",
+                                                anId,           @"name",
+                                                anId,			@"title",
+                                                lastTimeStamp,	@"timestamp",
+                                                [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                                nil];
+            
+            [aRecord addEntriesFromDictionary:aDictionary];
+            [aDataBaseRef updateDocument:aRecord documentId:anId tag:kDocumentAdded];
+        }
     }
 }
 
@@ -1333,31 +1335,36 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
     // (NSDictionary).
     //
     // The notification can also pass itself as an object to have its delegate called.
-    
-    NSDictionary* aDict = [aNote userInfo];
-    NSString* postToAddress = [aDict objectForKey:@"Address"];
-    NSDictionary* document = [aDict objectForKey:@"Document"];
-    if (postToAddress && document) {
-        [self postOrPutCustomRecord:document toAddress:postToAddress withDelegate:[aNote object]];
-    } else {
-        NSLog(@"postOrPutCustomRecord notification not properly constructed\n");
+    if(!stealthMode){
+
+        NSDictionary* aDict = [aNote userInfo];
+        NSString* postToAddress = [aDict objectForKey:@"Address"];
+        NSDictionary* document = [aDict objectForKey:@"Document"];
+        if (postToAddress && document) {
+            [self postOrPutCustomRecord:document toAddress:postToAddress withDelegate:[aNote object]];
+        } else {
+            NSLog(@"postOrPutCustomRecord notification not properly constructed\n");
+        }
     }
 }
 
 - (void) postOrPutCustomRecord:(NSDictionary*)aRecord toAddress:(NSString*)anAddr withDelegate:(id)del
 {
     // See documentation for postOrPutCustomRecord:(NSNotification*)aNote
-    
-    ORCouchDB* ref = [self statusDBRef:anAddr];
-    [ref setDelegate:del];
-    [self postOrPutCustomRecord:aRecord dataBaseRef:ref];
+    if(!stealthMode){
+
+        ORCouchDB* ref = [self statusDBRef:anAddr];
+        [ref setDelegate:del];
+        [self postOrPutCustomRecord:aRecord dataBaseRef:ref];
+    }
 }
 
 - (void) postOrPutCustomRecord:(NSDictionary*)aRecord dataBaseRef:(ORCouchDB*)aDataBaseRef
 {
     // See documentation for postOrPutCustomRecord:(NSNotification*)aNote
-    
-    [aDataBaseRef addDocument:aRecord tag:nil];
+    if(!stealthMode){
+        [aDataBaseRef addDocument:aRecord tag:nil];
+    }
 }
 
 - (void) checkDataBaseExists:(ORCouchDB*)aDataBase
@@ -1378,60 +1385,68 @@ static NSString* ORCouchDBModelInConnector 	= @"ORCouchDBModelInConnector";
 
 - (void) addAdcsToHistoryRecord:(NSNotification*)aNote
 {
-    [self addObject:[aNote object] adcDictionary:[aNote userInfo]];
+    if(!stealthMode){
+        [self addObject:[aNote object] adcDictionary:[aNote userInfo]];
+    }
 }
 
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary
 {
-    NSString* customDataBase = [aDictionary objectForKey:@"CustomDataBase"];
-    if(customDataBase){
-        aDictionary = [aDictionary objectForKey:@"DataBaseRecord"];
-        [self addObject:anObj adcDictionary:aDictionary dataBaseRef:[self historyDBRef:[@"history_" stringByAppendingString:customDataBase]]];
-    }
-    else {
-        [self addObject:anObj adcDictionary:aDictionary dataBaseRef:[self historyDBRef]];
+    if(!stealthMode){
+        NSString* customDataBase = [aDictionary objectForKey:@"CustomDataBase"];
+        if(customDataBase){
+            aDictionary = [aDictionary objectForKey:@"DataBaseRecord"];
+            [self addObject:anObj adcDictionary:aDictionary dataBaseRef:[self historyDBRef:[@"history_" stringByAppendingString:customDataBase]]];
+        }
+        else {
+            [self addObject:anObj adcDictionary:aDictionary dataBaseRef:[self historyDBRef]];
+        }
     }
 }
 
 - (void) addObject:(OrcaObject*)anObj adcDictionary:(NSDictionary*)aDictionary dataBaseRef:(ORCouchDB*)aDataBaseRef
 {
-    [self checkDataBaseExists:aDataBaseRef];
-    //these are special records that any object can insert into the database via this notification
-    //the userInfo should just be a dictionary that you want to go into the database
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
-    
-    NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
-    [dateFormatter setTimeZone:gmt];
-    NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
-    NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
-    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
-    [dateFormatter release];
-    
-    NSString* anId = [anObj fullID];
-    if([anId length] && aDictionary){
-        if(![lastTimeStamp length]) lastTimeStamp = @"0";
+    if(!stealthMode){
+        [self checkDataBaseExists:aDataBaseRef];
+        //these are special records that any object can insert into the database via this notification
+        //the userInfo should just be a dictionary that you want to go into the database
         
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        dateFormatter.dateFormat = @"yyyy/MM/dd HH:mm:ss";
         
-        NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                        lastTimeStamp,	@"timestamp",
-                                        [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
-                                        nil];
+        NSTimeZone* gmt = [NSTimeZone timeZoneWithAbbreviation:@"GMT"];
+        [dateFormatter setTimeZone:gmt];
+        NSString*   lastTimeStamp       = [dateFormatter stringFromDate:[NSDate date]];
+        NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
+        unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+        [dateFormatter release];
         
-        [aRecord addEntriesFromDictionary:aDictionary];
-        [aDataBaseRef addDocument:aRecord tag:kDocumentAdded];
+        NSString* anId = [anObj fullID];
+        if([anId length] && aDictionary){
+            if(![lastTimeStamp length]) lastTimeStamp = @"0";
+            
+            
+            NSMutableDictionary* aRecord = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                            lastTimeStamp,	@"timestamp",
+                                            [NSNumber numberWithUnsignedLong: secondsSince1970],		@"time",
+                                            nil];
+            
+            [aRecord addEntriesFromDictionary:aDictionary];
+            [aDataBaseRef addDocument:aRecord tag:kDocumentAdded];
+        }
     }
 }
 
 - (void) updateRunInfo
 {
-	NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-	if([runObjects count]){
-		ORRunModel* rc = [runObjects objectAtIndex:0];
-		[self updateRunState:rc];
-		[self updateDataSets];
-	}
+    if(!stealthMode){
+        NSArray* runObjects = [[self document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
+        if([runObjects count]){
+            ORRunModel* rc = [runObjects objectAtIndex:0];
+            [self updateRunState:rc];
+            [self updateDataSets];
+        }
+    }
 }
 
 - (void) updateRunState:(ORRunModel*)rc
