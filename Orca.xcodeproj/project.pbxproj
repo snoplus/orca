@@ -1375,6 +1375,9 @@
 		844049C308353B65000D03DB /* MemoryWatcherController.h in Headers */ = {isa = PBXBuildFile; fileRef = 844049C108353B65000D03DB /* MemoryWatcherController.h */; };
 		844049C408353B65000D03DB /* MemoryWatcherController.m in Sources */ = {isa = PBXBuildFile; fileRef = 844049C208353B65000D03DB /* MemoryWatcherController.m */; };
 		844049D408353D47000D03DB /* MemoryWatcher.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844049D308353D47000D03DB /* MemoryWatcher.nib */; };
+		8440A2ED20BD7BBF009E8033 /* ORSIS3316Card.hh in Headers */ = {isa = PBXBuildFile; fileRef = 8440A2EB20BD7BBE009E8033 /* ORSIS3316Card.hh */; };
+		8440A2EE20BD88B8009E8033 /* ORSIS3316Card.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8440A2EA20BD7BBD009E8033 /* ORSIS3316Card.cc */; };
+		8440A2EF20BD88B8009E8033 /* ORSIS3316Card.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8440A2EB20BD7BBE009E8033 /* ORSIS3316Card.hh */; };
 		84414BC51E770F980014EE41 /* ORFileGetterOp.h in Headers */ = {isa = PBXBuildFile; fileRef = 84414BC31E770F980014EE41 /* ORFileGetterOp.h */; };
 		84414BC61E770F980014EE41 /* ORFileGetterOp.m in Sources */ = {isa = PBXBuildFile; fileRef = 84414BC41E770F980014EE41 /* ORFileGetterOp.m */; };
 		844352090B56E9360033B918 /* FindPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = 844352060B56E9360033B918 /* FindPanel.nib */; };
@@ -3756,6 +3759,8 @@
 				84D787321B39D8EF004CCBCA /* ORSIS3305Card.cc in VME_Copy */,
 				43B191C31B4D641C003DD77F /* ORCAEN1730Readout.cc in VME_Copy */,
 				43B191C41B4D641C003DD77F /* ORCAEN1730Readout.hh in VME_Copy */,
+				8440A2EE20BD88B8009E8033 /* ORSIS3316Card.cc in VME_Copy */,
+				8440A2EF20BD88B8009E8033 /* ORSIS3316Card.hh in VME_Copy */,
 			);
 			name = VME_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4914,6 +4919,8 @@
 		844049C108353B65000D03DB /* MemoryWatcherController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryWatcherController.h; sourceTree = "<group>"; };
 		844049C208353B65000D03DB /* MemoryWatcherController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MemoryWatcherController.m; sourceTree = "<group>"; };
 		844049D308353D47000D03DB /* MemoryWatcher.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = MemoryWatcher.nib; path = "Source/Objects/Misc Objects/MemoryWatcher/MemoryWatcher.nib"; sourceTree = SOURCE_ROOT; };
+		8440A2EA20BD7BBD009E8033 /* ORSIS3316Card.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSIS3316Card.cc; sourceTree = "<group>"; };
+		8440A2EB20BD7BBE009E8033 /* ORSIS3316Card.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSIS3316Card.hh; sourceTree = "<group>"; };
 		84414BC31E770F980014EE41 /* ORFileGetterOp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORFileGetterOp.h; sourceTree = "<group>"; };
 		84414BC41E770F980014EE41 /* ORFileGetterOp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORFileGetterOp.m; sourceTree = "<group>"; };
 		8441B66F03CC9F33005F64B1 /* ORConnector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ORConnector.h; sourceTree = "<group>"; };
@@ -11356,6 +11363,8 @@
 				43ADFE6B10B6DBCF0044617C /* ORSIS3300Readout.hh */,
 				43ADFE6C10B6DBCF0044617C /* ORSIS3302Card.cc */,
 				43ADFE6D10B6DBCF0044617C /* ORSIS3302Card.hh */,
+				8440A2EA20BD7BBD009E8033 /* ORSIS3316Card.cc */,
+				8440A2EB20BD7BBE009E8033 /* ORSIS3316Card.hh */,
 				84D7872E1B39D865004CCBCA /* ORSIS3305Card.cc */,
 				84D7872F1B39D865004CCBCA /* ORSIS3305Card.hh */,
 				43ADFE6E10B6DBCF0044617C /* ORSIS3350Readout.cc */,
@@ -15609,6 +15618,7 @@
 				842A98900B5D7A14008ECAAD /* ORCommandCenter.h in Headers */,
 				8475974D0B5EF26500123411 /* ORSqlController.h in Headers */,
 				8475974F0B5EF26500123411 /* ORSqlModel.h in Headers */,
+				8440A2ED20BD7BBF009E8033 /* ORSIS3316Card.hh in Headers */,
 				84759D070B603B9400123411 /* ORCommandClient.h in Headers */,
 				84F7E2330B68281A00E52AA5 /* ORCrateLabelView.h in Headers */,
 				849E7C9A0B6957BF00353D50 /* ORADU200Controller.h in Headers */,
