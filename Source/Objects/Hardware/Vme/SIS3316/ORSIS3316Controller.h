@@ -38,9 +38,10 @@
     IBOutlet NSTextField*   addressText;
     IBOutlet NSPopUpButton* gainPU;
     IBOutlet NSPopUpButton* terminationPU;
-    IBOutlet NSPopUpButton* sharingPU;
+//    IBOutlet NSPopUpButton* sharingPU;
     
-    IBOutlet NSMatrix*		enabledMatrix;
+    IBOutlet NSMatrix*      enabledMatrix;
+    IBOutlet NSMatrix*      enabled1Matrix;
     IBOutlet NSMatrix*		heSuppressTrigModeMatrix;
     IBOutlet NSMatrix*		cfdControlMatrix;
     IBOutlet NSMatrix*		thresholdMatrix;
@@ -98,16 +99,12 @@
 	IBOutlet NSButton*		readThresholdButton;
     IBOutlet NSButton*      writeHistogramConfigurationButton;
     IBOutlet NSButton*      readHistogramConfigurationButton;
-	IBOutlet NSPopUpButton* clockSourcePU;
-    IBOutlet NSPopUpButton* hsDivPU;
-    IBOutlet NSTextField*   n1DivField;
+    IBOutlet NSPopUpButton* clockSourcePU;
+//    IBOutlet NSPopUpButton* hsDivPU;
+//    IBOutlet NSTextField*   n1DivField;
     IBOutlet NSTextField*   sampleFreqField;
     IBOutlet NSTextField*   pileUpWindowLenField;
     IBOutlet NSTextField*   rePileUpWindowLenField;
-
-
-    IBOutlet NSButton*      writeEventConfigButton;
-    IBOutlet NSButton*      readEventConfigButton;
 
     IBOutlet NSButton*      settingLockButton;
     IBOutlet NSButton*      initButton;
@@ -161,12 +158,12 @@
 - (void) nimControlStatusChanged: (NSNotification*)aNote;
 - (void) triggerDelayChanged: (NSNotification*)aNote;
 - (void) dacOffsetChanged:(NSNotification*)aNote;
-- (void) sharingChanged:(NSNotification*)aNote;
+//- (void) sharingChanged:(NSNotification*)aNote;
 - (void) lemoToMaskChanged:(NSNotification*)aNote;
 - (void) lemoUoMaskChanged:(NSNotification*)aNote;
 - (void) lemoCoMaskChanged:(NSNotification*)aNote;
-- (void) hsDivChanged:(NSNotification*)aNote;
-- (void) n1DivChanged:(NSNotification*)aNote;
+//- (void) hsDivChanged:(NSNotification*)aNote;
+//- (void) n1DivChanged:(NSNotification*)aNote;
 - (void) pileUpWindowLenChanged:(NSNotification*)aNote;
 - (void) rePileUpWindowLenChanged:(NSNotification*)aNote;
 
@@ -285,15 +282,15 @@
 - (IBAction) gainAction:(id)sender;
 - (IBAction) terminationAction:(id)sender;
 - (IBAction) dacOffsetAction:(id)sender;
-- (IBAction) sharingAction:(id)sender;
+//- (IBAction) sharingAction:(id)sender;
 - (IBAction) lemoToMaskAction:(id)sender;
 - (IBAction) lemoUoMaskAction:(id)sender;
 - (IBAction) lemoCoMaskAction:(id)sender;
 - (IBAction) loadDefaults:(id)sender;
 - (IBAction) internalGateLenAction:(id)sender;
 - (IBAction) internalCoinGateLenAction:(id)sender;
-- (IBAction) hsDivAction:(id)sender;
-- (IBAction) n1DivAction:(id)sender;
+//- (IBAction) hsDivAction:(id)sender;
+//- (IBAction) n1DivAction:(id)sender;
 - (IBAction) pileUpWindowLenAction:(id)sender;
 - (IBAction) rePileUpWindowLenAction:(id)sender;
 - (IBAction) dumpChan0Action:(id)sender;

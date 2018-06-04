@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14109" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1060" identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14109"/>
+        <deployment version="1080" identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -26,6 +26,7 @@
                 <outlet property="clrHistogramWithTSMatrix" destination="256-HA-5Mb" id="Cwo-ML-64l"/>
                 <outlet property="dacOffsetMatrix" destination="Ks9-Ex-5Gm" id="Gzh-ma-11h"/>
                 <outlet property="enableSumMatrix" destination="Upu-bP-6ML" id="VXO-oq-dvX"/>
+                <outlet property="enabled1Matrix" destination="1368" id="l2m-ZG-ANP"/>
                 <outlet property="enabledMatrix" destination="1523" id="1727"/>
                 <outlet property="endAddressMatrix" destination="hTz-4j-0Cc" id="4Jc-Sj-o1H"/>
                 <outlet property="endAddressSuppressionMatrix" destination="8KB-Hq-dHv" id="0cW-mT-Qkg"/>
@@ -42,7 +43,6 @@
                 <outlet property="heTrigThresholdMatrix" destination="ZIG-r5-1fr" id="cQV-ic-IGD"/>
                 <outlet property="heTrigThresholdSumMatrix" destination="U3O-6M-LHl" id="sQx-KJ-10n"/>
                 <outlet property="histogramsEnabledMatrix" destination="zd8-0L-3ZZ" id="yMb-M5-xeh"/>
-                <outlet property="hsDivPU" destination="cu1-Ue-geK" id="V6n-C4-dK0"/>
                 <outlet property="hwVersionField" destination="SrF-hQ-tct" id="y90-Fk-HSp"/>
                 <outlet property="initButton" destination="1217" id="1326"/>
                 <outlet property="intHeTrigOutPulseMatrix" destination="iZ7-cg-eZS" id="CTd-o4-z8S"/>
@@ -56,7 +56,6 @@
                 <outlet property="lemoUoMaskMatrix" destination="335-Rj-cdV" id="I3g-mS-Dov"/>
                 <outlet property="loadDefaultsButton" destination="6fL-kL-vYn" id="McN-KC-pPz"/>
                 <outlet property="moduleIDField" destination="2838" id="2840"/>
-                <outlet property="n1DivField" destination="Ov1-aU-YGq" id="eAe-QJ-alB"/>
                 <outlet property="nimControlStatusMatrix" destination="7dq-ve-G0n" id="rYD-nZ-qaE"/>
                 <outlet property="pileUpWindowLenField" destination="D6R-en-5Wf" id="z2c-5g-Kb1"/>
                 <outlet property="pileupEnabledMatrix" destination="0du-LW-ZH0" id="nqY-0e-7OY"/>
@@ -67,16 +66,13 @@
                 <outlet property="rawDataBufferLenField" destination="vrs-Qf-52V" id="UVo-7w-e0J"/>
                 <outlet property="rawDataBufferStartField" destination="5Fc-uG-GDC" id="otn-by-ay6"/>
                 <outlet property="rePileUpWindowLenField" destination="Rcv-Tv-T84" id="fYA-Ae-M44"/>
-                <outlet property="readEventConfigButton" destination="qZZ-jl-kXb" id="E1Q-vs-yFC"/>
                 <outlet property="readHistogramConfigurationButton" destination="c7H-zp-6C6" id="4zN-no-EGn"/>
                 <outlet property="readThresholdButton" destination="2190" id="2192"/>
                 <outlet property="revisionField" destination="job-xX-mKu" id="75K-dd-ewz"/>
                 <outlet property="riseTimeMatrix" destination="nZE-de-VlJ" id="zaQ-pi-g0b"/>
                 <outlet property="riseTimeSumMatrix" destination="z8I-df-J52" id="asT-Rm-wA8"/>
-                <outlet property="sampleFreqField" destination="dRo-dM-74L" id="MzR-rP-wDR"/>
                 <outlet property="serialNumberField" destination="CrN-pW-VP5" id="Vgm-WU-NbO"/>
                 <outlet property="settingLockButton" destination="1224" id="1305"/>
-                <outlet property="sharingPU" destination="j8X-oN-SHd" id="9sW-a2-XK5"/>
                 <outlet property="slotField" destination="1221" id="1301"/>
                 <outlet property="tabView" destination="1336" id="1779"/>
                 <outlet property="tauFactorMatrix" destination="PFO-94-JU4" id="OTm-8d-1Qa"/>
@@ -93,7 +89,6 @@
                 <outlet property="trigBothEdgesMatrix" destination="4Bz-pA-ssb" id="3Cs-im-Tz0"/>
                 <outlet property="triggerDelayMatrix" destination="xql-0V-7GG" id="nQI-nE-VNb"/>
                 <outlet property="window" destination="21" id="307"/>
-                <outlet property="writeEventConfigButton" destination="IFo-Mx-NHl" id="hgh-dd-g8q"/>
                 <outlet property="writeHistogramConfigurationButton" destination="7OC-q6-dxU" id="L3I-zF-ejv"/>
                 <outlet property="writeHitsIntoEventMemoryMatrix" destination="uag-t6-WK9" id="6gd-SD-YY2"/>
             </connections>
@@ -103,24 +98,24 @@
         <window title="SIS3316" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="21" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="222" y="-313" width="1394" height="930"/>
+            <rect key="contentRect" x="222" y="-313" width="1394" height="885"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="878"/>
             <value key="minSize" type="size" width="213" height="107"/>
             <view key="contentView" misplaced="YES" id="2">
-                <rect key="frame" x="0.0" y="0.0" width="1394" height="930"/>
+                <rect key="frame" x="0.0" y="0.0" width="1394" height="885"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView misplaced="YES" controlSize="small" id="1336">
-                        <rect key="frame" x="19" y="-266" width="1357" height="1168"/>
+                        <rect key="frame" x="19" y="-266" width="1357" height="1123"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <tabViewItems>
                             <tabViewItem label="Basic Ops" identifier="" id="1337">
                                 <view key="view" id="1339">
-                                    <rect key="frame" x="10" y="29" width="1337" height="1126"/>
+                                    <rect key="frame" x="10" y="25" width="1337" height="1085"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" boxType="secondary" borderType="bezel" title="Board Address" id="1218">
-                                            <rect key="frame" x="32" y="1065" width="177" height="59"/>
+                                            <rect key="frame" x="32" y="1024" width="177" height="59"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="Zi8-z7-Mlh">
                                                 <rect key="frame" x="3" y="3" width="171" height="41"/>
@@ -161,7 +156,7 @@
                                             </view>
                                         </box>
                                         <button misplaced="YES" id="1224">
-                                            <rect key="frame" x="5" y="295" width="36" height="46"/>
+                                            <rect key="frame" x="5" y="254" width="36" height="46"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="2874">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -172,12 +167,12 @@
                                             </connections>
                                         </button>
                                         <imageView id="1307">
-                                            <rect key="frame" x="5" y="1024" width="22" height="96"/>
+                                            <rect key="frame" x="5" y="983" width="22" height="96"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="SIS3300Card" id="2875"/>
                                         </imageView>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Module Info" id="iOO-wc-VNf">
-                                            <rect key="frame" x="32" y="943" width="177" height="118"/>
+                                            <rect key="frame" x="32" y="902" width="177" height="118"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="99B-bc-iLn">
                                                 <rect key="frame" x="1" y="1" width="175" height="102"/>
@@ -287,7 +282,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Acquistion Control" id="1298">
-                                            <rect key="frame" x="211" y="943" width="458" height="181"/>
+                                            <rect key="frame" x="211" y="902" width="458" height="181"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="HD7-h7-ajP">
                                                 <rect key="frame" x="2" y="2" width="454" height="164"/>
@@ -389,7 +384,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Box" titlePosition="noTitle" id="fUM-8q-TOz">
-                                            <rect key="frame" x="32" y="827" width="177" height="100"/>
+                                            <rect key="frame" x="32" y="786" width="177" height="100"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Fdk-BB-hRc">
                                                 <rect key="frame" x="1" y="1" width="175" height="98"/>
@@ -443,7 +438,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Event Configuration" id="2390">
-                                            <rect key="frame" x="674" y="884" width="365" height="240"/>
+                                            <rect key="frame" x="674" y="843" width="365" height="240"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Maf-eo-H4i">
                                                 <rect key="frame" x="1" y="1" width="363" height="224"/>
@@ -574,7 +569,7 @@
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="Input Invert" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="15z-Yq-CuD">
+                                                                <buttonCell type="check" title="Positive Signals" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="15z-Yq-CuD">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
@@ -678,30 +673,8 @@
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="IFo-Mx-NHl">
-                                            <rect key="frame" x="785" y="814" width="80" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="EC write" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="YxZ-n2-WkZ">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="writeEventConfigButton:" target="-2" id="OAA-DL-ney"/>
-                                            </connections>
-                                        </button>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="qZZ-jl-kXb">
-                                            <rect key="frame" x="693" y="814" width="80" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="EC read" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="JQy-4t-UAo">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="readEventConfigButton:" target="-2" id="y51-5F-wYM"/>
-                                            </connections>
-                                        </button>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Input" id="Nyi-k7-tIQ">
-                                            <rect key="frame" x="211" y="827" width="164" height="110"/>
+                                            <rect key="frame" x="211" y="786" width="164" height="110"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="gK4-Vu-76E">
                                                 <rect key="frame" x="1" y="1" width="162" height="94"/>
@@ -782,7 +755,7 @@
                                             <cells/>
                                         </matrix>
                                         <tabView misplaced="YES" controlSize="small" id="k2B-4h-qJi">
-                                            <rect key="frame" x="3" y="339" width="1331" height="476"/>
+                                            <rect key="frame" x="3" y="298" width="1331" height="476"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Main Settings" identifier="1" id="WwZ-ff-Haf">
@@ -2490,7 +2463,7 @@
                                                                     <action selector="enableSumAction:" target="-2" id="A2T-16-evP"/>
                                                                 </connections>
                                                             </matrix>
-                                                            <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autorecalculatesCellSize="YES" id="TLv-ng-rMR">
+                                                            <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" id="TLv-ng-rMR">
                                                                 <rect key="frame" x="1000" y="44" width="87" height="348"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -3388,7 +3361,7 @@
                                                                 </textFieldCell>
                                                             </textField>
                                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" id="qIU-cx-hv9">
-                                                                <rect key="frame" x="722" y="399" width="73" height="30"/>
+                                                                <rect key="frame" x="718" y="399" width="86" height="30"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="center" title="Extra Filter Average" id="a4e-er-Lmx">
                                                                     <font key="font" metaFont="smallSystem"/>
@@ -3421,50 +3394,6 @@
                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 </textFieldCell>
                                                             </textField>
-                                                            <button verticalHuggingPriority="750" misplaced="YES" id="2190">
-                                                                <rect key="frame" x="251" y="-2" width="119" height="28"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Dump Thresholds" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2880">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="dumpThresholdsAction:" target="-2" id="RIM-9b-TsT"/>
-                                                                </connections>
-                                                            </button>
-                                                            <button verticalHuggingPriority="750" misplaced="YES" id="KIb-sf-HTC">
-                                                                <rect key="frame" x="396" y="-2" width="89" height="28"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Dump DACs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="bcO-xx-6Po">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="dumpDACsAction:" target="-2" id="Eue-rc-81k"/>
-                                                                </connections>
-                                                            </button>
-                                                            <button verticalHuggingPriority="750" misplaced="YES" id="yj9-S2-8ni">
-                                                                <rect key="frame" x="499" y="-2" width="90" height="28"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Dump Gains" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="8vM-Eb-ae5">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="dumpGainsAction:" target="-2" id="ltE-05-3ub"/>
-                                                                </connections>
-                                                            </button>
-                                                            <button verticalHuggingPriority="750" misplaced="YES" id="19e-iR-Jua">
-                                                                <rect key="frame" x="592" y="-2" width="132" height="28"/>
-                                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                <buttonCell key="cell" type="push" title="Dump Trigger Setup" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="aKg-w6-Nlq">
-                                                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                                    <font key="font" metaFont="smallSystem"/>
-                                                                </buttonCell>
-                                                                <connections>
-                                                                    <action selector="dumpFirTriggerAction:" target="-2" id="gvj-yf-6Ix"/>
-                                                                </connections>
-                                                            </button>
                                                         </subviews>
                                                     </view>
                                                 </tabViewItem>
@@ -5350,32 +5279,14 @@
                                             </tabViewItems>
                                         </tabView>
                                         <box misplaced="YES" title="Clock Source" id="1902">
-                                            <rect key="frame" x="1051" y="943" width="167" height="177"/>
+                                            <rect key="frame" x="1041" y="1008" width="167" height="71"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jSp-ye-9Nk">
-                                                <rect key="frame" x="2" y="2" width="163" height="160"/>
+                                                <rect key="frame" x="2" y="2" width="163" height="54"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="j8X-oN-SHd">
-                                                        <rect key="frame" x="17" y="96" width="121" height="22"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="No Sharing" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="hFs-Wf-I3b" id="Shk-JJ-UtB">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <menu key="menu" title="OtherViews" id="Ot7-Uw-yiA">
-                                                                <items>
-                                                                    <menuItem title="No Sharing" state="on" id="hFs-Wf-I3b"/>
-                                                                    <menuItem title="Slave" id="zAW-xW-ufc"/>
-                                                                    <menuItem title="Master" id="eoi-v7-Db9"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="sharingAction:" target="-2" id="mUB-LP-duU"/>
-                                                        </connections>
-                                                    </popUpButton>
                                                     <popUpButton verticalHuggingPriority="750" misplaced="YES" id="1904">
-                                                        <rect key="frame" x="17" y="126" width="121" height="22"/>
+                                                        <rect key="frame" x="17" y="15" width="121" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <popUpButtonCell key="cell" type="push" title="Ext from NIM" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" selectedItem="oNC-fI-G4e" id="2881">
                                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
@@ -5393,141 +5304,136 @@
                                                             <action selector="clockSourceAction:" target="-2" id="1995"/>
                                                         </connections>
                                                     </popUpButton>
-                                                    <popUpButton verticalHuggingPriority="750" misplaced="YES" id="cu1-Ue-geK">
-                                                        <rect key="frame" x="24" y="43" width="51" height="22"/>
+                                                </subviews>
+                                            </view>
+                                        </box>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Data Buffer" id="B21-dV-qa5">
+                                            <rect key="frame" x="393" y="786" width="176" height="110"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <view key="contentView" id="NgZ-95-ibi">
+                                                <rect key="frame" x="1" y="1" width="174" height="94"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="0pk-CO-h6U">
+                                                        <rect key="frame" x="33" y="31" width="54" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <popUpButtonCell key="cell" type="push" title="4" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" tag="4" imageScaling="proportionallyDown" inset="2" selectedItem="t7M-vI-efg" id="mwj-Xt-G6U">
-                                                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Data Len:" id="STg-Bz-TT5">
                                                             <font key="font" metaFont="smallSystem"/>
-                                                            <menu key="menu" id="cJA-HS-Jqr">
-                                                                <items>
-                                                                    <menuItem title="4" state="on" tag="4" id="t7M-vI-efg"/>
-                                                                    <menuItem title="5" tag="5" id="5Ip-b8-bvB"/>
-                                                                    <menuItem title="6" tag="6" id="KWV-xp-FwW"/>
-                                                                    <menuItem title="7" tag="7" id="AoJ-4C-qJX"/>
-                                                                    <menuItem title="9" tag="9" id="2Tx-7L-nMm"/>
-                                                                    <menuItem title="11" tag="11" id="Bgd-S0-afe"/>
-                                                                </items>
-                                                            </menu>
-                                                        </popUpButtonCell>
-                                                        <connections>
-                                                            <action selector="hsDivAction:" target="-2" id="Q2O-oJ-aYM"/>
-                                                        </connections>
-                                                    </popUpButton>
-                                                    <textField verticalHuggingPriority="750" misplaced="YES" id="Ov1-aU-YGq">
-                                                        <rect key="frame" x="90" y="46" width="38" height="19"/>
+                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                        </textFieldCell>
+                                                    </textField>
+                                                    <textField verticalHuggingPriority="750" id="vrs-Qf-52V">
+                                                        <rect key="frame" x="93" y="28" width="61" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="N0x-z3-J0K">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="q7c-db-e0R">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                         <connections>
-                                                            <action selector="n1DivAction:" target="-2" id="aUd-l3-qc5"/>
+                                                            <action selector="rawDataBufferLenAction:" target="-2" id="w5J-dK-gHS"/>
                                                         </connections>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="oGz-Ru-2bt">
-                                                        <rect key="frame" x="25" y="68" width="49" height="17"/>
+                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="Cwj-nk-ucV">
+                                                        <rect key="frame" x="18" y="58" width="69" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="HS Div" id="8Cb-Ae-1mr">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Buffer Start:" id="13r-XP-DfZ">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
                                                     </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="jyo-qU-LZO">
-                                                        <rect key="frame" x="85" y="68" width="49" height="17"/>
+                                                    <textField verticalHuggingPriority="750" id="5Fc-uG-GDC">
+                                                        <rect key="frame" x="93" y="55" width="61" height="19"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="N1 Div" id="aJO-06-fnD">
+                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="Ant-zh-EiM">
                                                             <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                                         </textFieldCell>
-                                                    </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="dRo-dM-74L">
-                                                        <rect key="frame" x="25" y="21" width="64" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="--" id="DHd-X9-Yfb">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
-                                                    </textField>
-                                                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="dee-Zr-wd0">
-                                                        <rect key="frame" x="93" y="21" width="58" height="17"/>
-                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                        <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="left" title="MHz" id="dX2-Be-n5P">
-                                                            <font key="font" metaFont="smallSystem"/>
-                                                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        </textFieldCell>
+                                                        <connections>
+                                                            <action selector="rawDataBufferStartAction:" target="-2" id="eJV-bT-J8s"/>
+                                                        </connections>
                                                     </textField>
                                                 </subviews>
                                             </view>
                                         </box>
-                                        <textField verticalHuggingPriority="750" misplaced="YES" id="5Fc-uG-GDC">
-                                            <rect key="frame" x="582" y="888" width="61" height="19"/>
+                                        <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Reporting" id="wb8-D6-7d7">
+                                            <rect key="frame" x="1044" y="843" width="164" height="161"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="Ant-zh-EiM">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <action selector="rawDataBufferStartAction:" target="-2" id="eJV-bT-J8s"/>
-                                            </connections>
-                                        </textField>
-                                        <textField verticalHuggingPriority="750" misplaced="YES" id="vrs-Qf-52V">
-                                            <rect key="frame" x="582" y="861" width="61" height="19"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" drawsBackground="YES" id="q7c-db-e0R">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <connections>
-                                                <action selector="rawDataBufferLenAction:" target="-2" id="w5J-dK-gHS"/>
-                                            </connections>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="Cwj-nk-ucV">
-                                            <rect key="frame" x="507" y="891" width="69" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Buffer Start:" id="13r-XP-DfZ">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" id="0pk-CO-h6U">
-                                            <rect key="frame" x="522" y="864" width="54" height="14"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Data Len:" id="STg-Bz-TT5">
-                                                <font key="font" metaFont="smallSystem"/>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <button verticalHuggingPriority="750" misplaced="YES" id="FDi-s3-OkB">
-                                            <rect key="frame" x="1047" y="892" width="103" height="28"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="push" title="Dump All Regs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7jw-il-YbY">
-                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="smallSystem"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="dumpChan0Action:" target="-2" id="xJs-Aa-sBg"/>
-                                            </connections>
-                                        </button>
+                                            <view key="contentView" id="Rfv-sd-YHq">
+                                                <rect key="frame" x="1" y="1" width="162" height="145"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                                <subviews>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="2190">
+                                                        <rect key="frame" x="15" y="115" width="132" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Dump Thresholds" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="2880">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="dumpThresholdsAction:" target="-2" id="RIM-9b-TsT"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="KIb-sf-HTC">
+                                                        <rect key="frame" x="15" y="88" width="132" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Dump DACs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="bcO-xx-6Po">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="dumpDACsAction:" target="-2" id="Eue-rc-81k"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="yj9-S2-8ni">
+                                                        <rect key="frame" x="15" y="60" width="132" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Dump Gains" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="8vM-Eb-ae5">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="dumpGainsAction:" target="-2" id="ltE-05-3ub"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="19e-iR-Jua">
+                                                        <rect key="frame" x="15" y="32" width="132" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Dump Trigger Setup" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" inset="2" id="aKg-w6-Nlq">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="dumpFirTriggerAction:" target="-2" id="gvj-yf-6Ix"/>
+                                                        </connections>
+                                                    </button>
+                                                    <button verticalHuggingPriority="750" misplaced="YES" id="FDi-s3-OkB">
+                                                        <rect key="frame" x="15" y="7" width="132" height="28"/>
+                                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                                        <buttonCell key="cell" type="push" title="Dump All Regs" bezelStyle="rounded" alignment="center" controlSize="small" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="7jw-il-YbY">
+                                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                            <font key="font" metaFont="smallSystem"/>
+                                                        </buttonCell>
+                                                        <connections>
+                                                            <action selector="dumpChan0Action:" target="-2" id="xJs-Aa-sBg"/>
+                                                        </connections>
+                                                    </button>
+                                                </subviews>
+                                            </view>
+                                        </box>
                                     </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Rates" identifier="" id="1338">
                                 <view key="view" id="1340">
-                                    <rect key="frame" x="10" y="25" width="1337" height="1130"/>
+                                    <rect key="frame" x="10" y="25" width="1337" height="1085"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box boxType="secondary" borderType="bezel" title="Integration Time (s)" titlePosition="noTitle" id="1341">
-                                            <rect key="frame" x="658" y="955" width="94" height="34"/>
+                                            <rect key="frame" x="658" y="910" width="94" height="34"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="2NP-Sp-odS">
                                                 <rect key="frame" x="3" y="3" width="88" height="28"/>
@@ -5569,7 +5475,7 @@
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
                                         <box misplaced="YES" boxType="secondary" borderType="bezel" title="WaveForm Rates" id="1346">
-                                            <rect key="frame" x="17" y="722" width="412" height="401"/>
+                                            <rect key="frame" x="17" y="677" width="412" height="401"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="fMJ-LS-QTl">
                                                 <rect key="frame" x="3" y="3" width="406" height="384"/>
@@ -6019,6 +5925,9 @@
                                                                 </buttonCell>
                                                             </column>
                                                         </cells>
+                                                        <connections>
+                                                            <action selector="enabledAction:" target="-2" id="CQS-ZD-HX6"/>
+                                                        </connections>
                                                     </matrix>
                                                     <textField verticalHuggingPriority="750" id="1349">
                                                         <rect key="frame" x="50" y="361" width="43" height="14"/>
@@ -6068,7 +5977,7 @@
                                             <font key="titleFont" metaFont="label"/>
                                         </box>
                                         <button id="1406">
-                                            <rect key="frame" x="473" y="965" width="63" height="18"/>
+                                            <rect key="frame" x="473" y="920" width="63" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Log" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="2907">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -6079,7 +5988,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" id="1458">
-                                            <rect key="frame" x="473" y="1108" width="129" height="14"/>
+                                            <rect key="frame" x="473" y="1063" width="129" height="14"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Total Rate vs. Time" id="2908">
                                                 <font key="font" metaFont="smallSystem"/>
@@ -6088,7 +5997,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <customView id="2930" customClass="ORCompositeTimeLineView">
-                                            <rect key="frame" x="434" y="989" width="315" height="116"/>
+                                            <rect key="frame" x="434" y="944" width="315" height="116"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <connections>
                                                 <outlet property="delegate" destination="-2" id="2933"/>
@@ -6107,7 +6016,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="308"/>
             </connections>
-            <point key="canvasLocation" x="672" y="281"/>
+            <point key="canvasLocation" x="672" y="258.5"/>
         </window>
         <customObject id="387" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <window title="Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1483" userLabel="Panel" customClass="NSPanel">

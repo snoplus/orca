@@ -102,7 +102,7 @@ NSString* ORSIS3316EnableSumChanged                 = @"ORSIS3316EnableSumChange
 NSString* ORSIS3316RiseTimeSumChanged               = @"ORSIS3316RiseTimeSumChanged";
 NSString* ORSIS3316GapTimeSumChanged                = @"ORSIS3316GapTimeSumChanged";
 NSString* ORSIS3316CfdControlBitsSumChanged         = @"ORSIS3316CfdControlBitsSumChanged";
-NSString* ORSIS3316SharingChanged                   = @"ORSIS3316SharingChanged";
+//NSString* ORSIS3316SharingChanged                   = @"ORSIS3316SharingChanged";
 
 NSString* ORSIS3316LemoCoMaskChanged                = @"ORSIS3316LemoCoMaskChanged";
 NSString* ORSIS3316LemoUoMaskChanged                = @"ORSIS3316LemoUoMaskChanged";
@@ -111,8 +111,8 @@ NSString* ORSIS3316LemoToMaskChanged                = @"ORSIS3316LemoToMaskChang
 NSString* ORSIS3316InternalGateLenChanged           = @"ORSIS3316InternalGateLenChanged";
 NSString* ORSIS3316InternalCoinGateLenChanged       = @"ORSIS3316InternalCoinGateLenChanged";
 
-NSString* ORSIS3316HsDivChanged                     = @"ORSIS3316HsDivChanged";
-NSString* ORSIS3316N1DivChanged                     = @"ORSIS3316N1DivChanged";
+//NSString* ORSIS3316HsDivChanged                     = @"ORSIS3316HsDivChanged";
+//NSString* ORSIS3316N1DivChanged                     = @"ORSIS3316N1DivChanged";
 
 NSString* ORSIS3316PileUpWindowLengthChanged        = @"ORSIS3316PileUpWindowLengthChanged";
 NSString* ORSIS3316RePileUpWindowLengthChanged      = @"ORSIS3316RePileUpWindowLengthChanged";
@@ -348,12 +348,6 @@ unsigned char freqPreset250MHz[6]  = {0x20,0xC2,0xBC,0x33,0xE4,0xF2};
 @implementation ORSIS3316Model
 
 #pragma mark •••Static Declarations
-//static unsigned long bankMemory[4][2]={
-//{0x00400000,0x00600000},
-//{0x00480000,0x00680000},
-//{0x00500000,0x00700000},
-//{0x00580000,0x00780000},
-//};
 
 static unsigned long eventCountOffset[4][2]={ //group,bank
 {0x00200010,0x00200014},
@@ -909,7 +903,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                   group,
                   c1 , c2,
                   addr,
-                  aValue>>20 & 0xFFF
+                  aValue>>20 & 0xF
                   );
     }
     
@@ -1553,32 +1547,32 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 }
 //6.16 Programmable Clock I2C registers
 
-- (unsigned short) hsDiv
-{
-    return hsDiv;
-}
-
-- (void) setHsDiv:(unsigned short)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setHsDiv:hsDiv];
-    if(aValue==0)aValue = 4;
-    else if(aValue>11)aValue = 11;
-    hsDiv = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HsDivChanged object:self];
-}
-- (unsigned short) n1Div;
-{
-    return n1Div;
-}
-
-- (void) setN1Div:(unsigned short)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setN1Div:n1Div];
-    if(aValue<2)aValue = 2;
-    else if(aValue>126)aValue = 126;
-    n1Div = aValue/2*2;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316N1DivChanged object:self];
-}
+//- (unsigned short) hsDiv
+//{
+//    return hsDiv;
+//}
+//
+//- (void) setHsDiv:(unsigned short)aValue
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setHsDiv:hsDiv];
+//    if(aValue==0)aValue = 4;
+//    else if(aValue>11)aValue = 11;
+//    hsDiv = aValue;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316HsDivChanged object:self];
+//}
+//- (unsigned short) n1Div;
+//{
+//    return n1Div;
+//}
+//
+//- (void) setN1Div:(unsigned short)aValue
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setN1Div:n1Div];
+//    if(aValue<2)aValue = 2;
+//    else if(aValue>126)aValue = 126;
+//    n1Div = aValue/2*2;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316N1DivChanged object:self];
+//}
 
 //6.17 ADC Sample Clock distribution control register (0x50)
 - (long) clockSource
@@ -1742,7 +1736,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (unsigned long) readAcquisitionRegister:(BOOL)verbose
 {
-    unsigned long addr = [self singleRegister:kAcqControlStatusReg];
+    unsigned long addr   = [self singleRegister:kAcqControlStatusReg];
     unsigned long aValue =  [self readLongFromAddress:addr];
 
     if(verbose){
@@ -2117,17 +2111,17 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
             @"LU Table 1 Coin Stretched Output Pulse",
          };
         int bit[21] ={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,24};
-        int width = 62;
+        int width = 60;
         NSLog(@"\n");
         NSString* title = [NSString stringWithFormat:@"Internal Trig Feedback Select (0x%lx)",addr];
         NSLogStartTable(title, width);
-        NSLogMono(@"| Bit |                 Function                |    Value   |\n");
+        NSLogMono(@"| Bit |                   Function                 |  Set  |\n");
         NSLogDivider(@"-",width);
         
         int i;
         for(i =0; i < 21; i++) {
             unsigned long theBit  = ((aValue >> bit[i]) & 0x1);
-            NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:39],[theBit?@"Selected":@" -- " centered:10]);
+            NSLogMono(@"|  %2d | %@ | %@ |\n",bit[i],[name[i] leftJustified:42],[theBit?@"X":@"-" centered:5]);
         }
         NSLogDivider(@"=",width);
         NSLog(@"\n");
@@ -2295,137 +2289,137 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     NSLog(@"\n");
 }
 //6.6 ADC Input tap delay registers
-- (void) setSharing:(int)aValue
-{
-    [[[self undoManager] prepareWithInvocationTarget:self] setSharing:sharing];
-    sharing = aValue;
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316SharingChanged object:self];
-}
-- (int) sharing
-{
-    return sharing;
-}
+//- (void) setSharing:(int)aValue
+//{
+//    [[[self undoManager] prepareWithInvocationTarget:self] setSharing:sharing];
+//    sharing = aValue;
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316SharingChanged object:self];
+//}
+//- (int) sharing
+//{
+//    return sharing;
+//}
 
-- (void) setClockFreq
-{
-    unsigned HSdiv_reg[6];
-    unsigned HSdiv_val[6];
-    
-    HSdiv_reg[0] =  0 ;
-    HSdiv_val[0] =  4 ;
-    
-    HSdiv_reg[1] =  1 ;
-    HSdiv_val[1] =  5 ;
-    
-    HSdiv_reg[2] =  2 ;
-    HSdiv_val[2] =  6 ;
-    
-    HSdiv_reg[3] =  3 ;
-    HSdiv_val[3] =  7 ;
-    
-    HSdiv_reg[4] =  5 ;
-    HSdiv_val[4] =  9 ;
-    
-    HSdiv_reg[5] =  7 ;
-    HSdiv_val[5] =  11 ;
-
-    unsigned long hsDiv_local = 0xff;
-    int i;
-    for (i=0;i<6;i++){
-        if (HSdiv_val[i] == hsDiv) {
-            hsDiv_local = HSdiv_reg[i] ;
-        }
-    }
-
-    unsigned long n1Div_local = n1Div - 1 ;
-    
-    unsigned char freqSI570_high_speed_rd_value[6];
-    [self si570ReadDivider:0 data:freqSI570_high_speed_rd_value];
-    
-    unsigned char freqSI570_high_speed_wr_value[6];
-    freqSI570_high_speed_wr_value[0] = ((hsDiv_local & 0x7) << 5) + ((n1Div_local & 0x7c) >> 2);
-    freqSI570_high_speed_wr_value[1] = ((n1Div_local & 0x3) << 6) + (freqSI570_high_speed_rd_value[1] & 0x3F);
-    freqSI570_high_speed_wr_value[2] = freqSI570_high_speed_rd_value[2];
-    freqSI570_high_speed_wr_value[3] = freqSI570_high_speed_rd_value[3];
-    freqSI570_high_speed_wr_value[4] = freqSI570_high_speed_rd_value[4];
-    freqSI570_high_speed_wr_value[5] = freqSI570_high_speed_rd_value[5];
-    
-    
-    [self setFrequency:0 values:freqSI570_high_speed_wr_value];
-
-}
-#define OSC_ADR    0x55
-
-- (void) si570ReadDivider:(int) osc data:(unsigned char*)data
-{
-    int rc;
-    char ack;
-    int i;
-    
-    // start
-    rc = [self i2cStart:osc];
-    if(rc){
-        [self i2cStop:osc];
-        return;
-    }
-    
-    // address
-    rc = [self i2cWriteByte:osc data:OSC_ADR<<1 ack:&ack];
-    if(rc){
-        [self i2cStop:osc];
-    }
-    
-    if(!ack){
-        [self i2cStop:osc];
-    }
-    
-    // register offset
-    rc = [self i2cWriteByte:osc data:0x0D ack:&ack];
-    if(rc){
-        [self i2cStop:osc];
-        return;
-    }
-    
-    if(!ack){
-        [self i2cStop:osc];
-        return;
-    }
-    
-    
-    rc = [self i2cStart:osc];
-    if(rc){
-        [self i2cStop:osc];
-        return;
-    }
-    
-    // address + 1
-    rc = [self i2cWriteByte:osc data:(OSC_ADR<<1) + 1 ack: &ack];
-    if(rc){
-        [self i2cStop:osc];
-        return;
-    }
-    
-    if(!ack){
-        [self i2cStop:osc];
-        return;
-    }
-    
-    
-    // read data
-    for(i = 0;i < 6;i++){
-        ack = 1 ;
-        if (i==5) {ack = 0;}
-        rc = [self i2cReadByte:osc data:&data[i] ack: ack];
-        if(rc){
-            [self i2cStop:osc];
-            return;
-        }
-        
-    }
-    
-    // stop
-    [self i2cStop:osc];
-}
+//- (void) setClockFreq
+//{
+//    unsigned HSdiv_reg[6];
+//    unsigned HSdiv_val[6];
+//
+//    HSdiv_reg[0] =  0 ;
+//    HSdiv_val[0] =  4 ;
+//
+//    HSdiv_reg[1] =  1 ;
+//    HSdiv_val[1] =  5 ;
+//
+//    HSdiv_reg[2] =  2 ;
+//    HSdiv_val[2] =  6 ;
+//
+//    HSdiv_reg[3] =  3 ;
+//    HSdiv_val[3] =  7 ;
+//
+//    HSdiv_reg[4] =  5 ;
+//    HSdiv_val[4] =  9 ;
+//
+//    HSdiv_reg[5] =  7 ;
+//    HSdiv_val[5] =  11 ;
+//
+//    unsigned long hsDiv_local = 0xff;
+//    int i;
+//    for (i=0;i<6;i++){
+//        if (HSdiv_val[i] == hsDiv) {
+//            hsDiv_local = HSdiv_reg[i] ;
+//        }
+//    }
+//
+//    unsigned long n1Div_local = n1Div - 1 ;
+//
+//    unsigned char freqSI570_high_speed_rd_value[6];
+//    [self si570ReadDivider:0 data:freqSI570_high_speed_rd_value];
+//
+//    unsigned char freqSI570_high_speed_wr_value[6];
+//    freqSI570_high_speed_wr_value[0] = ((hsDiv_local & 0x7) << 5) + ((n1Div_local & 0x7c) >> 2);
+//    freqSI570_high_speed_wr_value[1] = ((n1Div_local & 0x3) << 6) + (freqSI570_high_speed_rd_value[1] & 0x3F);
+//    freqSI570_high_speed_wr_value[2] = freqSI570_high_speed_rd_value[2];
+//    freqSI570_high_speed_wr_value[3] = freqSI570_high_speed_rd_value[3];
+//    freqSI570_high_speed_wr_value[4] = freqSI570_high_speed_rd_value[4];
+//    freqSI570_high_speed_wr_value[5] = freqSI570_high_speed_rd_value[5];
+//
+//
+//    [self setFrequency:0 values:freqSI570_high_speed_wr_value];
+//
+//}
+//#define OSC_ADR    0x55
+//
+//- (void) si570ReadDivider:(int) osc data:(unsigned char*)data
+//{
+//    int rc;
+//    char ack;
+//    int i;
+//
+//    // start
+//    rc = [self i2cStart:osc];
+//    if(rc){
+//        [self i2cStop:osc];
+//        return;
+//    }
+//
+//    // address
+//    rc = [self i2cWriteByte:osc data:OSC_ADR<<1 ack:&ack];
+//    if(rc){
+//        [self i2cStop:osc];
+//    }
+//
+//    if(!ack){
+//        [self i2cStop:osc];
+//    }
+//
+//    // register offset
+//    rc = [self i2cWriteByte:osc data:0x0D ack:&ack];
+//    if(rc){
+//        [self i2cStop:osc];
+//        return;
+//    }
+//
+//    if(!ack){
+//        [self i2cStop:osc];
+//        return;
+//    }
+//
+//
+//    rc = [self i2cStart:osc];
+//    if(rc){
+//        [self i2cStop:osc];
+//        return;
+//    }
+//
+//    // address + 1
+//    rc = [self i2cWriteByte:osc data:(OSC_ADR<<1) + 1 ack: &ack];
+//    if(rc){
+//        [self i2cStop:osc];
+//        return;
+//    }
+//
+//    if(!ack){
+//        [self i2cStop:osc];
+//        return;
+//    }
+//
+//
+//    // read data
+//    for(i = 0;i < 6;i++){
+//        ack = 1 ;
+//        if (i==5) {ack = 0;}
+//        rc = [self i2cReadByte:osc data:&data[i] ack: ack];
+//        if(rc){
+//            [self i2cStop:osc];
+//            return;
+//        }
+//
+//    }
+//
+//    // stop
+//    [self i2cStop:osc];
+//}
 
 //6.7 ADC Gain and Termination Control register
 - (unsigned short) gain
@@ -2502,22 +2496,23 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.9 ADC Offset
 - (void) configureAnalogRegisters
 {
-    // set ADC chips via SPI
-    int iadc;
-    for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
-        [self writeLong:0x81001404 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]]; // SPI (OE)  set binary
-        usleep(1);
-        [self writeLong:0x81401404 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  set binary
-        usleep(1);
-        [self writeLong:0x8100ff01 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  update
-        usleep(1);
-        [self writeLong:0x8140ff01 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  update
-        usleep(1);
-    }
+//    // set ADC chips via SPI
+//    int iadc;
+//    for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
+//        [self writeLong:0x81001404 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]]; // SPI (OE)  set binary
+//        usleep(1);
+//        [self writeLong:0x81401404 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  set binary
+//        usleep(1);
+//        [self writeLong:0x8100ff01 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  update
+//        usleep(1);
+//        [self writeLong:0x8140ff01 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  update
+//        usleep(1);
+//    }
     
     //  set ADC offsets (DAC)
     //dacoffset[iadc] = 0x8000; //2V Range: -1 to 1V 0x8000, -2V to 0V 13000
-    for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
+    int iadc;
+   for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
         [self writeLong:0x88f00001
               toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:iadc]]; // set internal Reference
         usleep(1);
@@ -2566,6 +2561,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) setEventConfigBit:(unsigned short)bit withValue:(BOOL)aValue
 {
+    if(bit == 0)aValue = !aValue;
     long  aMask = eventConfigMask;
     if(aValue)      aMask |= (0x1<<bit);
     else            aMask &= ~(0x1<<bit);
@@ -2744,12 +2740,13 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.17 Raw Data Buffer Configuration registers
 - (unsigned long) rawDataBufferLen
 {
-    return rawDataBufferLen & 0xffff;
+    return rawDataBufferLen+1 & 0xfffe;
 }
 
 - (void) setRawDataBufferLen:(unsigned long)aValue
 {
-    if(aValue > 0xFFFF) aValue = 0xFFFF;
+    aValue = aValue+1 & 0xfffe;
+    if(aValue > 0xFFFe) aValue = 0xFFFe;
     
     [[[self undoManager] prepareWithInvocationTarget:self] setRawDataBufferLen:[self rawDataBufferLen]];
     rawDataBufferLen=aValue;
@@ -2899,8 +2896,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
     int i;
     for(i=0;i<kNumSIS3316Groups;i++){
-        //unsigned long aValue = 0x0f0f0f0f;//<<<<<<<---------hard coded for now---------------
-        unsigned long aValue = 0x0;//<<<<<<<---------hard coded for now---------------
+        unsigned long aValue = 0x0a0a0a;//<<<<<<<---------hard coded for now---------------
+        //unsigned long aValue = 0x0;//<<<<<<<---------hard coded for now---------------
         [self writeLong:aValue toAddress:[self groupRegister:kDataFormatConfigReg group:i]];
      }
 }
@@ -3815,6 +3812,7 @@ NSString* tauTable[4] ={
 //6.39.7 Key address: Disarm Bankx and Arm Bank1
 - (void) armBank1
 {
+    previousBank = 2;
     [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmXArmBank1Reg]];
     currentBank = 1;
 }
@@ -3822,6 +3820,7 @@ NSString* tauTable[4] ={
 //6.39.8 Key address: Disarm Bankx and Arm Bank2
 - (void) armBank2
 {
+    previousBank = 1;
     [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmXArmBank2Reg]];
     currentBank = 2;
 }
@@ -3944,16 +3943,13 @@ NSString* tauTable[4] ={
 {
     [self reset];
     //setup from the 3316 examples
-    [self getFrequency:0];
-    [self write_channel_header_ID:[self baseAddress] & 0xff000000] ;
+    //[self getFrequency:0];
     [self adcSpiSetup];
-    //[self configure_all_adc_dac_offsets];
-    //[self write_all_adc_dac_offsets];
-    //[self configureAnalogRegisters];
+    [self configureAnalogRegisters];
     [self write_all_gain_termination_values];
     
-    [self resetADCClockDCM];
-    [self setClockFreq];
+    //[self resetADCClockDCM];
+    //[self setClockFreq];
     [self writePileUpRegisters];
     [self writeActiveTrigGateWindowLen];
     [self writePreTriggerDelays];
@@ -3976,71 +3972,74 @@ NSString* tauTable[4] ={
     [self writeLemoUoMask];
     
     [self writeGateLengthConfiguration];
+    
+    [self write_channel_header_IDs] ;
+
 }
 #pragma mark •••Setup Utilities
-- (void) getFrequency:(int)osc
-{
-    [self si570ReadDivider:osc data:freqSI570_calibrated_value_125MHz];
-
-    //---------------------------------------------------------------------------------
-    //???? not used in the 3316 example code. Included here but not used in ORCA either
-    freqPreset62_5MHz[0] = 0x23;
-    freqPreset62_5MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
-    freqPreset62_5MHz[2] = freqSI570_calibrated_value_125MHz[2];
-    freqPreset62_5MHz[3] = freqSI570_calibrated_value_125MHz[3];
-    freqPreset62_5MHz[4] = freqSI570_calibrated_value_125MHz[4];
-    freqPreset62_5MHz[5] = freqSI570_calibrated_value_125MHz[5];
-    
-    freqPreset125MHz[0] = 0x21;
-    freqPreset125MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
-    freqPreset125MHz[2] = freqSI570_calibrated_value_125MHz[2];
-    freqPreset125MHz[3] = freqSI570_calibrated_value_125MHz[3];
-    freqPreset125MHz[4] = freqSI570_calibrated_value_125MHz[4];
-    freqPreset125MHz[5] = freqSI570_calibrated_value_125MHz[5];
-    
-    freqPreset250MHz[0] = 0x20;
-    freqPreset250MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
-    freqPreset250MHz[2] = freqSI570_calibrated_value_125MHz[2];
-    freqPreset250MHz[3] = freqSI570_calibrated_value_125MHz[3];
-    freqPreset250MHz[4] = freqSI570_calibrated_value_125MHz[4];
-    freqPreset250MHz[5] = freqSI570_calibrated_value_125MHz[5];
-    //---------------------------------------------------------------------------------
-}
+//- (void) getFrequency:(int)osc
+//{
+//    [self si570ReadDivider:osc data:freqSI570_calibrated_value_125MHz];
+//
+//    //---------------------------------------------------------------------------------
+//    //???? not used in the 3316 example code. Included here but not used in ORCA either
+//    freqPreset62_5MHz[0] = 0x23;
+//    freqPreset62_5MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
+//    freqPreset62_5MHz[2] = freqSI570_calibrated_value_125MHz[2];
+//    freqPreset62_5MHz[3] = freqSI570_calibrated_value_125MHz[3];
+//    freqPreset62_5MHz[4] = freqSI570_calibrated_value_125MHz[4];
+//    freqPreset62_5MHz[5] = freqSI570_calibrated_value_125MHz[5];
+//
+//    freqPreset125MHz[0] = 0x21;
+//    freqPreset125MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
+//    freqPreset125MHz[2] = freqSI570_calibrated_value_125MHz[2];
+//    freqPreset125MHz[3] = freqSI570_calibrated_value_125MHz[3];
+//    freqPreset125MHz[4] = freqSI570_calibrated_value_125MHz[4];
+//    freqPreset125MHz[5] = freqSI570_calibrated_value_125MHz[5];
+//
+//    freqPreset250MHz[0] = 0x20;
+//    freqPreset250MHz[1] = (0x3 << 6) + (freqSI570_calibrated_value_125MHz[1] & 0x3F);
+//    freqPreset250MHz[2] = freqSI570_calibrated_value_125MHz[2];
+//    freqPreset250MHz[3] = freqSI570_calibrated_value_125MHz[3];
+//    freqPreset250MHz[4] = freqSI570_calibrated_value_125MHz[4];
+//    freqPreset250MHz[5] = freqSI570_calibrated_value_125MHz[5];
+//    //---------------------------------------------------------------------------------
+//}
 
 - (int) adcSpiSetup
 {
     unsigned long adc_chip_id;
     unsigned long addr, data;
-    unsigned i_adc_fpga_group;
-    unsigned i_adc_chip;
+    unsigned iGroup_fpga_group;
+    unsigned iGroup_chip;
     
     // disable ADC output
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        [self writeLong:0x0 toAddress:[self groupRegister:kAdcSpiControlReg group:i_adc_fpga_group]];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        [self writeLong:0x0 toAddress:[self groupRegister:kAdcSpiControlReg group:iGroup_fpga_group]];
     }
     
     // dummy loop to access each adc chip one time after power up -- add 12.02.2015
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
-            [self adc_spi_read_group:i_adc_fpga_group chip:i_adc_chip address:1 data:&data];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        for (iGroup_chip = 0; iGroup_chip < 2; iGroup_chip++) {
+            [self adc_spi_read_group:iGroup_fpga_group chip:iGroup_chip address:1 data:&data];
         }
     }
     
     // reset
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
-            [self adc_spi_write_group:i_adc_fpga_group chip:i_adc_chip address: 0x0 data:0x24]; // soft reset
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        for (iGroup_chip = 0; iGroup_chip < 2; iGroup_chip++) {
+            [self adc_spi_write_group:iGroup_fpga_group chip:iGroup_chip address: 0x0 data:0x24]; // soft reset
         }
         usleep(10) ; // after reset
     }
     
     [self adc_spi_read_group:0 chip:0 address:1 data:&adc_chip_id]; // read chip Id from adc chips ch1/2
     
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
-            [self adc_spi_read_group:i_adc_fpga_group chip: i_adc_chip address: 1 data:&data];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        for (iGroup_chip = 0; iGroup_chip < 2; iGroup_chip++) {
+            [self adc_spi_read_group:iGroup_fpga_group chip: iGroup_chip address: 1 data:&data];
             if (data != adc_chip_id) {
-                NSLog(@"i_adc_fpga_group = %d   i_adc_chip = %d    data = 0x%08x     adc_chip_id = 0x%08x     \n", i_adc_fpga_group, i_adc_chip, data, adc_chip_id);
+                NSLog(@"iGroup_fpga_group = %d   iGroup_chip = %d    data = 0x%08x     adc_chip_id = 0x%08x     \n", iGroup_fpga_group, iGroup_chip, data, adc_chip_id);
                 return -1 ;
             }
         }
@@ -4059,9 +4058,9 @@ NSString* tauTable[4] ={
     else { // 125 MHz chip AD9268
         data = 0x40 ;     // Output type LVDS (bit6 = 1), Output inverted (bit2 = 0) !
     }
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
-            [self adc_spi_write_group:i_adc_fpga_group chip:i_adc_chip address: 0x14 data: data];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        for (iGroup_chip = 0; iGroup_chip < 2; iGroup_chip++) {
+            [self adc_spi_write_group:iGroup_fpga_group chip:iGroup_chip address: 0x14 data: data];
         }
     }
     
@@ -4074,23 +4073,23 @@ NSString* tauTable[4] ={
         //data = 0x8 ;     //  1.75V
         data = 0xC0 ;     //  2.0V
     }
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
-            [self adc_spi_write_group: i_adc_fpga_group chip:i_adc_chip address: 0x18 data: data];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        for (iGroup_chip = 0; iGroup_chip < 2; iGroup_chip++) {
+            [self adc_spi_write_group: iGroup_fpga_group chip:iGroup_chip address: 0x18 data: data];
         }
     }
 
     // reg 0xff : register update
     data = 0x01 ;     // update
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        for (i_adc_chip = 0; i_adc_chip < 2; i_adc_chip++) {
-            [self adc_spi_write_group:i_adc_fpga_group chip: i_adc_chip address: 0xff data: data];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        for (iGroup_chip = 0; iGroup_chip < 2; iGroup_chip++) {
+            [self adc_spi_write_group:iGroup_fpga_group chip: iGroup_chip address: 0xff data: data];
         }
     }
     
     // enable ADC output
-    for (i_adc_fpga_group = 0; i_adc_fpga_group < 4; i_adc_fpga_group++) {
-        addr = [self groupRegister:kAdcSpiControlReg group:i_adc_fpga_group];
+    for (iGroup_fpga_group = 0; iGroup_fpga_group < 4; iGroup_fpga_group++) {
+        addr = [self groupRegister:kAdcSpiControlReg group:iGroup_fpga_group];
         [self writeLong:0x1000000 toAddress:addr];
     }
     
@@ -4160,28 +4159,17 @@ NSString* tauTable[4] ={
     return 0 ;
 }
 
-- (void) write_channel_header_ID:(unsigned int) channel_header_id_reg_value
+- (void) write_channel_header_IDs
 {
     // Channel Header ID register
-    unsigned long data =   channel_header_id_reg_value;
-    [self writeLong:data            toAddress:[self groupRegister:kChanHeaderIdReg group:0]];
-    [self writeLong:data + 0x400000 toAddress:[self groupRegister:kChanHeaderIdReg group:1]];
-    [self writeLong:data + 0x800000 toAddress:[self groupRegister:kChanHeaderIdReg group:2]];
-    [self writeLong:data + 0xC00000 toAddress:[self groupRegister:kChanHeaderIdReg group:3]];
-}
-
-- (void) configure_all_adc_dac_offsets
-{
-    unsigned int dac_offset ;
-    unsigned int i_adc_fpga_group;
+    unsigned long data =   0x0;
+    [self writeLong:data | (0x0<<22) toAddress:[self groupRegister:kChanHeaderIdReg group:0]];
+    [self writeLong:data | (0x1<<22) toAddress:[self groupRegister:kChanHeaderIdReg group:1]];
+    [self writeLong:data | (0x2<<22) toAddress:[self groupRegister:kChanHeaderIdReg group:2]];
+    [self writeLong:data | (0x3<<22) toAddress:[self groupRegister:kChanHeaderIdReg group:3]];
+    unsigned long aValue = [self readLongFromAddress:[self groupRegister:kChanHeaderIdReg group:0]];
+    NSLog(@"chan id: 0x%08x\n",aValue);
     
-    for (i_adc_fpga_group=0;i_adc_fpga_group<4;i_adc_fpga_group++) {
-        dac_offset = dacOffsets[i_adc_fpga_group];
-        [self writeLong:0x88f00000 + 0x1 toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:i_adc_fpga_group]];// Standalone mode, set Internal Reference
-        [self poll_on_adc_dac_offset_busy];
-        [self writeLong:0xC0000000       toAddress:[self groupRegister:kAdcOffsetDacCntrlReg group:i_adc_fpga_group]];// CMD: DAC LDAC (load)
-        [self poll_on_adc_dac_offset_busy];
-    }
 }
 
 - (void) poll_on_adc_dac_offset_busy
@@ -4194,38 +4182,13 @@ NSString* tauTable[4] ={
     } while ( ((data & 0xf) != 0) && (poll_counter > 0)) ;
 }
 
-- (void) write_all_adc_dac_offsets
-{
-    unsigned int i_adc_fpga_group;
-    
-    for (i_adc_fpga_group=0;i_adc_fpga_group<4;i_adc_fpga_group++) {
-        
-        unsigned long addr = [self groupRegister:kAdcOffsetDacCntrlReg group:i_adc_fpga_group]; //group address
-        
-        [self writeLong:0x82000000 + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ A
-        [self poll_on_adc_dac_offset_busy];
-        
-        [self writeLong:0x82100000 + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ B
-        [self poll_on_adc_dac_offset_busy];
-        
-        [self writeLong:0x82200000  + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ C
-        [self poll_on_adc_dac_offset_busy];
-        
-        [self writeLong:0x82300000  + ([self dacOffset:i_adc_fpga_group] << 4) toAddress:addr]; //DAQ D
-        [self poll_on_adc_dac_offset_busy];
-        
-        [self writeLong:0xC0000000 toAddress:addr]; //LOAD
-        [self poll_on_adc_dac_offset_busy];
-    }
-}
-
 - (void) write_all_gain_termination_values
 {
-    unsigned int i_adc_fpga_group;
+    unsigned int iGroup_fpga_group;
     unsigned long all = termination<<2 | gain;
     unsigned long aValue = all | (all<<8) | (all<<16) | (all<<24);
-    for (i_adc_fpga_group=0; i_adc_fpga_group<4; i_adc_fpga_group++) {
-        [self writeLong:aValue toAddress:[self groupRegister:kAdcGainTermCntrlReg group:i_adc_fpga_group]];
+    for (iGroup_fpga_group=0; iGroup_fpga_group<4; iGroup_fpga_group++) {
+        [self writeLong:aValue toAddress:[self groupRegister:kAdcGainTermCntrlReg group:iGroup_fpga_group]];
     }
 }
 
@@ -4441,12 +4404,9 @@ NSString* tauTable[4] ={
 	[self armBank2];
 	[self setLed:YES];
 	isRunning = NO;
-    int group;
-    for(group=0;group<kNumSIS3316Groups;group++){
-        //[dataBuffer[group] release];
-        //dataBuffer[group] = [[NSMutableData alloc] initWithLength:endAddress[group]];
-    }
-    waitingOnChannelMask = 0x0; //not waiting on any channel
+     waitingOnChannelMask = 0x0; //not waiting on any channel
+    firstTime    = YES;
+
 }
 
 //**************************************************************************************
@@ -4455,125 +4415,86 @@ NSString* tauTable[4] ={
 //**************************************************************************************
 - (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {
-//     1 - 2 done in the initBoard method
-//    1. Disarm or Reset command
-//    2. Set address threshold registers
-    
-//    3 done in runTaskStarted
-//    3. Disarm active Bank and arm Bank2 command (start with the second bank)
-    
-//    do {
-//        4a. Poll on address threshold flag and wait until valid
-//        (also possible to wait for a defined time)
-//        5a. Disarm active Bank and arm Bank1 command
-//        6a. check if the active Bank is swapped (also possible to wait for defined time,
-//                                                 for example the length of time of one event )
-//            7a. read “Previous Bank Sample address registers Ch1 to Ch16”
-//            (bit 24 will be cleared if the address corresponds to theBank1 and will be set
-//             if the address correspond to Bank2, means for checking whether the active
-//             bank was swapped already)
-//            8a. read sampled data from Ch1 to Ch16 (Memory Bank 2)
-//            4b. Poll on address threshold flag and wait until valid
-//            (also possible to wait for a defined time)
-//            5b. Disarm active Bank and arm Bank2 command
-//            6b. check if the active Bank is swapped
-//                7b. read “Previous Bank Sample address registers Ch1 to Ch16”
-//                8b. read sampled data from Ch1 to Ch16 (Memory Bank 1)
-//                } (run == 1)
-//    9. Disarm command
-    
-    unsigned long bankSampleAddr[4] = {0x1120,0x1124,0x1128,0x112c};
-    unsigned long dataOffsetBank1[4] = {0x00000000,0x02000000,0x00000000,0x02000000};
-    unsigned long dataOffsetBank2[4] = {0x01000000,0x03000000,0x01000000,0x03000000};
     @try {
-        isRunning = YES;
-        if(waitingOnChannelMask == 0x0){
-            if([self addressThresholdFlag]){ //checks the OR of the address threshold flags
-                [self switchBanks];
-                waitingOnChannelMask    = enabledMask;
-                //groupDataTransferedMask = 0x0;
+        if(firstTime){
+            int chan;
+            for(chan=0;chan<kNumSIS3316Channels;chan++){
+                dataRecord[chan]        = malloc(rawDataBufferLen*sizeof(unsigned long)+100);
             }
+            firstTime = NO;
         }
-        else {
+        isRunning = YES;
+        
+        unsigned long acqRegValue =  [self readLongFromAddress:[self singleRegister:kAcqControlStatusReg]];
+        if((acqRegValue >> 19) & 0x1){ //checks the OR of the address threshold flags
+            unsigned long bit[4] = {25,27,29,31};
+            [self switchBanks];
+            [ORTimer delayNanoseconds:2E3]; //up to 2µs to for bank switch
             //appears to be data. wait on each channel for the bank switch to finish
-            int i;
-            for(i=0;i<kNumSIS3316Channels;i++){
-                if((enabledMask>>i) & 0x1){
-                    int group = i%4;
-                    unsigned long prevBankEndingAddress = [self readLongFromAddress:[self baseAddress]+bankSampleAddr[group]];
-                    //bit 24 is 0 for bank1, 1 for bank2. currentBank is 1 or 2
-                    if(((prevBankEndingAddress>>24) & 0x1) != currentBank-1){
-                        waitingOnChannelMask &= ~(0x1L << i);
-                    }
-                
-                    if(!((waitingOnChannelMask>>i) & 0x1)){
-                        
-                        unsigned long expectedNumberOfWords = prevBankEndingAddress & 0x00FFFFFF;
-                        if(expectedNumberOfWords>0 ){
-                            if(i&0x1 == 0){
-                                //only transfer once for 0,1  | 2,3 | etc...
-                                unsigned long memory_bank_offset_addr ;
-                                if (currentBank == 1) memory_bank_offset_addr = dataOffsetBank1[i]; // Bank1 offset
-                                else                  memory_bank_offset_addr = dataOffsetBank2[i]; // Bank2 offset
-                            
-                                //transfer data to fifo
-                                unsigned long addr = 0x80 + (group * 4) ;
-                                unsigned long data = 0x80000000 + memory_bank_offset_addr ;
-                                [self writeLong:data toAddress: [self baseAddress] + addr];
-                                //NSLog(@"Transfer | addr: 0x%0x data: 0x%08x\n",addr,data);
-                                [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
-                            }
-                           // NSLog(@"chan: %d getting %d words\n",i,expectedNumberOfWords);
-                            if(expectedNumberOfWords>4096)expectedNumberOfWords = 4096; //tmp TBD..make variable
-                            unsigned long addr = 0x100000 + (group * 0x100000)  ;
-                            dataBuffer[0] = dataId | rawDataBufferLen+2;
-                            dataBuffer[1] = location | ((i & 0x000000ff)<<8); //add in the channel
-                            [[self adapter] readLongBlock:&dataBuffer[2]
-                                                atAddress:addr
-                                                numToRead:rawDataBufferLen
-                                               withAddMod:0x09
-                                            usingAddSpace:0x01];
-                            
-                            //----test output------
-//                            unsigned long formatBits     = dataBuffer[2] & 0xf;
-//                            unsigned long chanID         = dataBuffer[2]>>4 & 0xfff;
-//                            unsigned long long tsHi      = (dataBuffer[2]>>16);
-//                            unsigned long long timeStamp = (tsHi << 32) | dataBuffer[3];
-//                            NSLog(@"=========================\n");
-//                            NSLog(@"rawDataBufferLen: %d\n",rawDataBufferLen);
-//                            NSLog(@"formatBits: 0x%x\n",formatBits);
-//                            NSLog(@"chanID: 0x%x\n",chanID);
-//                            NSLog(@"timeStamp: 0x%llx\n",timeStamp);
-                            //------------------------
-                            
-                            [aDataPacket addLongsToFrameBuffer:dataBuffer length:rawDataBufferLen+2];
-                            ++waveFormCount[0];
+            int chan;
+            for(chan=0;chan<16;chan++){
+                int iGroup    = chan/4;
+                if((acqRegValue>>bit[iGroup] & 0x1)){
 
-                            
-                        }
+                    unsigned long prevBankEndingAddress     = [self readLongFromAddress:baseAddress + 0x1120
+                                                               + iGroup*0x1000
+                                                               + (chan%4)*0x4];
+                
+                    [ORTimer delayNanoseconds:2E3]; //2us to finish bank switch -- SBC uses a loop here. But this is for testing, so just delay
+                   if((((prevBankEndingAddress & 0x1000000) >> 24 )  != (previousBank-1))){
+                       NSLog(@"BANK switch error: bank %d bit: %d\n",currentBank, (prevBankEndingAddress & 0x1000000) >> 24);
+                    }
+                    unsigned long expectedNumberOfWords     = prevBankEndingAddress & 0x00FFFFFF;
+                    if(expectedNumberOfWords>0 ){
+                        //first must transfer data from ADC FIFO to VME FIFO
+                        unsigned long prevBankReadBeginAddress  = (prevBankEndingAddress & 0x03000000) + 0x10000000*((chan/2)%2);
+                        unsigned long data = 0x80000000 + prevBankReadBeginAddress; //read, memory for ch1 & ch2
+                        [self writeLong:data toAddress: baseAddress + 0x80 + iGroup*0x4];
+                        [ORTimer delayNanoseconds:2E3]; //up to 2µs to transfer
+                        
+                        unsigned long orcaHeaderLen = 10;
+                        unsigned long dataHeaderLen =  7;
+                        expectedNumberOfWords = ((expectedNumberOfWords) & 0xfffffE);
+                        if(expectedNumberOfWords > rawDataBufferLen+dataHeaderLen) expectedNumberOfWords = rawDataBufferLen+dataHeaderLen; //we are slow so just read the first waveform
+                        dataRecord[chan][0] = dataId | expectedNumberOfWords+orcaHeaderLen;
+                        dataRecord[chan][1] = location | ((chan & 0xff)<<8); //add in the channel
+                        dataRecord[chan][2] = rawDataBufferLen;
+                        dataRecord[chan][3] = 0; //spares
+                        dataRecord[chan][4] = 0;
+                        dataRecord[chan][5] = 0;
+                        dataRecord[chan][6] = 0;
+                        dataRecord[chan][7] = 0;
+                        dataRecord[chan][8] = 0;
+                        dataRecord[chan][9] = 0;
+                        [[self adapter] readLongBlock:&dataRecord[chan][orcaHeaderLen]
+                                            atAddress:baseAddress + 0x100000 + iGroup*0x100000
+                                            numToRead:expectedNumberOfWords
+                                           withAddMod:0x09
+                                        usingAddSpace:0x01];
+                        [aDataPacket addLongsToFrameBuffer:dataRecord[chan] length:expectedNumberOfWords+orcaHeaderLen];
+                        ++waveFormCount[chan];
                     }
                 }
             }
         }
-	}
-	@catch(NSException* localException) {
-		[self incExceptionCount];
-		[localException raise];
-	}
+    }
+    @catch(NSException* localException) {
+        [self incExceptionCount];
+        [localException raise];
+    }
 }
-
 
 - (void) readStatistics
 {
     // start readout FSM
-    int i_adc=0; // only channel 1 to ch4
+    int iGroup=0; // only channel 1 to ch4
     // Space = Statistic counter
-    [self writeLong:0x80000000 + 0x30000000  toAddress: [self singleRegister:kAdcCh1_Ch4DataCntrReg] + (i_adc*4)];
+    [self writeLong:0x80000000 + 0x30000000  toAddress: [self singleRegister:kAdcCh1_Ch4DataCntrReg] + (iGroup*4)];
     
     // read from FIFO
     unsigned long dataBuffer[100];
     [[self adapter] readLongBlock:dataBuffer
-                        atAddress:[self baseAddress] + 0x100000 + (i_adc*0x100000)
+                        atAddress:[self baseAddress] + 0x100000 + (iGroup*0x100000)
                         numToRead:63
                        withAddMod:[self addressModifier]
                     usingAddSpace:0x01];
@@ -4600,6 +4521,14 @@ NSString* tauTable[4] ={
     [waveFormRateGroup stop];
 	[self setLed:NO];
     [self disarmSampleLogic];
+    int chan;
+    for(chan=0;chan<kNumSIS3316Channels;chan++){
+        if(dataRecord[chan]){
+            free(dataRecord[chan]);
+            dataRecord[chan] = nil;
+        }
+    }
+
 }
 
 //this is the data structure for the new SBCs (i.e. VX704 from Concurrent)
@@ -4612,7 +4541,7 @@ NSString* tauTable[4] ={
 	configStruct->card_info[index].crate					= [self crateNumber];
 	configStruct->card_info[index].add_mod					= [self addressModifier];
 	configStruct->card_info[index].base_add					= [self baseAddress];
-    //configStruct->card_info[index].deviceSpecificData[0]	= bankSwitchMode;
+    configStruct->card_info[index].deviceSpecificData[0]	= [self rawDataBufferLen];
 	configStruct->card_info[index].num_Trigger_Indexes		= 0;
 	
 	configStruct->card_info[index].next_Card_Index 	= index+1;	
@@ -4689,8 +4618,8 @@ NSString* tauTable[4] ={
     [self setLemoToMask:                [decoder decodeInt32ForKey: @"lemoToMask"]];
     [self setAcquisitionControlMask:    [decoder decodeInt32ForKey: @"acquisitionControlMask"]];
     [self setNIMControlStatusMask:      [decoder decodeInt32ForKey: @"nimControlStatusMask"]];
-    [self setHsDiv:                     [decoder decodeIntForKey:   @"hsDiv"]];
-    [self setN1Div:                     [decoder decodeIntForKey:   @"n1Div"]];
+//    [self setHsDiv:                     [decoder decodeIntForKey:   @"hsDiv"]];
+//    [self setN1Div:                     [decoder decodeIntForKey:   @"n1Div"]];
     [self setRawDataBufferLen:          [decoder decodeInt32ForKey: @"rawDataBufferLen"]];
     [self setRawDataBufferStart:        [decoder decodeInt32ForKey: @"rawDataBufferStart"]];
     [self setPileUpWindow:              [decoder decodeInt32ForKey: @"pileUpWindowLength"]];
@@ -4814,8 +4743,8 @@ NSString* tauTable[4] ={
 
     //clocks
     [encoder encodeInt:   clockSource                forKey:@"clockSource"];
-    [encoder encodeInt:   hsDiv                      forKey:@"hsDiv"];
-    [encoder encodeInt:   n1Div                      forKey:@"n1Div"];
+//    [encoder encodeInt:   hsDiv                      forKey:@"hsDiv"];
+//    [encoder encodeInt:   n1Div                      forKey:@"n1Div"];
     [encoder encodeObject:waveFormRateGroup          forKey:@"waveFormRateGroup"];
     [encoder encodeInt32: nimControlStatusMask       forKey:@"nimControlStatusMask"];
     [encoder encodeInt32: pileUpWindowLength         forKey:@"pileUpWindowLength"];

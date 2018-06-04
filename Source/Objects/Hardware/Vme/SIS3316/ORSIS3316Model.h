@@ -223,8 +223,8 @@ enum {
     unsigned short  dacOffsets[kNumSIS3316Groups];
     long            trigBothEdgesMask;
     long            intHeTrigOutPulseMask;
-    unsigned short  hsDiv;
-    unsigned short  n1Div;
+//    unsigned short  hsDiv;
+//    unsigned short  n1Div;
     
     
     unsigned long   eventConfigMask;
@@ -268,13 +268,14 @@ enum {
 
     
     int             currentBank;
+    int             previousBank;
 	BOOL			isRunning;
  	
 	unsigned short	moduleID;
     unsigned long   clockSource;
     unsigned short  gain;
     unsigned short  termination;
-    int             sharing; //clock sharing
+//    int             sharing; //clock sharing
     
 	//control status reg
  
@@ -310,14 +311,14 @@ enum {
     unsigned long   lemoToMask;
     unsigned long   internalGateLen[kNumSIS3316Groups];       //6.24
     unsigned long   internalCoinGateLen[kNumSIS3316Groups];   //6.24
-    unsigned long  dataBuffer[4096];
+    unsigned long*  dataRecord[kNumSIS3316Channels];
     
     unsigned char freqSI570_calibrated_value_125MHz[6]; // new 20.11.2013
     unsigned char freqPreset62_5MHz[6];
     unsigned char freqPreset125MHz[6];
     unsigned char freqPreset250MHz[6];
     unsigned int adc_125MHz_flag ;
-
+    BOOL firstTime;
 }
 
 - (id) init;
@@ -334,13 +335,13 @@ enum {
 - (void) setGain:(unsigned short)aGain;
 - (unsigned short) termination;
 - (void) setTermination:(unsigned short)aTermination;
-- (void) setSharing:(int)aValue;
-- (int) sharing;
+//- (void) setSharing:(int)aValue;
+//- (int) sharing;
 
-- (unsigned short) hsDiv;
-- (void) setHsDiv:(unsigned short)aValue;
-- (unsigned short) n1Div;
-- (void) setN1Div:(unsigned short)aValue;
+//- (unsigned short) hsDiv;
+//- (void) setHsDiv:(unsigned short)aValue;
+//- (unsigned short) n1Div;
+//- (void) setN1Div:(unsigned short)aValue;
 
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
@@ -652,22 +653,20 @@ enum {
 - (void) armBank2;
 - (int) currentBank;
 - (void) resetADCClockDCM;
-- (void) setClockFreq;
-- (int) setFrequency:(int) osc values:(unsigned char*)values;
-- (void) si570ReadDivider:(int) osc data:(unsigned char*)data;
+//- (void) setClockFreq;
+//- (int) setFrequency:(int) osc values:(unsigned char*)values;
+//- (void) si570ReadDivider:(int) osc data:(unsigned char*)data;
 
 //some test functions
 - (unsigned long) readTriggerEventBank:(int)bank index:(int)index;
 - (void) readAddressCounts;
 
-- (void) configure_all_adc_dac_offsets;
 - (void) poll_on_adc_dac_offset_busy;
-- (void) write_channel_header_ID:(unsigned int) channel_header_id_reg_value;
+- (void) write_channel_header_IDs;
 - (int) adc_spi_write_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long) spi_data;
 - (int) adc_spi_read_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long*) spi_data;
 - (int) adcSpiSetup;
-- (void) getFrequency:(int)osc;
-- (void) write_all_adc_dac_offsets;
+//- (void) getFrequency:(int)osc;
 - (void) write_all_gain_termination_values;
 - (void) dumpChan0;
 #pragma mark •••Data Taker
@@ -772,7 +771,7 @@ extern NSString* ORSIS3316EnableSumChanged;
 extern NSString* ORSIS3316RiseTimeSumChanged;
 extern NSString* ORSIS3316GapTimeSumChanged;
 extern NSString* ORSIS3316CfdControlBitsSumChanged;
-extern NSString* ORSIS3316SharingChanged;
+//extern NSString* ORSIS3316SharingChanged;
 
 extern NSString* ORSIS3316LemoCoMaskChanged;
 extern NSString* ORSIS3316LemoUoMaskChanged;
@@ -780,8 +779,8 @@ extern NSString* ORSIS3316LemoToMaskChanged;
 
 extern NSString* ORSIS3316InternalGateLenChanged;
 extern NSString* ORSIS3316InternalCoinGateLenChanged;
-extern NSString* ORSIS3316HsDivChanged;
-extern NSString* ORSIS3316N1DivChanged;
+//extern NSString* ORSIS3316HsDivChanged;
+//extern NSString* ORSIS3316N1DivChanged;
 
 extern NSString* ORSIS3316PileUpWindowLengthChanged;
 extern NSString* ORSIS3316RePileUpWindowLengthChanged;

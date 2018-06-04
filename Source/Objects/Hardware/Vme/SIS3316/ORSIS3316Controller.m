@@ -62,6 +62,7 @@
 	int i;
 	for(i=0;i<kNumSIS3316Channels;i++){
         [[enabledMatrix                     cellAtRow:i column:0] setTag:i];
+        [[enabled1Matrix                     cellAtRow:i column:0] setTag:i];
         [[histogramsEnabledMatrix           cellAtRow:i column:0] setTag:i];
         [[pileupEnabledMatrix               cellAtRow:i column:0] setTag:i];
         [[clrHistogramWithTSMatrix          cellAtRow:i column:0] setTag:i];
@@ -469,10 +470,10 @@
                          name : ORSIS3316CfdControlBitsSumChanged
                         object: model];
 
-    [notifyCenter addObserver : self
-                     selector : @selector(sharingChanged:)
-                         name : ORSIS3316SharingChanged
-                        object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(sharingChanged:)
+//                         name : ORSIS3316SharingChanged
+//                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(lemoToMaskChanged:)
@@ -499,15 +500,15 @@
                          name : ORSIS3316InternalCoinGateLenChanged
                         object: model];
     
-    [notifyCenter addObserver : self
-                     selector : @selector(hsDivChanged:)
-                         name : ORSIS3316HsDivChanged
-                        object: model];
-
-    [notifyCenter addObserver : self
-                     selector : @selector(n1DivChanged:)
-                         name : ORSIS3316N1DivChanged
-                        object: model];
+//    [notifyCenter addObserver : self
+//                     selector : @selector(hsDivChanged:)
+//                         name : ORSIS3316HsDivChanged
+//                        object: model];
+//
+//    [notifyCenter addObserver : self
+//                     selector : @selector(n1DivChanged:)
+//                         name : ORSIS3316N1DivChanged
+//                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(pileUpWindowLenChanged:)
@@ -615,7 +616,7 @@
     [self cfdControlBitsSumChanged:nil];
     
     [self dacOffsetChanged:nil];
-    [self sharingChanged:nil];
+//    [self sharingChanged:nil];
     [self lemoToMaskChanged:nil];
     [self lemoUoMaskChanged:nil];
     [self lemoCoMaskChanged:nil];
@@ -623,8 +624,8 @@
     
     [self internalGateLenChanged:nil];
     [self internalCoinGateLenChanged:nil];
-    [self hsDivChanged:nil];
-    [self n1DivChanged:nil];
+//    [self hsDivChanged:nil];
+//    [self n1DivChanged:nil];
     [self pileUpWindowLenChanged:nil];
     [self rePileUpWindowLenChanged:nil];
 
@@ -633,16 +634,16 @@
 }
 
 #pragma mark •••Interface Management
-- (void) hsDivChanged:(NSNotification*)aNote
-{
-    [hsDivPU selectItemWithTag:[model hsDiv]];
-    [sampleFreqField setIntValue: 5E9/([model hsDiv]*[model n1Div])/1E6];
-}
-- (void) n1DivChanged:(NSNotification*)aNote
-{
-    [n1DivField setIntValue:[model n1Div]];
-    [sampleFreqField setIntValue: 5E9/([model hsDiv]*[model n1Div])/1e6];
-}
+//- (void) hsDivChanged:(NSNotification*)aNote
+//{
+//    [hsDivPU selectItemWithTag:[model hsDiv]];
+//    [sampleFreqField setIntValue: 5E9/([model hsDiv]*[model n1Div])/1E6];
+//}
+//- (void) n1DivChanged:(NSNotification*)aNote
+//{
+//    [n1DivField setIntValue:[model n1Div]];
+//    [sampleFreqField setIntValue: 5E9/([model hsDiv]*[model n1Div])/1e6];
+//}
 
 - (void) pileUpWindowLenChanged:(NSNotification*)aNote
 {
@@ -697,10 +698,10 @@
     }
 }
 
-- (void) sharingChanged:(NSNotification*)aNote
-{
-    [sharingPU selectItemAtIndex:[model sharing]];
-}
+//- (void) sharingChanged:(NSNotification*)aNote
+//{
+//    [sharingPU selectItemAtIndex:[model sharing]];
+//}
 
 - (void) dacOffsetChanged:(NSNotification*)aNote
 {
@@ -724,6 +725,7 @@
     short i;
     for(i=0;i<kNumSIS3316Channels;i++){
         [[enabledMatrix cellWithTag:i] setState:[model enabled:i]];
+        [[enabled1Matrix cellWithTag:i] setState:[model enabled:i]];
     }
 }
 
@@ -1357,7 +1359,8 @@
     [loadDefaultsButton         setEnabled:!locked && !runInProgress];
     [addressText                setEnabled:!locked && !runInProgress];
     [initButton                 setEnabled:!lockedOrRunningMaintenance];
-	[enabledMatrix              setEnabled:!lockedOrRunningMaintenance];
+    [enabledMatrix              setEnabled:!lockedOrRunningMaintenance];
+    [enabled1Matrix             setEnabled:!lockedOrRunningMaintenance];
     [histogramsEnabledMatrix    setEnabled:!lockedOrRunningMaintenance];
 	[heSuppressTrigModeMatrix   setEnabled:!lockedOrRunningMaintenance];
 	[thresholdMatrix            setEnabled:!lockedOrRunningMaintenance];
@@ -1490,10 +1493,10 @@
 {
     [model setBaseAddress:[sender intValue]];
 }
-- (IBAction) sharingAction:(id)sender
-{
-    [model setSharing:[sender indexOfSelectedItem]];
-}
+//- (IBAction) sharingAction:(id)sender
+//{
+//    [model setSharing:[sender indexOfSelectedItem]];
+//}
 
 - (IBAction) histogramsEnabledAction:(id)sender
 {
@@ -1892,36 +1895,6 @@
 }
 
 
-- (IBAction) writeEventConfigButton:(id)sender
-{
-    @try {
-        [self endEditing];
-        [model writeEventConfig];
-        [model writeExtendedEventConfig];
-        [model writeEndAddress];
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Event Config write FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Write FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
-- (IBAction) readEventConfigButton:(id)sender
-{
-    @try {
-        [model readEventConfig:YES];
-        [model readExtendedEventConfig:YES];
-        [model readEndAddress:YES];
-
-    }
-    @catch(NSException* localException) {
-        NSLog(@"SIS3316 Event Config read FAILED.\n");
-        ORRunAlertPanel([localException name], @"%@\nSIS3316 Read FAILED", @"OK", nil, nil,
-                        localException);
-    }
-}
-
 - (IBAction) writeAccumulatorGateAction:(id)sender
 {
     @try {
@@ -2002,14 +1975,14 @@
 {
     [model setInternalCoinGateLen:[[sender selectedCell] tag] withValue:[sender intValue]];
 }
-- (IBAction) hsDivAction:(id)sender
-{
-    [model setHsDiv:[[hsDivPU selectedItem]tag]];
-}
-- (IBAction) n1DivAction:(id)sender
-{
-    [model setN1Div:[n1DivField intValue]];
-}
+//- (IBAction) hsDivAction:(id)sender
+//{
+//    [model setHsDiv:[[hsDivPU selectedItem]tag]];
+//}
+//- (IBAction) n1DivAction:(id)sender
+//{
+//    [model setN1Div:[n1DivField intValue]];
+//}
 - (IBAction) pileUpWindowLenAction:(id)sender
 {
     [model setPileUpWindow:[pileUpWindowLenField intValue]];
