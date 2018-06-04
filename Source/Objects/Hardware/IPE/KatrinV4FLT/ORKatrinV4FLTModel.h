@@ -114,7 +114,7 @@ enum {
 
     unsigned long   oldTriggerEnabledMask; //!< mask to temporarially store the enabled mask for later reuse.
     unsigned short lastHitRateLength;
-    int32_t isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
+    BOOL isBetweenSubruns;//temp variable used for shipping sum histograms -tb-
     int useBipolarEnergy;
     unsigned long bipolarEnergyThreshTest;
     int skipFltEventReadout;
@@ -154,6 +154,8 @@ enum {
 - (void) registerNotificationObservers;
 - (void) runIsAboutToStop:(NSNotification*)aNote;
 - (void) runIsAboutToChangeState:(NSNotification*)aNote;
+- (void) betweenSubRun:(NSNotification*)aNote;
+- (void) startSubRun:(NSNotification*)aNote;
 
 #pragma mark •••Accessors
 - (int) energyOffset;

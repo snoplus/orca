@@ -222,6 +222,24 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
                      selector : @selector(runIsAboutToStop:)
                          name : ORRunAboutToStopNotification
                        object : nil];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(betweenSubRun:)
+                         name : ORRunBetweenSubRunsNotification
+                       object : nil];
+    [notifyCenter addObserver : self
+                     selector : @selector(startSubRun:)
+                         name : ORRunStartSubRunNotification
+                       object : nil];
+}
+- (void) betweenSubRun:(NSNotification*)aNote
+{
+    isBetweenSubruns= YES;
+}
+- (void) startSubRun:(NSNotification*)aNote
+{
+    isBetweenSubruns= NO;
+
 }
 
 - (void) runIsAboutToStop:(NSNotification*)aNote
@@ -291,7 +309,7 @@ static NSString* fltTestName[kNumKatrinV4FLTTests]= {
 		    NSLog(@" %@::%@   Case 2: ERROR - runControlState==eRunStarting && lastState==eRunStarting\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
 		    return;
 		}
-        if(lastState==eRunBetweenSubRuns) isBetweenSubruns=1; else isBetweenSubruns=0;
+        //if(lastState==eRunBetweenSubRuns) isBetweenSubruns=1; else isBetweenSubruns=0;
 	    // case 2. (all other cases)
 		//NSLog(@"   Case 2: wait for 1 histogram\n");//DEBUG -tb-
         if([self receivedHistoChanMap]){
@@ -582,8 +600,10 @@ static double table[32]={
 }
 - (void) stopReadingHitRates
 {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
-    [self clearHitRates];
+    if(hitRateMode != kKatrinV4HitRunRateAlways){
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];
+        [self clearHitRates];
+    }
 }
 
 - (void) clearHitRates
@@ -2035,8 +2055,8 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
         NSLogError(@"",@"Hit Rate Exception",[self fullID],nil);
 	}
 
-
-    if (sltSec >= sltRunEndSec){
+    if ((sltSec >= sltRunEndSec) ||
+        (isBetweenSubruns && (hitRateMode == kKatrinV4HitRunRateAlways))){
     
         // Synchronize the hitrate readout to the Slt second counter
         // If the hardware is not accible the counter runs free but not less than a second
