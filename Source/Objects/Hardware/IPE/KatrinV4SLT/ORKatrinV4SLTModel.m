@@ -221,7 +221,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         // Warning: This overwrites the settings saved in the configuration
         //      The advantage is, that standard configuration is active at startup
         //
-        [self setPixelBusEnableReg:aMask];
+ //       [self setPixelBusEnableReg:aMask];
         [[self undoManager] enableUndoRegistration];
     }
 }
