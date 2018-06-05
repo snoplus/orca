@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6751" systemVersion="15G1004" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="7706" systemVersion="14B25" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="5100" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6751"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="6751"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="7706"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="7706"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="SNOPController">
@@ -147,10 +147,10 @@
         <window title="SNO+ Control Panel" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="5" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="212" y="194" width="1200" height="700"/>
+            <rect key="contentRect" x="212" y="194" width="1228" height="700"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <view key="contentView" id="6">
-                <rect key="frame" x="0.0" y="0.0" width="1200" height="700"/>
+                <rect key="frame" x="0.0" y="0.0" width="1228" height="700"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView id="mKD-4A-wzC">
@@ -673,21 +673,21 @@
                         </tabViewItems>
                     </tabView>
                     <tabView controlSize="small" id="101">
-                        <rect key="frame" x="394" y="10" width="793" height="673"/>
+                        <rect key="frame" x="394" y="10" width="834" height="673"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <animations/>
                         <font key="font" metaFont="system" size="14"/>
                         <tabViewItems>
                             <tabViewItem label="Standard Runs" identifier="" id="3006">
                                 <view key="view" autoresizesSubviews="NO" id="3007">
-                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="814" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Run Type Word" borderType="line" id="3963">
-                                            <rect key="frame" x="622" y="-7" width="147" height="636"/>
+                                            <rect key="frame" x="622" y="-7" width="188" height="636"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView">
-                                                <rect key="frame" x="1" y="1" width="145" height="620"/>
+                                                <rect key="frame" x="1" y="1" width="186" height="620"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <box verticalHuggingPriority="750" title="Box" boxType="separator" titlePosition="noTitle" id="ZAc-Zq-koX">
@@ -717,7 +717,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="aDt-ix-V7f">
-                                                        <rect key="frame" x="121" y="601" width="21" height="14"/>
+                                                        <rect key="frame" x="162" y="601" width="21" height="14"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
                                                         <textFieldCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="DB" id="Xf4-cz-YQv">
@@ -727,7 +727,7 @@
                                                         </textFieldCell>
                                                     </textField>
                                                     <matrix toolTip="Run type word of the selected standard run" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="zuQ-GY-eWY">
-                                                        <rect key="frame" x="122" y="82" width="20" height="512"/>
+                                                        <rect key="frame" x="164" y="82" width="20" height="512"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -873,58 +873,58 @@
                                                         </connections>
                                                     </matrix>
                                                     <matrix toolTip="Current run type word" verticalHuggingPriority="750" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="3935">
-                                                        <rect key="frame" x="8" y="82" width="119" height="512"/>
+                                                        <rect key="frame" x="14" y="82" width="149" height="512"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <animations/>
                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="cellSize" width="119" height="16"/>
+                                                        <size key="cellSize" width="149" height="16"/>
                                                         <buttonCell key="prototype" type="check" title="Check" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="3962">
                                                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                             <font key="font" metaFont="smallSystem"/>
                                                         </buttonCell>
                                                         <cells>
                                                             <column>
-                                                                <buttonCell type="check" title="Maintenance" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" inset="2" id="3961">
+                                                                <buttonCell type="check" title="Maintenance" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" inset="2" id="3961">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Transition" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="1" inset="2" id="3960">
+                                                                <buttonCell type="check" title="Transition" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="1" inset="2" id="3960">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Physics" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="2" inset="2" id="3959">
+                                                                <buttonCell type="check" title="Physics" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="2" inset="2" id="3959">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Deployed Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="3" inset="2" id="3958">
+                                                                <buttonCell type="check" title="Deployed Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="3" inset="2" id="3958">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="External Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="4" inset="2" id="3957">
+                                                                <buttonCell type="check" title="External Source" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="4" inset="2" id="3957">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="ECA" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="5" inset="2" id="3956">
+                                                                <buttonCell type="check" title="ECA" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="5" inset="2" id="3956">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Diagnostic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="6" inset="2" id="3955">
+                                                                <buttonCell type="check" title="Diagnostic" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="6" inset="2" id="3955">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Experimental" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="7" inset="2" id="3954">
+                                                                <buttonCell type="check" title="Experimental" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="7" inset="2" id="3954">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Supernova" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="8" inset="2" id="3953">
+                                                                <buttonCell type="check" title="Supernova" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="8" inset="2" id="3953">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="9" inset="2" id="3952">
+                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="9" inset="2" id="3952">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
-                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" tag="10" inset="2" id="3951">
+                                                                <buttonCell type="check" title="Spare" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" enabled="NO" tag="10" inset="2" id="3951">
                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>
                                                                 </buttonCell>
@@ -2242,7 +2242,7 @@
                                                         <rect key="frame" x="241" y="50" width="189" height="22"/>
                                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                         <animations/>
-                                                        <comboBoxCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Standard Run" drawsBackground="YES" numberOfVisibleItems="10" id="3J8-jw-KKa">
+                                                        <comboBoxCell key="cell" controlSize="small" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Standard Run" drawsBackground="YES" numberOfVisibleItems="10" id="3J8-jw-KKa">
                                                             <font key="font" metaFont="smallSystem"/>
                                                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -2357,7 +2357,7 @@
                             </tabViewItem>
                             <tabViewItem label="HV Master" identifier="" id="2797">
                                 <view key="view" autoresizesSubviews="NO" id="2798">
-                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="814" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" id="2947">
@@ -3415,7 +3415,7 @@
                             </tabViewItem>
                             <tabViewItem label="Detector State" identifier="" id="103">
                                 <view key="view" autoresizesSubviews="NO" id="105">
-                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="814" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button id="368">
@@ -3444,7 +3444,7 @@
                             </tabViewItem>
                             <tabViewItem label="Calibrations" identifier="" id="Mf7-9B-bHm">
                                 <view key="view" id="xAb-zH-K32">
-                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="814" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <tabView id="VHr-KT-QLs">
@@ -3645,7 +3645,7 @@
                                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                             <animations/>
                                                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                            <size key="cellSize" width="44" height="18"/>
+                                                                            <size key="cellSize" width="45" height="18"/>
                                                                             <size key="intercellSpacing" width="4" height="2"/>
                                                                             <buttonCell key="prototype" type="radio" title="Radio" imagePosition="left" alignment="left" controlSize="small" inset="2" id="4nF-5X-887">
                                                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -4692,7 +4692,7 @@
                             </tabViewItem>
                             <tabViewItem label="Nhit Monitor" identifier="" id="FRT-8S-HaJ">
                                 <view key="view" id="kyp-tq-6On">
-                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="814" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="Latest Results" borderType="line" id="osf-mb-MSE">
@@ -5330,7 +5330,7 @@
                             </tabViewItem>
                             <tabViewItem label="Settings" identifier="" id="2638">
                                 <view key="view" autoresizesSubviews="NO" id="2639">
-                                    <rect key="frame" x="10" y="25" width="773" height="635"/>
+                                    <rect key="frame" x="10" y="25" width="814" height="635"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box autoresizesSubviews="NO" title="OrcaDB" borderType="line" id="2651">
@@ -6174,7 +6174,7 @@
             <connections>
                 <outlet property="delegate" destination="-2" id="61"/>
             </connections>
-            <point key="canvasLocation" x="640" y="263"/>
+            <point key="canvasLocation" x="654" y="263"/>
         </window>
         <customObject id="270" userLabel="OHexFormatter" customClass="OHexFormatter"/>
         <objectController objectClassName="SNOPModel" id="2987" userLabel="SNOP Model">
