@@ -30,9 +30,18 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
  --------^-^^^--------------------------- Crate number
  -------------^-^^^^--------------------- Card number
- 
- raw data follows:
- 
+ --------------------^^^^ ^^^^----------- Chan number
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num Records in this record
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num longs in each record
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num of Records that were in the FIFO
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+
+ N Data Records follow with format described in manual
+
   */
 
 @implementation ORSIS3316WaveformDecoder
@@ -52,62 +61,82 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long* ptr      = (unsigned long*)someData;
-	unsigned long length    = ExtractLength(ptr[0]);
-    int crate               = (ptr[1]&0x01e00000)>>21;
-    int card                = (ptr[1]&0x001f0000)>>16;
-    int channel             = (ptr[1]&0x0000ff00)>>8;
-	NSString* crateKey		= [self getCrateKey:   crate];
-    NSString* cardKey       = [self getCardKey:    card];
-    NSString* channelKey    = [self getChannelKey: channel];
+    unsigned long* ptr       = (unsigned long*)someData;
+	unsigned long length     = ExtractLength(ptr[0]);
+    int crate                = (ptr[1]>>21) & 0xf;
+    int card                 = (ptr[1]>>16) & 0x1f;
+    int channel              = (ptr[1]>>8)  & 0xff;
+	NSString* crateKey		 = [self getCrateKey:   crate];
+    NSString* cardKey        = [self getCardKey:    card];
+    NSString* channelKey     = [self getChannelKey: channel];
     
-    unsigned long orcaHeader = 10;
-    unsigned long dataHeader = 7;
-    unsigned long* headerPtr = ptr + orcaHeader;
+    unsigned long numRecords        = ptr[2];
+
+    unsigned long orcaHeaderLen = 10;
+    unsigned long dataHeaderLen = 7;
+    unsigned long* dataStartPtr = ptr + orcaHeaderLen;
     
-    unsigned long numSamples     = headerPtr[6] & 0xfffff;
-    unsigned long numLongsInData = numSamples*2;
-    unsigned long* dataStartPtr  = headerPtr + dataHeader;
-    
-    NSMutableData* tmpData = [NSMutableData dataWithBytes:dataStartPtr length:numLongsInData*sizeof(short)];
-    if(tmpData){
-        [aDataSet loadWaveform:tmpData
-                        offset:0
-                      unitSize:2 //unit size in bytes!
-                        sender:self
-                      withKeys:@"SIS3316", @"Waveforms",crateKey,cardKey,channelKey,nil];
-    }
-    
-    //get the actual object
-    if(getRatesFromDecodeStage && !skipRateCounts){
-        NSString* aKey = [crateKey stringByAppendingString:cardKey];
-        if(!actualSIS3316Cards)actualSIS3316Cards = [[NSMutableDictionary alloc] init];
-        ORSIS3316Model* obj = [actualSIS3316Cards objectForKey:aKey];
-        if(!obj){
-            NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3316Model")];
-            NSEnumerator* e = [listOfCards objectEnumerator];
-            ORSIS3316Model* aCard;
-            while(aCard = [e nextObject]){
-                if([aCard slot] == card){
-                    [actualSIS3316Cards setObject:aCard forKey:aKey];
-                    obj = aCard;
-                    break;
+
+    int i;
+    for(i=0;i<numRecords;i++){
+        unsigned long numLongs    = dataStartPtr[6] & 0xfffff;
+        unsigned long numSamples  = numLongs*2;
+        unsigned long checkByte   = dataStartPtr[6] >>28;
+        if((checkByte == 0xE) && (numLongs <= length)){
+            
+            dataStartPtr+=dataHeaderLen;
+            NSMutableData* tmpData = [NSMutableData dataWithBytes:dataStartPtr length:numSamples*sizeof(short)];
+            if(tmpData){
+                [aDataSet loadWaveform:tmpData
+                                offset:0
+                              unitSize:2 //unit size in bytes!
+                                sender:self
+                              withKeys:@"SIS3316", @"Waveforms",crateKey,cardKey,channelKey,nil];
+            }
+            dataStartPtr += numLongs;
+        
+            //get the actual object
+            if(getRatesFromDecodeStage && !skipRateCounts){
+                NSString* aKey = [crateKey stringByAppendingString:cardKey];
+                if(!actualSIS3316Cards)actualSIS3316Cards = [[NSMutableDictionary alloc] init];
+                ORSIS3316Model* obj = [actualSIS3316Cards objectForKey:aKey];
+                if(!obj){
+                    NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORSIS3316Model")];
+                    NSEnumerator* e = [listOfCards objectEnumerator];
+                    ORSIS3316Model* aCard;
+                    while(aCard = [e nextObject]){
+                        if([aCard slot] == card){
+                            [actualSIS3316Cards setObject:aCard forKey:aKey];
+                            obj = aCard;
+                            break;
+                        }
+                    }
                 }
+                getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
             }
         }
-        getRatesFromDecodeStage = [obj bumpRateFromDecodeStage:channel];
+        else {
+            break;
+        }
     }
-			
     return length; //must return number of longs
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)ptr
 {
     NSString* title= @"SIS3316 Waveform Record\n\n";
-    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1]&0x01e00000)>>21];
-    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1]&0x001f0000)>>16];
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >>  8) & 0xff];
+    unsigned long numRecords        = ptr[2];
+    unsigned long longsInOneRecord  = ptr[3];
+    unsigned long numRecordsInFifo  = ptr[4];
 
-    return [NSString stringWithFormat:@"%@%@%@",title,crate,card];
+    NSString* s = [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];
+    s = [s stringByAppendingFormat:@"Num Records in Packet: %ld\n", numRecords];
+    s = [s stringByAppendingFormat:@"Num Longs in Each: %ld\n",     longsInOneRecord];
+    s = [s stringByAppendingFormat:@"Num Records in FIFO: %ld\n", numRecordsInFifo];
+    return s;
 }
 
 @end

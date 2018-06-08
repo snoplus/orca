@@ -11,12 +11,10 @@ public:
 	virtual bool Readout(SBC_LAM_Data* /* lam_data*/);  
 	virtual bool Resume();
 	virtual bool Stop();
-    
-	
 protected:
-	
-	virtual void DisarmAndArmBank();
+    void SwitchBanks();
+    void ArmBank1();
+    void ArmBank2();
     uint32_t currentBank;
-	uint32_t prevRunningBank;
-	time_t	 fLastBankSwitchTime;
+	uint32_t previousBank;
 };

@@ -2,6 +2,16 @@
 #include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
+
+#define kSIS3316AdcCh1PreviousBankSampleAddressReg   0x1120
+#define kSIS3316AdcRegOffset                         0x1000
+#define kSIS3316AcqControlStatusReg                  0x60       /* r/w; D32 */
+#define kSIS3316DataTransferBaseReg                  0x80       /* r/w; D32 */
+#define kSIS3316DisarmAndArmBank1                    0x420      /* write only; D32 */
+#define kSIS3316DisarmAndArmBank2                    0x424      /* write only; D32 */
+#define kSIS3316AdcMemOffset                         0x100000
+#define kSIS3316AdcMemBase                           0x100000
+
 ORSIS3316Card::ORSIS3316Card(SBC_card_info* ci) :
 ORVVmeCard(ci)
 {
@@ -10,10 +20,8 @@ ORVVmeCard(ci)
 
 bool ORSIS3316Card::Start()
 {
-    prevRunningBank=2;
-    DisarmAndArmBank();
-    //bank one is armed are taking data
-	return true;
+    ArmBank2();
+    return true;
 }
 
 bool ORSIS3316Card::Stop()
@@ -26,130 +34,144 @@ bool ORSIS3316Card::Resume()
 	return true;
 }
 
-#define kSIS3316AdcCh1PreviousBankSampleAddressReg   0x1120
-#define kSIS3316AdcRegOffset                         0x1000
-#define kSIS3316DataTransferBaseReg                  0x80       /* r/w; D32 */
-#define kSIS3316DisarmAndArmBank1                    0x420      /* write only; D32 */
-#define kSIS3316DisarmAndArmBank2                    0x424      /* write only; D32 */
-#define kSIS3316AdcMemOffset                         0x100000
-#define kSIS3316AdcMemBase                           0x100000
 
 bool ORSIS3316Card::Readout(SBC_LAM_Data* /*lam_data*/) 
 {
-    uint32_t dataId              = GetHardwareMask()[0];
-    uint32_t locationMask        = ((GetCrate() & 0x0f)<<21) | ((GetSlot() & 0x0000001f)<<16);
-    uint32_t orcaHeaderLen       = 10;
-    uint32_t dataHeaderLen       = 7;
-    uint32_t rawDataLen          = GetDeviceSpecificData()[0];
-    uint32_t numLongsToRead     = rawDataLen/2 + dataHeaderLen;
+    uint32_t dataId             = GetHardwareMask()[0];
+    uint32_t locationMask       = ((GetCrate() & 0x0f)<<21) | ((GetSlot() & 0x0000001f)<<16);
+    uint32_t orcaHeaderLen      = 10;
+    uint32_t dataHeaderLen      = 7;
+    uint32_t rawDataLen         = GetDeviceSpecificData()[0];
+    uint32_t longsInOneRecord   = rawDataLen/2 + dataHeaderLen;
+    uint32_t maxPayloadLongs    = kSBC_MaxPayloadSizeBytes/4/4; //allow 1/4 of max
+    uint32_t maxNumWaveforms    = maxPayloadLongs/longsInOneRecord;
 
-    int32_t return_code  = 0;
-    uint32_t addr        = 0;
-    uint32_t acqRegValue = 0;
-    uint32_t baseAddress = GetBaseAddress();
-    uint32_t addMod      = GetAddressModifier();
-    if(VMERead(baseAddress+ 0x60,addMod,4,acqRegValue) != sizeof(uint32_t)){
+    int32_t return_code         = 0;
+    uint32_t acqRegValue        = 0;
+    uint32_t baseAddress        = GetBaseAddress();
+    uint32_t addMod             = GetAddressModifier();
+    uint32_t addr               = baseAddress + kSIS3316AcqControlStatusReg;
+    if(VMERead(addr,addMod,4,acqRegValue) != sizeof(uint32_t)){
         LogBusErrorForCard(GetSlot(),"acqReg Err: SIS3316 0x%04x %s", baseAddress,strerror(errno));
         return 1;
     }
-    unsigned long bit[4] = {25,27,29,31};
-    //bit 19 means at least one channel got data
-    if((acqRegValue >> 19) & 0x1){
-        DisarmAndArmBank();
-         for(int32_t ichan = 0;ichan<16;ichan++){
-             int32_t iGroup = ichan/4;
+    
+    if((acqRegValue >> 19) & 0x1) { //checks the OR of the address threshold flags
+        unsigned long bit[4] = {25,27,29,31};
+        SwitchBanks();
+        usleep(2); //let the banks settle. Could do a loop but this is less bus activity and faster we can take data
+        for(int32_t ichan = 0;ichan<16;ichan++){
+            int32_t iGroup = ichan/4;
              
-             if((acqRegValue>>bit[iGroup] & 0x1)){
-                     ; //put chan # in the crate/card location
-             
-                    uint32_t prevBankEndingRegAddr = baseAddress
-                                                   + kSIS3316AdcCh1PreviousBankSampleAddressReg
-                                                   + iGroup*kSIS3316AdcRegOffset
-                                                   + (ichan%4)*0x4;
-             
-                    // Verify that the previous bank address is valid
-                    uint32_t prevBankEndingAddress  = 0;
-                    uint32_t max_poll_counter       = 1000;
-                    do {
-                        if (VMERead(prevBankEndingRegAddr,addMod,4,prevBankEndingAddress) != sizeof(uint32_t)) {
-                            LogBusErrorForCard(GetSlot(),"PrevBankEnd Err: SIS3316 0x%04x %s", baseAddress,strerror(errno));
-                            return true;
-                        }
-                        max_poll_counter--;
-                        if (max_poll_counter == 0) {
-                            LogBusErrorForCard(GetSlot(),"Poll Err: SIS3316 0x%04x %s", baseAddress,strerror(errno));
-                            return true;
-                        }
-                    } while (((prevBankEndingAddress & 0x1000000) >> 24 )  != (prevRunningBank-1)) ; // bank to read is not valid UNLES bit 24 is equal lastBank
+            if((acqRegValue>>bit[iGroup] & 0x1)){
+                uint32_t prevBankEndingAddress  = 0;
+                uint32_t prevBankEndingRegAddr = baseAddress
+                                               + kSIS3316AdcCh1PreviousBankSampleAddressReg
+                                               + iGroup*kSIS3316AdcRegOffset
+                                               + (ichan%4)*0x4;
+                 if (VMERead(prevBankEndingRegAddr,addMod,4,prevBankEndingAddress) != sizeof(uint32_t)) {
+                     LogBusErrorForCard(GetSlot(),"PrevBankEnd Err: SIS3316 0x%04x %s", baseAddress,strerror(errno));
+                     return true;
+                 }
 
-             
+                 if((((prevBankEndingAddress & 0x1000000) >> 24 )  != (previousBank-1))){
+                     LogBusErrorForCard(GetSlot(),"Bank not ready: SIS3316 0x%04x", baseAddress);
+                     return true;
+                 }
+                
+                uint32_t expectedNumberOfWords = prevBankEndingAddress & 0x00FFFFFF;
+
+                if(expectedNumberOfWords>0){
+                    //first must transfer data from ADC FIFO to VME FIFO
                     uint32_t prevBankReadBeginAddress   = (prevBankEndingAddress & 0x03000000) + 0x10000000*((ichan/2)%2);
-                    uint32_t expectedNumberOfWords      = prevBankEndingAddress & 0x00FFFFFF;
-                    expectedNumberOfWords               = ((expectedNumberOfWords + 1) & 0xfffffE);
-                 
-                    if(expectedNumberOfWords){
-                        
-                        //first must transfer data from ADC FIFO to VME FIFO
-                        uint32_t offsetData = 0x80000000 + prevBankReadBeginAddress;
-                        addr = baseAddress + kSIS3316DataTransferBaseReg + iGroup*0x4;
-                        if(VMEWrite(addr, addMod, 4, offsetData) != sizeof(uint32_t)){
-                            LogBusErrorForCard(GetSlot(),"Data Transfer: SIS3316 0x%04x %s", baseAddress,strerror(errno));
-                            return return_code;
-                        }
-                        usleep(2); //up to 2 µs for transfer to take place
-                        
-                        uint32_t numInBuffer = expectedNumberOfWords/numLongsToRead;
-                        addr = baseAddress + kSIS3316AdcMemBase +iGroup*kSIS3316AdcMemOffset;
-                        for(uint32_t n = 0; n<numInBuffer; n++){
-                            ensureDataCanHold(numLongsToRead + orcaHeaderLen);
-                            int32_t savedDataIndex = dataIndex;
-                            data[dataIndex++] = dataId | (orcaHeaderLen+rawDataLen);
-                            data[dataIndex++] = locationMask  | ((ichan & 0x000000ff)<<8);
-                            data[dataIndex++] = numInBuffer;
-                            data[dataIndex++] = n;
-                            data[dataIndex++] = 0;
-                            data[dataIndex++] = 0;
-                            data[dataIndex++] = 0;
-                            data[dataIndex++] = 0;
-                            data[dataIndex++] = 0;
-                            data[dataIndex++] = 0;
-                            uint32_t ret = DMARead(addr,
-                                            0xB, //address modifier
-                                            0x8, //transfer size
-                                            (uint8_t*)&data[dataIndex],
-                                            numLongsToRead*sizeof(uint32_t));
-                            if(ret>0){
-                                dataIndex += numLongsToRead;
-                            }
-                            else {
-                                dataIndex = savedDataIndex;
-                                break;
-                            }
-                        }
+                    uint32_t offset                     = 0x80000000 + prevBankReadBeginAddress;
+                    uint32_t addr                       = baseAddress + kSIS3316DataTransferBaseReg + iGroup*0x4;
+                    if(VMEWrite(addr, addMod, 4, offset) != sizeof(uint32_t)){
+                        LogBusErrorForCard(GetSlot(),"Data Transfer: SIS3316 0x%04x %s", baseAddress,strerror(errno));
+                        return return_code;
                     }
-             }
+                    
+                    usleep(2); //up to 2 µs for transfer to take place
+                    
+                    expectedNumberOfWords = ((expectedNumberOfWords + 1) & 0xfffffE);
+                    uint32_t numInBuffer  = expectedNumberOfWords/longsInOneRecord;
+                    uint32_t numToRead    = numInBuffer<maxNumWaveforms ? numInBuffer:maxNumWaveforms;
+                    
+                    ensureDataCanHold(numToRead*longsInOneRecord + orcaHeaderLen);
+                    
+                    int32_t savedDataIndex  = dataIndex;
+                    data[dataIndex++]       = dataId | (orcaHeaderLen + (numToRead*longsInOneRecord));
+                    data[dataIndex++]       = locationMask  | ((ichan & 0x000000ff)<<8);
+                    data[dataIndex++]       = numToRead;
+                    data[dataIndex++]       = longsInOneRecord;
+                    data[dataIndex++]       = numInBuffer;
+                    data[dataIndex++]       = 0;
+                    data[dataIndex++]       = 0;
+                    data[dataIndex++]       = 0;
+                    data[dataIndex++]       = 0;
+                    data[dataIndex++]       = 0;
+                    
+                    uint32_t ret = DMARead(baseAddress + kSIS3316AdcMemBase +iGroup*kSIS3316AdcMemOffset,
+                                           0xB, //address modifier
+                                           0x8, //transfer size
+                                           (uint8_t*)&data[dataIndex],
+                                           numToRead*longsInOneRecord*sizeof(uint32_t));
+                    
+                    if(ret>0){
+                        dataIndex += numToRead * longsInOneRecord;
+                    }
+                    else {
+                        dataIndex = savedDataIndex;
+                        break;
+                    }
+                }
+                
+            }
         }
     }
-    
 	return true;
 }
 
-void ORSIS3316Card::DisarmAndArmBank()
+void ORSIS3316Card::ArmBank1()
 {
-    if(prevRunningBank==2){
-        uint32_t addr = GetBaseAddress() + kSIS3316DisarmAndArmBank2;
-        if (VMEWrite(addr, GetAddressModifier(), 4, (uint32_t) 0x0) != sizeof(uint32_t)){
-            LogBusErrorForCard(GetSlot(),"BankSwitch Err: SIS3316 0x%04x %s", GetBaseAddress(),strerror(errno));
-        }
-        currentBank = 2;
-        prevRunningBank=1;
+    uint32_t addr = GetBaseAddress() + kSIS3316DisarmAndArmBank1;
+    if (VMEWrite(addr, GetAddressModifier(), 4, (uint32_t) 0x0) != sizeof(uint32_t)){
+        LogBusErrorForCard(GetSlot(),"Bank1 Err: SIS3316 0x%04x %s", GetBaseAddress(),strerror(errno));
     }
-    else{
-        uint32_t addr = GetBaseAddress() + kSIS3316DisarmAndArmBank1;
-        if (VMEWrite(addr, GetAddressModifier(), 4, (uint32_t) 0x0) != sizeof(uint32_t)){
-            LogBusErrorForCard(GetSlot(),"BankSwitch Err: SIS3316 0x%04x %s", GetBaseAddress(),strerror(errno));
-        }
-        currentBank = 1;
-        prevRunningBank=2;
-    }
+    currentBank = 1;
+    previousBank=2;
+    
 }
+
+void ORSIS3316Card::ArmBank2()
+{
+    uint32_t addr = GetBaseAddress() + kSIS3316DisarmAndArmBank2;
+    if (VMEWrite(addr, GetAddressModifier(), 4, (uint32_t) 0x0) != sizeof(uint32_t)){
+        LogBusErrorForCard(GetSlot(),"Bank2 Err: SIS3316 0x%04x %s", GetBaseAddress(),strerror(errno));
+    }
+    currentBank  = 2;
+    previousBank = 1;
+}
+
+void ORSIS3316Card::SwitchBanks()
+{
+    if(currentBank==1)  ArmBank2();
+    else                ArmBank1();
+    
+}
+
+
+//                    // Verify that the previous bank address is valid
+//                    uint32_t prevBankEndingAddress  = 0;
+//                    uint32_t max_poll_counter       = 1000;
+//                    do {
+//                        if (VMERead(prevBankEndingRegAddr,addMod,4,prevBankEndingAddress) != sizeof(uint32_t)) {
+//                            LogBusErrorForCard(GetSlot(),"PrevBankEnd Err: SIS3316 0x%04x %s", baseAddress,strerror(errno));
+//                            return true;
+//                        }
+//                        max_poll_counter--;
+//                        if (max_poll_counter == 0) {
+//                            LogBusErrorForCard(GetSlot(),"Poll Err: SIS3316 0x%04x %s", baseAddress,strerror(errno));
+//                            return true;
+//                        }
+//                    } while (((prevBankEndingAddress & 0x1000000) >> 24 )  != (previousBank-1)) ; // bank to read is not valid UNLES bit 24 is equal lastBank

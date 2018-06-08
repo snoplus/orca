@@ -38,7 +38,7 @@
     IBOutlet NSTextField*   addressText;
     IBOutlet NSPopUpButton* gainPU;
     IBOutlet NSPopUpButton* terminationPU;
-//    IBOutlet NSPopUpButton* sharingPU;
+    IBOutlet NSPopUpButton* sharingPU;
     
     IBOutlet NSMatrix*      enabledMatrix;
     IBOutlet NSMatrix*      enabled1Matrix;
@@ -158,7 +158,7 @@
 - (void) nimControlStatusChanged: (NSNotification*)aNote;
 - (void) triggerDelayChanged: (NSNotification*)aNote;
 - (void) dacOffsetChanged:(NSNotification*)aNote;
-//- (void) sharingChanged:(NSNotification*)aNote;
+- (void) sharingChanged:(NSNotification*)aNote;
 - (void) lemoToMaskChanged:(NSNotification*)aNote;
 - (void) lemoUoMaskChanged:(NSNotification*)aNote;
 - (void) lemoCoMaskChanged:(NSNotification*)aNote;
@@ -282,7 +282,7 @@
 - (IBAction) gainAction:(id)sender;
 - (IBAction) terminationAction:(id)sender;
 - (IBAction) dacOffsetAction:(id)sender;
-//- (IBAction) sharingAction:(id)sender;
+- (IBAction) sharingAction:(id)sender;
 - (IBAction) lemoToMaskAction:(id)sender;
 - (IBAction) lemoUoMaskAction:(id)sender;
 - (IBAction) lemoCoMaskAction:(id)sender;

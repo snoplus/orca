@@ -248,14 +248,14 @@ enum {
     unsigned short  accGate3Start[kNumSIS3316Groups];
     unsigned short  accGate4Len[kNumSIS3316Groups];
     unsigned short  accGate4Start[kNumSIS3316Groups];
-    unsigned short  accGate5Len[kNumSIS3316Groups];
-    unsigned short  accGate5Start[kNumSIS3316Groups];
-    unsigned short  accGate6Len[kNumSIS3316Groups];
-    unsigned short  accGate6Start[kNumSIS3316Groups];
-    unsigned short  accGate7Len[kNumSIS3316Groups];
-    unsigned short  accGate7Start[kNumSIS3316Groups];
-    unsigned short  accGate8Len[kNumSIS3316Groups];
-    unsigned short  accGate8Start[kNumSIS3316Groups];
+//    unsigned short  accGate5Len[kNumSIS3316Groups];
+//    unsigned short  accGate5Start[kNumSIS3316Groups];
+//    unsigned short  accGate6Len[kNumSIS3316Groups];
+//    unsigned short  accGate6Start[kNumSIS3316Groups];
+//    unsigned short  accGate7Len[kNumSIS3316Groups];
+//    unsigned short  accGate7Start[kNumSIS3316Groups];
+//    unsigned short  accGate8Len[kNumSIS3316Groups];
+//    unsigned short  accGate8Start[kNumSIS3316Groups];
     
     BOOL            enableSum[kNumSIS3316Groups];
     unsigned long   thresholdSum[kNumSIS3316Groups];
@@ -266,7 +266,6 @@ enum {
     unsigned long   pileUpWindowLength;
     unsigned long   rePileUpWindowLength;
 
-    
     int             currentBank;
     int             previousBank;
 	BOOL			isRunning;
@@ -275,11 +274,8 @@ enum {
     unsigned long   clockSource;
     unsigned short  gain;
     unsigned short  termination;
-//    int             sharing; //clock sharing
+    int             sharing; //clock sharing
     
-	//control status reg
- 
-	
 	//Acquisition control reg
 	BOOL bankSwitchMode;
     BOOL autoStart;
@@ -294,13 +290,12 @@ enum {
 	ORRateGroup*	waveFormRateGroup;
 	unsigned long 	waveFormCount[kNumSIS3316Channels];
 
-	
-	unsigned long location; //cach to speed takedata
-	id theController;       //cach to speed takedata
-    unsigned short waitingOnChannelMask;
-    unsigned short groupDataTransferedMask;
-    BOOL transferDone;
-    NSString* revision;
+	unsigned long   location; //cach to speed takedata
+	id              theController;       //cach to speed takedata
+    unsigned short  waitingOnChannelMask;
+    unsigned short  groupDataTransferedMask;
+    BOOL            transferDone;
+    NSString*       revision;
     unsigned short  majorRev;
     unsigned short  minorRev;
     unsigned short  hwVersion;
@@ -313,12 +308,13 @@ enum {
     unsigned long   internalCoinGateLen[kNumSIS3316Groups];   //6.24
     unsigned long*  dataRecord[kNumSIS3316Channels];
     
-    unsigned char freqSI570_calibrated_value_125MHz[6]; // new 20.11.2013
-    unsigned char freqPreset62_5MHz[6];
-    unsigned char freqPreset125MHz[6];
-    unsigned char freqPreset250MHz[6];
-    unsigned int adc_125MHz_flag ;
-    BOOL firstTime;
+    unsigned char   freqSI570_calibrated_value_125MHz[6]; // new 20.11.2013
+    unsigned char   freqPreset62_5MHz[6];
+    unsigned char   freqPreset125MHz[6];
+    unsigned char   freqPreset250MHz[6];
+    BOOL            adc125MHzFlag;
+    BOOL            firstTime;
+    BOOL            clocksProgrammed;
 }
 
 - (id) init;
@@ -335,9 +331,9 @@ enum {
 - (void) setGain:(unsigned short)aGain;
 - (unsigned short) termination;
 - (void) setTermination:(unsigned short)aTermination;
-//- (void) setSharing:(int)aValue;
-//- (int) sharing;
 
+- (void) setSharing:(int)aValue;
+- (int) sharing;
 //- (unsigned short) hsDiv;
 //- (void) setHsDiv:(unsigned short)aValue;
 //- (unsigned short) n1Div;
@@ -553,14 +549,13 @@ enum {
 - (unsigned long) readLongFromAddress:(unsigned long)anAddress;
 
 //Comments denote section of the manual 
-- (unsigned long) singleRegister:(unsigned long)aRegisterIndex;
-- (unsigned long) groupRegister:(unsigned long)aRegisterIndex  group:(int)aGroup;
-- (unsigned long) channelRegister:(unsigned long)aRegisterIndex channel:(int)aChannel;
+- (unsigned long) singleRegister:           (unsigned long)aRegisterIndex;
+- (unsigned long) groupRegister:            (unsigned long)aRegisterIndex  group:(int)aGroup;
+- (unsigned long) channelRegister:          (unsigned long)aRegisterIndex channel:(int)aChannel;
 - (unsigned long) channelRegisterVersionTwo:(unsigned long)aRegisterIndex channel:(int)aChannel;
-- (unsigned long) accumulatorRegisters:(unsigned long)aRegisterIndex channel:(int)aChannel;
-- (unsigned long)readControlStatusReg;          //6.1               (complete) -not connected  
-- (void) writeControlStatusReg:(unsigned long)aValue;
-        //6.1               (complete)
+- (unsigned long) accumulatorRegisters:     (unsigned long)aRegisterIndex channel:(int)aChannel;
+- (unsigned long)readControlStatusReg;          //6.1
+- (void) writeControlStatusReg:             (unsigned long)aValue;
 - (void) setLed:(BOOL)state;                    //6.1'
 - (void) readModuleID:(BOOL)verbose;            //6.2
 - (void) readHWVersion:(BOOL)verbose;           //6.7
@@ -602,6 +597,7 @@ enum {
 - (void) dumpPeakChargeConfig;                  //6.29
 - (void) dumpExtededRawDataBufferConfig;        //6.30
 - (void) dumpAccumulatorGates;                  //6.31
+- (void) writeTapDelayRegister;
 
 - (void) readExtendedEventConfig:(BOOL)verbose;
 - (void) writeEndAddress;                       //6.15 (section 2)
@@ -638,6 +634,7 @@ enum {
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
 - (void) readAccumulatorGates:(BOOL)verbose;
 - (void) configureAnalogRegisters;
+- (void) writeDacRegisters;
 
 - (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
 - (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; 
@@ -653,7 +650,6 @@ enum {
 - (void) armBank2;
 - (int) currentBank;
 - (void) resetADCClockDCM;
-//- (void) setClockFreq;
 //- (int) setFrequency:(int) osc values:(unsigned char*)values;
 //- (void) si570ReadDivider:(int) osc data:(unsigned char*)data;
 
@@ -663,11 +659,9 @@ enum {
 
 - (void) poll_on_adc_dac_offset_busy;
 - (void) write_channel_header_IDs;
-- (int) adc_spi_write_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long) spi_data;
-- (int) adc_spi_read_group:(unsigned int) adc_fpga_group chip:(unsigned int) adc_chip address:(unsigned long) spi_addr data:(unsigned long*) spi_data;
-- (int) adcSpiSetup;
-//- (void) getFrequency:(int)osc;
-- (void) write_all_gain_termination_values;
+- (int) set_frequency:(int)osc  values:(unsigned char*)values;
+
+- (void) writeGainTerminationValues;
 - (void) dumpChan0;
 #pragma mark •••Data Taker
 - (unsigned long) dataId;
@@ -703,7 +697,12 @@ enum {
 - (void) setUpArray:(SEL)aSetter intValue:(int)aValue numItems:(int)n;
 
 #pragma mark •••AutoTesting
-- (NSArray*) autoTests; 
+- (NSArray*) autoTests;
+
+#pragma mark •••Clock Setup
+- (void) setupSharing;
+- (void) setupClock;
+
 @end
 
 extern NSString* ORSIS3316EnabledChanged;
@@ -771,7 +770,7 @@ extern NSString* ORSIS3316EnableSumChanged;
 extern NSString* ORSIS3316RiseTimeSumChanged;
 extern NSString* ORSIS3316GapTimeSumChanged;
 extern NSString* ORSIS3316CfdControlBitsSumChanged;
-//extern NSString* ORSIS3316SharingChanged;
+extern NSString* ORSIS3316SharingChanged;
 
 extern NSString* ORSIS3316LemoCoMaskChanged;
 extern NSString* ORSIS3316LemoUoMaskChanged;

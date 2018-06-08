@@ -470,10 +470,10 @@
                          name : ORSIS3316CfdControlBitsSumChanged
                         object: model];
 
-//    [notifyCenter addObserver : self
-//                     selector : @selector(sharingChanged:)
-//                         name : ORSIS3316SharingChanged
-//                        object: model];
+    [notifyCenter addObserver : self
+                     selector : @selector(sharingChanged:)
+                         name : ORSIS3316SharingChanged
+                        object: model];
     
     [notifyCenter addObserver : self
                      selector : @selector(lemoToMaskChanged:)
@@ -616,7 +616,7 @@
     [self cfdControlBitsSumChanged:nil];
     
     [self dacOffsetChanged:nil];
-//    [self sharingChanged:nil];
+    [self sharingChanged:nil];
     [self lemoToMaskChanged:nil];
     [self lemoUoMaskChanged:nil];
     [self lemoCoMaskChanged:nil];
@@ -698,10 +698,10 @@
     }
 }
 
-//- (void) sharingChanged:(NSNotification*)aNote
-//{
-//    [sharingPU selectItemAtIndex:[model sharing]];
-//}
+- (void) sharingChanged:(NSNotification*)aNote
+{
+    [sharingPU selectItemAtIndex:[model sharing]];
+}
 
 - (void) dacOffsetChanged:(NSNotification*)aNote
 {
@@ -1493,10 +1493,10 @@
 {
     [model setBaseAddress:[sender intValue]];
 }
-//- (IBAction) sharingAction:(id)sender
-//{
-//    [model setSharing:[sender indexOfSelectedItem]];
-//}
+- (IBAction) sharingAction:(id)sender
+{
+    [model setSharing:[sender indexOfSelectedItem]];
+}
 
 - (IBAction) histogramsEnabledAction:(id)sender
 {
