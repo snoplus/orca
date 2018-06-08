@@ -3,7 +3,7 @@
 //  ORCA
 //
 //  Created by Mark Howe on Mon Feb 10 2003.
-//  Copyright © 2002 CENPA, University of Washington. All rights reserved.
+//  Copyright ï¿½ 2002 CENPA, University of Washington. All rights reserved.
 //-----------------------------------------------------------
 //This program was prepared for the Regents of the University of 
 //Washington at the Center for Experimental Nuclear Physics and 
@@ -86,6 +86,8 @@
 - (BOOL) available;
 - (id) owner;                                           // who obtained the port?
 - (NSFileHandle*) open;
+- (NSFileHandle*) openRaw;       // use returned file handle to read and write
+- (NSFileHandle*) open:(BOOL)isRaw;
 - (void) close;
 - (void) drainInput;
 - (void) flushInput:(bool)fIn Output:(bool)fOut;        // (fIn or fOut) must be YES

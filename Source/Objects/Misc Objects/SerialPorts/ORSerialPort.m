@@ -148,8 +148,19 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 }
 
 
-- (NSFileHandle*) open		// use returned file handle to read and write
+- (NSFileHandle*) open        // use returned file handle to read and write
 {
+    return [self open:NO];
+}
+
+- (NSFileHandle*) openRaw        // use returned file handle to read and write
+{
+    return [self open:YES];
+}
+
+- (NSFileHandle*) open:(BOOL)isRaw
+{
+    // use returned file handle to read and write
 	const char* thePath = [bsdPath cStringUsingEncoding:NSASCIIStringEncoding];
 	fileDescriptor = open(thePath, O_RDWR | O_NOCTTY); // | O_NONBLOCK);
 	NSLog(@"opened: %@\n", bsdPath);
@@ -168,7 +179,8 @@ NSString* ORSerialPortDataReceived = @"ORSerialPortDataReceived";
 	}
 	// Get a copy for local options
 	tcgetattr(fileDescriptor, options);
-	
+    if(isRaw) cfmakeraw(options);
+
 	// Success
 	fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:fileDescriptor closeOnDealloc:YES];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSerialPortStateChanged object:self];
