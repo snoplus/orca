@@ -315,6 +315,7 @@ enum {
     BOOL            adc125MHzFlag;
     BOOL            firstTime;
     BOOL            clocksProgrammed;
+    
 }
 
 - (id) init;
@@ -783,4 +784,5 @@ extern NSString* ORSIS3316InternalCoinGateLenChanged;
 
 extern NSString* ORSIS3316PileUpWindowLengthChanged;
 extern NSString* ORSIS3316RePileUpWindowLengthChanged;
+
 

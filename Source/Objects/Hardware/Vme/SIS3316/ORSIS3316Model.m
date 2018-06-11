@@ -637,10 +637,10 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
                   group*4+1, group*4+4,
                   addr,
                   [(aValue>>8 & 0x1)?@"2.5 GHz":@"1.25 GHz" centered:11],
-                  [(aValue>>16 & 0x1)?@"X":@" " centered:6],
-                  [(aValue>>17 & 0x1)?@"X":@" " centered:6],
-                  [(aValue>>20 & 0x1)?@"X":@" " centered:6],
-                  [(aValue>>21 & 0x1)?@"X":@" " centered:7]
+                  [(aValue>>16 & 0x1)?@"X":@"-" centered:6],
+                  [(aValue>>17 & 0x1)?@"X":@"-" centered:6],
+                  [(aValue>>20 & 0x1)?@"X":@"-" centered:6],
+                  [(aValue>>21 & 0x1)?@"X":@"-" centered:7]
                   );
     }
     NSLogDivider(@"=",width);
@@ -649,16 +649,16 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //4.1 ADC FPGA Status
 - (void) dumpFirmwareVersion
 {
-    int width = 41;
+    int width = 57;
     unsigned long addr = [self groupRegister:kAdcVersionReg group:0];
     NSString* title = [NSString stringWithFormat:@"ADC Firmware (0x%08lx)",addr];
     NSLogStartTable(title, width);
-    NSLogMono(@"|  Chan |   Type   | Version | Revision |\n");
+    NSLogMono(@"|  Chan |   Type   | Version | Revision | Neutron/Gamma |\n");
     NSLogDivider(@"-",width);
     int group;
     for(group=0;group<kNumSIS3316Groups;group++){
         unsigned long result =  [self readLongFromAddress:addr];
-        NSLogMono(@"| %2d-%2d |  0x%04x  |   0x%02x  |   0x%02x   |\n",group*4+1, group*4+4, result>>16 & 0xffff,result>>8 & 0xff,result&0xff);
+        NSLogMono(@"| %2d-%2d |  0x%04x  |   0x%02x  |   0x%02x   |%@|\n",group*4+1, group*4+4, result>>16 & 0xffff,result>>8 & 0xff,result&0xff,[result>>8 ==0x02?@"YES":@"NO" centered:15]);
     }
     NSLogDivider(@"=",width);
     
@@ -3814,7 +3814,25 @@ NSString* tauTable[4] ={
     NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:aChan] forKey:@"Channel"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316EnergySubtractorChanged object:self userInfo:userInfo];
 }
-
+//- (void) writeHistogramConfiguration
+//{
+//    unsigned long valueToWrite 0x0;
+//
+//    data =   ((histogram_mode_and_disable_sample_hits_flag & 0x1) << 31)
+//    + ((energy_p & 0xfff) << 16)
+//    + 0   // index offset * 0x100
+//    + 0   // if 1 : enable if Pileup
+//    + 1 ; // enable
+//    int iGroup;
+//    for (iGroup=0; iGroup<4; iGroup++) {
+//        [self writeLong:valueToWrite toAddress:[self groupRegister:kGenHistogramConfigReg group:iGroup]];
+//        return_code = vme_crate->vme_A32D32_write ( module_base_addr + (i_adc_fpga*SIS3316_FPGA_ADC_REG_OFFSET) + SIS3316_ADC_CH1_HISTOGRAM_CONF_REG, data);
+//        return_code = vme_crate->vme_A32D32_write ( module_base_addr + (i_adc_fpga*SIS3316_FPGA_ADC_REG_OFFSET) + SIS3316_ADC_CH2_HISTOGRAM_CONF_REG, data);
+//        return_code = vme_crate->vme_A32D32_write ( module_base_addr + (i_adc_fpga*SIS3316_FPGA_ADC_REG_OFFSET) + SIS3316_ADC_CH3_HISTOGRAM_CONF_REG, data);
+//        return_code = vme_crate->vme_A32D32_write ( module_base_addr + (i_adc_fpga*SIS3316_FPGA_ADC_REG_OFFSET) + SIS3316_ADC_CH4_HISTOGRAM_CONF_REG, data);
+//    }
+//}
+//
 
 //6.34 MAW Start Index and Energy Pickup Configuration registers
 
