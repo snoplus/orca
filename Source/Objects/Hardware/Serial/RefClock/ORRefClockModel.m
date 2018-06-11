@@ -120,13 +120,17 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 - (void) openPort:(BOOL)state
 {
     if(state) {
-        [serialPort open];
+        //[serialPort open];
+        [serialPort openRaw];
 		[serialPort setSpeed:9600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];
 		[serialPort setDataBits:8];
  		[serialPort commitChanges];
         [serialPort setDelegate:self];
+        
+        //[serialPort flushInput:YES Output:YES];
+        
     }
     else [serialPort close];
     
@@ -210,6 +214,7 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
         float delay = [cmdData length]/500.0;  // give it some extra time for big data chunks
         [self startTimeout:3 + delay];
         [self setLastRequest:aCmdDictionary];
+        
         [serialPort writeDataInBackground:cmdData];
     }
 }
@@ -217,7 +222,32 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
 - (void) processResponse:(NSData*)someData
 {
     //process the incoming data here and pass it to either the gps or the synclock
-    if(!lastRequest)return;
+    
+//    if([self verbose]){ // debug. remove this block
+//        unsigned short nBytes = [someData length];
+//        const unsigned short cnBytes = nBytes;
+//        unsigned char* bytes  = (unsigned char *)[someData bytes];
+//        int index = 0;
+//        const int nChars = 20;
+//        if (nBytes > nChars){
+//            index = nBytes - nChars;
+//            nBytes = nChars;
+//        }
+//        NSLog(@"proc. resp. Newdat (last %d Bytes of %d): ", nBytes, cnBytes);  //%*s \n", nChars, bytes + index);
+//        NSString* hexBytes = [[NSString alloc] init];
+//        for (int i = 0; i < nBytes; ++i){
+//            //NSLog(@"%2X ", bytes[index + i]);
+//            hexBytes = [NSString stringWithFormat:@"%@ %2X",hexBytes, bytes[index + i]];
+//        }
+//        NSLog(@"%@ \n", hexBytes);
+//    }
+    
+    if(!lastRequest){
+        if([self verbose]){
+            NSLog(@"RefClock: received unexpected data. \n");
+        }
+        return;
+    }
     if(!inComingData)inComingData = [[NSMutableData data] retain];
     [inComingData appendData:someData];
     
@@ -234,14 +264,15 @@ NSString* ORMotoGPS                             = @"ORMotoGPS";
     unsigned short nBytes = [inComingData length];
     unsigned char* bytes  = (unsigned char *)[inComingData bytes];
     
-    // remove undesired bytes from the other device
-    while(1 && nBytes > 0){
-            if(bytes[0] == '?' || bytes[0] == '\n' || bytes[0] == '\r'){
+    // remove undesired bytes (from the other device)
+    
+    if(nBytes > 0){
+            while(bytes[0] == '?' || bytes[0] == '\n' || bytes[0] == '\r'){
                 //NSLog(@"replacing %c ... \n", startByte[0]);
                 [inComingData replaceBytesInRange:NSMakeRange(0, 1) withBytes:NULL length:0];
                 nBytes = [inComingData length];
                 bytes  = (unsigned char *)[inComingData bytes];
-            }else break;
+            }
     }
     if([self verbose]){
         NSLog(@"receiving... (so far %d bytes ) \n", nBytes);
