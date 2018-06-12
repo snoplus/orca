@@ -424,48 +424,50 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			}
 			
 			//load up the private data that will be passed to the feneral interest notification
-			[usbCallbackData setCallBackObject:self];
-			[usbCallbackData setLocationID:locationID];
-			[usbCallbackData setVendor:vendor];
-			[usbCallbackData setProduct:product];
-			
-			// need to open the device in order to change its state
-			kr = (*deviceInterface)->USBDeviceOpen(deviceInterface);
-			if (KERN_SUCCESS != kr){
-				[NSException raise: @"USB Exception" format:@"Unable to open USB device"];
-			}
-			kr = [self _configureAnchorDevice:deviceInterface];
-			if (kIOReturnSuccess != kr){
-				printf("unable to configure device: %08x\n", kr);
-				(void) (*deviceInterface)->USBDeviceClose(deviceInterface);
-				[NSException raise: @"USB Exception" format:@"Unable to open configure device"];
-			}
-			
-			(void) (*deviceInterface)->USBDeviceClose(deviceInterface);
-			
-			
-			// Register for an interest notification of this device being removed. Use a reference to our
-			// private data as the refCon which will be passed to the notification callback.
-			io_object_t aNotification;
-			kr = IOServiceAddInterestNotification( _notifyPort,						// notifyPort
-												  usbDevice,						// service
-												  kIOGeneralInterest,				// interestType
-												  DeviceNotification,				// callback
-												  usbCallbackData,					// refCon
-												  &aNotification  // notification
-												  );
-			[usbCallbackData setNotification:aNotification];
-			
-			if (KERN_SUCCESS != kr)[NSException raise: @"USB Exception" format:@"Unable to add USB interest notification"];
-			
-            [self _findInterfaces:deviceInterface  userInfo:usbCallbackData supported:supported];
-			
-			// Done with this USB device; release the reference added by IOIteratorNext
-			IOObjectRelease(usbDevice);
-            if(!supported) {
+            if(supported){
+                [usbCallbackData setCallBackObject:self];
+                [usbCallbackData setLocationID:locationID];
+                [usbCallbackData setVendor:vendor];
+                [usbCallbackData setProduct:product];
+                
+                // need to open the device in order to change its state
+                kr = (*deviceInterface)->USBDeviceOpen(deviceInterface);
+                if (KERN_SUCCESS != kr){
+                    [NSException raise: @"USB Exception" format:@"Unable to open USB device"];
+                }
+                kr = [self _configureAnchorDevice:deviceInterface];
+                if (kIOReturnSuccess != kr){
+                    printf("unable to configure device: %08x\n", kr);
+                    (void) (*deviceInterface)->USBDeviceClose(deviceInterface);
+                    [NSException raise: @"USB Exception" format:@"Unable to open configure device"];
+                }
+                
+                (void) (*deviceInterface)->USBDeviceClose(deviceInterface);
+                
+                
+                // Register for an interest notification of this device being removed. Use a reference to our
+                // private data as the refCon which will be passed to the notification callback.
+                io_object_t aNotification;
+                kr = IOServiceAddInterestNotification( _notifyPort,						// notifyPort
+                                                      usbDevice,						// service
+                                                      kIOGeneralInterest,				// interestType
+                                                      DeviceNotification,				// callback
+                                                      usbCallbackData,					// refCon
+                                                      &aNotification  // notification
+                                                      );
+                [usbCallbackData setNotification:aNotification];
+                
+                if (KERN_SUCCESS != kr)[NSException raise: @"USB Exception" format:@"Unable to add USB interest notification"];
+                
+                [self _findInterfaces:deviceInterface  userInfo:usbCallbackData supported:supported];
+            }
+            else { //!supported
                 [[ORSerialPortList sharedSerialPortList] updatePortList];
             }
-		}
+
+			// Done with this USB device; release the reference added by IOIteratorNext
+			IOObjectRelease(usbDevice);
+ 		}
 		@catch(NSException* localException) {
 			if(plugInInterface)	(*plugInInterface)->Release(plugInInterface);
 			if(usbDevice)		IOObjectRelease(usbDevice);
