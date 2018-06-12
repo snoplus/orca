@@ -489,7 +489,7 @@ NSString* ORWG1220PulserLock = @"ORWG1220PulserLock";
 - (void) openPort:(BOOL)state
 {
     if(state) {
-        [serialPort open];
+        [serialPort openRaw];
 		[serialPort setSpeed:57600];
 		[serialPort setParityNone];
 		[serialPort setStopBits2:NO];

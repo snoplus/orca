@@ -110,11 +110,11 @@
     [self lockChanged:nil];
     [self portStateChanged:nil];
     [self portNameChanged:nil];
-	[self signalFormChanged:nil];
-	[self amplitudeChanged:nil];
-	[self dutyCycleChanged:nil];
-	[self frequencyChanged:nil];
-	[self verboseChanged:nil];
+    [self signalFormChanged:nil];
+    [self amplitudeChanged:nil];
+    [self dutyCycleChanged:nil];
+    [self frequencyChanged:nil];
+    [self verboseChanged:nil];
 }
 
 - (void) verboseChanged:(NSNotification*)aNote
