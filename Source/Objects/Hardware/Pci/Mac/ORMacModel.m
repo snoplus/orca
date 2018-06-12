@@ -63,7 +63,6 @@ void registryChanged(
 {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[fwBus release];
-	[usb release];
     [lastStringReceived release];
     [super dealloc];
 }
