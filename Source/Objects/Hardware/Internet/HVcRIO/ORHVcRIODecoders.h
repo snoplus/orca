@@ -22,7 +22,6 @@
 
 #import "ORBaseDecoder.h"
 
-@class ORDataHVcRIOket;
 @class ORDataSet;
 
 @interface ORHVcRIODecoderForAdc : ORBaseDecoder {

@@ -31,12 +31,13 @@
 //
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 //                          ^^^^ ^^^^ ^^^^--device id
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 0
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 0 taken in seconds since Jan 1, 1970
-// ..
-// ..
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc chan 7
-// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time pressure 7 taken in seconds since Jan 1, 1970
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  time measured
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc index
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc low
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  adc high
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  spare
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  spare
+// xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  spare
 //-----------------------------------------------------------------------------------------------
 
 @implementation ORHVcRIODecoderForAdc
@@ -44,37 +45,38 @@
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
 	unsigned long *dataPtr = (unsigned long*)someData;
-	int ident = dataPtr[1] & 0xfff;
-	int i;
-	int index = 2;
-	for(i=0;i<8;i++){
-		[aDataSet loadTimeSeries:(float)dataPtr[index]										
-						  atTime:dataPtr[index+1]
-						  sender:self 
-						withKeys:@"PAC",
-								[NSString stringWithFormat:@"Unit %d",ident],
-								[self getChannelKey:i],
-								nil];
-		index+=2;
-	}
-	
+    int dataIndex = dataPtr[3];
+    union {
+        double asDouble;
+        unsigned long asLong[2];
+    } theData;
+    theData.asLong[0] = dataPtr[4];
+    theData.asLong[1] = dataPtr[5];
+    double theValue = theData.asDouble;
+    NSString* valueString = [NSString stringWithFormat:@"%f",theValue];
+    NSString* indexString = [NSString stringWithFormat:@"%d",dataIndex];
+    [aDataSet loadGenericData:valueString sender:self withKeys:@"HVcRIO",indexString,nil];
 	return ExtractLength(dataPtr[0]);
 }
 
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr
 {
-    NSString* title= @"POC Controller\n\n";
+    NSString* title= @"HVcRIO\n\n";
     NSString* theString =  [NSString stringWithFormat:@"%@\n",title];               
 	int ident = dataPtr[1] & 0xfff;
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
-	int i;
-	int index = 2;
-	for(i=0;i<8;i++){
-		
-		NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[index+1]];		
-		theString = [theString stringByAppendingFormat:@"Channel %d: 0x%02lx %@\n",i,dataPtr[index],[date stdDescription]];
-		index+=2;
-	}
+    NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+    int dataIndex = dataPtr[3];
+    union {
+        double asDouble;
+        unsigned long asLong[2];
+    } theData;
+    theData.asLong[0] = dataPtr[4];
+    theData.asLong[1] = dataPtr[5];
+    double theValue = theData.asDouble;
+    
+    theString = [theString stringByAppendingFormat:@"Channel %d: %lf\n time: %@\n",dataIndex,theValue,[date stdDescription]];
+
 	return theString;
 }
 @end

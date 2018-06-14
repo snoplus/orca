@@ -26,7 +26,7 @@
 #define kVesselVoltageSetPt            @"kVesselVoltageSetPt"
 #define kPostRegulationScaleFactor     @"kPostRegulationScaleFactor"
 #define kPowerSupplyOffset             @"kPowerSupplyOffset"
-
+#define kHVcRIORecordSize 9
 @interface ORHVcRIOModel : OrcaObject <ORAdcProcessing>
 {
     @private
@@ -52,6 +52,7 @@
         NSMutableString*    stringBuffer;
         BOOL                showFormattedDates;
         int                 pollTime;
+        unsigned long       dataId;
 }
 
 #pragma mark ***Initialization
@@ -82,6 +83,7 @@
 - (BOOL) verbose;
 - (void) setShowFormattedDates:(BOOL)aState;
 - (BOOL) showFormattedDates;
+- (void) shipRecords;
 
 - (NSString*) title;
 
@@ -130,6 +132,13 @@
 - (void)   setPowerSupplyOffset:(int)anIndex withValue:(double)aValue;
 - (void)   setVesselVoltageSetPoint:(int)anIndex withValue:(double)aValue;
 
+- (unsigned long) dataId;
+- (void) setDataId: (unsigned long) DataId;
+- (void) setDataIds:(id)assigner;
+- (void) syncDataIdsWith:(id)anotherLakeShore210;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (NSDictionary*) dataRecordDescription;
+
 #pragma mark •••Adc or Bit Processing Protocol
 - (void)processIsStarting;
 - (void)processIsStopping;
@@ -173,6 +182,8 @@ extern NSString* ORHVcRIOModelPollTimeChanged;
 - (id) objectForKey:(id)aKey;
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
+
+
 @property   (retain) NSMutableDictionary* data;
 @end
 

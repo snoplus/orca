@@ -20,6 +20,8 @@
 #import "ORHVcRIOModel.h"
 #import "ORSafeQueue.h"
 #import "NetSocket.h"
+#import "ORDataTypeAssigner.h"
+#import "ORDataPacket.h"
 
 #pragma mark ***External Strings
 NSString* ORHVcRIOModelIsConnectedChanged           = @"ORHVcRIOModelIsConnectedChanged";
@@ -976,7 +978,7 @@ static NSString* measuredValueList[] = {
 
 - (void) setMeasuredValue: (int)aIndex withValue: (double)value
 {
-    [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%.6f",value] forKey:@"value"];
+    [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%f",value] forKey:@"value"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
     
 }
@@ -1254,7 +1256,7 @@ static NSString* measuredValueList[] = {
                 [self setMeasuredValue:i withValue:[[theParts objectAtIndex:i]doubleValue]];
             }
         }
-        
+        [self shipRecords];
         [self setLastRequest:nil];
         
         expertPCControlOnly = [[[measuredValues objectAtIndex:146] objectForKey:@"value"] boolValue];
@@ -1264,6 +1266,84 @@ static NSString* measuredValueList[] = {
         [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelMeasuredValuesChanged object: self];
     }
     [self processNextCommandFromQueue];
+}
+#pragma mark ***Data Records
+- (unsigned long) dataId { return dataId; }
+- (void) setDataId: (unsigned long) DataId
+{
+    dataId = DataId;
+}
+- (void) setDataIds:(id)assigner
+{
+    dataId   = [assigner assignDataIds:kLongForm];
+}
+
+- (void) syncDataIdsWith:(id)anOtherDevice
+{
+    [self setDataId:[anOtherDevice dataId]];
+}
+
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+{
+    //----------------------------------------------------------------------------------------
+    // first add our description to the data description
+    [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"HVcRIO"];
+}
+
+- (NSDictionary*) dataRecordDescription
+{
+    NSMutableDictionary* dataDictionary = [NSMutableDictionary dictionary];
+    NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
+                                 @"ORHVcRIODecoderForAdc",@"decoder",
+                                 [NSNumber numberWithLong:dataId],   @"dataId",
+                                 [NSNumber numberWithBool:NO],       @"variable",
+                                 [NSNumber numberWithLong:kHVcRIORecordSize],       @"length",
+                                 nil];
+    [dataDictionary setObject:aDictionary forKey:@"Temperatures"];
+    
+    return dataDictionary;
+}
+- (void) shipRecords
+{
+    #define kNumToShip  38
+    int indexesToShip[kNumToShip] = {
+         38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,
+         86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,
+         303,304,305,306,307,308
+    };
+    int i;
+    time_t    ut_Time;
+    time(&ut_Time);
+    unsigned long  timeMeasured = ut_Time;
+
+    for(i=0;i<kNumToShip;i++){
+        int j = indexesToShip[i];
+        if(j<[measuredValues count]){
+            if([[ORGlobal sharedGlobal] runInProgress]){
+                unsigned long record[kHVcRIORecordSize];
+                record[0] = dataId | kHVcRIORecordSize;
+                record[1] = ([self uniqueIdNumber] & 0x0000fffff);
+                record[2] = timeMeasured;
+                record[3] = j;
+
+                union {
+                    double asDouble;
+                    unsigned long asLong[2];
+                } theData;
+                NSString* s = [[measuredValues objectAtIndex:j]objectForKey:@"value"];
+                double aValue = [s doubleValue];
+                theData.asDouble = aValue;
+                record[4] = theData.asLong[0];
+                record[5] = theData.asLong[1];
+                record[6] = 0; //spares
+                record[7] = 0;
+                record[8] = 0;
+
+                [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
+                                                                    object:[NSData dataWithBytes:record length:sizeof(long)*kHVcRIORecordSize]];
+            }
+        }
+    }
 }
 
 - (NSString*) setPointFile
@@ -1800,5 +1880,7 @@ static NSString* measuredValueList[] = {
 {
     [encoder encodeObject:data  forKey:@"data"];
 }
+
+
 @end
 
