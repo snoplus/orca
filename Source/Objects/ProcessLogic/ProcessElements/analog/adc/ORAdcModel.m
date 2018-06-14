@@ -21,6 +21,7 @@
 
 #import "ORAdcModel.h"
 #import "ORProcessOutConnector.h"
+#import "ORProcessInConnector.h"
 #import "ORProcessModel.h"
 #import "ORProcessThread.h"
 #import "ORAdcProcessing.h"
@@ -35,6 +36,7 @@ NSString* ORAdcModelLowConnection		= @"ORAdcModelLowConnection";
 NSString* ORAdcModelHighConnection		= @"ORAdcModelHighConnection";
 NSString* ORAdcModelOutOfRangeLow       = @"ORAdcModelOutOfRangeLow";
 NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
+NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 
 @interface ORAdcModel (private)
 - (NSImage*) composeIcon;
@@ -161,6 +163,14 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
     [ aConnector setConnectorType: 'LP2 ' ];
     [ aConnector addRestrictedConnectionType: 'LP1 ' ]; //can only connect to processor inputs
     [aConnector release];
+    
+    ORProcessInConnector* inConnector = [[ORProcessInConnector alloc] initAt:NSMakePoint(0,kConnectorSize/2+8) withGuardian:self withObjectLink:self];
+    [[self connectors] setObject:inConnector forKey:ORSimpleInConnection];
+    [ inConnector setConnectorType: 'LP1 ' ];
+    [ inConnector addRestrictedConnectionType: 'LP2 ' ]; //can only connect to processor outputs
+    [[self connectors] setObject:inConnector forKey:@"Multiplier"];
+    [inConnector release];
+
 }
 
 - (void) setUpNubs
@@ -242,8 +252,16 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 	[self resetReportValues];
     [super processIsStarting];
     [ORProcessThread registerInputObject:self];
-}
+    id obj = [self objectConnectedTo:@"Multiplier"];
+    [obj processIsStarting];
 
+}
+- (void) processIsStopping
+{
+    [super processIsStopping];
+    id obj = [self objectConnectedTo:@"Multiplier"];
+    [obj processIsStopping];
+}
 - (void) viewSource
 {
 	[[self hwObject] showMainInterface];
@@ -269,7 +287,15 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 			double theMinValue		  = [hwObject minValueForChan:[self bit]];
 		
 			if(fabs(theConvertedValue-hwValue) > minChange || theMaxValue!=maxValue || theMinValue!=minValue)updateNeeded = YES;
-			hwValue = theConvertedValue;
+            
+            float multiplier = 1;
+            id obj = [self objectConnectedTo:@"Multiplier"];
+            if(obj){
+                ORProcessResult* theResult = [obj eval];
+                multiplier = [theResult analogValue];
+            }
+            
+			hwValue = theConvertedValue * multiplier;
 			maxValue = theMaxValue;
 			minValue = theMinValue;
 			
@@ -545,7 +571,7 @@ NSString* ORAdcModelOutOfRangeHi       = @"ORAdcModelOutOfRangeHi";
 	
 	if(idLabel){
 		NSSize textSize = [idLabel size];
-		[idLabel drawInRect:NSMakeRect(5,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
+		[idLabel drawInRect:NSMakeRect(15,theIconSize.height-textSize.height-2,textSize.width,textSize.height)];
 	}
 
 	[finalImage unlockFocus];
