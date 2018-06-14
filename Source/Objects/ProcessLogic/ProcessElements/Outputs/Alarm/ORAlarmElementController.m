@@ -54,11 +54,15 @@
                          name : ORAlarmElementSeverityChangedNotification
                        object : model];
     
-
     [notifyCenter addObserver : self
                      selector : @selector(noAlarmNameChanged:)
                          name : ORAlarmElementModelNoAlarmNameChanged
 						object: model];
+    
+    [notifyCenter addObserver : self
+                     selector : @selector(eMailDelayChanged:)
+                         name : ORAlarmElementeMailDelaChangedNotification
+                        object: model];
 
 }
 
@@ -75,13 +79,17 @@
     [self helpFieldChanged:nil];
     [self severityChanged:nil];
 	[self noAlarmNameChanged:nil];
+    [self eMailDelayChanged:nil];
 }
 
 - (void) nameFieldChanged:(NSNotification*) aNote
 {
 	[nameField setStringValue:[model alarmName]];
 }
-
+- (void) eMailDelayChanged:(NSNotification*) aNote
+{
+    [eMailDelayField setIntValue:[model eMailDelay]];
+}
 - (void) helpFieldChanged:(NSNotification*) aNote
 {
 	[helpField setStringValue:[model alarmHelp]];
@@ -113,7 +121,9 @@
     [model setAlarmSeverity:[[sender selectedCell]tag]];
 }
 
-
-
+- (IBAction) eMailDelayAction:(id)sender
+{
+    [model setEMailDelay:[sender intValue]];
+}
 
 @end

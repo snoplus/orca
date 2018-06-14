@@ -525,7 +525,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 	while(eMailThreadRunning){
 	
 		NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:11.0]];
+		[NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 		[eMailLock lock];
 
 		if(!mailAddress || 

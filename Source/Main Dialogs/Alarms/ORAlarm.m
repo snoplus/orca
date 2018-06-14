@@ -109,13 +109,15 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
     }
 }
 
-- (AlarmEmailDelayTime) mailDelay
+- (int) mailDelay
 {
     return mailDelay;
 }
 
-- (void) setMailDelay:(AlarmEmailDelayTime)aTime
+- (void) setMailDelay:(int)aTime
 {
+    if(mailDelay == 0)         aTime = k60SecDelay;
+    if(mailDelay > k60SecDelay)aTime = k60SecDelay;
     mailDelay = aTime;
 }
 

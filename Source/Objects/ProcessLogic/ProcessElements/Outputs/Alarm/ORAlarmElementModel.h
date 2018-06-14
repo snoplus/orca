@@ -31,6 +31,7 @@
     NSString* alarmHelp;
     int alarmSeverity;
     NSString* noAlarmName;
+    int       eMailDelay;
 }
 - (void) registerNotificationObservers;
 - (void) alarmsChanged:(NSNotification*)aNote;
@@ -49,6 +50,8 @@
 - (void)setAlarmName:(NSString*)aName;
 - (void)setAlarmHelp:(NSString*)aName;
 - (void)setAlarmSeverity:(int)aValue;
+- (unsigned short) eMailDelay;
+- (void)setEMailDelay:(unsigned short)aValue;
 
 - (id) initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
@@ -58,3 +61,4 @@ extern NSString* ORAlarmElementModelNoAlarmNameChanged;
 extern NSString* ORAlarmElementNameChangedNotification;
 extern NSString* ORAlarmElementHelpChangedNotification;
 extern NSString* ORAlarmElementSeverityChangedNotification;
+extern NSString* ORAlarmElementeMailDelaChangedNotification;

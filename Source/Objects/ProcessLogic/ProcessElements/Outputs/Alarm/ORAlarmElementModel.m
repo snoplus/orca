@@ -27,6 +27,7 @@ NSString* ORAlarmElementModelNoAlarmNameChanged     = @"ORAlarmElementModelNoAla
 NSString* ORAlarmElementNameChangedNotification     = @"ORAlarmElementNameChangedNotification";
 NSString* ORAlarmElementHelpChangedNotification     = @"ORAlarmElementHelpChangedNotification";
 NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityChangedNotification";
+NSString* ORAlarmElementeMailDelaChangedNotification = @"ORAlarmElementeMailDelaChangedNotification";
 
 @interface ORAlarmElementModel (private)
 - (NSImage*) composeIcon;
@@ -144,6 +145,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
         }
         [alarm setHelpString:[self alarmHelp]];
 		[alarm setAdditionalInfoString:[self alarmContentString]];
+        [alarm setMailDelay:[self eMailDelay]];
         [alarm postAlarm];
 	}
 	else {
@@ -170,10 +172,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
    else return alarmHelp;
 }
 
-- (int) alarmSeverity
-{
-    return alarmSeverity;
-}
+
 
 - (void)setAlarmName:(NSString*)aName
 {
@@ -189,6 +188,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
         if([alarm isPosted]){
             [alarm clearAlarm];
 			[alarm setAdditionalInfoString:[self alarmContentString]];
+            [alarm setMailDelay:[self eMailDelay]];
             [alarm postAlarm];
         }
     }
@@ -225,6 +225,10 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 	return s;
 }
 
+- (int) alarmSeverity
+{
+    return alarmSeverity;
+}
 - (void)setAlarmSeverity:(int)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmSeverity:alarmSeverity];
@@ -236,6 +240,7 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
         if([alarm isPosted]){
             [alarm clearAlarm];
 			[alarm setAdditionalInfoString:[self alarmContentString]];
+            [alarm setMailDelay:[self eMailDelay]];
             [alarm postAlarm];
         }
     }
@@ -243,6 +248,20 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     [[NSNotificationCenter defaultCenter]
 		postNotificationName:ORAlarmElementSeverityChangedNotification
 					  object:self];
+}
+- (unsigned short) eMailDelay
+{
+    return eMailDelay;
+}
+- (void)setEMailDelay:(unsigned short)aValue
+{
+    [[[self undoManager] prepareWithInvocationTarget:self] setEMailDelay:eMailDelay];
+    if(aValue==0)aValue = 60;
+    eMailDelay = aValue;
+
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:ORAlarmElementeMailDelaChangedNotification
+     object:self];
 }
 
 - (NSString*) description:(NSString*)prefix
@@ -282,10 +301,11 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
     [[self undoManager] disableUndoRegistration];
     
     [self setNoAlarmName:[decoder decodeObjectForKey:@"noAlarmName"]];
-    [self setAlarmSeverity:[decoder decodeIntForKey:@"alarmSeverity"]];
-    [self setAlarmName:[decoder decodeObjectForKey: @"alarmName"]];
-    [self setAlarmHelp:[decoder decodeObjectForKey: @"alarmHelp"]];
-    
+    [self setAlarmSeverity:[decoder decodeIntForKey: @"alarmSeverity"]];
+    [self setAlarmName:[decoder decodeObjectForKey:  @"alarmName"]];
+    [self setAlarmHelp:[decoder decodeObjectForKey:  @"alarmHelp"]];
+    [self setEMailDelay:[decoder decodeIntForKey:    @"eMailDelay"]];
+
     [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
   
@@ -295,11 +315,11 @@ NSString* ORAlarmElementSeverityChangedNotification = @"ORAlarmElementSeverityCh
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeObject:noAlarmName forKey:@"noAlarmName"];
-    [encoder encodeInt:alarmSeverity forKey:@"alarmSeverity"];
-    [encoder encodeObject:alarmName forKey:@"alarmName"];
-    [encoder encodeObject:alarmHelp forKey:@"alarmHelp"];
-    
+    [encoder encodeObject:noAlarmName   forKey:@"noAlarmName"];
+    [encoder encodeInt:alarmSeverity    forKey:@"alarmSeverity"];
+    [encoder encodeObject:alarmName     forKey:@"alarmName"];
+    [encoder encodeObject:alarmHelp     forKey:@"alarmHelp"];
+    [encoder encodeInt:eMailDelay       forKey:@"eMailDelay"];
 }
 
 @end
