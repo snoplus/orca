@@ -2838,6 +2838,14 @@ Relay</string>
                                                 <font key="font" metaFont="system" size="10"/>
                                             </buttonCell>
                                         </button>
+                                        <button toolTip="ORMultiplierModel" misplaced="YES" id="eyO-kd-2X9" customClass="ObjectFactory">
+                                            <rect key="frame" x="600" y="29" width="72" height="58"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="bevel" title="Multiplier" bezelStyle="regularSquare" image="Multiplier" imagePosition="above" alignment="center" inset="2" id="V3O-5s-3WB">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="system" size="10"/>
+                                            </buttonCell>
+                                        </button>
                                     </subviews>
                                 </view>
                             </tabViewItem>
@@ -3400,6 +3408,7 @@ Relay</string>
         <image name="ModBus" width="50" height="62"/>
         <image name="MotionNode" width="50" height="41"/>
         <image name="Motor" width="60" height="48"/>
+        <image name="Multiplier" width="70" height="41"/>
         <image name="NHQ226L" width="23" height="150"/>
         <image name="NMon5085" width="50" height="79"/>
         <image name="NandGate" width="62" height="32"/>
@@ -3439,7 +3448,7 @@ Relay</string>
         <image name="RaidMonitor" width="130" height="35"/>
         <image name="Ramper" width="50" height="60"/>
         <image name="RandomPulser" width="130" height="24"/>
-        <image name="RefClock" width="49" height="100"/>
+        <image name="RefClock" width="114.88086700439453" height="18.344249725341797"/>
         <image name="RemoteRunControl" width="80" height="74"/>
         <image name="RemoteSocket" width="152" height="50"/>
         <image name="ReplayData" width="80" height="55"/>

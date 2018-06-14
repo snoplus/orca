@@ -1700,6 +1700,12 @@
 		84701ACA0E0342F200195E3E /* ORCARoot.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AC90E0342F200195E3E /* ORCARoot.tif */; };
 		84701AD40E0344CF00195E3E /* ORCARootService.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84701AD30E0344CF00195E3E /* ORCARootService.tif */; };
 		8470D01518241FEE0054F7D4 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8470D01418241FEE0054F7D4 /* Accelerate.framework */; };
+		84716E3020D2BBD400649339 /* ORMultiplierModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84716E2A20D2BBD400649339 /* ORMultiplierModel.h */; };
+		84716E3120D2BBD400649339 /* Multiplier.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84716E2B20D2BBD400649339 /* Multiplier.nib */; };
+		84716E3220D2BBD400649339 /* ORMultiplierController.m in Sources */ = {isa = PBXBuildFile; fileRef = 84716E2C20D2BBD400649339 /* ORMultiplierController.m */; };
+		84716E3320D2BBD400649339 /* Multiplier.tif in Resources */ = {isa = PBXBuildFile; fileRef = 84716E2D20D2BBD400649339 /* Multiplier.tif */; };
+		84716E3420D2BBD400649339 /* ORMultiplierModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84716E2E20D2BBD400649339 /* ORMultiplierModel.m */; };
+		84716E3520D2BBD400649339 /* ORMultiplierController.h in Headers */ = {isa = PBXBuildFile; fileRef = 84716E2F20D2BBD400649339 /* ORMultiplierController.h */; };
 		8471C2F41250CF0C003A8DFB /* ORCAEN260Readout.hh in Headers */ = {isa = PBXBuildFile; fileRef = 8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */; };
 		8471C30F1250D456003A8DFB /* ORCAEN260Readout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */; };
 		8471C3101250D456003A8DFB /* ORCAEN260Readout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = 8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */; };
@@ -5275,6 +5281,12 @@
 		84701AC90E0342F200195E3E /* ORCARoot.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARoot.tif; path = "Source/Main Dialogs/ORCARootService/ORCARoot.tif"; sourceTree = SOURCE_ROOT; };
 		84701AD30E0344CF00195E3E /* ORCARootService.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = ORCARootService.tif; path = "Source/Main Document/ORCARootService.tif"; sourceTree = SOURCE_ROOT; };
 		8470D01418241FEE0054F7D4 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = ../../../../System/Library/Frameworks/Accelerate.framework; sourceTree = "<group>"; };
+		84716E2A20D2BBD400649339 /* ORMultiplierModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMultiplierModel.h; sourceTree = "<group>"; };
+		84716E2B20D2BBD400649339 /* Multiplier.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Multiplier.nib; sourceTree = "<group>"; };
+		84716E2C20D2BBD400649339 /* ORMultiplierController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMultiplierController.m; sourceTree = "<group>"; };
+		84716E2D20D2BBD400649339 /* Multiplier.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = Multiplier.tif; sourceTree = "<group>"; };
+		84716E2E20D2BBD400649339 /* ORMultiplierModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORMultiplierModel.m; sourceTree = "<group>"; };
+		84716E2F20D2BBD400649339 /* ORMultiplierController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMultiplierController.h; sourceTree = "<group>"; };
 		8471C2F11250CF0C003A8DFB /* ORCAEN260Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ORCAEN260Readout.cc; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN260Readout.cc; sourceTree = SOURCE_ROOT; };
 		8471C2F21250CF0C003A8DFB /* ORCAEN260Readout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ORCAEN260Readout.hh; path = Source/Objects/Hardware/Vme/VMEcpu/VME_Readout_Code/ORCAEN260Readout.hh; sourceTree = SOURCE_ROOT; };
 		8471D4731588DF3C0039894D /* ORRemoteSocketController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORRemoteSocketController.h; path = "Source/Objects/Misc Objects/RemoteSocket/ORRemoteSocketController.h"; sourceTree = SOURCE_ROOT; };
@@ -8724,6 +8736,7 @@
 			isa = PBXGroup;
 			children = (
 				840EFFD60944B28F00049827 /* BaseClasses */,
+				84716E2920D2BBD400649339 /* Multiplier */,
 				84DA76B916B803E00045F22A /* AdcRate */,
 				8459A8CF137C1FEC0029C5B6 /* Comparator */,
 				840B7B99094A649D00B1B135 /* Joiner */,
@@ -10413,6 +10426,19 @@
 			name = RunVeto;
 			path = Source/Objects/ProcessLogic/ProcessElements/Outputs/RunVeto;
 			sourceTree = SOURCE_ROOT;
+		};
+		84716E2920D2BBD400649339 /* Multiplier */ = {
+			isa = PBXGroup;
+			children = (
+				84716E2E20D2BBD400649339 /* ORMultiplierModel.m */,
+				84716E2A20D2BBD400649339 /* ORMultiplierModel.h */,
+				84716E2C20D2BBD400649339 /* ORMultiplierController.m */,
+				84716E2F20D2BBD400649339 /* ORMultiplierController.h */,
+				84716E2B20D2BBD400649339 /* Multiplier.nib */,
+				84716E2D20D2BBD400649339 /* Multiplier.tif */,
+			);
+			path = Multiplier;
+			sourceTree = "<group>";
 		};
 		8471D4721588DF3C0039894D /* RemoteSocket */ = {
 			isa = PBXGroup;
@@ -14825,10 +14851,10 @@
 				848E2101059378C700B6708F /* catalog.gif */,
 				848E201B059282F400B6708F /* statusWindow.gif */,
 				848E20690592891800B6708F /* alarmMaster.gif */,
+				84701AD30E0344CF00195E3E /* ORCARootService.tif */,
 				844E5CD506236ACD0051849B /* CommandCenter.gif */,
 				844E5CD606236ACD0051849B /* TaskMaster.gif */,
 				840B7DAF094DFBCB00B1B135 /* ProcessCenter.tif */,
-				84701AD30E0344CF00195E3E /* ORCARootService.tif */,
 				CE0D70B3146812E000B241D8 /* hardwareFinder.tiff */,
 				84D8CB4D10447A57005585C5 /* AutoTester.gif */,
 				84EBBE7E1282E5D500234313 /* Archive.tif */,
@@ -15256,6 +15282,7 @@
 				8434A229055B3287002D3102 /* ORCaenCardModel.h in Headers */,
 				8434A22A055B3287002D3102 /* ORCaenDataDecoder.h in Headers */,
 				8434A22B055B3287002D3102 /* ORCaen775Model.h in Headers */,
+				84716E3020D2BBD400649339 /* ORMultiplierModel.h in Headers */,
 				8434A22C055B3287002D3102 /* ORCaen775Controller.h in Headers */,
 				8434A22E055B3287002D3102 /* ORCaenCardController.h in Headers */,
 				8434A22F055B3287002D3102 /* ORCaen785Controller.h in Headers */,
@@ -15948,6 +15975,7 @@
 				84AB101E1057D6990069D5E2 /* ORiTransGasSensorModel.h in Headers */,
 				84DBA1341058122C00884B1C /* ORiTransGasSensorController.h in Headers */,
 				848BF510107255F8005779A2 /* PMC_Link.h in Headers */,
+				84716E3520D2BBD400649339 /* ORMultiplierController.h in Headers */,
 				CE85B6B71BBD1BEC0093ECD0 /* ORThread.hh in Headers */,
 				8421064D1085A28E00C3AA81 /* ORAdeiLoader.h in Headers */,
 				84D34B0410B1D6C90013473E /* ORSIS3302Controller.h in Headers */,
@@ -16844,6 +16872,7 @@
 				8472AD6F0A82BD8F0069A069 /* BiRa3251OCard.gif in Resources */,
 				6B325E0E1B2F4306002E2DD7 /* XL1.xib in Resources */,
 				0FF177C71DF7AEA000BA783B /* run_dog_frame_4.tiff in Resources */,
+				84716E3120D2BBD400649339 /* Multiplier.nib in Resources */,
 				842DAEBB0A82CA8400C942A2 /* BiRa2351I.nib in Resources */,
 				6B325E121B2F4334002E2DD7 /* MTC.xib in Resources */,
 				842DAEBC0A82CA8400C942A2 /* BiRa2351ICard.gif in Resources */,
@@ -17009,6 +17038,7 @@
 				84E18D640F0A7EFA0096F0F3 /* SingleStep.tif in Resources */,
 				84E18D660F0A7EFA0096F0F3 /* Pause.tif in Resources */,
 				3672CF8C1C4EB15000870996 /* SNOCaen1720.nib in Resources */,
+				84716E3320D2BBD400649339 /* Multiplier.tif in Resources */,
 				841922810F0BC1E300EF1C1C /* ScriptIDE.nib in Resources */,
 				841924490F0BD91A00EF1C1C /* ScriptRunning.tif in Resources */,
 				842042070F0C082D00720846 /* Continue.tif in Resources */,
@@ -17659,6 +17689,7 @@
 				844E49F3057538B1005F11A0 /* ORTask.m in Sources */,
 				C65995A620529EE300FE5973 /* ORMotoGPSController.m in Sources */,
 				8483E56E058652E400C28344 /* ORDataController.m in Sources */,
+				84716E3420D2BBD400649339 /* ORMultiplierModel.m in Sources */,
 				843DCF3B058E546A000C5219 /* ORDataGenModel.m in Sources */,
 				10279A731EBA4AFE00048814 /* LivePedestals.m in Sources */,
 				847CCA69058E8C75003522C8 /* ORQueue.m in Sources */,
@@ -18518,6 +18549,7 @@
 				2D12EEB0150FEB6600EBD8A2 /* OREdelweissSLTController.m in Sources */,
 				2D12EEB2150FEB6600EBD8A2 /* OREdelweissSLTDecoder.m in Sources */,
 				2D12EEB5150FEB6600EBD8A2 /* OREdelweissSLTModel.m in Sources */,
+				84716E3220D2BBD400649339 /* ORMultiplierController.m in Sources */,
 				CE0216BE1512139A00456EB7 /* ORnEDMCoilController.m in Sources */,
 				CE0216C01512139A00456EB7 /* ORnEDMCoilModel.m in Sources */,
 				8499A7591518D85800CD7AAC /* ORCP8CryopumpController.m in Sources */,
