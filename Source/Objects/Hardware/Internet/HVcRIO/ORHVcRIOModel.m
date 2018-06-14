@@ -978,7 +978,7 @@ static NSString* measuredValueList[] = {
 
 - (void) setMeasuredValue: (int)aIndex withValue: (double)value
 {
-    [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%f",value] forKey:@"value"];
+    [[measuredValues objectAtIndex:aIndex] setObject:[NSString stringWithFormat:@"%lf",value] forKey:@"value"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORHVcRIOModelSetPointChanged object:self];
     
 }
