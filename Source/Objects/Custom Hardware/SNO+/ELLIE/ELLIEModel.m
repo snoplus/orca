@@ -1072,7 +1072,7 @@ err:
 
     ///////////////
     // Now set-up is done, push initial run document
-    if([runControl isRunning]){
+    if([runControl isRunning] && ([runControl subRunNumber] == 0)){
         @try{
             if(forTELLIE){
                 [self pushInitialTellieRunDocument];
