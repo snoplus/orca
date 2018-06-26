@@ -150,13 +150,16 @@
  --------^-^^^--------------------------- Crate number
  -------------^-^^^^--------------------- Card number
  --------------------^^^^ ^^^^----------- Chan number
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num of longs in data header -- can get from the raw data also
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
- 
- N Data Records follow with format described in manual (NOTE THE FORMAT BITS)
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+
+ N longs follow containing the histogram
  
  */
 
@@ -212,7 +215,10 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
- 
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+
  N Data Records follow with format described in manual the statistic counter
  */
 

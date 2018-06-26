@@ -155,7 +155,7 @@ bool ORSIS3316Card::Readout(SBC_LAM_Data* /*lam_data*/)
         struct timeval t;
         gettimeofday(&t, NULL);
         uint32_t now = t.tv_sec;
-        if(((now - currentSec) >= 1)){
+        if(((now - currentSec) >= 10)){
             currentSec = now;
             ReadHistograms();
         }
@@ -180,7 +180,7 @@ void ORSIS3316Card::ReadHistograms()
                     0x00FF0000|(0x1<<28),
                     0x02FF0000|(0x1<<28)
                 };
-                uint32_t offset = 0x80000000 | memory_bank_offset_addr[iGroup]; //OR in the
+                uint32_t offset = 0x80000000 | memory_bank_offset_addr[chan%4]; //OR in the Read Cmd
                 uint32_t addr   = baseAddress + kSIS3316DataTransferBaseReg + (iGroup*0x4);
                 //printf("add: 0x%08x command: 0x%08x\n",addr,offset);
                 if(VMEWrite(addr, GetAddressModifier(), 4, offset) != sizeof(uint32_t)){
@@ -189,20 +189,18 @@ void ORSIS3316Card::ReadHistograms()
                 }
                 usleep(4); //up to 2 µs for transfer to take place
 
-                // readout
-               // addr = SIS3316_FPGA_ADC1_MEM_BASE + (((channel_no >> 2) & 0x3 )* SIS3316_FPGA_ADC_MEM_OFFSET)  ;
                 ensureDataCanHold(kSIS3316HistogramLength + kOrcaHeaderLen);
-                int32_t savedDataIndex  = dataIndex;
-                data[dataIndex++]       = histoId | (kOrcaHeaderLen + kSIS3316HistogramLength);
-                data[dataIndex++]       = locationMask  | ((chan & 0x000000ff)<<8);
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
-                data[dataIndex++]       = 0;
+                int32_t savedDataIndex = dataIndex;
+                data[dataIndex++]      = histoId      | (kOrcaHeaderLen + kSIS3316HistogramLength);
+                data[dataIndex++]      = locationMask | ((chan & 0x000000ff)<<8);
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
+                data[dataIndex++]      = 0;
 
                 uint32_t ret = DMARead(baseAddress + kSIS3316AdcMemBase + iGroup*kSIS3316AdcMemOffset,
                                        0xB, //address modifier
@@ -215,6 +213,7 @@ void ORSIS3316Card::ReadHistograms()
             }
         }
     }
+    
     uint32_t iGroup;
     for(iGroup=0;iGroup<4;iGroup++){
         ResetFSM(iGroup);

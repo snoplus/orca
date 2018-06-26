@@ -4022,8 +4022,8 @@ NSString* tauTable[4] ={
     for(iChan=0;iChan<kNumSIS3316Channels;iChan++){
         unsigned long aValue =  (((writeHitsToEventMemoryMask>>iChan) & 0x1) << 31) |
                                 (((clrHistogramsWithTSMask   >>iChan) & 0x1) << 30) |
-                                ((energyDivider[iChan] & 0xffe)              << 16) |
-                                ((energyOffset[iChan] & 0xfe)                <<  8) |
+                                ((energyDivider[iChan] & 0xfff)              << 16) |
+                                ((energyOffset[iChan] & 0xff)                <<  8) |
                                 (((pileupEnabledMask      >>iChan) & 0x1)    <<  1) |
                                 (((histogramsEnabledMask  >>iChan) & 0x1)    <<  0);
         unsigned long addr = [self channelRegisterVersionTwo:kGenHistogramConfigCh1Reg channel:iChan];
@@ -4050,7 +4050,7 @@ NSString* tauTable[4] ={
     [self writeLong:0 toAddress:[self singleRegister:kKeyResetReg]];
 }
 
-//6.39.4 Key address: Disarm sample logic
+//6.39.3 Key address: Disarm sample logic ...NOT implemented in firmware yet.
 - (void) disarmSampleLogic
 {
     [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmSampleLogicReg]];
@@ -4228,7 +4228,6 @@ NSString* tauTable[4] ={
     [self writeEventConfig];
     [self writeAccumulatorGates];
     [self writeEndAddress];
-    [self writeHistogramConfiguration];
     [self writeAcquisitionRegister];
     [self configureFIR];
     [self writeTriggerDelay];
@@ -4239,8 +4238,8 @@ NSString* tauTable[4] ={
     [self writeLemoUoMask];
     [self writeMawBufferConfig];
     [self writeGateLengthConfiguration];
-    
     [self write_channel_header_IDs] ;
+    [self writeHistogramConfiguration];
 
 }
 #pragma mark •••Setup Utilities
@@ -4531,11 +4530,6 @@ NSString* tauTable[4] ={
 
     @try {
         if(firstTime){
-            int chan;
-            for(chan=0;chan<kNumSIS3316Channels;chan++){
-                dataRecord[chan]  = malloc((rawDataBufferLen+dataHeaderLen)*sizeof(unsigned long));
-                histoRecord[chan] = malloc((0xffff+dataHeaderLen)*sizeof(unsigned long));
-            }
             timer = [[ORTimer alloc]init];
             [timer start];
             firstTime = NO;
@@ -4567,7 +4561,12 @@ NSString* tauTable[4] ={
 
                              expectedNumberOfWords = ((expectedNumberOfWords + 1) & 0xfffffE);
                             //expectedNumberOfWords -= 8;
-                            if(expectedNumberOfWords > rawDataBufferLen+dataHeaderLen) expectedNumberOfWords = rawDataBufferLen+dataHeaderLen; //we are slow so just read the first waveform
+                            if(expectedNumberOfWords > rawDataBufferLen+dataHeaderLen){
+                                expectedNumberOfWords = rawDataBufferLen+dataHeaderLen; //slow here, so limit to one waveform
+                            }
+                            if(!dataRecord[chan]){
+                                dataRecord[chan]  = malloc((rawDataBufferLen+dataHeaderLen)*sizeof(unsigned long));
+                            }
                             dataRecord[chan][0] = dataId | (expectedNumberOfWords+orcaHeaderLen);
                             dataRecord[chan][1] = location | ((chan & 0xff)<<8); //add in the channel
                             dataRecord[chan][2] = 1;
@@ -4594,18 +4593,20 @@ NSString* tauTable[4] ={
                 [timer reset];
                 for(chan=0;chan<16;chan++){
                     int iGroup    = chan/4;
-                    if(((histogramsEnabledMask>>iGroup)&0x1)){
+                    if(((histogramsEnabledMask>>chan)&0x1)){
                         uint32_t memory_bank_offset_addr[4] ={
                             0x00FF0000,
                             0x02FF0000,
                             0x00FF0000|(0x1<<28),
                             0x02FF0000|(0x1<<28)
                         };
-                        uint32_t data = 0x80000000 | memory_bank_offset_addr[iGroup]; //OR in the
+                        uint32_t data = 0x80000000 | memory_bank_offset_addr[chan%4]; //OR in the
                         NSLog(@"Transfer: %d 0x%08x 0x%08x\n",chan, data, baseAddress +0x80+iGroup*0x4);
                         [self writeLong:data toAddress: baseAddress + 0x80 + iGroup*0x4];
                         usleep(2); //up to 2 µs for transfer to take place
-                    
+                        if(!histoRecord[chan]){
+                            histoRecord[chan] = malloc((0xffff+dataHeaderLen)*sizeof(unsigned long));
+                        }
                         histoRecord[chan][0] = histoId | (0xFFFF+orcaHeaderLen);
                         histoRecord[chan][1] = location | ((chan & 0xff)<<8); //add in the channel
                         histoRecord[chan][2] = [self headerLen];

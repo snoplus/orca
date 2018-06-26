@@ -78,6 +78,8 @@
         [[trigBothEdgesMatrix               cellAtRow:i column:0] setTag:i];
         [[intHeTrigOutPulseMatrix           cellAtRow:i column:0] setTag:i];
         [[triggerDelayMatrix                cellAtRow:i column:0] setTag:i];
+        [[rateTextFields                    cellAtRow:i column:0] setTag:i];
+        
     }
     int tag = 0;
     int row,col;
