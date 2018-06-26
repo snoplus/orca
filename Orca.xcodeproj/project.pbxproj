@@ -3137,6 +3137,7 @@
 		84E9F6A3123FE4D600116607 /* ORNHQ226LDecoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */; };
 		84E9F6A4123FE4D600116607 /* ORNHQ226LModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 84E9F698123FE4D600116607 /* ORNHQ226LModel.h */; };
 		84E9F6A5123FE4D600116607 /* ORNHQ226LModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 84E9F699123FE4D600116607 /* ORNHQ226LModel.m */; };
+		84EA1FB120E28F810099F3DF /* RefClock.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84EA1FB020E28F800099F3DF /* RefClock.gif */; };
 		84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */; };
 		84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */; };
 		84EB2DDE1E32990D00C273AA /* LabJackU6.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EB2DD51E32990D00C273AA /* LabJackU6.nib */; };
@@ -3414,7 +3415,6 @@
 		C65995A920529EE300FE5973 /* ORSynClockModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959720529EE300FE5973 /* ORSynClockModel.m */; };
 		C65995AA20529EE400FE5973 /* ORSynClockController.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959820529EE300FE5973 /* ORSynClockController.m */; };
 		C65995AB20529EE400FE5973 /* ORRefClockController.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959920529EE300FE5973 /* ORRefClockController.m */; };
-		C65995AC20529EE400FE5973 /* RefClock.tif in Resources */ = {isa = PBXBuildFile; fileRef = C659959A20529EE300FE5973 /* RefClock.tif */; };
 		C65995AD20529EE400FE5973 /* ORSynClockController.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959B20529EE300FE5973 /* ORSynClockController.h */; };
 		C65995AE20529EE400FE5973 /* ORRefClockModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C659959C20529EE300FE5973 /* ORRefClockModel.m */; };
 		C65995AF20529EE400FE5973 /* ORMotoGPSController.h in Headers */ = {isa = PBXBuildFile; fileRef = C659959D20529EE300FE5973 /* ORMotoGPSController.h */; };
@@ -6844,6 +6844,7 @@
 		84E9F697123FE4D600116607 /* ORNHQ226LDecoders.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LDecoders.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LDecoders.m; sourceTree = SOURCE_ROOT; };
 		84E9F698123FE4D600116607 /* ORNHQ226LModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORNHQ226LModel.h; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.h; sourceTree = SOURCE_ROOT; };
 		84E9F699123FE4D600116607 /* ORNHQ226LModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORNHQ226LModel.m; path = Source/Objects/Hardware/HV/NHQ226L/ORNHQ226LModel.m; sourceTree = SOURCE_ROOT; };
+		84EA1FB020E28F800099F3DF /* RefClock.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RefClock.gif; sourceTree = "<group>"; };
 		84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAcqirisDC440Decoders.h; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.h; sourceTree = SOURCE_ROOT; };
 		84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAcqirisDC440Decoders.m; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.m; sourceTree = SOURCE_ROOT; };
 		84EB2DD51E32990D00C273AA /* LabJackU6.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LabJackU6.nib; sourceTree = "<group>"; };
@@ -7127,7 +7128,6 @@
 		C659959720529EE300FE5973 /* ORSynClockModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSynClockModel.m; sourceTree = "<group>"; };
 		C659959820529EE300FE5973 /* ORSynClockController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORSynClockController.m; sourceTree = "<group>"; };
 		C659959920529EE300FE5973 /* ORRefClockController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRefClockController.m; sourceTree = "<group>"; };
-		C659959A20529EE300FE5973 /* RefClock.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = RefClock.tif; sourceTree = "<group>"; };
 		C659959B20529EE300FE5973 /* ORSynClockController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORSynClockController.h; sourceTree = "<group>"; };
 		C659959C20529EE300FE5973 /* ORRefClockModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRefClockModel.m; sourceTree = "<group>"; };
 		C659959D20529EE300FE5973 /* ORMotoGPSController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORMotoGPSController.h; sourceTree = "<group>"; };
@@ -14545,7 +14545,7 @@
 			isa = PBXGroup;
 			children = (
 				C65995A120529EE300FE5973 /* RefClock.nib */,
-				C659959A20529EE300FE5973 /* RefClock.tif */,
+				84EA1FB020E28F800099F3DF /* RefClock.gif */,
 				C659959520529EE300FE5973 /* ORRefClockController.h */,
 				C659959920529EE300FE5973 /* ORRefClockController.m */,
 				C65995A020529EE300FE5973 /* ORRefClockModel.h */,
@@ -17135,7 +17135,6 @@
 				84D2586B0FA7340B00626276 /* NoMotionNodeDriverHelp.plist in Resources */,
 				84CC16CD0FAF157000CEE642 /* MCA927.nib in Resources */,
 				84CC16CE0FAF157000CEE642 /* MCA927.tif in Resources */,
-				C65995AC20529EE400FE5973 /* RefClock.tif in Resources */,
 				84C4CB6F0FB071BC00725AC3 /* M927.rbf in Resources */,
 				8494F8D11C440E2C00A35F8B /* MJDDewarScale.tif in Resources */,
 				84B1B00C0FCDAA1400775CF1 /* help.tif in Resources */,
@@ -17219,6 +17218,7 @@
 				2D159238113EE62C00EA1552 /* IpeV4SLTScript in Resources */,
 				843175CD1152766E005643AB /* Halo.gif in Resources */,
 				843175CE1152766E005643AB /* Halo.nib in Resources */,
+				84EA1FB120E28F810099F3DF /* RefClock.gif in Resources */,
 				844CD8FF18CA986F00F47A5B /* CouchHistoryEventsMap.txt in Resources */,
 				840DEA27115D7981006AF231 /* WindowSaveSet.nib in Resources */,
 				84B7545E1160E01C00667631 /* CC4189.nib in Resources */,
