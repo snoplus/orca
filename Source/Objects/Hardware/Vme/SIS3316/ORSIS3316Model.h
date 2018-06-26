@@ -144,7 +144,7 @@ enum {
     kAveConfigReg,
     
     kDataFormatConfigReg,
-    kMawTestBufferConfigReg,
+    kMawBufferConfigReg,
     kInternalTrigDelayConfigReg,
     kInternalGateLenConfigReg,
     
@@ -165,14 +165,25 @@ enum {
     kAccGate2ConfigReg,
     kAccGate3ConfigReg,
     kAccGate4ConfigReg,
+    kAccGate5ConfigReg,
+    kAccGate6ConfigReg,
+    kAccGate7ConfigReg,
+    kAccGate8ConfigReg,
+
+    kFirEnergySetupCh1Reg,
+    kFirEnergySetupCh2Reg,
+    kFirEnergySetupCh4Reg,
+    kFirEnergySetupCh3Reg,
     
-    kTofActiveWindowConfigReg,
-    kGenHistogramConfigReg,
+    kGenHistogramConfigCh1Reg,
+    kGenHistogramConfigCh2Reg,
+    kGenHistogramConfigCh3Reg,
+    kGenHistogramConfigCh4Reg,
     
-    kTofHistogramConfReg,
-    kShape2DXHistogramConfigReg,
-    kShape2DYHistogramConfigReg,
-    kPeakSumHistogramConfigReg,
+    kMAWStartConfigCh1Reg,
+    kMAWStartConfigCh2Reg,
+    kMAWStartConfigCh3Reg,
+    kMAWStartConfigCh4Reg,
     
     kAdcVersionReg,
     kAdcStatusReg,
@@ -201,7 +212,10 @@ enum {
 {
   @private
     unsigned long   dataId;
-    long			enabledMask;
+    unsigned long   histoId;
+    unsigned long   statId;
+    long            enabledMask;
+    long            formatMask;
     long            histogramsEnabledMask;
     long			pileupEnabledMask;
     long            acquisitionControlMask;
@@ -236,10 +250,8 @@ enum {
     unsigned long   rawDataBufferLen;
     unsigned long   rawDataBufferStart;
     unsigned short  energyDivider[kNumSIS3316Channels];
-    unsigned short  energySubtractor[kNumSIS3316Channels];
+    unsigned short  energyOffset[kNumSIS3316Channels];
 
-    unsigned short  accumulatorGateStart[kNumSIS3316Groups];
-    unsigned short  accumulatorGateLength[kNumSIS3316Groups];
     unsigned short  accGate1Len[kNumSIS3316Groups];
     unsigned short  accGate1Start[kNumSIS3316Groups];
     unsigned short  accGate2Len[kNumSIS3316Groups];
@@ -248,14 +260,14 @@ enum {
     unsigned short  accGate3Start[kNumSIS3316Groups];
     unsigned short  accGate4Len[kNumSIS3316Groups];
     unsigned short  accGate4Start[kNumSIS3316Groups];
-//    unsigned short  accGate5Len[kNumSIS3316Groups];
-//    unsigned short  accGate5Start[kNumSIS3316Groups];
-//    unsigned short  accGate6Len[kNumSIS3316Groups];
-//    unsigned short  accGate6Start[kNumSIS3316Groups];
-//    unsigned short  accGate7Len[kNumSIS3316Groups];
-//    unsigned short  accGate7Start[kNumSIS3316Groups];
-//    unsigned short  accGate8Len[kNumSIS3316Groups];
-//    unsigned short  accGate8Start[kNumSIS3316Groups];
+    unsigned short  accGate5Len[kNumSIS3316Groups];
+    unsigned short  accGate5Start[kNumSIS3316Groups];
+    unsigned short  accGate6Len[kNumSIS3316Groups];
+    unsigned short  accGate6Start[kNumSIS3316Groups];
+    unsigned short  accGate7Len[kNumSIS3316Groups];
+    unsigned short  accGate7Start[kNumSIS3316Groups];
+    unsigned short  accGate8Len[kNumSIS3316Groups];
+    unsigned short  accGate8Start[kNumSIS3316Groups];
     
     BOOL            enableSum[kNumSIS3316Groups];
     unsigned long   thresholdSum[kNumSIS3316Groups];
@@ -306,8 +318,8 @@ enum {
     unsigned long   lemoToMask;
     unsigned long   internalGateLen[kNumSIS3316Groups];       //6.24
     unsigned long   internalCoinGateLen[kNumSIS3316Groups];   //6.24
-    unsigned long*  dataRecord[kNumSIS3316Channels];
-    
+    unsigned long   mawBufferLength[kNumSIS3316Channels];
+    unsigned long   mawPretrigDelay[kNumSIS3316Channels];
     unsigned char   freqSI570_calibrated_value_125MHz[6]; // new 20.11.2013
     unsigned char   freqPreset62_5MHz[6];
     unsigned char   freqPreset125MHz[6];
@@ -316,6 +328,11 @@ enum {
     BOOL            firstTime;
     BOOL            clocksProgrammed;
     
+    //data buffer if Mac is taking data
+    unsigned long*  dataRecord[kNumSIS3316Channels];
+    unsigned long*  histoRecord[kNumSIS3316Channels];
+    ORTimer*        timer;;
+
 }
 
 - (id) init;
@@ -348,9 +365,7 @@ enum {
 - (void) dumpFPGAStatus1;
 - (void) dumpFPGAStatus2;
 
-- (long) enabledMask;
 - (unsigned long) eventConfigMask;
-
 - (void) setEventConfigMask:(unsigned long)aMask;
 - (void) setEventConfigBit:(unsigned short)bit withValue:(BOOL)aValue;
 
@@ -361,9 +376,18 @@ enum {
 - (void) setEndAddressSuppressionMask:(unsigned long)aMask;
 - (void) setEndAddressSuppressionBit:(unsigned short)aGroup withValue:(BOOL)aValue;
 
+- (long) enabledMask;
 - (void) setEnabledMask:(unsigned long)aMask;
 - (BOOL) enabled:(unsigned short)chan;
 - (void) setEnabledBit:(unsigned short)chan withValue:(BOOL)aValue;
+
+- (long) formatMask;
+- (BOOL) formatBit:(unsigned short)bit;
+- (void) setFormatMask:(unsigned long)aMask;
+- (void) setFormatBit:(unsigned short)bit withValue:(BOOL)aValue;
+- (short) headerLen;
+
+
 ///////
 - (long) acquisitionControlMask;
 - (void) setAcquisitionControlMask:(unsigned long)aMask;
@@ -446,8 +470,8 @@ enum {
 - (unsigned short) energyDivider:(unsigned short)aChan;
 - (void) setEnergyDivider:(unsigned short)aChan withValue:(unsigned short)aValue;
 
-- (unsigned short) energySubtractor:(unsigned short)aChan;
-- (void) setEnergySubtractor:(unsigned short)aChan withValue:(unsigned short)aValue;
+- (unsigned short) energyOffset:(unsigned short)aChan;
+- (void) setEnergyOffset:(unsigned short)aChan withValue:(unsigned short)aValue;
 
 - (void) setTauFactor:(unsigned short)chan withValue:(unsigned short)aValue;
 - (unsigned short) tauFactor:(unsigned short)chan;
@@ -489,12 +513,6 @@ enum {
 - (unsigned long)  rawDataBufferStart;
 - (void)           setRawDataBufferStart:(unsigned long)aValue;
 
-- (unsigned short)  accumulatorGateStart:(unsigned short)aGroup;
-- (void)            setAccumulatorGateStart:(unsigned short)aGroup withValue:(unsigned short)aValue;
-
-- (unsigned short)  accumulatorGateLength:(unsigned short)aGroup;
-- (void)            setAccumulatorGateLength:(unsigned short)aGroup withValue:(unsigned short)aValue;
-
 - (unsigned short)  accGate1Start:(unsigned short)aGroup;
 - (void)            setAccGate1Start:(unsigned short)group withValue:(unsigned short)aValue;
 
@@ -519,6 +537,29 @@ enum {
 - (unsigned short)  accGate4Len:(unsigned short)aGroup;
 - (void)            setAccGate4Len:(unsigned short)group withValue:(unsigned short)aValue;
 
+- (unsigned short)  accGate5Start:(unsigned short)aGroup;
+- (void)            setAccGate5Start:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate5Len:(unsigned short)aGroup;
+- (void)            setAccGate5Len:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate6Start:(unsigned short)aGroup;
+- (void)            setAccGate6Start:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate6Len:(unsigned short)aGroup;
+- (void)            setAccGate6Len:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate7Start:(unsigned short)aGroup;
+- (void)            setAccGate7Start:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate7Len:(unsigned short)aGroup;
+- (void)            setAccGate7Len:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate8Start:(unsigned short)aGroup;
+- (void)            setAccGate8Start:(unsigned short)group withValue:(unsigned short)aValue;
+
+- (unsigned short)  accGate8Len:(unsigned short)aGroup;
+- (void)            setAccGate8Len:(unsigned short)group withValue:(unsigned short)aValue;
 
 
 - (unsigned long)   lemoCoMask;
@@ -585,7 +626,12 @@ enum {
 - (void) dumpPreTriggerDelay;                   //6.19
 - (void) dumpAveConfig;                         //6.20
 - (void) dumpDataFormatConfig;                  //6.21
-- (void) dumpMawTestBufferConfig;               //6.22
+- (void) dumpMawBufferConfig;               //6.22
+- (unsigned long) mawBufferLength:(unsigned short)aGroup;
+- (void) setMawBufferLength:(unsigned short)aGroup withValue:(unsigned long)aValue;
+- (unsigned long) mawPretrigDelay:(unsigned short)aGroup;
+- (void) setMawPretrigDelay:(unsigned short)aGroup withValue:(unsigned long)aValue;
+
 - (void) dumpInternalTriggerDelayConfig;        //6.23
 - (void) dumpInternalGateLengthConfig;          //6.24
 - (void) dumpFirTriggerSetup;                   //6.25
@@ -633,7 +679,6 @@ enum {
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
 - (void) readHeTrigThresholdSum:(BOOL)verbose;
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
-- (void) readAccumulatorGates:(BOOL)verbose;
 - (void) configureAnalogRegisters;
 - (void) writeDacRegisters;
 
@@ -668,6 +713,10 @@ enum {
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
+- (unsigned long) histoId;
+- (void) setHistoId: (unsigned long) DataId;
+- (unsigned long) statId;
+- (void) setStatId: (unsigned long) DataId;
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (NSDictionary*) dataRecordDescription;
 - (void) reset;
@@ -707,6 +756,7 @@ enum {
 @end
 
 extern NSString* ORSIS3316EnabledChanged;
+extern NSString* ORSIS3316FormatMaskChanged;
 extern NSString* ORSIS3316EventConfigChanged;
 extern NSString* ORSIS3316ExtendedEventConfigChanged;
 extern NSString* ORSIS3316AcquisitionControlChanged;
@@ -726,7 +776,7 @@ extern NSString* ORSIS3316CfdControlBitsChanged;
 extern NSString* ORSIS3316ExtraFilterBitsChanged;
 extern NSString* ORSIS3316TauTableBitsChanged;
 extern NSString* ORSIS3316EnergyDividerChanged ;
-extern NSString* ORSIS3316EnergySubtractorChanged;
+extern NSString* ORSIS3316EnergyOffsetChanged;
 extern NSString* ORSIS3316TauFactorChanged;
 extern NSString* ORSIS3316GapTimeChanged;
 extern NSString* ORSIS3316PeakingTimeChanged;
@@ -739,8 +789,6 @@ extern NSString* ORSIS3316ActiveTrigGateWindowLenChanged;
 extern NSString* ORSIS3316PreTriggerDelayChanged;
 extern NSString* ORSIS3316RawDataBufferLenChanged;
 extern NSString* ORSIS3316RawDataBufferStartChanged;
-extern NSString* ORSIS3316AccumulatorGateStartChanged;
-extern NSString* ORSIS3316AccumulatorGateLengthChanged;
 extern NSString* ORSIS3316AccGate1LenChanged;
 extern NSString* ORSIS3316AccGate1StartChanged;
 extern NSString* ORSIS3316AccGate2LenChanged;
@@ -749,6 +797,15 @@ extern NSString* ORSIS3316AccGate3LenChanged;
 extern NSString* ORSIS3316AccGate3StartChanged;
 extern NSString* ORSIS3316AccGate4LenChanged;
 extern NSString* ORSIS3316AccGate4StartChanged;
+extern NSString* ORSIS3316AccGate5LenChanged;
+extern NSString* ORSIS3316AccGate5StartChanged;
+extern NSString* ORSIS3316AccGate6LenChanged;
+extern NSString* ORSIS3316AccGate6StartChanged;
+extern NSString* ORSIS3316AccGate7LenChanged;
+extern NSString* ORSIS3316AccGate7StartChanged;
+extern NSString* ORSIS3316AccGate8LenChanged;
+extern NSString* ORSIS3316AccGate8StartChanged;
+
 extern NSString* ORSIS3316TemperatureChanged;
 
 //CSR
@@ -781,6 +838,8 @@ extern NSString* ORSIS3316InternalGateLenChanged;
 extern NSString* ORSIS3316InternalCoinGateLenChanged;
 //extern NSString* ORSIS3316HsDivChanged;
 //extern NSString* ORSIS3316N1DivChanged;
+extern NSString* ORSIS3316MAWBuffLengthChanged;
+extern NSString* ORSIS3316MAWPretrigLenChanged;
 
 extern NSString* ORSIS3316PileUpWindowLengthChanged;
 extern NSString* ORSIS3316RePileUpWindowLengthChanged;

@@ -1,5 +1,6 @@
 #include "ORVVmeCard.hh"
 #include <time.h>
+#include <sys/time.h>
 
 class ORSIS3316Card: public ORVVmeCard
 {
@@ -16,6 +17,14 @@ protected:
     void ArmBank1();
     void ArmBank2();
     void ResetFSM(uint32_t iGroup);
+    void ReadHistograms();
+    void ReadStatistics();
+    
     uint32_t currentBank;
 	uint32_t previousBank;
+    uint32_t chanEnabledMask;
+    uint32_t histoEnabledMask;
+    uint32_t writeEventsEnabledMask;
+    uint32_t currentSec;
+    
 };

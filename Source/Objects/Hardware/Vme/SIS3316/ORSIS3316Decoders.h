@@ -30,3 +30,15 @@
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
 - (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
 @end
+
+@interface ORSIS3316HistogramDecoder : ORVmeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end
+
+@interface ORSIS3316StatisticsDecoder : ORVmeCardDecoder {
+}
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
+- (NSString*) dataRecordDescription:(unsigned long*)dataPtr;
+@end

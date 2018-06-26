@@ -34,13 +34,13 @@
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num Records in this record
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num longs in each record
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num of Records that were in the FIFO
- xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num of longs in data header -- can get from the raw data also
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
  xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
 
- N Data Records follow with format described in manual
+ N Data Records follow with format described in manual (NOTE THE FORMAT BITS)
 
   */
 
@@ -70,18 +70,18 @@
     NSString* cardKey        = [self getCardKey:    card];
     NSString* channelKey     = [self getChannelKey: channel];
     
-    unsigned long numRecords        = ptr[2];
+    unsigned long numRecords    = ptr[2];
+    unsigned long dataHeaderLen = ptr[5];
 
     unsigned long orcaHeaderLen = 10;
-    unsigned long dataHeaderLen = 7;
     unsigned long* dataStartPtr = ptr + orcaHeaderLen;
     
 
     int i;
     for(i=0;i<numRecords;i++){
-        unsigned long numLongs    = dataStartPtr[6] & 0xfffff;
+        unsigned long numLongs    = dataStartPtr[dataHeaderLen-1] & 0x3ffffff;
         unsigned long numSamples  = numLongs*2;
-        unsigned long checkByte   = dataStartPtr[6] >>28;
+        unsigned long checkByte   = dataStartPtr[dataHeaderLen-1] >>28;
         if((checkByte == 0xE) && (numLongs <= length)){
             
             dataStartPtr+=dataHeaderLen;
@@ -140,3 +140,116 @@
 }
 
 @end
+
+
+/*
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ --------^-^^^--------------------------- Crate number
+ -------------^-^^^^--------------------- Card number
+ --------------------^^^^ ^^^^----------- Chan number
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Num of longs in data header -- can get from the raw data also
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ 
+ N Data Records follow with format described in manual (NOTE THE FORMAT BITS)
+ 
+ */
+
+@implementation ORSIS3316HistogramDecoder
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr       = (unsigned long*)someData;
+    unsigned long length     = ExtractLength(ptr[0]);
+    int crate                = (ptr[1]>>21) & 0xf;
+    int card                 = (ptr[1]>>16) & 0x1f;
+    int channel              = (ptr[1]>>8)  & 0xff;
+    NSString* crateKey       = [self getCrateKey:   crate];
+    NSString* cardKey        = [self getCardKey:    card];
+    NSString* channelKey     = [self getChannelKey: channel];
+    unsigned long orcaHeaderLen = 10;
+    unsigned long* dataStartPtr = ptr + orcaHeaderLen;
+    unsigned long numLongs      = length - orcaHeaderLen;
+
+    NSMutableData* tmpData = [NSMutableData dataWithBytes:dataStartPtr length:numLongs*sizeof(long)];
+    if(tmpData){
+        [aDataSet loadSpectrum:tmpData
+                        sender:self
+                      withKeys:@"SIS3316",@"Histogram",crateKey,cardKey,channelKey,nil];
+
+    }
+    dataStartPtr += numLongs;
+
+    return length; //must return number of longs
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    NSString* title= @"SIS3316 Histogram Record\n\n";
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16) & 0x1f];
+    NSString* chan  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >>  8) & 0xff];
+    
+    NSString* s = [NSString stringWithFormat:@"%@%@%@%@",title,crate,card,chan];
+    return s;
+}
+
+@end
+
+/*
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ ^^^^ ^^^^ ^^^^ ^^----------------------- Data ID (from header)
+ -----------------^^ ^^^^ ^^^^ ^^^^ ^^^^- length
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
+ --------^-^^^--------------------------- Crate number
+ -------------^-^^^^--------------------- Card number
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx  Spare
+ 
+ N Data Records follow with format described in manual the statistic counter
+ */
+
+@implementation ORSIS3316StatisticsDecoder
+- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+{
+    unsigned long* ptr       = (unsigned long*)someData;
+    unsigned long length     = ExtractLength(ptr[0]);
+    int crate                = (ptr[1]>>21) & 0xf;
+    int card                 = (ptr[1]>>16) & 0x1f;
+    NSString* crateKey       = [self getCrateKey:   crate];
+    NSString* cardKey        = [self getCardKey:    card];
+    [aDataSet loadGenericData:@"Read" sender:self withKeys:@"SIS3316", @"Statistics",crateKey,cardKey,nil];
+    return length; //must return number of longs
+}
+
+- (NSString*) dataRecordDescription:(unsigned long*)ptr
+{
+    unsigned long orcaHeaderLen = 10;
+    NSString* title= @"SIS3316 Statistics Record\n\n";
+    NSString* crate = [NSString stringWithFormat:@"Crate = %lu\n",(ptr[1] >> 21) & 0xf];
+    NSString* card  = [NSString stringWithFormat:@"Card  = %lu\n",(ptr[1] >> 16) & 0x1f];
+    NSString* s = [NSString stringWithFormat:@"%@%@%@\n",title,crate,card];
+    ptr += orcaHeaderLen;
+    int i;
+    for(i=0;i<16;i++){
+        s = [s stringByAppendingFormat:@"Chan %d Counters\n",i];
+        s = [s stringByAppendingFormat:@"All     : %lu\n",*ptr++];
+        s = [s stringByAppendingFormat:@"Events  : %lu\n",*ptr++];
+        s = [s stringByAppendingFormat:@"DeadTime: %lu\n",*ptr++];
+        s = [s stringByAppendingFormat:@"Pileup  : %lu\n",*ptr++];
+        s = [s stringByAppendingFormat:@"Veto    : %lu\n",*ptr++];
+        s = [s stringByAppendingFormat:@"HE      : %lu\n",*ptr++];
+        s = [s stringByAppendingString:@"------------------------\n"];
+    }
+    return s;
+}
+
+@end
+
