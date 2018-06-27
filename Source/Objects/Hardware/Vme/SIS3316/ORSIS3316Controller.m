@@ -48,7 +48,7 @@
 
 - (void) awakeFromNib
 {
-    settingSize     = NSMakeSize(1350,900);
+    settingSize     = NSMakeSize(1350,870);
     rateSize		= NSMakeSize(790,460);
     
     blankView = [[NSView alloc] init];

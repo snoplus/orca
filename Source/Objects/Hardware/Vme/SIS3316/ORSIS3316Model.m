@@ -4053,7 +4053,9 @@ NSString* tauTable[4] ={
 //6.39.3 Key address: Disarm sample logic ...NOT implemented in firmware yet.
 - (void) disarmSampleLogic
 {
-    [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmSampleLogicReg]];
+    if(![[ORGlobal sharedGlobal] runInProgress]){
+        [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmSampleLogicReg]];
+    }
 }
 
 //6.39.4 Key address: arm sample logic **** not implemented in the firmware yet....
@@ -4071,7 +4073,10 @@ NSString* tauTable[4] ={
 //6.39.6 Key address: Timestamp Clear
 - (void) clearTimeStamp
 {
-    [self writeLong:1 toAddress:[self singleRegister:kKeyTimeStampClrReg]];
+    if(![[ORGlobal sharedGlobal] runInProgress]){
+        [self writeLong:1 toAddress:[self singleRegister:kKeyTimeStampClrReg]];
+    }
+    else NSLog(@"%@: Can not clear timestamp if run in progress\n",[self fullID]);
 }
 
 //6.39.7 Key address: Disarm Bankx and Arm Bank1
@@ -4089,10 +4094,33 @@ NSString* tauTable[4] ={
     [self writeLong:1 toAddress:[self singleRegister:kKeyDisarmXArmBank2Reg]];
     currentBank = 2;
 }
+
 - (int) currentBank
 {
     return currentBank;
 }
+
+- (void) readTimeStamp:(BOOL) verbose
+{
+    unsigned long hiTS  = [self readLongFromAddress:[self singleRegister:kPPSTimeStampHiReg]];
+    unsigned long lowTS = [self readLongFromAddress:[self singleRegister:kPPSTimeStampLoReg]];
+    if(verbose){
+        int cLen = 27;
+        NSLogStartTable(@"Time Stamp", cLen);
+        NSLogMono(@"|     Hi     |     Low    |\n");
+        NSLogDivider(@"-",cLen);
+        NSLogMono(@"| 0x%08x | 0x%08x |\n",hiTS,lowTS);
+        NSLogDivider(@"=",cLen);
+    }
+}
+
+
+//6.39.11 Key address: PPS_Latch_Bit_clear
+- (void) clearPPSLatchBit
+{
+    [self writeLong:1 toAddress:[self singleRegister:kKeyPPSLatchBitClrReg]];
+}
+
 //6.39.13 Key address: ADC Clock DCM/PLL Reset
 - (void) resetADCClockDCM
 {
@@ -4504,8 +4532,12 @@ NSString* tauTable[4] ={
     location        = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
     theController   = [self adapter];
     
-    if(!moduleID)[self readModuleID:NO];
-    
+    if(!moduleID){
+        [self readModuleID:NO];
+        [self readHWVersion:NO];
+        [self readSerialNumber:NO];
+        [self readTemperature:NO];
+    }
     [self startRates];
     [self initBoard];
     [self clearTimeStamp];
@@ -4637,37 +4669,43 @@ NSString* tauTable[4] ={
 
 - (void) readStatistics
 {
-    // start readout FSM
-    int cLen = 95;
-    NSLogStartTable(@"Stats",cLen);
-    NSLogMono(@"| ch |     All    |  Hits/Events |    Deadtime  |    Pileup    |      Veto    | HE Suppressed |\n");
-    NSLogDivider(@"-",cLen);
-    int iGroup;
-    for(iGroup=0;iGroup<4;iGroup++){
-        // Space = Statistic counter
-        [self writeLong:0x80000000 + 0x30000000  toAddress: [self singleRegister:kAdcCh1_Ch4DataCntrReg] + (iGroup*4)];
-        
-        // read from FIFO
-        unsigned long dataBuffer[6*4];
-        [[self adapter] readLongBlock:dataBuffer
-                            atAddress:[self baseAddress] + 0x100000 + (iGroup*0x100000)
-                            numToRead:6*4
-                           withAddMod:[self addressModifier]
-                        usingAddSpace:0x01];
-        int i_ch;
-        for (i_ch = 0; i_ch < 4;i_ch++) {
-            NSLogMono(@"| %2d | %10lu |  %10lu  |  %10lu  |  %10lu  |  %10lu  |   %10lu  |\n",
-                  i_ch+ iGroup*4,
-                      dataBuffer[(i_ch*6) + 0],
-                      dataBuffer[(i_ch*6) + 1],
-                      dataBuffer[(i_ch*6) + 2],
-                      dataBuffer[(i_ch*6) + 3],
-                      dataBuffer[(i_ch*6) + 4],
-                      dataBuffer[(i_ch*6) + 5]
-                      );
-          }
+    if(![[ORGlobal sharedGlobal] runInProgress]){
+
+        // start readout FSM
+        int cLen = 95;
+        NSLogStartTable(@"Stats",cLen);
+        NSLogMono(@"| ch |     All    |  Hits/Events |    Deadtime  |    Pileup    |      Veto    | HE Suppressed |\n");
+        NSLogDivider(@"-",cLen);
+        int iGroup;
+        for(iGroup=0;iGroup<4;iGroup++){
+            // Space = Statistic counter
+            [self writeLong:0x80000000 + 0x30000000  toAddress: [self singleRegister:kAdcCh1_Ch4DataCntrReg] + (iGroup*4)];
+            
+            // read from FIFO
+            unsigned long dataBuffer[6*4];
+            [[self adapter] readLongBlock:dataBuffer
+                                atAddress:[self baseAddress] + 0x100000 + (iGroup*0x100000)
+                                numToRead:6*4
+                               withAddMod:[self addressModifier]
+                            usingAddSpace:0x01];
+            int i_ch;
+            for (i_ch = 0; i_ch < 4;i_ch++) {
+                NSLogMono(@"| %2d | %10lu |  %10lu  |  %10lu  |  %10lu  |  %10lu  |   %10lu  |\n",
+                      i_ch+ iGroup*4,
+                          dataBuffer[(i_ch*6) + 0],
+                          dataBuffer[(i_ch*6) + 1],
+                          dataBuffer[(i_ch*6) + 2],
+                          dataBuffer[(i_ch*6) + 3],
+                          dataBuffer[(i_ch*6) + 4],
+                          dataBuffer[(i_ch*6) + 5]
+                          );
+              }
+        }
+        NSLogDivider(@"=",cLen);
     }
-    NSLogDivider(@"=",cLen);
+    else {
+        NSLog(@"%@: Can not read statistics while run in progress\n",[self fullID]);
+    }
 }
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
 {

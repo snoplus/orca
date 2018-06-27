@@ -124,11 +124,11 @@
                         <tabViewItems>
                             <tabViewItem label="Basic Ops" identifier="" id="1337">
                                 <view key="view" id="1339">
-                                    <rect key="frame" x="10" y="29" width="1337" height="1081"/>
+                                    <rect key="frame" x="10" y="25" width="1337" height="1085"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <box misplaced="YES" boxType="secondary" borderType="bezel" title="Board Address" id="1218">
-                                            <rect key="frame" x="32" y="1020" width="177" height="59"/>
+                                            <rect key="frame" x="32" y="1024" width="177" height="59"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <view key="contentView" id="Zi8-z7-Mlh">
                                                 <rect key="frame" x="3" y="3" width="171" height="41"/>
@@ -169,7 +169,7 @@
                                             </view>
                                         </box>
                                         <button misplaced="YES" id="1224">
-                                            <rect key="frame" x="5" y="250" width="36" height="46"/>
+                                            <rect key="frame" x="5" y="254" width="36" height="46"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" image="Unlocked" imagePosition="above" alignment="center" alternateImage="Locked" inset="2" id="2874">
                                                 <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
@@ -180,12 +180,12 @@
                                             </connections>
                                         </button>
                                         <imageView id="1307">
-                                            <rect key="frame" x="5" y="979" width="22" height="96"/>
+                                            <rect key="frame" x="5" y="983" width="22" height="96"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                             <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="SIS3300Card" id="2875"/>
                                         </imageView>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Module Info" id="iOO-wc-VNf">
-                                            <rect key="frame" x="32" y="898" width="177" height="118"/>
+                                            <rect key="frame" x="32" y="902" width="177" height="118"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="99B-bc-iLn">
                                                 <rect key="frame" x="1" y="1" width="175" height="102"/>
@@ -295,7 +295,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" title="Acquistion Control" id="1298">
-                                            <rect key="frame" x="211" y="898" width="458" height="181"/>
+                                            <rect key="frame" x="211" y="902" width="458" height="181"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="HD7-h7-ajP">
                                                 <rect key="frame" x="2" y="2" width="454" height="164"/>
@@ -397,7 +397,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Box" titlePosition="noTitle" id="fUM-8q-TOz">
-                                            <rect key="frame" x="32" y="782" width="177" height="100"/>
+                                            <rect key="frame" x="32" y="786" width="177" height="100"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Fdk-BB-hRc">
                                                 <rect key="frame" x="1" y="1" width="175" height="98"/>
@@ -451,7 +451,7 @@
                                             </view>
                                         </box>
                                         <box misplaced="YES" borderType="line" title="Event Configuration" id="2390">
-                                            <rect key="frame" x="674" y="839" width="365" height="240"/>
+                                            <rect key="frame" x="674" y="843" width="365" height="240"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Maf-eo-H4i">
                                                 <rect key="frame" x="1" y="1" width="363" height="224"/>
@@ -687,7 +687,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Input" id="Nyi-k7-tIQ">
-                                            <rect key="frame" x="211" y="782" width="164" height="110"/>
+                                            <rect key="frame" x="211" y="786" width="164" height="110"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="gK4-Vu-76E">
                                                 <rect key="frame" x="1" y="1" width="162" height="94"/>
@@ -768,7 +768,7 @@
                                             <cells/>
                                         </matrix>
                                         <box misplaced="YES" title="Clock Source" id="1902">
-                                            <rect key="frame" x="1041" y="964" width="167" height="111"/>
+                                            <rect key="frame" x="1041" y="968" width="167" height="111"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="jSp-ye-9Nk">
                                                 <rect key="frame" x="2" y="2" width="163" height="94"/>
@@ -815,7 +815,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Data Buffer" id="B21-dV-qa5">
-                                            <rect key="frame" x="393" y="782" width="176" height="110"/>
+                                            <rect key="frame" x="393" y="786" width="176" height="110"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="NgZ-95-ibi">
                                                 <rect key="frame" x="1" y="1" width="174" height="94"/>
@@ -867,7 +867,7 @@
                                             </view>
                                         </box>
                                         <box autoresizesSubviews="NO" misplaced="YES" borderType="line" title="Reporting" id="wb8-D6-7d7">
-                                            <rect key="frame" x="1044" y="839" width="164" height="104"/>
+                                            <rect key="frame" x="1044" y="843" width="164" height="104"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <view key="contentView" id="Rfv-sd-YHq">
                                                 <rect key="frame" x="1" y="1" width="162" height="88"/>
@@ -910,7 +910,7 @@
                                             </view>
                                         </box>
                                         <tabView misplaced="YES" controlSize="small" id="k2B-4h-qJi">
-                                            <rect key="frame" x="3" y="294" width="1331" height="476"/>
+                                            <rect key="frame" x="3" y="298" width="1331" height="476"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <tabViewItems>
                                                 <tabViewItem label="Main Settings" identifier="1" id="WwZ-ff-Haf">
@@ -2390,7 +2390,7 @@
                                                                 </connections>
                                                             </matrix>
                                                             <matrix autoresizesSubviews="NO" verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="U3O-6M-LHl">
-                                                                <rect key="frame" x="1249" y="75" width="51" height="282"/>
+                                                                <rect key="frame" x="1249" y="76" width="51" height="282"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 <size key="cellSize" width="51" height="18"/>
@@ -2429,7 +2429,7 @@
                                                                 </connections>
                                                             </matrix>
                                                             <matrix autoresizesSubviews="NO" verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="beb-GA-eCh">
-                                                                <rect key="frame" x="1188" y="75" width="51" height="282"/>
+                                                                <rect key="frame" x="1188" y="76" width="51" height="282"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 <size key="cellSize" width="51" height="18"/>
@@ -2468,7 +2468,7 @@
                                                                 </connections>
                                                             </matrix>
                                                             <matrix autoresizesSubviews="NO" verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="z8I-df-J52">
-                                                                <rect key="frame" x="1143" y="75" width="37" height="282"/>
+                                                                <rect key="frame" x="1143" y="76" width="37" height="282"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 <size key="cellSize" width="37" height="18"/>
@@ -2507,7 +2507,7 @@
                                                                 </connections>
                                                             </matrix>
                                                             <matrix autoresizesSubviews="NO" verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" autosizesCells="NO" id="CCQ-mY-bR7">
-                                                                <rect key="frame" x="1098" y="75" width="37" height="282"/>
+                                                                <rect key="frame" x="1098" y="76" width="37" height="282"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                 <size key="cellSize" width="37" height="18"/>
@@ -2619,10 +2619,10 @@
                                                                 </connections>
                                                             </matrix>
                                                             <matrix verticalHuggingPriority="750" misplaced="YES" mode="highlight" allowsEmptySelection="NO" id="TLv-ng-rMR">
-                                                                <rect key="frame" x="1000" y="44" width="87" height="348"/>
+                                                                <rect key="frame" x="1000" y="40" width="87" height="352"/>
                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                                 <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                                                <size key="cellSize" width="87" height="87"/>
+                                                                <size key="cellSize" width="87" height="88"/>
                                                                 <popUpButtonCell key="prototype" type="push" title="Disabled" bezelStyle="rounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="x7F-Gt-gKO" id="Fhx-Nq-081">
                                                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                                                     <font key="font" metaFont="smallSystem"/>

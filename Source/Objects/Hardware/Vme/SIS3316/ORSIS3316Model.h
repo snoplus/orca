@@ -631,6 +631,7 @@ enum {
 - (void) setMawBufferLength:(unsigned short)aGroup withValue:(unsigned long)aValue;
 - (unsigned long) mawPretrigDelay:(unsigned short)aGroup;
 - (void) setMawPretrigDelay:(unsigned short)aGroup withValue:(unsigned long)aValue;
+- (void) readTimeStamp;
 
 - (void) dumpInternalTriggerDelayConfig;        //6.23
 - (void) dumpInternalGateLengthConfig;          //6.24
@@ -681,6 +682,7 @@ enum {
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
 - (void) configureAnalogRegisters;
 - (void) writeDacRegisters;
+- (void) clearPPSLatchBit;                      //6.39
 
 - (unsigned long) eventNumberGroup:(int)group bank:(int) bank;
 - (unsigned long) eventTriggerGroup:(int)group bank:(int) bank; 
