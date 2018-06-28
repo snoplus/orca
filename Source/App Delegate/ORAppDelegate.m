@@ -443,13 +443,20 @@ NSString* OROrcaFinalQuitNotice      = @"OROrcaFinalQuitNotice";
 	[self showStatusLog:self];
     
     bool debugging = [self inDebugger];
-    NSLog(@"-------------------------------------------------\n");
-    NSLog(@"   Orca (v%@) started %@                   \n",fullVersion(),debugging?@"in debugger":@"");
+    NSLog(@"--------------------------------------------------------\n");
+    NSLog(@"   Orca (v%@)\n",fullVersion());
+    if(debugging)NSLog(@"   Running in the debugger\n");
     NSNumber* shutdownFlag = [[NSUserDefaults standardUserDefaults] objectForKey:ORNormalShutDownFlag];
     if(shutdownFlag && ([shutdownFlag boolValue]==NO)){
-		NSLog(@"   (After crash or hard debugger stop)           \n");
+		NSLog(@"   Last Run ending with crash or debugger hard stop\n");
     }
-    NSLog(@"-------------------------------------------------\n");
+#if __LP64__
+    NSLog(@"   Compiled in 64-bit mode\n");
+#else
+    NSLog(@"   Compiled in 32-bit mode\n");
+#endif
+
+    NSLog(@"--------------------------------------------------------\n");
 
     NSString *version = [[NSProcessInfo processInfo] operatingSystemVersionString];
     NSString* updateNotice = @"";
