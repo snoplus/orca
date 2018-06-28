@@ -533,6 +533,12 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 {
 	return moduleID;
 }
+
+- (unsigned short) mHzType
+{
+    return mHzType;
+}
+
 - (float) temperature
 {
     return temperature;
@@ -676,21 +682,25 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 }
 
 //4.1 ADC FPGA Status
-- (void) dumpFirmwareVersion
+- (void) readFirmwareVersion:(BOOL)verbose
 {
-    int width = 57;
-    unsigned long addr = [self groupRegister:kAdcVersionReg group:0];
-    NSString* title = [NSString stringWithFormat:@"ADC Firmware (0x%08lx)",addr];
-    NSLogStartTable(title, width);
-    NSLogMono(@"|  Chan |   Type   | Version | Revision | Neutron/Gamma |\n");
-    NSLogDivider(@"-",width);
-    int group;
-    for(group=0;group<kNumSIS3316Groups;group++){
-        unsigned long result =  [self readLongFromAddress:addr];
-        NSLogMono(@"| %2d-%2d |  0x%04x  |   0x%02x  |   0x%02x   |%@|\n",group*4+1, group*4+4, result>>16 & 0xffff,result>>8 & 0xff,result&0xff,[result>>8 ==0x02?@"YES":@"NO" centered:15]);
-    }
-    NSLogDivider(@"=",width);
+    unsigned long addr    = [self groupRegister:kAdcVersionReg group:0];
+    unsigned long result  =  [self readLongFromAddress:addr];
+    mHzType               = result>>16 & 0xffff;
     
+    if(verbose){
+        int width = 57;
+        NSString* title = [NSString stringWithFormat:@"ADC Firmware (0x%08lx)",addr];
+        NSLogStartTable(title, width);
+        NSLogMono(@"|  Chan |   Type   | Version | Revision | Neutron/Gamma |\n");
+        NSLogDivider(@"-",width);
+        int group;
+        for(group=0;group<kNumSIS3316Groups;group++){
+            unsigned long result =  [self readLongFromAddress:addr];
+            NSLogMono(@"| %2d-%2d |  0x%04x  |   0x%02x  |   0x%02x   |%@|\n",group*4+1, group*4+4, result>>16 & 0xffff,result>>8 & 0xff,result&0xff,[result>>8 ==0x02?@"YES":@"NO" centered:15]);
+        }
+        NSLogDivider(@"=",width);
+    }
 }
 //6.1 Control/Status Register(0x0, write/read)
 
@@ -735,6 +745,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 
 - (void) readModuleID:(BOOL)verbose //*** readModuleID method ***//
 {
+    mHzType  =  ([self readLongFromAddress:[self groupRegister:kAdcVersionReg group:0]]>>16) & 0xffff;
+
     unsigned long addr = [self singleRegister:kModuleIDReg];
     unsigned long result =  [self readLongFromAddress:addr];
     moduleID = result >> 16;
@@ -768,8 +780,8 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 //6.7 Hardware Version Register
 - (void) readHWVersion:(BOOL)verbose
 {
-    unsigned long addr = [self singleRegister:kHWVersionReg];
-    unsigned long result =  [self readLongFromAddress:addr];
+    unsigned long addr   = [self singleRegister:kHWVersionReg];
+    unsigned long result = [self readLongFromAddress:addr];
     result &= 0xf;
     if(verbose){
         int width = 30;
@@ -1178,7 +1190,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     int i;
     for(i = 0; i < kNumSIS3316Groups; i++) {
         unsigned long valueToWrite1 = ((mawBufferLength[i]  & 0xFFE) |
-                                      ((mawPretrigDelay[i] &0x3FE) << 16 ));
+                                      ((mawPretrigDelay[i]  & 0x3FFE) << 16 ));
         [self writeLong:valueToWrite1 toAddress:[self groupRegister:kMawBufferConfigReg group:i]];
     }
 }
@@ -3172,12 +3184,8 @@ NSString* cfdCntrlString[4] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316CfdControlBitsChanged object:self userInfo:userInfo];
 }
 
-
-
 - (long) threshold:(unsigned short)aChan            { if(aChan<kNumSIS3316Channels)return threshold[aChan];      else return 0;}
 - (unsigned long) thresholdSum:(unsigned short)aGroup {if(aGroup<kNumSIS3316Groups)return thresholdSum[aGroup]; else return 0;}
-
-
 
 - (void) setHeSuppressTriggerMask:(unsigned long)aMask
 {
@@ -5136,6 +5144,7 @@ NSString* tauTable[4] ={
 - (void) dumpChan0
 {
     [self readModuleID:YES];
+    [self readFirmwareVersion:YES];
     [self readHWVersion:YES];
     [self readTemperature:YES];
     [self readSerialNumber:YES];
@@ -5183,7 +5192,6 @@ NSString* tauTable[4] ={
     [self dumpPeakChargeConfig];
     [self dumpExtededRawDataBufferConfig];
     [self dumpAccumulatorGates];
-    [self dumpFirmwareVersion];
     [self dumpFPGAStatus];
 }
 - (void) setupSharing
@@ -5219,12 +5227,12 @@ NSString* tauTable[4] ={
     
     unsigned long adcFpgaFirmwareVersion = [self readLongFromAddress:[self singleRegister:kAdcVersionReg]];
     adcFpgaFirmwareVersion &= 0xFFFF;
-    NSLog(@"SIS3316_ADC_CH1_4_FIRMWARE_REG   = 0x%08x \n", adcFpgaFirmwareVersion);
     unsigned int clock_N1div_array[16]    ;
     unsigned int clock_HSdiv_array[16]    ;
     unsigned int iob_delay_14bit_array[16];
-    unsigned int iob_delay_16bit_array[16]  ;
-    double double_fft_frequency_array[16]  ;
+    unsigned int iob_delay_16bit_array[16];
+    double double_fft_frequency_array[16] ;
+    
     if (adcFpgaFirmwareVersion < 4) {
         // 250.000 MHz
         iob_delay_14bit_array[0]  =  0x48  ;

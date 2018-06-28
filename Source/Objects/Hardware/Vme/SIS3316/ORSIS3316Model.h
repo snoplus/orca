@@ -312,6 +312,7 @@ enum {
     unsigned short  minorRev;
     unsigned short  hwVersion;
     float           temperature;
+    unsigned short  mHzType;
     unsigned short  serialNumber;
     unsigned long   lemoCoMask;
     unsigned long   lemoUoMask;
@@ -343,6 +344,7 @@ enum {
 #pragma mark ***Accessors
 - (void) setDefaults;
 - (unsigned short) moduleID;
+- (unsigned short) mHzType;
 - (unsigned short) hwVersion;
 - (float) temperature;
 - (unsigned short) gain;
@@ -360,7 +362,7 @@ enum {
 - (NSString*) revision;
 - (void) setRevision:(NSString*)aString;
 - (unsigned short) majorRevision;
-- (void) dumpFirmwareVersion;
+- (void) readFirmwareVersion:(BOOL)verbose;
 - (void) dumpFPGAStatus;
 - (void) dumpFPGAStatus1;
 - (void) dumpFPGAStatus2;

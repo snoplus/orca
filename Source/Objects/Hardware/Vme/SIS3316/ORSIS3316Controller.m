@@ -1446,7 +1446,8 @@
 - (void) moduleIDChanged:(NSNotification*)aNote
 {
 	unsigned short moduleID = [model moduleID];
-	if(moduleID) [moduleIDField setStringValue:[NSString stringWithFormat:@"%x",moduleID]];
+    unsigned short mHzType  = [model mHzType];
+	if(moduleID) [moduleIDField setStringValue:[NSString stringWithFormat:@"%x %3x MHz",moduleID,mHzType]];
 	else		 [moduleIDField setStringValue:@"---"];
     
     NSString* revision = [model revision];
@@ -2047,6 +2048,7 @@
 {
 	@try {
         [model readModuleID:YES];
+        [model readFirmwareVersion:YES];
         [model readHWVersion:YES];
         [model readSerialNumber:YES];
         [model readTemperature:YES];
