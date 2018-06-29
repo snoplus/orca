@@ -243,12 +243,12 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 	return [NSString stringWithFormat:@"33220 Pulser (%d)",[self tag]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x1fb9;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x301;
 }

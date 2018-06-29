@@ -90,8 +90,8 @@
 - (void) setConnectionProtocol:(int)aConnectionProtocol;
 - (void) addCmdToQueue:(NSString*)aCmd;
 
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSUInteger) vendorID;
+- (NSUInteger) productID;
 - (NSString*) usbInterfaceDescription;
 - (void) connectionChanged;
 - (void) setInputs:(NSMutableArray*)anArray;
