@@ -174,7 +174,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	}
 }
 
-- (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(unsigned long)aProductID for:(id)obj
+- (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(NSUInteger) aProductID for:(id)obj
 {
 	//just grab the first one....someday this will probably have to be fixed
     NSArray* someInterfaces;
@@ -229,7 +229,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	return [devices objectAtIndex:index];
 }
 
-- (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(unsigned long)aProductID
+- (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(NSUInteger) aProductID
 {
 	id intf;
 	NSEnumerator* e = [interfaces objectEnumerator];
@@ -690,12 +690,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     return kr;
 }
 
-- (NSString*) keyForVendorID:(unsigned long)aVendorID productID:(unsigned long)aProductID
+- (NSString*) keyForVendorID:(unsigned long)aVendorID productID:(NSUInteger) aProductID
 {
-	return [NSString stringWithFormat:@"%lu_%lu",aVendorID,aProductID];
+	return [NSString stringWithFormat:@"%lu_%lu",(unsigned long)aVendorID,(unsigned long)aProductID];
 }
 
-- (NSArray*) interfacesForVender:(unsigned long)aVenderID product:(unsigned long)aProductID
+- (NSArray*) interfacesForVender:(NSUInteger) aVenderID product:(NSUInteger) aProductID
 {
     NSMutableArray* matchingInterfaces = [NSMutableArray array];
     NSEnumerator* e = [interfaces objectEnumerator];
@@ -722,7 +722,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
        return  matchingInterfaces;
     }
     else {
-        NSLog(@"Programmer error: VenderID and ProductID lists have different number of entries\n");
+        NSLog(@"Programmer error: vendorID and ProductID lists have different number of entries\n");
         return nil;
     }
 }

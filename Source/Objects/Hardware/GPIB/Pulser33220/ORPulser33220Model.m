@@ -229,12 +229,12 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 	return [NSString stringWithFormat:@"33220 Pulser (%d)",[self tag]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x0957;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x0407;
 }

@@ -60,7 +60,7 @@
 - (NSString*) ipAddress:(int)desiredNetwork;
 
 #pragma mark ¥¥¥FireWire
-- (id) getFireWireInterface:(unsigned long)aVenderID;
+- (id) getFireWireInterface:(NSUInteger) aVenderID;
 
 #pragma mark ¥¥¥USB
 - (unsigned) usbDeviceCount;

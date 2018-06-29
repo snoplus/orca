@@ -258,7 +258,7 @@ void registryChanged(
 
 
 #pragma mark ¥¥¥FireWire
-- (id) getFireWireInterface:(unsigned long)aVenderID
+- (id) getFireWireInterface:(NSUInteger) aVenderID
 {
 	if(!fwBus){
 		fwBus = [[ORFireWireBus alloc] init];

@@ -150,7 +150,7 @@ static NSString* ORIpeCrateFireWireOut 	= @"ORIpeCrateFireWireOut";
 	}
 }
 
-- (id) getFireWireInterface:(unsigned long)aVenderID
+- (id) getFireWireInterface:(NSUInteger) aVenderID
 {
 	id connectedObj = [self objectConnectedTo:ORIpeCrateFireWireIn];
 	return [ connectedObj getFireWireInterface:aVenderID];

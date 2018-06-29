@@ -37,7 +37,7 @@
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
-- (id) getFireWireInterface:(unsigned long)aVenderID;
+- (id) getFireWireInterface:(NSUInteger) aVenderID;
 - (void) adapterChanged:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥OROrderedObjHolding

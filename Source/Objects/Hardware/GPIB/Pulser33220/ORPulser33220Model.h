@@ -74,8 +74,8 @@
 - (int) connectionProtocol;
 - (void) setConnectionProtocol:(int)aConnectionProtocol;
 
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSUInteger) vendorID;
+- (NSUInteger) productID;
 - (NSString*) usbInterfaceDescription;
 
 

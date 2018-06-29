@@ -57,7 +57,7 @@ typedef  struct  {
 #pragma mark ¥¥¥accessors
 - (void) registerForUSBNotifications:(id)anObj;
 
-- (NSString*) keyForVendorID:(unsigned long)aVendorID productID:(unsigned long)aProductID;
+- (NSString*) keyForVendorID:(unsigned long)aVendorID productID:(NSUInteger) aProductID;
 
 #pragma mark ¥¥¥HW access
 - (void) startMatching;
@@ -71,8 +71,8 @@ typedef  struct  {
 - (IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*) usbCallbackData supported:(BOOL)supported;
 
 
-- (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(unsigned long)aProductID;
-- (NSArray*) interfacesForVender:(unsigned long)aVenderID product:(unsigned long)aProductID;
+- (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(NSUInteger) aProductID;
+- (NSArray*) interfacesForVender:(NSUInteger) aVenderID product:(NSUInteger) aProductID;
 - (NSArray*) interfacesForVenders:(NSArray*)someVendorIDs products:(NSArray*)someProductIDs;
 - (unsigned) deviceCount;
 - (unsigned) interfaceCount;
@@ -80,7 +80,7 @@ typedef  struct  {
 - (id) deviceAtIndex:(unsigned)index;
 - (void) releaseInterfaceFor:(id)obj;
 - (void) claimInterfaceWithSerialNumber:(NSString*)serialNumber for:(id)obj;
-- (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(unsigned long)aProductID for:(id)obj;
+- (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(NSUInteger) aProductID for:(id)obj;
 - (ORUSBInterface*) getUSBInterfaceWithSerialNumber:(NSString*)aSerialNumber;
 - (void) removeAllObjects;
 - (void) objectsAdded:(NSArray*)newObjects;
@@ -98,8 +98,8 @@ extern NSString* ORUSBInterfaceAdded;
 @interface NSObject (multipleIDs)
 - (NSArray*) vendorIDs;
 - (NSArray*) productIDs;
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSUInteger) vendorID;
+- (NSUInteger) productID;
 @end
 
 @protocol USBDevice

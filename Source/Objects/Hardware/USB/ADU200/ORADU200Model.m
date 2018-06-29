@@ -173,12 +173,12 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 	return [NSString stringWithFormat:@"ADU200 (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x0a07; //Ontrak ID
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x00C8;	//ADU200 ID
 }

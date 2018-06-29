@@ -212,12 +212,12 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	return [NSString stringWithFormat:@"MCA927 (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x0A2D; //MCA927
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x0019;	//MCA927
 }

@@ -109,8 +109,8 @@
 - (void) setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*) usbInterfaceDescription;
 - (void) registerWithUSB:(id)usb;
-- (unsigned long) vendorID;
-- (unsigned long) productID;
+- (NSUInteger) vendorID;
+- (NSUInteger) productID;
 - (NSString*) title;
 - (NSString*) settingsLock;
 - (void) checkInterface;

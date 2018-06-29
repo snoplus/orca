@@ -148,12 +148,12 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 	return [NSString stringWithFormat:@"USBtoGPIB (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x0403; //Ontrak ID
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x6001;	//USBtoGPIB ID
 }

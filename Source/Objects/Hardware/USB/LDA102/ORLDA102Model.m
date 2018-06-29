@@ -197,12 +197,12 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	return [NSString stringWithFormat:@"LDA102 (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x041F;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x1207;	//LDA102 ID
 }

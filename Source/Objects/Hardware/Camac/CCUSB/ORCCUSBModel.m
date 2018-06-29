@@ -242,12 +242,12 @@ enum {
 	[usb registerForUSBNotifications:self];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x16DC;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x1;
 }

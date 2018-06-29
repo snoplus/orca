@@ -217,12 +217,12 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 	return [NSString stringWithFormat:@"LabJack (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x0CD5;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x0001;	//LabJack ID
 }

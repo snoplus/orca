@@ -271,12 +271,12 @@ static NSString* DT5725StartStopRunModeString[4] = {
 	return [NSString stringWithFormat:@"DT5725 (Serial# %@)",[usbInterface serialNumber]];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x21E1UL; //DT5725
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x0000UL; //DT5725
 }

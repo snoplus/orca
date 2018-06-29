@@ -115,12 +115,12 @@ NSString* ORLabJackU6CounterEnabledChanged      = @"ORLabJackU6CounterEnabledCha
 	return [NSString stringWithFormat:@"LabJackU6 (Serial# %@)",@"fix me"];
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x0CD5;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x0006;	//LabJackU6 ID
 }

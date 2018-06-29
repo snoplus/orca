@@ -179,8 +179,8 @@ typedef struct  {
 - (void)            setUsbInterface:(ORUSBInterface*)anInterface;
 - (NSString*)       serialNumber;
 - (void)            setSerialNumber:(NSString*)aSerialNumber;
-- (unsigned long)   vendorID;
-- (unsigned long)   productID;
+- (NSUInteger)   vendorID;
+- (NSUInteger)   productID;
 - (NSString*)       usbInterfaceDescription;
 - (void)            interfaceAdded:(NSNotification*)aNote;
 - (void)            interfaceRemoved:(NSNotification*)aNote;
