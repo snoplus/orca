@@ -24,6 +24,6 @@
 - (NSArray*)allSelectedItems;
 - (void)selectItems:(NSArray*)items byExtendingSelection:(BOOL)extend;
 - (id) parentOfSelectedRow;
-- (id) selectedItem;
+- (NSMenuItem *) selectedItem;
 
 @end

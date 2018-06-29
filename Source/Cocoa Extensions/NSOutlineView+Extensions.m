@@ -15,7 +15,7 @@
 
 @implementation NSOutlineView (OrcaExtensions)
 
-- (id)selectedItem { return [self itemAtRow: [self selectedRow]]; }
+- (NSMenuItem *)selectedItem { return [self itemAtRow: [self selectedRow]]; }
 
 - (NSArray*)allSelectedItems {
     NSMutableArray *items = [NSMutableArray array];
