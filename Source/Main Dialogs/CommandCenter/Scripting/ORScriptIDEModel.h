@@ -97,7 +97,7 @@
 - (void)	setInputValue:(id)aValue;
 - (NSDictionary*)		breakpoints;
 - (NSMutableIndexSet*)	breakpointSet;
-- (void)		setBreakpoints:(NSDictionary*) someBreakpoints;
+- (void)		setBreakpoints:(NSMutableIndexSet*) someBreakpoints;
 - (NSString*)	comments;
 - (void)		setComments:(NSString*)aComments;
 - (void)		setCommentsNoNote:(NSString*)aString;

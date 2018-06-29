@@ -317,7 +317,7 @@
 	NSScrollView* scrollView = [scriptView enclosingScrollView];
 	id theRuler = [scrollView verticalRulerView];
 	if([aNote object] == theRuler){
-		NSDictionary* theBreakpoints = [[aNote userInfo] objectForKey:@"lineMarkers"];
+		NSMutableIndexSet* theBreakpoints = [[aNote userInfo] objectForKey:@"lineMarkers"];
 		[model setBreakpoints:theBreakpoints];
 	}
 }
