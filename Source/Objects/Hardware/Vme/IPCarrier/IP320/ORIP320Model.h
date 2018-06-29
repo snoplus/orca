@@ -87,7 +87,7 @@ struct{
     unsigned long   convertedDataId;
 	unsigned long	readCount;
     BOOL			displayRaw;
-	int				mode;
+	int				opMode;
 	BOOL			pollRunning;
     BOOL			logToFile;
     NSString*		logFile;
@@ -133,8 +133,8 @@ struct{
 - (void) setPollingState:(NSTimeInterval)aState;
 - (NSTimeInterval) pollingState;
 - (BOOL) hasBeenPolled;
-- (void)			setMode:(int)aMode;
-- (int)				mode;
+- (void)			setOpMode:(int)aMode;
+- (int)				opMode;
 - (unsigned long)  getRegisterAddress:(short) aRegister;
 - (unsigned long)  getAddressOffset:(short) anIndex;
 - (NSString*)      getRegisterName:(short) anIndex;
@@ -180,10 +180,10 @@ struct{
 #pragma mark ¥¥¥DataSource
 - (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
 - (unsigned)  numberOfChildren;
-- (id)   childAtIndex:(int)index;
+- (id)   childAtIndex:(NSUInteger)index;
 - (id)   name;
 - (void) removeDataSet:(ORDataSet*)aSet;
 - (BOOL) leafNode;

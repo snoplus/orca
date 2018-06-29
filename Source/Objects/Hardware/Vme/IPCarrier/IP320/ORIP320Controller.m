@@ -567,7 +567,7 @@
 #pragma mark ¥¥¥Data Source
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
 {
-	if([model mode] == 1)return YES;
+	if([model opMode] == 1)return YES;
 	else {
 		if( tableView == valueTable2 || 
 		   tableView == calibrationTable2 ||
@@ -606,7 +606,7 @@
 	if(anObject!=nil){
 		rowIndex += [aTableView tag];
 		//NSParameterAssert(rowIndex >= 0 && rowIndex < kNumIP320Channels);
-		id obj = [[model chanObjs] objectAtIndex:rowIndex];
+		NSMutableDictionary* obj = [[model chanObjs] objectAtIndex:rowIndex];
 		[[[self undoManager] prepareWithInvocationTarget:self] tableView:aTableView setObjectValue:[obj objectForKey:[aTableColumn identifier]] forTableColumn:aTableColumn row:rowIndex];
 		[obj setObject:anObject forKey:[aTableColumn identifier]];
 		[aTableView reloadData];
@@ -648,7 +648,7 @@
     }
 }
 
-- (id)outlineView:(NSOutlineView *)ov child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)ov child:(NSUInteger)index ofItem:(id)item
 {
     id anObj;
     if(ov == outlineView){

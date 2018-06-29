@@ -258,19 +258,19 @@ static struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelLogToFileChanged object:self];
 }
 
-- (void) setMode:(int)aMode
+- (void) setOpMode:(int)aMode
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
+    [[[self undoManager] prepareWithInvocationTarget:self] setOpMode:opMode];
     
-    mode = aMode;
+    opMode = aMode;
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIP320ModelModeChanged object:self];
 	
 }
 
-- (int) mode
+- (int) opMode
 {
-	return mode;
+	return opMode;
 }
 
 - (BOOL) displayRaw
@@ -404,7 +404,7 @@ static struct {
     unsigned short aMask = 0;
     aMask |= (aChannel%20 & kChan_mask);//bits 0-5
 	aMask |= [chanObj gain] << 6;       //bits 6-7
-	aMask |= [self mode] << 8;			//bits 8-9
+	aMask |= [self opMode] << 8;			//bits 8-9
 	
 	[[guardian adapter] writeWordBlock:&aMask
 							 atAddress:[self getRegisterAddress:kControlReg]
@@ -674,7 +674,7 @@ static struct {
 		short chan;
 		for(chan=0;chan<kNumIP320Channels;chan++){
 			if([[chanObjs objectAtIndex:chan] readEnabled]){
-				if(mode == 0 && chan>=20)break;	//if differential, don't read chan >= 20
+				if(opMode == 0 && chan>=20)break;	//if differential, don't read chan >= 20
 				[self readAdcChannel:chan time:ut_time];
 				if(logToFile)outputString = [outputString stringByAppendingFormat:@"%6.3f ",[self convertedValue:chan]];
 			}
@@ -718,7 +718,7 @@ static struct {
 {
     short chan;
     for(chan=0;chan<kNumIP320Channels;chan++){
-        [[chanObjs objectAtIndex:chan] setObject:[NSNumber numberWithBool:state] forKey:k320ChannelReadEnabled];
+        [(ORIP320Channel*)[chanObjs objectAtIndex:chan] setObject:[NSNumber numberWithBool:state] forKey:k320ChannelReadEnabled];
     }
 }
 
@@ -726,7 +726,7 @@ static struct {
 {
     short chan;
     for(chan=0;chan<kNumIP320Channels;chan++){
-        [[chanObjs objectAtIndex:chan] setObject:[NSNumber numberWithBool:state] forKey:k320ChannelAlarmEnabled];
+        [(ORIP320Channel*)[chanObjs objectAtIndex:chan] setObject:[NSNumber numberWithBool:state] forKey:k320ChannelAlarmEnabled];
     }
 }
 
@@ -886,7 +886,7 @@ static struct {
 
 - (double) convertedValue:(int)channel
 {
-	return [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelValue] doubleValue];
+	return [[(ORIP320Channel*)[chanObjs objectAtIndex:channel] objectForKey:k320ChannelValue] doubleValue];
 }
 
 - (double) maxValueForChan:(int)channel
@@ -904,8 +904,8 @@ static struct {
 - (void) getAlarmRangeLow:(double*)theLowLimit high:(double*)theHighLimit channel:(int)channel
 {
 	@synchronized(self){
-		*theLowLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelLowValue] doubleValue];
-		*theHighLimit = [[[chanObjs objectAtIndex:channel] objectForKey:k320ChannelHighValue] doubleValue];
+		*theLowLimit = [[(ORIP320Channel*)[chanObjs objectAtIndex:channel] objectForKey:k320ChannelLowValue] doubleValue];
+		*theHighLimit = [[(ORIP320Channel*)[chanObjs objectAtIndex:channel] objectForKey:k320ChannelHighValue] doubleValue];
 	}		
 }
 
@@ -1035,7 +1035,7 @@ static struct {
 		int index = 3;
 		int i;
 		int n;
-		if(mode == 0) n = 20;
+		if(opMode == 0) n = 20;
 		else n = 40;
 		for(i=0;i<n;i++){
 			if([[chanObjs objectAtIndex:i] readEnabled]){
@@ -1071,7 +1071,7 @@ static struct {
 		
 		int index = 3;
 		int n;
-		if(mode == 0) n = 20;
+		if(opMode == 0) n = 20;
 		else n = 40;
 		
 		union {
@@ -1108,15 +1108,15 @@ static struct {
     return    (item == nil) ? [self numberOfChildren]!=0 : ([item numberOfChildren] != 0);
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item
 {
-    if(item)   return [item childAtIndex:index];
+    if(item)   return [(ORIP320Model*)item childAtIndex:index];
     else	return dataSet;
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
-    return  ((item == nil) ? @"IP320" : [item name]);
+    return  ((item == nil) ? @"IP320" : [(ORIP320Model*)item name]);
 }
 
 - (unsigned)  numberOfChildren
@@ -1125,7 +1125,7 @@ static struct {
     return count;
 }
 
-- (id)   childAtIndex:(int)index
+- (id)   childAtIndex:(NSUInteger)index
 {
     NSEnumerator* e = [dataSet objectEnumerator];
     id obj;
