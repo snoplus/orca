@@ -526,12 +526,12 @@ NSString* ORXTR6Lock                            = @"ORXTR6Lock";
 
 
 #pragma mark ***USB Methods
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x403; //XTR6 vendorID
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x6001; //XTR6 productID
 }

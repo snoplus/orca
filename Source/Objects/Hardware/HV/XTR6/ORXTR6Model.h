@@ -69,8 +69,8 @@
 
 #pragma mark ***USB
 - (void)            makeUSBConnectors;
-- (unsigned long)   vendorID;
-- (unsigned long)   productID;
+- (NSUInteger)   vendorID;
+- (NSUInteger)   productID;
 - (void)            connectUSB;
 - (NSString*)       usbInterfaceDescription;
 - (void)            interfaceAdded:(NSNotification*)aNote;
