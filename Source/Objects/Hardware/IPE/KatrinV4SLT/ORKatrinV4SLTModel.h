@@ -404,6 +404,7 @@
 - (BOOL) doneTakingData;
 
 - (void) dumpSltSecondCounter:(NSString*)text;
+- (void) shipSecondCounter:(unsigned char)aType sec:(unsigned long)seconds;
 - (void) shipSltSecondCounter:(unsigned char)aType;
 - (void) shipSltRunCounter:(unsigned char)aType;
 - (void) shipSltEvent:(unsigned char)aCounterType withType:(unsigned char)aType eventCt:(unsigned long)c high:(unsigned long)h low:(unsigned long)l;

@@ -252,11 +252,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             if (isSubRun){
                 NSLog(@"--- Notification: go to  %@\n",@"eSubRunStarting");
             
-                // Release inhibit and
-                // wait for second strobe
-                // Release inhibit with the next second strobe
-                [self writeClrInhibit];
-                
+                // Define the start of the subrun here; there is no inhibit used
+                // during subruns, but still phases change only at the second strobe
                 subseconds = [self readSubSecondsCounter];
                 seconds = [self readSecondsCounter];
                 subsec2 = (subseconds >> 11) & 0x3fff;
@@ -265,16 +262,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                 secondToWaitFor = seconds + 1;
                 waitForSubRunStart = true;
 
-                // If inhibit has been released the time needs to be corrected
-                status = [self readStatusReg];
-                if ((status & kStatusInh) == 0) {
-                    subseconds = [self readSubSecondsCounter];
-                    seconds = [self readSecondsCounter];
-                    subsec2 = (subseconds >> 11) & 0x3fff;
-                    
-                    secondToWaitFor = seconds;
-                }
-
                 // Tell run control to wait
                 NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                           @"waiting for second strobe",
@@ -282,11 +269,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                                           nil];
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
                 
-                // Ship the sub run records
-                // Ship as early as possible; at high rates it's impossible to put them at the
-                // right place?!
-                [self shipSltSecondCounter: kStartSubRunType];
-                [self shipSltRunCounter:    kStartSubRunType];
+                // Ship announcement of subrun as early as possible;
+                // at high rates it's impossible to put them at the right place?!
+                [self shipSecondCounter: kStartSubRunType sec:secondToWaitFor];
                 
             } else {
                 NSLog(@"--- Notification: go to  %@\n",@"eRunStarting");
@@ -296,10 +281,8 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         case eRunBetweenSubRuns:
             NSLog(@"--- Notification: go to  %@\n",@"eRunBetweenSubRuns");
             
-            // Set inhibit and
-            // wait for second strobe
-            [self writeSetInhibit];
-
+            // Define the end of the subrun here; there is no inhibit used
+            // during subruns, but still phases change only at the second strobe
             subseconds = [self readSubSecondsCounter];
             seconds = [self readSecondsCounter];
             subsec2 = (subseconds >> 11) & 0x3fff;
@@ -307,15 +290,6 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
             
             secondToWaitFor = seconds + 1;
             waitForSubRunEnd = true;
-
-            status = [self readStatusReg];
-            if ((status & kStatusInh) != 0) {
-                subseconds = [self readSubSecondsCounter];
-                seconds = [self readSecondsCounter];
-                subsec2 = (subseconds >> 11) & 0x3fff;
-                
-                secondToWaitFor = seconds;
-            }
             
             // Tell run control to wait
             NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -324,11 +298,9 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
                                       nil];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-            // Ship the sub run records
-            // Ship as early as possible; at high rates it's impossible to put them at the
-            // right place?!
-            [self shipSltSecondCounter: kStopSubRunType];
-            [self shipSltRunCounter:    kStopSubRunType];
+            // Ship end of subrun announcement as early as possible;
+            // at high rates it's impossible to put them at the right place?!
+            [self shipSecondCounter: kStopSubRunType sec:secondToWaitFor];
 
             break;
             
@@ -726,19 +698,13 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) runIsBetweenSubRuns:(NSNotification*)aNote
 {
-    // Moved to takeData
-    
-	//[self shipSltSecondCounter: kStopSubRunType];
-	//[self shipSltRunCounter:    kStopSubRunType];
+    // Handled in takeData
 }
 
 
 - (void) runIsStartingSubRun:(NSNotification*)aNote
 {
-    // Moved to takeData
-
-    //[self shipSltSecondCounter: kStartSubRunType];
-	//[self shipSltRunCounter:    kStartSubRunType];
+    // Handled in takeData
 }
 
 #pragma mark •••Accessors
@@ -1987,6 +1953,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         
         if (seconds >= secondToWaitFor) {
             waitForSubRunStart = false;
+            [self shipSltRunCounter:    kStartSubRunType];
             NSLog(@"SLT %i.%03i - met second strobe %i\n", seconds, subsec2/10, secondToWaitFor);
             
             // Wait for second strobe or inhibit to become active
@@ -2003,6 +1970,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
         
         if (seconds >= secondToWaitFor) {
             waitForSubRunEnd = false;
+            [self shipSltRunCounter:    kStopSubRunType];
             NSLog(@"SLT %i.%03i - met second strobe %i\n", seconds, subsec2/10, secondToWaitFor);
 
             // Wait for second strobe or inhibit to become active
@@ -2158,6 +2126,14 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 	unsigned long seconds = [self readSecondsCounter];
     if(text) NSLog(@"%@::%@   %@   sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),text,seconds,subseconds);//DEBUG -tb-
     else     NSLog(@"%@::%@    sec:%i  subsec:%i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),seconds,subseconds);//DEBUG -tb-
+}
+
+- (void) shipSecondCounter:(unsigned char)aType sec: (unsigned long ) seconds 
+{
+    const char *sType[] = {"", "run start", "run stop", "subrun start", "subrun stop"};
+
+    [self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:0 ];
+
 }
 
 - (void) shipSltSecondCounter:(unsigned char)aType
