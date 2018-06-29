@@ -109,12 +109,12 @@ uint8_t verbose = 0;
 	return @"VME/SBS_SIS3150.html";
 }
 
-- (unsigned long) vendorID
+- (NSUInteger) vendorID
 {
 	return 0x1657;
 }
 
-- (unsigned long) productID
+- (NSUInteger) productID
 {
 	return 0x3150;	
 }
