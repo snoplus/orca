@@ -35,7 +35,7 @@
     unsigned long   timeMeasured;
     BOOL            userMaxCurrentEnabled;
     int             type;
-    int             mode;
+    int             opMode;
     int             input;
     BOOL            powerUpEnable;
     
@@ -69,7 +69,7 @@
 @property (assign,nonatomic) double         maxValue;
 @property (assign,nonatomic) int            currentOrPower;
 @property (assign,nonatomic) BOOL           userMaxCurrentEnabled;
-@property (assign,nonatomic) int            mode;
+@property (assign,nonatomic) int            opMode;
 @property (assign,nonatomic) int            input;
 @property (assign,nonatomic) BOOL           powerUpEnable;
 @property (assign,nonatomic) float          pValue;

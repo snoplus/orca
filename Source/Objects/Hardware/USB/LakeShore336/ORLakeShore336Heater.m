@@ -27,7 +27,7 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
 
 @synthesize label,channel,output,resistance, maxCurrent, maxUserCurrent, currentOrPower;
 @synthesize lowLimit,highLimit,minValue,maxValue,timeRate,timeMeasured,userMaxCurrentEnabled;
-@synthesize iValue,pValue,dValue,mode,input,powerUpEnable;
+@synthesize iValue,pValue,dValue,opMode,input,powerUpEnable;
 
 - (id) init
 {
@@ -56,7 +56,7 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
 }
 - (NSString*) outputSetupString;
 {
-    return [NSString stringWithFormat:@"OUTMODE %d,%d,%d,%d",channel+1,mode,input,powerUpEnable];
+    return [NSString stringWithFormat:@"OUTMODE %d,%d,%d,%d",channel+1,opMode,input,powerUpEnable];
 }
 
 - (void) setOutput:(float)aValue
@@ -137,12 +137,12 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
     dValue = aValue;
 }
 
-- (void) setMode:(int)aValue
+- (void) setOpMode:(int)aValue
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
+    [[[self undoManager] prepareWithInvocationTarget:self] setOpMode:opMode];
     if(aValue<0)aValue=0;
     else if(aValue>5)aValue=5;
-    mode = aValue;
+    opMode = aValue;
 }
 
 - (void) setInput:(int)aValue
@@ -186,7 +186,7 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
     [self setIValue:        [decoder decodeFloatForKey: @"iValue"]];
     [self setDValue:        [decoder decodeIntForKey:   @"dValue"]];
     [self setLabel:         [decoder decodeObjectForKey:@"label"]];
-    [self setMode:          [decoder decodeIntForKey:   @"mode"]];
+    [self setOpMode:          [decoder decodeIntForKey:   @"mode"]];
     [self setInput:         [decoder decodeIntForKey:   @"input"]];
     [self setPowerUpEnable: [decoder decodeBoolForKey:  @"powerUpEnable"]];
 
@@ -216,7 +216,7 @@ NSString* ORLakeShore336InputChanged  = @"ORLakeShore336InputChanged";
     [encoder encodeFloat:iValue         forKey:@"iValue"];
     [encoder encodeInt:dValue           forKey:@"dValue"];
     [encoder encodeObject:label         forKey:@"label"];
-    [encoder encodeInt:mode             forKey:@"mode"];
+    [encoder encodeInt:opMode             forKey:@"mode"];
     [encoder encodeInt:input            forKey:@"input"];
     [encoder encodeBool:powerUpEnable   forKey:@"powerUpEnable"];
 }
