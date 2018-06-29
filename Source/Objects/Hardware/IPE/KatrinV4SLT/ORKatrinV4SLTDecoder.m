@@ -44,15 +44,28 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx eventCounter (when record type != 0 see below)
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Hi
 xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx timeStamp Lo
-when record type != 0 the eventCounter is 0 (has no meaning) and for
+
+record type = 0 = a 32 bit counter is stored as specified in "counter types"
+
+counter type (form ORKatrinV4SLTDefs.h):
+
+#define kUnknownType        0
+#define kSecondsCounterType    1
+#define kVetoCounterType    2
+#define kDeadCounterType    3
+#define kRunCounterType        4
+#define kLostFltEventCounterType 5
+#define kLostSltEventCounterType 6
+#define kLostFltEventTrCounterType 7
+
+For record types > 0  64 bit timestamps are stored.
+
 record type = 1 = kStartRunType:	the timestamp is a run start timestamp
 record type = 2 = kStopRunType:		the timestamp is a run stop timestamp
 record type = 3 = kStartSubRunType: the timestamp is a subrun start timestamp
 record type = 4 = kStopSubRunType:	the timestamp is a subrun stop timestamp
 
-
-counter type = kSecondsCounterType, kVetoCounterType, kDeadCounterType, kRunCounterType,
-                kLostFltEventCounterType, kLostSltEventCounterType
+For these settings the eventCounter field is 0 and has no meaning.
 
 **/
 //-------------------------------------------------------------
