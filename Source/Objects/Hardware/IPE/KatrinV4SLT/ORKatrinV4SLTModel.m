@@ -240,7 +240,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
     unsigned long subseconds;
     unsigned long seconds;
     unsigned long subsec2;
-    unsigned long status;
+    //unsigned long status;
 
     int state = [[[aNote userInfo] objectForKey:@"State"] intValue];
     BOOL isSubRun = [[[aNote userInfo] objectForKey:@"StartingSubRun"] boolValue];
@@ -2130,7 +2130,7 @@ NSString* ORKatrinV4SLTcpuLock                              = @"ORKatrinV4SLTcpu
 
 - (void) shipSecondCounter:(unsigned char)aType sec: (unsigned long ) seconds 
 {
-    const char *sType[] = {"", "run start", "run stop", "subrun start", "subrun stop"};
+   // const char *sType[] = {"", "run start", "run stop", "subrun start", "subrun stop"};
 
     [self shipSltEvent:kSecondsCounterType withType:aType eventCt:0 high:seconds low:0 ];
 
