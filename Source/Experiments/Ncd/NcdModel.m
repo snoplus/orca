@@ -98,7 +98,8 @@ enum {
 
 -(void)dealloc
 {
-	[[NcdDetector sharedInstance] setDelegate:nil];
+    NcdDetector* ncdDet = [NcdDetector sharedInstance];
+	[ncdDet setDelegate:nil];
 
     [reducedEfficiencyDate release];
     [nominalSettingsFile release];
@@ -888,7 +889,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     [self setCurrentMuxEfficiency:[decoder decodeFloatForKey:@"NcdModelCurrentMuxEfficiency"]];
     [self setNominalSettingsFile:[decoder decodeObjectForKey:@"NcdModelNominalSettingsFile"]];
     [[NcdDetector sharedInstance] loadWithCoder:decoder];
-    [[NcdDetector sharedInstance] setDelegate:(id)self];
+    [(NcdDetector*)[NcdDetector sharedInstance] setDelegate:(id)self];
     
     
     ncdPulseChannelsTask = [[decoder decodeObjectForKey:ORNcdPulseChannelsTask] retain];
@@ -1028,7 +1029,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     //ORCA reserves bit 0 for its own maintenance run type.
     if(!allDisabled && (runTypeMask &  0x4)){
         NSEnumerator* e = [altMuxThresholds objectEnumerator];
-        id obj;
+        NSDictionary* obj;
         while(obj = [e nextObject]){
             SourceMask* theSourceMaskObj = [obj objectForKey:@"sourceMask"];
             if(sourceMask & (0x1L << [theSourceMaskObj value])){
@@ -1462,7 +1463,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     id newCardKey;
     while( newCardKey = [eNew nextObject]){ 
         //loop over all cards, comparing old card records to new ones.
-        id newCardRecord = [newCrateDictionary objectForKey:newCardKey];
+        NSDictionary* newCardRecord = [newCrateDictionary objectForKey:newCardKey];
         if(![[newCardRecord class] isSubclassOfClass:NSClassFromString(@"NSDictionary")])continue;
         NSEnumerator* eOld =  [oldCardKeys objectEnumerator];
         id oldCardKey;
@@ -1481,7 +1482,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
         }
         
         while( oldCardKey = [eOld nextObject]){ 
-            id oldCardRecord = [oldCrateDictionary objectForKey:oldCardKey];
+            NSDictionary* oldCardRecord = [oldCrateDictionary objectForKey:oldCardKey];
             if(![[oldCardRecord class] isSubclassOfClass:NSClassFromString(@"NSDictionary")])continue;
             
             //grab some objects that we'll use more than once below
@@ -1511,7 +1512,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
     eNew =  [newMuxes objectEnumerator];
     id newMuxKey;
     while( newMuxKey = [eNew nextObject]){
-        id newMuxRecord = [newDictionary objectForKey:newMuxKey];
+        NSDictionary* newMuxRecord = [newDictionary objectForKey:newMuxKey];
         //loop over all muxes, comparing old card records to new ones.
         if(![[newMuxRecord class] isSubclassOfClass:NSClassFromString(@"NSDictionary")])continue;
         //grab some objects that we'll use more than once below
@@ -1529,7 +1530,7 @@ static NSString *ORNcdMuxFullEfficiencyThresholds = @"ORNcdMuxFullEfficiencyThre
         NSEnumerator* eOld =  [oldMuxes objectEnumerator];
         id oldMuxKey;
         while( oldMuxKey = [eOld nextObject]){ 
-            id oldMuxRecord = [oldDictionary objectForKey:oldMuxKey];
+            NSDictionary* oldMuxRecord = [oldDictionary objectForKey:oldMuxKey];
             if(![[oldMuxRecord class] isSubclassOfClass:NSClassFromString(@"NSDictionary")])continue;
             
             //grab some objects that we'll use more than once below
