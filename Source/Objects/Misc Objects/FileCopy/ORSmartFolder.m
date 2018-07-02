@@ -43,8 +43,8 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORSmartFolder (private)
-- (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 #endif
 
@@ -679,12 +679,12 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     [gSecurity tryToSetLock:[self lockName] to:[sender intValue] forWindow:window?window:[view window]];
 }
 
-- (IBAction) copyEnabledAction:(id)sender
+- (IBAction) copyEnabledAction:(NSButton*)sender
 {
     [self setCopyEnabled:[sender state]];
 }
 
-- (IBAction) deleteEnabledAction:(id)sender
+- (IBAction) deleteEnabledAction:(NSButton*)sender
 {
     [self setDeleteWhenCopied:[sender state]];
 }
@@ -791,7 +791,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     [self setRemoteUserName:[sender stringValue]];
 }
 
-- (IBAction) verboseButtonAction:(id)sender
+- (IBAction) verboseButtonAction:(NSButton*)sender
 {
     [self setVerbose:[sender state]];
 }
@@ -874,14 +874,14 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORSmartFolder (private)
-- (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         [self deleteAll];
     }
 }
 
-- (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         if(![self queueIsRunning])[self sendAll];

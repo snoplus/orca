@@ -132,8 +132,8 @@
 #pragma mark ***Actions
 
 - (IBAction) lockButtonAction:(id)sender;
-- (IBAction) copyEnabledAction:(id)sender;
-- (IBAction) deleteEnabledAction:(id)sender;
+- (IBAction) copyEnabledAction:(NSButton*)sender;
+- (IBAction) deleteEnabledAction:(NSButton*)sender;
 - (IBAction) chooseDirButtonAction:(id)sender;
 - (IBAction) copyButtonAction:(id)sender;
 - (IBAction) deleteButtonAction:(id)sender;
@@ -141,7 +141,7 @@
 - (IBAction) remotePathTextFieldAction:(id)sender;
 - (IBAction) passWordSecureTextFieldAction:(id)sender;
 - (IBAction) userNameTextFieldAction:(id)sender;
-- (IBAction) verboseButtonAction:(id)sender;
+- (IBAction) verboseButtonAction:(NSButton*)sender;
 - (IBAction) transferPopupButtonAction:(id)sender;
 
 
