@@ -24,7 +24,7 @@
 
 
 @interface ORHP3458aController (private)
-- (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) systemTest;
 @end
 
