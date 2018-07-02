@@ -22,7 +22,7 @@
 {
     unsigned long long amountBlocked;
 }
-- (void)netsocket:(NetSocket*)insocket dataAvailable:(unsigned)inAmount;
+- (void)netsocket:(NetSocket*)insocket dataAvailable:(NSUInteger)inAmount;
 - (void) setAmountBlocked:(unsigned long long)numBytes;
 - (unsigned long long)amountBlocked;
 - (float)percentBlocked;

@@ -20,7 +20,7 @@
 
 @implementation ORDispatcherClient
 
-- (void)netsocket:(NetSocket*)insocket dataAvailable:(unsigned)inAmount
+- (void)netsocket:(NetSocket*)insocket dataAvailable:(NSUInteger)inAmount
 {
     if(insocket == socket){
         [[ORCommandCenter sharedCommandCenter] handleCommand:[socket readString:NSASCIIStringEncoding amount:inAmount] fromClient:self];
