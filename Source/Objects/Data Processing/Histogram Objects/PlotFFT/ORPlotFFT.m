@@ -47,7 +47,7 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 
 
 #pragma mark ¥¥¥Accessors
-- (unsigned) numberChans
+- (NSUInteger) numberChans
 {
 	return [realArray count];
 }

@@ -49,7 +49,7 @@
 - (void) setShowImaginary:(BOOL)aFlag;
 - (BOOL) showPowerSpectrum;
 - (void) setShowPowerSpectrum:(BOOL)aFlag;
-- (unsigned) numberChans;
+- (NSUInteger) numberChans;
 
 #pragma mark ¥¥¥Data Management
 - (void) clear;
