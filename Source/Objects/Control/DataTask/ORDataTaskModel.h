@@ -29,6 +29,7 @@
 @class ORDataSet;
 @class ORTimer;
 @class ORDecoder;
+@class ORDataChainObject;
 
 #define kTimeHistoSize 4000
 
@@ -36,7 +37,7 @@
 
 @interface ORDataTaskModel : ORDataChainObject  {
     ORReadOutList*  readOutList;
-    id              nextObject;     //cache for alittle bit more speed.
+    ORDataChainObject*  nextObject;     //cache for alittle bit more speed.
     NSArray*        dataTakers;     //cache of data takers.
     unsigned long   queueCount;
     
@@ -97,15 +98,15 @@
 - (void) removeOrcaObject:(id)anObject;
 
 #pragma mark ¥¥¥Run Management
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStarted:(id)userInfo;
-- (void) runIsStopping:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runIsStopping:(NSDictionary*)userInfo;
 - (BOOL) doneTakingData;
-- (void) runTaskStopped:(id)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
 - (void) putDataInQueue:(ORDataPacket*)aDataPacket force:(BOOL)forceAdd;
 - (void) queueRecordForShipping:(NSNotification*)aNote;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 - (void) doCycleRate;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 
@@ -130,7 +131,7 @@ extern NSString* ORDataTaskModelTimerEnableChanged;
 - (int) stationNumber;
 - (int) slot;
 - (int) crateNumber;
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 @end
 
 

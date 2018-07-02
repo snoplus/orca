@@ -287,7 +287,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 
 
 #pragma mark ¥¥¥Run Management
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
 	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
 	if(processThreadRunning){
@@ -370,7 +370,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	[aDataPacket startFrameTimer];
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
     nextObject =  [self objectConnectedTo: ORDataTaskDataOut];
     [nextObject subRunTaskStarted:userInfo];
@@ -407,7 +407,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 
 //takeData...
 //this operates out of the data taking thread. It should not be called from anywhere else.
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
 	//ship pending records.
@@ -442,7 +442,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	++cycleCount;
 }
 
-- (void) runIsStopping:(id)userInfo
+- (void) runIsStopping:(NSDictionary*)userInfo
 {
 	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     int i;
@@ -464,7 +464,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	return allDone;
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
 	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     int i;
@@ -496,14 +496,14 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	[self setCycleRate:0];
 }
 
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
     //a chance to do a preclean of the pending records
     ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     [self shipPendingRecords:aDataPacket];
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 	ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
     [self shipPendingRecords:aDataPacket];
