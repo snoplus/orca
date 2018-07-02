@@ -188,7 +188,7 @@
 - (NSDictionary*) dataRecordDescription;
 - (void) shipPulserRecord:(ORHPPulserModel*)thePulser;
 - (void) shipTaskRecord:(id)aTask running:(BOOL)aState;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 
 
 - (void) modifiyMuxEfficiency;

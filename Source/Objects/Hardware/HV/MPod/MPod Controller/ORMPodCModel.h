@@ -43,9 +43,9 @@
 - (BOOL) power;
 - (void) initConnectionHistory;
 - (void) clearHistory;
-- (unsigned) connectionHistoryCount;
-- (id) connectionHistoryItem:(unsigned)index;
-- (unsigned) ipNumberIndex;
+- (NSUInteger) connectionHistoryCount;
+- (id) connectionHistoryItem:(NSUInteger)index;
+- (NSUInteger) ipNumberIndex;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
 - (int) systemParamAsInt:(NSString*)name;
@@ -68,7 +68,7 @@
 - (void) writeValues:(NSArray*)cmds target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
 - (void) pollHardware;
 - (void) pollHardwareAfterDelay;
-- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo;
+- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(NSDictionary*)userInfo;
 
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

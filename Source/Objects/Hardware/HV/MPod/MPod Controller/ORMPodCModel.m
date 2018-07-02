@@ -151,18 +151,18 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	[self setIPNumber:[self IPNumber]];
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
-- (unsigned) ipNumberIndex
+- (NSUInteger) ipNumberIndex
 {
 	return ipNumberIndex;
 }
@@ -326,7 +326,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 	}
 }
 
-- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo
+- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(NSDictionary*)userInfo
 {
 	//just a fancy way to sync something back in the target with activities in the queue
 	ORSNMPCallBackOperation* anOP = [[ORSNMPCallBackOperation alloc] initWithDelegate:self];

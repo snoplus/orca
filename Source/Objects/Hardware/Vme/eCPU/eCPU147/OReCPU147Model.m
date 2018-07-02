@@ -558,7 +558,7 @@ const struct {
     
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
     powerFailed = NO;
@@ -641,7 +641,7 @@ const struct {
 	[self update];
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(startedCode){
         if([circularBufferReader takeData:aDataPacket userInfo:userInfo]){
@@ -666,7 +666,7 @@ const struct {
 	[self startUserCodeWithRetries:1];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     startedCode = NO;
 	isRunning = NO;
@@ -674,7 +674,7 @@ const struct {
         [self stopUserCode];
     }
     
-	[circularBufferReader runTaskStopped:aDataPacket userInfo:(id)userInfo];
+	[circularBufferReader runTaskStopped:aDataPacket userInfo:(NSDictionary*)userInfo];
     
 	[[NSNotificationCenter defaultCenter]
 	 postNotificationName:OReCPU147QueChanged

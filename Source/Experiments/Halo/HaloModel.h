@@ -60,7 +60,7 @@
 
 #pragma mark ¥¥¥EMail
 - (void) mailSent:(NSString*)address;
-- (void) sendMail:(id)userInfo;
+- (void) sendMail:(NSDictionary*)userInfo;
 - (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses;
 
 #pragma mark ¥¥¥Segment Group Methods

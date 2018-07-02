@@ -110,7 +110,7 @@
 
 #pragma mark ***Delegate Methods (IP)
 - (void) netsocketConnected:(NetSocket*)inNetSocket;
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount;
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket;
 - (BOOL) isConnected;
 
