@@ -186,7 +186,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
     [self linkToController:@"ORDataSetController"];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if([self leafNode]){
         [[self data] appendDataDescription:aDataPacket userInfo:userInfo];
@@ -217,12 +217,12 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
     return result;
 }
 
-- (long) runNumber
+- (unsigned long) runNumber
 {
 	return runNumber;
 }
 
-- (void) setRunNumber:(long)aRunNumber
+- (void) setRunNumber:(unsigned long)aRunNumber
 {
 	runNumber = aRunNumber;
 }
@@ -386,7 +386,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
     id aKey;
     id objectData;
     while(aKey = [e nextObject]){
-        objectData = [[realDictionary objectForKey:aKey] data];
+        objectData = [(ORDataSet*)[realDictionary objectForKey:aKey] data];
         if(objectData)[collection addObjectsFromArray:[objectData collectObjectsOfClass:aClass]];
         else [collection addObjectsFromArray:[[realDictionary objectForKey:aKey] collectObjectsOfClass:aClass]];
     }	
@@ -411,7 +411,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 
 #pragma mark •••Primative NSDictionary Methods
 
-- (unsigned) count
+- (NSUInteger) count
 {
     return [realDictionary count];
 }
@@ -544,7 +544,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 }
 
 
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [realDictionary keyEnumerator];
     NSString* aKey;
@@ -554,7 +554,7 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
     }
 }
 
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo keys:(NSMutableArray*)aKeyArray
 {
     if([self leafNode]){
         [[self data] packageData:aDataPacket userInfo:userInfo keys:aKeyArray];
@@ -1664,12 +1664,12 @@ NSString* ORForceLimitsMaxYChanged = @"ORForceLimitsMaxYChanged";
 }
 
 #pragma mark •••Data Source Methods
-- (unsigned)  numberOfChildren
+- (NSUInteger)  numberOfChildren
 {
     return [self count];
 }
 
-- (id)   childAtIndex:(int)index
+- (NSString*)   childAtIndex:(NSUInteger)index
 {
 	id theData = nil;
 	@synchronized(self){  

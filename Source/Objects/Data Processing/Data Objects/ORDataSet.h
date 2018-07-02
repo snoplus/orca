@@ -33,7 +33,7 @@
     id                      data;		//data will be nil unless this is a leaf node.	
     unsigned long			totalCounts;
 	//NSLock*					dataSetLock;
-	long					runNumber;
+	unsigned long					runNumber;
     float                   minX,maxX,minY,maxY;
 }
 
@@ -59,15 +59,15 @@
 
 - (id) findObjectWithFullID:(NSString*)aFullID;
 - (NSArray*) collectObjectsOfClass:(Class)aClass;
-- (long) runNumber;
-- (void) setRunNumber:(long)aRunNumber;
+- (unsigned long) runNumber;
+- (void) setRunNumber:(unsigned long)aRunNumber;
 - (id) objectForKeyArray:(NSMutableArray*)anArray;
 - (ORDataSet*) dataSetWithName:(NSString*)aName;
 - (void) setKey:(NSString*)aKey;
 - (NSString*) key;
 - (NSString*)name; 
 - (NSString*) shortName;
-- (unsigned) count;
+- (NSUInteger) count;
 - (NSEnumerator*) objectEnumerator;
 - (unsigned long) totalCounts;
 - (void) setTotalCounts:(unsigned long) newCount;
@@ -118,19 +118,19 @@
 - (void) loadFFTReal:(NSArray*)realArray imaginary:(NSArray*)imaginaryArray withKeyArray:(NSArray*)keyArray;
 - (void) loadTimeSeries:(float)aValue atTime:(unsigned long)aTime sender:(id)obj withKeys:(NSString*)firstArg,...;
 - (void) loadSpectrum:(NSData*)aSpectrum  sender:(id)obj  withKeys:(NSString*)firstArg,...;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
 
 #pragma mark •••Writing Data
 - (void) writeDataToFile:(FILE*)aFile;
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray;
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo keys:(NSMutableArray*)aKeyArray;
 - (NSString*) summarizeIntoString:(NSMutableString*)summary;
 - (NSString*) summarizeIntoString:(NSMutableString*)summary level:(int)level;
 
 #pragma mark •••Data Source Methods
-- (unsigned)  numberOfChildren;
-- (id)   childAtIndex:(int)index;
+- (NSUInteger)  numberOfChildren;
+- (id)   childAtIndex:(NSUInteger)index;
 
 @end
 
