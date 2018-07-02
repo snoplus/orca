@@ -29,5 +29,6 @@
 - (void) drawLinScale;			// draw a linear scale
 - (void) setStartTime:(NSTimeInterval)aStartTime;
 - (NSTimeInterval) startTime;
+- (NSString*) markerLabel:(NSNumber*)markerNumber;
 
 @end

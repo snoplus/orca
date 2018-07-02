@@ -18,7 +18,6 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
-
 #import "ORTimeLine.h"
 
 @implementation ORTimeLine
@@ -94,6 +93,7 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
     NSBezierPath* 	theAxis = [NSBezierPath bezierPath];
     NSBezierPath* 	theAxisColoredTicks = [NSBezierPath bezierPath];
     [theAxisColoredTicks setLineWidth:3];
+    
     NSString* theDateFormat = [self dateFormat];
 	if(!theDateFormat)theDateFormat = @"M/d/yy H:m:s";
 	gridCount = 0;    
@@ -164,9 +164,18 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 	unsigned short nthTick = 0;
     
     if ([self isXAxis]) {
-		
+
         y = [self frame].size.height;
 		
+        NSArray* markers = [attributes objectForKey:ORAxisMarkers];
+        for(id markerNumber in markers){
+            [self drawMarker:[markerNumber floatValue]+startTime axisPosition:0];
+        }
+        if(markerBeingDragged){
+            [self drawMarker:[markerBeingDragged floatValue]+startTime axisPosition:0];
+        }
+
+        
         [theAxis moveToPoint:NSMakePoint(lowOffset-2,y)];						// draw axis line
         [theAxis lineToPoint:NSMakePoint(highOffset+1,y)];
         --y;
@@ -223,10 +232,11 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
                 if (val < lim) break;
             }
         }
-        
-	} else {
+	}
+    else {
         // Do nothing, should not be Y axis.
     }
+
     [[self color] set];
     [theAxis setLineWidth:1];
     [theAxis stroke];
@@ -234,5 +244,13 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
     [theAxisColoredTicks stroke];
 }
 
+- (NSString*) markerLabel:(NSNumber*)markerNumber
+{
+    NSString* theDateFormat = [self dateFormat];
+    if(!theDateFormat)theDateFormat = @"M/d/yy H:m:s";
+    float markerValue = [markerNumber floatValue];
+    NSDate *aDate = [NSDate dateWithTimeIntervalSince1970:markerValue+startTime];
+    return [aDate descriptionFromTemplate:theDateFormat];
+}
 
 @end
