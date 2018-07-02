@@ -46,11 +46,11 @@ NSString* ORHWWizardLock					= @"ORHWWizardLock";
 - (void) _executeController:(id)actionController container:(id)container;
 - (void) _restoreAll;
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 #endif
 @end
 
@@ -1753,14 +1753,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         [self performSelector:@selector(_delayedRestoreAllFileRequest) withObject:nil afterDelay:.1];
     }    
 }
      
-- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         [self setUseMark:NO];
@@ -1768,7 +1768,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
     }    
 }
-- (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         [self setUseMark:YES];
@@ -1778,7 +1778,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     }    
 }
 
-- (void)_clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         [hwUndoManager clearMarks];
@@ -1786,7 +1786,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     }    
 }
 
-- (void)_clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
         [self clearUndoStacks];
