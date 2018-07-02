@@ -168,7 +168,7 @@
 - (IBAction) copy:(id)sender
 {
 	if([[self window] firstResponder] == headerView){
-		[self copyHeader:[headerView selectedItem] toPasteBoard:[NSPasteboard generalPasteboard]];
+		[self copyHeader:(ORHeaderItem*)[headerView selectedItem] toPasteBoard:[NSPasteboard generalPasteboard]];
 	}
 }
 

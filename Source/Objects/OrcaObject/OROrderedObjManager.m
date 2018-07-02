@@ -22,12 +22,12 @@
 
 @implementation OROrderedObjManager
 
-+ (id) for:(id<OROrderedObjHolding>)aContainerObj
++ (id) for:(id)aContainerObj
 {
 	return [[[OROrderedObjManager alloc] initForContainer:aContainerObj] autorelease];
 }
 
-- (id) initForContainer:(id<OROrderedObjHolding>)aContainerObj
+- (id) initForContainer:(id)aContainerObj
 {
 	self = [super init];
 	containerObj = aContainerObj;

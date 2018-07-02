@@ -313,10 +313,12 @@
 
 - (void) plotOrderDidChange:(ORPlotView*)aPlotView
 {
-	id topRoi = [[aPlotView topPlot] roi];
-	[roiController setModel:topRoi];
-	[fitController setModel:[topRoi fit]];
-	[fftController setModel:[topRoi fft]];
+    if([[aPlotView topPlot] isKindOfClass:NSClassFromString(@"ORPlotWithROI")]){
+        id topRoi = [[(ORPlotWithROI*)aPlotView topPlot] roi];
+        [roiController setModel:topRoi];
+        [fitController setModel:[topRoi fit]];
+        [fftController setModel:[topRoi fft]];
+    }
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)tableView

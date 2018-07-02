@@ -483,7 +483,7 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 
 - (IBAction) doubleClick:(id)sender
 {
-    [[outlineView selectedItem] doDoubleClick:sender];
+    [(OrcaObject*)[outlineView selectedItem] doDoubleClick:sender];
 }
 
 - (void) outlineView:(NSOutlineView*)tv didClickTableColumn:(NSTableColumn *)tableColumn

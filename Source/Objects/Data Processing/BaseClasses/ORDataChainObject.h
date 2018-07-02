@@ -29,6 +29,10 @@
 - (void) setRunMode:(int)aMode;
 - (void) runIsStopping:(NSDictionary*)userInfo;
 - (BOOL) runModals;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
+- (void) subRunTaskStarted:(NSDictionary*)userInfo;
 @end
 
 @interface ORDataChainObjectWithGroup : ORGroup {

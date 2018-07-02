@@ -49,6 +49,7 @@
 - (void) sendSelectedObjectsToBack;
 
 #pragma mark ¥¥¥Group Methods
+- (BOOL)   useAltView;
 - (BOOL)    changesAllowed;
 - (void)    removeSelectedObjects;
 - (void)    drawContents:(NSRect)aRect;

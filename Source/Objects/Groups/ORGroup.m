@@ -101,7 +101,10 @@ NSString* ORGroupDragBoardItem  = @"ORGroupDragBoardItem";
     return collection;
 }
 
-
+- (BOOL) useAltView
+{
+    return NO;
+}
 #pragma mark ¥¥¥Archival
 static NSString *ORGroupObjects 			= @"ORGroupObjects";
 

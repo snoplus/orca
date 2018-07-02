@@ -44,7 +44,10 @@
     if([super prepareForDragOperation:sender]){
         NSPoint aPoint     = [sender draggedImageLocation];
         NSPoint localPoint = [self convertPoint:aPoint fromView:nil];
-        return [[OROrderedObjManager for:group] dropPositionOK:localPoint];
+        if([group conformsToProtocol:@protocol(OROrderedObjHolding)]){
+            return [[OROrderedObjManager for:group] dropPositionOK:localPoint];
+        }
+            else return NO;
     }
     else return NO;
 }

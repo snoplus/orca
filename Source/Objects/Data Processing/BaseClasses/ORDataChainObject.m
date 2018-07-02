@@ -49,6 +49,10 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 - (void) runIsStopping:(NSDictionary*)userInfo     { }
 - (void) endOfRunCleanup:(NSDictionary*)userInfo   { }
 - (void) setRunMode:(int)aMode          { }
+- (void) runTaskStarted:(NSDictionary*)userInfo     { }
+- (void) runTaskStopped:(NSDictionary*)userInfo     { }
+- (void) closeOutRun:(NSDictionary*)userInfo     { }
+- (void) subRunTaskStarted:(NSDictionary*)userInfo     { }
 
 - (BOOL) runModals
 {

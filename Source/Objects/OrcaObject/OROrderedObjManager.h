@@ -21,11 +21,11 @@
 #import "OROrderedObjHolding.h"
 
 @interface OROrderedObjManager : NSObject {
-	id<OROrderedObjHolding> containerObj;
+	id containerObj;
 }
-+ (id) for:(id<OROrderedObjHolding>)aContainerObj;
++ (id) for:(id)aContainerObj;
 
-- (id) initForContainer:(id<OROrderedObjHolding>)aContainerObj;
+- (id) initForContainer:(id)aContainerObj;
 - (NSPoint) suggestLocationFor:(id)anObj;
 - (BOOL) dropPositionOK:(NSPoint)aPoint;
 - (void) moveObject:(id)obj to:(NSPoint)aPoint;
