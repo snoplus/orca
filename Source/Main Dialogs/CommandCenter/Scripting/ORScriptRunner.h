@@ -84,7 +84,7 @@
 - (void) setFinishCallBack:(id)aTarget selector:(SEL)aSelector;
 - (void) togglePause;
 - (void) singleStep;
-- (unsigned) symbolTableCount;
+- (NSUInteger) symbolTableCount;
 - (id) symbolNameForIndex:(int)i;
 - (id) symbolValueForIndex:(int)i;
 - (long) lastLine;

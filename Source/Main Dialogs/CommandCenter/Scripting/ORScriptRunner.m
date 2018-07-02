@@ -207,7 +207,7 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 	finishSelector  = aSelector;
 }
 
- - (unsigned) symbolTableCount
+ - (NSUInteger) symbolTableCount
 {
 	return [eval symbolTableCount];
 }
