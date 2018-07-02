@@ -35,7 +35,7 @@
 #import "ORCompositePlotView.h"
 
 @interface ORMultiPlotController (private)
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) setUpPlots;
 @end
 
@@ -232,7 +232,7 @@
 
 @implementation ORMultiPlotController (private)
 
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;
