@@ -44,8 +44,8 @@
 @interface NSMutableArray (OrcaExtensions)
 - (void) insertObjectsFromArray:(NSArray *)array atIndex:(int)index;
 - (NSMutableArray*) children;
-- (unsigned) numberOfChildren;
-- (void) moveObject:(id)anObj toIndex:(unsigned)newIndex;
+- (NSUInteger) numberOfChildren;
+- (void) moveObject:(id)anObj toIndex:(NSUInteger)newIndex;
 - (void)shuffle;
 
 //implements stack behavior

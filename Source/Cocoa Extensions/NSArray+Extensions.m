@@ -225,7 +225,7 @@ static NSUInteger random_below(NSUInteger n) {
 	return self;
 }
 
-- (void) moveObject:(id)anObj toIndex:(unsigned)newIndex
+- (void) moveObject:(id)anObj toIndex:(NSUInteger)newIndex
 {
 	if(newIndex>[self count])newIndex = [self count];
     if([self containsObject:anObj]){
@@ -246,7 +246,7 @@ static NSUInteger random_below(NSUInteger n) {
         [self exchangeObjectAtIndex:i-1 withObjectAtIndex:j];
     }
 }
-- (unsigned) numberOfChildren
+- (NSUInteger) numberOfChildren
 {
     return [self count];
 }
