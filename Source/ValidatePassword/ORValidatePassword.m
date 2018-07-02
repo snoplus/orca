@@ -23,7 +23,7 @@
 #import "ORValidatePassword.h"
 
 @interface ORValidatePassword (private)
-- (void) _panelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _panelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) _shakeIt;
 @end
 
@@ -67,7 +67,7 @@
 @end
 
 @implementation ORValidatePassword (private)
-- (void) _panelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _panelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     int returnValue = kPasswordCancelled;
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
