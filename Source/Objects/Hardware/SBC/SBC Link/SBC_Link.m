@@ -347,18 +347,18 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 }
 
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
-- (unsigned) ipNumberIndex
+- (NSUInteger) ipNumberIndex
 {
 	return ipNumberIndex;
 }
@@ -1923,7 +1923,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     updateCount=0;
 	if([[self orcaObjects] count]){
@@ -1950,7 +1950,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     [self update];
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//this stuff is socket based, so no need to try to ask for data too often. A larger throttleCount
 	//will result in larger sized buffers from the SBC.
@@ -1972,7 +1972,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 	}
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	@try {
 		[self tellClientToStopRun];
@@ -2015,7 +2015,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
     }
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
     [self performSelector:@selector(getRunInfoBlock) withObject:self afterDelay:1];
     [self waitForPingTask]; //SV
@@ -2289,7 +2289,7 @@ static void AddSBCPacketWrapperToCache(SBCPacketWrapper *sbc)
 }
 
 
-- (NSPoint) cbPoint:(unsigned)i
+- (NSPoint) cbPoint:(NSUInteger)i
 {
     if(i<cbTestCount)return cbPoints[i];
     else return NSZeroPoint;

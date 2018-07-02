@@ -169,7 +169,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setSbcPollingRate:(unsigned long)aValue;
 - (long) sbcCodeVersion;
 - (void) setSbcCodeVersion:(long)aVersion;
-- (unsigned) ipNumberIndex;
+- (NSUInteger) ipNumberIndex;
 - (int) slot;
 - (NSUndoManager*) undoManager;
 - (void) setErrorTimeOut:(int)aValue;
@@ -231,8 +231,8 @@ typedef enum eSBC_ThrottleConsts{
 - (void) setPayloadSize:(long)aValue;
 - (ORSBCLinkJobStatus*) jobStatus;
 - (void) setJobStatus:(ORSBCLinkJobStatus*)theJobStatus;
-- (unsigned) connectionHistoryCount;
-- (id) connectionHistoryItem:(unsigned)index;
+- (NSUInteger) connectionHistoryCount;
+- (id) connectionHistoryItem:(NSUInteger)index;
 - (BOOL) pingInProgress;
 - (BOOL) pingedSuccessfully;
 - (unsigned long) totalErrorCount;
@@ -338,12 +338,12 @@ typedef enum eSBC_ThrottleConsts{
 - (void) send:(SBC_Packet*)aSendPacket receive:(SBC_Packet*)aReceivePacket;
 
 - (void) update;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (BOOL) doneTakingData;
 - (void) waitForPingTask; //SV
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) load_HW_Config:(SBC_crate_config*)aConfig;
 - (unsigned long) throttle;
 - (BOOL) disableThrottle;
@@ -360,7 +360,7 @@ typedef enum eSBC_ThrottleConsts{
 - (void) startCBTransferTest;
 - (BOOL) cbTestRunning;
 - (int) cbTestCount;
-- (NSPoint) cbPoint:(unsigned)i;
+- (NSPoint) cbPoint:(NSUInteger)i;
 - (double) cbTestProgress;
 - (long) totalRecordsChecked;
 - (long) totalErrors;

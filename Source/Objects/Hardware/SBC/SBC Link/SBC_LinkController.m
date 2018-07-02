@@ -34,11 +34,11 @@
 
 @interface SBC_LinkController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 #endif
-- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation SBC_LinkController
@@ -1265,7 +1265,7 @@
 
 @implementation SBC_LinkController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
 		[[model sbcLink] killCrate];
@@ -1273,7 +1273,7 @@
 }
 #endif
 
-- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
@@ -1284,7 +1284,7 @@
 	}
 }
 
-- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
@@ -1297,7 +1297,7 @@
 
 
     
-- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
