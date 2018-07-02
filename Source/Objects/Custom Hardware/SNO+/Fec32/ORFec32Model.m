@@ -1842,7 +1842,7 @@ static int              sChannelsNotChangedCount = 0;
     }
 }
 
-- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if (returnCode == NSAlertDefaultReturn) {
         sDetectorDbState = 0;

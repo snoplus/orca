@@ -345,7 +345,7 @@ typedef struct Fec32CmosShiftReg{
 - (void) hwWizardActionFinal:(NSNotification*)aNote;
 - (void) hwWizardWaitingForDatabase;
 - (void) _detDbCallback:(ORPQDetectorDB*)data;
-- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _continueHWWizard:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) _continueHWWizard;
 
 #pragma mark Converted Data Methods
