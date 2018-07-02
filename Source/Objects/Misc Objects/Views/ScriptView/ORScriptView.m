@@ -915,7 +915,7 @@
 	}
 }
 
-- (BOOL) breakPointAtLine:(unsigned)aLineNumber
+- (BOOL) breakPointAtLine:(NSUInteger)aLineNumber
 {
 	NSScrollView* scrollView = [self enclosingScrollView];
 	id theRuler = [scrollView verticalRulerView];

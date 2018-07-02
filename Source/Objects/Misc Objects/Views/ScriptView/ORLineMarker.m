@@ -14,12 +14,12 @@
 	return self;
 }
 
-- (void) setLineNumber:(unsigned)line
+- (void) setLineNumber:(NSUInteger)line
 {
 	lineNumber = line;
 }
 
-- (unsigned) lineNumber
+- (NSUInteger) lineNumber
 {
 	return lineNumber;
 }

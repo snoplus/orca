@@ -75,6 +75,6 @@
 - (void) colorCommentsFrom: (NSString*) startCh to: (NSString*) endCh inString: (NSMutableAttributedString*)s withColor: (NSColor*) col andMode:(NSString*)attr;
 - (void) colorIdentifier: (NSString*) ident inString: (NSMutableAttributedString*)s withColor: (NSColor*) col andMode:(NSString*)attr charset: (NSCharacterSet*)cset;
 - (void) colorStringsFrom: (NSString*) startCh to: (NSString*) endCh inString: (NSMutableAttributedString*)s withColor: (NSColor*) col andMode:(NSString*)attr;
-- (BOOL) breakPointAtLine:(unsigned)aLineNumber;
+- (BOOL) breakPointAtLine:(NSUInteger)aLineNumber;
 @end
 

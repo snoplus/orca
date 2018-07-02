@@ -7,7 +7,7 @@
 }
 
 - (id) initWithRulerView:(NSRulerView *)aRulerView lineNumber:(float)line image:(NSImage *)anImage imageOrigin:(NSPoint)imageOrigin;
-- (void) setLineNumber:(unsigned)line;
-- (unsigned) lineNumber;
+- (void) setLineNumber:(NSUInteger)line;
+- (NSUInteger) lineNumber;
 
 @end
