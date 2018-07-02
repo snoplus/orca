@@ -341,7 +341,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     if(inNetSocket == socket){
         NSString* theString = [[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding];
