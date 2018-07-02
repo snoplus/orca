@@ -31,7 +31,7 @@
 #import "OR1DHistoPlot.h"
 
 @interface OR1DHistoController (private)
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation OR1DHistoController
@@ -160,7 +160,7 @@
 
 @implementation OR1DHistoController (private)
 
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;
