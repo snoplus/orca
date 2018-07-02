@@ -25,9 +25,9 @@
 - (BOOL) involvedInCurrentRun;
 - (void) setInvolvedInCurrentRun:(BOOL)state;
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray;
-- (void) endOfRunCleanup:(id)userInfo;
+- (void) endOfRunCleanup:(NSDictionary*)userInfo;
 - (void) setRunMode:(int)aMode;
-- (void) runIsStopping:(id)userInfo;
+- (void) runIsStopping:(NSDictionary*)userInfo;
 - (BOOL) runModals;
 @end
 
@@ -37,9 +37,9 @@
 - (BOOL) involvedInCurrentRun;
 - (void) setInvolvedInCurrentRun:(BOOL)state;
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray;
-- (void) endOfRunCleanup:(id)userInfo;
+- (void) endOfRunCleanup:(NSDictionary*)userInfo;
 - (void) setRunMode:(int)aMode;
-- (void) runIsStopping:(id)userInfo;
+- (void) runIsStopping:(NSDictionary*)userInfo;
 - (BOOL) runModals;
 @end
 

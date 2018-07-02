@@ -46,8 +46,8 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 	}
 }
 
-- (void) runIsStopping:(id)userInfo     { }
-- (void) endOfRunCleanup:(id)userInfo   { }
+- (void) runIsStopping:(NSDictionary*)userInfo     { }
+- (void) endOfRunCleanup:(NSDictionary*)userInfo   { }
 - (void) setRunMode:(int)aMode          { }
 
 - (BOOL) runModals
@@ -83,8 +83,8 @@ NSString* ORDataChainObjectInvolvedInCurrentRun = @"ORDataChainObjectInvolvedInC
 	}
 }
 
-- (void) runIsStopping:(id)userInfo     { }
-- (void) endOfRunCleanup:(id)userInfo   { }
+- (void) runIsStopping:(NSDictionary*)userInfo     { }
+- (void) endOfRunCleanup:(NSDictionary*)userInfo   { }
 - (void) setRunMode:(int)aMode          { }
 
 - (BOOL) runModals
