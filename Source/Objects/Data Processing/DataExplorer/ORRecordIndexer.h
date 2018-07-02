@@ -46,8 +46,8 @@
 - (BOOL) cancelAndStop;
 - (void) setFileToReplay:(NSString*)newFileToReplay;
 - (void) setDataRecords: (NSArray *) aDataRecords;
-- (void) setTotalLength:(unsigned)aLength;
-- (void) setLengthDecoded:(unsigned)aLength;
+- (void) setTotalLength:(NSUInteger)aLength;
+- (void) setLengthDecoded:(NSUInteger)aLength;
 - (void) setHeader:(id)aHeader;
 - (void) checkStatus;
 
