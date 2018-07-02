@@ -30,10 +30,10 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORHVRampController (private)
-- (void) _startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 #endif
 
@@ -873,7 +873,7 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORHVRampController (private)
-- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
         [model setStates:kHVRampPanic onlyControlled:YES];
@@ -882,7 +882,7 @@
     }
 	
 }
-- (void)_startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_startRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
 		[model resolveActualVsSetValueProblem];
@@ -894,7 +894,7 @@
 	
 }
 
-- (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
         [model setStates:kHVRampPanic onlyControlled:NO];
@@ -902,7 +902,7 @@
 		[self updateButtons];
     }
 }
-- (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model forceDacToAdc];
