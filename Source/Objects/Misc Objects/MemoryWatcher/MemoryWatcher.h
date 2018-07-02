@@ -53,7 +53,7 @@
 - (NSTimeInterval) taskInterval;
 - (void) setTaskInterval:(NSTimeInterval)aTaskInterval;
 - (float) convertValue:(float)aValue withMultiplier:(NSString*)aMultiplier;
-- (unsigned) timeRateCount:(int)rateIndex;
+- (NSUInteger) timeRateCount:(int)rateIndex;
 - (float) timeRate:(int)rateIndex value:(int)valueIndex;
 - (void) setUpQueue;
 

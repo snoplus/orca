@@ -122,7 +122,7 @@ enum {
      object:self];
 }
 
-- (unsigned) timeRateCount:(int)rateIndex
+- (NSUInteger) timeRateCount:(int)rateIndex
 {
     if(rateIndex<kNumWatchedValues)return [timeRate[rateIndex] count];
     else return 0;
