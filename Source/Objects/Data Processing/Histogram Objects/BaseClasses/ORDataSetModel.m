@@ -257,7 +257,7 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 	}
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //by default there is no data description. subclasses can override
 }
@@ -269,12 +269,12 @@ NSString* ORDataSetCalibrationChanged		= @"ORDataSetCalibrationChanged";
 
 
 #pragma mark ¥¥¥Data Source Methods
-- (unsigned)  numberOfChildren
+- (NSUInteger)  numberOfChildren
 {
 	return 0;
 }
 
-- (id)   childAtIndex:(int)index
+- (id)   childAtIndex:(NSUInteger)index
 {
 	return nil;
 }
@@ -328,7 +328,7 @@ static NSString *ORDataSetModelFullName         = @"ORDataSetModelFullName";
     [encoder encodeObject:dataSet forKey:@"dataSet"];
 }
 
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo keys:(NSMutableArray*)aKeyArray
 {
     //default is no data... subclasses can override
 }

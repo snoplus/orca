@@ -54,8 +54,8 @@
 - (void) postUpdateOnMainThread;
 - (void) scheduleUpdateOnMainThread;
 - (void) postUpdate;
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo keys:(NSMutableArray*)aKeyArray;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (BOOL) canJoinMultiPlot;
 - (void) runTaskStopped;
 - (void) runTaskBoundary;
@@ -68,8 +68,8 @@
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
 #pragma mark ¥¥¥Data Source Methods
-- (unsigned)  numberOfChildren;
-- (id)   childAtIndex:(int)index;
+- (NSUInteger)  numberOfChildren;
+- (id)   childAtIndex:(NSUInteger)index;
 - (NSString*)   name;
 
 @end
