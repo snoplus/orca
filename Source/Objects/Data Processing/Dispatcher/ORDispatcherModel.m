@@ -407,7 +407,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 {
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
-        for(id d in dataArray){
+        for(NSData* d in dataArray){
             for(ORDispatcherClient* aClient in clients){
                 if(ignoreBlock || [aClient socketStatus] != kNetSocketBlocked){
                     [aClient writeData:d];
@@ -419,7 +419,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	}    
 }
 
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {	
 	runInProgress = YES;
     ignoreBlock = NO;
@@ -429,23 +429,23 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	[clients makeObjectsPerformSelector:@selector(clearCounts)];
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
 	//store the new current header
 	[currentHeader release];
 	currentHeader = [[userInfo objectForKey:kHeader] retain];
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
 	runInProgress = NO;
 }
 
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 	[currentHeader release];
 	currentHeader = nil;
