@@ -27,7 +27,7 @@ NSString*   ORSecurityNumberLockPagesChanged = @"ORSecurityNumberLockPagesChange
 ORSecurity* gSecurity = nil;
 
 @interface ORSecurity (private)
-- (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) _formSuperUnlockMask;
 @end
 
@@ -172,7 +172,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Security);
         superUnlockMask |= aMask;
     }
 }
-- (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _validatePWDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     //set the lock according to the result.
     NSString* lockName = [userInfo objectForKey:@"LockName"];
