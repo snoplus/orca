@@ -351,7 +351,7 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 
 #pragma mark •••Run Management
 //mostly just pass-thrus for the run control commands.
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {	
 	if(!ignoreValues){
 		NSMutableDictionary* runNotes = [NSMutableDictionary dictionary];
@@ -370,11 +370,11 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
     [nextObject runTaskStarted:userInfo];
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo { [nextObject takeData:aDataPacket userInfo:userInfo]; }
-- (void) runIsStopping:(id)userInfo		{ [nextObject runIsStopping:userInfo];  }
-- (void) runTaskStopped:(id)userInfo	{ [nextObject runTaskStopped:userInfo]; }
-- (void) preCloseOut:(id)userInfo		{ [nextObject preCloseOut:userInfo];    }
-- (void) closeOutRun:(id)userInfo		{ [nextObject closeOutRun:userInfo];    }
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo { [nextObject takeData:aDataPacket userInfo:userInfo]; }
+- (void) runIsStopping:(NSDictionary*)userInfo		{ [nextObject runIsStopping:userInfo];  }
+- (void) runTaskStopped:(NSDictionary*)userInfo	{ [nextObject runTaskStopped:userInfo]; }
+- (void) preCloseOut:(NSDictionary*)userInfo		{ [nextObject preCloseOut:userInfo];    }
+- (void) closeOutRun:(NSDictionary*)userInfo		{ [nextObject closeOutRun:userInfo];    }
 - (BOOL) doneTakingData					{ return [nextObject doneTakingData];   }
 - (void) setRunMode:(int)runMode		{ [[self objectConnectedTo: ORRunNotesDataOut] setRunMode:runMode]; }
 

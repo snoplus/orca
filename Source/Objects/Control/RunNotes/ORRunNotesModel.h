@@ -64,11 +64,11 @@
 - (BOOL) readNamesFromFile;
 
 #pragma mark •••Run Management
-- (void) runTaskStarted:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 - (void) setRunMode:(int)runMode;
 
 #pragma mark •••Save/Restore
