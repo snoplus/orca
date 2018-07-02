@@ -99,12 +99,12 @@
 	return operands;
 }
 
-- (unsigned) count
+- (NSUInteger) count
 {
 	return [operands count];
 }
 
-- (id) objectAtIndex:(unsigned)index
+- (id) objectAtIndex:(NSUInteger)index
 {
 	if(index<[operands count]) return [operands objectAtIndex:index];
 	else return nil;

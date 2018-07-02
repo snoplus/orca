@@ -47,8 +47,8 @@
 - (int)				operatorTag;
 - (void)			setOperatorTag:(int)anOperator;
 - (NSMutableArray*) operands;
-- (unsigned)		count;
-- (id)				objectAtIndex:(unsigned)index;
+- (NSUInteger)		count;
+- (id)				objectAtIndex:(NSUInteger)index;
 - (void)			setOperands:(NSMutableArray*)anArray;
 - (void)			addOperand:(id)anOperand;
 @end
