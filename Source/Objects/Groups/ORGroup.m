@@ -70,11 +70,11 @@ NSString* ORGroupDragBoardItem  = @"ORGroupDragBoardItem";
     return orcaObjects;
 }
 
-- (unsigned int) count
+- (NSUInteger) count
 {
     return [orcaObjects count];
 }
-- (id) objectAtIndex:(unsigned) index
+- (id) objectAtIndex:(NSUInteger) index
 {
     if(index<[orcaObjects count]){
         return [orcaObjects objectAtIndex:index];

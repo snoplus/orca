@@ -33,11 +33,11 @@
 #pragma mark ¥¥¥Assessors
 - (void) setOrcaObjects:(NSMutableArray*)anArray;
 - (NSMutableArray*) orcaObjects;
-- (unsigned int) count;
+- (NSUInteger) count;
 - ( NSMutableArray*)children;
 - (NSMutableArray*) familyList;
 - (NSEnumerator*) objectEnumerator;
-- (id) objectAtIndex:(unsigned) index;
+- (id) objectAtIndex:(NSUInteger) index;
 
 #pragma mark ¥¥¥Undoable Actions
 - (void) addObject:(id)anObject;
