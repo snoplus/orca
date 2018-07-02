@@ -411,12 +411,12 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 #pragma mark ¥¥¥Run Management
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [dataSet appendDataDescription:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
 
 	processedFinalCall = NO;
@@ -431,7 +431,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	else {
 		id header = [userInfo objectForKey:kHeader];
 		NSArray* dataChainObjects = [header objectForNestedKey:@"ObjectInfo,DataChain"];
-		NSDictionary* runControlEntry = [[dataChainObjects objectAtIndex:0] objectForKey:@"Run Control"];
+		NSDictionary* runControlEntry = [(NSDictionary*)[dataChainObjects objectAtIndex:0] objectForKey:@"Run Control"];
 		runNumber = [[runControlEntry objectForKey:@"RunNumber"] longValue];
 	}	  
 	[dataSet setRunNumber:runNumber];
@@ -446,12 +446,12 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
 	//we don't care
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
   	id nextObject =  [self objectConnectedTo: ORHistoPassThruConnection];
 	[nextObject runTaskStopped:userInfo];
@@ -459,7 +459,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 	[dataSet runTaskStopped];
 }
 
-- (void) endOfRunCleanup:(id)userInfo
+- (void) endOfRunCleanup:(NSDictionary*)userInfo
 {
  	if(shipFinalHistograms){
 		ORDataPacket* aDataPacket = [userInfo objectForKey:kDataPacket];
@@ -472,11 +472,11 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
    [dataSet runTaskBoundary];
 }
 
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 
 	[[NSNotificationCenter defaultCenter]
@@ -513,34 +513,34 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 }
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(ORDataSet*)item
 {
     return (item == nil) ? 1  : [item numberOfChildren];
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(ORDataSet*)item
 {
     return    (item == nil) ? [self numberOfChildren]!=0 : ([item numberOfChildren] != 0);
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(ORDataSet*)item
 {
     if(item)   return [item childAtIndex:index];
     else	return dataSet;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(ORDataSet*)item
 {
     return  ((item == nil) ? @"System" : [item name]);
 }
 
-- (unsigned)  numberOfChildren
+- (NSUInteger)  numberOfChildren
 {
     int count =  [dataSet count];
     return count;
 }
 
-- (id)   childAtIndex:(int)index
+- (id)   childAtIndex:(NSUInteger)index
 {
     id child = nil;
     [mLock lock];

@@ -75,20 +75,20 @@
 - (NSArray*) collectObjectsRespondingTo:(SEL)aSelector;
 - (ORDataSet*) dataSetWithName:(NSString*)aName;
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStarted:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 - (void) runTaskBoundary;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 
-- (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
-- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
-- (unsigned)  numberOfChildren;
-- (id)   childAtIndex:(int)index;
+- (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(ORDataSet*)item;
+- (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(ORDataSet*)item;
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(ORDataSet*)item;
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(ORDataSet*)item;
+- (NSUInteger)  numberOfChildren;
+- (id)   childAtIndex:(NSUInteger)index;
 - (id)   name;
 - (void) removeDataSet:(ORDataSet*)aSet;
 - (BOOL) leafNode;
