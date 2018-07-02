@@ -354,12 +354,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	[eMailList addObject:@"eMail Address"];
 }
 
-- (void) removeEMail:(unsigned) anIndex
+- (void) removeEMail:(NSUInteger) anIndex
 {
 	[eMailList removeObjectAtIndex:anIndex];
 }
 
-- (NSString*) addressAtIndex:(unsigned)anIndex
+- (NSString*) addressAtIndex:(NSUInteger)anIndex
 {
 	if(anIndex<[eMailList count])return [eMailList objectAtIndex:anIndex];
 	else return nil;
@@ -1008,7 +1008,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [self setDataId:[anotherAmi286 dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

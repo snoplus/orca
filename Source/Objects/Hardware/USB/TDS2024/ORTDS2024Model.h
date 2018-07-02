@@ -76,7 +76,7 @@
 - (void) readDataInfo;
 - (int) numPoints:(int)index;
 - (long) dataSet:(int)index valueAtChannel:(int)x;
-- (void) curvesThreadFinished:(id)userInfo;
+- (void) curvesThreadFinished:(NSDictionary*)userInfo;
 
 #pragma mark ***Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

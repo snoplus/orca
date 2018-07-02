@@ -37,7 +37,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 @interface ORTDS2024Model (private)
 - (long) writeReadFromDevice: (NSString*) aCommand data: (char*) aData
                    maxLength: (long) aMaxLength;
-- (id) threadToGetCurves:(id)userInfo thread:tw;
+- (id) threadToGetCurves:(NSDictionary*)userInfo thread:tw;
 @end
 
 @implementation ORTDS2024Model
@@ -426,7 +426,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     }
 }
 
-- (void) curvesThreadFinished:(id)userInfo
+- (void) curvesThreadFinished:(NSDictionary*)userInfo
 {
 
     [curvesThread release];
@@ -548,7 +548,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 @implementation ORTDS2024Model (private)
 
-- (id) threadToGetCurves:(id)userInfo thread:tw
+- (id) threadToGetCurves:(NSDictionary*)userInfo thread:tw
 
 {
     int chan;

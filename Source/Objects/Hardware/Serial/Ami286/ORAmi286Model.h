@@ -87,8 +87,8 @@
 - (BOOL) sendOnValveChange;
 - (void) setSendOnValveChange:(BOOL)aSendOnValveChange;
 - (void) addEMail;
-- (void) removeEMail:(unsigned) anIndex;
-- (NSString*) addressAtIndex:(unsigned)anIndex;
+- (void) removeEMail:(NSUInteger) anIndex;
+- (NSString*) addressAtIndex:(NSUInteger)anIndex;
 - (BOOL) emailEnabled;
 - (void) setEmailEnabled:(BOOL)aEmailEnabled;
 - (NSMutableArray*) eMailList;
@@ -135,7 +135,7 @@
 - (NSString*) fillStateName:(int)i;
 
 #pragma mark •••Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;

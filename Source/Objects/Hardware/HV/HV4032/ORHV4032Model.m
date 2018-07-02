@@ -632,7 +632,7 @@ static NSString *ORHVPollingState 	= @"ORHVPollingState";
     return objDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
     

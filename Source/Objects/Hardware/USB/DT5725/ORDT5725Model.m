@@ -1825,7 +1825,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
@@ -1856,7 +1856,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
     [NSThread detachNewThreadSelector:@selector(dataWorker:) toTarget:self withObject:nil];
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(firstTime){
         firstTime = NO;
@@ -1870,7 +1870,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
     }
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //stop data pulling thread
     [self writeAcquisitionControl:NO];
@@ -1883,7 +1883,7 @@ static NSString* DT5725StartStopRunModeString[4] = {
     circularBuffer = nil;
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [waveFormRateGroup stop];
     short i;

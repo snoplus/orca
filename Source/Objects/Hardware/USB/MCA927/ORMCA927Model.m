@@ -1213,7 +1213,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
     
     return dataDictionary;
 }
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
@@ -1234,12 +1234,12 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	}
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
  //nothing to do....
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	@try {
 		mainRunIsStopping = YES;
@@ -1260,7 +1260,7 @@ static MCA927Registers reg[kNumberMCA927Registers] = {
 	@catch(NSException* localException){
 	}
 }
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//nothing to do....
 }

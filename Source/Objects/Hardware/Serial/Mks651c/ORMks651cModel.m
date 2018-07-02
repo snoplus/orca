@@ -1252,7 +1252,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
     [self setDataId:[anotherMks651c dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
