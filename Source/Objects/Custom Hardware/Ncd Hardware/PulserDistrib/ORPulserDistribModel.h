@@ -49,7 +49,7 @@
 
 #pragma mark ¥¥¥Data Record
 - (NSDictionary*) dataRecordDescription;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) setDataIds:(id)assigner;
