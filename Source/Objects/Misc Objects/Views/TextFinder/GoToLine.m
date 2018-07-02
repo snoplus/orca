@@ -23,7 +23,7 @@
 #import "SynthesizeSingleton.h"
 
 @interface NSString (NSStringTextFinding)
-- (NSRange)findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(unsigned)mask wrap:(BOOL)wrapFlag;
+- (NSRange)findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(NSUInteger)mask wrap:(BOOL)wrapFlag;
 @end
 
 @implementation GoToLine
@@ -115,7 +115,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 }
 
 
--(void)showLine:(unsigned)lineNumber
+-(void)showLine:(NSUInteger)lineNumber
 {
 	unsigned indexLine = 0;
 	unsigned charIndex = 0;
@@ -135,7 +135,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(GoToLine);
 }
 
 
--(BOOL)showCharacter:(unsigned)charIndex granularity:(NSSelectionGranularity)granularity
+-(BOOL)showCharacter:(NSUInteger)charIndex granularity:(NSSelectionGranularity)granularity
 	// show line in document text view
 	// Granularity is one of NSSelectByCharacter, NSSelectByWord, NSSelectByParagraph, or -1(select by line)
 {

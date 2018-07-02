@@ -26,7 +26,7 @@
 
 @interface NSString (NSStringTextFinding)
 
-- (NSRange)findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(unsigned)mask wrap:(BOOL)wrapFlag;
+- (NSRange)findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(NSUInteger)mask wrap:(BOOL)wrapFlag;
 
 @end
 
@@ -344,7 +344,7 @@ Turns out this approach of building the new string and inserting it at the appro
 
 @implementation NSString (NSStringTextFinding)
 
-- (NSRange) findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(unsigned)options wrap:(BOOL)wrap {
+- (NSRange) findString:(NSString *)string selectedRange:(NSRange)selectedRange options:(NSUInteger)options wrap:(BOOL)wrap {
     BOOL forwards = (options & NSBackwardsSearch) == 0;
     unsigned length = [self length];
     NSRange searchRange, range;

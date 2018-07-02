@@ -34,8 +34,8 @@
 - (IBAction) orderFrontGoToPanel:(id)sender;
 - (IBAction) jumpButtonClicked:(id)sender;
 
-- (void) showLine:(unsigned)lineNumber;
-- (BOOL) showCharacter:(unsigned)charIndex granularity:(NSSelectionGranularity)granularity;
+- (void) showLine:(NSUInteger)lineNumber;
+- (BOOL) showCharacter:(NSUInteger)charIndex granularity:(NSSelectionGranularity)granularity;
 
 
 @end
