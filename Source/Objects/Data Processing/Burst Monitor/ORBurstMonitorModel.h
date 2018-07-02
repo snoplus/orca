@@ -143,7 +143,7 @@
 - (void) unlockArray;
 
 #pragma mark ***Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -151,16 +151,16 @@
 - (void) syncDataIdsWith:(id)anotherVXM;
 
 #pragma mark •••Run Methods
-- (void) runTaskStarted:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 - (void) setRunMode:(int)aMode;
 
 #pragma mark •••EMail
 - (void) mailSent:(NSString*)address;
-- (void) sendMail:(id)userInfo state:(int)eventState;
+- (void) sendMail:(NSDictionary*)userInfo state:(int)eventState;
 - (NSString*) cleanupAddresses:(NSArray*)aListOfAddresses;
 
 #pragma mark •••Archival

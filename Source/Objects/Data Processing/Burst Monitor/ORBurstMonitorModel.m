@@ -1008,7 +1008,7 @@ double facto(unsigned long long num)
 	return objDictionary;
 }
 
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
     burstCount          = 0;
     shaperID            = 0;
@@ -1058,12 +1058,12 @@ double facto(unsigned long long num)
     
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
 	//we don't care
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
     //stop monitoring the queues
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -1089,11 +1089,11 @@ double facto(unsigned long long num)
     [runbits release];
 
 }
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 	[thePassThruObject       closeOutRun:userInfo];
  
@@ -1154,7 +1154,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 	NSLog(@"Process Center status was sent to:\n%@\n",address);
 }
 
-- (void) sendMail:(id)userInfo state:(int)eventState;
+- (void) sendMail:(NSDictionary*)userInfo state:(int)eventState;
 {
 	NSString* address =  [userInfo objectForKey:@"Address"];
 	NSString* content = [NSString string];
@@ -1230,7 +1230,7 @@ static NSString* ORBurstMonitorMinimumEnergyAllowed  = @"ORBurstMonitor Minimum 
 - (void) setDataIds:(id)assigner            { dataId  = [assigner assignDataIds:kLongForm]; }
 - (void) syncDataIdsWith:(id)anotherVXM     { [self setDataId:[anotherVXM dataId]]; }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     // add our description to the data description
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"VXMModel"];

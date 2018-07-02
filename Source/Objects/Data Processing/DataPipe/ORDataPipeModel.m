@@ -274,7 +274,7 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
 }
 
 
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
     unsigned long runModelRunType = [runModel runType];
     validRunType = !(runModelRunType & runType);
@@ -296,12 +296,12 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
     }
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
     numberBytesSent = 0;
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
     runInProgress   = NO;
     numberBytesSent = 0;
@@ -314,8 +314,8 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
 //--------------------------------------
 //needed to obey the protocol
 - (void) runTaskBoundary{}
-- (void) runTaskStopped:(id)userInfo{}
-- (void) preCloseOut:(id)userInfo{}
+- (void) runTaskStopped:(NSDictionary*)userInfo{}
+- (void) preCloseOut:(NSDictionary*)userInfo{}
 //--------------------------------------
 
 #pragma mark •••Archival
