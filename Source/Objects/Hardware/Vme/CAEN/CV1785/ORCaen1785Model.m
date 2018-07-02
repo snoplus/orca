@@ -629,7 +629,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 {	
 }
 
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {  
 	
 	[aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:NSStringFromClass([self class])]; 
@@ -658,7 +658,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	isRunning = YES;
 	
@@ -758,7 +758,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	for (id obj in dataTakers1){
 		[obj runTaskStopped:aDataPacket userInfo:userInfo];
@@ -770,7 +770,7 @@ NSString* ORCaen1785WriteValueChanged			= @"ORCaen1785WriteValueChanged";
 	isRunning = NO;
 }
 
-- (void) readOutChildren:(NSArray*)children dataPacket:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) readOutChildren:(NSArray*)children dataPacket:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [children objectEnumerator];
     id obj;

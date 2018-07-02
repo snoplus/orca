@@ -438,7 +438,7 @@ static Caen419Registers reg[kNumRegisters] = {
 	[anEventDictionary setObject:aDictionary forKey:@"CV419"];
 }
 
-- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -460,7 +460,7 @@ static Caen419Registers reg[kNumRegisters] = {
 
 }
 
-- (void) takeData: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) takeData: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	isRunning = YES;
 	
@@ -507,7 +507,7 @@ static Caen419Registers reg[kNumRegisters] = {
 	
 }
 
-- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [adcRateGroup stop];
     controller = nil;

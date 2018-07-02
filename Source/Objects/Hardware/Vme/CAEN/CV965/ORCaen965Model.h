@@ -161,9 +161,9 @@ enum {
 - (NSDictionary*) dataRecordDescription;
 - (void) appendEventDictionary:(NSMutableDictionary*)anEventDictionary topLevel:(NSMutableDictionary*)topLevel;
 - (void) reset;
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 - (unsigned long) adcCount:(int)aChannel;
 - (void) startRates;

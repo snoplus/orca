@@ -637,7 +637,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     dataIdN = aValue;
 }
 
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
     
@@ -656,7 +656,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     [self startRates];
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 {
     
     unsigned short 	theStatus1;
@@ -755,7 +755,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[qdcRateGroup stop];
 	isRunning = NO;

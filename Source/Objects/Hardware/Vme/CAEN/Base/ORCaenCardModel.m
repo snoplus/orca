@@ -674,7 +674,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 }
 
 
-- (void) 	runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) 	runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -711,7 +711,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 //             ^ ^^^^-------------------- card
 // n bytes of raw data follow.
 //-------------------------------------------------------------------------------
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 {
     
     unsigned short 	theStatus1;
@@ -814,7 +814,7 @@ static NSString*	CAENThresholdChnl       = @"CAENThresholdChnl%d";
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [dataDecoder release];
     dataDecoder = nil;

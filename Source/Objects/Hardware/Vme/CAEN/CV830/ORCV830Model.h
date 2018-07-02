@@ -188,9 +188,9 @@ enum {
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
 - (void) reset;
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
 
 #pragma mark ***Children
 - (ORReadOutList*)	readOutGroup;

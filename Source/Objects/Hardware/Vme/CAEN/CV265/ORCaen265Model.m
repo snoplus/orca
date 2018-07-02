@@ -221,7 +221,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![[self adapter] controllerCard]){
@@ -251,7 +251,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	isRunning = YES;
     @try {
@@ -296,7 +296,7 @@ NSString* ORCaen265SettingsLock			= @"ORCaen265SettingsLock";
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	isRunning = NO;
 }

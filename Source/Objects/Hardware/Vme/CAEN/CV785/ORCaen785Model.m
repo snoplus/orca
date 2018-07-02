@@ -306,7 +306,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***DataTaker
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [super runTaskStarted:aDataPacket userInfo:userInfo];
      
@@ -319,7 +319,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 {
     
     unsigned short 	theStatus1;
@@ -408,7 +408,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }

@@ -394,14 +394,14 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 }
 
 #pragma mark ***DataTaker
-- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[self initBoard];
  	location =  (([self crateNumber]&0xf)<<21) | (([self slot]& 0x0000001f)<<16); //doesn't change so do it here.
     [super runTaskStarted:aDataPacket userInfo:userInfo];
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 {
     
     unsigned short 	theStatus1;
@@ -486,7 +486,7 @@ static RegisterNamesStruct reg[kNumRegisters] = {
 	}
 }
 
-- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [super runTaskStopped:aDataPacket userInfo:userInfo];
 }

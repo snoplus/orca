@@ -144,9 +144,9 @@ enum {
 - (BOOL)			hwReset: (short) anIndex;
 
 #pragma mark ***Data Taker
-- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
 
 #pragma mark •••Rates
 - (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag;
