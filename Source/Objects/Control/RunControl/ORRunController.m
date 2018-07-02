@@ -28,8 +28,8 @@
 
 @interface ORRunController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 
 #endif
 - (void) populatePopups;
@@ -1077,7 +1077,7 @@
 
 @implementation ORRunController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _changeRunNumberDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
@@ -1087,7 +1087,7 @@
         [runNumberText setIntValue:[model runNumber]];
     }
 }
-- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _chooseDirAlertDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         //have to do this after the alert actually closes, hence the delay to the next cycle of the event loop
