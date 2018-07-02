@@ -95,7 +95,7 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
     NSBezierPath* 	theAxisColoredTicks = [NSBezierPath bezierPath];
     [theAxisColoredTicks setLineWidth:3];
     NSString* theDateFormat = [self dateFormat];
-	if(!theDateFormat)theDateFormat = @"m/d/y H:M:S";
+	if(!theDateFormat)theDateFormat = @"M/d/yy H:m:s";
 	gridCount = 0;    
     tstep  = [self getValRel:[self optimalLabelSeparation]];
     
