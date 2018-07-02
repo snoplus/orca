@@ -126,13 +126,13 @@
 - (void) runAboutToStart:(NSNotification*)aNotification;
 - (void) setRunMode:(int)aMode;
 - (void) statusLogFlushed:(NSNotification*)aNotification;
-- (void) preCloseOut:(id)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
 - (void) closeOutLogFiles:(NSNotification*)aNote;
 
 #pragma mark ¥¥¥Data Handling
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
-- (void) runTaskStarted:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
 
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;

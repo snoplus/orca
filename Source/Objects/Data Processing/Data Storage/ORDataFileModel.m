@@ -47,7 +47,7 @@ NSString* ORDataFileLock					= @"ORDataFileLock";
 static NSString *ORDataFileConnection 		= @"Data File Input Connector";
 
 @interface ORDataFileModel (private)
-- (NSString*) formRunName:(id)userInfo;
+- (NSString*) formRunName:(NSDictionary*)userInfo;
 @end
 
 @implementation ORDataFileModel
@@ -479,7 +479,7 @@ static const int currentVersion = 1;           // Current version
 }
 
 
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
 	if(diskFullAlarm){
 		[diskFullAlarm clearAlarm];
@@ -528,22 +528,22 @@ static const int currentVersion = 1;           // Current version
     }
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
 	//we don't care
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
 	//we don't care
 }
 
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
     
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {	
     if(processedCloseRun)return;
     else {
@@ -953,7 +953,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 @implementation ORDataFileModel (private)
 
-- (NSString*) formRunName:(id)userInfo
+- (NSString*) formRunName:(NSDictionary*)userInfo
 {
 	NSString* s;
 	int runNumber		 = [[userInfo objectForKey:kRunNumber]intValue];
