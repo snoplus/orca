@@ -22,7 +22,7 @@
 #import "ORHVcRIODecoders.h"
 #import "ORDataPacket.h"
 #import "ORDataSet.h"
-
+#import "ORHVcRIOModel.h"
 //------------------------------------------------------------------------------------------------
 // Data Format
 // xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx
@@ -44,8 +44,10 @@
 
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long *dataPtr = (unsigned long*)someData;
-    int dataIndex = dataPtr[3];
+	unsigned long *dataPtr  = (unsigned long*)someData;
+    int objId               = dataPtr[1] & 0xfffff;
+    unsigned long timeStamp = dataPtr[2];
+    int dataIndex           = dataPtr[3];
     union {
         double asDouble;
         unsigned long asLong[2];
@@ -54,8 +56,31 @@
     theData.asLong[1] = dataPtr[5];
     double theValue = theData.asDouble;
     NSString* valueString = [NSString stringWithFormat:@"%f",theValue];
-    NSString* indexString = [NSString stringWithFormat:@"%d",dataIndex];
-    [aDataSet loadGenericData:valueString sender:self withKeys:@"HVcRIO",indexString,nil];
+    
+    NSString* aKey = [@"ORHVcRIOModel," stringByAppendingFormat:@"%d",objId];
+    if(!actualHVObjs)actualHVObjs = [[NSMutableDictionary alloc] init];
+    ORHVcRIOModel* obj = [actualHVObjs objectForKey:aKey];
+    if(!obj){
+        NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORHVcRIOModel")];
+        for(ORHVcRIOModel* anObj in listOfCards){
+            if([anObj uniqueIdNumber] == objId){
+                [actualHVObjs setObject:anObj forKey:aKey];
+                obj = anObj;
+                break;
+            }
+        }
+    }
+    NSString* nameString = [obj measuredValueName:dataIndex];
+
+    [aDataSet loadGenericData:valueString sender:self withKeys:@"HVcRIO",nameString,nil];
+    [aDataSet loadTimeSeries:theValue
+                      atTime:timeStamp
+                      sender:self
+                    withKeys:@"HVcRIO TimeSeries",
+                    nameString,
+                nil];
+    
+    [aDataSet loadGenericData:valueString sender:self withKeys:@"HVcRIO",nameString,nil];
 	return ExtractLength(dataPtr[0]);
 }
 
@@ -66,6 +91,7 @@
 	int ident = dataPtr[1] & 0xfff;
 	theString = [theString stringByAppendingFormat:@"Unit %d\n",ident];
     NSDate* date = [NSDate dateWithTimeIntervalSince1970:(NSTimeInterval)dataPtr[2]];
+    int objId               = dataPtr[1] & 0xfffff;
     int dataIndex = dataPtr[3];
     union {
         double asDouble;
@@ -75,7 +101,24 @@
     theData.asLong[1] = dataPtr[5];
     double theValue = theData.asDouble;
     
-    theString = [theString stringByAppendingFormat:@"Channel %d: %lf\n time: %@\n",dataIndex,theValue,[date stdDescription]];
+    NSString* aKey = [@"ORHVcRIOModel," stringByAppendingFormat:@"%d",objId];
+    if(!actualHVObjs)actualHVObjs = [[NSMutableDictionary alloc] init];
+    ORHVcRIOModel* obj = [actualHVObjs objectForKey:aKey];
+    if(!obj){
+        NSArray* listOfCards = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORHVcRIOModel")];
+        for(ORHVcRIOModel* anObj in listOfCards){
+            if([anObj uniqueIdNumber] == objId){
+                [actualHVObjs setObject:anObj forKey:aKey];
+                obj = anObj;
+                break;
+            }
+        }
+    }
+    NSString* nameString = [obj measuredValueName:dataIndex];
+
+    
+    
+    theString = [theString stringByAppendingFormat:@"%@: %lf\n time: %@\n",nameString,theValue,[date stdDescription]];
 
 	return theString;
 }

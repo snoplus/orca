@@ -998,6 +998,8 @@ static NSString* measuredValueList[] = {
         if([setPointList[index] isEqualToString:@""])break;
     }
 }
+
+
 - (NSInteger) numSetPoints
 {
     return [setPoints count];
@@ -1017,7 +1019,17 @@ static NSString* measuredValueList[] = {
     }
 }
 
-- (NSInteger) numMeasuredValues
+- (NSString*)measuredValueName:(NSUInteger)anIndex
+{
+    if(anIndex < [measuredValues count]){
+        NSString* part1 = [[measuredValues objectAtIndex:anIndex] objectForKey:@"item"];
+        NSString* part2 = [[measuredValues objectAtIndex:anIndex] objectForKey:@"data"];
+        return [part1 stringByAppendingFormat:@" %@",part2];
+    }
+    return [NSString stringWithFormat:@"Index %d",anIndex];
+}
+
+- (NSUInteger) numMeasuredValues
 {
     return [measuredValues count];
 }

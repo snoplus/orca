@@ -97,7 +97,7 @@
 - (void) createSetPointArray;
 - (NSInteger) numSetPoints;
 - (void) createMeasuredValueArray;
-- (NSInteger) numMeasuredValues;
+- (NSUInteger) numMeasuredValues;
 - (BOOL) expertPCControlOnly ;
 - (BOOL) zeusHasControl;
 - (BOOL) orcaHasControl;
@@ -110,6 +110,7 @@
 - (void) setPostRegulationArray:(NSMutableArray*)anArray;
 - (unsigned long) numPostRegulationPoints;
 - (id) postRegulationPointAtIndex:(int)anIndex;
+- (NSString*)measuredValueName:(NSUInteger)anIndex;
 
 #pragma mark ***Commands
 - (void) writeSetpoints;
