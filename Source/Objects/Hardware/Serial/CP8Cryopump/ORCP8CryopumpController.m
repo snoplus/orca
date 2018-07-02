@@ -976,7 +976,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:YES];
 }
@@ -1027,7 +1027,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:NO];
 }
@@ -1071,7 +1071,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:YES];
 }
@@ -1124,7 +1124,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) closePurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) closePurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:NO];
 }
@@ -1168,7 +1168,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:YES];
 }
@@ -1204,7 +1204,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) closeRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) closeRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:NO];
 }
@@ -1239,7 +1239,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:YES];
 }
@@ -1274,7 +1274,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:NO];
 }

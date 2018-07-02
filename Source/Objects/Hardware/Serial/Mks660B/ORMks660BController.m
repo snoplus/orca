@@ -481,7 +481,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) loadDialogDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) loadDialogDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model readAndLoad];
@@ -573,7 +573,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) zeroDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) zeroDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model writeZeroDisplay];
@@ -611,7 +611,7 @@
 }
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) fullScaleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) fullScaleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[model writeFullScale];
