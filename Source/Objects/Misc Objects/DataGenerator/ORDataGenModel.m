@@ -144,7 +144,7 @@
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
     //----------------------------------------------------------------------------------------
@@ -163,7 +163,7 @@
 // Description: Read data from a card
 //----------------------------------------------------------------------------
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//check for burst first
 	if([burstTimer microseconds] >= nextBurst){
@@ -269,7 +269,7 @@
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo  
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo  
 {
 	[burstTimer release];
 	burstTimer = nil;
