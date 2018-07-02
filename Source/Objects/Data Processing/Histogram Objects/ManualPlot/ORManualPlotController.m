@@ -30,7 +30,7 @@
 #import "ORAxis.h"
 
 @interface ORManualPlotController (private)
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation ORManualPlotController
@@ -408,7 +408,7 @@
 @end
 
 @implementation ORManualPlotController (private)
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;

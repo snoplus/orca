@@ -133,10 +133,10 @@
 - (NSDictionary*) dataRecordDescription;
 
 - (void) verifyFilterIsReady;
-- (void) runTaskStarted:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
 - (void) setRunMode:(int)aMode;
 - (void) cleanUpFilter;

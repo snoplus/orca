@@ -588,7 +588,7 @@ int filterGraph(nodeType*);
 	stackPtrErrorReported = nil;
 }
 
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {		
 	[self clearTimeHistogram];
 	
@@ -615,13 +615,13 @@ int filterGraph(nodeType*);
 	
 }
 
-- (void) subRunTaskStarted:(id)userInfo
+- (void) subRunTaskStarted:(NSDictionary*)userInfo
 {
 	//we don't care
 }
 
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
 	
 	[thePassThruObject runTaskStopped:userInfo];
@@ -634,11 +634,11 @@ int filterGraph(nodeType*);
 	
 }
 
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
 }
 
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 	
 	if(usePlugin) [pluginInstance finish];
