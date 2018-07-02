@@ -414,7 +414,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	else return nil;
 }
 
-- (unsigned) cmdQueueCount
+- (NSUInteger) cmdQueueCount
 {
 	return [cmdList count];
 }
@@ -738,7 +738,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [self setDataId:[anotherVXM dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

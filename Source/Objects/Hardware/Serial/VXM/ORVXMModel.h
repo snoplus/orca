@@ -98,7 +98,7 @@
 - (BOOL) isMoving;
 
 #pragma mark ***Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;
@@ -125,7 +125,7 @@
 - (void) addCustomCmd;
 - (void) sendGo;
 - (void) sendMotorType:(int)motorIndex;
-- (unsigned)  cmdQueueCount;
+- (NSUInteger)  cmdQueueCount;
 - (NSString*) cmdQueueCommand:(int)index;
 - (NSString*) cmdQueueDescription:(int)index;
 - (ORVXMMotorCmd*) motorCmd:(int)index;

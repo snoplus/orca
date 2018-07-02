@@ -98,9 +98,9 @@ enum {
 - (void) setStartPoint:(NSPoint)aStart;
 - (NSString*) cmdFile;
 - (void) setCmdFile:(NSString*)aCmdFile;
-- (unsigned)currentTrackIndex;
-- (unsigned)validTrackCount;
-- (NSPoint) track:(unsigned)i;
+- (NSUInteger)currentTrackIndex;
+- (NSUInteger)validTrackCount;
+- (NSPoint) track:(NSUInteger)i;
 
 - (BOOL) goingHome;
 - (void) setGoingHome:(BOOL)aGoingHome;
@@ -122,7 +122,7 @@ enum {
 
 
 #pragma mark ***Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;

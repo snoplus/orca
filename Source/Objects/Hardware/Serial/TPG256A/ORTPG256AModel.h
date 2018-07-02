@@ -86,7 +86,7 @@
 - (void) setLowAlarm:(int)aChan value:(double)aValue;
 
 #pragma mark •••Data Records
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (unsigned long) dataId;
 - (void) setDataId: (unsigned long) DataId;

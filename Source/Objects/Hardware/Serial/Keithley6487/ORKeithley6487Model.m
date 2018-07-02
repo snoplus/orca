@@ -375,7 +375,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
     [self setDataId:[anotherKeithley6487 dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

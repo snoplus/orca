@@ -320,7 +320,7 @@ NSString* ORCC4189Lock = @"ORCC4189Lock";
     [self setDataId:[anotherCC4189 dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

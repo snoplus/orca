@@ -344,17 +344,17 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXYScannerModelCmdFileChanged object:self];
 }
 
-- (unsigned)currentTrackIndex
+- (NSUInteger)currentTrackIndex
 {
     return currentTrackIndex;
 }
 
-- (unsigned)validTrackCount
+- (NSUInteger)validTrackCount
 {
     return validTrackCount;
 }
 
-- (NSPoint) track:(unsigned)i
+- (NSPoint) track:(NSUInteger)i
 {
     if(i<kNumTrackPoints)return track[i];
     else return NSZeroPoint;
@@ -648,7 +648,7 @@ NSString* ORXYScannerLock = @"ORXYScannerLock";
     [self setDataId:[anotherXYScanner dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

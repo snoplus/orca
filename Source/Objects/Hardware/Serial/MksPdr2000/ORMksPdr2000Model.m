@@ -442,7 +442,7 @@ NSString* ORMksPdr2000Lock = @"ORMksPdr2000Lock";
     [self setDataId:[anotherMksPdr2000 dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

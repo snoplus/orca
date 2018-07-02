@@ -762,7 +762,7 @@ static MotionNodeCalibrations motionNodeCalibrationV10[3] = {
     [self setDataId:[anotherPDcu dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
