@@ -307,7 +307,7 @@ static NSString* ORListenerConnector = @"ORListenerConnector";
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     if(inNetSocket == socket){
         if(threadRunning){
