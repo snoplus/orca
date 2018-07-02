@@ -1126,7 +1126,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![[self adapter] controllerCard]){
@@ -1145,7 +1145,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
     [self clearExceptionCount];
 	
 	[self initBoard];
-    if([[userInfo objectForKey:@"doinit"]intValue]){
+    if([[(NSDictionary*)userInfo objectForKey:@"doinit"]intValue]){
 		[self loadThresholdsAndGains];
     }
 	
@@ -1160,7 +1160,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	isRunning = YES;
 	
@@ -1250,7 +1250,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [adcRateGroup stop];
     

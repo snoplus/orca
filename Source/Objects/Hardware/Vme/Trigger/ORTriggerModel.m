@@ -916,7 +916,7 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
 //--------------------------------------------------------------
 
 #pragma mark ¥¥¥DataTaker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
     [[self undoManager] disableUndoRegistration];
@@ -967,7 +967,7 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
     [timer start];
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	struct timeval timeValue;
 	struct timezone timeZone;
@@ -1224,7 +1224,7 @@ static NSString *ORTriggerUseMSAM		= @"ORTriggerUseMSAM";
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [dataTakers1 objectEnumerator];
     id obj;

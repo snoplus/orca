@@ -508,7 +508,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 
 
 #pragma mark ¥¥¥DataTaker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
     if(![[self adapter] controllerCard]){
@@ -571,7 +571,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 // 0000 0000 0000 0000 0000 0000 0000 0000   32 bits holding  lower clock reg
 //--------------------------------------------------------------
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSString* errorLocation = @"";
     
@@ -620,7 +620,7 @@ static NSString *OR4ChanEnableClock     = @"OR4ChanEnableClock";
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	if(shipFirstLast){
 		int i;
