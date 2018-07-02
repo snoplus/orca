@@ -123,22 +123,22 @@
 	yScale = anAxis; //don't retain
 }
 
-- (ORAxis*) xScale
+- (id) xScale
 {
 	return xScale; 
 }
 
-- (ORAxis*) yScale
+- (id) yScale
 { 
 	return yScale; 
 }
 
-- (ORAxis*) zScale
+- (id) zScale
 { 
 	return zScale; 
 }
 
-- (ORAxis*) colorScale
+- (id) colorScale
 {
 	return colorScale;
 }
@@ -146,7 +146,6 @@
 {
 	colorScale = aColorScale; //don't retain
 }
-
 
 - (NSTextField*) titleField
 {

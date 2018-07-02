@@ -77,10 +77,10 @@
  
 #pragma mark ***Parts
 - (NSTextField*) titleField;
-- (ORAxis*) xScale;
-- (ORAxis*) yScale;
-- (ORAxis*) zScale;
-- (ORAxis*) colorScale;
+- (id) xScale;
+- (id) yScale;
+- (id) zScale;
+- (id) colorScale;
 - (void) setXScale:(id)anAxis;
 - (void) setYScale:(id)anAxis;
 - (void) setZScale:(id)anAxis;
