@@ -31,6 +31,6 @@
 - (void) clear;
 - (void) writeControlBlockHeader:(SCBHeader*)theControlBlockHeader;
 - (tCBWord) readBlockUsing:(SCBHeader*)theControlBlockHeader into:(tCBWord*)aBlockOfMemory size:(tCBWord) aLongWordsInBlock;
-- (BOOL) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (BOOL) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 @end

@@ -26,7 +26,7 @@
 #import "ORVmeIOCard.h"
 
 @interface ORCircularBufferReader (private)
--(BOOL) getDataFromCB:(ORDataPacket*)aDataPacket  userInfo:(id)userInfo;
+-(BOOL) getDataFromCB:(ORDataPacket*)aDataPacket  userInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation ORCircularBufferReader
@@ -106,13 +106,13 @@
 }
 
 
--(BOOL) takeData:(ORDataPacket*)aDataPacket  userInfo:(id)userInfo
+-(BOOL) takeData:(ORDataPacket*)aDataPacket  userInfo:(NSDictionary*)userInfo
 {
 	return [self getDataFromCB:aDataPacket userInfo:userInfo];
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	SCBHeader theControlBlockHeader = [self readControlBlockHeader];
 	long numBlocks = theControlBlockHeader.blocksWritten - theControlBlockHeader.blocksRead;
@@ -125,7 +125,7 @@
 
 @implementation ORCircularBufferReader (private)
 
--(BOOL) getDataFromCB:(ORDataPacket*)aDataPacket  userInfo:(id)userInfo
+-(BOOL) getDataFromCB:(ORDataPacket*)aDataPacket  userInfo:(NSDictionary*)userInfo
 {
 	SCBHeader theControlBlockHeader = [self readControlBlockHeader];
 	tCBWord numBlocks = theControlBlockHeader.blocksWritten - theControlBlockHeader.blocksRead;
