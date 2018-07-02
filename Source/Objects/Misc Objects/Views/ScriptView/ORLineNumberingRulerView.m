@@ -31,7 +31,7 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 - (NSMutableArray*) lineIndices;
 - (void) invalidateLineIndices;
 - (void) calculateLines;
-- (unsigned) lineNumberForCharacterIndex:(unsigned)index inText:(NSString*)text;
+- (NSUInteger) lineNumberForCharacterIndex:(NSUInteger)index inText:(NSString*)text;
 - (NSDictionary*) textAttributes;
 - (NSDictionary*) markerTextAttributes;
 @end
@@ -292,7 +292,7 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 	return NSNotFound;
 }
 
-- (ORLineMarker*) markerAtLine:(unsigned)line
+- (ORLineMarker*) markerAtLine:(NSUInteger)line
 {
 	return [linesToMarkers objectForKey:[NSNumber numberWithUnsignedInt:line - 1]];
 }
@@ -340,7 +340,7 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 	}
 }
 
-- (unsigned) lineNumberForCharacterIndex:(unsigned)index inText:(NSString*)text
+- (NSUInteger) lineNumberForCharacterIndex:(NSUInteger)index inText:(NSString*)text
 {
 	NSMutableArray* lines = [self lineIndices];
 	
@@ -377,7 +377,7 @@ NSString* ORBreakpointsAction = @"ORBreakpointsAction";
 - (float) requiredThickness
 {    
     long lineCount = [[self lineIndices] count];
-    long digits    = (unsigned)log10(lineCount) + 1;
+    long digits    = (NSUInteger)log10(lineCount) + 1;
 	NSMutableString* sampleString = [NSMutableString string];
 	long i;
     for (i = 0; i < digits; i++) {
