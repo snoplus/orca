@@ -46,8 +46,8 @@
 - (IBAction) readWriteTest:(id)sender;
 
 #pragma mark ¥¥¥Thread Worker Methods
-- (id) runWriteReadTest:(id)userInfo thread:tw;
-- (void) writeReadTestFinished:(id)userInfo;
+- (id) runWriteReadTest:(NSDictionary*)userInfo thread:tw;
+- (void) writeReadTestFinished:(NSDictionary*)userInfo;
 
 
 @end

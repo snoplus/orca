@@ -70,7 +70,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"IPFIFO (%@)",[model identifier]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"IPFIFO (%@)",[(ORFifoModel*)model identifier]]];
 }
 
 #pragma mark ¥¥¥Actions
@@ -156,7 +156,7 @@
 }
 
 #pragma mark ¥¥¥Thread Worker Methods
-- (id) runWriteReadTest:(id)userInfo thread:tw
+- (id) runWriteReadTest:(NSDictionary*)userInfo thread:tw
 {
 	
 	unsigned short j;
@@ -195,7 +195,7 @@
 }
 
 
-- (void) writeReadTestFinished:(id)userInfo
+- (void) writeReadTestFinished:(NSDictionary*)userInfo
 {
 	if(![readWriteTestThread cancelled]){
 		NSLog(@"*** FIFO Block Read/Write Test Finished ***\n");
