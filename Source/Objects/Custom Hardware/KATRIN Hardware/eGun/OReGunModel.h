@@ -79,9 +79,9 @@
 - (ORObjectProxy*) y220Object;
 - (BOOL) moving;
 - (void) setMoving:(BOOL)aMoving;
-- (unsigned)currentTrackIndex;
-- (unsigned)validTrackCount;
-- (NSPoint) track:(unsigned)i;
+- (NSUInteger)currentTrackIndex;
+- (NSUInteger)validTrackCount;
+- (NSPoint) track:(NSUInteger)i;
 
 - (BOOL) absMotion;
 - (void) setAbsMotion:(BOOL)aAbsMotion;

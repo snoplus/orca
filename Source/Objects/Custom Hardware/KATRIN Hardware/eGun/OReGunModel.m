@@ -283,17 +283,17 @@ NSString* OReGunLock = @"OReGunLock";
     }
 }
 
-- (unsigned)currentTrackIndex
+- (NSUInteger)currentTrackIndex
 {
     return currentTrackIndex;
 }
 
-- (unsigned)validTrackCount
+- (NSUInteger)validTrackCount
 {
     return validTrackCount;
 }
 
-- (NSPoint) track:(unsigned)i
+- (NSPoint) track:(NSUInteger)i
 {
     if(i<kNumTrackPoints)return track[i];
     else return NSZeroPoint;
