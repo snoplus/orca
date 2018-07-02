@@ -34,7 +34,7 @@
 - (void) updatePortList;
 
 - (NSUInteger) count;
-- (ORSerialPort*) objectAtIndex:(unsigned)index;
+- (ORSerialPort*) objectAtIndex:(NSUInteger)index;
 - (ORSerialPort*) objectWithName:(NSString*) name;
 - (NSInteger) indexOfObjectWithName:(NSString*) name;
 - (NSArray*) portList;

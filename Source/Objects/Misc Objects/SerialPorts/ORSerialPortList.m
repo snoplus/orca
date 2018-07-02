@@ -179,7 +179,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(SerialPortList);
     return [portList count];
 }
 
-- (ORSerialPort*) objectAtIndex:(unsigned)index
+- (ORSerialPort*) objectAtIndex:(NSUInteger)index
 {
     if(index<[portList count]) return [portList objectAtIndex:index];
     else return nil;
