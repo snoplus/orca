@@ -33,11 +33,11 @@
 
 @protocol ORDataProcessing
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
-- (void) runTaskStarted:(id)userInfo;
-- (void) subRunTaskStarted:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) subRunTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 - (void) setInvolvedInCurrentRun:(BOOL)state;
 - (void) runTaskBoundary;
 @end

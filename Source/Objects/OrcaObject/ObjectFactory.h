@@ -20,7 +20,7 @@
 
 
 @interface ObjectFactory : NSButton {
-    id object;
+    OrcaObject* object;
 }
 #pragma mark ¥¥¥Factory methods
 + (id) makeObject:(NSString*)aClassName;
