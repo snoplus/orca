@@ -840,7 +840,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
     return NO;
 }
 
-- (id) outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item 
+- (id) outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item 
 {
 	if (item == nil)item = [model itemTreeRoot];
     
@@ -1071,7 +1071,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 	return NO;
 }
 
-- (NSColor*) tableView:(id)aTableView backgroundColorForRow:(unsigned)row
+- (NSColor*) tableView:(id)aTableView backgroundColorForRow:(NSUInteger)row
 {
     if(aTableView==itemTableView){
 		if(row<[model pollingLookUpCount]){
