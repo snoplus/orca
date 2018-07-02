@@ -123,7 +123,7 @@
 - (void) sendHeartbeatShutOffWarning;
 - (void) sendHeartbeat;
 - (void) mailSent:(NSString*)address;
-- (void) sendMail:(id)userInfo;
+- (void) sendMail:(NSDictionary*)userInfo;
 - (void) setNextHeartbeatString;
 - (NSDate*) nextHeartbeat;
 - (void) sendStartStopNotice:(BOOL)state;

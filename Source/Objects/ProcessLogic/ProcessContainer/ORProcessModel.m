@@ -1243,7 +1243,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 	NSLog(@"Process Center status was sent to:\n%@\n",address);
 }
 
-- (void) sendMail:(id)userInfo
+- (void) sendMail:(NSDictionary*)userInfo
 {
 	NSString* address =  [userInfo objectForKey:@"Address"];
 	NSString* content = [NSString string];
