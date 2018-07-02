@@ -445,7 +445,7 @@ int sortListDnFunc(id element1,id element2, void* context){return [element2 comp
 }
 
 #pragma mark ¥¥¥Data Source
-- (id)   outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)   outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item
 {
 	if(item==nil)return [[self group] objectAtIndex:index];
 	else {

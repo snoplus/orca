@@ -88,7 +88,7 @@
 - (IBAction) setProductionMode:(id)sender;
 
 #pragma mark ¥¥¥Data Source
-- (id)   outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item;
+- (id)   outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item;
 - (BOOL) outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item;
 - (id)  outlineView:(NSOutlineView *)outlineView  objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
