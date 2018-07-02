@@ -18,7 +18,6 @@
 //-------------------------------------------------------------
 
 #pragma mark ***Imported Files
-#import <Cocoa/Cocoa.h>
 #import "ORSIS3316Controller.h"
 #import "ORRateGroup.h"
 #import "ORRate.h"
