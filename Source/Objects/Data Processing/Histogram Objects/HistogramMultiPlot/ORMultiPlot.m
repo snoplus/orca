@@ -210,12 +210,12 @@ NSString* ORMultiPlotNameChangedNotification         = @"ORMultiPlotNameChangedN
 
 #pragma mark ¥¥¥Data Source Methods
 
-- (unsigned)  count
+- (NSUInteger)  count
 {
     return [dataSetItems count];
 }
 
-- (unsigned)  cachedCount
+- (NSUInteger)  cachedCount
 {
     return [cachedDataSets count];
 }

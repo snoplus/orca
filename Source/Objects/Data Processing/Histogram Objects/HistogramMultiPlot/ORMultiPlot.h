@@ -56,8 +56,8 @@
 
 #pragma mark ¥¥¥Data Source Methods
 - (NSMutableArray*) rois:(int)index;
-- (unsigned)  count;
-- (unsigned)  cachedCount;
+- (NSUInteger)  count;
+- (NSUInteger)  cachedCount;
 - (id)   name;
 @end
 
