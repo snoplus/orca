@@ -286,7 +286,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 {
 	return [wayPoints objectAtIndex:index];
 }
-- (unsigned) wayPointCount
+- (NSUInteger) wayPointCount
 {
 	return [wayPoints count];
 }

@@ -97,7 +97,7 @@
 - (NSMutableArray*) wayPoints;
 - (void) setWayPoints:(NSMutableArray*)someWayPoints;
 - (ORWayPoint*) wayPoint:(int)index;
-- (unsigned) wayPointCount;
+- (NSUInteger) wayPointCount;
 - (void) removeWayPoint:(id)aWayPoint;
 - (ORWayPoint*) currentWayPoint;
 - (BOOL) isRunning;
