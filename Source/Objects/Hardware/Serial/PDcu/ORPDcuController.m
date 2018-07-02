@@ -32,7 +32,7 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORPDcuController (private)
-- (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 #endif
 @implementation ORPDcuController
@@ -462,7 +462,7 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORPDcuController (private)
-- (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _turnOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
 		[model turnStationOff];

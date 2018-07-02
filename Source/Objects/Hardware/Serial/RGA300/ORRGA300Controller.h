@@ -183,9 +183,9 @@
 
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) turnOnIonizerDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) turnDetectorOnDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) turnOnIonizerDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) turnDetectorOnDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 #endif
 
 - (int) numberPointsInPlot:(id)aPlotter;
