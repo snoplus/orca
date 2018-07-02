@@ -92,7 +92,7 @@
 - (void) cancelRequest:(NSNotification*)aNote;
 - (void) requestNotification:(NSNotification*)aNote;
 - (void) sendRequest:(NSMutableDictionary*)request fromObject:(id)anObject;
-- (unsigned) connectionHistoryCount;
+- (NSUInteger) connectionHistoryCount;
 - (id) connectionHistoryItem:(NSUInteger)index;
 - (void) clearFitInFlight;
 

@@ -398,7 +398,7 @@ SYNTHESIZE_SINGLETON_FOR_CLASS(ORCARootService);
 	}
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
 	if(inNetSocket == socket){
 		if(dataId==0){
