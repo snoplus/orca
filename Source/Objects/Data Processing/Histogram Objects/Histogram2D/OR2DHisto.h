@@ -48,8 +48,8 @@
 
 #pragma mark ¥¥¥Data Management
 - (NSDictionary*) dataRecordDescription;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo keys:(NSMutableArray*)aKeyArray;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) packageData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo keys:(NSMutableArray*)aKeyArray;
 - (void) mergeHistogram:(unsigned long*)ptr numValues:(unsigned long)numBins;
 - (void) load:(unsigned long*)ptr numValues:(unsigned long)num;
 - (void) histogramX:(unsigned short)aXValue y:(unsigned short)aYValue;
