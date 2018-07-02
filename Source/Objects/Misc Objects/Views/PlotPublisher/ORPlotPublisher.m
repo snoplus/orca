@@ -37,7 +37,7 @@
 
 @interface ORPlotPublisher (private)
 - (void) dumpAndStore;
-- (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) storeNewAttributes;
 - (void) loadNewAttributes;
 - (void) finish;
@@ -246,7 +246,7 @@
     }];
 }
 
-- (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _publishingDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
