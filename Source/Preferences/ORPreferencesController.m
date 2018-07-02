@@ -29,9 +29,9 @@
 @interface ORPreferencesController (private)
 - (void) _openValidatePassWordPanel;
 - (void) _openSetNewPassWordPanel;
-- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _changePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _changePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) _shakeIt;
 - (void) _setPassWordButtonText;
 @end;
@@ -219,7 +219,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 
 - (IBAction) lockAction:(id)sender
 {
-    BOOL newState = [sender state];
+    BOOL newState = [(NSButton*)sender state];
     BOOL oldState = [[[NSUserDefaults standardUserDefaults] objectForKey:OROrcaSecurityEnabled] boolValue];
     if(oldState == kLocked && newState == kUnlocked){
         NSString* thePassWord = [[NSUserDefaults standardUserDefaults] objectForKey:OROrcaPassword];
@@ -229,7 +229,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
         else [self _openValidatePassWordPanel];
     }
     else {
-        [self setLockState:[sender state]];
+        [self setLockState:[(NSButton*)sender state]];
         NSLog(@"Global security enabled.\n");
     }
 }
@@ -285,7 +285,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
 
 - (IBAction) enableBugReportSendAction:(id)sender
 {
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:[sender state]] forKey:ORMailBugReportFlag];    
+    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithBool:[(NSButton*)sender state]] forKey:ORMailBugReportFlag];    
 }
 
 - (void) textDidChange:(NSNotification*)aNote
@@ -458,7 +458,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
             contextInfo: nil];
 }
 
-- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
@@ -485,7 +485,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
    
 }
 
-- (void) _changePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _changePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
@@ -515,7 +515,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(PreferencesController);
   
 }
 
-- (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _setNewPasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {   
 #if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
     if(returnCode == NSModalResponseOK){
