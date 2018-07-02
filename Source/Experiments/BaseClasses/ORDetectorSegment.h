@@ -79,8 +79,8 @@
 - (NSUndoManager*) undoManager;
 - (id) objectForKey:(id)key;
 - (void) setObject:(id)obj forKey:(id)key;
-- (void) setSegmentNumber:(unsigned)index;
-- (unsigned) segmentNumber;
+- (void) setSegmentNumber:(NSUInteger)index;
+- (NSUInteger) segmentNumber;
 - (BOOL) segmentError;
 - (void) setSegmentError:(BOOL)state;
 - (void) clearSegmentError;

@@ -381,13 +381,13 @@ NSString* KSegmentChangedNotification	  =	@"KSegmentChangedNotification";
     [[NSNotificationCenter defaultCenter] postNotificationName:KSegmentChangedNotification object:self];
 }
 
-- (void) setSegmentNumber:(unsigned)index
+- (void) setSegmentNumber:(NSUInteger)index
 {
 	if(!params)[self setParams:[NSMutableDictionary dictionary]];
 	[params setObject:[NSNumber numberWithInt:index] forKey:@"kSegmentNumber"];
 }
 
-- (unsigned) segmentNumber
+- (NSUInteger) segmentNumber
 {
 	return [[params objectForKey:@"kSegmentNumber"] intValue];
 }
