@@ -72,7 +72,7 @@
 }
 
 #pragma mark ¥¥¥Optimization
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
 	id obj = [[destination connector] objectLink];
 	if(obj && [obj respondsToSelector:@selector(runTaskStarted:)]){
@@ -88,21 +88,21 @@
 	}
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
 	id obj = [[destination connector] objectLink];
 	if(obj && [obj respondsToSelector:@selector(runTaskStopped:)]){
 		[obj runTaskStopped:userInfo];
 	}
 }
-- (void) preCloseOut:(id)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
 {
     id obj = [[destination connector] objectLink];
     if(obj && [obj respondsToSelector:@selector(preCloseOut:)]){
         [obj preCloseOut:userInfo];
     }
 }
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 	id obj = [[destination connector] objectLink];
 	if(obj && [obj respondsToSelector:@selector(closeOutRun:)]){
