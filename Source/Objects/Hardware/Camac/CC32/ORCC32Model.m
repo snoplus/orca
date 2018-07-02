@@ -551,7 +551,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 }
 
 #pragma mark ¥¥¥DataTaker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//cach the dataTakers by stationNumber;
 	int i;
@@ -568,7 +568,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 	}
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	unsigned long lamStations = 0;
 	[self readLAMStations:&lamStations];
@@ -582,7 +582,7 @@ NSString* ORCC32SettingsLock			= @"ORCC32SettingsLock";
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 }
 

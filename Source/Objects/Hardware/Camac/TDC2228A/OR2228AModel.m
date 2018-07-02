@@ -173,7 +173,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![self adapter]){
@@ -219,7 +219,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSString* errorLocation = @"";
     @try {
@@ -270,7 +270,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [overflowAlarm clearAlarm];
     [overflowAlarm release];

@@ -176,7 +176,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![[self adapter] controller]){
@@ -217,7 +217,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     BOOL resetDone;
 	
@@ -286,7 +286,7 @@ NSString* ORADC2249SuppressZerosChangedNotification  = @"ORADC2249SuppressZerosC
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[self disableLAMEnableLatch];
 }
