@@ -200,7 +200,7 @@ bool ORSLTv4Readout::Stop()
         // For performance testing always run the first run without signal, to measure the loop time
         loopsPerSec = 0;
         if (runTime > 0) loopsPerSec = (float) nLoops / runTime;
-        if ((unsigned ) loopsPerSec > maxLoopsPerSec) maxLoopsPerSec = (unsigned) loopsPerSec;
+        if ((unsigned ) loopsPerSec > maxLoopsPerSec) maxLoopsPerSec = (NSUInteger) loopsPerSec;
         
         tLoop = 0;
         if (nLoops > 0) tLoop = (float) (t1Ticks - t0Ticks) / nLoops;
