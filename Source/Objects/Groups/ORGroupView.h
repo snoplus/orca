@@ -17,12 +17,13 @@
 //express or implied, or assume any liability or responsibility 
 //for the use of this software.
 //-------------------------------------------------------------
+@class ORGroup;
 
 @interface ORGroupView : NSView <NSMenuDelegate>{
     id                  mouseTask;
     BOOL                dragSessionInProgress;
     BOOL                goodObjectsInDrag;
-    id                  group;
+    ORGroup*            group;
     NSColor*            backgroundColor;
     NSArray*            draggedObjects;
     NSArray*            savedObjects;
@@ -34,8 +35,8 @@
 #pragma mark ¥¥¥Accessors
 - (NSArray*)draggedNodes;
 - (void) dragDone;
-- (void) setGroup:(id)aModel;
-- (id) group;
+- (void) setGroup:(ORGroup*)aModel;
+- (ORGroup*) group;
 - (NSColor*) backgroundColor;
 - (void) setBackgroundColor:(NSColor*)aColor;
 - (NSEnumerator*) objectEnumerator;

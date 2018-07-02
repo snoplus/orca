@@ -113,12 +113,12 @@
     dragLocked = aState;
 }
 
-- (void) setGroup:(id)aModel
+- (void) setGroup:(ORGroup*)aModel
 {	
     group = aModel;
 }
 
-- (id) group
+- (ORGroup*) group
 {
     return group;
 }
@@ -616,9 +616,9 @@
 	NSArray* items = [group selectedObjects];
 	NSEnumerator* e = [items objectEnumerator];
 	id obj = [e nextObject];
-	float y = [obj frame].origin.y;
+	float y = [(OrcaObject*)obj frame].origin.y;
 	while(obj = [e nextObject]){
-		[obj moveTo:NSMakePoint([obj frame].origin.x,y)];
+		[obj moveTo:NSMakePoint([(OrcaObject*)obj frame].origin.x,y)];
 	}
 }
 
@@ -626,7 +626,7 @@
 {
 	NSArray* items = [group selectedObjects];
 	NSEnumerator* e = [items objectEnumerator];
-	id obj = [e nextObject];
+	OrcaObject* obj = [e nextObject];
 	float y = [obj frame].origin.y + [obj frame].size.height;
 	while(obj = [e nextObject]){
 		[obj moveTo:NSMakePoint([obj frame].origin.x,y - [obj frame].size.height)];
@@ -637,7 +637,7 @@
 {
 	NSArray* items = [group selectedObjects];
 	NSEnumerator* e = [items objectEnumerator];
-	id obj = [e nextObject];
+	OrcaObject* obj = [e nextObject];
 	float x = [obj frame].origin.x;
 	while(obj = [e nextObject]){
 		[obj moveTo:NSMakePoint(x,[obj frame].origin.y)];
@@ -648,7 +648,7 @@
 {
 	NSArray* items = [group selectedObjects];
 	NSEnumerator* e = [items objectEnumerator];
-	id obj = [e nextObject];
+	OrcaObject* obj = [e nextObject];
 	float x = [obj frame].origin.x + [obj frame].size.width;
 	while(obj = [e nextObject]){
 		[obj moveTo:NSMakePoint(x - [obj frame].size.width,[obj frame].origin.y)];
@@ -659,7 +659,7 @@
 {
 	NSArray* items = [group selectedObjects];
 	NSEnumerator* e = [items objectEnumerator];
-	id obj = [e nextObject];
+	OrcaObject* obj = [e nextObject];
 	float xc = [obj frame].origin.x + [obj frame].size.width/2.;
 	while(obj = [e nextObject]){
 		[obj moveTo:NSMakePoint(xc - [obj frame].size.width/2.,[obj frame].origin.y)];
@@ -670,7 +670,7 @@
 {
 	NSArray* items = [group selectedObjects];
 	NSEnumerator* e = [items objectEnumerator];
-	id obj = [e nextObject];
+	OrcaObject* obj = [e nextObject];
 	float yc = [obj frame].origin.y + [obj frame].size.height/2.;
 	while(obj = [e nextObject]){
 		[obj moveTo:NSMakePoint([obj frame].origin.x,yc - [obj frame].size.height/2.)];
@@ -686,9 +686,7 @@
 	float xMax = -9.99E100;
 	float yMin = 9.99E100;
 	float yMax = -9.99E100;
-	NSEnumerator* e = [sortedArray objectEnumerator];
-	id obj;
-	while(obj = [e nextObject]){
+	for(OrcaObject* obj in sortedArray){
 	
 		float midX = [obj frame].origin.x;
 		if(midX > xMax)xMax = midX;
@@ -702,9 +700,8 @@
 	float radius = MAX((xMax - xMin),(xMax - xMin))/2.;
 	NSPoint center = NSMakePoint(xMin + radius,yMin + radius);
 	float deltaAngle = 2.*3.14159/(float)count;
-	e = [sortedArray objectEnumerator];
 	float a = 0;
-	while(obj = [e nextObject]){
+    for(OrcaObject* obj in sortedArray){
 		float newX = center.x  + radius*cosf(a);
 		float newY = center.y + radius*sinf(a);
 		[obj moveTo:NSMakePoint(newX,newY)];
@@ -765,9 +762,7 @@
         [unarchiver finishDecoding];
         [unarchiver release];
         
-        NSEnumerator* e = [objectList objectEnumerator];
-        NSNumber* aPointer;
-        while(aPointer = [e nextObject]){
+        for(NSNumber* aPointer in objectList){
 			BOOL okToPaste = YES;
             OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
 			if([anObject solitaryObject]){
@@ -816,7 +811,7 @@
 
 - (NSPoint) suggestPasteLocationFor:(id)anObject
 {
-    NSPoint aPoint = [anObject frame].origin;
+    NSPoint aPoint = [(OrcaObject*)anObject frame].origin;
     aPoint.x += 5;
     aPoint.y += 5;
     return aPoint;
@@ -878,7 +873,7 @@
     [unarchiver release];
     
     goodObjectsInDrag = YES;
-    NSEnumerator* e = [obj objectEnumerator];
+    NSEnumerator* e = [(ORGroup*)obj objectEnumerator];
     NSNumber* aPointer;
     while(aPointer = [e nextObject]){
         OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
@@ -1081,7 +1076,7 @@
 	id obj;
 	NSEnumerator* e = [objects objectEnumerator];
 	while(obj = [e nextObject]){
-		NSPoint p = [obj frame].origin;
+		NSPoint p = [(OrcaObject*)obj frame].origin;
 		[obj moveTo:NSMakePoint(p.x+delta.x,p.y+delta.y)];
 	}
 }
@@ -1198,15 +1193,10 @@
         NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
         id objectList = [unarchiver decodeObjectForKey:ORObjArrayPtrPBType];
 		
-        
-        NSEnumerator* e = [objectList objectEnumerator];
-        NSNumber* aPointer;
-        
-        
         if([op isEqual: @"drop"]){
             [group unHighlightAll];
             NSMutableArray* newObjects = [NSMutableArray array];
-            while(aPointer = [e nextObject]){
+            for(NSNumber* aPointer in objectList){
                 OrcaObject* anObject  = (OrcaObject*)[aPointer longValue];
                 NSPoint     anOffset  = [anObject offset];
                 NSPoint		newPoint  = NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y);
@@ -1243,7 +1233,7 @@
             if(result)[group addObjects:newObjects];            
         }
         else if([op isEqual: @"move"]){	
-            while(aPointer = [e nextObject]){
+            for(NSNumber* aPointer in objectList){
                 OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
                 NSPoint     anOffset = [anObject offset];
                 NSPoint		newPoint  = NSMakePoint(aPoint.x + anOffset.x,aPoint.y + anOffset.y);
