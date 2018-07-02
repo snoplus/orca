@@ -42,8 +42,8 @@
 - (BOOL) cancelAndStop;
 - (void) setFileToReplay:(NSString*)newFileToReplay;
 - (void) sendDataArray:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
-- (void) sendRunStart:(id)userInfo;
-- (void) sendCloseOutRun:(id)userInfo;
-- (void) sendRunEnd:(id)userInfo;
-- (void) sendRunSubRunStart:(id)userInfo;
+- (void) sendRunStart:(NSDictionary*)userInfo;
+- (void) sendCloseOutRun:(NSDictionary*)userInfo;
+- (void) sendRunEnd:(NSDictionary*)userInfo;
+- (void) sendRunSubRunStart:(NSDictionary*)userInfo;
 @end
