@@ -112,7 +112,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 	}
 	if([self respondsToSelector:@selector(dataRecordDescription)]){
 		NSDictionary* dict = [self dataRecordDescription];
-		id recDict;
+		NSDictionary* recDict;
 		NSString* decoders = @"";
 		NSEnumerator* e = [dict objectEnumerator];
 		while(recDict = [e nextObject]){
@@ -303,19 +303,19 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     return [NSMutableArray arrayWithObject:self];
 }
 
-- (int) stationNumber
+- (NSInteger) stationNumber
 {
     //some objects use stationNumber. they can override for special situations.
     //hardware wizard uses this instead of a slot or tag number.
     return [self tag] + [self tagBase];
 }
 
-- (int) tag
+- (NSInteger) tag
 {
     return tag;
 }
 
-- (void) setTag:(int)aTag
+- (void) setTag:(NSInteger)aTag
 {
     tag = aTag;
     
@@ -324,7 +324,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
                        object:self];
 }
 
-- (int) tagBase
+- (NSInteger) tagBase
 {
     //some objects, i.e. CAMAC start at 1 instead of 0. those object will override this method.
     return 0;
