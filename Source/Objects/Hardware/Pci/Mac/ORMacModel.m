@@ -283,12 +283,12 @@ void registryChanged(
 	[usb objectsRemoved:[[aNote userInfo] objectForKey:ORGroupObjectList]];
 }
 
-- (unsigned) usbDeviceCount
+- (NSUInteger) usbDeviceCount
 {
 	return [usb deviceCount];
 }
 
-- (id) usbDeviceAtIndex:(unsigned)index;
+- (id) usbDeviceAtIndex:(NSUInteger)index;
 {
 	return [usb deviceAtIndex:index];
 }

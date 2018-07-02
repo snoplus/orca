@@ -63,8 +63,8 @@
 - (id) getFireWireInterface:(NSUInteger) aVenderID;
 
 #pragma mark ¥¥¥USB
-- (unsigned) usbDeviceCount;
-- (id)		 usbDeviceAtIndex:(unsigned)index;
+- (NSUInteger) usbDeviceCount;
+- (id)		 usbDeviceAtIndex:(NSUInteger)index;
 - (void)	 objectsAdded:(NSNotification*)aNote;
 - (void)	 objectsRemoved:(NSNotification*)aNote;
 - (id)		 getUSBController;
