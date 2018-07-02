@@ -143,7 +143,7 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
 }
 
 #pragma mark ***Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     EcpuWriteLAMStruct eCpuLAMStruct;
     MacWriteLAMStruct macLAMStruct;
@@ -250,7 +250,7 @@ static NSString *ORDualPortLAMVariables       = @"ORDualPortLAMVariables";
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	if(started){
 		NSEnumerator* e = [dataTakers1 objectEnumerator];

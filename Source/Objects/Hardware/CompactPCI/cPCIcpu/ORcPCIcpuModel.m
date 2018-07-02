@@ -190,7 +190,7 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	[encoder encodeObject:sbcLink		forKey:@"SBC_Link"];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	dataTakers = [[readOutGroup allObjects] retain];	//cache of data takers.
     
@@ -205,17 +205,17 @@ NSString* ORcPCIcpuLock							= @"ORcPCIcpuLock";
 	[sbcLink runTaskStarted:aDataPacket userInfo:userInfo];
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[sbcLink takeData:aDataPacket userInfo:userInfo];
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[sbcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[sbcLink runTaskStopped:aDataPacket userInfo:userInfo];
 }
