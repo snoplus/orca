@@ -1599,7 +1599,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo: (id) anUserInfo
+- (void) runTaskStarted: (ORDataPacket*) aDataPacket userInfo: (NSDictionary*) anUserInfo
 {
     short		i;
     bool		bRetVal = false;
@@ -1849,7 +1849,7 @@ NSString* ORTek754GpibLock  = @"ORTek754GpibLock";
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo: (id) anUserInfo
+- (void) runTaskStopped: (ORDataPacket*) aDataPacket userInfo: (NSDictionary*) anUserInfo
 {
     short i;
 	

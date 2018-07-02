@@ -317,7 +317,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 }
 
 #pragma mark ***Data Taking
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // Add our description to the data description
@@ -330,7 +330,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 //-------------------------------------------------------------
 //The data taking process is called from a thread.
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(firstTime){
         [self enableChannels];
@@ -344,7 +344,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     [self disableAllChannels];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 }
 

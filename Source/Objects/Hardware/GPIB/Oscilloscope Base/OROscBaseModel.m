@@ -972,7 +972,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 	
 }
 
-- (void)	takeDataTask:(id)userInfo
+- (void)	takeDataTask:(NSDictionary*)userInfo
 {
 	//subclass responsibility
 }

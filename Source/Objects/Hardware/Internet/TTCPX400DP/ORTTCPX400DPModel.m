@@ -478,7 +478,7 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     [self performSelectorInBackground:@selector(_syncReadoutSetToModel) withObject:nil];
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
 	//if(inNetSocket != socket) return;
     

@@ -146,7 +146,7 @@ NSString* OREHS8260pSettingsLock				= @"OREHS8260pSettingsLock";
 	 }
 }
 
-- (void) checkRamperCallBack:(id)userInfo
+- (void) checkRamperCallBack:(NSDictionary*)userInfo
 {
 	int aChannel = [[userInfo objectForKey:@"Channel"] intValue];
 	if([self channelInBounds:aChannel]){

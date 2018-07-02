@@ -94,7 +94,7 @@
 
 #pragma mark ***Delegate Methods
 //- (void) netsocketConnected:(NetSocket*)inNetSocket;
-//- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
+//- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount;
 //- (void) netsocketDisconnected:(NetSocket*)inNetSocket;
 
 #pragma mark ***Utilities

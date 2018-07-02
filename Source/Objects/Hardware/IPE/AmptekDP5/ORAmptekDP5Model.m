@@ -5295,7 +5295,7 @@ return ;
 
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
@@ -5434,7 +5434,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 
         //spectrum readout is started in "takeData"!
@@ -5671,7 +5671,7 @@ if((len % 4) != 0){
 
 
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestSpectrumTimedWorker) object:nil];
     [self setIsPollingSpectrum:NO];
@@ -5687,7 +5687,7 @@ return;
     //	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
         //[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(requestSpectrumTimedWorker) object:nil];
         [self setIsPollingSpectrum:NO];

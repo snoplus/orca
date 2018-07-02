@@ -179,7 +179,7 @@ typedef struct Channels {
 - (void)    syncDataIdsWith:(id)anotherShaper;
 - (void) incEventCount:(int)aChannel;
 - (unsigned long) eventCount:(int)aChannel;
-- (void)	takeDataTask:(id)userInfo;
+- (void)	takeDataTask:(NSDictionary*)userInfo;
 
 #pragma mark ***Commands
 - (void) 	setOscFromModel;
@@ -241,10 +241,10 @@ typedef struct Channels {
 - (void)	oscStopAcquisition;
 
 #pragma mark ¥¥¥DataTaker
-- (void) 	runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) 	runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
 
-- (void) 	takeData: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) 	takeData: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void)	markAsCancelled;
 - (BOOL)	cancelled;
 

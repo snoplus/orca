@@ -223,7 +223,7 @@ typedef struct HPPulserCustomWaveformStruct {
 - (NSArray*) getLoadedWaveforms;
 
 - (NSDictionary*) dataRecordDescription;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 
 #pragma mark •••Waveform Building
 - (void) insert:(unsigned short) numPoints value:(float) theValue;

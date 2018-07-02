@@ -2534,7 +2534,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	[self writeReg:kFLTV4CommandReg value:kIpeFlt_Reset_All];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [self setIsPartOfRun: YES];
 
@@ -2595,7 +2595,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 // Description: Read data from a card. Should never call this method since the FLT
 //
 //***************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
 	if(firstTime){
 		firstTime = NO;
@@ -2604,7 +2604,7 @@ static const uint32_t SLTCommandReg      = 0xa80008 >> 2;
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	//changed 2013-04-29 -tb- SLT will set inhibit anyway! for quick start we want to leave the current mode active (histogr. FLTs are restarted at runTaskStarted) [self writeControlWithStandbyMode];

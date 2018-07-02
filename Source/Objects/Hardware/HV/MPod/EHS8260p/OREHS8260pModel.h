@@ -49,7 +49,7 @@
 - (NSString*) name;
 - (NSString*) behaviourString:(int)channel;
 - (ORDetectorRamper*) ramper:(int)channel;
-- (void) checkRamperCallBack:(id)userInfo;
+- (void) checkRamperCallBack:(NSDictionary*)userInfo;
 
 #pragma mark •••Hardware Access
 - (void) writeTripTime:(int)channel;

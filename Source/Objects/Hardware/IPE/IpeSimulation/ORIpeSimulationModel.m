@@ -304,18 +304,18 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSimulationModelViewItemNameChanged object:self];
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
-- (unsigned) ipNumberIndex
+- (NSUInteger) ipNumberIndex
 {
 	return ipNumberIndex;
 }
@@ -589,7 +589,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	else return nil;
 }
 
-- (unsigned) pollingLookUpCount
+- (NSUInteger) pollingLookUpCount
 {
 	return [pollingLookUp count];
 }
@@ -891,7 +891,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
     return objDictionary;
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
 }
@@ -1294,7 +1294,7 @@ NSString* ORIpeSimulationPendingRequestsChanged	= @"ORIpeSimulationPendingReques
 	else return 0;
 }
 
-- (unsigned) pendingRequestsCount
+- (NSUInteger) pendingRequestsCount
 {
 	return [[pendingRequests allKeys] count];
 }

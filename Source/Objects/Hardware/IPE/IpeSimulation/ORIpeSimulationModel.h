@@ -132,8 +132,8 @@
 - (void) setItemType:(int)aItemType;
 - (BOOL) viewItemName;
 - (void) setViewItemName:(BOOL)aViewItemName;
-- (unsigned) connectionHistoryCount;
-- (id) connectionHistoryItem:(unsigned)index;
+- (NSUInteger) connectionHistoryCount;
+- (id) connectionHistoryItem:(NSUInteger)index;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
 - (NSString*) ipNumberToURL;
@@ -146,7 +146,7 @@
 - (void) addItems:(NSArray*)aSensorPathArray;
 - (NSString*) itemKey:aUrl path:aPath;
 - (void) removeSet:(NSIndexSet*)aSetToRemove;
-- (unsigned) pendingRequestsCount;
+- (NSUInteger) pendingRequestsCount;
 - (id) pendingRequest:(id)aKey forIndex:(int)anIndex;
 
 - (void)          dumpSensorlist;
@@ -162,7 +162,7 @@
 - (void)checkATaskStatus:(NSNotification *)aNotification;
 
 #pragma mark ***Polling Cache
-- (unsigned)  pollingLookUpCount;
+- (NSUInteger)  pollingLookUpCount;
 - (NSString*) requestCacheItemKey:(int)anIndex;
 - (NSDictionary*) requestCacheItem:(int)anIndex;
 

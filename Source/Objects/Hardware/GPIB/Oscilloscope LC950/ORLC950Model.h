@@ -108,9 +108,9 @@
                                                     
 #pragma mark ¥¥¥DataTaker
 - (NSDictionary*) dataRecordDescription;
-- (void) 	runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
-- (void)	takeDataTask:(id)userInfo;
-- (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(id)userInfo;
+- (void) 	runTaskStarted: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void)	takeDataTask:(NSDictionary*)userInfo;
+- (void) 	runTaskStopped: (ORDataPacket*) aDataPacket userInfo:(NSDictionary*)userInfo;
 
 #pragma mark ***Specialty routines.
 - (NSString*) 	triggerSourceAsString;
