@@ -28,9 +28,9 @@
 #define kSBCisDataTaker @"kSBCisDataTaker"
 
 @protocol ORDataTaker
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) reset;
 @end
 
@@ -44,12 +44,12 @@
 /*
 @interface NSObject (ORDataTaker)
 - (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (BOOL) dataAvailable;
 - (BOOL) isRunning;
 - (void) takeData:(ORDataPacket*)aDataPacket;
 - (void) runTaskStarted:(ORDataPacket*)aDataPacket;
 - (void) runTaskStopped:(ORDataPacket*)aDataPacket;
-- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) closeOutRun:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 
 @end*/
