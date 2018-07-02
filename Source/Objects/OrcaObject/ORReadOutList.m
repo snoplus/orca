@@ -214,7 +214,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     return [children containsObject:anObj];
 }
 
-- (unsigned) indexOfObject:(id) anObj
+- (NSUInteger) indexOfObject:(id) anObj
 {
     return [children indexOfObject:anObj];
 }
@@ -297,7 +297,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 }
 //--------------------------------------------------------------
 
-- (unsigned) count
+- (NSUInteger) count
 {
 	return [children count];
 }
@@ -313,7 +313,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     
 }
 
-- (void) moveObject:(id)anObj toIndex:(unsigned)index
+- (void) moveObject:(id)anObj toIndex:(NSUInteger)index
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] moveObject:anObj toIndex:[children indexOfObject:anObj]];
     if(index > [children count]-1){
@@ -326,7 +326,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
     
 }
 
-- (void) removeObjectAtIndex:(unsigned)index;
+- (void) removeObjectAtIndex:(NSUInteger)index;
 {
 	if([children count]){
 		[[[self undoManager] prepareWithInvocationTarget:self] insertObject:[children objectAtIndex:index] atIndex:index];
@@ -337,7 +337,7 @@ NSString* NSReadOutListChangedNotification = @"NSReadOutListChangedNotification"
 	}
 }
 
-- (void) insertObject:(id)anObj atIndex:(unsigned)index
+- (void) insertObject:(id)anObj atIndex:(NSUInteger)index
 {
         [[[self undoManager] prepareWithInvocationTarget:self] removeObject:anObj];
         [children insertObject:anObj atIndex:index];

@@ -57,7 +57,7 @@
 - (void) dealloc;
 
 #pragma mark ¥¥¥Accessors
-- (unsigned) count;
+- (NSUInteger) count;
 - (NSMutableArray*) children;
 - (void)	    setChildren:(NSMutableArray*)newChildren;
 - (NSString*) acceptedProtocol;
@@ -65,14 +65,14 @@
 - (void) addAcceptedObjectName:(NSString*)objectName;
 
 - (BOOL) containsObject:(id) anObj;
-- (unsigned) indexOfObject:(id) anObj;
+- (NSUInteger) indexOfObject:(id) anObj;
 
 - (BOOL) acceptsObject:(id) anObject;
-- (void) moveObject:(id)anObj toIndex:(unsigned)index;
+- (void) moveObject:(id)anObj toIndex:(NSUInteger)index;
 - (void) removeObject:(id)obj;
 - (void) addObject:(id)obj;
-- (void) insertObject:(id)anObj atIndex:(unsigned)index;
-- (void) removeObjectAtIndex:(unsigned)index;
+- (void) insertObject:(id)anObj atIndex:(NSUInteger)index;
+- (void) removeObjectAtIndex:(NSUInteger)index;
 - (void) addObjectsFromArray:(NSArray*)anArray;
 - (void) removeObjectsInArray:(NSArray*)anArray;
 - (NSUndoManager *)	undoManager;
