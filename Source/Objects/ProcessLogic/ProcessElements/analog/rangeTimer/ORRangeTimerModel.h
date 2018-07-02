@@ -45,7 +45,7 @@
 - (void) addAddress;
 - (void) removeAddressAtIndex:(int) anIndex;
 - (void) setEMailList:(NSMutableArray*)aEMailList;
-- (id)   addressEntry:(unsigned)index;
+- (id)   addressEntry:(NSUInteger)index;
 - (BOOL) enableMail;
 - (void) setEnableMail:(BOOL)aEnableMail;
 - (int)	  direction;
@@ -56,7 +56,7 @@
 - (void)  setDeadband:(int)aDeadband;
 - (void) setDeadTimeStart:(NSDate*)aDate;
 - (BOOL) isTrueEndNode;
-- (unsigned) addressCount;
+- (NSUInteger) addressCount;
 
 #pragma mark ¥¥¥Archival
 - (id)   initWithCoder:(NSCoder*)decoder;

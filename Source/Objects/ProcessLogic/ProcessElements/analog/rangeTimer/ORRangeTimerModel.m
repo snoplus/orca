@@ -35,7 +35,7 @@ NSString* ORRangeTimerModelAddressesChanged  = @"ORRangeTimerModelAddressesChang
 NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 
 @interface ORRangeTimerModel (private)
-- (void) eMailThread:(id)userInfo;
+- (void) eMailThread:(NSDictionary*)userInfo;
 @end
 
 
@@ -98,11 +98,11 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
     return eMailList;
 }
 
-- (unsigned) addressCount
+- (NSUInteger) addressCount
 {
 	return [eMailList count];
 }
-- (id)   addressEntry:(unsigned)index
+- (id)   addressEntry:(NSUInteger)index
 {
 	return [eMailList objectAtIndex:index];
 }
@@ -406,7 +406,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 @end
 
 @implementation ORRangeTimerModel (private)
-- (void) eMailThread:(id)userInfo
+- (void) eMailThread:(NSDictionary*)userInfo
 {
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
 	NSString* address =  [userInfo objectForKey:@"Address"];
