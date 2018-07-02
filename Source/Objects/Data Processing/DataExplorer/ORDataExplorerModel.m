@@ -170,7 +170,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     return @"System";
 }
 
-- (id)   childAtIndex:(int)index
+- (id)   childAtIndex:(NSUInteger)index
 {
     NSEnumerator* e = [dataSet objectEnumerator];
     id obj;
@@ -184,12 +184,12 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     }
     return child;
 }
-- (unsigned)  count
+- (NSUInteger)  count
 {
     return [dataSet count];
 }
 
-- (unsigned)  numberOfChildren
+- (NSUInteger)  numberOfChildren
 {
     int count =  [dataSet count];
     return count;
@@ -208,23 +208,23 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease]];
 }
 
-- (void) setTotalLength:(unsigned)aLength
+- (void) setTotalLength:(NSUInteger)aLength
 {
 	totalLength = aLength;
 }
 
-- (void) setLengthDecoded:(unsigned)aLength
+- (void) setLengthDecoded:(NSUInteger)aLength
 {
 	lengthDecoded = aLength;
 }
 
 
-- (unsigned) totalLength
+- (NSUInteger) totalLength
 {
     return totalLength;
 }
 
-- (unsigned) lengthDecoded
+- (NSUInteger) lengthDecoded
 {
     return lengthDecoded;
 }
