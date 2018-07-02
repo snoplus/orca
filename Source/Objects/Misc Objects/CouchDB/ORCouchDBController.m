@@ -26,10 +26,10 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORCouchDBController (private)
-- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
-- (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
+- (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 #endif
 
@@ -535,28 +535,28 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORCouchDBController (private)
-- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
 		[model createDatabases];
 	}
 }
 
-- (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
 		[model deleteDatabases];
 	}
 }
 
-- (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
 		[model setStealthMode:YES];
 	}
     else [model setStealthMode:NO];
 }
-- (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){
 		[model setKeepHistory:NO];
