@@ -815,7 +815,7 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
     return objDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
     

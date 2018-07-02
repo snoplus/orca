@@ -86,8 +86,8 @@
 @property (assign)	BOOL			ppoRepeats;
 
 - (void) clearConnectionHistory;
-- (unsigned) connectionHistoryCount;
-- (id) connectionHistoryItem:(unsigned)index;
+- (NSUInteger) connectionHistoryCount;
+- (id) connectionHistoryItem:(NSUInteger)index;
 - (BOOL) gpsOpsRunningForKey:(id)aKey;
 - (void) setGpsOpsRunning:(BOOL)aGpsOpsRunning forKey:(id)aKey;
 - (void) updatePpoCommand;

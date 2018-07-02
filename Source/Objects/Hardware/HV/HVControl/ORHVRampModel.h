@@ -111,7 +111,7 @@
 - (void) panic;
 
 #pragma mark ¥¥¥Run Data
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 

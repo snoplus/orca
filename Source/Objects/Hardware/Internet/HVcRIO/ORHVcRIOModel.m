@@ -1160,7 +1160,7 @@ static NSString* measuredValueList[] = {
 - (BOOL) zeusHasControl         {return zeusHasControl;}
 - (BOOL) orcaHasControl         {return orcaHasControl;}
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     if(inNetSocket == socket){
 		NSString* theString = [[[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease] uppercaseString];
@@ -1283,7 +1283,7 @@ static NSString* measuredValueList[] = {
     [self setDataId:[anOtherDevice dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

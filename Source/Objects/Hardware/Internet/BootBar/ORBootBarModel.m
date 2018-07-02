@@ -167,18 +167,18 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	[self setIPNumber:[self IPNumber]];
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
-- (unsigned) ipNumberIndex
+- (NSUInteger) ipNumberIndex
 {
 	return ipNumberIndex;
 }
@@ -325,7 +325,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     if(inNetSocket == socket){
 		[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(connect) object:nil];

@@ -185,7 +185,7 @@ NSString* ORNplpCMeterLowLimitChanged		= @"ORNplpCMeterLowLimitChanged";
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     if(inNetSocket == socket){
 		[self appendMeterData:[inNetSocket readData]];
@@ -233,7 +233,7 @@ NSString* ORNplpCMeterLowLimitChanged		= @"ORNplpCMeterLowLimitChanged";
     [self setDataId:[anotherCard dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"NplpCMeter"];
 }

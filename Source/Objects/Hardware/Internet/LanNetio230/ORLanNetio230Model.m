@@ -205,18 +205,18 @@ NSString* ORLanNetio230ModelOutletNameChanged	 = @"ORLanNetio230ModelOutletNameC
 	[self setIPNumber:[self IPNumber]];
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
-- (unsigned) ipNumberIndex
+- (NSUInteger) ipNumberIndex
 {
 	return ipNumberIndex;
 }
@@ -701,7 +701,7 @@ return;
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     //DEBUG OUTPUT:  	
     NSLog(@"%@::%@: UNDER CONSTRUCTION!  \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG testing ...-tb-

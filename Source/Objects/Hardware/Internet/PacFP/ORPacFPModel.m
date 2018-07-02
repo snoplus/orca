@@ -285,7 +285,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     }
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
     if(!lastRequest)return;
     
@@ -804,7 +804,7 @@ NSString* ORPacFPLock						= @"ORPacFPLock";
     [self setDataId:[anotherPacFP dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

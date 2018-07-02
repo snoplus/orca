@@ -52,9 +52,9 @@
 - (void) setPassword:(NSString*)aPassword;
 - (void) initConnectionHistory;
 - (void) clearHistory;
-- (unsigned) connectionHistoryCount;
-- (id) connectionHistoryItem:(unsigned)index;
-- (unsigned) ipNumberIndex;
+- (NSUInteger) connectionHistoryCount;
+- (id) connectionHistoryItem:(NSUInteger)index;
+- (NSUInteger) ipNumberIndex;
 - (NSString*) IPNumber;
 - (void) setIPNumber:(NSString*)aIPNumber;
 - (NetSocket*) socket;

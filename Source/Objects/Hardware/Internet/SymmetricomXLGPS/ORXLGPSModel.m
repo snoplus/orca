@@ -134,12 +134,12 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 	[self setIPNumber:[self IPNumber]];
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
@@ -780,7 +780,7 @@ NSString* ORXLGPSModelPpoRepeatsChanged		= @"ORXLGPSModelPpoRepeatsChanged";
 	[self kill];
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
 	if(inNetSocket == socket){
 		NSString* theString = [[[NSString alloc] initWithData:[inNetSocket readData] encoding:NSASCIIStringEncoding] autorelease];

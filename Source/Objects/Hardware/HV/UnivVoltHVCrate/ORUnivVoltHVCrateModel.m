@@ -1051,7 +1051,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 }
 
 
-- (void) netsocket: (NetSocket*) anInNetSocket dataAvailable: (unsigned) anInAmount
+- (void) netsocket: (NetSocket*) anInNetSocket dataAvailable: (NSUInteger) anInAmount
 {
     @try {
 		if (anInNetSocket == mSocket) {
