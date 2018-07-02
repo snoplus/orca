@@ -303,7 +303,7 @@
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (IBAction) changeMonitorRead: (id) aSender
+- (IBAction) changeMonitorRead: (NSButton*) aSender
 {
     bool	tmpValue = false;
     if ( [ aSender state ] == 1 ) tmpValue = true;
@@ -317,7 +317,7 @@
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (IBAction) changeMonitorWrite: (id) aSender
+- (IBAction) changeMonitorWrite: (NSButton*) aSender
 {
     bool	tmpValue = false;
     if ( [ aSender state ] == 1 ) tmpValue = true;

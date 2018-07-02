@@ -66,8 +66,8 @@
 - (IBAction)	changePrimaryAddress: (id) aSender;
 - (IBAction) 	changeBoardIndexAction: (id) aSender;
 - (IBAction)    testLockAction:(id)sender;
-- (IBAction)	changeMonitorRead: (id) aSender;
-- (IBAction)	changeMonitorWrite: (id) aSender;
+- (IBAction)	changeMonitorRead: (NSButton*) aSender;
+- (IBAction)	changeMonitorWrite: (NSButton*) aSender;
 
 #pragma mark ***Support
 - (void)    changeIbstaStatus: (int) aStatus;
