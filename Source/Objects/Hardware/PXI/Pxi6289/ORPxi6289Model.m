@@ -246,7 +246,7 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
     else return [[cardDictionary objectForKey:param] objectAtIndex:aChannel];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -269,7 +269,7 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = YES; 
 	BOOL dataReady = NO;
@@ -321,7 +321,7 @@ static unsigned long register_offsets[kNumberOfPxi6289Registers] = {
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = NO;
     [waveFormRateGroup stop];

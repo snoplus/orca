@@ -144,13 +144,13 @@
 
 #pragma mark ¥¥¥DataTaker
 - (NSDictionary*) dataRecordDescription;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherCard;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) shipEvent:(ORDataPacket*)aDataPacket data:(NSMutableData*)eventBuffer numWords:(unsigned)dataWordCount;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) shipEvent:(ORDataPacket*)aDataPacket data:(NSMutableData*)eventBuffer numWords:(NSUInteger)dataWordCount;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) reset;
 
 #pragma mark ¥¥¥Hardware Access

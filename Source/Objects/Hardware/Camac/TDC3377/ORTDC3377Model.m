@@ -1068,7 +1068,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     return dataDictionary;
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
@@ -1079,7 +1079,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 {
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![self adapter]){
@@ -1112,7 +1112,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     unsigned short dummy;
     unsigned short statusWord;
@@ -1193,7 +1193,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	
 }
 
-- (void) shipEvent:(ORDataPacket*)aDataPacket data:(NSMutableData*)eventBuffer numWords:(unsigned)dataWordCount
+- (void) shipEvent:(ORDataPacket*)aDataPacket data:(NSMutableData*)eventBuffer numWords:(NSUInteger)dataWordCount
 {
 	if(dataWordCount){
 		if(eventBuffer){
@@ -1219,7 +1219,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 }
 

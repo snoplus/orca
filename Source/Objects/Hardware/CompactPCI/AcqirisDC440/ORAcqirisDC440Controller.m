@@ -32,7 +32,7 @@
 #import "ORValueBarGroupView.h"
 
 @interface ORAcqirisDC440Controller (private)
-- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation ORAcqirisDC440Controller
@@ -598,7 +598,7 @@
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @implementation ORAcqirisDC440Controller (private)
-- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertDefaultReturn){
 		[model loadDialog];
