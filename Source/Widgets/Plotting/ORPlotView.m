@@ -123,22 +123,22 @@
 	yScale = anAxis; //don't retain
 }
 
-- (id) xScale
+- (ORAxis*) xScale
 {
 	return xScale; 
 }
 
-- (id) yScale
+- (ORAxis*) yScale
 { 
 	return yScale; 
 }
 
-- (id) zScale
+- (ORAxis*) zScale
 { 
 	return zScale; 
 }
 
-- (id) colorScale
+- (ORAxis*) colorScale
 {
 	return colorScale;
 }

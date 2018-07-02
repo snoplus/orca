@@ -22,6 +22,7 @@
 
 @class ORPlotView;
 @class ORPlot;
+@class ORAxis;
 
 @interface NSObject (NRTPlotViewDelegateMethods)
 - (void) plotViewWillDraw:(ORPlotView*) view;
@@ -48,10 +49,10 @@
 		float					currentDragYValue;
 		NSString*				comment;
 		IBOutlet id				delegate;
-		IBOutlet id				xScale;
-		IBOutlet id				yScale;
-		IBOutlet id				zScale;
-		IBOutlet id				colorScale;
+		IBOutlet ORAxis*		xScale;
+		IBOutlet ORAxis*		yScale;
+		IBOutlet ORAxis*		zScale;
+		IBOutlet ORAxis*		colorScale;
 		IBOutlet NSView*		viewForPDF;
 		IBOutlet NSTextField*	titleField;
 }
@@ -76,10 +77,10 @@
  
 #pragma mark ***Parts
 - (NSTextField*) titleField;
-- (id) xScale;
-- (id) yScale;
-- (id) zScale;
-- (id) colorScale;
+- (ORAxis*) xScale;
+- (ORAxis*) yScale;
+- (ORAxis*) zScale;
+- (ORAxis*) colorScale;
 - (void) setXScale:(id)anAxis;
 - (void) setYScale:(id)anAxis;
 - (void) setZScale:(id)anAxis;
