@@ -83,11 +83,11 @@
 #pragma mark ¥¥¥Data Source Methods
 - (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;
 - (int)  outlineView:(NSOutlineView*)ov numberOfChildrenOfItem:(id)item;
-- (id)   outlineView:(NSOutlineView*)ov child:(int)index ofItem:(id)item;
+- (id)   outlineView:(NSOutlineView*)ov child:(NSUInteger)index ofItem:(id)item;
 - (id)   outlineView:(NSOutlineView*)ov objectValueForTableColumn:(NSTableColumn*)tableColumn byItem:(id)item;
-- (unsigned)  numberOfChildren;
-- (id)   childAtIndex:(int)index;
-- (id)   name;
+- (NSUInteger)  numberOfChildren;
+- (id)   childAtIndex:(NSUInteger)index;
+- (NSString*)   name;
 
 #pragma mark ¥¥¥Actions
 - (IBAction) clearAllAction:(id)sender;

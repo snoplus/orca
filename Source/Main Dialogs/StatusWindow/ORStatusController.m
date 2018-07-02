@@ -35,7 +35,7 @@ ORStatusController* theLogger = nil;
 
 @interface ORStatusController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 #endif
 - (void) mainThreadPrint:(NSAttributedString*)s1;
 @end
@@ -399,9 +399,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     return    (item == nil) ? YES : ([item numberOfChildren] != 0);
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item
 {
-    if(item)   return [item childAtIndex:index];
+    if(item)   return [(ORDataSet*)item childAtIndex:index];
     else	return dataSet;
 }
 
@@ -410,12 +410,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     return  ((item == nil) ? [self name] : [item name]);
 }
 
-- (unsigned)  numberOfChildren
+- (NSUInteger)  numberOfChildren
 {
     return [dataSet count];
 }
 
-- (id)   childAtIndex:(int)index
+- (id)   childAtIndex:(NSUInteger)index
 {
     NSEnumerator* e = [dataSet objectEnumerator];
     id obj;
@@ -430,7 +430,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     return child;
 }
 
-- (id)   name
+- (NSString*)   name
 {
     return @"Errors";
 }
@@ -1052,7 +1052,7 @@ void NSLogError(NSString* aString,...)
 
 @implementation ORStatusController (private)
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) deleteHistoryActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertAlternateReturn){		
 		NSString* alarmHistoryPath = [[ApplicationSupport sharedApplicationSupport] applicationSupportFolder:@"History"];
