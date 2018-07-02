@@ -2980,7 +2980,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 }
 
 #pragma mark •••DataTaking
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -3024,7 +3024,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//reading events from the mac is very, very slow. If the buffer is filling up, it can take a long time to readout all events.
 	//Because of this we limit the number of events from any one buffer read. The SBC should be used if possible.
@@ -3128,7 +3128,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 }
 
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	isRunning = NO;
 	
@@ -3165,7 +3165,7 @@ static SIS3302GammaRegisterInformation register_information[kNumSIS3302ReadRegs]
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	if(runMode == kMcaRunMode){	
 		unsigned long aValue = 0;

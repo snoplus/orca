@@ -367,7 +367,7 @@ unsigned char freqPreset250MHz[6]  = {0x20,0xC2,0xBC,0x33,0xE4,0xF2};
 - (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(BOOL*)anArray                    size:(long)numItems forKey:(NSString*)aKey;
 - (void) configureAdcFpgaIobDelays:(unsigned long) iobDelayValue;
 - (void) enableAdcSpiAdcOutputs;
-- (int) changeFrequencyHsDivN1Div:(int) osc hsDiv:(unsigned) hs_div_val n1Div:( unsigned) n1_div_val;
+- (int) changeFrequencyHsDivN1Div:(int) osc hsDiv:(NSUInteger) hs_div_val n1Div:( unsigned) n1_div_val;
 - (int) writesi5325ClkMultiplier:(unsigned long) addr data:(unsigned long) data;
 - (int) adcSpiSetup;
 @end
@@ -2472,126 +2472,6 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     return sharing;
 }
 
-//- (void) setClockFreq
-//{
-//    unsigned HSdiv_reg[6];
-//    unsigned HSdiv_val[6];
-//
-//    HSdiv_reg[0] =  0 ;
-//    HSdiv_val[0] =  4 ;
-//
-//    HSdiv_reg[1] =  1 ;
-//    HSdiv_val[1] =  5 ;
-//
-//    HSdiv_reg[2] =  2 ;
-//    HSdiv_val[2] =  6 ;
-//
-//    HSdiv_reg[3] =  3 ;
-//    HSdiv_val[3] =  7 ;
-//
-//    HSdiv_reg[4] =  5 ;
-//    HSdiv_val[4] =  9 ;
-//
-//    HSdiv_reg[5] =  7 ;
-//    HSdiv_val[5] =  11 ;
-//
-//    unsigned long hsDiv_local = 0xff;
-//    int i;
-//    for (i=0;i<6;i++){
-//        if (HSdiv_val[i] == hsDiv) {
-//            hsDiv_local = HSdiv_reg[i] ;
-//        }
-//    }
-//
-//    unsigned long n1Div_local = n1Div - 1 ;
-//
-//    unsigned char freqSI570_high_speed_rd_value[6];
-//    [self si570ReadDivider:0 data:freqSI570_high_speed_rd_value];
-//
-//    unsigned char freqSI570_high_speed_wr_value[6];
-//    freqSI570_high_speed_wr_value[0] = ((hsDiv_local & 0x7) << 5) + ((n1Div_local & 0x7c) >> 2);
-//    freqSI570_high_speed_wr_value[1] = ((n1Div_local & 0x3) << 6) + (freqSI570_high_speed_rd_value[1] & 0x3F);
-//    freqSI570_high_speed_wr_value[2] = freqSI570_high_speed_rd_value[2];
-//    freqSI570_high_speed_wr_value[3] = freqSI570_high_speed_rd_value[3];
-//    freqSI570_high_speed_wr_value[4] = freqSI570_high_speed_rd_value[4];
-//    freqSI570_high_speed_wr_value[5] = freqSI570_high_speed_rd_value[5];
-//
-//
-//    [self setFrequency:0 values:freqSI570_high_speed_wr_value];
-//
-//}
-//#define OSC_ADR    0x55
-//
-//- (void) si570ReadDivider:(int) osc data:(unsigned char*)data
-//{
-//    int rc;
-//    char ack;
-//    int i;
-//
-//    // start
-//    rc = [self i2cStart:osc];
-//    if(rc){
-//        [self i2cStop:osc];
-//        return;
-//    }
-//
-//    // address
-//    rc = [self i2cWriteByte:osc data:OSC_ADR<<1 ack:&ack];
-//    if(rc){
-//        [self i2cStop:osc];
-//    }
-//
-//    if(!ack){
-//        [self i2cStop:osc];
-//    }
-//
-//    // register offset
-//    rc = [self i2cWriteByte:osc data:0x0D ack:&ack];
-//    if(rc){
-//        [self i2cStop:osc];
-//        return;
-//    }
-//
-//    if(!ack){
-//        [self i2cStop:osc];
-//        return;
-//    }
-//
-//
-//    rc = [self i2cStart:osc];
-//    if(rc){
-//        [self i2cStop:osc];
-//        return;
-//    }
-//
-//    // address + 1
-//    rc = [self i2cWriteByte:osc data:(OSC_ADR<<1) + 1 ack: &ack];
-//    if(rc){
-//        [self i2cStop:osc];
-//        return;
-//    }
-//
-//    if(!ack){
-//        [self i2cStop:osc];
-//        return;
-//    }
-//
-//
-//    // read data
-//    for(i = 0;i < 6;i++){
-//        ack = 1 ;
-//        if (i==5) {ack = 0;}
-//        rc = [self i2cReadByte:osc data:&data[i] ack: ack];
-//        if(rc){
-//            [self i2cStop:osc];
-//            return;
-//        }
-//
-//    }
-//
-//    // stop
-//    [self i2cStop:osc];
-//}
 
 //6.7 ADC Gain and Termination Control register
 - (unsigned short) gain
@@ -2665,22 +2545,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     dacOffsets[aGroup] = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3316DacOffsetChanged object:self];
 }
-//6.9 ADC Offset
-- (void) configureAnalogRegisters
-{
-//    // set ADC chips via SPI
-//    int iadc;
-//    for (iadc=0;iadc<kNumSIS3316Groups;iadc++) {
-//        [self writeLong:0x81001404 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]]; // SPI (OE)  set binary
-//        usleep(1);
-//        [self writeLong:0x81401404 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  set binary
-//        usleep(1);
-//        [self writeLong:0x8100ff01 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  update
-//        usleep(1);
-//        [self writeLong:0x8140ff01 toAddress:[self groupRegister:kAdcSpiControlReg group:iadc]];// SPI (OE)  update
-//        usleep(1);
-//    }
-}
+
 - (void) writeDacRegisters
 {
     //  set ADC offsets (DAC)
@@ -4525,7 +4390,7 @@ NSString* tauTable[4] ={
     else return nil;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -4563,7 +4428,7 @@ NSString* tauTable[4] ={
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     unsigned long orcaHeaderLen = 10;
     unsigned long dataHeaderLen =  [self headerLen];
@@ -4715,7 +4580,7 @@ NSString* tauTable[4] ={
         NSLog(@"%@: Can not read statistics while run in progress\n",[self fullID]);
     }
 }
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [timer stop];
     [timer release];
@@ -5543,7 +5408,7 @@ NSString* tauTable[4] ={
     }
 }
 
-- (int) changeFrequencyHsDivN1Div:(int) osc hsDiv:(unsigned) hs_div_val n1Div:( unsigned) n1_div_val
+- (int) changeFrequencyHsDivN1Div:(int) osc hsDiv:(NSUInteger) hs_div_val n1Div:( unsigned) n1_div_val
 {
     int rc;
     unsigned i ;

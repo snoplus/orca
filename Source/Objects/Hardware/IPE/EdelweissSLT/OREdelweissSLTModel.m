@@ -3494,7 +3494,7 @@ NSLog(@"WARNING: %@::%@: under construction! \n",NSStringFromClass([self class])
 }
 
 #pragma mark •••Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 //TODO: UNDER construction -tb-
 //TODO: UNDER construction -tb-
@@ -3619,7 +3619,7 @@ NSLog(@"     %@::%@: takeUDPstreamData: savedUDPSocketState is %i \n",NSStringFr
 	
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
         // -------TIMER-VARIABLES-----------
         static struct timeval starttime, /*stoptime,*/ currtime;//    struct timezone tz; is obsolete ... -tb-
@@ -4004,7 +4004,7 @@ if((len % 4) != 0){
 
 
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     for(id obj in dataTakers){
         [obj runIsStopping:aDataPacket userInfo:userInfo];
@@ -4014,7 +4014,7 @@ if((len % 4) != 0){
     	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(accessAllowedToHardwareAndSBC){
 	    [self shipSltSecondCounter: kStopRunType];

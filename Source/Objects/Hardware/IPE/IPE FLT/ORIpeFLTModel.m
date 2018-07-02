@@ -1302,7 +1302,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 {
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	id slt = [[self crate] adapter];
 	
@@ -1363,7 +1363,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 
 // Description: Read data from a card
 //***************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
     @try {	
 		
@@ -1440,7 +1440,7 @@ static NSString* fltTestName[kNumIpeFLTTests]= {
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[self setLedOff:YES];
 	[self writeControlStatus];

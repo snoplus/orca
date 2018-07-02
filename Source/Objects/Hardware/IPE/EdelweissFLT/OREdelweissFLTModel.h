@@ -627,9 +627,9 @@
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Taker
 - (void) fireRepeatedSoftwareTriggerInRun;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢HW Wizard
 - (int) numberOfChannels;

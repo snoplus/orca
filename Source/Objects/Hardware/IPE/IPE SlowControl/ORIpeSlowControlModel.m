@@ -428,18 +428,18 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlModelViewItemNameChanged object:self];
 }
 
-- (unsigned) connectionHistoryCount
+- (NSUInteger) connectionHistoryCount
 {
 	return [connectionHistory count];
 }
 
-- (id) connectionHistoryItem:(unsigned)index
+- (id) connectionHistoryItem:(NSUInteger)index
 {
 	if(connectionHistory && index<[connectionHistory count])return [connectionHistory objectAtIndex:index];
 	else return nil;
 }
 
-- (unsigned) ipNumberIndex
+- (NSUInteger) ipNumberIndex
 {
 	return ipNumberIndex;
 }
@@ -590,7 +590,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 	else return nil;
 }
 
-- (unsigned) pollingLookUpCount
+- (NSUInteger) pollingLookUpCount
 {
 	return [pollingLookUp count];
 }
@@ -973,7 +973,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
     return objDictionary;
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
 }
@@ -1951,7 +1951,7 @@ enum {
 	else return 0;
 }
 
-- (unsigned) pendingRequestsCount
+- (NSUInteger) pendingRequestsCount
 {
 	return [[pendingRequests allKeys] count];
 }

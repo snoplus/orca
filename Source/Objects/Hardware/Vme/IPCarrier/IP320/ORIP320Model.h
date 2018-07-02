@@ -182,7 +182,7 @@ struct{
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item;
 - (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item;
-- (unsigned)  numberOfChildren;
+- (NSUInteger)  numberOfChildren;
 - (id)   childAtIndex:(NSUInteger)index;
 - (id)   name;
 - (void) removeDataSet:(ORDataSet*)aSet;

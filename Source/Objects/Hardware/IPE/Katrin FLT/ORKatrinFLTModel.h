@@ -523,9 +523,9 @@
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 
 #pragma mark ¥¥¥Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 //- (void) reset; //see above -tb-
 
 #pragma mark ¥¥¥SubSets of TakeData
@@ -534,8 +534,8 @@
 - (void) takeDataMeasureMode:(ORDataPacket*)aDataPacket;
 - (void) takeDataRunOrDebugMode:(ORDataPacket*) aDataPacket;
 - (void) takeDataHistogramMode:(ORDataPacket*)aDataPacket;
-- (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) takeDataVetoMode:(ORDataPacket*)aDataPacket;
 
 #pragma mark ¥¥¥HW Wizard

@@ -223,9 +223,9 @@
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (unsigned long) waveFormCount:(int)aChannel;
 - (void)   startRates;
 - (void) clearWaveFormCounts;

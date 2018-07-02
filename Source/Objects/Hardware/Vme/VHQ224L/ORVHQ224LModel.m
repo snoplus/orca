@@ -529,7 +529,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 
 
 #pragma mark •••Header Stuff
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

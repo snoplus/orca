@@ -2218,7 +2218,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 }
 
 #pragma mark •••Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"No Crate controller detected."];
@@ -2246,7 +2246,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 	isRunning		= NO;
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {
 		isRunning		= YES;
@@ -2309,7 +2309,7 @@ unsigned long triggerThresholdAddress[kNumSIS3320Channels]={
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	ledOn = NO;
 	[self writeControlStatusRegister];

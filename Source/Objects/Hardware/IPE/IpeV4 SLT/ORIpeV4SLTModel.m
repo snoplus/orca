@@ -1730,7 +1730,7 @@ return;
 
 #pragma mark •••Data Taker
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
         //DEBUG
@@ -1858,7 +1858,7 @@ return;
     //next  takeData:userInfo: will be called, which will release inhibit in the first cycle -tb-
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	if(!first){
 		//event readout controlled by the SLT cpu now. ORCA reads out 
@@ -1886,7 +1886,7 @@ return;
 	}
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
         //DEBUG NSLog(@"%@::%@   <------- \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//DEBUG -tb-
@@ -1900,7 +1900,7 @@ return;
 	[pmcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     #if SHOW_RUN_NOTIFICATIONS_AND_CALLS
         //DEBUG

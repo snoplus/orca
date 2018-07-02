@@ -3881,7 +3881,7 @@ clean_up_mark:
 	return objDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 #ifdef __ORCA_DEVELOPMENT__CONFIGURATION__
     //NSLog(@"---- ORKatrinFLTModel::runTaskStarted (%i)----\n", [self slot]);
@@ -4214,7 +4214,7 @@ clean_up_mark:
 
 // Description: Read data from a card
 //****************************g**********************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
     @try {	
 	   	
@@ -5234,7 +5234,7 @@ clean_up_mark:
  *
  * For old FPGA version(s) < 0x3
  */ //-tb- 2008-03-05
-- (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) pauseHistogrammingAndReadOutData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     //THE FOLLOWING PART WAS FOR FPGAversion <3
@@ -5311,7 +5311,7 @@ clean_up_mark:
  *
  * For NEW FPGA version(s) >= 0x3 ([self versionRegHWVersion]>=0x3)
  */ //-tb- 2008-03-05
-- (void) readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) readOutHistogramDataV3:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     DebugHistoTB(  NSLog(@"READ HISTOGRAMS\n");  )
     int chan;
@@ -5501,7 +5501,7 @@ clean_up_mark:
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKatrinFLTModelHitRateChanged object:self];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     // read the hardware histogram -tb- 2008-03-05
     if(daqRunMode == kKatrinFlt_DaqHistogram_Mode){	

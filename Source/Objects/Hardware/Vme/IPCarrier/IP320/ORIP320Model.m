@@ -428,7 +428,7 @@ static struct {
 }
 
 -(unsigned short) readDataBlock
-{	
+{
 	unsigned short value = 0;
 	unsigned short modifier = [guardian addressModifier];
 	id cachedController = [guardian adapter];
@@ -957,7 +957,7 @@ static struct {
 	return objDictionary;
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"IP320"];
 }
@@ -1119,7 +1119,7 @@ static struct {
     return  ((item == nil) ? @"IP320" : [(ORIP320Model*)item name]);
 }
 
-- (unsigned)  numberOfChildren
+- (NSUInteger)  numberOfChildren
 {
     int count =  [dataSet count];
     return count;

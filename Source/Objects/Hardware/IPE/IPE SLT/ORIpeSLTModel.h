@@ -286,9 +286,9 @@ enum {
 - (void) syncDataIdsWith:(id)anotherCard;
 
 #pragma mark ¥¥¥DataTaker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) saveReadOutList:(NSFileHandle*)aFile;
 - (void) loadReadOutList:(NSFileHandle*)aFile;
 - (ORReadOutList*)	readOutGroup;

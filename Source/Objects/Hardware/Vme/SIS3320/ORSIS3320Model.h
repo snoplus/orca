@@ -270,9 +270,9 @@
 - (NSArray*) wizardSelections;
 
 #pragma mark •••Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (int) load_HW_Config_Structure:(SBC_crate_config*)configStruct index:(int)index;
 - (BOOL) bumpRateFromDecodeStage:(short)channel;
 

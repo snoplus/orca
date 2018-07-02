@@ -4417,7 +4417,7 @@ for(chan=0; chan<6;chan++)
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
 //TODO: runTaskStarted UNDER CONSTRUCTION -tb- 
@@ -4505,7 +4505,7 @@ for(chan=0; chan<6;chan++)
 
 // Description: Read data from a card
 //***************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
 	if(firstTime){
 		firstTime = NO;
@@ -4513,7 +4513,7 @@ for(chan=0; chan<6;chan++)
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[self setLedOff:YES];
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(readHitRates) object:nil];

@@ -148,8 +148,8 @@ static unsigned long adcGainOffsets[4]={
 unsigned long rblt_data[kMaxNumberWords];
 
 @interface ORSIS3350Model (private)
-- (void) takeDataType1:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder;
-- (void) takeDataType2:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder;
+- (void) takeDataType1:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo reorder:(BOOL)reorder;
+- (void) takeDataType2:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo reorder:(BOOL)reorder;
 - (void) readAndShip:(ORDataPacket*)aDataPacket
 			 channel: (int) aChannel 
   sampleStartAddress:(unsigned long) aBufferSampleStartAddress 
@@ -1301,7 +1301,7 @@ unsigned long rblt_data[kMaxNumberWords];
 }
 
 #pragma mark •••Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -1325,18 +1325,18 @@ unsigned long rblt_data[kMaxNumberWords];
 	isRunning		= NO;
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {	
 		isRunning		= YES;
 		switch(runningOperationMode){
-			case kOperationRingBufferSync:			[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
-			case kOperationDirectMemoryGateSync:	[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
-			case kOperationDirectMemoryStart:		[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
-			case kOperationDirectMemoryStop:		[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:YES];	break;
+			case kOperationRingBufferSync:			[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(NSDictionary*)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryGateSync:	[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(NSDictionary*)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryStart:		[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(NSDictionary*)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryStop:		[self takeDataType1:(ORDataPacket*)aDataPacket	userInfo:(NSDictionary*)userInfo reorder:YES];	break;
 			
-			case kOperationRingBufferAsync:			[self takeDataType2:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
-			case kOperationDirectMemoryGateAsync:	[self takeDataType2:(ORDataPacket*)aDataPacket	userInfo:(id)userInfo reorder:NO];	break;
+			case kOperationRingBufferAsync:			[self takeDataType2:(ORDataPacket*)aDataPacket	userInfo:(NSDictionary*)userInfo reorder:NO];	break;
+			case kOperationDirectMemoryGateAsync:	[self takeDataType2:(ORDataPacket*)aDataPacket	userInfo:(NSDictionary*)userInfo reorder:NO];	break;
 		}
 	}
 	@catch(NSException* localException) {
@@ -1345,7 +1345,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	ledOn = NO;
 	[self writeControlStatusRegister];
@@ -1608,7 +1608,7 @@ unsigned long rblt_data[kMaxNumberWords];
 @end
 
 @implementation ORSIS3350Model (private)
-- (void) takeDataType1:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder
+- (void) takeDataType1:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo reorder:(BOOL)reorder
 {
 	unsigned long status = [self readAcqRegister];
 	if((status & kAcqStatusArmedFlag) != kAcqStatusArmedFlag){
@@ -1643,7 +1643,7 @@ unsigned long rblt_data[kMaxNumberWords];
 	}
 } 
 
-- (void) takeDataType2:(ORDataPacket*)aDataPacket userInfo:(id)userInfo reorder:(BOOL)reorder
+- (void) takeDataType2:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo reorder:(BOOL)reorder
 {
 	unsigned long status = [self readAcqRegister];
 	if((status & kAcqStatusEndAddressFlag) == kAcqStatusEndAddressFlag){

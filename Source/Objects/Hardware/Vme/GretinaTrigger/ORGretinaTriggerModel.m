@@ -1105,7 +1105,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
 - (NSString*) stateStatus:(int)aStateIndex
 {
     if(aStateIndex < [stateStatus count]){
-        return [[stateStatus objectAtIndex:aStateIndex] objectForKey:@"status"];
+        return [(NSDictionary*)[stateStatus objectAtIndex:aStateIndex] objectForKey:@"status"];
     }
     else return @"";
 }
@@ -2078,7 +2078,7 @@ static GretinaTriggerStateInfo router_state_info[kNumRouterTriggerStates] = {
     [self setDataId:[anotherObj dataId]];
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description

@@ -2153,7 +2153,7 @@ static struct {
     else return [[cardDictionary objectForKey:param] objectAtIndex:aChannel];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -2203,7 +2203,7 @@ static struct {
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = YES;
     NSString* errorLocation = @"";
@@ -2269,7 +2269,7 @@ static struct {
     }
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {
 		/* Disable all channels.  The remaining buffer should be readout. */
@@ -2284,7 +2284,7 @@ static struct {
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = NO;
     [waveFormRateGroup stop];

@@ -2866,7 +2866,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     runNumberLocal     = [[userInfo objectForKey:@"kRunNumber"] unsignedLongValue];
     subRunNumberLocal     = [[userInfo objectForKey:@"kSubRunNumber"] unsignedLongValue];
@@ -2923,7 +2923,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = YES;
     NSString* errorLocation = @"";
@@ -2966,7 +2966,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
     }
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {
         if([[userInfo objectForKey:@"doinit"]boolValue]==1){
@@ -2985,7 +2985,7 @@ static Gretina4MRegisterInformation fpga_register_information[kNumberOfFPGARegis
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = NO;
     [waveFormRateGroup stop];

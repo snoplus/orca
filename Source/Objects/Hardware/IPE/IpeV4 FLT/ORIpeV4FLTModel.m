@@ -1425,7 +1425,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	[self writeReg:kFLTV4CommandReg value:kIpeFlt_Reset_All];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
 	firstTime = YES;
 	
@@ -1479,7 +1479,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 
 // Description: Read data from a card
 //***************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
 	if(firstTime){
 		firstTime = NO;
@@ -1487,7 +1487,7 @@ static IpeRegisterNamesStruct regV4[kFLTV4NumRegs] = {
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//[self writeRunControl:NO];// let it run, see runTaskStarted ... -tb-
 	[self setLedOff:YES];

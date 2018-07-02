@@ -3183,7 +3183,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     firstTime = YES;
     if(![[self adapter] controllerCard]){
@@ -3237,7 +3237,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //return;
     isRunning = YES;
@@ -3280,7 +3280,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     }
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 
     @try {
@@ -3301,7 +3301,7 @@ NSString* ORGretina4AAcceptedEventCountChanged          = @"ORGretina4AAcceptedE
     }
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     isRunning = NO;
     [waveFormRateGroup stop];

@@ -633,7 +633,7 @@ enum {
 - (void) setMawBufferLength:(unsigned short)aGroup withValue:(unsigned long)aValue;
 - (unsigned long) mawPretrigDelay:(unsigned short)aGroup;
 - (void) setMawPretrigDelay:(unsigned short)aGroup withValue:(unsigned long)aValue;
-- (void) readTimeStamp;
+- (void) readTimeStamp:(BOOL) verbose;
 
 - (void) dumpInternalTriggerDelayConfig;        //6.23
 - (void) dumpInternalGateLengthConfig;          //6.24
@@ -682,7 +682,6 @@ enum {
 - (void) readHeTrigThresholds:(BOOL)verbose;    //6.27 (section 2)
 - (void) readHeTrigThresholdSum:(BOOL)verbose;
 - (void) writeAccumulatorGates;                 //6.31 (section 2)
-- (void) configureAnalogRegisters;
 - (void) writeDacRegisters;
 - (void) clearPPSLatchBit;                      //6.39
 
@@ -724,9 +723,9 @@ enum {
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (NSDictionary*) dataRecordDescription;
 - (void) reset;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (unsigned long) waveFormCount:(int)aChannel;
 - (void)   startRates;
 - (void) clearWaveFormCounts;

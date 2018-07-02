@@ -795,7 +795,7 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
     return objDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -822,12 +822,12 @@ NSString* ORSIS3800ChannelNameChanged				 = @"ORSIS3800ChannelNameChanged";
 	endOfRun = NO;
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//nothing to do for this card
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	if([self syncWithRun]){
 		[self stopCounting];

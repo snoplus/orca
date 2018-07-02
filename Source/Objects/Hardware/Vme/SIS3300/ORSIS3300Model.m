@@ -1334,7 +1334,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
     else return nil;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![[self adapter] controllerCard]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI Controller (i.e. a 617)."];
@@ -1374,7 +1374,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 // Function:	TakeData
 // Description: Read data from a card
 //**************************************************************************************
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {
 		isRunning = YES;
@@ -1446,7 +1446,7 @@ static unsigned long addressCounterOffset[4][2]={ //group,bank
 	}
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[self stopSampling];
 	[self stopBankSwitching];
