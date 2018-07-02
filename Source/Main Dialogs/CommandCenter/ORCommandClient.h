@@ -21,6 +21,6 @@
 @interface ORCommandClient : ORSocketClient 
 {
 }
-- (void)netsocket:(NetSocket*)insocket dataAvailable:(unsigned)inAmount;
+- (void)netsocket:(NetSocket*)insocket dataAvailable:(NSUInteger)inAmount;
 - (void) sendCmd:(NSString*)aCmd withString:(NSString*)aString;
 @end

@@ -22,7 +22,7 @@
 
 @implementation ORCommandClient
 
-- (void)netsocket:(NetSocket*)insocket dataAvailable:(unsigned)inAmount
+- (void)netsocket:(NetSocket*)insocket dataAvailable:(NSUInteger)inAmount
 {
     if(insocket == socket){
         [delegate handleCommand:[socket readString:NSASCIIStringEncoding amount:inAmount] fromClient:self];
