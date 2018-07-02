@@ -139,7 +139,7 @@ Example:
 The longTask method in self will then be called and should look
 something like this:
  <pre>
-    - (id)longTask:(id)userInfo
+    - (id)longTask:(NSDictionary*)userInfo
     {
         // Do something that takes a while and uses 'userInfo' if you want
         id otherSelf = [userInfo objectForKey:&#064;"self"];
@@ -156,7 +156,7 @@ which will be the controlling ThreadWorker instance which you can use
 to see if the ThreadWorker has been marked as cancelled.
 Your "longTask" method might then look like this:
  <pre>
-    - (id)longTask:(id)userInfo anyNameHere:(ThreadWorker *)tw
+    - (id)longTask:(NSDictionary*)userInfo anyNameHere:(ThreadWorker *)tw
    {
        ...
        while(... && ![tw cancelled]){
@@ -181,7 +181,7 @@ the longTaskFinished will be called on the main thread, which is what you
 need if you want to then modify any GUI components.
 The longTaskFinished method might look something like this, then:
  <pre>
-    - (void)longTaskFinished:(id)userInfo
+    - (void)longTaskFinished:(NSDictionary*)userInfo
     {
         //Do something now that the thread is done
         // ...
@@ -200,7 +200,7 @@ Enjoy.
 + (ThreadWorker *)
     workOn:(id)target 
     withSelector:(SEL)selector 
-    withObject:(id)userInfo
+    withObject:(NSDictionary*)userInfo
     didEndSelector:(SEL)didEndSelector;
 
 
@@ -213,7 +213,7 @@ Enjoy.
      not the ThreadWorker is cancelled using a two-argument
      "longTask:..." method like so:
 <pre>
-     - (id)longTask:(id)userInfo anyNameHere:(ThreadWorker *)tw
+     - (id)longTask:(NSDictionary*)userInfo anyNameHere:(ThreadWorker *)tw
      {
          ...
          while(... && ![tw cancelled]){
