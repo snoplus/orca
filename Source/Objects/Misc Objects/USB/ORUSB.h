@@ -74,10 +74,10 @@ typedef  struct  {
 - (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(NSUInteger) aProductID;
 - (NSArray*) interfacesForVender:(NSUInteger) aVenderID product:(NSUInteger) aProductID;
 - (NSArray*) interfacesForVenders:(NSArray*)someVendorIDs products:(NSArray*)someProductIDs;
-- (unsigned) deviceCount;
-- (unsigned) interfaceCount;
+- (NSUInteger) deviceCount;
+- (NSUInteger) interfaceCount;
 - (NSArray*) interfaces;
-- (id) deviceAtIndex:(unsigned)index;
+- (id) deviceAtIndex:(NSUInteger)index;
 - (void) releaseInterfaceFor:(id)obj;
 - (void) claimInterfaceWithSerialNumber:(NSString*)serialNumber for:(id)obj;
 - (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(NSUInteger) aProductID for:(id)obj;

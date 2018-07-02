@@ -210,12 +210,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 
 #pragma mark ¥¥¥accessors
-- (unsigned) deviceCount
+- (NSUInteger) deviceCount
 {
 	return [devices count];
 }
 
-- (unsigned) interfaceCount
+- (NSUInteger) interfaceCount
 {
 	return [interfaces count];
 }
@@ -224,7 +224,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 {
 	return interfaces;
 }
-- (id) deviceAtIndex:(unsigned)index
+- (id) deviceAtIndex:(NSUInteger)index
 {
 	return [devices objectAtIndex:index];
 }
