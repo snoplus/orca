@@ -247,7 +247,7 @@
 //------------------
 // external access to the 'min' set of symbols
 
-- (unsigned) symbolTableCount
+- (NSUInteger) symbolTableCount
 {
 	[symbolTableLock lock];
 

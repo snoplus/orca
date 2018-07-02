@@ -63,7 +63,7 @@
 - (int) functionLevel;
 - (NSString*) functionName;
 - (void) setValue:(id)aValue forIndex:(int) anIndex;
-- (unsigned) symbolTableCount;
+- (NSUInteger) symbolTableCount;
 - (id) symbolNameForIndex:(int)i;
 - (id) symbolValueForIndex:(int)i;
 - (NSMutableDictionary*) minSymbolTable;
