@@ -72,10 +72,10 @@
 - (void) removeFiles:(NSMutableArray*)anArray;
 - (void) replayFiles;
 - (void) sendDataArray:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
-- (void) sendRunStart:(id)userInfo;
-- (void) sendRunEnd:(id)userInfo;
-- (void) sendCloseOutRun:(id)userInfo;
-- (void) sendRunSubRunStart:(id)userInfo;
+- (void) sendRunStart:(NSDictionary*)userInfo;
+- (void) sendRunEnd:(NSDictionary*)userInfo;
+- (void) sendCloseOutRun:(NSDictionary*)userInfo;
+- (void) sendRunSubRunStart:(NSDictionary*)userInfo;
 @end
 
 #pragma mark ¥¥¥External String Definitions

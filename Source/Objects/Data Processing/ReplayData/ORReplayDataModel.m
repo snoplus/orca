@@ -256,7 +256,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
     NSLog(@"Replay stopped manually\n");
 }
 
-- (void) sendRunStart:(id)userInfo
+- (void) sendRunStart:(NSDictionary*)userInfo
 {
 	[userInfo retain];
 	nextObject = [self objectConnectedTo:ORReplayDataConnection];
@@ -272,7 +272,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 		[nextObject processData:dataArray decoder:aDecoder];
 	}
 }
-- (void) sendRunEnd:(id)userInfo
+- (void) sendRunEnd:(NSDictionary*)userInfo
 {
 	[userInfo retain];
 	nextObject = [self objectConnectedTo:ORReplayDataConnection];
@@ -280,7 +280,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	[userInfo release];
 }
 
-- (void) sendCloseOutRun:(id)userInfo
+- (void) sendCloseOutRun:(NSDictionary*)userInfo
 {
 	[userInfo retain];
 	nextObject = [self objectConnectedTo:ORReplayDataConnection];
@@ -288,7 +288,7 @@ static NSString *ORReplayDataConnection = @"Replay File Input Connector";
 	[userInfo release];
 }
 
-- (void) sendRunSubRunStart:(id)userInfo
+- (void) sendRunSubRunStart:(NSDictionary*)userInfo
 {
 	[userInfo retain];
 	nextObject = [self objectConnectedTo:ORReplayDataConnection];
