@@ -94,7 +94,7 @@
 
 #pragma mark ¥¥¥DataTaker
 - (NSDictionary*) dataRecordDescription;
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (void) shipScalerRecords;

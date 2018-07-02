@@ -194,7 +194,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![self adapter]){
@@ -221,7 +221,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {
         
@@ -291,7 +291,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[self disableLAM];
 }

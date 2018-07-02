@@ -189,11 +189,11 @@ union {
 - (unsigned short) paramValue:(NSString*)aParamName channel:(int)aChannel;
 
 
-- (id) param:(NSString*)arrayName index:(unsigned)index forKey:(NSString*)aKey;
-- (void) set:(NSString*)arrayName index:(unsigned)index toObject:(id)anObject forKey:(NSString*)aKey;
+- (id) param:(NSString*)arrayName index:(NSUInteger)index forKey:(NSString*)aKey;
+- (void) set:(NSString*)arrayName index:(NSUInteger)index toObject:(id)anObject forKey:(NSString*)aKey;
 
 
-- (unsigned) countForArray:(NSString*)anArrayName;
+- (NSUInteger) countForArray:(NSString*)anArrayName;
 - (short)channel;
 - (void)setChannel:(short)aChannel;
 
@@ -237,9 +237,9 @@ union {
 #pragma mark ¥¥¥DataTaker
 - (NSDictionary*) dataRecordDescription;
 - (void) reset;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherShaper;
 - (void) shipLiveTime;

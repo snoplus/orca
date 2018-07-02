@@ -46,7 +46,7 @@ NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
 void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned long userInfo)
 {
 	NSLog(@"got irq\n");
-	id obj = (id)userInfo;
+	id obj = (NSDictionary*)userInfo;
 	[obj handleIRQ:irq_type data:irq_data];
 }
 
@@ -638,7 +638,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
     [encoder encodeObject:ipAddress forKey:@"IpAddress"];
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {	
 	[irqLock lock];		//begin critical section
 	if(lamMask) {

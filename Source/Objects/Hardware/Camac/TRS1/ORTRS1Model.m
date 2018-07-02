@@ -289,7 +289,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![self adapter]){
@@ -321,7 +321,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     @try {
         
@@ -372,7 +372,7 @@ NSString* ORTRS1ModelControlRegisterChanged = @"ORTRS1ModelControlRegisterChange
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	free(dataBuffer);
 	[self disableLAM];

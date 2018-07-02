@@ -718,7 +718,7 @@ enum {
 	 userInfo: [NSDictionary dictionaryWithObject:aParamName forKey:@"ParamName"]];
 }
 
-- (void) set:(NSString*)arrayName index:(unsigned)index toObject:(id)anObject forKey:(NSString*)aKey
+- (void) set:(NSString*)arrayName index:(NSUInteger)index toObject:(id)anObject forKey:(NSString*)aKey
 {
     id array = [params objectForKey:arrayName];
     if([array count] && index<[array count]){
@@ -739,7 +739,7 @@ enum {
     }
 }
 
-- (id) param:(NSString*)arrayName index:(unsigned)index forKey:(NSString*)aKey
+- (id) param:(NSString*)arrayName index:(NSUInteger)index forKey:(NSString*)aKey
 {
     id array = [params objectForKey:arrayName];
     if([array count] && index<[array count]){
@@ -750,7 +750,7 @@ enum {
 }
 
 
-- (unsigned) countForArray:(NSString*)arrayName;
+- (NSUInteger) countForArray:(NSString*)arrayName;
 {
     return [[params objectForKey:arrayName] count];
     
@@ -1756,7 +1756,7 @@ enum {
 }
 
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
 	memset(oscModeData,0,4*8192*sizeof(short));
@@ -1807,7 +1807,7 @@ enum {
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     BOOL locked = NO;
     @try {
@@ -1890,7 +1890,7 @@ enum {
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//stop the run without overwritting other bits.
 	[self clearCSRBit:kRunEnableCSRBit];

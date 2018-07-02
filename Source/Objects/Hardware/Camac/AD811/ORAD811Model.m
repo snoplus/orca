@@ -168,7 +168,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     return dataDictionary;
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![self adapter]){
@@ -209,7 +209,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSString* errorLocation = @"";
     BOOL resetDone;
@@ -276,7 +276,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 }
 

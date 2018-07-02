@@ -483,7 +483,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 {
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	
     if(![self adapter]){
@@ -515,7 +515,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	savedHeader = 0;
 }
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	if(operationMode == kCMC203FifoMode){
 		isRunning = YES;
@@ -570,7 +570,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	}
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
@@ -590,7 +590,7 @@ NSString* ORCMC203SettingsLock					= @"ORCMC203SettingsLock";
 	else								 return readingHistogram;
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
