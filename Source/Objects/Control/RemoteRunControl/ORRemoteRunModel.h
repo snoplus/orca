@@ -139,7 +139,7 @@
 
 #pragma mark ***Delegate Methods
 - (void) netsocketConnected:(id)aSocket;
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount;
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket;
 
 - (void) connectSocket:(BOOL)state;
