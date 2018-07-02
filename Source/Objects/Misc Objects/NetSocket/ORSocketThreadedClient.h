@@ -33,9 +33,9 @@
 - (BOOL)	 dataAvailable;
 - (NSData*)  readNextBlock;
 - (NSData*)  readNextBlockAppendedTo:(NSData*)someData;
-- (unsigned) bufferSize;
-- (unsigned) readMark;
-- (unsigned) writeMark;
+- (NSUInteger) bufferSize;
+- (NSUInteger) readMark;
+- (NSUInteger) writeMark;
 - (void)	 reset;
 
 #pragma mark •••Thread

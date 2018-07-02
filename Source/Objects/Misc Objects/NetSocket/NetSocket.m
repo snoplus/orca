@@ -395,7 +395,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 
 #pragma mark -
 
-- (unsigned)read:(void*)inBuffer amount:(unsigned)inAmount
+- (NSUInteger)read:(void*)inBuffer amount:(NSUInteger)inAmount
 {
 	[mLock lock];
     // If there is no data to read, simply return
@@ -415,7 +415,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     return amountToRead;
 }
 
-- (unsigned)readOntoData:(NSMutableData*)inData
+- (NSUInteger)readOntoData:(NSMutableData*)inData
 {
 	[mLock lock];
     
@@ -437,7 +437,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     return amountRead;
 }
 
-- (unsigned)readOntoData:(NSMutableData*)inData amount:(unsigned)inAmount
+- (NSUInteger)readOntoData:(NSMutableData*)inData amount:(NSUInteger)inAmount
 {
 	[mLock lock];
     
@@ -457,7 +457,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     return amountToRead;
 }
 
-- (unsigned)readOntoString:(NSMutableString*)inString encoding:(NSStringEncoding)inEncoding amount:(unsigned)inAmount
+- (NSUInteger)readOntoString:(NSMutableString*)inString encoding:(NSStringEncoding)inEncoding amount:(NSUInteger)inAmount
 {
     
 	[mLock lock];
@@ -500,7 +500,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     return readData;
 }
 
-- (NSData*)readData:(unsigned)inAmount
+- (NSData*)readData:(NSUInteger)inAmount
 {    
 	[mLock lock];
     // If there is no data to read, simply return
@@ -549,7 +549,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     return readString;
 }
 
-- (NSString*)readString:(NSStringEncoding)inEncoding amount:(unsigned)inAmount
+- (NSString*)readString:(NSStringEncoding)inEncoding amount:(NSUInteger)inAmount
 {    
 	[mLock lock];
     // If there is no data to read, simply return
@@ -572,7 +572,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 
 #pragma mark -
 
-- (void)write:(const void*)inBytes length:(unsigned)inLength
+- (void)write:(const void*)inBytes length:(NSUInteger)inLength
 {
 	[mLock lock];
     // Return if there are no bytes to write
@@ -713,7 +713,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
     return mSocketListening;
 }
 
-- (unsigned)incomingBufferLength
+- (NSUInteger)incomingBufferLength
 {
  	[mLock lock];
 	
@@ -722,7 +722,7 @@ static void _cfsocketCallback( CFSocketRef inCFSocketRef, CFSocketCallBackType i
 	return i;
 }
 
-- (unsigned)outgoingBufferLength
+- (NSUInteger)outgoingBufferLength
 {
  	[mLock lock];
     int i =  [mOutgoingBuffer length];

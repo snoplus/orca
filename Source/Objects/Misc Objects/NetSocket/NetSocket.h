@@ -57,17 +57,17 @@
 - (NSData*)peekData;
 
 // Reading
-- (unsigned)read:(void*)inBuffer amount:(unsigned)inAmount;
-- (unsigned)readOntoData:(NSMutableData*)inData;
-- (unsigned)readOntoData:(NSMutableData*)inData amount:(unsigned)inAmount;
-- (unsigned)readOntoString:(NSMutableString*)inString encoding:(NSStringEncoding)inEncoding amount:(unsigned)inAmount;
+- (NSUInteger)read:(void*)inBuffer amount:(NSUInteger)inAmount;
+- (NSUInteger)readOntoData:(NSMutableData*)inData;
+- (NSUInteger)readOntoData:(NSMutableData*)inData amount:(NSUInteger)inAmount;
+- (NSUInteger)readOntoString:(NSMutableString*)inString encoding:(NSStringEncoding)inEncoding amount:(NSUInteger)inAmount;
 - (NSData*)readData;
-- (NSData*)readData:(unsigned)inAmount;
+- (NSData*)readData:(NSUInteger)inAmount;
 - (NSString*)readString:(NSStringEncoding)inEncoding;
-- (NSString*)readString:(NSStringEncoding)inEncoding amount:(unsigned)inAmount;
+- (NSString*)readString:(NSStringEncoding)inEncoding amount:(NSUInteger)inAmount;
 
 // Writing
-- (void)write:(const void*)inBytes length:(unsigned)inLength;
+- (void)write:(const void*)inBytes length:(NSUInteger)inLength;
 - (void)writeData:(NSData*)inData;
 - (void)writeString:(NSString*)inString encoding:(NSStringEncoding)inEncoding;
 
@@ -78,8 +78,8 @@
 - (UInt16)localPort;
 - (BOOL)isConnected;
 - (BOOL)isListening;
-- (unsigned)incomingBufferLength;
-- (unsigned)outgoingBufferLength;
+- (NSUInteger)incomingBufferLength;
+- (NSUInteger)outgoingBufferLength;
 - (CFSocketNativeHandle)nativeSocketHandle;
 - (CFSocketRef)cfsocketRef;
 
@@ -96,7 +96,7 @@
 - (void) netsocket:(NetSocket*)inNetSocket connectionTimedOut:(NSTimeInterval)inTimeout;
 - (void) netsocketDisconnected:(NetSocket*)inNetSocket;
 - (void) netsocket:(NetSocket*)inNetSocket connectionAccepted:(NetSocket*)inNewNetSocket;
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount;
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount;
 - (void) netsocketDataSent:(NetSocket*)inNetSocket length:(long)amount;
 - (void) netsocketDataInOutgoingBuffer:(NetSocket*)inNetSocket length:(long)amount;
 - (void) netsocket:(NetSocket*)inNetSocket status:(int)status;

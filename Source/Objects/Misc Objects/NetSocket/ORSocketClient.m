@@ -167,7 +167,7 @@
     [self setTotalSent:[self totalSent]+length];
 }
 
-- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(unsigned)inAmount
+- (void) netsocket:(NetSocket*)inNetSocket dataAvailable:(NSUInteger)inAmount
 {
 	NSData* data = [inNetSocket readData:inAmount];
 	NSLog(@"received data: %d bytes\n",[data length]);

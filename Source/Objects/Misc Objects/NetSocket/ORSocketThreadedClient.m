@@ -82,7 +82,7 @@
     return [_cancelled condition];
 }
 
-- (void)netsocket:(NetSocket*)insocket dataAvailable:(unsigned)inAmount
+- (void)netsocket:(NetSocket*)insocket dataAvailable:(NSUInteger)inAmount
 {
     if(insocket == socket){
 		[circularBuffer writeData:[socket readData]];
@@ -104,17 +104,17 @@
 	return [circularBuffer readNextBlockAppendedTo:someData];
 }
 
-- (unsigned) bufferSize
+- (NSUInteger) bufferSize
 {
 	return [circularBuffer bufferSize];
 }
 
-- (unsigned) readMark
+- (NSUInteger) readMark
 {
 	return [circularBuffer readMark];
 }
 
-- (unsigned) writeMark
+- (NSUInteger) writeMark
 {
 	return [circularBuffer writeMark];
 }
