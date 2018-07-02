@@ -184,9 +184,9 @@
         int validCount = 0;
         int i;
         for(i=0;i<[selection count];i++){
-            id aDataSet = [selection objectAtIndex:i];
+            ORDataSet* aDataSet = [selection objectAtIndex:i];
             if([aDataSet leafNode]){
-                id obj = [aDataSet data];
+                ORDataSetModel* obj = [aDataSet data];
                 if([obj canJoinMultiPlot]){
                     validCount++;
                 }
@@ -303,7 +303,7 @@
     int validCount = 0;
     while(aDataSet = [e nextObject]){
         if([aDataSet leafNode]){
-            id obj = [aDataSet data];
+            ORDataSetModel* obj = [aDataSet data];
             if([obj canJoinMultiPlot]){
                 [newMultiPlot addDataSetName:[[aDataSet data] shortName]];
                 validCount++;
@@ -314,7 +314,7 @@
         }
     }
     if(validCount){
-        [newMultiPlot setDataSource:[model dataSet]];
+        [newMultiPlot setDataSource:[(ORHistoModel*)model dataSet]];
         [newMultiPlot doDoubleClick:nil];
         [model addMultiPlot:newMultiPlot];
     }
@@ -370,7 +370,7 @@
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
-            [[model dataSet] clear];
+            [[(ORHistoModel*)model dataSet] clear];
             [outlineView reloadData];
         }
     }];
@@ -388,7 +388,7 @@
 
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
     if(returnCode == NSAlertAlternateReturn){
         [[model dataSet] clear];
@@ -415,11 +415,11 @@
 		if([[self window] firstResponder] == outlineView){
 			NSArray *selection = [outlineView allSelectedItems];
 			NSEnumerator* e = [selection objectEnumerator];
-			id item;
+			ORDataSet* item;
 			while(item = [e nextObject]){
-				[model removeDataSet:item];
+				[(ORHistoModel*)model removeDataSet:item];
 			}
-			[[model dataSet] recountTotal];
+			[[(ORHistoModel*)model dataSet] recountTotal];
 			[outlineView deselectAll:self];
 			[outlineView reloadData];
 		}
@@ -472,7 +472,7 @@
     else {
         if(!item)return [[model multiPlots] count];
         else {
-            if([item respondsToSelector:@selector(count)])return [item count];
+            if([item respondsToSelector:@selector(count)])return [(ORMultiPlot*)item count];
             else return 0;
         }
     }
@@ -486,18 +486,18 @@
     else {
         if(!item)return [[model multiPlots] count]!=0;
         else {
-            if([item respondsToSelector:@selector(count)])return [item count]!=0;
+            if([item respondsToSelector:@selector(count)])return [(ORMultiPlot*)item count]!=0;
             else return NO;
         }
     }
 }
 
-- (id)outlineView:(NSOutlineView *)ov child:(int)index ofItem:(id)item
+- (id)outlineView:(NSOutlineView *)ov child:(NSUInteger)index ofItem:(id)item
 {
     id anObj;
     if(ov == outlineView){
         if(!item)   anObj = model;
-        else        anObj = [item childAtIndex:index];
+        else        anObj = [(ORMultiPlot*)item childAtIndex:index];
     }
     else {
         if(!item)   anObj = [[model multiPlots] objectAtIndex:index];

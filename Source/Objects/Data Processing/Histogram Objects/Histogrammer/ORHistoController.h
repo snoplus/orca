@@ -72,13 +72,13 @@
 - (IBAction) doubleClickMultiPlot:(id)sender;
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void)_clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 #endif
 
 #pragma mark ¥¥¥Data Source Methods
 - (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;
 - (int)  outlineView:(NSOutlineView*)ov numberOfChildrenOfItem:(id)item;
-- (id)   outlineView:(NSOutlineView*)ov child:(int)index ofItem:(id)item;
+- (id)   outlineView:(NSOutlineView*)ov child:(NSUInteger)index ofItem:(id)item;
 - (id)   outlineView:(NSOutlineView*)ov objectValueForTableColumn:(NSTableColumn*)tableColumn byItem:(id)item;
 
 @end
