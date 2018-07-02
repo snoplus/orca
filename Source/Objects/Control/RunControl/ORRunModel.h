@@ -213,7 +213,7 @@
 - (void) prepareForNewSubRun;
 - (void) startNewSubRun;
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
 - (void) takeData;
 - (void) runStarted:(BOOL)doInit;
@@ -234,16 +234,16 @@
 - (void) gotRequestedRunStopNotification:(NSNotification*)aNotification;
 - (void) gotRequestedRunHaltNotification:(NSNotification*)aNotification;
 - (void) gotRequestedRunRestartNotification:(NSNotification*)aNotification;
-- (void) requestedRunHalt:(id)userInfo;
-- (void) requestedRunStop:(id)userInfo;
-- (void) requestedRunRestart:(id)userInfo;
+- (void) requestedRunHalt:(NSDictionary*)userInfo;
+- (void) requestedRunStop:(NSDictionary*)userInfo;
+- (void) requestedRunRestart:(NSDictionary*)userInfo;
 - (BOOL) readRunTypeNames;
 - (NSString*) shortStatus;
 - (NSString*) endOfRunState;
 - (void) checkVetos;
 - (NSString*) fullRunNumberString;
-- (unsigned) waitRequestersCount;
-- (id) waitRequesterAtIdex:(unsigned)index;
+- (NSUInteger) waitRequestersCount;
+- (id) waitRequesterAtIdex:(NSUInteger)index;
 - (void) postProductionAlarm;
 - (void) clearProductionAlarm;
 - (id)   initWithCoder:(NSCoder*)decoder;
@@ -300,7 +300,7 @@
 @end
 
 @interface NSObject (SpecialDataTakingFinishUp)
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (BOOL) doneTakingData;
 - (BOOL) preRunChecks;
 @end

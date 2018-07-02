@@ -1722,7 +1722,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return dataDictionary;
 }
 
-- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [aDataPacket addDataDescriptionItem:[self dataRecordDescription] forKey:@"ORRunModel"];
 }
@@ -2040,7 +2040,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORRequestRunHalt object:self];
 }
 
-- (unsigned) waitRequestersCount
+- (NSUInteger) waitRequestersCount
 {
     unsigned count;
 	@synchronized (self){
@@ -2049,7 +2049,7 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return count;
 }
 
-- (id) waitRequesterAtIdex:(unsigned)index
+- (id) waitRequesterAtIdex:(NSUInteger)index
 {
     id result = nil;
 	@synchronized (self){
@@ -2116,21 +2116,21 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
 	[self performSelectorOnMainThread:@selector(requestedRunStop:) withObject:[aNotification userInfo] waitUntilDone:NO];
 }
 
-- (void) requestedRunHalt:(id)userInfo
+- (void) requestedRunHalt:(NSDictionary*)userInfo
 {
 	if(userInfo)NSLog(@"Got halt run request:     %@\n",userInfo);
 	else NSLog(@"Got halt run request (No reason given)\n");
 	[self haltRun];
 }
 
-- (void) requestedRunStop:(id)userInfo
+- (void) requestedRunStop:(NSDictionary*)userInfo
 {
 	if(userInfo)NSLog(@"Got stop run request:     %@\n",userInfo);
 	else NSLog(@"Got stop run request (No reason given)\n");
 	[self stopRun];
 }
 
-- (void) requestedRunRestart:(id)userInfo
+- (void) requestedRunRestart:(NSDictionary*)userInfo
 {
 	if(userInfo)NSLog(@"Got restart run request:     %@\n",userInfo);
 	else NSLog(@"Got restart run request (No reason given)\n");
@@ -2622,7 +2622,7 @@ static NSString *ORRunTypeNames 	= @"ORRunTypeNames";
 @end
 
 @implementation NSObject (SpecialDataTakingFinishUp)
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	//classes can override as needed
 }
