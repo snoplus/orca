@@ -23,7 +23,7 @@
 //
 
 @implementation ORSafeCircularBuffer
-- (id) initWithBufferSize:(unsigned) aBufferSize
+- (id) initWithBufferSize:(NSUInteger) aBufferSize
 {
 	self = [super init];
     if(aBufferSize==0)aBufferSize = 1024*100; //if passed zero, put something in....
@@ -57,21 +57,21 @@
 	numBlocksRead = numBlocksWritten = 0;
 }
 
-- (unsigned) bufferSize
+- (NSUInteger) bufferSize
 {
 	return bufferSize;
 }
 
-- (unsigned) readMark
+- (NSUInteger) readMark
 {
 	return readMark;
 }
-- (unsigned) writeMark
+- (NSUInteger) writeMark
 {
 	return writeMark;
 }
 
-- (BOOL) writeBlock:(char*)someBytes length:(unsigned)numBytes
+- (BOOL) writeBlock:(char*)someBytes length:(NSUInteger)numBytes
 {
 	[bufferLock lock];
 	BOOL full = NO;
@@ -106,12 +106,12 @@
 	return full;
 }
 
-- (unsigned) numBlocksWritten
+- (NSUInteger) numBlocksWritten
 {
 	return numBlocksWritten;
 }
 
-- (unsigned) numBlocksRead
+- (NSUInteger) numBlocksRead
 {
 	return numBlocksRead;
 }

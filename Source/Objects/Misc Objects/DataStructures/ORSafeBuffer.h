@@ -29,10 +29,10 @@
 	NSLock* bufferLock;
 }
 - (id) init;
-- (id) initWithBufferSize:(unsigned)aSize;
+- (id) initWithBufferSize:(NSUInteger)aSize;
 - (void) dealloc;
-- (id) objectAtIndex:(unsigned)index;
+- (id) objectAtIndex:(NSUInteger)index;
 - (id) lastObject;
 - (void) addObject:(id) anObject;
-- (unsigned) count;
+- (NSUInteger) count;
 @end

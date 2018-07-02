@@ -37,18 +37,18 @@
 		long freeSpace;
 }
 
-- (id) initWithBufferSize:(unsigned) aBufferSize;
+- (id) initWithBufferSize:(NSUInteger) aBufferSize;
 - (BOOL) writeData:(NSData*)someData;
-- (BOOL) writeBlock:(char*)someBytes length:(unsigned)numBytes;
+- (BOOL) writeBlock:(char*)someBytes length:(NSUInteger)numBytes;
 - (NSData*) readNextBlock;
 - (NSData*) readNextBlockAppendedTo:(NSData*)someData;
-- (unsigned) numBlocksWritten;
-- (unsigned) numBlocksRead;
+- (NSUInteger) numBlocksWritten;
+- (NSUInteger) numBlocksRead;
 - (void) reset;
 - (BOOL) dataAvailable;
-- (unsigned) bufferSize;
-- (unsigned) readMark;
-- (unsigned) writeMark;
+- (NSUInteger) bufferSize;
+- (NSUInteger) readMark;
+- (NSUInteger) writeMark;
 
 + (void) fullTest;
 + (void) test:(long)bufferSize;

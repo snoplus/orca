@@ -35,7 +35,7 @@
 	return self;
 }
 
-- (id) initWithBufferSize:(unsigned)aSize;
+- (id) initWithBufferSize:(NSUInteger)aSize;
 {
 	self = [super init];
 	startIndex = 0;
@@ -52,7 +52,7 @@
 	[super dealloc];
 }
 
-- (id) objectAtIndex:(unsigned)index
+- (id) objectAtIndex:(NSUInteger)index
 {
 	id anObject = nil;
 	[bufferLock lock];
@@ -100,7 +100,7 @@
 	return anObject;
 }
 
-- (unsigned) count
+- (NSUInteger) count
 {
 	return [buffer count];
 }
