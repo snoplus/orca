@@ -139,7 +139,7 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
 }
 
 #pragma mark ***Data Taker
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	dataTakers = [[readoutGroup allObjects] retain];	//cache of data takers.
 	NSEnumerator* e = [dataTakers objectEnumerator];
@@ -204,7 +204,7 @@ NSString* ORSBC_LAMLock						= @"ORSBC_LAMLock";
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	NSEnumerator* e = [dataTakers objectEnumerator];
 	id obj;
