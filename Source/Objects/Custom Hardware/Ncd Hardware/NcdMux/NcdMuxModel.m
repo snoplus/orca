@@ -365,7 +365,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 	else if([dataTakers2 count])[[dataTakers2 objectAtIndex:0] appendEventDictionary:topLevel topLevel:topLevel];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     //----------------------------------------------------------------------------------------
     // first add our description to the data description
@@ -452,7 +452,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 //                   ^ ^^^^------------------ spare
 //                          ^^^^ ^^^^ ^^^^--- chan hit register for this mux
 //--------------------------------------------------------------
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     id scopeA = [dataTakers1 lastObject];
     id scopeB = [dataTakers2 lastObject];
@@ -665,7 +665,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
     
 }
 
-- (void) readOutScope:(int)scope usingPacket:(ORDataPacket*)aDataPacket hitDR:(unsigned short)aHitDR userInfo:(id)userInfo
+- (void) readOutScope:(int)scope usingPacket:(ORDataPacket*)aDataPacket hitDR:(unsigned short)aHitDR userInfo:(NSDictionary*)userInfo
 {
     unsigned char aMask;
     id theScopeObject;
@@ -681,7 +681,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 }
 
 
-- (void) takeScopeData:(ORDataPacket*)aDataPacket onScope:(id)scope userInfo:(id)userInfo
+- (void) takeScopeData:(ORDataPacket*)aDataPacket onScope:(id)scope userInfo:(NSDictionary*)userInfo
 {
     @try {
         [scope takeData:aDataPacket userInfo:userInfo];
@@ -844,7 +844,7 @@ NSString* NcdMuxErrorCountChangedNotification 		= @"NcdMuxErrorCountChangedNotif
 
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     
 	//  [[NSNotificationCenter defaultCenter] removeObserver:self];

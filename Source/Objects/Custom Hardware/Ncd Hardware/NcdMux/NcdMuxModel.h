@@ -101,15 +101,15 @@
 
 #pragma mark ¥¥¥DataTaker
 - (NSDictionary*) dataRecordDescription;
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo;
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (void) saveReadOutList:(NSFileHandle*)aFile;
 - (void) loadReadOutList:(NSFileHandle*)aFile;
 
 - (BOOL) getScopeMask:(unsigned char*)aMask forScope:(short)scope eventReg:(unsigned short) aMuxEventRegister;
-- (void) takeScopeData:(ORDataPacket*)aDataPacket onScope:(id)scope userInfo:(id)userInfo;
-- (void) readOutScope:(int)scope usingPacket:(ORDataPacket*)aDataPacket hitDR:(unsigned short)aHitDR userInfo:(id)userInfo;
+- (void) takeScopeData:(ORDataPacket*)aDataPacket onScope:(id)scope userInfo:(NSDictionary*)userInfo;
+- (void) readOutScope:(int)scope usingPacket:(ORDataPacket*)aDataPacket hitDR:(unsigned short)aHitDR userInfo:(NSDictionary*)userInfo;
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary;
 @end
 
