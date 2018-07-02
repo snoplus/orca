@@ -1172,9 +1172,7 @@ enum {
 		else           imageOffset = -imageSize.width-2;
 		p = NSMakePoint(axisPosition+imageOffset,val-imageSize.height/2+lowOffset);
 	}
-	
 	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositeSourceOver fraction:.8];
-	
 }
 
 - (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
@@ -1187,6 +1185,7 @@ enum {
     }
     [self drawMark:markerBeingDragged inFrame:aFrame usingColor:aColor];
 }
+
 - (void) drawMark:(NSNumber*)markerNumber inFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
 {
     if(!markerNumber)return;
@@ -1196,21 +1195,8 @@ enum {
     float val = [markerNumber floatValue];
     val = [self getPixAbs:val];
     
-    NSString* label;
-    float markerValue;
-    if([self isXAxis] && [[self calibration] useCalibration]){
-        markerValue = [[self calibration] convertedValueForChannel:[markerNumber floatValue]];
-        label = [NSString stringWithFormat:@"%.3f",markerValue];
-    }
-    else {
-        markerValue = [markerNumber floatValue];
-        NSString* format = @"%.0f";
-        double scaleRange = fabs([self maxValue] - [self minValue]);
-        if(scaleRange<.5)format = @"%.3f";
-        else if(scaleRange<5)format = @"%.2f";
-        else if(scaleRange<50)format = @"%.1f";
-        label = [NSString stringWithFormat:format,markerValue];
-    }
+    NSString* label = [self markerLabel:markerNumber];
+    
     if([self isXAxis]){
         [NSBezierPath strokeLineFromPoint:NSMakePoint(val,0) 
                                 toPoint:NSMakePoint(val,aFrame.size.height-1)];
@@ -1233,6 +1219,25 @@ enum {
 
     [NSBezierPath setDefaultLineWidth:oldLineWidth];
 	
+}
+
+- (NSString*) markerLabel:(NSNumber*)markerNumber
+{
+    float markerValue;
+    if([self isXAxis] && [[self calibration] useCalibration]){
+        markerValue = [[self calibration] convertedValueForChannel:[markerNumber floatValue]];
+        return [NSString stringWithFormat:@"%.3f",markerValue];
+    }
+    else {
+        markerValue = [markerNumber floatValue];
+        NSString* format = @"%.0f";
+        double scaleRange = fabs([self maxValue] - [self minValue]);
+        if(scaleRange<.5)format = @"%.3f";
+        else if(scaleRange<5)format = @"%.2f";
+        else if(scaleRange<50)format = @"%.1f";
+        return [NSString stringWithFormat:format,markerValue];
+    }
+    return @"";
 }
 
 - (void) drawGridInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor

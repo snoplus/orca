@@ -163,6 +163,7 @@ long roundToLong(double x);
 - (void) setAxisMinLimit:(long)aValue;
 - (long) axisMaxLimit;
 - (void) setAxisMaxLimit:(long)aValue;
+- (NSString*) markerLabel:(NSNumber*)markerNumber;
 
 - (IBAction) setLogScale:(id)sender;
 - (IBAction) shiftLeft:(id)sender;
