@@ -71,7 +71,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 	}
 }
 
-- (unsigned) count
+- (NSUInteger) count
 {
 	if(writeIndex == 0 && readIndex==0)return 0;
 	else if(writeIndex > readIndex)return writeIndex - readIndex;
@@ -79,7 +79,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 }
 
 
-- (void) index:(unsigned)index time:(unsigned long*)theTime value:(double*)y
+- (void) index:(NSUInteger)index time:(unsigned long*)theTime value:(double*)y
 {
 	if(index<kTimeSeriesBufferSize){
 		int i = (readIndex+index)%kTimeSeriesBufferSize;
@@ -88,7 +88,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 	}
 }
 
-- (unsigned long) timeAtIndex:(unsigned)index
+- (unsigned long) timeAtIndex:(NSUInteger)index
 {
 	if(index<kTimeSeriesBufferSize){
 		int i = (readIndex+index)%kTimeSeriesBufferSize;
@@ -97,7 +97,7 @@ NSString* ORTimeSeriesChangedNotification 	= @"ORTimeSeriesChangedNotification";
 	else return [self startTime];
 }
 
-- (float) valueAtIndex:(unsigned)index
+- (float) valueAtIndex:(NSUInteger)index
 {
 	if(index<kTimeSeriesBufferSize){
 		int i = (readIndex+index)%kTimeSeriesBufferSize;

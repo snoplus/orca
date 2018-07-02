@@ -44,9 +44,9 @@
 - (void) setLastAverageTime:(NSDate*)newLastAverageTime;
 - (unsigned long) sampleTime;
 - (void) setSampleTime:(unsigned long)newSampleTime;
-- (unsigned) count;
-- (double)valueAtIndex:(unsigned)index;
-- (NSTimeInterval)timeSampledAtIndex:(unsigned)index;
+- (NSUInteger) count;
+- (double)valueAtIndex:(NSUInteger)index;
+- (NSTimeInterval)timeSampledAtIndex:(NSUInteger)index;
 - (NSArray*) ratesAsArray;
 
 

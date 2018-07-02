@@ -102,7 +102,7 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
     }
 }
 
-- (unsigned) count
+- (NSUInteger) count
 {
     unsigned theCount = 0;
     @synchronized(self){
@@ -113,7 +113,7 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
     
 }
 
-- (double)valueAtIndex:(unsigned)index
+- (double)valueAtIndex:(NSUInteger)index
 {
     double theValue = 0;
     @synchronized(self){
@@ -123,7 +123,7 @@ NSString* ORRateAverageChangedNotification 	= @"ORRateAverageChangedNotification
     return theValue;
 }
 
-- (NSTimeInterval)timeSampledAtIndex:(unsigned)index
+- (NSTimeInterval)timeSampledAtIndex:(NSUInteger)index
 {
     NSTimeInterval theValue = 0;
     @synchronized(self){

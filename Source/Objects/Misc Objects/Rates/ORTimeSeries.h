@@ -32,11 +32,11 @@
 }
 
 - (unsigned long) startTime;
-- (unsigned) count;
+- (NSUInteger) count;
 - (void) addValue:(float)aValue atTime:(unsigned long)aTime;
-- (void) index:(unsigned)index time:(unsigned long*)theTime value:(double*)y;
-- (unsigned long) timeAtIndex:(unsigned)index;
-- (float) valueAtIndex:(unsigned)index;
+- (void) index:(NSUInteger)index time:(unsigned long*)theTime value:(double*)y;
+- (unsigned long) timeAtIndex:(NSUInteger)index;
+- (float) valueAtIndex:(NSUInteger)index;
 @end
 
 extern NSString* ORTimeSeriesChangedNotification;
