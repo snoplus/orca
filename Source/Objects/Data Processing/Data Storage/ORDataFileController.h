@@ -69,8 +69,8 @@
 - (IBAction) filePrefixTextFieldAction:(id)sender;
 - (IBAction) maxFileSizeTextFieldAction:(id)sender;
 - (IBAction) limitSizeAction:(id)sender;
-- (IBAction) sizeLimitReachedAction:(id)sender;
-- (IBAction) saveConfigurationAction:(id)sender;
+- (IBAction) sizeLimitReachedAction:(NSMatrix*)sender;
+- (IBAction) saveConfigurationAction:(NSButton*)sender;
 
 - (IBAction) stopSendingAction:(id)sender;
 - (IBAction) lockButtonAction:(id)sender;

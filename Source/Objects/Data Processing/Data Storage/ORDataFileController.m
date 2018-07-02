@@ -32,7 +32,7 @@ enum {
 
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORDataFileController (private)
-- (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 #endif
 
@@ -108,7 +108,7 @@ enum {
 	[self lockChanged:nil];	
 }
 
-- (IBAction) sizeLimitReachedAction:(id)sender
+- (IBAction) sizeLimitReachedAction:(NSMatrix*)sender
 {
 	[model setSizeLimitReachedAction:[[sender selectedCell] tag]];
 }
@@ -119,7 +119,7 @@ enum {
 }
 
 
-- (IBAction) saveConfigurationAction:(id)sender
+- (IBAction) saveConfigurationAction:(NSButton*)sender
 {
 	if([sender state] != [model saveConfiguration]){
 	    [[self undoManager] setActionName: @"Set Save Configuration"];
@@ -157,7 +157,7 @@ enum {
 #endif
 }
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-- (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	if(returnCode == NSAlertDefaultReturn){
 		[[model dataFolder] stopTheQueue];
