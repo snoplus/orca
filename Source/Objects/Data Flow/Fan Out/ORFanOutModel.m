@@ -436,7 +436,7 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
 //be getting hit the hardest with data processing. Let the slow methods handle everything except the next 
 //three messages.
 //
-- (void) runTaskStarted:(id)userInfo
+- (void) runTaskStarted:(NSDictionary*)userInfo
 {
 	[cachedProcessors release];
 	cachedProcessors = [[NSMutableArray array] retain];
@@ -459,19 +459,19 @@ static NSString *ORFanOutNumber 		= @"Number of Fan In Outputs";
     }
 }
 
-- (void) runTaskStopped:(id)userInfo
+- (void) runTaskStopped:(NSDictionary*)userInfo
 {
 	for(id obj in cachedProcessors){
         [obj runTaskStopped:userInfo];
     }
 }
-- (void) preCloseOut:(id)userInfo
+- (void) preCloseOut:(NSDictionary*)userInfo
 {
     for(id obj in cachedProcessors){
         [obj preCloseOut:userInfo];
     }
 }
-- (void) closeOutRun:(id)userInfo
+- (void) closeOutRun:(NSDictionary*)userInfo
 {
 	for(id obj in cachedProcessors){
         [obj closeOutRun:userInfo];

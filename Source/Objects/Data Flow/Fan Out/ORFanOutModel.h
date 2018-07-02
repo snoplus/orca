@@ -48,11 +48,11 @@
 - (void) 		setLineType: (int)aType;
 
 //used with caching to speed up the data processing.
-- (void) runTaskStarted:(id)userInfo;
-- (void) runTaskStopped:(id)userInfo;
+- (void) runTaskStarted:(NSDictionary*)userInfo;
+- (void) runTaskStopped:(NSDictionary*)userInfo;
 - (void) processData:(NSArray*)dataArray decoder:(ORDecoder*)aDecoder;
-- (void) preCloseOut:(id)userInfo;
-- (void) closeOutRun:(id)userInfo;
+- (void) preCloseOut:(NSDictionary*)userInfo;
+- (void) closeOutRun:(NSDictionary*)userInfo;
 
 #pragma mark ¥¥¥Notifications
 - (void) registerNotificationObservers;
