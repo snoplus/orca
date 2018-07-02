@@ -300,7 +300,7 @@
 {
     if(outlineView == headerView){
         if(!item) return [[model header] count];
-        else      return [item count]; 
+        else      return [(ORHeaderItem*)item count];
     }
     else return 0;
 }
@@ -317,11 +317,11 @@
     else return NO;
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView child:(int)index ofItem:(id)item 
+- (id)outlineView:(NSOutlineView *)outlineView child:(NSUInteger)index ofItem:(id)item 
 {
     if(outlineView == headerView){
         if(!item) return [[model header] childAtIndex:index];
-        else      return [item childAtIndex:index];
+        else      return [(ORHeaderItem*)item childAtIndex:index];
     }
     else return nil;
 }
@@ -345,7 +345,7 @@
                 }
                 else {
                     return [[[NSAttributedString alloc] 
-                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[item count]] 
+                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[(ORHeaderItem*)item count]] 
                             attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]] autorelease];            
                 }
             }
