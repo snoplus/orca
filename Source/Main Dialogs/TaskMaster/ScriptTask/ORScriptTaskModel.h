@@ -54,7 +54,7 @@
 
 - (void) postNotificationName:(NSString*)aName;
 - (void) postNotificationName:(NSString*)aName   fromObject:(id)anObject;
-- (void) postNotificationName:(NSString*)aName   fromObject:(id)anObject userInfo:(id)userInfo;
+- (void) postNotificationName:(NSString*)aName   fromObject:(id)anObject userInfo:(NSDictionary*)userInfo;
 - (void) runOnNotificationName:(NSString*)aName  fromObject:(id)anObject;
 - (void) stopOnNotificationName:(NSString*)aName fromObject:(id)anObject;
 - (void) cancelNotificationName:(NSString*)aName;

@@ -233,7 +233,7 @@ NSString*  ORScriptTaskOutConnector			= @"ORScriptTaskOutConnector";
     [self postNotificationName:aName fromObject:anObject userInfo:nil];
 }
 
-- (void) postNotificationName:(NSString*)aName fromObject:(id)anObject userInfo:(id)userInfo
+- (void) postNotificationName:(NSString*)aName fromObject:(id)anObject userInfo:(NSDictionary*)userInfo
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:aName object:anObject userInfo:userInfo];
 }
