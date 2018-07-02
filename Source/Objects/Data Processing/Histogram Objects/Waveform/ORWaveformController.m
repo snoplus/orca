@@ -31,7 +31,7 @@
 #import "ORCalibration.h"
 
 @interface ORWaveformController (private)
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation ORWaveformController
@@ -125,7 +125,7 @@
 
 #pragma mark ¥¥¥Data Source
 
-- (void) plotOrderDidChange:(id)aPlotView
+- (void) plotOrderDidChange:(ORPlot*)aPlotView
 {
 	id topRoi = [[aPlotView topPlot] roi];
 	[roiController setModel:topRoi];
@@ -155,7 +155,7 @@
 	return [model useUnsignedValues];
 }
 
-- (BOOL) plotterShouldShowRoi:(id)aPlot
+- (BOOL) plotterShouldShowRoi:(ORPlot*)aPlot
 {
 	if([analysisDrawer state] == NSDrawerOpenState)return YES;
 	else return NO;
@@ -189,7 +189,7 @@
 
 @implementation ORWaveformController (private)
 
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;
@@ -217,7 +217,7 @@
 
 
 @interface ORBasicWaveformController (private)
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo;
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation ORBasicWaveformController
@@ -311,7 +311,7 @@
 
 #pragma mark ¥¥¥Data Source
 
-- (void) plotOrderDidChange:(id)aPlotView
+- (void) plotOrderDidChange:(ORPlotView*)aPlotView
 {
 	id topRoi = [[aPlotView topPlot] roi];
 	[roiController setModel:topRoi];
@@ -379,7 +379,7 @@
 
 @implementation ORBasicWaveformController (private)
 
-- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)userInfo
+- (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
 	[calibrationPanel release];
 	calibrationPanel = nil;

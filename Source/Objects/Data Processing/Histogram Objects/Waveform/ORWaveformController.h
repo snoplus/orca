@@ -50,8 +50,8 @@
 
 #pragma mark ¥¥¥Data Source
 - (BOOL) useUnsignedValues;
-- (void) plotOrderDidChange:(id)aPlotView;
-- (BOOL) plotterShouldShowRoi:(id)aPlot;
+- (void) plotOrderDidChange:(ORPlotView*)aPlotView;
+- (BOOL) plotterShouldShowRoi:(ORPlot*)aPlot;
 - (int) numberPointsInPlot:(id)aPlot;
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y;
 - (NSUInteger) plotter:(id)aPlot indexRange:(NSRange)aRange stride:(NSUInteger)stride x:(NSMutableData*)x y:(NSMutableData*)y;
