@@ -48,7 +48,7 @@
 - (NSMutableArray *) items;
 - (void) setItems: (NSMutableArray *) anItems;
 - (void) addObject:(id)anObject;
-- (unsigned) count;
+- (NSUInteger) count;
 - (BOOL) isLeafNode;
-- (id) childAtIndex:(int)index;
+- (id) childAtIndex:(NSUInteger)index;
 @end

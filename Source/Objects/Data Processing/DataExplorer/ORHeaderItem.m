@@ -158,7 +158,7 @@
     [items addObject:anObject];
 }
 
-- (unsigned) count
+- (NSUInteger) count
 {
     if([self isLeafNode]){
 		return 1;
@@ -169,7 +169,7 @@
 {
     return object!=nil;
 }
-- (id) childAtIndex:(int)index
+- (id) childAtIndex:(NSUInteger)index
 {
 	if([self isLeafNode])return object;
     else return [items objectAtIndex:index];
