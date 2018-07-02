@@ -22,6 +22,6 @@
 
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector;
 - (void) writeValue:(NSString*)aCmd target:(id)aTarget selector:(SEL)aSelector priority:(NSOperationQueuePriority)aPriority;
-- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(id)userInfo;
+- (void) callBackToTarget:(id)aTarget selector:(SEL)aSelector userInfo:(NSDictionary*)userInfo;
 
 @end
