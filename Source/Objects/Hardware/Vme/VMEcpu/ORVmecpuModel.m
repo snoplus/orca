@@ -207,7 +207,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[encoder encodeObject:sbcLink		forKey:@"SBC_Link"];
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [sbcLink checkSBCTime];
 	dataTakers = [[readOutGroup allObjects] retain];									//cache of data takers.
@@ -226,12 +226,12 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[sbcLink runTaskStarted:aDataPacket userInfo:extraUserInfo];
 }
 
--(void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+-(void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
 	[sbcLink takeData:aDataPacket userInfo:userInfo];
 }
 
-- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runIsStopping:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;
@@ -241,7 +241,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	[sbcLink runIsStopping:aDataPacket userInfo:userInfo];
 }
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     NSEnumerator* e = [dataTakers objectEnumerator];
     id obj;

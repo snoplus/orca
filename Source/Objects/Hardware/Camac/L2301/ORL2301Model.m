@@ -173,7 +173,7 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 	
 }
 
-- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStarted:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if(![self adapter]){
         [NSException raise:@"Not Connected" format:@"You must connect to a PCI-CAMAC Controller (i.e. a CC32)."];
@@ -200,7 +200,7 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 // Description: Read data from a card
 //**************************************************************************************
 
-- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) takeData:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     if([lastDataTS timeIntervalSinceNow] < -5.) {
         [self shipHistogram:aDataPacket];
@@ -221,7 +221,7 @@ NSString* ORL2301AllowOverflowChangedNotification   = @"ORL2301AllowOverflowChan
 }
 
 
-- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(id)userInfo
+- (void) runTaskStopped:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo
 {
     [self stopQVT];
     [self shipHistogram:aDataPacket];
