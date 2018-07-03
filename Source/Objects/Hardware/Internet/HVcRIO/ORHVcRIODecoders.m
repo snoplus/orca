@@ -79,7 +79,6 @@
                     nameString,
                 nil];
     
-    [aDataSet loadGenericData:valueString sender:self withKeys:@"HVcRIO",nameString,nil];
 	return ExtractLength(dataPtr[0]);
 }
 
