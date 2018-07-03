@@ -421,15 +421,17 @@ int OrcaScriptYYINPUT(char* theBuffer,int maxSize)
 
 - (void) printAll
 {
+    BOOL printWholeTree = ([[NSApp currentEvent] modifierFlags] & 0x80000)>0; //option key is down
+
 	NSLog(@"==================================\n");
-	NSLog(@"Syntax Trees for [%@]\n",scriptName);
+	if(printWholeTree)NSLog(@"Syntax Trees for [%@]\n",scriptName);
 	id aKey;
 	NSEnumerator* e = [functionTable keyEnumerator];
 	while(aKey = [e nextObject]){
 		id someNodes = [functionTable objectForKey:aKey];
 		if(someNodes && ![aKey hasSuffix:@"_ArgNode"]){
-			NSLog(@"Function: %@\n",aKey);
-			[eval printAll:someNodes];
+			NSLog(@"Parsing Function: %@\n",aKey);
+            [eval printAll:someNodes];
 		}
 	}
 	NSLog(@"==================================\n");

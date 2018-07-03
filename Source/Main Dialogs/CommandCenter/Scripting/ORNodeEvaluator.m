@@ -101,6 +101,7 @@
 - (id)      processGlobals:(id)p;
 - (id)      doGlobalVar:(id)p;
 - (id)      doGlobalAssign:(id)p;
+- (void)    addVariabletoCheckDictionary:(NSString *)aVariable;
 
 - (NSMutableDictionary*) makeSymbolTable;
 - (NSComparisonResult) compare:(id)a to:(id)b;
@@ -605,9 +606,7 @@
 {
     [variableCheckDictionary release];
     variableCheckDictionary = nil;
-	id aNode;
-	NSEnumerator* e = [someNodes objectEnumerator];
-	while(aNode = [e nextObject]){
+	for(id aNode in someNodes){
 		[self printNode:aNode];
 	}
     [self checkForCaseIssues];
@@ -621,7 +620,7 @@
         if([vars count] > 1){
             if(firstOne){
                 firstOne = NO;
-                NSLog(@"The following variables differ only in case:\n");
+                NSLogColor([NSColor redColor],@"Possible Issue: the following variables differ only in case:\n");
             }
             NSLog(@"%@\n",vars);
         }
@@ -636,7 +635,12 @@
 -(id) printNode:(id) p 
 {
     int level = 0;
-    NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@",[self finalPass:[self printNode:p atLevel:level lastOne:NO]]);
+    NSString* theTree = [self finalPass:[self printNode:p atLevel:level lastOne:NO]];
+    BOOL printWholeTree = ([[NSApp currentEvent] modifierFlags] & 0x80000)>0; //option key is down
+
+    if(printWholeTree){
+        NSLogFont([NSFont fontWithName:@"Monaco" size:9.0],@"\n%@",theTree);
+    }
     return _zero;
 }
 
@@ -650,6 +654,29 @@
 @end
 
 @implementation ORNodeEvaluator (Interpret_private)
+- (void) addVariabletoCheckDictionary:(NSString *)aVariable
+{
+    //don't card about the logic fixed variables
+    if([aVariable isEqualToString:@"YES"])  return;
+    if([aVariable isEqualToString:@"NO"])   return;
+    if([aVariable isEqualToString:@"FALSE"])return;
+    if([aVariable isEqualToString:@"TRUE"])  return;
+    
+    if(!variableCheckDictionary)variableCheckDictionary= [[NSMutableDictionary dictionary]retain];
+    NSString* aKey = [aVariable uppercaseString];
+    NSMutableArray* allLikeThis = [variableCheckDictionary objectForKey:aKey];
+    if(!allLikeThis)allLikeThis = [NSMutableArray array];
+    BOOL exists = NO;
+    for(NSString* anEntry in allLikeThis){
+        if([anEntry isEqualToString:aVariable]){
+            exists = YES;
+            break;
+        }
+    }
+    if(!exists) [allLikeThis addObject:aVariable];
+    
+    [variableCheckDictionary setObject:allLikeThis forKey:aKey];
+}
 
 - (id) doOperation:(id) p container:(id)aContainer
 {
@@ -2045,6 +2072,8 @@
 @end
 
 @implementation ORNodeEvaluator (Graph_Private)
+
+
 - (id) printNode:(id)p atLevel:(int)aLevel lastOne:(BOOL)lastChild
 {
     if (!p) return @"";
@@ -2053,25 +2082,10 @@
 	
     switch([(Node*)p type]) {
         case typeId:
-        {
             line = [NSMutableString stringWithFormat:@"ident(%s)",    [[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];
-            if(!variableCheckDictionary)variableCheckDictionary= [[NSMutableDictionary dictionary]retain];
-            NSString* aVariable = [p nodeData];
-            NSString* aKey = [aVariable uppercaseString];
-            NSMutableArray* allLikeThis = [variableCheckDictionary objectForKey:aKey];
-            if(!allLikeThis)allLikeThis = [NSMutableArray array];
-            BOOL exists = NO;
-            for(NSString* anEntry in allLikeThis){
-                if([anEntry isEqualToString:aVariable]){
-                    exists = YES;
-                    break;
-                }
-            }
-            if(!exists) [allLikeThis addObject:aVariable];
-            
-            [variableCheckDictionary setObject:allLikeThis forKey:aKey];
-        }
+            [self  addVariabletoCheckDictionary:[p nodeData]]; //this checks for variables that differ only in case
             break;
+            
         case typeCon:               line = [NSMutableString stringWithFormat:@"c(%@)",		[p nodeData]];	break;
         case typeSelVar:			line = [NSMutableString stringWithFormat:@"selVar(%s)", [[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;
         case typeStr:				line = [NSMutableString stringWithFormat:@"\"%s\"",		[[p nodeData] cStringUsingEncoding:NSASCIIStringEncoding]];	break;

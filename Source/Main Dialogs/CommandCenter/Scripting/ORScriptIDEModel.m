@@ -556,13 +556,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	if(!scriptRunner)scriptRunner = [[ORScriptRunner alloc] init];
 	if(![scriptRunner running]){
 		[scriptRunner setScriptName:scriptName];
+        NSLog(@"==================================\n");
+        NSLog(@"Parse check for %@\n",scriptName);
 		[scriptRunner parse:script];
 		parsedOK = [scriptRunner parsedOK];
 		scriptExists = [scriptRunner scriptExists];
-		if(([[NSApp currentEvent] modifierFlags] & 0x80000)>0){
-			//option key is down
-			[scriptRunner printAll];
-		}
+        [scriptRunner printAll];
+        if(parsedOK)NSLog(@"%@ Parsed OK\n",scriptName);
 	}
 }
 - (BOOL) runScript
