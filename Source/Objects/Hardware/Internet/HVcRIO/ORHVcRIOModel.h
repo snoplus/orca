@@ -44,6 +44,7 @@
         NSMutableArray*     setPoints;
         NSMutableArray*     postRegulationArray;
         NSString*           postRegulationFile;
+        NSMutableDictionary* shipValueDictionary;
 
         BOOL                expertPCControlOnly;
         BOOL                zeusHasControl;
@@ -84,6 +85,7 @@
 - (void) setShowFormattedDates:(BOOL)aState;
 - (BOOL) showFormattedDates;
 - (void) shipRecords;
+- (void) checkShipValueDictionary;
 
 - (NSString*) title;
 

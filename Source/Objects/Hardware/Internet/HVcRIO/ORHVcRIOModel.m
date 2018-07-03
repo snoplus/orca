@@ -906,6 +906,48 @@ static NSString* measuredValueList[] = {
     @"", @""
 };
 
+#define kNumToShip  38
+static NSString* itemsToShip[kNumToShip*2] = {
+    @"38",  @"436-EHV-0-1001-0001-U_set",
+    @"39",  @"436-EHV-0-1001-0002-U_act",
+    @"40",  @"436-EHV-0-1001-0003-I_max",
+    @"41",  @"436-EHV-0-1001-0004-I_act",
+    @"42",  @"436-EHV-0-1001-0005-U_ramp",
+    @"43",  @"436-EHV-0-1001-0030-I_limited",
+    @"44",  @"436-EHV-0-1001-0031-warning",
+    @"45",  @"436-EHV-0-1001-0032-error",
+    @"46",  @"436-EHV-0-1002-0001-U_set",
+    @"47",  @"436-EHV-0-1002-0002-U_act",
+    @"48",  @"436-EHV-0-1002-0003-I_max",
+    @"49",  @"436-EHV-0-1002-0004-I_act",
+    @"50",  @"436-EHV-0-1002-0005-U_ramp",
+    @"51",  @"436-EHV-0-1002-0030-I_limited",
+    @"52",  @"436-EHV-0-1002-0031-warning",
+    @"53",  @"436-EHV-0-1002-0032-error",
+    @"86",  @"436-EHV-0-1003-0001-U_set",
+    @"87",  @"436-EHV-0-1003-0002-U_act",
+    @"88",  @"436-EHV-0-1003-0003-I_max",
+    @"89",  @"436-EHV-0-1003-0004-I_act",
+    @"90",  @"436-EHV-0-1003-0005-U_ramp",
+    @"91",  @"436-EHV-0-1003-0030-I_limited",
+    @"92",  @"436-EHV-0-1003-0031-warning",
+    @"93",  @"436-EHV-0-1003-0032-error",
+    @"94",  @"416-EHV-0-1001-0001-U_set",
+    @"95",  @"416-EHV-0-1001-0002-U_act",
+    @"96",  @"416-EHV-0-1001-0003-I_max",
+    @"97",  @"416-EHV-0-1001-0004-I_act",
+    @"98",  @"416-EHV-0-1001-0005-U_ramp",
+    @"99",  @"416-EHV-0-1001-0030-I_limited",
+    @"100", @"416-EHV-0-1001-0031-warning",
+    @"101", @"416-EHV-0-1001-0032-error",
+    @"303", @"436-REU-0-0201-0001-U_act",
+    @"304", @"436-REU-0-0201-0020-trigger_time",
+    @"305", @"436-REU-0-0201-0030-meas_flag",
+    @"306", @"436-REU-0-0301-0001-U_act",
+    @"307", @"436-REU-0-0301-0020-trigger_time",
+    @"308", @"436-REU-0-0301-0030-meas_flag",
+};
+
 @interface ORHVcRIOModel (private)
 - (void) timeout;
 - (void) processNextCommandFromQueue;
@@ -933,7 +975,7 @@ static NSString* measuredValueList[] = {
         [socket setDelegate:nil];
         [socket release];
     }
-	
+    [shipValueDictionary release];
     [ipAddress release];
 	
 	[super dealloc];
@@ -1019,9 +1061,15 @@ static NSString* measuredValueList[] = {
     }
 }
 
-- (NSString*)measuredValueName:(NSUInteger)anIndex
+- (NSString*) measuredValueName:(NSUInteger)anIndex
 {
-    if(anIndex < [measuredValues count]){
+    [self checkShipValueDictionary];
+    NSString* aKey = [NSString stringWithFormat:@"%d",anIndex];
+    NSString* aName = [shipValueDictionary objectForKey:aKey];
+    if(aName){
+        return aName;
+    }
+    else if(anIndex < [measuredValues count]){
         NSString* part1 = [[measuredValues objectAtIndex:anIndex] objectForKey:@"item"];
         NSString* part2 = [[measuredValues objectAtIndex:anIndex] objectForKey:@"data"];
         return [part1 stringByAppendingFormat:@" %@",part2];
@@ -1315,21 +1363,32 @@ static NSString* measuredValueList[] = {
     
     return dataDictionary;
 }
+
+- (void) checkShipValueDictionary
+{
+    if(!shipValueDictionary){
+        shipValueDictionary = [[NSMutableDictionary dictionary] retain];
+        int i;
+        int index=0;
+        for(i=0;i<kNumToShip;i++){
+            NSString* itemIndex = itemsToShip[index++];
+            NSString* itemName  = itemsToShip[index++];
+            NSString* aName = [NSString stringWithFormat:@"(%@) %@",itemIndex,itemName];
+            [shipValueDictionary setObject:aName forKey:itemIndex];
+        }
+    }
+}
+
 - (void) shipRecords
 {
-    #define kNumToShip  38
-    int indexesToShip[kNumToShip] = {
-         38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,
-         86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,
-         303,304,305,306,307,308
-    };
-    int i;
+    [self checkShipValueDictionary];
+
     time_t    ut_Time;
     time(&ut_Time);
     unsigned long  timeMeasured = ut_Time;
 
-    for(i=0;i<kNumToShip;i++){
-        int j = indexesToShip[i];
+    for(NSString* aKey in shipValueDictionary){
+        int j = [aKey intValue];
         if(j<[measuredValues count]){
             if([[ORGlobal sharedGlobal] runInProgress]){
                 unsigned long record[kHVcRIORecordSize];

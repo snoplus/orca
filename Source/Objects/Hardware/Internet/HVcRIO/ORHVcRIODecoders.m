@@ -72,7 +72,6 @@
     }
     NSString* nameString = [obj measuredValueName:dataIndex];
 
-    [aDataSet loadGenericData:valueString sender:self withKeys:@"HVcRIO",nameString,nil];
     [aDataSet loadTimeSeries:theValue
                       atTime:timeStamp
                       sender:self
