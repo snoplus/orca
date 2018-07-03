@@ -167,15 +167,6 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
 
         y = [self frame].size.height;
 		
-        NSArray* markers = [attributes objectForKey:ORAxisMarkers];
-        for(id markerNumber in markers){
-            [self drawMarker:[markerNumber floatValue]+startTime axisPosition:0];
-        }
-        if(markerBeingDragged){
-            [self drawMarker:[markerBeingDragged floatValue]+startTime axisPosition:0];
-        }
-
-        
         [theAxis moveToPoint:NSMakePoint(lowOffset-2,y)];						// draw axis line
         [theAxis lineToPoint:NSMakePoint(highOffset+1,y)];
         --y;
@@ -232,6 +223,14 @@ static char	symbols[]	= "fpnum\0kMG";		// symbols for exponents
                 if (val < lim) break;
             }
         }
+        NSArray* markers = [attributes objectForKey:ORAxisMarkers];
+        for(id markerNumber in markers){
+            [self drawMarker:[markerNumber floatValue] axisPosition:0];
+        }
+        if(markerBeingDragged){
+            [self drawMarker:[markerBeingDragged floatValue] axisPosition:0];
+        }
+
 	}
     else {
         // Do nothing, should not be Y axis.
