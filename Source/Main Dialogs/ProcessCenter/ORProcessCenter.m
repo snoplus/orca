@@ -205,7 +205,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (IBAction) doubleClick:(id)sender
 {
-    [[processView selectedItem] doDoubleClick:sender];
+    [(OrcaObject*)[processView selectedItem] doDoubleClick:sender];
 }
 
 - (IBAction) saveDocument:(id)sender
