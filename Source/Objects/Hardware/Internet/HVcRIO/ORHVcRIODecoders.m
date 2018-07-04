@@ -55,7 +55,6 @@
     theData.asLong[0] = dataPtr[4];
     theData.asLong[1] = dataPtr[5];
     double theValue = theData.asDouble;
-    NSString* valueString = [NSString stringWithFormat:@"%f",theValue];
     
     NSString* aKey = [@"ORHVcRIOModel," stringByAppendingFormat:@"%d",objId];
     if(!actualHVObjs)actualHVObjs = [[NSMutableDictionary alloc] init];
