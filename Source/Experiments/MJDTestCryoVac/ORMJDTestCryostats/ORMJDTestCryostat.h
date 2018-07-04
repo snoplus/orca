@@ -29,7 +29,7 @@
 {
 	id					 delegate;
 	int					 connectionStatus; 
-	NSInteger			 tag;
+	int			         tag;
 	NSMutableDictionary* partDictionary;
 	NSMutableDictionary* valueDictionary;
 	NSMutableDictionary* statusDictionary;
@@ -40,8 +40,8 @@
 - (id) model;
 - (int) connectionStatus;
 - (void) setConnectionStatus:(int) aState;
-- (NSInteger) tag;
-- (void) setTag:(NSInteger)aValue;
+- (int) tag;
+- (void) setTag:(int)aValue;
 - (BOOL) showGrid;
 - (void) setDelegate:(id)aDelegate;
 - (void) makeParts;

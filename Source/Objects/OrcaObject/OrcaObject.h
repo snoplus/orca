@@ -54,7 +54,7 @@ extern NSString* ORObjArrayPtrPBType;
     @private
         //internal flags
         BOOL		aWake;
-        NSInteger   tag; //used by subclasses for identification
+        int   tag; //used by subclasses for identification
         unsigned long uniqueIdNumber;
 }
 
@@ -100,10 +100,10 @@ extern NSString* ORObjArrayPtrPBType;
 - (void)		setSkipConnectionDraw:(BOOL)state;
 - (NSMutableArray*) 	children;
 - (NSMutableArray*) 	familyList;
-- (NSInteger)         stationNumber;
-- (NSInteger)	tag;
-- (void)		setTag:(NSInteger)aTag;
-- (NSInteger)         tagBase;
+- (int)         stationNumber;
+- (int)	        tag;
+- (void)		setTag:(int)aTag;
+- (int)         tagBase;
 - (BOOL)        solitaryObject;
 - (BOOL)		solitaryInViewObject;
 - (void)        askForUniqueIDNumber;

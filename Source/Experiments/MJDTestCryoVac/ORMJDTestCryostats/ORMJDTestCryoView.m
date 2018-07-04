@@ -21,11 +21,11 @@
 #import "ORMJDTestCryostat.h"
 
 @implementation ORMJDTestCryoView
-- (NSInteger) tag
+- (int) tag
 {
 	return tag;
 }
-- (void) setTag:(NSInteger)aValue
+- (void) setTag:(int)aValue
 {
 	tag = aValue;
 }

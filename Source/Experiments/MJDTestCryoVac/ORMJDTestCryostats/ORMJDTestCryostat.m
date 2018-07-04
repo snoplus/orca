@@ -123,11 +123,11 @@ NSString* ORMJDTestCryoConnectionChanged = @"ORMJDTestCryoConnectionChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDTestCryoConnectionChanged object:self];
 }
 
-- (NSInteger) tag
+- (int) tag
 {
 	return tag;
 }
-- (void) setTag:(NSInteger)aValue
+- (void) setTag:(int)aValue
 {
 	tag = aValue;
 }
