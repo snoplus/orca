@@ -18,6 +18,7 @@
 //for the use of this software.
 //-------------------------------------------------------------
 
+
 #import "ORKatrinV4FLTDecoder.h"
 #import "ORKatrinV4FLTModel.h"
 #import "ORDataPacket.h"
@@ -488,6 +489,8 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
     unsigned long *ptrData;
     int normE;
     int spacing;
+    int digiErr;
+    int low, high, edge;
     
     ptrData = &ptr[12];
     for (int i=0;i<4095;i++) normHisto[i] = 0;
@@ -502,10 +505,25 @@ xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx histogramInfo (some flags; some spare fo
            normHisto[normE] += ptrData[i];
             
         } else {
+            // Calculate missing counts due to the integer division
+            // digiErr is the number of counts that need to be added
+            // to some of the bins. Consider rising and faling edges.
+            digiErr = ptrData[i] % spacing;
+            low = MAX(i-1,0);
+            high = MIN(i+1,2047);
+            edge = ptrData[high] - ptrData[low];
+            
             for (int j=0; j<spacing; j++){
                 normE = (histoEOffset + i * histoEBinSize) / filterLen + j;
                 if (normE > 4095) normE = 4095;
                 normHisto[normE] = ptrData[i] / spacing;
+                
+                // Correct digitization error
+                if (edge > 0){
+                    if (j >= (spacing - digiErr)) normHisto[normE] += 1;
+                } else {
+                    if (j < digiErr) normHisto[normE] += 1;
+                }
             }
             
         }
