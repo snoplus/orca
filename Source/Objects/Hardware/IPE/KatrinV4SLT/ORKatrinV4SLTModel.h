@@ -352,6 +352,7 @@
 - (unsigned long long) readRunTime;
 - (void) clearRunTime;
 
+- (double) readTime;
 - (unsigned long) readSecondsCounter;
 - (unsigned long) readSubSecondsCounter;
 - (unsigned long) getSeconds;

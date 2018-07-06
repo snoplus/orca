@@ -129,6 +129,8 @@
 - (void) setStartScript:(ORRunScriptModel*)aStartScript;
 - (BOOL) isRunning;
 - (BOOL) isStopped;
+- (BOOL) isRunInProgress;
+- (BOOL) isRunBetweenSubRuns;
 - (BOOL) runPaused;
 - (void) setRunPaused:(BOOL)aFlag;
 - (BOOL) remoteInterface;

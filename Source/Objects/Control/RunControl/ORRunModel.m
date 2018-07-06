@@ -467,6 +467,15 @@ static NSString *ORRunModelRunControlConnection = @"Run Control Connector";
     return [self runningState] == eRunStopped;
 }
 
+- (BOOL) isRunInProgress
+{
+    return [self runningState] == eRunInProgress;
+}
+
+- (BOOL) isRunBetweenSubRuns
+{
+    return [self runningState] == eRunBetweenSubRuns;
+}
 
 - (NSString*) startTimeAsString
 {
