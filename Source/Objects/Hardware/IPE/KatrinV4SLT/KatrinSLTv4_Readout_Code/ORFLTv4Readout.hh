@@ -66,6 +66,8 @@ class ORFLTv4Readout : public ORVCard
     uint32_t histoStorage[kNumChan][kMaxHistoLength];
     uint32_t histoCurrent[kMaxHistoLength];
     
+    uint32_t runEndSec;
+    
 };
 
 #endif /* _ORFLTv4Readout_hh_*/

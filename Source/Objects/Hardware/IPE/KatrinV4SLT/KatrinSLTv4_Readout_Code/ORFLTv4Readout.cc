@@ -30,11 +30,10 @@ bool ORFLTv4Readout::Start() {
     firstTime = true;
     return true;
     
+    runEndSec = 0;
     
     // Histogram - clear buffers !!!
     // Read histogramm parameters here !!!
-    
-    
     
 }
 
@@ -91,7 +90,7 @@ bool ORFLTv4Readout::Readout(SBC_LAM_Data* lamData)
 
 bool ORFLTv4Readout::Stop()
 {
-    
+
     // Energy mode - nothing to do
     
     // Trace mode - nothing to do
@@ -103,7 +102,8 @@ bool ORFLTv4Readout::Stop()
     
     uint32_t daqRunMode         = GetDeviceSpecificData()[5];
     if(daqRunMode == kKatrinV4Flt_Histogram_DaqMode){
-   
+
+        
         //
         // Readout active page if necessary
         //
@@ -134,11 +134,21 @@ bool ORFLTv4Readout::Stop()
         histoRefreshTime    = srack->theFlt[col]->histMeasTime->read();
         tRec = srack->theFlt[col]->histRecTime->read();
         
+        // Check if all histogram have been read for this second!
+        runEndSec = srack->theFlt[col]->secondCounter->read();
+        
         //printf("Rec time %d / %d sec \n", tRec, histoRefreshTime);
         
-        if (tRec > 0) {
-            
+        if ((tRec > 0) || (histoReadoutSec < runEndSec)) {
+        
             pageAB    = srack->theFlt[col]->status->histPageAB->read();
+            if (tRec == 0) {
+                printf("Warning: Detected missing histogram at the end of the run - will read it now!\n");
+                // But we need to read the other page !!!
+                pageAB = (pageAB+1)%2;
+                // Do we need a sleep for safety?!
+            }
+            
             fpgaHistogramID = srack->theFlt[col]->histNofMeas->read();
             histoReadoutSec  = srack->theFlt[col]->secondCounter->read();
 
