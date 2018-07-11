@@ -296,17 +296,18 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 
 - (void) saveToFile:(NSString*)aPath
 {
-	NSString* s = @"#Script Parameters:RunLength:SubRun\n";
+    NSString* s = @"#StartArgs:EndArgs:RunLength:SubRun\n";
 	for(id anItem in items){ 
         id isSubRun             = [anItem objectForKey:@"SubRun"];
         if(!isSubRun)isSubRun   = [NSNumber numberWithBool:NO];
 		s = [s stringByAppendingFormat:@"%@:%@:%@:%@\n",
              [[anItem objectForKey:@"ScriptParameters"]length]   > 0 ? [anItem objectForKey:@"ScriptParameters"]:@"",
              [[anItem objectForKey:@"EndScriptParameters"]length]> 0 ? [anItem objectForKey:@"EndScriptParameters"]:@"",
-			 [[anItem objectForKey:@"RunLength"]length]          > 0 ? [anItem objectForKey:@"RunLength"]:@"0",
+			 [anItem objectForKey:@"RunLength"]  ? [anItem objectForKey:@"RunLength"]:@"0",
              isSubRun];
 	}
 	[s writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
+    [self setLastFile:aPath];
 }
 
 - (void) restoreFromFile:(NSString*)aPath
