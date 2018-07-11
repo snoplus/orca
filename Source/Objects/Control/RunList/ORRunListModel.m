@@ -56,6 +56,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 - (void) calcTotalExpectedTime;
 - (void) setUpWorkingOrder;
 - (void) collectSubRunsAtIndex:(int)anIndex intoRun:(NSMutableDictionary*) aRun;
+- (BOOL) isNextRunSubrun;
 
 @end
 
@@ -360,12 +361,13 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 		case kReadyToStart:     return @"Ready";
 		case kStartRun:			return @"StartRun";
 		case kStartSubRun:		return @"StartSubRun";
-		case kStartScript:		return @"Starting Script";
-		case kWaitForScript:	return @"Script Wait";
+		case kRunStartScript:   return @"Starting Script";
+        case kWaitForStartScript: return @"Running Start Script";
 		case kWaitForRunTime:	return [NSString stringWithFormat:@"%.0f",runLength - runTimeElapsed];
-        case kStartEndScript:   return @"Starting End Script";
-        case kWaitForEndScript:	return @"Script Wait";
-		case kRunFinished:		return @"Done";
+        case kRunEndScript:     return @"Starting End Script";
+        case kWaitForEndScript:	return @"Running End Script";
+        case kEndOfRun:         return @"End Of Run";
+        case kNextRun:          return @"Done";
 		case kCheckForRepeat:	return @"Repeat Check";
         case kFinishUp:         return @"Manual Quit";
         case kPause:            return @"Paused";
@@ -535,7 +537,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 			
         case kReadyToStart:
 			if(!scriptAtStartModel) runListState = kStartRun;
-			else                    runListState = kStartScript;
+			else                    runListState = kRunStartScript;
 			[self calcTotalExpectedTime];
 			[self setUpWorkingOrder];
 		break;
@@ -558,14 +560,14 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 			runListState = kWaitForRunTime;
 			break;
 			
-		case kStartScript:
+		case kRunStartScript:
 			[self setWorkingItemState];
 			[scriptAtStartModel setInputValue:[self getScriptParameters]];
 			[scriptAtStartModel runScript];
-			runListState = kWaitForScript;
+			runListState = kWaitForStartScript;
 		break;
 			
-		case kWaitForScript:
+		case kWaitForStartScript:
 			[self setWorkingItemState];
 			if(![[scriptAtStartModel scriptRunner] running]) {
 				doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
@@ -580,12 +582,11 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
             runTimeElapsed = [[NSDate date] timeIntervalSinceDate:timeRunStarted];
 			accumulatedTime = dt+skippedTime;
             if(runTimeElapsed>=runLength){
-                if(scriptAtEndModel)runListState = kStartEndScript;
-                else                runListState = kRunFinished;
+                runListState = kEndOfRun;
             }
 		break;
 			
-        case kStartEndScript:
+        case kRunEndScript:
             [self setWorkingItemState];
             [scriptAtEndModel setInputValue:[self getEndScriptParameters]];
             [scriptAtEndModel runScript];
@@ -595,32 +596,44 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
         case kWaitForEndScript:
             [self setWorkingItemState];
             if(![[scriptAtEndModel scriptRunner] running]) {
-                //doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
-                runListState = kRunFinished;
+                runListState = kNextRun;
             }
             break;
             
-		case kRunFinished:
+		case kEndOfRun:
 			[self setWorkingItemState];
-			[self goToNextWorkingIndex];
-			if([orderArray count]==0) runListState = kCheckForRepeat;
-			else {
-				doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
-				if(doSubRun){
-					[runModel prepareForNewSubRun];
-					runListState = kWaitForSubRun;
-					if(!scriptAtStartModel) nextState = kStartSubRun;
-					else                    nextState = kStartScript;
-				}
-				else {
-					[runModel stopRun];
-					runListState = kWaitForRunToStop;
-					if(!scriptAtStartModel) nextState = kStartRun;
-					else                    nextState = kStartScript;
-				}
-			}
+            if([self isNextRunSubrun]){
+                [runModel prepareForNewSubRun]; //ends a subrun
+                runListState = kWaitForSubRun;
+                if(scriptAtEndModel) nextState = kRunEndScript;
+                else                 nextState = kNextRun;
+            }
+            else {
+                [runModel stopRun];
+                runListState = kWaitForRunToStop;
+                if(scriptAtEndModel) nextState = kRunEndScript;
+                else                 nextState = kNextRun;
+            }
 		break;
 			
+            
+        case kNextRun:
+            [self setWorkingItemState];
+            [self goToNextWorkingIndex];
+           if([orderArray count]==0) runListState = kCheckForRepeat;
+            else {
+                doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
+                if(doSubRun){
+                    if(!scriptAtStartModel) runListState = kStartSubRun;
+                    else                    runListState = kRunStartScript;
+                }
+                else {
+                    if(!scriptAtStartModel) runListState = kStartRun;
+                    else                    runListState = kRunStartScript;
+                }
+            }
+            break;
+            
 		case kCheckForRepeat:
 			executionCount++;
 			if(executionCount>=timesToRepeat){
@@ -686,6 +699,15 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 {
     [orderArray popTop];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelWorkingItemIndexChanged object:self];
+}
+
+- (BOOL) isNextRunSubrun
+{
+    if([orderArray count]>1){
+        int index = [[orderArray objectAtIndex:1] intValue];
+        return [[[items objectAtIndex:index] objectForKey:@"SubRun"] boolValue];
+    }
+    else return NO;
 }
 
 - (id) getScriptParameters
