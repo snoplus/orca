@@ -178,9 +178,16 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
                        object : nil];
 }
 - (void) runAboutToStart: (NSNotification*) aNone {
-    [self setDataReadout:NO];
-    [self ResetFifo]; //Maybe take this out eventually? I'm not sure
-    [self setDataReadout:YES];
+    @try {
+        [self setDataReadout:NO];
+        [self ResetFifo]; //Maybe take this out eventually? I'm not sure
+        [self setDataReadout:YES];
+    } @catch (NSException *exception) {
+        // Need to catch the exception here and not let it bubble up.
+        // Else the run will not actually start. And TUBii isn't of high enough
+        // priority to stop a run start.
+        NSLogColor([NSColor redColor], @"Could not start tubii data readout: Exception: %@ Reason: %@\n", [exception name],[exception reason]);
+    }
 }
 
 - (void) awakeAfterDocumentLoaded
