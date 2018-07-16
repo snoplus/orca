@@ -104,6 +104,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder *)aCoder {
     self = [super initWithCoder:aCoder];
+    [self registerNotificationObservers];
     if (self) {
         //  Initialize model member variables
         currentModelState.smellieRate = 0;
@@ -148,6 +149,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
         // latency from remote shift stations causing timeouts
         [connection setTimeout:2000];
     }
+    [self activateKeepAlive];
     return self;
 }
 - (void) encodeWithCoder:(NSCoder *)aCoder{
@@ -168,25 +170,9 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
     NSNotificationCenter* notifyCenter = [NSNotificationCenter defaultCenter];
 
     [notifyCenter addObserver : self
-                     selector : @selector(runAboutToStart:)
-                         name : ORRunAboutToStartNotification
-                       object : nil];
-
-    [notifyCenter addObserver : self
                      selector : @selector(killKeepAlive:)
                          name : @"TELLIEEmergencyStop"
                        object : nil];
-}
-- (void) runAboutToStart: (NSNotification*) aNone {
-    [self setDataReadout:NO];
-    [self ResetFifo]; //Maybe take this out eventually? I'm not sure
-    [self setDataReadout:YES];
-}
-
-- (void) awakeAfterDocumentLoaded
-{
-    [self registerNotificationObservers];
-    [self activateKeepAlive];
 }
 
 #pragma mark •••Network Communication
@@ -952,7 +938,7 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
             break;
         }
         
-        [NSThread sleepForTimeInterval:0.5];
+        [NSThread sleepForTimeInterval:5.0];
 
         // This is a very long running thread need to relase the pool every so often
         if(counter == 1000){
@@ -965,6 +951,9 @@ NSString* ORTubiiSettingsChangedNotification    = @"ORTubiiSettingsChangedNotifi
 
     NSLogColor([NSColor redColor],@"[TUBii]: Stopped sending keep-alive to TUBii\n");
     NSLogColor([NSColor redColor],@"[TUBii]: Unless you restart this process the ELLIE systems will not be able to trigger through TUBii. If you'd like to restart at a later time please do so from the servers tab of the ELLIE gui\n");
+
+    // Update the servers tab of the ELLIE gui to denote that the keep alive is no longer active
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:@"TUBiiKeepAliveDied" object:self];
 
     // release memory
     [pool release];
