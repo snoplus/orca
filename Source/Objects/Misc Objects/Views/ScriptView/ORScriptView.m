@@ -108,12 +108,12 @@
             NSEventType     eventType = [event type];
             NSTimeInterval eventTime  = [event timestamp];
             
-            if (eventType == NSLeftMouseDown) {
+            if (eventType == NSEventTypeLeftMouseDown) {
                 // This is the mouseDown of the double-click; we do not want
                 // to modify the selection here, just log the time
                 doubleDownTime = eventTime;
             }
-            else if (eventType == NSLeftMouseUp) {
+            else if (eventType == NSEventTypeLeftMouseUp) {
                 // After the double-click interval since the second mouseDown,
                 // the mouseUp is no longer eligible
                 if (eventTime - doubleDownTime <= [NSEvent doubleClickInterval]){
@@ -121,8 +121,8 @@
                     NSRange   startRange = NSMakeRange(proposedCharRange.location,1);
                     NSString*          s = [scriptString substringWithRange: startRange];
                     unsigned char      c = [s characterAtIndex:0];
-                    int            start = startRange.location;
-                    int              len = [scriptString length];
+                    int      start = (int)startRange.location;
+                    int        len = (int)[scriptString length];
                     int i;
                     int level = 0;
                     switch(c){
@@ -217,15 +217,15 @@
 	[self setSelectedRange: NSMakeRange(0,0)];
 }
 
-- (void) selectLine:(unsigned long)aLine
+- (void) selectLine:(uint32_t)aLine
 {
 	NSString* originalText = [[self textStorage] string];
 	NSArray* lines = [originalText componentsSeparatedByString:@"\n"];
-	long selectionStart = 0;
-	long selectionLen = [[lines objectAtIndex:aLine] length];
-	int i;
+	NSUInteger selectionStart = 0;
+	NSUInteger selectionLen = [[lines objectAtIndex:aLine] length];
+	NSUInteger i;
 	for(i=0;i<aLine;i++){
-		long lineLen = [[lines objectAtIndex:i] length];
+		NSUInteger lineLen = [[lines objectAtIndex:i] length];
 		selectionStart+=lineLen+1;
 	}
 	NSRange selectionRange = NSMakeRange(selectionStart,selectionLen);
@@ -313,13 +313,13 @@
 		NSMutableString*			newStr = [[replacementString mutableCopy] autorelease];
 		NSMutableAttributedString*  textStore = [self textStorage];
 		BOOL						hadSpaces = NO;
-		unsigned int				lastSpace = affectedCharRange.location,
+        int				lastSpace = (int)affectedCharRange.location,
 		prevLineBreak = 0;
 		NSRange						spacesRange = { 0, 0 };
 		unichar						theChar = 0;
-		unsigned int				x;
+        int				x;
 		
-		if(affectedCharRange.location>0) x = affectedCharRange.location -1;
+		if(affectedCharRange.location>0) x = (int)affectedCharRange.location -1;
 		else							 x = 0;
 		
 		NSString* tsString = [textStore string];
@@ -476,7 +476,7 @@
 		theRange.location = theRange.location +theRange.length;
 	}
 	
-	[status setStringValue: [NSString stringWithFormat: @"Characters %u to %u", theRange.location +1, theRange.location +theRange.length]];
+    [status setStringValue: [NSString stringWithFormat: @"Characters %lu to %lu", theRange.location +1, theRange.location +theRange.length]];
 	[self scrollRangeToVisible: theRange];
 	[self setSelectedRange: theRange];
 }
@@ -651,7 +651,7 @@
 - (NSRange)  textView: (NSTextView*)textView willChangeSelectionFromCharacterRange: (NSRange)oldSelectedCharRange
 	 toCharacterRange:(NSRange)newSelectedCharRange
 {
-	[status setStringValue: [NSString stringWithFormat: @"Selected char %u to %u",
+	[status setStringValue: [NSString stringWithFormat: @"Selected char %lu to %lu",
 							 newSelectedCharRange.location +1,
 							 newSelectedCharRange.location +newSelectedCharRange.length]];
 	
@@ -703,19 +703,18 @@
 		BOOL						vIsEndChar = NO;
 		BOOL						justExtit = NO;
 		while( ![vScanner isAtEnd] ){
-			int		vStartOffs,
-			vEndOffs;
+			uint32_t		vStartOffs,vEndOffs;
 			vIsEndChar = NO;
 			
 			// Look for start of string:
 			[vScanner scanUpToString: startCh intoString: nil];
-			vStartOffs = [vScanner scanLocation];
+			vStartOffs = (int)[vScanner scanLocation];
 			if( ![vScanner scanString:startCh intoString:nil] ) {
 				break;
 			}
 			while( !vIsEndChar && ![vScanner isAtEnd] )	{  // Loop until we find end-of-string marker or our text to color is finished:
 				[vScanner scanUpToString: endCh intoString: nil];
-				unsigned x = [vScanner scanLocation] -1;
+				uint32_t x = (uint32_t)[vScanner scanLocation] -1;
 				
 				if( [[s string] characterAtIndex: x] != '\\' )	// Backslash before the end marker? That means ignore the end marker.
 					vIsEndChar = YES;	// A real one! Terminate loop.
@@ -726,7 +725,7 @@
 				}
 			}
 			
-			vEndOffs = [vScanner scanLocation];
+			vEndOffs = (uint32_t)[vScanner scanLocation];
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
@@ -763,14 +762,14 @@
 		while( ![vScanner isAtEnd] ){			
 			// Look for start of multi-line comment:
 			[vScanner scanUpToString: startCh intoString: nil];
-			int vStartOffs = [vScanner scanLocation];
+			NSUInteger vStartOffs = [vScanner scanLocation];
 			if( ![vScanner scanString:startCh intoString:nil] )
 				break;
 			
 			// Look for associated end-of-comment marker:
 			[vScanner scanUpToString: endCh intoString: nil];
 			if( ![vScanner scanString:endCh intoString:nil] )break;
-			int vEndOffs = [vScanner scanLocation];
+			NSUInteger vEndOffs = [vScanner scanLocation];
 			
 			// Now mess with the string's styles:
 			[s setAttributes: vStyles range: NSMakeRange( vStartOffs, vEndOffs -vStartOffs )];
@@ -793,7 +792,7 @@
 											   nil];
 		
 		while( ![vScanner isAtEnd] ) {
-			int		vStartOffs,
+			NSUInteger		vStartOffs,
 			vEndOffs;
 			
 			// Look for start of one-line comment:
@@ -828,7 +827,7 @@
 											   nil];
 		
 		
-		int							vStartOffs = 0;
+		NSUInteger							vStartOffs = 0;
 		
 		[vScanner setCaseSensitive:YES];
 		

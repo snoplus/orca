@@ -100,7 +100,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 
 - (NSString*) description:(NSString*)prefix
 {
-    return [NSString stringWithFormat:@"%@%@ %lu",prefix,[self elementName],[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"%@%@ %u",prefix,[self elementName],[self uniqueIdNumber]];
 }
 
 
@@ -439,20 +439,20 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:label				forKey:@"label"];
     [encoder encodeObject:displayFormat		forKey:@"displayFormat"];
-    [encoder encodeInt:textSize				forKey:@"textSize"];
-	[encoder encodeInt:labelType			forKey:@"labelType"];
+    [encoder encodeInteger:textSize				forKey:@"textSize"];
+	[encoder encodeInteger:labelType			forKey:@"labelType"];
     [encoder encodeObject:controllerString	forKey:@"controllerString"];
-	[encoder encodeInt:updateInterval		forKey:@"updateInterval"];
+	[encoder encodeInteger:updateInterval		forKey:@"updateInterval"];
 }
 - (void) doCntrlClick:(NSView*)aView
 {
 	NSEvent* theCurrentEvent = [NSApp currentEvent];
-    NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+    NSEvent *event =  [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown
                                          location:[theCurrentEvent locationInWindow]
-                                    modifierFlags:NSLeftMouseDownMask // 0x100
+                                    modifierFlags:NSEventModifierFlagControl // 0x100
                                         timestamp:(NSTimeInterval)0
                                      windowNumber:[theCurrentEvent windowNumber]
-                                          context:[theCurrentEvent context]
+                                          context:nil
                                       eventNumber:0
                                        clickCount:1
                                          pressure:1];
@@ -485,7 +485,7 @@ NSString* ORLabelModelFormatChanged				 = @"ORLabelModelFormatChanged";
 	}
 	else {
 		int i;
-		int n = [displayValues count];
+		int n = (int)[displayValues count];
 		NSArray* formats = [displayFormat componentsSeparatedByString:@"\n"];
 		NSString* newString = @"";
 		NSString* aFormat;

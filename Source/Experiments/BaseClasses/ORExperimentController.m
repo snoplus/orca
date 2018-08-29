@@ -61,7 +61,7 @@
 	[detectorView setDelegate:model];	
     
 	NSString* tabPrefName = [NSString stringWithFormat:@"orca.%@.selectedtab",[self className]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: tabPrefName];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: tabPrefName];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -493,7 +493,7 @@
 {
 	if(runControl)	{
 		[runStatusField setStringValue:[runControl shortStatus]];
-		[runNumberField setIntValue:[runControl runNumber]];
+		[runNumberField setIntegerValue:(int)[runControl runNumber]];
 		
 		if([runControl isRunning]){
 			[runBar setIndeterminate:!([runControl timedRun] && ![runControl remoteControl])];
@@ -559,7 +559,7 @@
 }
 - (IBAction) colorScaleTypeAction:(id)sender
 {
-    [model setColorScaleType:[[sender selectedCell]tag]];
+    [model setColorScaleType:(int)[[sender selectedCell]tag]];
 }
 
 - (IBAction) customColor1Action:(id)sender
@@ -626,7 +626,7 @@
 - (IBAction) runModeAction:(id)sender
 {
 	[self endEditing];
-    int tag = [[runModeMatrix selectedCell] tag];
+    int tag = (int)[[runModeMatrix selectedCell] tag];
     if(tag != [[ORGlobal sharedGlobal] runMode]){
         [[ORGlobal sharedGlobal] setRunMode:tag];
     }
@@ -635,7 +635,7 @@
 - (IBAction) displayTypeAction:(id)sender
 {
 	[self endEditing];
-	int type = [[sender selectedCell]tag];
+	int type = (int)[[sender selectedCell]tag];
 	[model setDisplayType:type];	
 	[self setValueHistogramTitle];
 	[self scaleValueHistogram];
@@ -951,7 +951,7 @@
     [captureDateField setObjectValue:[model captureDate]]; 
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
 {
 	if(tableView == primaryTableView){
 		return ![gSecurity isLocked:[model experimentMapLock]];
@@ -975,21 +975,7 @@
 	[NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateForReplayMode) object:nil];
 }
 
-- (void) scaleValueHistogram
-{
 
-    [[valueHistogramsPlot xAxis] setRngLow:0 withHigh:64];
-	switch([model displayType]){
-		case kDisplayRates:		[[valueHistogramsPlot xAxis] setRngLow:0 withHigh:64]; break;
-		case kDisplayThresholds:
-		case kDisplayGains:		
-		case kDisplayTotalCounts:		
-			[valueHistogramsPlot autoScaleX:self];
-			[valueHistogramsPlot autoScaleY:self];
-		break;
-		default: break;
-	}
-}
 
 #pragma mark •••Details Interface Management
 - (void) histogramsUpdated:(NSNotification*)aNote
@@ -1041,10 +1027,10 @@
 #pragma mark •••Data Source For Plots
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int tag = [aPlotter tag];
+	int tag = (int)[aPlotter tag];
 	if(tag < 10){ //rate plots
 		int set = tag;
-		return [[[model segmentGroup:set]  totalRate] count];
+		return (int)[[[model segmentGroup:set]  totalRate] count];
 	}
 	else if(tag >= 10){ //value plots
 		int set = tag-10;
@@ -1062,10 +1048,10 @@
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	double aValue = 0;
-	int tag = [aPlotter tag];
+	int tag = (int)[aPlotter tag];
 	if(tag < 10){ //rate plots
 		int set = tag;
-		int count = [[[model segmentGroup:set] totalRate] count];
+		int count = (int)[[[model segmentGroup:set] totalRate] count];
 		int index = count-i-1;
 		if(count==0) aValue = 0;
 		else		 aValue = [[[model segmentGroup:set] totalRate] valueAtIndex:index];
@@ -1087,15 +1073,15 @@
 }
 
 #pragma mark •••Data Source For Tables
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == primaryTableView || aTableView == primaryValuesView){
-		return [[model segmentGroup:0] segment:rowIndex objectForKey:[aTableColumn identifier]];
+		return [[model segmentGroup:0] segment:(int)rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else return nil;
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == primaryTableView || aTableView == primaryValuesView){
 		return [[model segmentGroup:0] numSegments];
@@ -1103,16 +1089,16 @@
 	else return 0;
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	ORDetectorSegment* aSegment;
 	if(aTableView == primaryTableView){
-		aSegment = [[model segmentGroup:0] segment:rowIndex];
+		aSegment = [[model segmentGroup:0] segment:(int)rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
 		[[model segmentGroup:0] configurationChanged:nil];
 	}
 	else if(aTableView == primaryValuesView){
-		aSegment = [[model segmentGroup:0] segment:rowIndex];
+		aSegment = [[model segmentGroup:0] segment:(int)rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -1124,7 +1110,7 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    int index = [tabView indexOfTabViewItem:item];
+    NSInteger index = [tabView indexOfTabViewItem:item];
 	NSString* tabPrefName = [NSString stringWithFormat:@"orca.%@.selectedtab",[self className]];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:tabPrefName];
 }
@@ -1169,15 +1155,17 @@
 
 - (void) scaleValueHistogram
 {
-	switch([model displayType]){
-		case kDisplayRates:			[[valueHistogramsPlot xAxis] setRngLow:0 withHigh:[model maxNumSegments]]; break;
-		case kDisplayTotalCounts:	[[valueHistogramsPlot xAxis] setRngLow:0 withHigh:[model maxNumSegments]]; break;
-		case kDisplayThresholds:
-		case kDisplayGains:		
-			[valueHistogramsPlot autoScaleX:self];
-			[valueHistogramsPlot autoScaleY:self];
-		break;
-		default: break;
-	}
+    
+    [[valueHistogramsPlot xAxis] setRngLow:0 withHigh:64];
+    switch([model displayType]){
+        case kDisplayRates:        [[valueHistogramsPlot xAxis] setRngLow:0 withHigh:64]; break;
+        case kDisplayThresholds:
+        case kDisplayGains:
+        case kDisplayTotalCounts:
+            [valueHistogramsPlot autoScaleX:self];
+            [valueHistogramsPlot autoScaleY:self];
+            break;
+        default: break;
+    }
 }
 @end

@@ -35,18 +35,18 @@
 #pragma mark •••Type Defs
 typedef struct A3818ConfigStructUser
 {
-    UInt32 int32[64];
+    uint32_t int32[64];
 } A3818ConfigStructUser;
 
 
 typedef struct MapRegisterStructUser
 {
-    UInt32 *userAddress;
-    UInt32 vmeAddress;
-    UInt32 numberBytes;
-    UInt16 addressModifier;
-    UInt16 addressSpace; 
-    UInt8 accessWidth;
+    uint32_t *userAddress;
+    uint32_t vmeAddress;
+    uint32_t numberBytes;
+    uint16_t addressModifier;
+    uint16_t addressSpace; 
+    uint8_t accessWidth;
 } MapRegisterStructUser;
 
 
@@ -107,17 +107,17 @@ enum {
         io_object_t A3818Device;
         io_connect_t dataPort;
         io_service_t dataService;
-        vm_address_t CSRRegisterAddress;
-        vm_size_t CSRRegisterLength;
-        vm_address_t mapRegisterAddress;
-        vm_size_t mapRegisterLength;
-        vm_address_t remMemRegisterAddress;
-        vm_size_t remMemRegisterLength;    
+        mach_vm_address_t CSRRegisterAddress;
+        mach_vm_size_t CSRRegisterLength;
+        mach_vm_address_t mapRegisterAddress;
+        mach_vm_size_t mapRegisterLength;
+        mach_vm_address_t remMemRegisterAddress;
+        mach_vm_size_t remMemRegisterLength;    
 		unsigned char* fVStatusReg;
         NSString*       deviceName;
-        unsigned int 	rwAddress;
-        unsigned int 	writeValue;
-        unsigned int	readWriteType;
+        uint32_t 	rwAddress;
+        uint32_t 	writeValue;
+        uint32_t	readWriteType;
         unsigned int 	rwAddressModifier;
         unsigned int 	readWriteIOSpace;
         
@@ -150,16 +150,16 @@ enum {
 - (void) setDoRange:(BOOL)aDoRange;
 - (NSString *) deviceName;
 - (void) setDeviceName: (NSString *) aDeviceName;
-- (unsigned long) rwAddress;
-- (void) setRwAddress:(unsigned long)aValue;
-- (unsigned long) writeValue;
-- (void) setWriteValue:(unsigned long)aValue;
+- (uint32_t) rwAddress;
+- (void) setRwAddress:(uint32_t)aValue;
+- (uint32_t) writeValue;
+- (void) setWriteValue:(uint32_t)aValue;
 - (unsigned int) rwAddressModifier;
 - (void) setRwAddressModifier:(unsigned int)aValue;
 - (unsigned int) readWriteIOSpace;
 - (void) setReadWriteIOSpace:(unsigned int)aValue;
-- (unsigned int) readWriteType;
-- (void) setReadWriteType:(unsigned int)aValue;
+- (uint32_t) readWriteType;
+- (void) setReadWriteType:(uint32_t)aValue;
 - (unsigned short) rwAddressModifierValue;
 - (unsigned short) rwIOSpaceValue;
 
@@ -199,45 +199,45 @@ enum {
 //----------------------------------------------------------------
 //the following methods raise exceptions by reraising the exception
 //raised by checkStatusErrors;
-- (void) readLongBlock:(unsigned long *) readAddress
-					 atAddress:(unsigned long) vmeAddress
+- (void) readLongBlock:(uint32_t *) readAddress
+					 atAddress:(uint32_t) vmeAddress
 					 numToRead:(unsigned int) numberLongs
 					withAddMod:(unsigned short) addressModifier
 				 usingAddSpace:(unsigned short) addressSpace;
 
-- (void) readLong:(unsigned long *) readAddress
-             atAddress:(unsigned long) vmeAddress
+- (void) readLong:(uint32_t *) readAddress
+             atAddress:(uint32_t) vmeAddress
              timesToRead:(unsigned int) numberLongs
             withAddMod:(unsigned short) addModifier
          usingAddSpace:(unsigned short) addressSpace;
 
-- (void) writeLongBlock:(unsigned long *) writeAddress
-					  atAddress:(unsigned long) vmeAddress
+- (void) writeLongBlock:(uint32_t *) writeAddress
+					  atAddress:(uint32_t) vmeAddress
 					  numToWrite:(unsigned int) numberLongs
 					 withAddMod:(unsigned short) addressModifier
 				  usingAddSpace:(unsigned short) addressSpace;
 
 - (void) readByteBlock:(unsigned char *) readAddress
-					 atAddress:(unsigned long) vmeAddress
+					 atAddress:(uint32_t) vmeAddress
 					 numToRead:(unsigned int) numberBytes
 					withAddMod:(unsigned short) addressModifier
 				 usingAddSpace:(unsigned short) addressSpace;
 
 - (void) writeByteBlock:(unsigned char *) writeAddress
-					  atAddress:(unsigned long) vmeAddress
+					  atAddress:(uint32_t) vmeAddress
 					  numToWrite:(unsigned int) numberBytes
 					 withAddMod:(unsigned short) addressModifier
 				  usingAddSpace:(unsigned short) addressSpace;
 
 
 - (void) readWordBlock:(unsigned short *) readAddress
-					 atAddress:(unsigned long) vmeAddress
+					 atAddress:(uint32_t) vmeAddress
 					 numToRead:(unsigned int) numberWords
 					withAddMod:(unsigned short) addressModifier
 				 usingAddSpace:(unsigned short) addressSpace;
 
 - (void) writeWordBlock:(unsigned short *) writeAddress
-					  atAddress:(unsigned long) vmeAddress
+					  atAddress:(uint32_t) vmeAddress
 					  numToWrite:(unsigned int) numberWords
 					 withAddMod:(unsigned short) addressModifier
 				  usingAddSpace:(unsigned short) addressSpace;
@@ -251,33 +251,33 @@ enum {
 
 
 #pragma mark •••DMA
-- (void) readLongBlock:(unsigned long *) readAddress
-					 atAddress:(unsigned long) vmeAddress
+- (void) readLongBlock:(uint32_t *) readAddress
+					 atAddress:(uint32_t) vmeAddress
 					 numToRead:(unsigned int) numberLongs
 				 usingAddSpace:(unsigned short) addressSpace
 				 useBlockMode:(bool) useBlockMode;
 
-- (void) writeLongBlock:(unsigned long *) writeAddress
-					  atAddress:(unsigned long) vmeAddress
+- (void) writeLongBlock:(uint32_t *) writeAddress
+					  atAddress:(uint32_t) vmeAddress
 					  numToWrite:(unsigned int) numberLongs
 				  usingAddSpace:(unsigned short) addressSpace
 				 useBlockMode:(bool) useBlockMode;
 				 
 - (bool) checkDmaErrors;
 
-- (bool) checkDmaComplete:(unsigned long*) checkFlag;
+- (bool) checkDmaComplete:(uint32_t*) checkFlag;
 
-- (void) startDma:(unsigned long) vmeAddress 
-  physicalBufferAddress:(unsigned long) physicalBufferAddress
-		numberTransfers:(unsigned long) numberTransfers 
+- (void) startDma:(uint32_t) vmeAddress 
+  physicalBufferAddress:(uint32_t) physicalBufferAddress
+		numberTransfers:(uint32_t) numberTransfers 
 		   addressSpace:(unsigned short) addressSpace
 		 enableByteSwap:(bool) enableByteSwap 
 		 enableWordSwap:(bool) enableWordSwap
 		   useBlockMode:(bool) useBlockMode
 			  direction:(char) theDirection;
 			  
-- (void) setupMappingDMA:(unsigned long) remoteAddress
-	numberBytes:(unsigned long) numberBytes
+- (void) setupMappingDMA:(uint32_t) remoteAddress
+	numberBytes:(uint32_t) numberBytes
 		 enableByteSwap:(bool) enableByteSwap 
 		 enableWordSwap:(bool) enableWordSwap;
 

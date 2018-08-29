@@ -200,13 +200,13 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[4];
+		uint32_t data[4];
 		data[0] = dataId | 4;
 		data[1] = ([self units]<<16) | ([self uniqueIdNumber]&0xfff);
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		
 		theData.asFloat = pressure;
@@ -214,7 +214,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 		data[3] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*4]];
 	}
 }
 
@@ -540,7 +540,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	return checksum;
 }
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -552,7 +552,7 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 	time_t	ut_Time;
 	time(&ut_Time);
 	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	timeMeasured = ut_Time;
+	timeMeasured = (uint32_t)ut_Time;
 
 
 	if(timeRates == nil) timeRates = [[ORTimeRate alloc] init];
@@ -860,26 +860,26 @@ NSString* ORMks651cLock = @"ORMks651cLock";
     [super encodeWithCoder:encoder];
     [encoder encodeFloat:spanCalibration	forKey:@"spanCalibration"];
     [encoder encodeFloat:specialZero		forKey:@"specialZero"];
-    [encoder encodeInt:setPtSelection		forKey:@"setPtSelection"];
+    [encoder encodeInteger:setPtSelection		forKey:@"setPtSelection"];
     [encoder encodeBool:positionRange		forKey:@"positionRange"];
     [encoder encodeFloat:openSoftstart		forKey:@"openSoftstart"];
     [encoder encodeFloat:closeSoftstart		forKey:@"closeSoftstart"];
     [encoder encodeFloat:analogSoftstart	forKey:@"analogSoftstart"];
     [encoder encodeFloat:analogSetPoint		forKey:@"analogSetPoint"];
-    [encoder encodeInt:sensorRange			forKey:@"sensorRange"];
-    [encoder encodeInt:sensorVoltageRange	forKey:@"sensorVoltageRange"];
-    [encoder encodeInt:analogRange			forKey:@"analogRange"];
-    [encoder encodeInt:analogFSLevel		forKey:@"analogFSLevel"];
-    [encoder encodeInt:units				forKey: @"units"];
+    [encoder encodeInteger:sensorRange			forKey:@"sensorRange"];
+    [encoder encodeInteger:sensorVoltageRange	forKey:@"sensorVoltageRange"];
+    [encoder encodeInteger:analogRange			forKey:@"analogRange"];
+    [encoder encodeInteger:analogFSLevel		forKey:@"analogFSLevel"];
+    [encoder encodeInteger:units				forKey: @"units"];
     [encoder encodeBool:shipPressures		forKey: @"shipPressures"];
-    [encoder encodeInt: pollTime			forKey: @"pollTime"];
+    [encoder encodeInteger: pollTime			forKey: @"pollTime"];
     [encoder encodeBool:portWasOpen			forKey: @"portWasOpen"];
     [encoder encodeObject:portName			forKey: @"portName"];
-	[encoder encodeInt:pressureScale		forKey: @"pressureScale"];
-	[encoder encodeInt:valveResponse		forKey: @"valveResponse"];
-	[encoder encodeInt:sensorType			forKey: @"sensorType"];
-	[encoder encodeInt:controlType			forKey: @"controlType"];
-	[encoder encodeInt:valveType			forKey: @"valveType"];
+	[encoder encodeInteger:pressureScale		forKey: @"pressureScale"];
+	[encoder encodeInteger:valveResponse		forKey: @"valveResponse"];
+	[encoder encodeInteger:sensorType			forKey: @"sensorType"];
+	[encoder encodeInteger:controlType			forKey: @"controlType"];
+	[encoder encodeInteger:valveType			forKey: @"valveType"];
 	int i;
 	for(i=0;i<5;i++){
 		[encoder encodeFloat:setPoint[i]	  forKey: [NSString stringWithFormat:@"setPoint%d",i]];
@@ -1237,8 +1237,8 @@ NSString* ORMks651cLock = @"ORMks651cLock";
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }

@@ -97,9 +97,9 @@
 		[[NSColor colorWithCalibratedRed:.7 green:0 blue:0 alpha:.1] set];
 		float y1 = yLowConstraint;
 		float y2 = yHighConstraint;
-		int index = [[model wayPoints] indexOfObject:selectedWayPoint];
+		int index = (int)[[model wayPoints] indexOfObject:selectedWayPoint];
 		if(index == [model wayPointCount]-1){
-			NSPoint nextToLastPoint = [[model wayPoint:[model wayPointCount]-2] xyPosition];
+			NSPoint nextToLastPoint = [[model wayPoint:(int)[model wayPointCount]-2] xyPosition];
 			float y = [yScale getPixAbs:nextToLastPoint.y];
 			float x = [xScale getPixAbs:nextToLastPoint.x];
 			[[NSColor colorWithCalibratedRed:.7 green:0 blue:0 alpha:.3] set];
@@ -150,7 +150,7 @@
 	if(![model isRunning]){
 		[rightTargetBug drawAtPoint:NSMakePoint([self bounds].size.width - [rightTargetBug size].width,
 												 targetLineY-[rightTargetBug size].height/2.) 
-						   fromRect:[rightTargetBug imageRect] operation:NSCompositeSourceOver fraction:1.0];
+						   fromRect:[rightTargetBug imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 
 	}
 	
@@ -165,7 +165,7 @@
 		[s release];
 	}
 	
-	int n = [model wayPointCount];
+	int n = (int)[model wayPointCount];
 	int i;
 	if(![model isRunning]){
 		for(i=0;i<n;i++){
@@ -213,7 +213,7 @@
 
 	float bugPadWidth = [rightTargetBug size].width;
 	float bugPadHeight = [rightTargetBug size].height+2;
-    BOOL cmdKeyDown   = ([event modifierFlags] & NSCommandKeyMask)!=0;
+    BOOL cmdKeyDown   = ([event modifierFlags] & NSEventModifierFlagCommand)!=0;
     NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
 	NSEnumerator* e = [[model wayPoints] objectEnumerator];
 	ORWayPoint* aWayPoint;
@@ -234,7 +234,7 @@
 				[p release];
 			}
 			
-			int index = [wayPoints indexOfObject:selectedWayPoint];
+			int index = (int)[wayPoints indexOfObject:selectedWayPoint];
 			if(index == 0){
 				ORWayPoint* more = [wayPoints objectAtIndex:index+1];
 				xLowConstraint  = 0;

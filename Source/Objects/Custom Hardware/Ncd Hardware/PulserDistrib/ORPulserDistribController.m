@@ -72,21 +72,21 @@
 
 - (void) patternChanged:(NSNotification*)aNotification
 {
-	long patternMask = [[[model patternArray] objectAtIndex:0] longValue];
+	uint32_t patternMask = (int32_t)[[[model patternArray] objectAtIndex:0] longValue];
 	short bit;
 	for(bit=0;bit< [patternMatrix0 numberOfColumns];bit++){
 		[[patternMatrix0 cellWithTag:bit] setState:(patternMask&(1L<<bit)) > 0L];
 	}
 	
-	patternMask = [[[model patternArray] objectAtIndex:1] longValue];
+	patternMask = (int32_t)[[[model patternArray] objectAtIndex:1] longValue];
 	for(bit=0;bit< [patternMatrix1 numberOfColumns];bit++){
 		[[patternMatrix1 cellWithTag:bit] setState:(patternMask&(1L<<bit)) > 0L];
 	}
-	patternMask = [[[model patternArray] objectAtIndex:2] longValue];
+	patternMask = (int32_t)[[[model patternArray] objectAtIndex:2] longValue];
 	for(bit=0;bit< [patternMatrix2 numberOfColumns];bit++){
 		[[patternMatrix2 cellWithTag:bit] setState:(patternMask&(1L<<bit)) > 0L];
 	}
-	patternMask = [[[model patternArray] objectAtIndex:3] longValue];
+	patternMask = (int32_t)[[[model patternArray] objectAtIndex:3] longValue];
 	for(bit=0;bit< [patternMatrix3 numberOfColumns];bit++){
 		[[patternMatrix3 cellWithTag:bit] setState:(patternMask&(1L<<bit)) > 0L];
 	}
@@ -130,24 +130,24 @@
 
 - (IBAction) patternAction:(id)sender
 {
-	unsigned long aMask = 0; 
+	uint32_t aMask = 0; 
 	int bit;
 	for(bit=0;bit< [sender numberOfColumns];bit++){
 		if([[sender cellWithTag:bit] state]){
 			aMask |= (1L<<bit);
 		}
 	}
-	[model setPatternMaskForArray:[sender tag] to:aMask];
+	[model setPatternMaskForArray:(int)[sender tag] to:aMask];
 }
 
 - (IBAction) allColAction:(id)sender
 {
-	[model setPatternMaskForArray:[sender selectedTag] to:0xffffffff];
+	[model setPatternMaskForArray:(int)[sender selectedTag] to:0xffffffff];
 }
 
 - (IBAction) noneColAction:(id)sender
 {
-	[model setPatternMaskForArray:[sender selectedTag] to:0x0];
+	[model setPatternMaskForArray:(int)[sender selectedTag] to:0x0];
 }
 
 - (IBAction) disableForPulserAction:(id)sender

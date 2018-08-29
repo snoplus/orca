@@ -69,7 +69,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"CTI Temperature (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CTI Temperature (Unit %u)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications
@@ -193,7 +193,7 @@
 - (void) tempChanged:(NSNotification*)aNote
 {
 	[tempField setFloatValue:[model temperature]];
-	unsigned long t = [model timeMeasured];
+	uint32_t t = [model timeMeasured];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -310,18 +310,18 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate] count];
+	return (int)[[model timeRate] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model timeRate] count];
+	int count = (int)[[model timeRate] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate] timeSampledAtIndex:index];
 	*yValue = [[model timeRate] valueAtIndex:index];

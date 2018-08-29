@@ -144,8 +144,8 @@
     timersSize		= NSMakeSize(570,580);
     mux80Size		= NSMakeSize(400,440);
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORLabJackUE9%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJackUE9%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	[super awakeFromNib];
@@ -427,7 +427,7 @@
 
 - (void) adcEnabledChanged:(NSNotification*)aNote
 {
-	unsigned long aMask = [model adcEnabledMask:0];
+	uint32_t aMask = [model adcEnabledMask:0];
 	int i;
 	for(i=0;i<14;i++){
 		[[adcEnabledMatrix cellWithTag:i] setIntValue:aMask& (1<<i)];
@@ -439,7 +439,7 @@
 {
 	int i;
 	for(i=0;i<kUE9NumTimers;i++){
-		[[timerMatrix cellWithTag:i] setIntValue:[model timer:i]];
+		[[timerMatrix cellWithTag:i] setIntegerValue:[model timer:i]];
 	}
 }
 
@@ -447,7 +447,7 @@
 {
 	int i;
 	for(i=0;i<kUE9NumTimers;i++){
-		[[timerResultMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%lu",[model timerResult:i]]];
+		[[timerResultMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%u",[model timerResult:i]]];
 	}
 }
 
@@ -458,7 +458,7 @@
 
 - (void) counterEnableMaskChanged:(NSNotification*)aNote
 {
-	unsigned long aMask = [model counterEnableMask];
+	uint32_t aMask = [model counterEnableMask];
 	[[counterEnableMatrix cellWithTag:0] setIntValue: (aMask & (1L<<0))!=0];
 	[[counterEnableMatrix cellWithTag:1] setIntValue: (aMask & (1L<<1))!=0];
 	[self updateButtons];
@@ -467,7 +467,7 @@
 
 - (void) timerEnableMaskChanged:(NSNotification*)aNote
 {
-	unsigned long aMask = [model timerEnableMask];
+	uint32_t aMask = [model timerEnableMask];
 	int i;
 	for(i=0;i<kUE9NumTimers;i++){
 		[[timerEnableMaskMatrix cellWithTag:i] setIntValue: (aMask & (1L<<i))!=0];
@@ -505,8 +505,8 @@
 	}
     [[self window] setContentView:totalView];
 
-    NSString* key = [NSString stringWithFormat: @"orca.ORLabJackUE9%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJackUE9%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
@@ -643,8 +643,8 @@
 
 - (void) counterChanged:(NSNotification*)aNote
 {
-	[counter0Field setIntValue: [model counter:0]];
-	[counter1Field setIntValue: [model counter:1]];
+	[counter0Field setIntegerValue: [model counter:0]];
+	[counter1Field setIntegerValue: [model counter:1]];
 }
 
 - (void) checkGlobalSecurity
@@ -656,7 +656,7 @@
 
 - (void) setDoEnabledState
 {
-	unsigned long aMask = [model doDirection];
+	uint32_t aMask = [model doDirection];
 	int i;
 	for(i=0;i<kUE9NumIO;i++){
 		[[doValueOutMatrix cellWithTag:i] setTransparent: (aMask & (1L<<i))!=0];
@@ -698,7 +698,7 @@
 
 - (void) doDirectionChanged:(NSNotification*)aNotification
 {
-	int value = [model doDirection];
+	unsigned short value = [model doDirection];
 	short i;
 	for(i=0;i<kUE9NumIO;i++){
 		[[doDirectionMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
@@ -709,7 +709,7 @@
 
 - (void) doValueOutChanged:(NSNotification*)aNotification
 {
-	int value = [model doValueOut];
+	unsigned short value = [model doValueOut];
 	short i;
 	for(i=0;i<kUE9NumIO;i++){
 		[[doValueOutMatrix cellWithTag:i] setState:(value & (1L<<i))>0];
@@ -862,8 +862,7 @@
 - (IBAction) openIDChangePanel:(id)sender
 {
 	[self endEditing];
-    [NSApp beginSheet:idChangePanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:idChangePanel completionHandler:nil];
 	[newLocalIDField setIntValue:[model localID]];
 }
 - (IBAction) closeIDChangePanel:(id)sender
@@ -878,26 +877,26 @@
 
 - (void) clockSelectionAction:(id)sender
 {
-	[model setClockSelection:[[sender selectedCell]tag]];	
+	[model setClockSelection:(int)[[(NSMatrix*)sender selectedCell]tag]];
 }
 
 - (void) timerEnableMaskAction:(id)sender
 {
-	int theIndex = [[sender selectedCell] tag];
+	int theIndex = (int)[[(NSMatrix*)sender selectedCell] tag];
 	[model setTimerEnableBit:theIndex value:[sender intValue]];
 	[self updateButtons];
 }
 
 - (void) counterEnableMaskAction:(id)sender
 {
-	int theIndex = [[sender selectedCell] tag];
+	int theIndex = (int)[[(NSMatrix*)sender selectedCell] tag];
 	[model setCounterEnableBit:theIndex value:[sender intValue]];
 	[self updateButtons];
 }
 
 - (void) timerOptionAction:(id)sender
 {
-	int timerIndex = [sender tag];
+	int timerIndex = (int)[(NSMatrix*)sender tag];
 	[model setTimer:timerIndex option:[sender indexOfSelectedItem]];
 }
 
@@ -931,7 +930,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];	
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (void) digitalOutputEnabledAction:(id)sender
@@ -946,17 +945,17 @@
 
 - (IBAction) channelNameAction:(id)sender
 {
-	[model setChannel:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
+	[model setChannel:(int)[[(NSMatrix*)sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) channelUnitAction:(id)sender
 {
-	[model setChannel:[[sender selectedCell] tag] unit:[[sender selectedCell] stringValue]];
+	[model setChannel:(int)[[(NSMatrix*)sender selectedCell] tag] unit:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) doNameAction:(id)sender
 {
-	[model setDo:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
+	[model setDo:(int)[[(NSMatrix*)sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) updateAllAction:(id)sender
@@ -966,13 +965,13 @@
 
 - (IBAction) doDirectionBitAction:(id)sender
 {
-	int theIndex = [[sender selectedCell] tag];
+	int theIndex = (int)[[(NSMatrix*)sender selectedCell] tag];
 	[model setDoDirectionBit:theIndex value:[sender intValue]];
 }
 
 - (IBAction) doValueOutBitAction:(id)sender
 {
-	int theIndex = [[sender selectedCell] tag];
+	int theIndex = (int)[[(NSMatrix*)sender selectedCell] tag];
 	[model setDoValueOutBit:theIndex value:[sender intValue]];
 	[model readAllValues];
 }
@@ -984,42 +983,42 @@
 
 - (IBAction) lowLimitAction:(id)sender
 {
-	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setLowLimit:(int)[[(NSMatrix*)sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) hiLimitAction:(id)sender
 {
-	[model setHiLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setHiLimit:(int)[[(NSMatrix*)sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) minValueAction:(id)sender
 {
-	[model setMinValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setMinValue:(int)[[(NSMatrix*)sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) maxValueAction:(id)sender
 {
-	[model setMaxValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setMaxValue:(int)[[(NSMatrix*)sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) gainAction:(id)sender
 {
-	[model setGain:[sender tag] value:[sender indexOfSelectedItem]];
+    [model setGain:(int)[(NSPopUpButton*)sender tag] value:(int)[(NSPopUpButton*)sender indexOfSelectedItem]];
 }
 
 - (IBAction) bipolarAction:(id)sender
 {
-	[model setBipolar:[sender tag] value:[sender indexOfSelectedItem]];
+	[model setBipolar:(int)[(NSPopUpButton*)sender tag] value:(int)[(NSPopUpButton*)sender indexOfSelectedItem]];
 }
 
 - (IBAction) slopeAction:(id)sender
 {
-	[model setSlope:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setSlope:(int)[[(NSPopUpButton*)sender selectedCell] tag] value:[[(NSPopUpButton*)sender selectedCell] floatValue]];
 }
 
 - (IBAction) interceptAction:(id)sender
 {
-	[model setIntercept:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setIntercept:(int)[[(NSPopUpButton*)sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) testAction:(id)sender
@@ -1035,7 +1034,7 @@
 - (IBAction) timerAction:(id)sender
 {
 	[self endEditing];
-	[model setTimer:[[sender selectedCell] tag] value:[sender intValue]];
+	[model setTimer:(int)[[(NSPopUpButton*)sender selectedCell] tag] value:[sender intValue]];
 }
 
 - (IBAction) changeIPNumber:(id)sender
@@ -1051,8 +1050,7 @@
 - (IBAction) openIPChangePanel:(id)sender
 {
 	[self endEditing];
-    [NSApp beginSheet:ipChangePanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:ipChangePanel completionHandler:nil];
 }
 
 - (IBAction) closeIPChangePanel:(id)sender
@@ -1063,7 +1061,7 @@
 
 - (IBAction) adcEnabledAction:(id)sender
 {
-	int theBit = [[sender selectedCell] tag];
+	int theBit = (int)[[(NSMatrix*)sender selectedCell] tag];
 	[model setAdcEnabled:theBit value:[sender intValue]];
 
 }

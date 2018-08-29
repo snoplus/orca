@@ -54,14 +54,14 @@ NSString* ORXYCom564InterpretADCHasChanged  = @"ORXYCom564InterpretADCHasChanged
 - (void) _readAllAdcChannels;
 - (void) _setPollingSpeed:(NSTimeInterval)aTime;
 - (double) _interpretADCValue:(uint16_t)adc;
-- (uint16_t) _recenterValue:(uint16)adc;
+- (uint16_t) _recenterValue:(uint16_t)adc;
 @end
 
 @implementation ORXYCom564Model
 
 #pragma mark •••Static Declarations
 typedef struct {
-	unsigned long offset;
+	uint32_t offset;
 	NSString* name;
 } XyCom564RegisterInformation;
 
@@ -123,11 +123,11 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     [self linkToController:@"ORXYCom564Controller"];
 }
 #pragma mark ***Accessors
-- (unsigned long) dataId 
+- (uint32_t) dataId 
 {
     return dataId;
 }
-- (void) setDataId: (unsigned long) DataId
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -336,7 +336,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     return mIOXY564Reg[anIndex].name;
 }
 
-- (unsigned long) getAddressOffset:(EXyCom564Registers) anIndex
+- (uint32_t) getAddressOffset:(EXyCom564Registers) anIndex
 {
     return mIOXY564Reg[anIndex].offset;
 }
@@ -751,7 +751,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     }
 
     [self setOperationMode:[decoder decodeIntForKey:@"kORXYCom564OperationMode"]];
-    [self setAverageValueNumber:[decoder decodeIntForKey:@"kORXYCom564AvgValNumber"]];    
+    [self setAverageValueNumber:[decoder decodeIntForKey:@"kORXYCom564AvgValNumber"]];
     [self setAutoscanMode:[decoder decodeIntForKey:@"kORXYCom564AutoscanMode"]];
     [self setShipRecords:[decoder decodeBoolForKey:@"kORXYCom564ShipRecords"]];
     [self setInterpretADC:[decoder decodeIntForKey:@"kORXYCom564InterpretADC"]];
@@ -767,11 +767,11 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:channelGains forKey:@"kORXYCom564chanGains"];
-    [encoder encodeInt:[self operationMode] forKey:@"kORXYCom564OperationMode"];    
-    [encoder encodeInt:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
-    [encoder encodeInt:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];
+    [encoder encodeInteger:[self operationMode] forKey:@"kORXYCom564OperationMode"];    
+    [encoder encodeInteger:[self autoscanMode] forKey:@"kORXYCom564AutoscanMode"];
+    [encoder encodeInteger:[self averageValueNumber] forKey:@"kORXYCom564AvgValNumber"];
     [encoder encodeBool:shipRecords forKey:@"kORXYCom564ShipRecords"];
-    [encoder encodeInt:interpretADC forKey:@"kORXYCom564InterpretADC"];
+    [encoder encodeInteger:interpretADC forKey:@"kORXYCom564InterpretADC"];
     [encoder encodeObject:userLocked forKey:@"kORXYCom564UL"];
 }
 
@@ -938,15 +938,15 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
 	if(!runInProgress) return;
     int channelsToRead =kXVME564_NumAutoScanChannelsPerGroup << ([self autoscanMode]);
     int headernumber = 4;
-    unsigned long data[headernumber+channelsToRead];
+    uint32_t data[headernumber+channelsToRead];
     
     data[1] = (([self crateNumber]&0x01e)<<21) |  (([self slot]&0x1f) << 16);
     
     //get the time(UT!)
     struct timeval ut_time;
     gettimeofday(&ut_time, NULL);
-    data[2] = ut_time.tv_sec;	//seconds since 1970
-    data[3] = ut_time.tv_usec;	//seconds since 1970
+    data[2] = (uint32_t)ut_time.tv_sec;	//seconds since 1970
+    data[3] = (uint32_t)ut_time.tv_usec;	//seconds since 1970
     int index = headernumber;
     int i;
     for(i=0;i<channelsToRead;i++){
@@ -1035,7 +1035,7 @@ static XyCom564RegisterInformation mIOXY564Reg[kNumberOfXyCom564Registers] = {
     return vol * volrange / adcrange; //scaling
 }
 
-- (uint16_t) _recenterValue:(uint16)raw
+- (uint16_t) _recenterValue:(uint16_t)raw
 {
     // first thing, centering so that 0x8000 is 0.
     if (raw < 0x8000) {

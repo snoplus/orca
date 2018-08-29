@@ -97,11 +97,11 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     NSImage* aCachedImage = [NSImage imageNamed:[self imageName]];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     
     if([self constraintsInPlace]){
         NSImage* constraintImage = [NSImage imageNamed:@"smallLock"];
-        [constraintImage drawAtPoint:NSMakePoint([i size].width/2 - [constraintImage size].width/2,[i size].height-[constraintImage size].height-15) fromRect:[constraintImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [constraintImage drawAtPoint:NSMakePoint([i size].width/2 - [constraintImage size].width/2,[i size].height-[constraintImage size].height-15) fromRect:[constraintImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     }
     
     [i unlockFocus];
@@ -179,7 +179,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	return nil;
 }
 
-- (unsigned long)   exceptionCount
+- (uint32_t)   exceptionCount
 {
     return exceptionCount;
 }
@@ -240,7 +240,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
             int currentState = [currentOnOffState intValue];
             
             if(oldOnOffState && currentOnOffState && (oldState != currentState)){
-                NSLog(@"MPod (%lu), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], i,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
+                NSLog(@"MPod (%u), Card %d Channel %d changed state from %@ to %@\n",[[self guardian]uniqueIdNumber],[self slot], i,oldState?@"ON":@"OFF",currentState?@"ON":@"OFF");
             }
             
             
@@ -259,7 +259,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
         [modParams release];
         modParams = [[aDictionary objectForKey:moduleID] retain];
 
-        int moduleEvents = [self moduleFailureEvents];
+        int moduleEvents = (int)[self moduleFailureEvents];
         
         if(!doNotPostSafetyLoopAlarm && (moduleEvents & moduleEventSafetyLoopNotGood)){
             if(!safetyLoopNotGoodAlarm){
@@ -488,9 +488,9 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	}
 	return count;
 }
-- (unsigned long) channelStateMask
+- (uint32_t) channelStateMask
 {
-	unsigned long mask = 0x0;
+	uint32_t mask = 0x0;
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
 		int state = [self channel:i readParamAsInt:@"outputSwitch"];
@@ -610,7 +610,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOn];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Turned ON MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Turned ON MPod (%u), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) turnChannelOff:(short)channel
@@ -619,7 +619,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	[self writeVoltage:channel];
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Turned OFF MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Turned OFF MPod (%u), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) panicChannel:(short)channel
@@ -632,14 +632,14 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 {
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputResetEmergencyOff];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Clear Panic MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Clear Panic MPod (%u), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) clearEventsChannel:(short)channel
 {
 	NSString* cmd = [NSString stringWithFormat:@"outputSwitch.u%d i %d",[self slotChannelValue:channel],kiSegHVCardOutputClearEvents];
 	[[self adapter] writeValue:cmd target:self selector:@selector(processWriteResponseArray:) priority:NSOperationQueuePriorityVeryHigh];
-    NSLog(@"Clear Events MPod (%lu), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
+    NSLog(@"Clear Events MPod (%u), Card %d Channel %d\n",[[self guardian]uniqueIdNumber],[self slot], channel);
 }
 
 - (void) stopRamping:(short)channel
@@ -749,7 +749,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	NSLog(@"Clear Module Events, Card %d \n",[self slot]);
 }
 
-- (unsigned long) failureEvents:(short)channel
+- (uint32_t) failureEvents:(short)channel
 {
 	int events = [self channel:selectedChannel readParamAsInt:@"outputStatus"];
 	events &= (outputFailureMinSenseVoltageMask    | outputFailureMaxSenseVoltageMask |
@@ -760,16 +760,16 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 	return events;
 }
 
-- (unsigned long) failureEvents
+- (uint32_t) failureEvents
 {
-	unsigned long failEvents = 0;
+	uint32_t failEvents = 0;
 	int i;
 	for(i=0;i<[self numberOfChannels];i++){
 		failEvents |= [self failureEvents:i];
 	}
 	return failEvents;
 }
-- (unsigned long) moduleFailureEvents
+- (uint32_t) moduleFailureEvents
 {
     id oldModuleEventStatus = [[[modParams objectForKey:@"moduleEventStatus"] copy] autorelease];
     int events = [[oldModuleEventStatus objectForKey:@"Value"] intValue];
@@ -962,9 +962,9 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 }
 
 #pragma mark ¥¥¥Data Taker
-- (unsigned long) dataId { return dataId; }
+- (uint32_t) dataId { return dataId; }
 
-- (void) setDataId: (unsigned long) DataId
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -1032,12 +1032,12 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
     [super encodeWithCoder:encoder];
     
 	[encoder encodeBool:shipRecords                 forKey:@"shipRecords"];
-	[encoder encodeInt:selectedChannel              forKey:@"selectedChannel"];
+	[encoder encodeInteger:selectedChannel              forKey:@"selectedChannel"];
     [encoder encodeFloat:riseRate                   forKey:@"riseRate"];
     
 	int i;
  	for(i=0;i<[self numberOfChannels];i++){
-		[encoder encodeInt:target[i] forKey:[@"target" stringByAppendingFormat:@"%d",i]];
+		[encoder encodeInteger:target[i] forKey:[@"target" stringByAppendingFormat:@"%d",i]];
 		[encoder encodeFloat:maxCurrent[i] forKey:[@"maxCurrent" stringByAppendingFormat:@"%d",i]];
 	}
 }
@@ -1106,13 +1106,13 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
         
         
 		int i;
-        unsigned long onMask = 0x0;
+        uint32_t onMask = 0x0;
         for(i=0;i<[self numberOfChannels];i++){
             if([self isOn:i])onMask |= (0x1<<i);
         }
         int n = 5+[self numberOfChannels]*2;
 
-		unsigned long data[n];
+		uint32_t data[n];
 		data[0] = dataId | n;
 		data[1] = (([self crateNumber] & 0xf) << 20) |
         (([self slot]&0xf)<<16)            |
@@ -1120,11 +1120,11 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
         ([self polarity] & 0x1);
         data[2] = onMask;
 		data[3] = 0x0; //spare
-		data[4] = ut_Time;
+		data[4] = (uint32_t)ut_Time;
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		for(i=0;i<[self numberOfChannels];i++){
 			theData.asFloat = [self channel:i readParamAsFloat:@"outputMeasurementSenseVoltage"];
@@ -1134,7 +1134,7 @@ NSString* ORiSegHVCardCustomInfoChanged         = @"ORiSegHVCardCustomInfoChange
 			data[6+i] = theData.asLong;
 		}
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-                                                            object:[NSData dataWithBytes:data length:sizeof(long)*n]];	}
+                                                            object:[NSData dataWithBytes:data length:sizeof(int32_t)*n]];	}
 }
 #pragma mark ¥¥¥Convenience Methods
 - (float) voltage:(short)aChannel

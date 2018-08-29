@@ -189,7 +189,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 
 #pragma mark ***Register - Register specific routines
 - (NSString*)     getRegisterName:(short) anIndex	{ return reg[anIndex].regName; }
-- (unsigned long) getAddressOffset:(short) anIndex	{ return(reg[anIndex].addressOffset); }
+- (uint32_t)      getAddressOffset:(short) anIndex	{ return(reg[anIndex].addressOffset); }
 - (short)		  getAccessType:(short) anIndex		{ return reg[anIndex].accessType; }
 - (short)         getAccessSize:(short) anIndex		{ return reg[anIndex].size; }
 - (BOOL)          dataReset:(short) anIndex			{ return reg[anIndex].dataReset; }
@@ -203,7 +203,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
     return [NSString stringWithFormat:@"CAEN 260 (Slot %d) ",[self slot]];
 }
 
-- (unsigned long) scalerValue:(int)index
+- (uint32_t) scalerValue:(int)index
 {
 	if(index<0)return 0;
 	else if(index>kNumCaen260Channels)return 0;
@@ -224,7 +224,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
     
 }
 
-- (void) setScalerValue:(unsigned long)aValue index:(int)index
+- (void) setScalerValue:(uint32_t)aValue index:(int)index
 {
 	if(index<0)return;
 	else if(index>kNumCaen260Channels)return;
@@ -306,11 +306,11 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 	BOOL runInProgress = [gOrcaGlobals runInProgress];
 	
 	if(runInProgress){
-		unsigned long data[19];
+		uint32_t data[19];
 		
 		data[0] = dataId | 19;
 		data[1] = (([self crateNumber]&0x01e)<<21) | ([self slot]& 0x0000001f)<<16  | (enabledMask & 0x0000ffff);
-		data[2] = lastReadTime;	//seconds since 1970
+		data[2] = (uint32_t)lastReadTime;	//seconds since 1970
 		
 		int index = 3;
 		int i;
@@ -321,7 +321,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 		if(index>3){
 			//the full record goes into the data stream via a notification
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(int32_t)]];
 		}
 	}
 	
@@ -484,7 +484,7 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 	lastReadTime = ut_Time;
 	for(i=0;i<kNumCaen260Channels;i++){
 		if(enabledMask & (0x1<<i)){
-			unsigned long aValue = 0;
+			uint32_t aValue = 0;
 			[[self adapter] readLongBlock:&aValue
 								atAddress:[self baseAddress]+[self getAddressOffset:kCounter0] + (i*0x04)
 								numToRead:1
@@ -508,8 +508,8 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
     [self setDataId:[anotherObj dataId]];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -600,9 +600,9 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
     [self setChannelForTriggeredShip:[decoder decodeIntForKey:@"channelForTriggeredShip"]];
     [self setShipOnChange:[decoder decodeBoolForKey:@"shipOnChange"]];
     [self setAutoInhibit:	[decoder decodeBoolForKey:@"autoInhibit"]];
-	[self setPollingState:	[decoder decodeIntForKey:@"pollingState"]];
+	[self setPollingState:	[decoder decodeIntegerForKey:@"pollingState"]];
 	[self setShipRecords:	[decoder decodeBoolForKey:@"shipRecords"]];
-	[self setEnabledMask:	[decoder decodeIntForKey:@"enabledMask"]];
+	[self setEnabledMask:	[decoder decodeIntegerForKey:@"enabledMask"]];
 	
     [[self undoManager] enableUndoRegistration];
     [self registerNotificationObservers];
@@ -615,12 +615,12 @@ NSString* ORCaen260ModelAllScalerValuesChanged= @"ORCaen260ModelAllScalerValuesC
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:channelForTriggeredShip forKey:@"channelForTriggeredShip"];
+    [encoder encodeInteger:channelForTriggeredShip forKey:@"channelForTriggeredShip"];
     [encoder encodeBool:shipOnChange forKey:@"shipOnChange"];
     [encoder encodeBool:autoInhibit forKey:@"autoInhibit"];
-    [encoder encodeInt:[self pollingState] forKey:@"pollingState"];
+    [encoder encodeInteger:[self pollingState] forKey:@"pollingState"];
     [encoder encodeBool:[self pollingState] forKey:@"shipRecords"];
-	[encoder encodeInt:[self enabledMask] forKey:@"enabledMask"];
+	[encoder encodeInteger:[self enabledMask] forKey:@"enabledMask"];
 }
 
 @end

@@ -18,8 +18,8 @@ extern "C"{
 #endif
 
 typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint32;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
 
 //Structure for storing calibration constants
 struct U6_CALIBRATION_INFORMATION {
@@ -114,7 +114,7 @@ uint8 normalChecksum8( uint8 *b,
 //b = data packet for normal command
 //n = size of data packet
 
-uint16 extendedChecksum16( uint8 *b,
+uint16_t extendedChecksum16( uint8 *b,
                            int n);
 //Returns the Checksum16 for a extended command data packet.
 //b = data packet for extended command
@@ -124,7 +124,7 @@ uint8 extendedChecksum8( uint8 *b);
 //Returns the Checksum8 for a extended command data packet.
 //b = data packet for extended command
 
-void listDeviceSerialNumbers();
+void listDeviceSerialNumbers(void);
 HANDLE openU6Connection(int searchValue);
 HANDLE openUSBConnection(int searchValue,BOOL verbose);
 //Opens a U6 connection over USB.  Returns NULL on failure, or a HANDLE
@@ -134,18 +134,18 @@ HANDLE openUSBConnection(int searchValue,BOOL verbose);
 void closeUSBConnection( HANDLE hDevice);
 //Closes a HANDLE to a U6 device.
 
-long getTickCount();
+int32_t getTickCount(void);
 //Returns the number of milliseconds that has elasped since the system was
 //started.
 
-long getCalibrationInfo( HANDLE hDevice,
+int32_t getCalibrationInfo( HANDLE hDevice,
                          u6CalibrationInfo *caliInfo);
 //Gets calibration information from memory blocks 0-10 of a U6.  Returns the
 //calibration information in a calibrationInfo structure.
 //hDevice = handle to a U6 device
 //caliInfo = structure where calibrarion information will be stored
 
-long getTdacCalibrationInfo( HANDLE hDevice,
+int32_t getTdacCalibrationInfo( HANDLE hDevice,
                              u6TdacCalibrationInfo *caliInfo,
                              uint8 DIOAPinNum);
 //Gets calibration information from the EEPROM of a LJTick-DAC (LJTDAC).
@@ -160,21 +160,21 @@ double FPuint8ArrayToFPDouble( uint8 *buffer,
 //Converts a fixed point byte array (starting a startIndex) to a floating point
 //double value.  This function is used primarily by getCalibrationInfo.
 
-long isCalibrationInfoValid( u6CalibrationInfo *caliInfo);
+int32_t isCalibrationInfoValid( u6CalibrationInfo *caliInfo);
 //Performs a simple check to determine if the caliInfo struct was set up by
 //getCalibrationInfo.  Returns 0 if caliInfo is not valid, or 1 if it is.
 //caliInfo = structure where calibrarion information is stored
 
-long isTdacCalibrationInfoValid( u6TdacCalibrationInfo *caliInfo);
+int32_t isTdacCalibrationInfoValid( u6TdacCalibrationInfo *caliInfo);
 //Performs a simple check to determine if the caliInfo struct was set up by
 //getTdacCalibrationInfo.  Returns 0 if caliInfo is not valid, or 1 if it is.
 //caliInfo = structure where LJTDAC calibration information is stored
 
-long getAinVoltCalibrated( u6CalibrationInfo *caliInfo,
+int32_t getAinVoltCalibrated( u6CalibrationInfo *caliInfo,
                            int resolutionIndex,
                            int gainIndex,
                            int bits24,
-                           uint32 bytesVolt,
+                           uint32_t bytesVolt,
                            double *analogVolt);
 //Translates the binary AIN reading from the U6 to a voltage value (calibrated)
 //in Volts.  Call getCalibrationInfo first to set up caliInfo.  Returns -1 on
@@ -190,7 +190,7 @@ long getAinVoltCalibrated( u6CalibrationInfo *caliInfo,
 //            value.
 //analogVolt = The converted analog voltage.
 
-long getDacBinVoltCalibrated8Bit( u6CalibrationInfo *caliInfo,
+int32_t getDacBinVoltCalibrated8Bit( u6CalibrationInfo *caliInfo,
                                   int dacNumber,
                                   double analogVolt,
                                   uint8 *bytesVolt8);
@@ -202,10 +202,10 @@ long getDacBinVoltCalibrated8Bit( u6CalibrationInfo *caliInfo,
 //analogVolt = The analog voltage that will be converted.
 //bytesVolt8 = The converted binary 8 bit value.
 
-long getDacBinVoltCalibrated16Bit( u6CalibrationInfo *caliInfo,
+int32_t getDacBinVoltCalibrated16Bit( u6CalibrationInfo *caliInfo,
                                    int dacNumber,
                                    double analogVolt,
-                                   uint16 *bytesVolt16);
+                                   uint16_t *bytesVolt16);
 //Translates a analog output voltage value (Volts) to a binary 16 bit value
 //(calibrated) that can be sent to a U6. Call getCalibrationInfo first to set
 //up caliInfo.  Returns -1 on error, 0 on success.
@@ -214,11 +214,11 @@ long getDacBinVoltCalibrated16Bit( u6CalibrationInfo *caliInfo,
 //analogVolt = The analog voltage that will be converted.
 //bytesVolt16 = The converted binary 16 bit value.
 
-long getTempKCalibrated( u6CalibrationInfo *caliInfo,
+int32_t getTempKCalibrated( u6CalibrationInfo *caliInfo,
                          int resolutionIndex,
                          int gainIndex,
                          int bits24,
-                         uint32 bytesTemp,
+                         uint32_t bytesTemp,
                          double *kelvinTemp);
 //Translates the binary reading from the U6 to a temperature value
 //(calibrated) in Kelvin.  Call getCalibrationInfo first to set up caliInfo.
@@ -234,10 +234,10 @@ long getTempKCalibrated( u6CalibrationInfo *caliInfo,
 //            value.
 //kelvinTemp = The converted Kelvins temperature.
 
-long getTdacBinVoltCalibrated( u6TdacCalibrationInfo *caliInfo,
+int32_t getTdacBinVoltCalibrated( u6TdacCalibrationInfo *caliInfo,
                                int dacNumber,
                                double analogVolt,
-                               uint16 *bytesVolt);
+                               uint16_t *bytesVolt);
 //Translates a voltage value (Volts) to binary analog input bytes (calibrated)
 //that can be sent to a LJTick-DAC (LJTDAC).  Call getLJTDACCalibrationInfo
 //first to set up caliInfo.  Returns -1 on error, 0 on success.
@@ -246,10 +246,10 @@ long getTdacBinVoltCalibrated( u6TdacCalibrationInfo *caliInfo,
 //analogVoltage = The analog voltage that will be converted.
 //bytesVoltage = The converted 2 byte voltage.
 
-long getAinVoltUncalibrated( int resolutionIndex,
+int32_t getAinVoltUncalibrated( int resolutionIndex,
                              int gainIndex,
                              int bits24,
-                             uint32 bytesVolt,
+                             uint32_t bytesVolt,
                              double *analogVolt);
 //Translates the binary AIN reading from the U6 to a voltage value
 //(uncalibrated) in Volts.  Returns -1 on error, 0 on success.
@@ -263,7 +263,7 @@ long getAinVoltUncalibrated( int resolutionIndex,
 //            value.
 //analogVolt = The converted analog voltage.
 
-long getDacBinVoltUncalibrated8Bit( int dacNumber,
+int32_t getDacBinVoltUncalibrated8Bit( int dacNumber,
                                     double analogVolt,
                                     uint8 *bytesVolt8);
 //Translates a DAC voltage value (Volts) to a binary 8 bit value (uncalibrated)
@@ -272,9 +272,9 @@ long getDacBinVoltUncalibrated8Bit( int dacNumber,
 //analogVolt = The analog voltage that will be converted.
 //bytesVolt = The converted binary 8 bit value.
 
-long getDacBinVoltUncalibrated16Bit( int dacNumber,
+int32_t getDacBinVoltUncalibrated16Bit( int dacNumber,
                                      double analogVolt,
-                                     uint16 *bytesVolt16);
+                                     uint16_t *bytesVolt16);
 //Translates a DAC voltage value (Volts) to a binary 16 bit value
 //(uncalibrated) that can be sent to a U6.  Returns -1 on error, 0 on
 //success.
@@ -282,10 +282,10 @@ long getDacBinVoltUncalibrated16Bit( int dacNumber,
 //analogVolt = The analog voltage that needs to be converted.
 //bytesVolt = The converted binary 16 bit value.
 
-long getTempKUncalibrated( int resolutionIndex,
+int32_t getTempKUncalibrated( int resolutionIndex,
                            int gainIndex,
                            int bits24,
-                           uint32 bytesTemp,
+                           uint32_t bytesTemp,
                            double *kelvinTemp);
 //Translates the binary reading from the U6, to a temperature value
 //(uncalibrated) in Kelvin.
@@ -299,7 +299,7 @@ long getTempKUncalibrated( int resolutionIndex,
 //bytesTemp = the 2 byte binary temperature that will be converted.
 //kelvinTemp = the converted Kelvins temperature
 
-long I2C( HANDLE hDevice,
+int32_t I2C( HANDLE hDevice,
           uint8 I2COptions,
           uint8 SpeedAdjust,
           uint8 SDAPinNum,
@@ -334,17 +334,17 @@ long I2C( HANDLE hDevice,
 
 /* Easy Functions (Similar to the easy functions in the UD driver for Windows) */
 
-long eAIN( HANDLE Handle,
+int32_t eAIN( HANDLE Handle,
            u6CalibrationInfo *CalibrationInfo,
-           long ChannelP,
-           long ChannelN,
+           int32_t ChannelP,
+           int32_t ChannelN,
            double *Voltage,
-           long Range,
-           long Resolution,
-           long Settling,
-           long Binary,
-           long Reserved1,
-           long Reserved2);
+           int32_t Range,
+           int32_t Resolution,
+           int32_t Settling,
+           int32_t Binary,
+           int32_t Reserved1,
+           int32_t Reserved2);
 //An "easy" function that returns a reading from one analog input.  Returns 0
 //for no error, or -1 or >0 value (low-level errorcode) on error.
 //Call getCalibrationInfo first to set up CalibrationInfo.
@@ -363,13 +363,13 @@ long eAIN( HANDLE Handle,
 //Reserved (1&2) = Pass 0.
 
 
-long eDAC( HANDLE Handle,
+int32_t eDAC( HANDLE Handle,
            u6CalibrationInfo *CalibrationInfo,
-           long Channel,
+           int32_t Channel,
            double Voltage,
-           long Binary,
-           long Reserved1,
-           long Reserved2);
+           int32_t Binary,
+           int32_t Reserved1,
+           int32_t Reserved2);
 //An "easy" function that writes a value to one analog output.  Returns 0 for
 //no error, or -1 or >0 value (low-level errorcode) on error.
 //Call getCalibrationInfo first to set up CalibrationInfo.
@@ -381,18 +381,18 @@ long eDAC( HANDLE Handle,
 //         binary.
 //Reserved (1&2) = Pass 0.
 
-long eDI( HANDLE Handle,
-          long Channel,
-          long *State);
+int32_t eDI( HANDLE Handle,
+          int32_t Channel,
+          int32_t *State);
 //An "easy" function that reads the state of one digital input.  Returns 0 for
 //no error, or -1 or >0 value (low-level errorcode) on error.
 //Handle = Handle to a U6 device.
 //Channel = The channel to read.  0-19 corresponds to FIO0-CIO3.
 //State = Returns the state of the digital input.  0=False=Low and 1=True=High.
 
-long eDO( HANDLE Handle,
-          long Channel,
-          long State);
+int32_t eDO( HANDLE Handle,
+          int32_t Channel,
+          int32_t State);
 //An "easy" function that writes the state of one digital output.  This
 //function does not automatically configure the specified channel as digital,
 //unless ConfigIO is set as True.  Returns 0 for no error, or -1 or >0 value
@@ -402,16 +402,16 @@ long eDO( HANDLE Handle,
 //State = The state to write to the digital output.  0=False=Low and
 //        1=True=High.
 
-long eTCConfig( HANDLE Handle,
-                long *aEnableTimers,
-                long *aEnableCounters,
-                long TCPinOffset,
-                long TimerClockBaseIndex,
-                long TimerClockDivisor,
-                long *aTimerModes,
+int32_t eTCConfig( HANDLE Handle,
+                int32_t *aEnableTimers,
+                int32_t *aEnableCounters,
+                int32_t TCPinOffset,
+                int32_t TimerClockBaseIndex,
+                int32_t TimerClockDivisor,
+                int32_t *aTimerModes,
                 double *aTimerValues,
-                long Reserved1,
-                long Reserved2);
+                int32_t Reserved1,
+                int32_t Reserved2);
 //An "easy" function that configures and initializes all the timers and
 //counters.  When needed, this function automatically configures the needed
 //lines as digital.  Returns 0 for no error, or -1 or >0 value (low-level
@@ -442,15 +442,15 @@ long eTCConfig( HANDLE Handle,
 //               2 elements.
 //Reserved (1&2) =  Pass 0.
 
-long eTCValues( HANDLE Handle,
-                long *aReadTimers,
-                long *aUpdateResetTimers,
-                long *aReadCounters,
-                long *aResetCounters,
+int32_t eTCValues( HANDLE Handle,
+                int32_t *aReadTimers,
+                int32_t *aUpdateResetTimers,
+                int32_t *aReadCounters,
+                int32_t *aResetCounters,
                 double *aTimerValues,
                 double *aCounterValues,
-                long Reserved1,
-                long Reserved2);
+                int32_t Reserved1,
+                int32_t Reserved2);
 //An "easy" function that updates and reads all the timers and counters.
 //Returns 0 for no error, or -1 or >0 value (low-level errorcode) on error.
 //Handle = Handle to a U6 device.
@@ -489,7 +489,7 @@ long eTCValues( HANDLE Handle,
 
 /* Easy Function Helpers */
 
-long ehConfigIO( HANDLE hDevice,
+int32_t ehConfigIO( HANDLE hDevice,
                  uint8 inWriteMask,
                  uint8 inNumberTimersEnabled,
                  uint8 inCounterEnable,
@@ -502,7 +502,7 @@ long ehConfigIO( HANDLE hDevice,
 //bytes) as its parameter and performs a ConfigIO call with the U6.  Returns
 //-1 or errorcode (>1 value) on error, 0 on success.
 
-long ehConfigTimerClock( HANDLE hDevice,
+int32_t ehConfigTimerClock( HANDLE hDevice,
                          uint8 inTimerClockConfig,
                          uint8 inTimerClockDivisor,
                          uint8 *outTimerClockConfig,
@@ -512,13 +512,13 @@ long ehConfigTimerClock( HANDLE hDevice,
 //and command bytes) as its parameter and performs a ConfigTimerClock call with
 //the U6.  Returns -1 or errorcode (>1 value) on error, 0 on success.
 
-long ehFeedback( HANDLE hDevice,
+int32_t ehFeedback( HANDLE hDevice,
                  uint8 *inIOTypesDataBuff,
-                 long inIOTypesDataSize,
+                 int32_t inIOTypesDataSize,
                  uint8 *outErrorcode,
                  uint8 *outErrorFrame,
                  uint8 *outDataBuff,
-                 long outDataSize);
+                 int32_t outDataSize);
 //Used by the all of the easy functions.  This function takes the Feedback
 //low-level command and response bytes (not including checksum and command
 //bytes) as its parameter and performs a Feedback call with the U6.  Returns -1

@@ -157,8 +157,8 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD3511GainChanged object:self];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -208,7 +208,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    crateAndStationId   = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
+    crateAndStationId   = (uint32_t)((([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16)); //doesn't change so do it here.
 	if(includeTiming)crateAndStationId |= 0x02000000;
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
@@ -229,7 +229,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 			//test the LAM
 			union {
 				NSTimeInterval asTimeInterval;
-				unsigned long asLongs[2];
+				uint32_t asLongs[2];
 			}theTimeRef;
 			
 			unsigned short dummy;
@@ -248,7 +248,7 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
 					dataOffset = 2;
 				}
 				
-				unsigned long dataBuffer[512+dataOffset];
+				uint32_t dataBuffer[512+dataOffset];
 				do {
 					//read a word from the buffer
 					[controller camacShortNAF:cachedStation a:0 f:2 data:&adcValue];
@@ -355,8 +355,8 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     [[self undoManager] disableUndoRegistration];
     [self setIncludeTiming:[decoder decodeBoolForKey:@"ORAD3511ModelIncludeTiming"]];
     [self setEnabled:[decoder decodeBoolForKey:@"ORAD3511ModelEnabled"]];
-    [self setStorageOffset:[decoder decodeIntForKey:@"ORAD3511ModelStorageOffset"]];
-    [self setGain:[decoder decodeIntForKey:@"ORAD3511ModelGain"]];
+    [self setStorageOffset:[decoder decodeIntegerForKey:@"ORAD3511ModelStorageOffset"]];
+    [self setGain:[decoder decodeIntegerForKey:@"ORAD3511ModelGain"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -367,8 +367,8 @@ NSString* ORAD3511WarningPosted						= @"ORAD3511WarningPosted";
     [super encodeWithCoder:encoder];
     [encoder encodeBool:includeTiming forKey:@"ORAD3511ModelIncludeTiming"];
     [encoder encodeBool:enabled forKey:@"ORAD3511ModelEnabled"];
-    [encoder encodeInt:storageOffset forKey:@"ORAD3511ModelStorageOffset"];
-    [encoder encodeInt:gain forKey:@"ORAD3511ModelGain"];
+    [encoder encodeInteger:storageOffset forKey:@"ORAD3511ModelStorageOffset"];
+    [encoder encodeInteger:gain forKey:@"ORAD3511ModelGain"];
 	
 }
 

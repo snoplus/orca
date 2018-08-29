@@ -53,21 +53,21 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORIP320%d%d%d.selectedtab",[model crateNumber],[model slot],[model slotConv]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
 	
-    [[[valueTable1 tableColumnWithIdentifier:k320ChannelReadEnabled ]dataCell]setControlSize:NSSmallControlSize];
-    [[[valueTable2 tableColumnWithIdentifier:k320ChannelReadEnabled ]dataCell]setControlSize:NSSmallControlSize];
+    [[[valueTable1 tableColumnWithIdentifier:k320ChannelReadEnabled ]dataCell]setControlSize:NSControlSizeSmall];
+    [[[valueTable2 tableColumnWithIdentifier:k320ChannelReadEnabled ]dataCell]setControlSize:NSControlSizeSmall];
 	
 	
-    [[[alarmTable1 tableColumnWithIdentifier:k320ChannelAlarmEnabled ]dataCell]setControlSize:NSSmallControlSize];
-    [[[alarmTable2 tableColumnWithIdentifier:k320ChannelAlarmEnabled ]dataCell]setControlSize:NSSmallControlSize];
+    [[[alarmTable1 tableColumnWithIdentifier:k320ChannelAlarmEnabled ]dataCell]setControlSize:NSControlSizeSmall];
+    [[[alarmTable2 tableColumnWithIdentifier:k320ChannelAlarmEnabled ]dataCell]setControlSize:NSControlSizeSmall];
 	
     
-    [[[calibrationTable1 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setControlSize:NSSmallControlSize];
-    [[[calibrationTable2 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setControlSize:NSSmallControlSize];
+    [[[calibrationTable1 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setControlSize:NSControlSizeSmall];
+    [[[calibrationTable2 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setControlSize:NSControlSizeSmall];
     [[[calibrationTable1 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setFont:[NSFont systemFontOfSize:10]];
     [[[calibrationTable2 tableColumnWithIdentifier:k320ChannelGain ]dataCell]setFont:[NSFont systemFontOfSize:10]];
     
@@ -84,7 +84,7 @@
 	
     [outlineView setDoubleAction:@selector(doubleClick:)];
     [multiPlotView setDoubleAction:@selector(doubleClickMultiPlot:)];
-	[splitView loadLayoutWithName:[NSString stringWithFormat:@"IP320-%lu",[model uniqueIdNumber]]];
+	[splitView loadLayoutWithName:[NSString stringWithFormat:@"IP320-%u",[model uniqueIdNumber]]];
 	[plotGroupButton setEnabled:NO];    
 	
     [super awakeFromNib];
@@ -465,7 +465,7 @@
 
 - (IBAction) setJumperSettings:(id)sender
 {
-	[model setCardJumperSetting:[[sender selectedItem] tag]];	
+	[model setCardJumperSetting:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) calibrateAction:(id)sender
@@ -558,7 +558,7 @@
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORIP320%d%d%d.selectedtab",[model crateNumber],[model slot],[model slotConv]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -596,12 +596,12 @@
 
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return kNumIP320Channels/2;
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if(anObject!=nil){
 		rowIndex += [aTableView tag];
@@ -620,7 +620,7 @@
 }
 
 #pragma mark ¥¥¥Data Source Methods
-- (int)outlineView:(NSOutlineView *)ov numberOfChildrenOfItem:(id)item
+- (NSUInteger)outlineView:(NSOutlineView *)ov numberOfChildrenOfItem:(id)item
 {
     if(ov == outlineView){
         return  (item == nil) ? [model numberOfChildren]  : [item numberOfChildren];

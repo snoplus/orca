@@ -342,14 +342,14 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 		
 		int i;
 		for(i=0;i<[self numberOfChannels];i++){
-			unsigned long data[5];
+			uint32_t data[5];
 			data[0] = dataId | 5;
 			data[1] = ((i & 0x1)<<28) | (([self outputState:i] & 0x1)<<16) | ([self uniqueIdNumber]&0xfff);
-			data[2] = ut_Time;
+			data[2] = (uint32_t)ut_Time;
 			
 			union {
 				float asFloat;
-				unsigned long asLong;
+				uint32_t asLong;
 			}theData;
 			theData.asFloat = actVoltage[i];
 			data[3] = theData.asLong;
@@ -357,7 +357,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 			theData.asFloat = actCurrent[i];
 			data[4] = theData.asLong;
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:sizeof(long)*5]];
+																object:[NSData dataWithBytes:data length:sizeof(int32_t)*5]];
 			statusChanged[i] = NO;
 		}
 	}	
@@ -407,7 +407,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt:numberOfChannels forKey:@"numberOfChannels"];
+	[encoder encodeInteger:numberOfChannels forKey:@"numberOfChannels"];
 	int i;
 	for(i=0;i<kNumAmrelHVChannels;i++){
 		[encoder encodeFloat:voltage[i]		forKey:[NSString stringWithFormat:@"voltage%d",i]];
@@ -417,7 +417,7 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 	}
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
-    [encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeInteger:pollTime			forKey: @"pollTime"];
 }
 
 - (void) sendCmd:(NSString*)aCommand channel:(short)aChannel value:(float)aValue
@@ -694,8 +694,8 @@ NSString* ORAmrelHVModelDataIsValidChanged	= @"ORAmrelHVModelDataIsValidChanged"
 {
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }

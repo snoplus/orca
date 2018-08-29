@@ -32,7 +32,7 @@
     double          minValue;
     double          maxValue;
     ORTimeRate*		timeRate;
-    unsigned long   timeMeasured;
+    time_t          timeMeasured;
     BOOL            userMaxCurrentEnabled;
     int             type;
     int             opMode;
@@ -51,7 +51,7 @@
 - (id)   initWithCoder:(NSCoder*)decoder;
 - (void) encodeWithCoder:(NSCoder*)encoder;
 
-- (int)  numberPointsInTimeRate;
+- (NSUInteger)  numberPointsInTimeRate;
 - (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue;
 - (NSString*) heaterSetupString;
 - (NSString*) pidSetupString;
@@ -77,7 +77,7 @@
 @property (assign,nonatomic) unsigned short dValue;
 
 @property (retain)           ORTimeRate*    timeRate;
-@property (assign)           unsigned long  timeMeasured;
+@property (assign)           time_t  timeMeasured;
 
 @end
 

@@ -205,13 +205,13 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[10];
+		uint32_t data[10];
 		data[0] = dataId | 10;
 		data[1] = [self uniqueIdNumber]&0xfff;
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		int index = 2;
 		int i;
@@ -227,7 +227,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*10]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*10]];
 	}
 }
 
@@ -247,12 +247,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286ModelSendOnAlarmChanged object:self];
 }
 
-- (long) expiredTime
+- (int32_t) expiredTime
 {
     return expiredTime;
 }
 
-- (void) setExpiredTime:(long)aExpiredTime
+- (void) setExpiredTime:(int32_t)aExpiredTime
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setExpiredTime:expiredTime];
     if(aExpiredTime<1)aExpiredTime = 1;
@@ -429,7 +429,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 }
 
 
-- (unsigned long) timeMeasured:(int)index
+- (uint32_t) timeMeasured:(int)index
 {
 	if(index>=0 && index<4 && (enabledMask&(1<<index)))return timeMeasured[index];
 	else return 0;
@@ -613,7 +613,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		time_t	ut_Time;
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		timeMeasured[index] = ut_Time;
+		timeMeasured[index] = (uint32_t)ut_Time;
 		
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:index] forKey:@"Index"];
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORAmi286Update 
@@ -806,10 +806,10 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
 	[self setSendOnAlarm:[decoder decodeBoolForKey:@"sendOnAlarm"]];
-	[self setExpiredTime:[decoder decodeInt32ForKey:@"expiredTime"]];
+	[self setExpiredTime:[decoder decodeIntForKey:@"expiredTime"]];
 	[self setSendOnExpired:[decoder decodeBoolForKey:@"sendOnExpired"]];
 	[self setSendOnValveChange:[decoder decodeBoolForKey:@"sendOnValveChange"]];
-	[self setEnabledMask:[decoder decodeIntForKey:@"enabledMask"]];
+	[self setEnabledMask:[decoder decodeIntegerForKey:@"enabledMask"]];
 	[self setShipLevels:[decoder decodeBoolForKey:@"ORAmi286ModelShipLevels"]];
 	[self setPollTime:[decoder decodeIntForKey:@"ORAmi286ModelPollTime"]];
 	[self setPortWasOpen:[decoder decodeBoolForKey:@"ORAmi286ModelPortWasOpen"]];
@@ -844,12 +844,12 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:sendOnAlarm forKey:@"sendOnAlarm"];
-    [encoder encodeInt32:expiredTime forKey:@"expiredTime"];
+    [encoder encodeInt:expiredTime forKey:@"expiredTime"];
     [encoder encodeBool:sendOnExpired forKey:@"sendOnExpired"];
     [encoder encodeBool:sendOnValveChange forKey:@"sendOnValveChange"];
-    [encoder encodeInt:enabledMask forKey:@"enabledMask"];
+    [encoder encodeInteger:enabledMask forKey:@"enabledMask"];
     [encoder encodeBool:shipLevels forKey:@"ORAmi286ModelShipLevels"];
-    [encoder encodeInt:pollTime forKey:@"ORAmi286ModelPollTime"];
+    [encoder encodeInteger:pollTime forKey:@"ORAmi286ModelPollTime"];
     [encoder encodeBool:portWasOpen forKey:@"ORAmi286ModelPortWasOpen"];
     [encoder encodeObject:portName forKey: @"portName"];
     [encoder encodeObject:eMailList forKey: @"eMailList"];
@@ -860,7 +860,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 		[encoder encodeFloat:hiAlarmLevel[i] forKey:[NSString stringWithFormat:@"HiAlarm%d",i]];
 		[encoder encodeFloat:lowFillPoint[i] forKey:[NSString stringWithFormat:@"lowFillPoint%d",i]];
 		[encoder encodeFloat:hiFillPoint[i] forKey:[NSString stringWithFormat:@"hiFillPoint%d",i]];
-		[encoder encodeInt:fillState[i] forKey:[NSString stringWithFormat:@"FillState%d",i]];
+		[encoder encodeInteger:fillState[i] forKey:[NSString stringWithFormat:@"FillState%d",i]];
 	}
 }
 
@@ -993,8 +993,8 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -1059,7 +1059,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Ami286,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Ami286,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -1152,7 +1152,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 - (void) timeout
 {
     isValid = NO;
-	NSLogError(@"",@"Command Timeout",[NSString stringWithFormat:@"AMI 286 %lu",[self uniqueIdNumber]],nil);
+	NSLogError(@"",@"Command Timeout",[NSString stringWithFormat:@"AMI 286 %u",[self uniqueIdNumber]],nil);
     [cmdQueue removeAllObjects];
 	[self setLastRequest:nil];
 }
@@ -1234,7 +1234,7 @@ NSString* ORAmi286Lock = @"ORAmi286Lock";
 	for(i=0;i<4;i++){
 		if(enabledMask & (1<<i)) {
 			NSString* time = [[NSDate date] descriptionFromTemplate:@"MM/dd HH:mm:ss"];
-			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %ld minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
+			[self addReason:[NSString stringWithFormat:@"Chan %d. As of %@ NO CHANGE to Fill state (now %@) for at least %d minutes\n",i,time,[self fillStatusName:fillStatus[i]], expiredTime]];
 			[self scheduleStatusSend];
 		}
 	}

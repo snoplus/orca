@@ -43,9 +43,8 @@ NSString* ORC111CConnectionChanged			= @"ORC111CConnectionChanged";
 NSString* ORC111CTimeConnectedChanged		= @"ORC111CTimeConnectedChanged";
 NSString* ORC111CIpAddressChanged			= @"ORC111CIpAddressChanged";
 
-void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned long userInfo)
+void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,NSUInteger userInfo)
 {
-	NSLog(@"got irq\n");
 	id obj = (NSDictionary*)userInfo;
 	[obj handleIRQ:irq_type data:irq_data];
 }
@@ -258,8 +257,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 				cr_info.tout_ticks = 1000; 
 				CRSET(crate_id, &cr_info);
 				[ORTimer delay:.3];
-				int res = CRIRQ(crate_id,IRQHandler,(unsigned long)(self));
-				NSLog(@"res: %d\n",res);
+				CRIRQ(crate_id,(IRQ_CALLBACK)IRQHandler,(uint32_t)(self));
 			}
 		}
 	}
@@ -306,13 +304,13 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	NSLog(@"C111C doesn't support a controller reset function\n");
     return 1;
 }
-- (unsigned long) setLAMMask:(unsigned long) mask
+- (uint32_t) setLAMMask:(uint32_t) mask
 {
 	NSLog(@"C111C doesn't support a set LAM mask function\n");
     return 1;
 }
 
-- (unsigned short)  readLAMMask:(unsigned long *)mask
+- (unsigned short)  readLAMMask:(uint32_t *)mask
 {
 	NSLog(@"C111C doesn't support a read LAM mask function\n");
 	
@@ -353,7 +351,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 }
 
 
-- (unsigned short)  readLAMStations:(unsigned long *)stations
+- (unsigned short)  readLAMStations:(uint32_t *)stations
 {
 	short res;
 	unsigned int mask;
@@ -457,15 +455,16 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (unsigned short)  camacLongNAF:(unsigned short) n 
 							   a:(unsigned short) a 
 							   f:(unsigned short) f
-							data:(unsigned long*) data
+							data:(uint32_t*) data
 {
 	short result;
 	[socketLock lock];		//begin critical section
+    int* pp = (int*)data;
 	CRATE_OP cr_op;
 	cr_op.F = f;
 	cr_op.N = n;
 	cr_op.A = a;
-	cr_op.DATA = *data;
+	cr_op.DATA = *pp;
 	if(trackTransactions)[transactionTimer reset];
 	result = CFSA(crate_id,&cr_op);
 	[ORTimer delay:kTinyDelay]; //without this to flush the event loop, the rate is 1/sec
@@ -490,7 +489,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 									 a:(unsigned short) a 
 									 f:(unsigned short) f
 								  data:(unsigned short*) data
-                                length:(unsigned long) numWords
+                                length:(uint32_t) numWords
 {
 	short result;
 	[socketLock lock];		//begin critical section
@@ -534,8 +533,8 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (unsigned short)  camacLongNAFBlock:(unsigned short) n 
 									a:(unsigned short) a 
 									f:(unsigned short) f
-								 data:(unsigned long*) data
-							   length:(unsigned long)    numWords
+								 data:(uint32_t*) data
+							   length:(uint32_t)    numWords
 {
 	short result = 0;
 	[socketLock lock];		//begin critical section
@@ -562,7 +561,8 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 	else {
 		//CAMAC write
 		unsigned int* dp = buffer;
-		for(i=0;i<numWords;i++) *dp++ = *data++;
+        unsigned int* pp = (unsigned int*)data;
+		for(i=0;i<numWords;i++) *dp++ = *pp++;
 		result = BLKTRANSF(crate_id, &blk_info, buffer);
 	}
 	if(trackTransactions)[self histogramTransactions];
@@ -622,7 +622,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setStationToTest:[decoder decodeIntForKey:@"ORC111CModelStationToTest"]];
+    [self setStationToTest:[decoder decodeIntegerForKey:@"ORC111CModelStationToTest"]];
 	[self setIpAddress:[decoder decodeObjectForKey:@"IpAddress"]];
     [[self undoManager] enableUndoRegistration];
 	
@@ -634,7 +634,7 @@ void IRQHandler(short crate_id, short irq_type, unsigned int irq_data,unsigned l
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:stationToTest forKey:@"ORC111CModelStationToTest"];
+    [encoder encodeInteger:stationToTest forKey:@"ORC111CModelStationToTest"];
     [encoder encodeObject:ipAddress forKey:@"IpAddress"];
 }
 

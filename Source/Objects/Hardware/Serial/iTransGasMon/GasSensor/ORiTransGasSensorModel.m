@@ -155,7 +155,7 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 {
 	time_t	ut_Time;
 	time(&ut_Time);
-	timeMeasured = ut_Time;
+	timeMeasured = (uint32_t)ut_Time;
 	
     gasReading = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORiTransGasSensorGasReadingChanged object:self];
@@ -396,8 +396,8 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -449,9 +449,9 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt:channel		 forKey:@"channel"];
+    [encoder encodeInteger:channel		 forKey:@"channel"];
     [encoder encodeObject:sensorName forKey:@"sensorName"];
-    [encoder encodeInt:baseAddress	 forKey:@"baseAddress"];
+    [encoder encodeInteger:baseAddress	 forKey:@"baseAddress"];
 }
 
 - (void) shipDataRecords
@@ -460,10 +460,10 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		
-		unsigned long data[8];
+		uint32_t data[8];
 		data[0] = dataId | 8;
 		data[1] = (channel<<16) | ([delegate uniqueIdNumber]&0xfff);
 		
@@ -478,7 +478,7 @@ NSString* ORiTransGasDecimalPlacesChanged			= @"ORiTransGasDecimalPlacesChanged"
 		data[7] = gasType;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*8]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*8]];
 	}
 }
 

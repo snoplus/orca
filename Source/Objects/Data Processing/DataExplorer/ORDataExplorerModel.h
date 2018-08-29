@@ -34,8 +34,8 @@
         NSArray*        dataRecords;
         ORDataSet*      dataSet;
 
-        unsigned        totalLength;
-        unsigned        lengthDecoded;
+        NSUInteger        totalLength;
+        NSUInteger        lengthDecoded;
 		BOOL			multiCatalog;
 		BOOL			histoErrorFlag;
 		ORRecordIndexer* recordIndexer;
@@ -58,15 +58,15 @@
 - (void)        setHeader:(ORHeaderItem *)aHeader;
 - (NSArray *)   dataRecords;
 - (void)        setDataRecords: (NSArray *) aDataRecords;
-- (id)          dataRecordAtIndex:(int)index;
+- (id)          dataRecordAtIndex:(int32_t)index;
 - (void) removeDataSet:(ORDataSet*)item;
 - (id)   childAtIndex:(NSUInteger)index;
 - (NSUInteger)  numberOfChildren;
 - (NSUInteger)  count;
 - (void) createDataSet;
-- (void) decodeOneRecordAtOffset:(unsigned long)offset forKey:(id)aKey;
-- (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey;
-- (NSString*) dataRecordDescription:(unsigned long)anOffset forKey:(NSNumber*)aKey;
+- (void) decodeOneRecordAtOffset:(uint32_t)offset forKey:(id)aKey;
+- (void) byteSwapOneRecordAtOffset:(uint32_t)anOffset forKey:(id)aKey;
+- (NSString*) dataRecordDescription:(uint32_t)anOffset forKey:(NSNumber*)aKey;
 - (void) setTotalLength:(NSUInteger)aLength;
 - (void) setLengthDecoded:(NSUInteger)aLength;
 - (NSUInteger) totalLength;

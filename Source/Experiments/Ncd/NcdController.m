@@ -60,11 +60,11 @@
     ascendingSortingImage = [[NSImage imageNamed:@"NSAscendingSortIndicator"] retain];
     descendingSortingImage = [[NSImage imageNamed:@"NSDescendingSortIndicator"] retain];
     
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.NcdController.selectedtab"];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.NcdController.selectedtab"];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
     
-    [[[hwTableView tableColumnWithIdentifier:@"kCableCheck"]dataCell] setControlSize:NSSmallControlSize];
+    [[[hwTableView tableColumnWithIdentifier:@"kCableCheck"]dataCell] setControlSize:NSControlSizeSmall];
     
     if([model xAttributes])[[ratePlot xScale] setAttributes:[[[model xAttributes] mutableCopy] autorelease]];
     if([model yAttributes])[[ratePlot yScale] setAttributes:[[[model yAttributes] mutableCopy] autorelease]];
@@ -109,7 +109,7 @@
 
 - (unsigned int)countOfAltMuxThresholds 
 {
-    return [[model altMuxThresholds] count];
+    return (unsigned int)[[model altMuxThresholds] count];
 }
 
 
@@ -321,7 +321,7 @@
 #pragma mark ¥¥¥Actions
 - (IBAction) allDisabledAction:(id)sender
 {
-    [model setAllDisabled:[sender state]];
+    [model setAllDisabled:[(NSButton*)sender state]];
 }
 
 - (IBAction) captureStateAction:(id)sender
@@ -401,13 +401,13 @@
 - (IBAction) colorBarUsesLogAction:(id)sender
 {
     NSMutableDictionary* attributes = [[detectorColorBar colorAxis]attributes];
-    [attributes setObject:[NSNumber numberWithBool:[sender state]] forKey:ORAxisUseLog];
+    [attributes setObject:[NSNumber numberWithBool:[(NSButton*)sender state]] forKey:ORAxisUseLog];
     [model setColorBarAttributes:attributes];
 }
 
 - (IBAction) setDisplayOptionAction:(id)sender
 {
-    [model setDisplayOption:[[sender selectedCell]tag] state:[[sender selectedCell]state]];
+    [model setDisplayOption:[[sender selectedCell]tag] state:[(NSButton*)[sender selectedCell]state]];
 }
 
 - (IBAction) readMapFileAction:(id)sender
@@ -681,7 +681,7 @@
 
 - (void) displayOptionsChanged:(NSNotification*)aNote 
 {
-    int numberRows = [displayOptionMatrix numberOfRows];
+    int numberRows = (int)[displayOptionMatrix numberOfRows];
     int i;
     for(i=0;i<numberRows;i++){
         [[displayOptionMatrix cellWithTag:i] setState:[model displayOptionState:i]];
@@ -895,7 +895,7 @@
     [allDisabledButton setState:[model allDisabled]]; 
 }
 
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
 {
     return ![gSecurity isLocked:ORNcdTubeMapLock];
 }
@@ -909,22 +909,22 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
- 	int set = [aPlotter tag];
-	if(set == 0)return [[[model detector]shaperTotalRate]count];
-    else return [[[model detector]muxTotalRate]count];
+ 	int set = (int)[aPlotter tag];
+	if(set == 0)return (int)[[[model detector]shaperTotalRate]count];
+    else        return (int)[[[model detector]muxTotalRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-  	int set = [aPlotter tag];
+  	int set = (int)[aPlotter tag];
 	double aValue = 0;
 	if(set == 0){
-        int count = [[[model detector]shaperTotalRate]count];
+        int count = (int)[[[model detector]shaperTotalRate]count];
 		if(count==0) aValue = 0;
         else aValue = [[[model detector]shaperTotalRate]valueAtIndex:count-i-1];
     }
     else {
-        int count = [[[model detector]muxTotalRate]count];
+        int count = (int)[[[model detector]muxTotalRate]count];
 		if(count==0) aValue = 0;
         else aValue = [[[model detector]muxTotalRate]valueAtIndex:count-i-1];
     }
@@ -939,23 +939,23 @@
 
 
 #pragma mark ¥¥¥Data Source Methods
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
     NSParameterAssert(rowIndex >= 0 && rowIndex < [[[NcdDetector sharedInstance]tubes] count]);
-    NcdTube* tube = [[NcdDetector sharedInstance] tube:rowIndex];
+    NcdTube* tube = [[NcdDetector sharedInstance] tube:(int)rowIndex];
     return [tube objectForKey:[aTableColumn identifier]];
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [[NcdDetector sharedInstance] numberOfTubes];
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     NSParameterAssert(rowIndex >= 0 && rowIndex < [[[NcdDetector sharedInstance]tubes] count]);
-    NcdTube* tube = [[NcdDetector sharedInstance] tube:rowIndex];
+    NcdTube* tube = [[NcdDetector sharedInstance] tube:(int)rowIndex];
     [tube setObject:anObject forKey:[aTableColumn identifier]];
 }
 
@@ -984,7 +984,7 @@
     NSString *key = [[NcdDetector sharedInstance] sortColumn];
     NSArray *a = [hwTableView tableColumns];
     NSTableColumn *column = [hwTableView tableColumnWithIdentifier:key];
-    unsigned i = [a count];
+    NSInteger i = [a count];
     
     while (i-- > 0) [hwTableView setIndicatorImage:nil inTableColumn:[a objectAtIndex:i]];
     
@@ -1018,7 +1018,7 @@
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    int index = [tabView indexOfTabViewItem:item];
+    NSInteger index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.NcdController.selectedtab"];
     
 }

@@ -79,7 +79,7 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
 	NSSize theIconSize = [anImage size];
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];	
 	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
 	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
 	if(iconLabel){
@@ -105,11 +105,11 @@ NSString* ORSPDTRelayOutOffConnection  = @"ORSPDTRelayOutOffConnection";
 - (id) eval
 {
 	[guardian eval];
-	int theState = [guardian state];
+	int32_t theState = [guardian state];
 	if(![guardian objectConnectedTo:ORInputElementInConnection])[self setEvaluatedState: !theState];
 	else {
 		if(theState) [self setEvaluatedState:0];
-		else		 [self setEvaluatedState:[guardian connectedObjState]];
+		else		 [self setEvaluatedState:[(ORInputElement*)guardian connectedObjState]];
 	}
 	return [ORProcessResult processState:evaluatedState value:evaluatedState];
 }

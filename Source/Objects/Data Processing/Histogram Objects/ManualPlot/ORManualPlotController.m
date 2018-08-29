@@ -315,22 +315,22 @@
 
 - (IBAction) col3KeyAction:(id)sender
 {
-	[model setCol3Key:[sender indexOfSelectedItem]];	
+	[model setCol3Key:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) col2KeyAction:(id)sender
 {
-	[model setCol2Key:[sender indexOfSelectedItem]];	
+	[model setCol2Key:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) col1KeyAction:(id)sender
 {
-	[model setCol1Key:[sender indexOfSelectedItem]];	
+	[model setCol1Key:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) col0KeyAction:(id)sender
 {
-	[model setCol0Key:[sender indexOfSelectedItem]];	
+	[model setCol0Key:(int)[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) writeDataFileAction:(id)sender
@@ -366,10 +366,10 @@
 
 - (NSMutableArray*) roiArrayForPlotter:(id)aPlot
 {
-	return [model rois:[aPlot tag]];
+	return [model rois:(int)[aPlot tag]];
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model numPoints];
 }
@@ -390,19 +390,19 @@
      */
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	return [model dataAtRow:row column:[[tableColumn identifier] intValue]];
+	return [model dataAtRow:(int)row column:[[tableColumn identifier] intValue]];
 }
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [model numPoints];
+	return (int)[model numPoints];
 }
 
-- (BOOL) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
+- (BOOL) plotter:(id)aPlotter index:(uint32_t)index x:(double*)xValue y:(double*)yValue
 {
-	return [model dataSet:[aPlotter tag] index:index x:xValue y:yValue];
+	return [model dataSet:(int)[aPlotter tag] index:index x:xValue y:yValue];
 }
 
 @end

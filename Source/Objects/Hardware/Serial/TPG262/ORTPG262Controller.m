@@ -135,7 +135,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"TPG262 (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"TPG262 (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -228,7 +228,7 @@
 		NSString* pressureAsString = [NSString stringWithFormat:@"%.2E",[model pressure:index]];
 		[[pressureMatrix cellWithTag:index] setStringValue:pressureAsString];
 		[[pressure1Matrix cellWithTag:index] setStringValue:pressureAsString];
-		unsigned long t = [model timeMeasured:index];
+		uint32_t t = [model timeMeasured:index];
 		NSDate* theDate;
 		if(t){
 			theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -344,7 +344,7 @@
 
 - (void) pressureScaleAction:(id)sender
 {
-	[model setPressureScale:[sender indexOfSelectedItem]];	
+	[model setPressureScale:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) shipPressuresAction:(id)sender
@@ -374,7 +374,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 
@@ -390,14 +390,14 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	return [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	return (int)[[model timeRate:set] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[[model timeRate:set] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index] * [model pressureScaleValue];

@@ -240,17 +240,17 @@ NSString* ORSelectionControllerSelectionValueChangedNotification = @"ORSelection
 
 - (IBAction) logicalPopUpButtonAction:(id)sender
 {
-    [self setLogicalTag:[sender indexOfSelectedItem]];
+    [self setLogicalTag:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) objPopUpButtonAction:(id)sender
 {
-    [self setObjTag:[sender indexOfSelectedItem]];
+    [self setObjTag:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) selectionPopUpButtonAction:(id)sender
 {
-    [self setSelectionTag:[sender indexOfSelectedItem]];
+    [self setSelectionTag:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) selectionTextFieldAction:(id)sender
@@ -294,9 +294,9 @@ static NSString* ORSelectionControllerSelectionValue = @"ORSelectionControllerSe
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-	[encoder encodeInt:logicalTag forKey:ORSelectionControllerLogicalTag];
-	[encoder encodeInt:objTag forKey:ORSelectionControllerObjTag];
-	[encoder encodeInt:selectionTag forKey:ORSelectionControllerSelectionTag];
-	[encoder encodeInt:selectionValue forKey:ORSelectionControllerSelectionValue];
+	[encoder encodeInteger:logicalTag forKey:ORSelectionControllerLogicalTag];
+	[encoder encodeInteger:objTag forKey:ORSelectionControllerObjTag];
+	[encoder encodeInteger:selectionTag forKey:ORSelectionControllerSelectionTag];
+	[encoder encodeInteger:selectionValue forKey:ORSelectionControllerSelectionValue];
 }
 @end

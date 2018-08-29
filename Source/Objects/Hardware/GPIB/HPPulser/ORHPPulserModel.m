@@ -199,7 +199,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 					[self setMaxTime:temp];
 					[[self undoManager] enableUndoRegistration];
 				}
-				srand((NSUInteger)(time(0)));		
+				srand((unsigned int)(time(0)));
 				float deltaTime = random_range((int)(minTime*10),(int)(maxTime*10))/10000.;
 				[self performSelector:@selector(firePulserRandom) withObject:nil afterDelay:deltaTime];
 			}
@@ -294,11 +294,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 	 postNotificationName:ORHPPulserMaxTimeChangedNotification 
 	 object: self ];
 }
-- (unsigned long) randomCount
+- (uint32_t) randomCount
 {
 	return randomCount;
 }
-- (void) setRandomCount:(unsigned long)aNewRandomCount
+- (void) setRandomCount:(uint32_t)aNewRandomCount
 {
 	randomCount = aNewRandomCount;
     
@@ -487,8 +487,8 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
     fileName = [newFileName copy];
 }
 
-- (unsigned long)   pulserDataId {return pulserDataId;}
-- (void)   setPulserDataId:(unsigned long)aValue
+- (uint32_t)   pulserDataId {return pulserDataId;}
+- (void)   setPulserDataId:(uint32_t)aValue
 {
     pulserDataId = aValue;
 }
@@ -591,7 +591,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) normalizeWaveform
 {
 	float* w = (float*)[waveform bytes];
-	int n = [waveform length]/sizeof(float);
+	int n = (int)[waveform length]/sizeof(float);
 	int i;
 	float maxValue = -9.9E10;
 	float minValue = 9.9E10;
@@ -633,12 +633,12 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     if([self isConnected]){
         char  reply[256];
-        long n = [self writeReadGPIBDevice: @"*IDN?"
+        int32_t n = [self writeReadGPIBDevice: @"*IDN?"
                                       data: reply
                                  maxLength: 256 ];
-        reply[n] = "\n";
+        reply[n] = '\n';
         NSString* s =  [NSString stringWithCString:reply encoding:NSASCIIStringEncoding];
-        long nlPos = [s rangeOfString:@"\n"].location;
+        NSUInteger nlPos = [s rangeOfString:@"\n"].location;
         if(nlPos != NSNotFound){
             s = [s substringWithRange:NSMakeRange(0,nlPos)];
         }
@@ -835,11 +835,11 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) logSystemResponse
 {
 	return;   //stopped asking for response because of device time-outs and errors. MAH 12/18/09
-    char reply[1024];
-    long n = [self writeReadGPIBDevice:@"SYST:ERR?" data:reply maxLength:1024];
-    if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
-        NSLog(@"%s\n",reply);
-    }
+//    char reply[1024];
+//    int32_t n = [self writeReadGPIBDevice:@"SYST:ERR?" data:reply maxLength:1024];
+//    if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
+//        NSLog(@"%s\n",reply);
+//    }
 }
 
 - (void) downloadWaveform
@@ -879,7 +879,7 @@ static HPPulserCustomWaveformStruct waveformData[kNumWaveforms] = {
 {
     //get list of waveforms already in pulser
     char reply[1024];
-    long n = [self writeReadGPIBDevice:@"Data:CAT?" data:reply maxLength:1024];
+    int32_t n = [self writeReadGPIBDevice:@"Data:CAT?" data:reply maxLength:1024];
     if(n>0)reply[n-1]='\0';
     NSString* replyString = [[[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] componentsSeparatedByString:@"\""] componentsJoinedByString:@""];
     replyString = [replyString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -1284,7 +1284,7 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 - (void)loadMemento:(NSCoder*)aDecoder
 {
     [[self undoManager] disableUndoRegistration];
-    [self setTriggerSource: [aDecoder decodeIntForKey: HPTriggerMode]];
+    [self setTriggerSource: [aDecoder decodeIntegerForKey: HPTriggerMode]];
     [self setVoltage: [aDecoder decodeFloatForKey: HPVoltage]];
     [self setVoltageOffset: [aDecoder decodeFloatForKey: HPVoltageOffset]];
     [self setFrequency: [aDecoder decodeFloatForKey: HPFrequency]];
@@ -1304,15 +1304,15 @@ static NSString* ORHPPulserMaxTime = @"ORHPPulserMaxTime";
 {
     [anEncoder encodeBool:verbose forKey:@"verbose"];
     [anEncoder encodeBool:negativePulse forKey:@"ORHPPulserModelNegativePulse"];
-    [anEncoder encodeInt: [self triggerSource] forKey: HPTriggerMode];
+    [anEncoder encodeInteger: [self triggerSource] forKey: HPTriggerMode];
     [anEncoder encodeFloat: [self voltage] forKey: HPVoltage];
 	[anEncoder encodeFloat: [self voltageOffset] forKey: HPVoltageOffset];
     [anEncoder encodeFloat: [self burstRate] forKey: HPBurstRate];
     [anEncoder encodeFloat: [self frequency] forKey: HPFrequency];
-    [anEncoder encodeInt: [self burstCycles] forKey: HPBurstCycles];
-    [anEncoder encodeInt: [self burstPhase] forKey: HPBurstPhase];
+    [anEncoder encodeInteger: [self burstCycles] forKey: HPBurstCycles];
+    [anEncoder encodeInteger: [self burstPhase] forKey: HPBurstPhase];
 	//    [anEncoder encodeFloat: [self totalWidth] forKey: HPTotalWidth];
-    [anEncoder encodeInt: [self selectedWaveform] forKey: HPSelectedWaveform];
+    [anEncoder encodeInteger: [self selectedWaveform] forKey: HPSelectedWaveform];
 	[anEncoder encodeBool:enableRandom forKey:ORHPPulserEnableRandom];
 	[anEncoder encodeFloat:minTime forKey:ORHPPulserMinTime];
 	[anEncoder encodeFloat:maxTime forKey:ORHPPulserMaxTime];

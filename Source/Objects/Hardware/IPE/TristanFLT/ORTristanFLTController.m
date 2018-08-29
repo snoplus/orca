@@ -57,8 +57,8 @@
 	[rateTextFields setFormatter:rateFormatter];
     blankView = [[NSView alloc] init];
     
-    NSString* key = [NSString stringWithFormat: @"orca.ORTristanFLT%d.selectedtab",[model stationNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORTristanFLT%d.selectedtab",(int)[model stationNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -205,7 +205,7 @@
 
 - (void) portChanged:(NSNotification*)aNote
 {
-    [portField setIntValue:[(ORTristanFLTModel*)model  port]];
+    [portField setIntegerValue:[(ORTristanFLTModel*)model  port]];
 }
 
 - (void) shapingLengthChanged:(NSNotification*)aNote
@@ -229,7 +229,7 @@
 - (void) thresholdChanged:(NSNotification*)aNotification
 {
     int chan = [[[aNotification userInfo] objectForKey:@"Channel"] intValue];
-    [[thresholdMatrix cellWithTag:chan] setIntValue: [model threshold:chan]];
+    [[thresholdMatrix cellWithTag:chan] setIntegerValue: [model threshold:chan]];
 }
 
 - (void) postTriggerTimeChanged:(NSNotification*)aNotification
@@ -245,8 +245,8 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
     // for FLTv4 'slot' goes from 0-9, 11-20 (SLTv4 has slot 10)
-    [[self window] setTitle:[NSString stringWithFormat:@"TristanFLT Card (Slot %d, TristanFLT# %d)",[model slot]+1,[model stationNumber]]];
-    [slotNumField setStringValue: [NSString stringWithFormat:@"# %d",[model stationNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"TristanFLT Card (Slot %d, TristanFLT# %d)",[model slot]+1,(uint32_t)[model stationNumber]]];
+    [slotNumField setStringValue: [NSString stringWithFormat:@"# %d",(uint32_t)[model stationNumber]]];
 }
 
 - (void) totalRateChanged:(NSNotification*)aNote
@@ -355,8 +355,8 @@
     }
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORTristanFLT%d.selectedtab",[model stationNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORTristanFLT%d.selectedtab",(int)[model stationNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
@@ -449,13 +449,13 @@
 #pragma mark ***Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model  totalRate]count];
+	return (int)[[model  totalRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model totalRate]count];
-	int index = count-i-1;
+	NSUInteger count = [[model totalRate]count];
+	NSUInteger index = count-i-1;
 	*yValue =  [[model totalRate] valueAtIndex:index];
 	*xValue =  [[model totalRate] timeSampledAtIndex:index];
 }

@@ -145,20 +145,20 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[4];
+		uint32_t data[4];
 		data[0] = dataId | 4;
 		data[1] =  ([self uniqueIdNumber]&0x0000fffff);
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		theData.asFloat = current;
 		data[2] = theData.asLong;
 		data[3] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*4]];
 	}
 }
 
@@ -208,7 +208,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 	return current;
 }
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -220,7 +220,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 	time_t	ut_Time;
 	time(&ut_Time);
 	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	timeMeasured = ut_Time;
+	timeMeasured = (uint32_t)ut_Time;
 
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORKeithley6487CurrentChanged 
 														object:self 
@@ -337,7 +337,7 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:shipCurrent forKey:@"shipCurrent"];
-    [encoder encodeInt:pollTime		forKey:@"pollTime"];
+    [encoder encodeInteger:pollTime		forKey:@"pollTime"];
     [encoder encodeBool:portWasOpen forKey:@"portWasOpen"];
     [encoder encodeObject:portName	forKey: @"portName"];
 }
@@ -360,8 +360,8 @@ NSString* ORKeithley6487Lock = @"ORKeithley6487Lock";
 }
 
 #pragma mark ***Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }

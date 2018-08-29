@@ -266,8 +266,8 @@ NSString* ORNHQ226LModelTimeout				= @"ORNHQ226LModelTimeout";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORNHQ226LRampRateChanged object:self userInfo: nil];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -455,7 +455,7 @@ return NO; /////////ToDo
 	for(i=0;i<kNumNHQ226LChannels;i++){
 		[self setVoltage:i withValue:   [decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxCurrent%d",i]]];
-		[self setRampRate:i withValue:  [decoder decodeIntForKey:  [NSString stringWithFormat:@"rampRate%d",i]]];
+		[self setRampRate:i withValue:  [decoder decodeIntegerForKey:  [NSString stringWithFormat:@"rampRate%d",i]]];
 	}
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
     [self setPortName:		[decoder decodeObjectForKey: @"portName"]];
@@ -473,11 +473,11 @@ return NO; /////////ToDo
 	for(i=0;i<kNumNHQ226LChannels;i++){
 		[encoder encodeFloat:voltage[i]    forKey:[NSString stringWithFormat:@"voltage%d",i]];
 		[encoder encodeFloat:maxCurrent[i] forKey:[NSString stringWithFormat:@"maxCurrent%d",i]];
-		[encoder encodeInt:rampRate[i]     forKey:[NSString stringWithFormat:@"rampRate%d",i]];
+		[encoder encodeInteger:rampRate[i]     forKey:[NSString stringWithFormat:@"rampRate%d",i]];
 	}
     [encoder encodeBool:portWasOpen		forKey: @"portWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
-	[encoder encodeInt:pollTime			forKey:@"pollTime"];
+	[encoder encodeInteger:pollTime			forKey:@"pollTime"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -517,14 +517,14 @@ return NO; /////////ToDo
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		
-		unsigned long data[11];
+		uint32_t data[11];
 		data[0] = dataId | 11;
 		data[1] = [self uniqueIdNumber]&0xfff;
-		data[2] = ut_Time;
+		data[2] = (uint32_t)ut_Time;
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		int index = 3;
 		int i;
@@ -540,7 +540,7 @@ return NO; /////////ToDo
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*11]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*11]];
 	}	
 	statusChanged = NO;
 }

@@ -68,7 +68,7 @@ NSString* ORRateValue 				= @"ORRateValue";
 	lastTime = newLastTime;
 }
 
-- (int) tag
+- (NSUInteger) tag
 {
 	return tag;
 }
@@ -127,7 +127,7 @@ NSString* ORRateValue 				= @"ORRateValue";
 - (void) calcRate:(id)obj
 {
 
-	unsigned long currentCount = [obj getCounter:tag forGroup:groupTag];
+	uint32_t currentCount = [obj getCounter:tag forGroup:groupTag];
 	if(lastTime == nil){
 		[self setRate:0];
 		lastCount = currentCount;
@@ -165,8 +165,8 @@ static NSString *ORRate_TimeRate 	= @"ORRate_TimeRate";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt:[self tag] forKey:ORRate_Tag];
-    [encoder encodeInt:[self groupTag] forKey:ORRate_GroupTag];
+    [encoder encodeInteger:(int32_t)[self tag] forKey:ORRate_Tag];
+    [encoder encodeInteger:[self groupTag] forKey:ORRate_GroupTag];
     [encoder encodeObject:[self timeRate] forKey:ORRate_TimeRate];
 }
 

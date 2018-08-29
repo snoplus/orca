@@ -143,13 +143,13 @@
 
 #pragma mark •••Table Data Source
 - (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn 
-			 row:(int) rowIndex;
+			 row:(NSInteger) rowIndex;
 //- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row;
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (void)tableView:(NSTableView *)aTableView setObjectValue:anObject 
-   forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
+   forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
 - (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell 
-   forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex;
+   forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex;
 - (void) tableView:(NSTableView*)tv didClickTableColumn:(NSTableColumn *)tableColumn;
 
 @end

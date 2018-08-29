@@ -77,9 +77,9 @@
 	[controller checkStatusErrors];
 }
 
--(void) readLongBlock:(unsigned long *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberLongs
+-(void) readLongBlock:(uint32_t *) readAddress
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -94,9 +94,9 @@
 				usingAddSpace:anAddressSpace];
 }
 
--(void) writeLongBlock:(unsigned long *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberLongs
+-(void) writeLongBlock:(uint32_t *) writeAddress
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberLongs
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -112,9 +112,9 @@
 	
 }
 
--(void) readLong:(unsigned long *) readAddress
-	   atAddress:(unsigned int) vmeAddress
-	 timesToRead:(unsigned int) numberLongs
+-(void) readLong:(uint32_t *) readAddress
+	   atAddress:(uint32_t) vmeAddress
+	 timesToRead:(uint32_t) numberLongs
 	  withAddMod:(unsigned short) anAddressModifier
    usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -130,8 +130,8 @@
 }
 
 -(void) readByteBlock:(unsigned char *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberBytes
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberBytes
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -148,8 +148,8 @@
 }
 
 -(void) writeByteBlock:(unsigned char *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberBytes
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberBytes
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -167,8 +167,8 @@
 
 
 -(void) readWordBlock:(unsigned short *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberWords
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberWords
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -185,8 +185,8 @@
 }
 
 -(void) writeWordBlock:(unsigned short *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberWords
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberWords
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {

@@ -95,14 +95,14 @@ static NSString* MJDPreAmpInputConnector     = @"MJDPreAmpInputConnector";
 #define kStraightBinary 0x1
 
 struct {
-    unsigned long adcSelection;
+    uint32_t adcSelection;
     BOOL calculateLeakageCurrent;
     int leakageCurrentIndex;
-    unsigned long mode;
+    uint32_t mode;
 	BOOL  conversionType;
     float slope;
     float intercept;
-    long adcOffset;
+    int32_t adcOffset;
 } mjdPreAmpTable[16] = {
     {kADC1,YES, 0, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,0
     {kADC1,YES, 1, kSingleEnded, kTwosComplement,2*20/8192., 0, 0},   //0,1
@@ -238,7 +238,7 @@ struct {
                               spikeObj,@"spikeInfo",
                               [NSNumber numberWithInt:[self connectedGretinaCrate]],@"crate",
                               [NSNumber numberWithInt:[self connectedGretinaSlot]], @"card",
-                              [NSNumber numberWithInt:[spikeObj tag]],              @"adcChannel",
+                              [NSNumber numberWithInteger:[spikeObj tag]],              @"adcChannel",
                               nil];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpModelRateSpiked object:self userInfo:userInfo];
 }
@@ -492,11 +492,11 @@ struct {
 {
     if(i>=0 && i<kMJDPreAmpAdcChannels){
         switch(i){
-            case 5:  return (supplyErrors[0] == 0)?@"+12V":[NSString stringWithFormat:@"+12V (%lu Error%@)",supplyErrors[0],supplyErrors[0]>1?@"s":@""];
-            case 6:  return (supplyErrors[1] == 0)?@"-12V":[NSString stringWithFormat:@"-12V (%lu Error%@)",supplyErrors[1],supplyErrors[1]>1?@"s":@""];
+            case 5:  return (supplyErrors[0] == 0)?@"+12V":[NSString stringWithFormat:@"+12V (%u Error%@)",supplyErrors[0],supplyErrors[0]>1?@"s":@""];
+            case 6:  return (supplyErrors[1] == 0)?@"-12V":[NSString stringWithFormat:@"-12V (%u Error%@)",supplyErrors[1],supplyErrors[1]>1?@"s":@""];
             case 7:  return @"Temp Chip 1";
-            case 13: return (supplyErrors[2] == 0)?@"+24V":[NSString stringWithFormat:@"+24V (%lu Error%@)",supplyErrors[2],supplyErrors[2]>1?@"s":@""];
-            case 14: return (supplyErrors[3] == 0)?@"-24V":[NSString stringWithFormat:@"-24V (%lu Error%@)",supplyErrors[3],supplyErrors[3]>1?@"s":@""];
+            case 13: return (supplyErrors[2] == 0)?@"+24V":[NSString stringWithFormat:@"+24V (%u Error%@)",supplyErrors[2],supplyErrors[2]>1?@"s":@""];
+            case 14: return (supplyErrors[3] == 0)?@"-24V":[NSString stringWithFormat:@"-24V (%u Error%@)",supplyErrors[3],supplyErrors[3]>1?@"s":@""];
             case 15: return @"Temp Chip 2";
             default: if(!detectorName[i].length)return @"";
                      else return detectorName[i];
@@ -530,12 +530,12 @@ struct {
 }
 
 
-- (unsigned long) adcEnabledMask
+- (uint32_t) adcEnabledMask
 {
     return adcEnabledMask;
 }
 
-- (void) setAdcEnabledMask:(unsigned long)aAdcEnabledMask
+- (void) setAdcEnabledMask:(uint32_t)aAdcEnabledMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAdcEnabledMask:adcEnabledMask];
     
@@ -864,16 +864,16 @@ struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpDacArrayChanged object:self];
 }
 
-- (unsigned long) dac:(unsigned short) aChan
+- (uint32_t) dac:(unsigned short) aChan
 {
     return [[dacs objectAtIndex:aChan] unsignedShortValue];
 }
 
-- (void) setDac:(unsigned short) aChan withValue:(unsigned long) aValue
+- (void) setDac:(unsigned short) aChan withValue:(uint32_t) aValue
 {
 	if(aValue>0xffff) aValue = 0xffff;
     [[[self undoManager] prepareWithInvocationTarget:self] setDac:aChan withValue:[self dac:aChan]];
-	[dacs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+	[dacs replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInteger:aValue]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithInt:aChan] forKey: @"Channel"];
@@ -883,7 +883,7 @@ struct {
 													  userInfo: userInfo];
 }
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -901,16 +901,16 @@ struct {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMJDPreAmpAmplitudeArrayChanged object:self];
 }
 
-- (unsigned long) amplitude:(int) aChan
+- (uint32_t) amplitude:(int) aChan
 {
     return [[amplitudes objectAtIndex:aChan] unsignedShortValue];
 }
 
-- (void) setAmplitude:(int) aChan withValue:(unsigned long) aValue
+- (void) setAmplitude:(int) aChan withValue:(uint32_t) aValue
 {
 	if(aValue>0xffff) aValue = 0xffff;
     [[[self undoManager] prepareWithInvocationTarget:self] setAmplitude:aChan withValue:[self amplitude:aChan]];
-	[amplitudes replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInt:aValue]];
+	[amplitudes replaceObjectAtIndex:aChan withObject:[NSNumber numberWithInteger:aValue]];
 	
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
     [userInfo setObject:[NSNumber numberWithUnsignedShort:aChan] forKey: @"Channel"];
@@ -937,7 +937,7 @@ struct {
 - (void) writeFetVds:(int)index
 {
 	if(index>=0 && index<16){
-		unsigned long theValue;
+		uint32_t theValue;
 		//set up the Octal chip mask first
 		if(index<8)	theValue = kDAC3;
 		else		theValue = kDAC4;
@@ -962,7 +962,7 @@ struct {
 - (void) writeAmplitude:(int)index
 {
 	if(index>=0 && index<16){
-		unsigned long theValue;
+		uint32_t theValue;
 		//set up the Octal chip mask first
 		if(index<8)	theValue = kDAC1;
 		else		theValue = kDAC2;
@@ -978,7 +978,7 @@ struct {
 
 - (void) zeroAmplitudes
 {
-    unsigned long zeroAllOctalChips = 0x2F0000;
+    uint32_t zeroAllOctalChips = 0x2F0000;
 	[self writeAuxIOSPI:(kDAC1 | zeroAllOctalChips)];
 	[self writeAuxIOSPI:(kDAC2 | zeroAllOctalChips)];
 }
@@ -990,7 +990,7 @@ struct {
     //controller
     
     //both chips are set up the same. so we only have to 
-    unsigned long controlWord;    
+    uint32_t controlWord;    
     controlWord =   (kRangeReg1      << 13)  |
                     (kBipolar10V     << 11)  |       //chan 0
                     (kBipolar10V     << 9)   |       //chan 1
@@ -1018,11 +1018,11 @@ struct {
 {
     if(!connected)return;
     if(!rangesHaveBeenSet)[self writeAdcRanges];
-    unsigned long rawAdcValue[16];
+    uint32_t rawAdcValue[16];
     int chan;
     if([self controllerIsSBC] ){
         
-        unsigned long cmdType;
+        uint32_t cmdType;
         if(connectedToANLCard)cmdType = kMJDReadPreampsANL;
         else                  cmdType = kMJDReadPreamps;
         
@@ -1032,22 +1032,22 @@ struct {
         for(chip=0;chip<2;chip++){
             SBC_Packet aPacket;
             aPacket.cmdHeader.destination	= kMJD;
-            aPacket.cmdHeader.cmdID			= cmdType;
-            aPacket.cmdHeader.numberBytesinPayload	= (8 + 3)*sizeof(long);
+            aPacket.cmdHeader.cmdID			= (uint32_t)cmdType;
+            aPacket.cmdHeader.numberBytesinPayload	= (8 + 3)*sizeof(int32_t);
             
             GRETINA4_PreAmpReadStruct* p = (GRETINA4_PreAmpReadStruct*) aPacket.payload;
-            p->baseAddress      = [self baseAddress];
+            p->baseAddress      = (uint32_t)[self baseAddress];
             p->chip             = chip;
-            p->readEnabledMask  = adcEnabledMask;
+            p->readEnabledMask  = (uint32_t)adcEnabledMask;
             for(chan=0;chan<8;chan++){
                 int adcIndex = chan + (chip*8);
                 if(adcEnabledMask & (0x1<<adcIndex)){
-                    unsigned long controlWord = (kControlReg << 13)    |             //sel the chan set
+                    uint32_t controlWord = (kControlReg << 13)    |             //sel the chan set
                     (chan<<10)         |             //set chan
                     (0x1 << 4)         |             //use internal voltage reference for conversion
                     (mjdPreAmpTable[adcIndex].conversionType << 5)   |
                     (mjdPreAmpTable[adcIndex].mode << 8);    //set mode, other bits are zero
-                    p->adc[chan] = (mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8));
+                    p->adc[chan] = (uint32_t)((mjdPreAmpTable[adcIndex].adcSelection | (controlWord<<8)));
                 }
                 else p->adc[chan] = 0;
             }
@@ -1078,7 +1078,7 @@ struct {
                 rawAdcValue[chan] = ((rawAdcValue[chan]&0x1FFFE)>>1);
             
             
-            long adcValue;
+            int32_t adcValue;
             if(mjdPreAmpTable[chan].conversionType == kTwosComplement){
                 
                 if(rawAdcValue[chan] & 0x1000){ // negative bit sign
@@ -1141,7 +1141,7 @@ struct {
     //get the time(UT!) for the data record.
     time_t	ut_Time;
     time(&ut_Time);
-    timeMeasured = ut_Time;
+    timeMeasured = (uint32_t)ut_Time;
 }
          
 - (BOOL) controllerIsSBC
@@ -1155,7 +1155,7 @@ struct {
     else return NO;
 }
     
-- (unsigned long) baseAddress
+- (uint32_t) baseAddress
 {
     id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
     if([connectedObj respondsToSelector:@selector(baseAddress)]){
@@ -1231,7 +1231,7 @@ struct {
 	//set the pulser amplitudes
     [self writeAmplitudes];
 
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	//set the high and low times (frequency)
     
     // Firmware Rev 1
@@ -1274,7 +1274,7 @@ struct {
 	NSLog(@"PreAmp(%d) Started Pulser\n",[self uniqueIdNumber]);
 }
 
-- (unsigned long)  writeAuxIOSPI:(unsigned long)aValue
+- (uint32_t)  writeAuxIOSPI:(uint32_t)aValue
 {
 	id connectedObj = [self objectConnectedTo:MJDPreAmpInputConnector];
 	if([connectedObj respondsToSelector:@selector(writeAuxIOSPI:)]){
@@ -1291,7 +1291,7 @@ struct {
 	
     [[self undoManager] disableUndoRegistration];
     [self setBoardRev:      [decoder decodeIntForKey:   @"boardRev"]];
-    [self setAdcEnabledMask:[decoder decodeInt32ForKey: @"adcEnabledMask"]];
+    [self setAdcEnabledMask:[decoder decodeIntForKey: @"adcEnabledMask"]];
     [self setShipValues:	[decoder decodeBoolForKey:  @"shipValues"]];
 	[self setPollTime:		[decoder decodeIntForKey:   @"pollTime"]];
     [self setFirmwareRev:   [decoder decodeIntForKey:   @"firmwareRev"]];
@@ -1306,10 +1306,10 @@ struct {
     
 
     [self setLoopForever:	[decoder decodeBoolForKey:   @"loopForever"]];
-    [self setPulseCount:	[decoder decodeIntForKey:    @"pulseCount"]];
+    [self setPulseCount:	[decoder decodeIntegerForKey:    @"pulseCount"]];
 	[self setPulseHighTime:	[decoder decodeIntForKey:    @"pulseHighTime"]];
 	[self setPulseLowTime:	[decoder decodeIntForKey:    @"pulseLowTime"]];
-	[self setPulserMask:	[decoder decodeIntForKey:    @"pulserMask"]];
+	[self setPulserMask:	[decoder decodeIntegerForKey:    @"pulserMask"]];
     [self setDacs:			[decoder decodeObjectForKey: @"dacs"]];
     [self setAmplitudes:	[decoder decodeObjectForKey: @"amplitudes"]];
     [self setFeedBackResistors:	[decoder decodeObjectForKey: @"feedBackResistors"]];
@@ -1337,11 +1337,11 @@ struct {
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:doNotUseHWMap   forKey:@"doNotUseHWMap"];
-	[encoder encodeInt:boardRev         forKey:@"boardRev"];
-	[encoder encodeInt32:adcEnabledMask forKey:@"adcEnabledMask"];
+	[encoder encodeInteger:boardRev         forKey:@"boardRev"];
+	[encoder encodeInt:adcEnabledMask forKey:@"adcEnabledMask"];
 	[encoder encodeBool:shipValues		forKey:@"shipValues"];
-	[encoder encodeInt:pollTime			forKey:@"pollTime"];
-    [encoder encodeInt:firmwareRev      forKey:@"firmwareRev"];
+	[encoder encodeInteger:pollTime			forKey:@"pollTime"];
+    [encoder encodeInteger:firmwareRev      forKey:@"firmwareRev"];
     
 	int i;
 	for(i=0;i<2;i++){
@@ -1354,10 +1354,10 @@ struct {
     }
 
 	[encoder encodeBool:loopForever		forKey:@"loopForever"];
-	[encoder encodeInt:pulseCount		forKey:@"pulseCount"];
-	[encoder encodeInt:pulseHighTime	forKey:@"pulseHighTime"];
-	[encoder encodeInt:pulseLowTime		forKey:@"pulseLowTime"];
-	[encoder encodeInt:pulserMask		forKey:@"pulserMask"];
+	[encoder encodeInteger:pulseCount		forKey:@"pulseCount"];
+	[encoder encodeInteger:pulseHighTime	forKey:@"pulseHighTime"];
+	[encoder encodeInteger:pulseLowTime		forKey:@"pulseLowTime"];
+	[encoder encodeInteger:pulserMask		forKey:@"pulserMask"];
 	[encoder encodeObject:dacs			forKey:@"dacs"];
 	[encoder encodeObject:amplitudes	forKey:@"amplitudes"];
 	[encoder encodeObject:feedBackResistors			forKey:@"feedBackResistors"];
@@ -1381,7 +1381,7 @@ struct {
     [objDictionary setObject:[NSNumber numberWithInt:crate]                 forKey:@"crate"];
     [objDictionary setObject:[NSNumber numberWithInt:slot]                  forKey:@"slot"];
 
-    [objDictionary setObject:[NSNumber numberWithInt:[self uniqueIdNumber]] forKey:@"preampID"];
+    [objDictionary setObject:[NSNumber numberWithInteger:[self uniqueIdNumber]] forKey:@"preampID"];
     [objDictionary setObject:[NSNumber numberWithInt:[self boardRev]]       forKey:@"boardRev"];
     [objDictionary setObject:[NSNumber numberWithLong:adcEnabledMask]       forKey:@"adcEnabledMask"];
     [objDictionary setObject:[NSNumber numberWithInt:pollTime]              forKey:@"pollTime"];
@@ -1413,8 +1413,8 @@ struct {
 }
 
 #pragma mark ¥¥¥Data Records
-- (unsigned long) dataId					{ return dataId;   }
-- (void) setDataId: (unsigned long) DataId	{ dataId = DataId; }
+- (uint32_t) dataId					{ return dataId;   }
+- (void) setDataId: (uint32_t) DataId	{ dataId = DataId; }
 - (void) setDataIds:(id)assigner			{ dataId = [assigner assignDataIds:kLongForm]; }
 - (void) syncDataIdsWith:(id)anotherTPG262	{ [self setDataId:[anotherTPG262 dataId]]; }
 
@@ -1445,7 +1445,7 @@ struct {
 	
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[kMJDPreAmpDataRecordLen];
+		uint32_t data[kMJDPreAmpDataRecordLen];
 		
 		data[0] = dataId | kMJDPreAmpDataRecordLen;
 		data[1] = [self uniqueIdNumber]&0xfff;
@@ -1454,7 +1454,7 @@ struct {
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		} theData;
 		
 		int index = 4;
@@ -1466,7 +1466,7 @@ struct {
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName: ORQueueRecordForShippingNotification 
-                                object: [NSData dataWithBytes:data length:sizeof(long)*kMJDPreAmpDataRecordLen]];
+                                object: [NSData dataWithBytes:data length:sizeof(int32_t)*kMJDPreAmpDataRecordLen]];
 	}
 }
 
@@ -1477,27 +1477,27 @@ struct {
     if(!connected)return;
     
     return; //temps don't work -- don't alarm
-    
-    float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
-    int aChip;
-    float aTemperature;
-    for(aChip=0;aChip<2;aChip++){
-        if(aChip == 0)  aTemperature = [self adc:7];
-        else            aTemperature = [self adc:15];
-        if(aTemperature >= maxAllowedTemperature){
- 			if(!temperatureAlarm[aChip]){
-				temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Controller %lu Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
-                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Controller %lu has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
-				[temperatureAlarm[aChip] setSticky:YES];
-                [temperatureAlarm[aChip] postAlarm];
-			}
-        }
-        else {
-            [temperatureAlarm[aChip] clearAlarm];
-			[temperatureAlarm[aChip] release];
-			temperatureAlarm[aChip] = nil;
-        }
-    }
+//    
+//    float maxAllowedTemperature = 1000; //temporarily set high because the temp readout isn't working right
+//    int aChip;
+//    float aTemperature;
+//    for(aChip=0;aChip<2;aChip++){
+//        if(aChip == 0)  aTemperature = [self adc:7];
+//        else            aTemperature = [self adc:15];
+//        if(aTemperature >= maxAllowedTemperature){
+//             if(!temperatureAlarm[aChip]){
+//                temperatureAlarm[aChip] = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Controller %u Temperature",[self uniqueIdNumber]] severity:kRangeAlarm];
+//                [temperatureAlarm[aChip] setHelpString:[NSString stringWithFormat:@"Controller %u has exceeded %.1f C. This alarm will be in effect until the temperature returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],maxAllowedTemperature]];
+//                [temperatureAlarm[aChip] setSticky:YES];
+//                [temperatureAlarm[aChip] postAlarm];
+//            }
+//        }
+//        else {
+//            [temperatureAlarm[aChip] clearAlarm];
+//            [temperatureAlarm[aChip] release];
+//            temperatureAlarm[aChip] = nil;
+//        }
+//    }
 }
 
 - (void) checkLeakageCurrentIsWithinLimits:(int)aChan
@@ -1505,13 +1505,13 @@ struct {
     if(!connected)return;
 
     float maxAllowedLeakageCurrent = 50;//pA
-    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %d of Controller %lu: Leakage Current Alarm",aChan,[self uniqueIdNumber]];
+    NSString* alarmName  = [NSString stringWithFormat:@"Preamp %d of Controller %u: Leakage Current Alarm",aChan,[self uniqueIdNumber]];
     float aLeakageCurrent = [self leakageCurrent:aChan];
     
     if(aLeakageCurrent >= maxAllowedLeakageCurrent){
         if(!leakageCurrentAlarm[aChan]){
             leakageCurrentAlarm[aChan] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %d of Controller %lu: leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",aChan,[self uniqueIdNumber]]];
+            [leakageCurrentAlarm[aChan] setHelpString:[NSString stringWithFormat:@"Preamp %d of Controller %u: leakage current value exceeded limits. This alarm will be in effect until the leakage current returns to normal limits. It can be silenced by acknowledging it.",aChan,[self uniqueIdNumber]]];
             [leakageCurrentAlarm[aChan] setSticky:YES];
         }
         [leakageCurrentAlarm[aChan] postAlarm];
@@ -1534,7 +1534,7 @@ struct {
     switch(anIndex){
         case 5:
             if(fabs(aValue - 12)/12. >= 0.1){ //set range to 10% - niko
-               // alarmName  = [NSString stringWithFormat:@"Controller %lu +12V Supply",[self uniqueIdNumber]];
+               // alarmName  = [NSString stringWithFormat:@"Controller %u +12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
             [self checkSupplyError:0 postAlarm:postAlarm];
@@ -1542,7 +1542,7 @@ struct {
             
         case 6:
             if(fabs(aValue + 12)/12. >= 0.1){ //set range to 10% - niko
-               // alarmName = [NSString stringWithFormat:@"Controller %lu -12V Supply",[self uniqueIdNumber]];
+               // alarmName = [NSString stringWithFormat:@"Controller %u -12V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
             [self checkSupplyError:1 postAlarm:postAlarm];
@@ -1550,7 +1550,7 @@ struct {
             
         case 13:
             if(fabs(aValue - 24)/24. >= 0.1){ //set range to 10% - niko
-             //   alarmName = [NSString stringWithFormat:@"Controller %lu +24V Supply",[self uniqueIdNumber]];
+             //   alarmName = [NSString stringWithFormat:@"Controller %u +24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
             }
             [self checkSupplyError:2 postAlarm:postAlarm];
@@ -1558,7 +1558,7 @@ struct {
             
         case 14:
             if(fabs(aValue + 24)/24. >= 0.1){ //set range to 10% - niko
-             //   alarmName = [NSString stringWithFormat:@"Controller %lu -24V Supply",[self uniqueIdNumber]];
+             //   alarmName = [NSString stringWithFormat:@"Controller %u -24V Supply",[self uniqueIdNumber]];
                 postAlarm  = YES;
            }
            [self checkSupplyError:3 postAlarm:postAlarm];
@@ -1570,7 +1570,7 @@ struct {
     if(postAlarm){
         if(!adcAlarm[anIndex]){
             adcAlarm[anIndex] = [[ORAlarm alloc] initWithName:alarmName severity:kRangeAlarm];
-            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Controller %lu adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
+            [adcAlarm[anIndex] setHelpString:[NSString stringWithFormat:@"Controller %u adc value exceeded limits (was at %.2f). This alarm will be in effect until the adc value returns to normal limits. It can be silenced by acknowledging it.",[self uniqueIdNumber],aValue]];
             [adcAlarm[anIndex] setSticky:YES];
             [adcAlarm[anIndex] postAlarm];
         }
@@ -1682,7 +1682,7 @@ struct {
             int tempAdcChannel     = tempChanToUse[i];
             if((detectorName[detectorAdcChannel].length!=0) && (adcEnabledMask & (0x1 << detectorAdcChannel))){
                 NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
-                    [NSString stringWithFormat:@"PreAmp%ld",[self uniqueIdNumber]], @"preamp",
+                    [NSString stringWithFormat:@"PreAmp%d",[self uniqueIdNumber]], @"preamp",
                     detectorName[detectorAdcChannel],                               @"title",
                     machineName,                                                    @"machine",
                     [NSNumber numberWithInt:detectorAdcChannel],                    @"adcIndex",
@@ -1748,7 +1748,7 @@ struct {
     
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ORCouchDBAddObjectRecord" object:self userInfo:theRecord];
     
-    NSString* s =  [NSString stringWithFormat:@"PreAmpSupply%lu",[self uniqueIdNumber]];
+    NSString* s =  [NSString stringWithFormat:@"PreAmpSupply%u",[self uniqueIdNumber]];
     NSDictionary* historyRecord = [NSDictionary dictionaryWithObjectsAndKeys:
                                    s,       @"name",
                                    s,       @"title",

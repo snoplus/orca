@@ -152,7 +152,7 @@
 
 - (void) drawBackground:(NSRect)aRect
 {
-	[backgroundImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+	[backgroundImage drawAtPoint:NSZeroPoint fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
     
 }
 
@@ -311,10 +311,10 @@
 {
     [[self window] makeFirstResponder:self];
     
-    BOOL shiftKeyDown = ([event modifierFlags] & NSShiftKeyMask)!=0;
-    BOOL cmdKeyDown   = ([event modifierFlags] & NSCommandKeyMask)!=0;
-    BOOL cntrlKeyDown = ([event modifierFlags] & NSControlKeyMask)!=0;
-    BOOL optionKeyDown = ([event modifierFlags] & NSAlternateKeyMask)!=0;
+    BOOL shiftKeyDown = ([event modifierFlags] & NSEventModifierFlagShift)!=0;
+    BOOL cmdKeyDown   = ([event modifierFlags] & NSEventModifierFlagCommand)!=0;
+    BOOL cntrlKeyDown = ([event modifierFlags] & NSEventModifierFlagControl)!=0;
+    BOOL optionKeyDown = ([event modifierFlags] & NSEventModifierFlagOption)!=0;
     BOOL shiftCmdKeyDown = cmdKeyDown & shiftKeyDown;
 	
     NSPoint localPoint = [self convertPoint:[event locationInWindow] fromView:nil];
@@ -425,12 +425,12 @@
 	if([group isKindOfClass:NSClassFromString(@"ORContainerModel")]){
 		
 		NSEvent* theCurrentEvent = [NSApp currentEvent];
-		NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+		NSEvent *event =  [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown
 											 location:[theCurrentEvent locationInWindow]
-										modifierFlags:NSLeftMouseDownMask // 0x100
+										modifierFlags:NSEventModifierFlagControl // 0x100
 											timestamp:(NSTimeInterval)0
 										 windowNumber:[theCurrentEvent windowNumber]
-											  context:[theCurrentEvent context]
+											  context:nil
 										  eventNumber:0
 										   clickCount:1
 											 pressure:1];
@@ -548,7 +548,7 @@
 
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem
 {
-    int selectedCount = [[group selectedObjects]count];
+    NSUInteger selectedCount = [[group selectedObjects]count];
     BOOL changesAllowed = [group changesAllowed];
     if ([menuItem action] == @selector(paste:)) {
         NSPasteboard *pb = [NSPasteboard pasteboardWithName:NSGeneralPboard];
@@ -679,7 +679,7 @@
 
 - (IBAction) arrangeInCircle:(id)sender
 {
-	int count = [[group selectedObjects] count];
+	NSUInteger count = [[group selectedObjects] count];
 	NSArray* sortedArray = [[group selectedObjects] sortedArrayUsingSelector:@selector(sortCompare:)];
 	//first find ranges
 	float xMin = 9.99E100;
@@ -847,7 +847,7 @@
         NSMutableArray* pointerArray = [NSMutableArray array];
         id obj;
         while(obj = [e nextObject]){
-            [pointerArray addObject:[NSNumber numberWithLong:(unsigned long)obj]];
+            [pointerArray addObject:[NSNumber numberWithUnsignedInteger:(NSUInteger)obj]];
         }
         
         NSMutableData *itemData = [NSMutableData data];
@@ -876,7 +876,7 @@
     NSEnumerator* e = [(ORGroup*)obj objectEnumerator];
     NSNumber* aPointer;
     while(aPointer = [e nextObject]){
-        OrcaObject* anObject = (OrcaObject*)[aPointer longValue];
+        OrcaObject* anObject = (OrcaObject*)[aPointer unsignedIntegerValue];
         if(![anObject acceptsGuardian:group]){
             goodObjectsInDrag = NO;
             break;
@@ -891,7 +891,7 @@
 {
     // make sure we can accept the drag.  If so, then turn on the highlight.
     NSPasteboard *pboard = [sender draggingPasteboard];
-    unsigned int mask = [sender draggingSourceOperationMask];
+    NSDragOperation mask = [sender draggingSourceOperationMask];
     unsigned int ret = NSDragOperationNone;
     
     if(goodObjectsInDrag){
@@ -1043,7 +1043,7 @@
 
 - (void) moveSelectedObjectsUp:(NSEvent*)event
 {
-    BOOL shiftKeyDown = ([event modifierFlags] & NSShiftKeyMask)!=0;
+    BOOL shiftKeyDown = ([event modifierFlags] & NSEventModifierFlagShift)!=0;
 	float delta = shiftKeyDown?1:5;
 	[self moveSelectedObjects:NSMakePoint(0,delta)];
 }
@@ -1051,21 +1051,21 @@
 
 - (void) moveSelectedObjectsDown:(NSEvent*)event
 {
-    BOOL shiftKeyDown = ([event modifierFlags] & NSShiftKeyMask)!=0;
+    BOOL shiftKeyDown = ([event modifierFlags] & NSEventModifierFlagShift)!=0;
 	float delta = shiftKeyDown?1:5;
 	[self moveSelectedObjects:NSMakePoint(0,-delta)];
 }
 
 - (void) moveSelectedObjectsLeft:(NSEvent*)event
 {
-    BOOL shiftKeyDown = ([event modifierFlags] & NSShiftKeyMask)!=0;
+    BOOL shiftKeyDown = ([event modifierFlags] & NSEventModifierFlagShift)!=0;
 	float delta = shiftKeyDown?1:5;
 	[self moveSelectedObjects:NSMakePoint(-delta,0)];
 }
 
 - (void) moveSelectedObjectsRight:(NSEvent*)event
 {
-    BOOL shiftKeyDown = ([event modifierFlags] & NSShiftKeyMask)!=0;
+    BOOL shiftKeyDown = ([event modifierFlags] & NSEventModifierFlagShift)!=0;
 	float delta = shiftKeyDown?1:5;
 	[self moveSelectedObjects:NSMakePoint(delta,0)];
 }

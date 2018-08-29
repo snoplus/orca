@@ -485,7 +485,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 
 - (NSString*) identifier
 {
-    if([[self scriptName] isEqualToString:@"OrcaScript"])return [NSString stringWithFormat:@"%@ %lu",[self scriptName],[self uniqueIdNumber]];
+    if([[self scriptName] isEqualToString:@"OrcaScript"])return [NSString stringWithFormat:@"%@ %u",[self scriptName],[self uniqueIdNumber]];
     else return [self scriptName];
 }
 
@@ -498,13 +498,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 {
 	if(!inputValues)inputValues = [[NSMutableArray array] retain];
 	[inputValues addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-							[NSString stringWithFormat:@"$%d",[inputValues count]],	@"name",
+							[NSString stringWithFormat:@"$%d",(int)[inputValues count]],	@"name",
 							[NSDecimalNumber numberWithUnsignedLong:0],				@"iValue",
 							nil]];
 	
 }
 
-- (void) removeInputValue:(int)i
+- (void) removeInputValue:(NSUInteger)i
 {
 	[inputValues removeObjectAtIndex:i];
 }
@@ -675,7 +675,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	//if the name and description are prepended then strip off and restore
 	//the name is always first if it exists
 	if([theContents hasPrefix:@"//#Name:"]){
-		unsigned eofLoc = [theContents rangeOfString:@"\n"].location;
+		NSUInteger eofLoc = [theContents rangeOfString:@"\n"].location;
 		NSString* theName = [theContents substringToIndex:eofLoc];
 		theContents = [theContents substringFromIndex:eofLoc+1];
 		theName = [theName substringFromIndex:[theName rangeOfString:@":"].location+1];
@@ -684,7 +684,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	else [self setScriptName:@"OrcaScript"];
 	//the description comment is always second if it exists
 	if([theContents hasPrefix:@"//#Comments:"]){
-		unsigned eofLoc = [theContents rangeOfString:@"\n"].location;
+		NSUInteger eofLoc = [theContents rangeOfString:@"\n"].location;
 		NSString* theComments = [theContents substringToIndex:eofLoc];
 		theContents = [theContents substringFromIndex:eofLoc+1];
 		theComments = [theComments substringFromIndex:[theComments rangeOfString:@":"].location+1];
@@ -699,7 +699,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	
 	do {
 		if([theContents hasPrefix:@"//#Global:"]){
-			unsigned eofLoc = [theContents rangeOfString:@"\n"].location;
+			NSUInteger eofLoc = [theContents rangeOfString:@"\n"].location;
 			NSString* theLine = [theContents substringToIndex:eofLoc];
 			theContents = [theContents substringFromIndex:eofLoc+1];
 			theLine = [theLine substringFromIndex:[theLine rangeOfString:@":"].location+1];
@@ -766,13 +766,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 - (NSRect) testFuncRectReturn:(NSRect)aRect						{ return aRect; }
 
 #pragma mark ***Data ID
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
-- (unsigned long) recordDataId { return recordDataId; }
-- (void) setRecordDataId: (unsigned long) aDataId
+- (uint32_t) recordDataId { return recordDataId; }
+- (void) setRecordDataId: (uint32_t) aDataId
 {
     recordDataId = aDataId;
 }
@@ -848,18 +848,18 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		//time_t ut_time = mktime(theTimeGMTAsStruct); //seconds since 1970
 		
-		unsigned long data[4];		
+		uint32_t data[4];		
 		data[0] = dataId | 4; 
 		data[1] = ([self scriptType]&0xf)<<24 | [self uniqueIdNumber]; 
-		data[2] = ut_time;	
+		data[2] = (uint32_t)ut_time;
 		data[3] = aState;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*4]];
     }
 }
 
-- (void) shipDataRecord:(id)someData tag:(unsigned long)anID
+- (void) shipDataRecord:(id)someData tag:(uint32_t)anID
 {
     if([gOrcaGlobals runInProgress]){
 		if([someData respondsToSelector:@selector(description)]){
@@ -881,19 +881,19 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 				time_t ut_time = mktime(theTimeGMTAsStruct);
 				
 				NSMutableData*  theRecord = [NSMutableData dataWithCapacity:1024];
-				unsigned long data[5];
-				data[0] = recordDataId | (5 + ([plist length]+3)/4) ; 		
+				uint32_t data[5];
+				data[0] = recordDataId | (uint32_t)(5 + ([plist length]+3)/4) ;
 				data[1] = ([self scriptType]&0xf)<<24 | [self uniqueIdNumber]; 
-				data[2] = ut_time;	//seconds since 1970
+				data[2] = (uint32_t)ut_time;	//seconds since 1970
 				data[3] = anID;
-				data[4] = [plist length];
+				data[4] = (uint32_t)[plist length];
 				
-				[theRecord appendBytes:data length:sizeof(long) * 5];
+				[theRecord appendBytes:data length:sizeof(int32_t) * 5];
 				[theRecord appendData:plist];
 				int pad = [plist length]%4;
 				if(pad){
-					unsigned long padWord = 0;
-					[theRecord appendBytes:&padWord length:4-pad]; //pad to nearest long
+					uint32_t padWord = 0;
+					[theRecord appendBytes:&padWord length:4-pad]; //pad to nearest int32_t
 				}
 				[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
 																	object:theRecord];
@@ -966,7 +966,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:persistantStore       forKey:@"persistantStore"];
-    [encoder encodeInt:periodicRunInterval      forKey:@"periodicRunInterval"];
+    [encoder encodeInteger:periodicRunInterval      forKey:@"periodicRunInterval"];
     [encoder encodeBool:runPeriodically         forKey:@"runPeriodically"];
     [encoder encodeBool:autoRunAtQuit           forKey:@"autoRunAtQuit"];
     [encoder encodeBool:showCommonOnly			forKey:@"showCommonOnly"];
@@ -980,10 +980,11 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
     [encoder encodeObject:scriptName			forKey:@"scriptName"];
     [encoder encodeObject:inputValues			forKey:@"inputValues"];
     [encoder encodeObject:lastFile				forKey:@"lastFile"];
-    [encoder encodeObject:breakpoints			forKey:@"breakpoints"];
+    // comment out because this throws an exception if the config contains breakpoints! - PH
+    //[encoder encodeObject:breakpoints			forKey:@"breakpoints"];
 }
 
-- (unsigned long) currentTime
+- (uint32_t) currentTime
 {
 	return [NSDate timeIntervalSinceReferenceDate];
 }
@@ -1002,13 +1003,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 */
 
 @implementation ORScriptDecoderForState
-- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long value = *((unsigned long*)someData);
+    uint32_t value = *((uint32_t*)someData);
     return ExtractLength(value);
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
+- (NSString*) dataRecordDescription:(uint32_t*)ptr
 {
     NSString* title= @"ORCA Script\n";
 	int theObjID = ptr[1] & 0xff;
@@ -1052,13 +1053,13 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
  */
 
 @implementation ORScriptDecoderForRecord
-- (unsigned long) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData  fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-    unsigned long value = *((unsigned long*)someData);
+    uint32_t value = *((uint32_t*)someData);
     return ExtractLength(value);
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
+- (NSString*) dataRecordDescription:(uint32_t*)ptr
 {
     NSString* title= @"ORCA Script Record\n";
 	int theObjID = ptr[1] & 0xff;
@@ -1067,7 +1068,7 @@ NSString* ORScriptIDEModelGlobalsChanged			= @"ORScriptIDEModelGlobalsChanged";
 	if(scriptType == 1)			typeString = @"ORRunScriptModel";
 	else if(scriptType == 2)	typeString = @"ORScriptTaskModel";
 	else						typeString = @"ID"; //should never use this one if all types defined.
-    NSString* idString = [NSString stringWithFormat:@"%@,%d id: %lu\n",typeString,theObjID,ptr[3]];
+    NSString* idString = [NSString stringWithFormat:@"%@,%d id: %u\n",typeString,theObjID,ptr[3]];
 	
 	NSPropertyListFormat format;
 	NSData *plistXML = [NSData dataWithBytes:&ptr[5] length:ptr[4]];

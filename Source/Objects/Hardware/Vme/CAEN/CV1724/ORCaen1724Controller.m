@@ -59,8 +59,8 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
-    [registerAddressPopUp setAlignment:NSCenterTextAlignment];
-    [channelPopUp setAlignment:NSCenterTextAlignment];
+    [registerAddressPopUp setAlignment:NSTextAlignmentCenter];
+    [channelPopUp setAlignment:NSTextAlignmentCenter];
 	
     [self populatePullDown];
    
@@ -72,7 +72,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -348,7 +348,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	//  Set value of both text and stepper
 	[self updateStepper:writeValueStepper setting:[model writeValue]];
-	[writeValueTextField setIntValue:[model writeValue]];
+	[writeValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
@@ -391,13 +391,13 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
 {
-	[postTriggerSettingTextField setIntValue: [model postTriggerSetting]*2];
+	[postTriggerSettingTextField setIntegerValue: [model postTriggerSetting]*2];
 }
 
 - (void) triggerSourceMaskChanged:(NSNotification*)aNote
 {
 	int i;
-	unsigned long mask = [model triggerSourceMask];
+	uint32_t mask = [model triggerSourceMask];
 	for(i=0;i<8;i++){
 		[[chanTriggerMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
 	}
@@ -422,7 +422,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) customSizeChanged:(NSNotification*)aNote
 {
-	[customSizeTextField setIntValue: [model customSize]];
+	[customSizeTextField setIntegerValue: [model customSize]];
 }
 
 - (void) isFixedSizeChanged:(NSNotification*)aNote
@@ -445,7 +445,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 {
 	//  Set value of both text and stepper
 	[self updateStepper:addressStepper setting:[model baseAddress]];
-	[addressTextField setIntValue:[model baseAddress]];
+	[addressTextField setIntegerValue:[model baseAddress]];
 }
 
 - (void) thresholdChanged:(NSNotification*) aNotification
@@ -562,7 +562,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (void) eventSizeAction:(id)sender
 {
-	[model setEventSize:[sender indexOfSelectedItem]];	
+	[model setEventSize:(int)[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) integrationAction:(id)sender
@@ -696,7 +696,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 - (IBAction) triggerSourceMaskAction:(id)sender
 {
 	int i;
-	unsigned long mask = 0;
+	uint32_t mask = 0;
 	for(i=0;i<8;i++){
 		if([[chanTriggerMatrix cellWithTag:i] intValue]) mask |= (1L << i);
 	}
@@ -815,7 +815,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     };
 	
     [registerOffsetTextField setStringValue:
-	 [NSString stringWithFormat:@"0x%04lx",
+	 [NSString stringWithFormat:@"0x%04x",
 	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
@@ -845,7 +845,7 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -859,12 +859,12 @@ int chan1724ConfigToMaskBit[kNumChanConfigBits] = {1,3,4,6,11};
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[[model waveFormRateGroup]timeRate]count];
+	return (int)[[[model waveFormRateGroup]timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int count = [[[model waveFormRateGroup]timeRate] count];
+	int count = (int)[[[model waveFormRateGroup]timeRate] count];
 	int index = count-i-1;
 	*yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
 	*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];

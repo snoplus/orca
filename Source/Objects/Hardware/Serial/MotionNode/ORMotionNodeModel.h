@@ -52,11 +52,11 @@ typedef struct MotionNodeHistoryData {
 }MotionNodeHistoryData;
 
 typedef struct MotionNodeHistoryHeader {
-    unsigned long           moduleID;
+    uint32_t           moduleID;
     double                  endTime;
     double                  startTime;
     MotionNodeCalibrations  calibrations[3];
-    unsigned long numDataPoints;
+    uint32_t numDataPoints;
     //numDataPoints * MotionNodeData structs to follow
 } MotionNodeHistoryHeader;
 
@@ -66,7 +66,7 @@ typedef struct MotionNodeHistoryHeader {
 #define kNumMin                     60
 
 @interface ORMotionNodeModel : ORSerialPortModel {
-	unsigned long	dataId;
+	uint32_t	dataId;
     BOOL			nodeRunning;
 	NSMutableData*	inComingData;
 	ORSafeQueue*	cmdQueue;
@@ -193,12 +193,11 @@ typedef struct MotionNodeHistoryHeader {
 - (NSString*) historyFolder;
 - (void) setHistoryFolder:(NSString*)aHistoryFolder;
 - (void) viewPastHistory:(NSString*)filePath;
-- (int) numPointsInOldHistory;
-- (int) numPointsInOldHistory;
+- (NSUInteger) numPointsInOldHistory;
 - (float) oldHistoryValue:(int)index;
 - (NSTimeInterval) oldHistoryStartTime;
 - (NSTimeInterval) oldHistoryEndTime;
-- (unsigned long)maxHistoryLength;
+- (uint32_t)maxHistoryLength;
 - (BOOL) keepHistory;
 - (void) setKeepHistory:(BOOL)aFlag;
 
@@ -219,8 +218,8 @@ typedef struct MotionNodeHistoryHeader {
 #pragma mark •••Data Records
 - (void) appendDataDescription:(ORDataPacket*)aDataPacket userInfo:(NSDictionary*)userInfo;
 - (NSDictionary*) dataRecordDescription;
-- (unsigned long) dataId;
-- (void) setDataId: (unsigned long) DataId;
+- (uint32_t) dataId;
+- (void) setDataId: (uint32_t) DataId;
 - (void) setDataIds:(id)assigner;
 - (void) syncDataIdsWith:(id)anotherPDcu;
 - (void) shipXYZTrace;

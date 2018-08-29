@@ -462,7 +462,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	[self setBurstRate:		[decoder decodeFloatForKey:@"burstRate"]];
 	[self setBurstPhase:	[decoder decodeFloatForKey:@"burstPhase"]];
 	[self setBurstCount:	[decoder decodeIntForKey:@"burstCount"]];
-	[self setTriggerSource:	[decoder decodeIntForKey:@"triggerSource"]];
+	[self setTriggerSource:	[decoder decodeIntegerForKey:@"triggerSource"]];
 	[self setTriggerTimer:	[decoder decodeFloatForKey:@"triggerTimer"]];
     [self setSelectedWaveform:     [decoder decodeIntForKey:@"selectedWaveform"]];
     [self setBurstMode:     [decoder decodeBoolForKey:@"burstMode"]];
@@ -492,7 +492,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	[encoder encodeFloat:burstRate		forKey:@"burstRate"];
 	[encoder encodeFloat:burstPhase		forKey:@"burstPhase"];
 	[encoder encodeInt:burstCount		forKey:@"burstCount"];
-	[encoder encodeInt:triggerSource	forKey:@"triggerSource"];
+	[encoder encodeInteger:triggerSource	forKey:@"triggerSource"];
 	[encoder encodeFloat:triggerTimer	forKey:@"triggerTimer"];
     [encoder encodeInt:selectedWaveform forKey:@"selectedWaveform"];
     [encoder encodeBool:burstMode       forKey:@"burstMode"];
@@ -647,7 +647,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 	else {
 		//get list of waveforms already in pulser
 		char reply[1024];
-		long n = [pulser writeReadDevice:[NSString stringWithFormat:@"SOUR%d:Data:CAT?",channel] data:reply maxLength:1024];
+		int32_t n = [pulser writeReadDevice:[NSString stringWithFormat:@"SOUR%d:Data:CAT?",channel] data:reply maxLength:1024];
 		if(n>0)reply[n-1]='\0';
 		NSString* replyString = [[[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] componentsSeparatedByString:@"\""] componentsJoinedByString:@""];
 		replyString = [replyString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -1004,7 +1004,7 @@ static Pulser33500CustomWaveformStruct waveformData[kNumWaveforms] = {
 - (void) normalizeWaveform
 {
 	float* w = (float*)[waveform bytes];
-	int n = [waveform length]/sizeof(float);
+	int n = (int)[waveform length]/sizeof(float);
 	int i;
 	float maxValue = -9.9E10;
 	float minValue = 9.9E10;

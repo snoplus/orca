@@ -17,7 +17,7 @@ typedef struct {
   uint8_t     rmp[8];    //!< back edge timing ramp    
   uint8_t     rmpup[8];  //!< front edge timing ramp    
   uint8_t     vsi[8];    //!< short integrate voltage     
-  uint8_t     vli[8];    //!< long integrate voltage
+  uint8_t     vli[8];    //!< int32_t integrate voltage
 } TDisc; //!< discriminator timing dacs
 
 typedef struct {
@@ -69,7 +69,7 @@ typedef struct
   uint32_t hv_relay2; //!< stores the (upper) relays
 } Crate; //!< all database values for the crate
 
-Crate crate; //!< Current configuration
+extern Crate crate; //!< Current configuration
 
 #pragma pack()
 

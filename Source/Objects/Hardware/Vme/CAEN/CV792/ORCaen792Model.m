@@ -338,12 +338,12 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCaen792ModelModelTypeChanged object:self];
 }
-- (unsigned long)onlineMask {
+- (uint32_t)onlineMask {
 	
     return onlineMask;
 }
 
-- (void)setOnlineMask:(unsigned long)anOnlineMask
+- (void)setOnlineMask:(uint32_t)anOnlineMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setOnlineMask:[self onlineMask]];
     onlineMask = anOnlineMask;
@@ -358,7 +358,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 
 - (void) setOnlineMaskBit:(int)bit withValue:(BOOL)aValue
 {
-	unsigned long aMask = onlineMask;
+	uint32_t aMask = onlineMask;
 	if(aValue)aMask |= (1<<bit);
 	else      aMask &= ~(1<<bit);
 	[self setOnlineMask:aMask];
@@ -401,7 +401,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     return kNumRegisters;
 }
 
-- (unsigned long) getBufferOffset
+- (uint32_t) getBufferOffset
 {
     return reg[kOutputBuffer].addressOffset;
 }
@@ -417,7 +417,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 	else							  return 16;
 }
 
-- (unsigned long) getThresholdOffset:(int)aChan
+- (uint32_t) getThresholdOffset:(int)aChan
 {
 	if(modelType==kModel792)return reg[kThresholds].addressOffset + (aChan * 2);
 	else					return reg[kThresholds].addressOffset + (aChan * 4);
@@ -434,7 +434,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     return(kThresholds);
 }
 
-- (unsigned long) getThresholdOffset
+- (uint32_t) getThresholdOffset
 {
     return reg[kThresholds].addressOffset;
 }
@@ -451,7 +451,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     return reg[anIndex].regName;
 }
 
-- (unsigned long) getAddressOffset:(short) anIndex
+- (uint32_t) getAddressOffset:(short) anIndex
 {
     return(reg[anIndex].addressOffset);
 }
@@ -631,8 +631,8 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     [self setDataIdN:[anotherObj dataIdN]];
 }
 
-- (unsigned long) dataIdN { return dataIdN; }
-- (void) setDataIdN: (unsigned long) aValue
+- (uint32_t) dataIdN { return dataIdN; }
+- (void) setDataIdN: (uint32_t) aValue
 {
     dataIdN = aValue;
 }
@@ -669,13 +669,13 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
         
         // Get some values from the status register using the decoder.
         BOOL dataIsReady 		= [dataDecoder isDataReady:theStatus1];
-        unsigned long bufferAddress = [self baseAddress] + [self getBufferOffset];
+        uint32_t bufferAddress = [self baseAddress] + [self getBufferOffset];
         
         // Read the buffer.
         if (dataIsReady) {
 			
 			//OK, at least one data value is ready
-			unsigned long dataValue;
+			uint32_t dataValue;
 			[controller readLongBlock:&dataValue
 							atAddress:bufferAddress
 							numToRead:1
@@ -689,15 +689,15 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 				int numMemorizedChannels = ShiftAndExtract(dataValue,8,0x3f);
 				int i;
 				if((numMemorizedChannels>0)){
-					unsigned long dataRecord[0xffff];
+					uint32_t dataRecord[0xffff];
 					//we fill in dataRecord[0] below once we know the final size
 					dataRecord[1] = location;
                     int index = 2;
                     if(shipTimeStamp) {
                         struct timeval ts;
                         if(gettimeofday(&ts,NULL) ==0){
-                            dataRecord[index++] = ts.tv_sec;
-                            dataRecord[index++] = ts.tv_usec;
+                            dataRecord[index++] = (uint32_t)ts.tv_sec;
+                            dataRecord[index++] = (uint32_t)ts.tv_usec;
                         }
                     }
 					for(i=0;i<numMemorizedChannels;i++){
@@ -776,7 +776,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     return YES;
 }
 
-- (unsigned long) eventCount:(int)aChannel
+- (uint32_t) eventCount:(int)aChannel
 {
     return eventCounter[aChannel];
 }
@@ -795,7 +795,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     }
 }
 
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+- (uint32_t) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
 		if(counterTag>=0 && counterTag<[self numberOfChannels]){
@@ -815,17 +815,17 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 {
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id = kCaen792; //should be unique
-    if(modelType == kModel792)	configStruct->card_info[index].hw_mask[0] 	 = dataId; //better be unique
-    else						configStruct->card_info[index].hw_mask[0] 	 = dataIdN;
+    if(modelType == kModel792)	configStruct->card_info[index].hw_mask[0] 	 = (uint32_t)dataId; //better be unique
+    else						configStruct->card_info[index].hw_mask[0] 	 = (uint32_t)dataIdN;
 	configStruct->card_info[index].slot 	 = [self slot];
 	configStruct->card_info[index].crate 	 = [self crateNumber];
 	configStruct->card_info[index].add_mod 	 = [self addressModifier];
 	configStruct->card_info[index].base_add  = [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = modelType;
-	configStruct->card_info[index].deviceSpecificData[1] = [self baseAddress]+reg[kStatusRegister1].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[2] = [self baseAddress]+reg[kStatusRegister2].addressOffset;
-	configStruct->card_info[index].deviceSpecificData[3] = [self baseAddress]+reg[kOutputBuffer].addressOffset;
-    configStruct->card_info[index].deviceSpecificData[4] = [self getDataBufferSize]/sizeof(long);
+	configStruct->card_info[index].deviceSpecificData[1] = ([self baseAddress]+reg[kStatusRegister1].addressOffset);
+	configStruct->card_info[index].deviceSpecificData[2] = ([self baseAddress]+reg[kStatusRegister2].addressOffset);
+	configStruct->card_info[index].deviceSpecificData[3] = ([self baseAddress]+reg[kOutputBuffer].addressOffset);
+    configStruct->card_info[index].deviceSpecificData[4] = [self getDataBufferSize]/sizeof(uint32_t);
     configStruct->card_info[index].deviceSpecificData[5] = shipTimeStamp;
 	configStruct->card_info[index].num_Trigger_Indexes = 0;
 	
@@ -870,15 +870,15 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
     [self setTotalCycleZTime:       [aDecoder decodeIntForKey:  @"totalCycleZTime"]];
     [self setPercentZeroOff:        [aDecoder decodeIntForKey:  @"percentZeroOff"]];
     [self setCycleZeroSuppression:  [aDecoder decodeBoolForKey: @"cycleZeroSuppression"]];
-    [self setSlideConstant:         [aDecoder decodeIntForKey:  @"slideConstant"]];
+    [self setSlideConstant:         [aDecoder decodeIntegerForKey:  @"slideConstant"]];
     [self setSlidingScaleEnable:    [aDecoder decodeBoolForKey: @"slidingScaleEnable"]];
     [self setEventCounterInc:       [aDecoder decodeBoolForKey: @"eventCounterInc"]];
     [self setZeroSuppressThresRes:  [aDecoder decodeBoolForKey: @"zeroSuppressThresRes"]];
     [self setZeroSuppressEnable:    [aDecoder decodeBoolForKey: @"zeroSuppressEnable"]];
     [self setOverflowSuppressEnable:[aDecoder decodeBoolForKey: @"overflowSuppressEnable"]];
-    [self setIPed:                  [aDecoder decodeIntForKey:  @"iPed"]];
+    [self setIPed:                  [aDecoder decodeIntegerForKey:  @"iPed"]];
     [self setModelType:             [aDecoder decodeIntForKey:  @"modelType"]];
-   	[self setOnlineMask:            [aDecoder decodeInt32ForKey:@"onlineMask"]];
+   	[self setOnlineMask:            [aDecoder decodeIntForKey:@"onlineMask"]];
     [self setShipTimeStamp:         [aDecoder decodeBoolForKey:@"shipTimeStamp"]];
 
     [self setQdcRateGroup:[aDecoder decodeObjectForKey:@"qdcRateGroup"]];
@@ -899,18 +899,18 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 {
     [super encodeWithCoder:anEncoder];
     [anEncoder encodeBool:useHWReset              forKey:@"useHWReset"];
-	[anEncoder encodeInt:totalCycleZTime          forKey:@"totalCycleZTime"];
-	[anEncoder encodeInt:percentZeroOff           forKey:@"percentZeroOff"];
+	[anEncoder encodeInteger:totalCycleZTime          forKey:@"totalCycleZTime"];
+	[anEncoder encodeInteger:percentZeroOff           forKey:@"percentZeroOff"];
 	[anEncoder encodeBool:cycleZeroSuppression    forKey:@"cycleZeroSuppression"];
-	[anEncoder encodeInt:  slideConstant          forKey:@"slideConstant"];
+	[anEncoder encodeInteger:  slideConstant          forKey:@"slideConstant"];
 	[anEncoder encodeBool: slidingScaleEnable     forKey:@"slidingScaleEnable"];
 	[anEncoder encodeBool: eventCounterInc        forKey:@"eventCounterInc"];
 	[anEncoder encodeBool: zeroSuppressThresRes   forKey:@"zeroSuppressThresRes"];
 	[anEncoder encodeBool: zeroSuppressEnable     forKey:@"zeroSuppressEnable"];
 	[anEncoder encodeBool: overflowSuppressEnable forKey:@"overflowSuppressEnable"];
-	[anEncoder encodeInt:  iPed                   forKey:@"iPed"];
-	[anEncoder encodeInt:  modelType              forKey:@"modelType"];
-	[anEncoder encodeInt32:onlineMask             forKey:@"onlineMask"];
+	[anEncoder encodeInteger:  iPed                   forKey:@"iPed"];
+	[anEncoder encodeInteger:  modelType              forKey:@"modelType"];
+	[anEncoder encodeInt:onlineMask             forKey:@"onlineMask"];
     [anEncoder encodeObject: qdcRateGroup         forKey:@"qdcRateGroup"];
     [anEncoder encodeBool: shipTimeStamp          forKey:@"shipTimeStamp"];
 }
@@ -923,7 +923,7 @@ NSString* ORCaen792ModelShipTimeStampChanged          = @"ORCaen792ModelShipTime
 	return NO;
 }
 
-- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+- (uint32_t) thresholdForDisplay:(unsigned short) aChan
 {
 	return [self threshold:aChan];
 }

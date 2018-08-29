@@ -61,35 +61,35 @@
 - (void) deviceCallback:(natural_t) messageType argument:(void*)messageArgument;
 
 - (void) unLockAndRaise;
-- (void) write_raw:(unsigned long long)address value:(unsigned long*)theData size:(unsigned long)len;
-- (void) read_raw:(unsigned long long) address data:(unsigned long*)theData size:(unsigned long)len;
+- (void) write_raw:(uint64_t)address value:(uint32_t*)theData size:(uint32_t)len;
+- (void) read_raw:(uint64_t) address data:(uint32_t*)theData size:(uint32_t)len;
 
-- (void) write_raw:(unsigned long long)address value:(unsigned long)aValue;
-- (unsigned long) read_raw:(unsigned long long) address;
+- (void) write_raw:(uint64_t)address value:(uint32_t)aValue;
+- (uint32_t) read_raw:(uint64_t) address;
 
 
-- (void) compareSwap64:(const FWAddress*) addr
-		 expectedValue:(unsigned long*)expectedVal
-				newVal:(unsigned long*)newVal
-				oldVal:(unsigned long*)oldVal
+- (void) compareSwap64:(IOFireWireLibDeviceRef) addr
+		 expectedValue:(uint32_t*)expectedVal
+				newVal:(uint32_t*)newVal
+				oldVal:(uint32_t*)oldVal
 				  size:(IOByteCount)size
 				   abs:(BOOL) abs
 		   failOnReset:(BOOL)failOnReset
-			generation:(unsigned long)generation;	
+			generation:(uint32_t)generation;	
 
 - (void) busReset;														
-- (void) getBusGeneration:(unsigned long*) generation;						
-- (void) getLocalNodeIDWithGeneration:(unsigned long) checkGeneration
+- (void) getBusGeneration:(uint32_t*) generation;						
+- (void) getLocalNodeIDWithGeneration:(uint32_t) checkGeneration
 						  localNodeID:(unsigned short*) localNodeID;
 
-- (void) getRemoteNodeID:(unsigned long) checkGeneration
+- (void) getRemoteNodeID:(uint32_t) checkGeneration
 			remoteNodeID:(unsigned short*) remoteNodeID;
 
-- (void) getSpeedToNode:(unsigned long) checkGeneration
+- (void) getSpeedToNode:(uint32_t) checkGeneration
 				  speed:(IOFWSpeed*) speed;
 
-- (void) getSpeedBetweenNodes:(unsigned long) checkGeneration
-					srcNodeId:(unsigned long) srcNodeID
+- (void) getSpeedBetweenNodes:(uint32_t) checkGeneration
+					srcNodeId:(uint32_t) srcNodeID
 				   destNodeID:(unsigned short) destNodeID
 						speed:( IOFWSpeed*) speed;					
 -(IOFireWireLibDeviceRef) interface;													

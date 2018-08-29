@@ -133,7 +133,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"ADC2249 (Station %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"ADC2249 (Station %d)",(int)[model stationNumber]]];
 }
 
 - (void) onlineMaskChanged:(NSNotification*)aNotification
@@ -170,7 +170,7 @@
 - (IBAction) onlineAction:(id)sender
 {
 	[[self undoManager] setActionName: @"Set Online Mask"];
-	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setOnlineMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) readNoResetAction:(id)sender

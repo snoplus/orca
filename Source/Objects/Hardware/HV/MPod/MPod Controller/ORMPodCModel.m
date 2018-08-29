@@ -380,7 +380,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 {
 	NSOperationQueue* queue = [[ORSNMPQueue sharedSNMPQueue] queue];
     if (object == queue && [keyPath isEqual:@"operationCount"]) {
-		NSNumber* n = [NSNumber numberWithInt:[[[ORSNMPQueue queue] operations] count]];
+		NSNumber* n = [NSNumber numberWithInteger:[[[ORSNMPQueue queue] operations] count]];
 		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
 		if ([[queue operations] count] == 0) {
 			[self performSelectorOnMainThread:@selector(pollHardwareAfterDelay) withObject:nil waitUntilDone:NO];
@@ -598,7 +598,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 {
 	NSMutableDictionary* dict = [NSMutableDictionary dictionary];
 	aValue = [aValue trimSpacesFromEnds];
-	unsigned long bitMask = 0;
+	uint32_t bitMask = 0;
 	NSArray* parts = [aValue componentsSeparatedByString:@" "];
 	NSMutableArray* descriptionArray = [NSMutableArray array];
 	for(NSString* aPart in parts){
@@ -610,7 +610,7 @@ NSString* ORMPodCQueueCountChanged			 = @"ORMPodCQueueCountChanged";
 		}
 	}
 	
-	[dict setObject:[NSString stringWithFormat:@"%lu",bitMask] forKey:@"Value"];
+	[dict setObject:[NSString stringWithFormat:@"%u",bitMask] forKey:@"Value"];
 	if([descriptionArray count])[dict setObject:descriptionArray forKey:@"Names"];
 	return dict;
 }

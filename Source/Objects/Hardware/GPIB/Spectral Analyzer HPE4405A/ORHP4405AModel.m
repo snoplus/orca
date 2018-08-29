@@ -621,13 +621,13 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 		if(p[0] == '#'){
 			int headerSizeBytes = 2 + (p[1] - 48);
 			NSData* theData = [NSData dataWithBytes:&p[headerSizeBytes] length:[someData length] - headerSizeBytes];
-			int lenInBytes = [theData length];
+			NSUInteger lenInBytes = [theData length];
 			switch (dataType) {
 				case 1: //Int32
 				{
 					int i;
-					long* p = (long*) [theData bytes];
-					for(i=0;i<lenInBytes/sizeof(long);i++){
+					int32_t* p = (int32_t*) [theData bytes];
+					for(i=0;i<lenInBytes/sizeof(int32_t);i++){
 						[trace1 addObject:[NSNumber numberWithDouble:(double)p[i]]];
 					}
 				}
@@ -653,7 +653,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 				}
 				break;
 					
-				case 4: //UInt16
+				case 4: //uint16_t
 				{
 					int i;
 					unsigned short* p = (unsigned short*) [theData bytes];
@@ -695,15 +695,15 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 	NSDateComponents *components = [gregorian components:(NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit) fromDate:today];
 
 #endif
-    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SYST:DATE %d,%d,%d", [components hour],[components minute],[components second]]];
+    [ self writeToGPIBDevice: [ NSString stringWithFormat: @"SYST:DATE %d,%d,%d", (int)[components hour],(int)[components minute],(int)[components second]]];
 }
 
-- (unsigned long)	getPowerOnTime
+- (uint32_t)	getPowerOnTime
 {
     char reply[1024];
-    long n = [self writeReadGPIBDevice:@":SYST:PON:TIME?" data:reply maxLength:1024];
+    int32_t n = [self writeReadGPIBDevice:@":SYST:PON:TIME?" data:reply maxLength:1024];
     if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
-		return atol(reply);
+		return (uint32_t)atol(reply);
 	}
 	else return 0; //inserted to get rid of compiler warnings MAH -8/06/08
 }
@@ -792,7 +792,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 	
 	NSMutableData* theTrace = [NSMutableData dataWithLength:maxTraceLength];
 	char* p = (char*)[theTrace bytes];
-    long  n = [self writeReadGPIBDevice:@":TRAC:DATA? TRACE1" data:p maxLength:maxTraceLength];
+    int32_t  n = [self writeReadGPIBDevice:@":TRAC:DATA? TRACE1" data:p maxLength:maxTraceLength];
     if(n){
 		[theTrace setLength:n];
 		[self setTrace1:theTrace];
@@ -824,7 +824,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@"*ESR?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@"*ESR?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setStandardEventReg:theResult];
@@ -836,7 +836,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@"*STB?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@"*STB?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setStatusReg:theResult];
@@ -848,7 +848,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@":STAT:OPER:COND?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@":STAT:OPER:COND?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setStatusOperationReg:theResult];
@@ -859,7 +859,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@":STAT:QUES?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@":STAT:QUES?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setQuestionableEventReg:theResult];
@@ -871,7 +871,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@":STAT:QUES:CAL:COND?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@":STAT:QUES:CAL:COND?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setQuestionableConditionReg:theResult];
@@ -883,7 +883,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@":STAT:QUES:COND?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@":STAT:QUES:COND?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setQuestionableConditionReg:theResult];
@@ -895,7 +895,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@"*STB?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@"*STB?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setQuestionableFreqReg:theResult];
@@ -907,7 +907,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@":STAT:QUES:INT:COND?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@":STAT:QUES:INT:COND?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setQuestionableIntegrityReg:theResult];
@@ -919,7 +919,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 {
 	unsigned char theResult = 0;
 	char reply[1024];
-	long n = [self writeReadGPIBDevice:@":STAT:QUES:POW:COND?" data:reply maxLength:1024];
+	int32_t n = [self writeReadGPIBDevice:@":STAT:QUES:POW:COND?" data:reply maxLength:1024];
 	if(n){
 		theResult = atoi(reply);
 		[self setQuestionablePowerReg:theResult];
@@ -930,9 +930,9 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 
 #pragma mark ***DataTaker
 
-- (unsigned long) dataId { return dataId; }
+- (uint32_t) dataId { return dataId; }
 
-- (void) setDataId: (unsigned long) DataId
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -999,7 +999,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
     [self setDetectorGainEnabled:[decoder decodeBoolForKey:@"detectorGainEnabled"]];
     [self setBurstPulseDiscrimEnabled:[decoder decodeBoolForKey:@"burstPulseDiscrimEnabled"]];
     [self setBurstModeAbs:[decoder decodeBoolForKey:@"burstModeAbs"]];
-    [self setBurstModeSetting:[decoder decodeIntForKey:@"burstModeSetting"]];
+    [self setBurstModeSetting:[decoder decodeIntegerForKey:@"burstModeSetting"]];
     [self setBurstFreqEnabled:[decoder decodeBoolForKey:@"burstFreqEnabled"]];
     [self setTriggerSource:[decoder decodeIntForKey:@"triggerSource"]];
     [self setTriggerOffsetEnabled:[decoder decodeBoolForKey:@"triggerOffsetEnabled"]];
@@ -1020,27 +1020,27 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder: encoder];
-    [encoder encodeInt:dataType forKey:@"dataType"];
+    [encoder encodeInteger:dataType forKey:@"dataType"];
     [encoder encodeBool:continuousMeasurement forKey:@"continuousMeasurement"];
-    [encoder encodeInt:optimizePreselectorFreq forKey:@"optimizePreselectorFreq"];
-    [encoder encodeInt:inputMaxMixerPower forKey:@"inputMaxMixerPower"];
+    [encoder encodeInteger:optimizePreselectorFreq forKey:@"optimizePreselectorFreq"];
+    [encoder encodeInteger:inputMaxMixerPower forKey:@"inputMaxMixerPower"];
     [encoder encodeBool:inputGainEnabled forKey:@"inputGainEnabled"];
     [encoder encodeBool:inputAttAutoEnabled forKey:@"inputAttAutoEnabled"];
-    [encoder encodeInt:inputAttenuation forKey:@"inputAttenuation"];
+    [encoder encodeInteger:inputAttenuation forKey:@"inputAttenuation"];
     [encoder encodeBool:detectorGainEnabled forKey:@"detectorGainEnabled"];
     [encoder encodeBool:burstPulseDiscrimEnabled forKey:@"burstPulseDiscrimEnabled"];
     [encoder encodeBool:burstModeAbs forKey:@"burstModeAbs"];
-    [encoder encodeInt:burstModeSetting forKey:@"burstModeSetting"];
+    [encoder encodeInteger:burstModeSetting forKey:@"burstModeSetting"];
     [encoder encodeBool:burstFreqEnabled forKey:@"burstFreqEnabled"];
-    [encoder encodeInt:triggerSource forKey:@"triggerSource"];
+    [encoder encodeInteger:triggerSource forKey:@"triggerSource"];
     [encoder encodeBool:triggerOffsetEnabled forKey:@"triggerOffsetEnabled"];
     [encoder encodeFloat:triggerOffset forKey:@"triggerOffset"];
-    [encoder encodeInt:triggerSlope forKey:@"triggerSlope"];
+    [encoder encodeInteger:triggerSlope forKey:@"triggerSlope"];
     [encoder encodeBool:triggerDelayEnabled forKey:@"triggerDelayEnabled"];
     [encoder encodeFloat:triggerDelay forKey:@"triggerDelay"];
     [encoder encodeBool:freqStepDir forKey:@"freqStepDir"];
     [encoder encodeFloat:freqStepSize forKey:@"freqStepSize"];
-    [encoder encodeInt:units forKey:@"units"];
+    [encoder encodeInteger:units forKey:@"units"];
     [encoder encodeFloat:stopFreq forKey:@"stopFreq"];
     [encoder encodeFloat:startFreq forKey:@"startFreq"];
     [encoder encodeFloat:centerFreq forKey:@"centerFreqx"];
@@ -1061,7 +1061,7 @@ NSString* ORHP4405AModelTraceChanged		= @"ORHP4405AModelTraceChanged";
 	 
 - (int) numPoints
 {
-	return [trace1 count];
+	return (int)[trace1 count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue

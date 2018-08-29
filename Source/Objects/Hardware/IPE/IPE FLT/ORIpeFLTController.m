@@ -63,8 +63,8 @@
 	
     blankView = [[NSView alloc] init];
     
-    NSString* key = [NSString stringWithFormat: @"orca.ORIpeFLT%d.selectedtab",[model stationNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORIpeFLT%u.selectedtab",(int)[model stationNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -239,17 +239,17 @@
 
 - (void) dataMaskChanged:(NSNotification*)aNote
 {
-	[dataMaskTextField setIntValue: [model dataMask]];
+	[dataMaskTextField setIntegerValue: [model dataMask]];
 }
 
 - (void) integrationTimeChanged:(NSNotification*)aNote
 {
-	[integrationTimeField setIntValue: [model integrationTime]];
+	[integrationTimeField setIntegerValue: [model integrationTime]];
 }
 
 - (void) coinTimeChanged:(NSNotification*)aNote
 {
-	[coinTimeField setIntValue: [model coinTime]];
+	[coinTimeField setIntegerValue: [model coinTime]];
 }
 
 
@@ -265,7 +265,7 @@
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
 {
-	[interruptMaskField setIntValue: [model interruptMask]];
+	[interruptMaskField setIntegerValue: [model interruptMask]];
 }
 
 - (void) updateWindow
@@ -471,7 +471,7 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	// Set title of FLT configuration window, ak 15.6.07
-	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V3 FLT Card (Slot %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"IPE-DAQ-V3 FLT Card (Slot %u)",(int)[model stationNumber]]];
 }
 
 - (void) gainArrayChanged:(NSNotification*)aNotification
@@ -564,8 +564,8 @@
     }
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORIpeFLT%d.selectedtab",[model stationNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORIpeFLT%u.selectedtab",(int)[model stationNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
@@ -712,7 +712,7 @@
 
 - (IBAction) modeAction: (id) sender
 {
-	[model setFltRunMode:[modeButton indexOfSelectedItem]];
+	[model setFltRunMode:(int)[modeButton indexOfSelectedItem]];
 }
 
 - (IBAction) versionAction: (id) sender
@@ -821,7 +821,7 @@
     [alert setInformativeText:@"Really run threshold calibration? This will change ALL thresholds on this card."];
     [alert addButtonWithTitle:@"Yes/Do Calibrate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -852,11 +852,11 @@
 #pragma mark ¥¥¥Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model  totalRate]count];
+	return (int)[[model  totalRate]count];
 }
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model totalRate]count];
+	int count = (int)[[model totalRate]count];
 	int index = count-i-1;
 	*yValue =  [[model totalRate] valueAtIndex:index];
 	*xValue =  [[model totalRate] timeSampledAtIndex:index];

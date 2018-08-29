@@ -79,7 +79,7 @@
     NSMutableDictionary *objects;
     NSMutableDictionary *fileHeader;
 
-    int objectTag;
+    NSInteger objectTag;
     NSMutableArray* controlArray;
     BOOL containerExists;
     
@@ -107,7 +107,7 @@
 - (void)setSelectionControllers:(NSMutableArray *)aSelectionControllers;
 - (NSDictionary *)objects;
 - (void)setObjects:(NSMutableDictionary *)anObjects;
-- (int)objectTag;
+- (NSInteger)objectTag;
 - (void)setObjectTag:(int)anObjectTag;
 - (NSMutableArray *)controlArray;
 - (void)setControlArray:(NSMutableArray *)aControlArray;
@@ -155,10 +155,10 @@
 - (IBAction) restoreAllAction:(id) sender;
 - (void) clearUndoStacks;
 
-- (void) removeActionControllerAtIndex:(int) index;
-- (void) addActionController:(id) obj atIndex:(int) index;
-- (void) addSelectionController:(id) obj atIndex:(int) index;
-- (void) removeSelectionControllerAtIndex:(int) index;
+- (void) removeActionControllerAtIndex:(NSInteger) index;
+- (void) addActionController:(id) obj atIndex:(NSInteger) index;
+- (void) addSelectionController:(id) obj atIndex:(NSInteger) index;
+- (void) removeSelectionControllerAtIndex:(NSInteger) index;
 
 - (void) adjustActionSize:(int)amount;
 - (void) adjustSelectionSize:(int)amount;
@@ -187,7 +187,7 @@
 - (void) countChannels;
 - (void) askForFileAndExecute;
 - (BOOL) needToRestore;
-- (int) numberOfRowsInTableView:(NSTableView *) tableView;
+- (NSInteger) numberOfRowsInTableView:(NSTableView *) tableView;
 
 @end
 
@@ -202,14 +202,14 @@ extern NSString* ORHWWizActionFinalNotification;
 
 @interface ORHWWizObj : NSObject
 {
-    unsigned long wizMask;
+    uint32_t wizMask;
     id<ORHWWizard> target;
 }
 + (id) hwWizObject:(id<ORHWWizard>)obj;
 - (id) initWithTarget:(id<ORHWWizard>)obj;
 - (id) target;
-- (unsigned long) wizMask;
-- (void) setWizMask:(unsigned long)aMask;
+- (uint32_t) wizMask;
+- (void) setWizMask:(uint32_t)aMask;
 - (int) numberOfChannels;
 
 

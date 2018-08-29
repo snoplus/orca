@@ -454,12 +454,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
     [[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSLTModelPatternFilePathChanged object:self];
 }
 
-- (unsigned long) nextPageDelay
+- (uint32_t) nextPageDelay
 {
 	return nextPageDelay;
 }
 
-- (void) setNextPageDelay:(unsigned long)aDelay
+- (void) setNextPageDelay:(uint32_t)aDelay
 {	
 	if(aDelay>102400) aDelay = 102400;
 	
@@ -486,25 +486,25 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 }
 
 
-- (unsigned long) pageStatusLow
+- (uint32_t) pageStatusLow
 {
 	return pageStatusLow;
 }
 
-- (unsigned long) pageStatusHigh
+- (uint32_t) pageStatusHigh
 {
 	return pageStatusHigh;
 }
-- (unsigned long) actualPage
+- (uint32_t) actualPage
 {
 	return actualPage;
 }
-- (unsigned long) nextPage
+- (uint32_t) nextPage
 {
 	return nextPage;
 }
 
-- (void) setPageStatusLow:(unsigned long)loPart high:(unsigned long)hiPart actual:(unsigned long)p0 next:(unsigned long)p1
+- (void) setPageStatusLow:(uint32_t)loPart high:(uint32_t)hiPart actual:(uint32_t)p0 next:(uint32_t)p1
 {
     
     pageStatusLow	= loPart;
@@ -516,12 +516,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 }
 
 
-- (unsigned long) interruptMask
+- (uint32_t) interruptMask
 {
     return interruptMask;
 }
 
-- (void) setInterruptMask:(unsigned long)aInterruptMask
+- (void) setInterruptMask:(uint32_t)aInterruptMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setInterruptMask:interruptMask];
     
@@ -641,7 +641,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	return reg[anIndex].regName;
 }
 
-- (unsigned long) getAddressOffset: (short) anIndex
+- (uint32_t) getAddressOffset: (short) anIndex
 {
     return( reg[anIndex].addressOffset );
 }
@@ -667,12 +667,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	 object:self];
 }
 
-- (unsigned long) writeValue
+- (uint32_t) writeValue
 {
     return writeValue;
 }
 
-- (void) setWriteValue:(unsigned long) aValue
+- (void) setWriteValue:(uint32_t) aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     
@@ -918,12 +918,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	
 }
 
-- (unsigned long) pageSize
+- (uint32_t) pageSize
 {
 	return pageSize;
 }
 
-- (void) setPageSize: (unsigned long) aPageSize
+- (void) setPageSize: (uint32_t) aPageSize
 {
 	
 	[[[self undoManager] prepareWithInvocationTarget:self] setPageSize:pageSize];
@@ -959,8 +959,8 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 		[scanner scanInt:&amplitude];
 		int i=0;
 		int j=0;
-		unsigned long time[256];
-		unsigned long mask[20][256];
+		uint32_t time[256];
+		uint32_t mask[20][256];
 		int len = 0;
 		BOOL status;
 		while(1){
@@ -990,7 +990,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			id aCard;
 			while(aCard = [e nextObject]){
 				if([aCard isKindOfClass:NSClassFromString(@"ORIpeFireWireCard")])continue;
-				int index = [aCard stationNumber] - 1;
+				int index = (int)[aCard stationNumber] - 1;
 				if(index<20){
 					cards[index] = aCard;
 				}
@@ -1019,9 +1019,9 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			NSLogFont(aFont,@"Index|  Time    | Mask                              Amplitude = %5d\n",amplitude);			
 			NSLogFont(aFont,@"-----------------------------------------------------------------------------\n");			
 			NSLogFont(aFont,@"     |    delta |  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20\n");			
-			unsigned int delta = time[0];
+			uint32_t delta = time[0];
 			for(i=0;i<len;i++){
-				NSMutableString* line = [NSMutableString stringWithFormat:@"  %2d |=%4d=%4lu|",i,delta,time[i]];
+				NSMutableString* line = [NSMutableString stringWithFormat:@"  %2d |=%4d=%4u|",i,delta,time[i]];
 				delta += time[i];
 				for(j=0;j<20;j++){
 					//if(mask[j][i] != 0x1000000)[line appendFormat:@"%3s",mask[j][i]?"¥":"-"];
@@ -1051,12 +1051,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	[self writeReg:kSLTSwTestpulsTrigger value:0];
 }
 
-- (void) writeReg:(unsigned short)index value:(unsigned long)aValue
+- (void) writeReg:(unsigned short)index value:(uint32_t)aValue
 {
 	[self write:SLT_REG_ADDRESS(index) value:aValue];
 }
 
-- (unsigned long) readReg:(unsigned short) index
+- (uint32_t) readReg:(unsigned short) index
 {
 	return [self read:SLT_REG_ADDRESS(index)];
 }
@@ -1075,9 +1075,9 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 					  next:   [self readReg:kSLTNextPage]];
 }
 
-- (unsigned long) readStatusReg
+- (uint32_t) readStatusReg
 {
-	unsigned long data = 0;
+	uint32_t data = 0;
 	
 	data = [self readReg:kSLTStatusReg];
 	
@@ -1104,7 +1104,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 
 - (void) writeStatusReg
 {
-	unsigned long data = 0;
+	uint32_t data = 0;
 	data |= veto			 << SLT_VETO;
 	data |= extInhibit		 << SLT_EXTINHIBIT;
 	data |= nopgInhibit		 << SLT_NOPGINHIBIT;
@@ -1116,14 +1116,14 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 - (void) writeNextPageDelay
 {
 	//nextPageDelay stored as number from 0 - 100
-	unsigned long aValue = nextPageDelay * 1999./100.; //convert to value 0 - 1999 x 50us  // ak, 5.10.07
+	uint32_t aValue = nextPageDelay * 1999./100.; //convert to value 0 - 1999 x 50us  // ak, 5.10.07
 	[self writeReg:kSLTT1 value:aValue];
 }
 
 
-- (unsigned long) readControlReg
+- (uint32_t) readControlReg
 {
-	unsigned long data;
+	uint32_t data;
 	
 	data = [self readReg:kSLTControlReg];
 	
@@ -1147,7 +1147,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 
 - (void) printControlReg
 {
-	unsigned long data = [self readReg:kSLTControlReg];
+	uint32_t data = [self readReg:kSLTControlReg];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"----Control Register SLT (%d) ----\n",[self stationNumber]);
 	NSLogFont(aFont,@"LedInhibit       : %d\n",(data >> SLT_UPPERLED)      & SLT_UPPERLED_MASK);
@@ -1168,7 +1168,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 
 - (void) writeControlReg
 {
-	unsigned long data = 0;
+	uint32_t data = 0;
 	data |= (ledInhibit   & SLT_UPPERLED_MASK)   << SLT_UPPERLED;
 	data |= (ledVeto   & SLT_LOWERLED_MASK)   << SLT_LOWERLED;
 	data |= (triggerSource   & SLT_TRIGGER_MASK)   << SLT_TRIGGER_LOW;
@@ -1202,7 +1202,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 
 - (void) printInterruptMask
 {
-	unsigned long data = [self readReg:kSLTIRMask];
+	uint32_t data = [self readReg:kSLTIRMask];
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:10];
 	NSLogFont(aFont,@"----Interrupt Mask SLT (%d) ----\n",[self stationNumber]);
 	if(!data)NSLogFont(aFont,@"Interrupt Mask is Clear (No interrupts enabled)\n");
@@ -1228,18 +1228,18 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	return fpgaVersion;
 }
 
-- (unsigned long long) readDeadTime
+- (uint64_t) readDeadTime
 {
-	unsigned long low  = [self readReg:kSLTDeadTimeLow];
-	unsigned long high = [self readReg:kSLTDeadTimeHigh];
-	return ((unsigned long long)high << 32) | low;
+	uint32_t low  = [self readReg:kSLTDeadTimeLow];
+	uint32_t high = [self readReg:kSLTDeadTimeHigh];
+	return ((uint64_t)high << 32) | low;
 }
 
-- (unsigned long long) readVetoTime
+- (uint64_t) readVetoTime
 {
-	unsigned long low  = [self readReg:kSLTVetoTimeLow];
-	unsigned long high = [self readReg:kSLTVetoTimeHigh];
-	return ((unsigned long long)high << 32) | low;
+	uint32_t low  = [self readReg:kSLTVetoTimeLow];
+	uint32_t high = [self readReg:kSLTVetoTimeHigh];
+	return ((uint64_t)high << 32) | low;
 }
 
 - (void) initBoard
@@ -1263,10 +1263,10 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	inhibitSource = 0x3; 
 	[self writeControlReg];
 	[self releaseAllPages];
-	unsigned long long p1 = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
+	uint64_t p1 = ((uint64_t)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	[self writeReg:kSLTSwRelInhibit value:0];
 	int i = 0;
-	unsigned long lTmp;
+	uint32_t lTmp;
     do {
 		lTmp = [self readReg:kSLTStatusReg];
 		//NSLog(@"waiting for inhibit %x i=%d\n", lTmp, i);
@@ -1279,7 +1279,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 		[NSException raise:@"SLT error" format:@"Release inhibit failed"];
 	}
 	
-	unsigned long long p2  = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
+	uint64_t p2  = ((uint64_t)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 	if(p1 == p2) NSLog (@"No software trigger\n");
 	[self writeReg:kSLTSwSetInhibit value:0];
 	triggerSource = savedTriggerSource;
@@ -1385,7 +1385,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	
 	//status reg
 	[self setPatternFilePath:		[decoder decodeObjectForKey:@"ORIpeSLTModelPatternFilePath"]];
-	[self setInterruptMask:			[decoder decodeInt32ForKey:@"ORIpeSLTModelInterruptMask"]];
+	[self setInterruptMask:			[decoder decodeIntForKey:@"ORIpeSLTModelInterruptMask"]];
 	[self setPulserDelay:			[decoder decodeFloatForKey:@"ORIpeSLTModelPulserDelay"]];
 	[self setPulserAmp:				[decoder decodeFloatForKey:@"ORIpeSLTModelPulserAmp"]];
 	[self setInhibit:				[decoder decodeBoolForKey:@"ORIpeSLTStatusInhibit"]];
@@ -1400,13 +1400,13 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	[self setTestPulseSource:		[decoder decodeIntForKey:@"testPulseSource"]];
 	[self setSecStrobeSource:		[decoder decodeIntForKey:@"secStrobeSource"]];
 	[self setWatchDogStart:			[decoder decodeIntForKey:@"watchDogStart"]];
-	[self setEnableDeadTimeCounter:	[decoder decodeIntForKey:@"enableDeadTimeCounter"]];
+	[self setEnableDeadTimeCounter:	[decoder decodeIntegerForKey:@"enableDeadTimeCounter"]];
 	[self setLedInhibit:			[decoder decodeBoolForKey:@"ledInhibit"]];
 	[self setLedVeto:				[decoder decodeBoolForKey:@"ledVeto"]];
 	
 	//special
-	[self setNHitThreshold:			[decoder decodeIntForKey:@"ORIpeSLTModelNHitThreshold"]];
-	[self setNHit:					[decoder decodeIntForKey:@"ORIpeSLTModelNHit"]];
+	[self setNHitThreshold:			[decoder decodeIntegerForKey:@"ORIpeSLTModelNHitThreshold"]];
+	[self setNHit:					[decoder decodeIntegerForKey:@"ORIpeSLTModelNHit"]];
 	[self setReadAll:				[decoder decodeBoolForKey:@"readAll"]];
     [self setNextPageDelay:			[decoder decodeIntForKey:@"nextPageDelay"]]; // ak, 5.10.07
 	
@@ -1439,7 +1439,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	
 	//status reg
 	[encoder encodeObject:patternFilePath forKey:@"ORIpeSLTModelPatternFilePath"];
-	[encoder encodeInt32:interruptMask	 forKey:@"ORIpeSLTModelInterruptMask"];
+	[encoder encodeInt:interruptMask	 forKey:@"ORIpeSLTModelInterruptMask"];
 	[encoder encodeFloat:pulserDelay	 forKey:@"ORIpeSLTModelPulserDelay"];
 	[encoder encodeFloat:pulserAmp		 forKey:@"ORIpeSLTModelPulserAmp"];
 	[encoder encodeBool:inhibit			 forKey:@"ORIpeSLTStatusInhibit"];
@@ -1449,26 +1449,26 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	[encoder encodeBool:veto			 forKey:@"ORIpeSLTStatusVeto"];
 	
 	//control reg
-	[encoder encodeInt:triggerSource	forKey:@"triggerSource"];
-	[encoder encodeInt:inhibitSource	forKey:@"inhibitSource"];
-	[encoder encodeInt:testPulseSource	forKey:@"testPulseSource"];
-	[encoder encodeInt:secStrobeSource	forKey:@"secStrobeSource"];
-	[encoder encodeInt:watchDogStart	forKey:@"watchDogStart"];
-	[encoder encodeInt:enableDeadTimeCounter	forKey:@"enableDeadTimeCounter"];
+	[encoder encodeInteger:triggerSource	forKey:@"triggerSource"];
+	[encoder encodeInteger:inhibitSource	forKey:@"inhibitSource"];
+	[encoder encodeInteger:testPulseSource	forKey:@"testPulseSource"];
+	[encoder encodeInteger:secStrobeSource	forKey:@"secStrobeSource"];
+	[encoder encodeInteger:watchDogStart	forKey:@"watchDogStart"];
+	[encoder encodeInteger:enableDeadTimeCounter	forKey:@"enableDeadTimeCounter"];
 	[encoder encodeBool:ledInhibit		forKey:@"ledInhibit"];
 	[encoder encodeBool:ledVeto			forKey:@"ledVeto"];
 	
 	
 	//special
-	[encoder encodeInt:nHitThreshold	 forKey:@"ORIpeSLTModelNHitThreshold"];
-	[encoder encodeInt:nHit				 forKey:@"ORIpeSLTModelNHit"];
+	[encoder encodeInteger:nHitThreshold	 forKey:@"ORIpeSLTModelNHitThreshold"];
+	[encoder encodeInteger:nHit				 forKey:@"ORIpeSLTModelNHit"];
 	[encoder encodeBool:readAll			 forKey:@"readAll"];
-    [encoder encodeInt:nextPageDelay     forKey:@"nextPageDelay"]; // ak, 5.10.07
+    [encoder encodeInt:(int32_t)nextPageDelay     forKey:@"nextPageDelay"]; // ak, 5.10.07
 	
 	[encoder encodeObject:readOutGroup  forKey:@"ReadoutGroup"];
     [encoder encodeObject:poller         forKey:@"poller"];
 	
-    [encoder encodeInt:pageSize         forKey:@"ORIpeSLTPageSize"]; // ak, 9.12.07
+    [encoder encodeInt:(int32_t)pageSize         forKey:@"ORIpeSLTPageSize"]; // ak, 9.12.07
     [encoder encodeBool:displayTrigger   forKey:@"ORIpeSLTDisplayTrigger"];
     [encoder encodeBool:displayEventLoop forKey:@"ORIpeSLTDisplayEventLoop"];
 	
@@ -1499,10 +1499,10 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
     return dataDictionary;
 }
 
-- (unsigned long) eventDataId        { return eventDataId; }
-- (unsigned long) multiplicityId	 { return multiplicityId; }
-- (void) setEventDataId: (unsigned long) aDataId    { eventDataId = aDataId; }
-- (void) setMultiplicityId: (unsigned long) aDataId { multiplicityId = aDataId; }
+- (uint32_t) eventDataId        { return eventDataId; }
+- (uint32_t) multiplicityId	 { return multiplicityId; }
+- (void) setEventDataId: (uint32_t) aDataId    { eventDataId = aDataId; }
+- (void) setMultiplicityId: (uint32_t) aDataId { multiplicityId = aDataId; }
 
 - (void) setDataIds:(id)assigner
 {
@@ -1591,15 +1591,15 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 		struct timezone tz;	
 		
 		
-		unsigned long long lPageStatus;
-		lPageStatus = ((unsigned long long)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
+		uint64_t lPageStatus;
+		lPageStatus = ((uint64_t)[self readReg:kPageStatusHigh]<<32) | [self readReg:kPageStatusLow];
 		
 		// Simulation of events every second?!
 		if (usingPBusSimulation){
 			gettimeofday(&t0, &tz);
 			if (t0.tv_sec > lastSimSec) {
 				lPageStatus = 1;
-				lastSimSec = t0.tv_sec;
+				lastSimSec = (uint32_t)t0.tv_sec;
 			}	
 		}
 		
@@ -1616,19 +1616,19 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			eventCounter++;
 			
 			//read page start address
-			unsigned long lTimeL     = [self read: SLT_REG_ADDRESS(kSLTLastTriggerTimeStamp) + actualPageIndex];
+			uint32_t lTimeL     = [self read: SLT_REG_ADDRESS(kSLTLastTriggerTimeStamp) + actualPageIndex];
 			int iPageStart = (((lTimeL >> 10) & 0x7fe)  + 20) %2000;
 			
-			unsigned long timeStampH = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*actualPageIndex];
-			unsigned long timeStampL = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*actualPageIndex+1];
+			uint32_t timeStampH = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*actualPageIndex];
+			uint32_t timeStampL = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*actualPageIndex+1];
 			//
 			//			NSLog(@"Reading event from page %d, start=%d:  %ds %dx100us\n", 
 			//			         actualPageIndex+1, iPageStart, timeStampH, (timeStampL >> 11) & 0x3fff);
 			
 			//readout the SLT pixel trigger data
 			int i;
-			unsigned long buffer[2000];
-			unsigned long sltMemoryAddress = (SLTID << 24) | actualPageIndex<<11;
+			uint32_t buffer[2000];
+			uint32_t sltMemoryAddress = (SLTID << 24) | actualPageIndex<<11;
 			// Split the reading of the memory in blocks according to the maximal block size
 			// supported by the firewire driver	
 			// TODO: Read only the relevant trigger data for smaller page sizes!
@@ -1637,13 +1637,13 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			int sltSize = 2000; // Allways read the full trigger memory
 			int nBlocks = sltSize / blockSize;
 			for (i=0;i<nBlocks;i++)
-				[self read:sltMemoryAddress+i*blockSize data:buffer+i*blockSize size:blockSize*sizeof(unsigned long)];
+				[self read:sltMemoryAddress+i*blockSize data:buffer+i*blockSize size:blockSize*sizeof(uint32_t)];
 			
 			//for(i=0;i<2000;i++) buffer[i]=0; // only Test
 			
             // Check result from block readout - Testing only
-			//unsigned long buffer2[2000];
-            //[self readBlock:sltMemoryAddress dataBuffer:(unsigned long*)buffer2 length:2000 increment:1];
+			//uint32_t buffer2[2000];
+            //[self readBlock:sltMemoryAddress dataBuffer:(uint32_t*)buffer2 length:2000 increment:1];
 			//for(i=0;i<2000;i++) if (buffer[i]!=buffer2[i]) {
 			//  NSLog(@"Error reading Slt Memory\n"); 
 			//  break;
@@ -1651,10 +1651,10 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			
 		    // Re-organize trigger data to get it in a continous data stream
 			// There is no automatic address wrapping like in the Flts available...
-			unsigned long reorderBuffer[2000];
-			unsigned long *pMult = reorderBuffer;
-			memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(unsigned long));  
-			memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(unsigned long));  
+			uint32_t reorderBuffer[2000];
+			uint32_t *pMult = reorderBuffer;
+			memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(uint32_t));  
+			memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(uint32_t));  
 			
 			
 			if (usingPBusSimulation){
@@ -1664,15 +1664,15 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 				}
             }
 			
-			int nTriggered = 0;
-		    unsigned long xyProj[20];
-			unsigned long tyProj[100];
+			uint32_t nTriggered = 0;
+		    uint32_t xyProj[20];
+			uint32_t tyProj[100];
 			nTriggered = [self calcProjection:pMult xyProj:xyProj tyProj:tyProj];
 			
 			//ship the start of event record
-			unsigned long eventData[5];
+			uint32_t eventData[5];
 			eventData[0] = eventDataId | 5;	
-			eventData[1] = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16;
+			eventData[1] = (uint32_t)((([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16);
 			eventData[2] = eventCounter;
 			eventData[3] = timeStampH; 
 			eventData[4] = timeStampL;
@@ -1682,14 +1682,14 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			// the data is send in hardware format: 100 x 1u of trigger data of all cards is collected.
 			// ak 3.3.08
 			// Ship trigger memory and not projection only !!!
-            unsigned long multiplicityRecord[3 + 2000];
+            uint32_t multiplicityRecord[3 + 2000];
             multiplicityRecord[0] = multiplicityId | (20*pageSize + 3);
 			
-			multiplicityRecord[1] = (([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16; 
+			multiplicityRecord[1] = (uint32_t)((([self crateNumber]&0x0f)<<21) | ([self stationNumber]& 0x0000001f)<<16);
 			multiplicityRecord[2] = eventCounter;
 			
 			// Ship trigger memory and not projection only !!!
-            memcpy(multiplicityRecord+3, pMult, 2000*sizeof(unsigned long));
+            memcpy(multiplicityRecord+3, pMult, 2000*sizeof(uint32_t));
             [aDataPacket addLongsToFrameBuffer:multiplicityRecord length:20*pageSize + 3];
 			
 			
@@ -1704,12 +1704,12 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 			NSMutableDictionary* userInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 											 [NSNumber numberWithInt:actualPageIndex], @"page",
 											 [NSNumber numberWithInt:lStart],		  @"lStart",
-											 [NSNumber numberWithInt:eventCounter],	  @"eventCounter",
-											 [NSNumber numberWithInt:pageSize],		  @"pageSize",
+											 [NSNumber numberWithInteger:eventCounter],	  @"eventCounter",
+											 [NSNumber numberWithInteger:pageSize],		  @"pageSize",
 											 nil];
 			id obj;
 			while(obj = [e nextObject]){			    
-				unsigned long pixelList;
+				uint32_t pixelList;
 				if(readAll)	pixelList = 0x3fffff;
 				else		pixelList = xyProj[[obj slot] - 1];
 				//NSLog(@"Datataker in slot %d, pixelList %06x\n", [obj slot], pixelList);
@@ -1731,10 +1731,10 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 				// 7.12.07 ak
 				if (t0.tv_sec > lastDisplaySec){
 					NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
-					int nEv = eventCounter - lastDisplayCounter;
+					int nEv = (int)(eventCounter - lastDisplayCounter);
 					double rate = 0.1 * nEv / (t0.tv_sec-lastDisplaySec) + 0.9 * lastDisplayRate;
 					
-					unsigned long tRead = (t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec);
+					uint32_t tRead = (uint32_t)((t1.tv_sec - t0.tv_sec) * 1000000 + (t1.tv_usec - t0.tv_usec));
 					if (t0.tv_sec%20 == 0) {
 					    NSLogFont(aFont, @"%64s  | %16s\n", "Last event", "Interval summary"); 
 						NSLogFont(aFont, @"%4s %14s %4s %14s %4s %4s %14s  |  %4s %10s\n", 
@@ -1746,7 +1746,7 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 							  nTriggered, tRead, nEv, rate);
 					
 					// Keep the last display second		  
-					lastDisplaySec = t0.tv_sec;	
+					lastDisplaySec = (uint32_t)t0.tv_sec;
 					lastDisplayCounter = eventCounter;
 					lastDisplayRate = rate;	  
 				}
@@ -1781,17 +1781,17 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 }
 
 
-- (unsigned long) calcProjection:(unsigned long *)pMult  xyProj:(unsigned long *)xyProj  tyProj:(unsigned long *)tyProj
+- (uint32_t) calcProjection:(uint32_t *)pMult  xyProj:(uint32_t *)xyProj  tyProj:(uint32_t *)tyProj
 { 
 	//temp----
 	int i, j, k;
-	int sltSize = pageSize * 20;	
+	uint32_t sltSize = pageSize * 20;
 	
 	
 	// Dislay the matrix of triggered pixel and timing
 	// The xy-Projection is needed to readout only the triggered pixel!!!
-	//unsigned long xyProj[20];
-	//unsigned long tyProj[100];
+	//uint32_t xyProj[20];
+	//uint32_t tyProj[100];
 	for (i=0;i<20;i++) xyProj[i] = 0;
 	for (k=0;k<100;k++) tyProj[k] = 0;
 	for (k=0;k<sltSize;k++){
@@ -1856,25 +1856,25 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 {
 	
 	//read page start address
-	unsigned long lTimeL     = [self read: SLT_REG_ADDRESS(kSLTLastTriggerTimeStamp) + aPageIndex];
+	uint32_t lTimeL     = [self read: SLT_REG_ADDRESS(kSLTLastTriggerTimeStamp) + aPageIndex];
 	int iPageStart = (((lTimeL >> 10) & 0x7fe)  + 20) % 2000;
 	
-	unsigned long timeStampH = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*aPageIndex];
-	unsigned long timeStampL = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*aPageIndex+1];
+	uint32_t timeStampH = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*aPageIndex];
+	uint32_t timeStampL = [self read: SLT_REG_ADDRESS(kSLTPageTimeStamp) + 2*aPageIndex+1];
 	
 	NSFont* aFont = [NSFont userFixedPitchFontOfSize:9];
 	NSLogFont(aFont,@"Reading event from page %d, start=%d:  %ds %dx100us\n", 
 			  aPageIndex+1, iPageStart, timeStampH, (timeStampL >> 11) & 0x3fff);
 	
 	//readout the SLT pixel trigger data
-	unsigned long buffer[2000];
-	unsigned long sltMemoryAddress = (SLTID << 24) | aPageIndex<<11;
-	[self readBlock:sltMemoryAddress dataBuffer:(unsigned long*)buffer length:20*100 increment:1];
-	unsigned long reorderBuffer[2000];
+	uint32_t buffer[2000];
+	uint32_t sltMemoryAddress = (SLTID << 24) | aPageIndex<<11;
+	[self readBlock:sltMemoryAddress dataBuffer:(uint32_t*)buffer length:20*100 increment:1];
+	uint32_t reorderBuffer[2000];
 	// Re-organize trigger data to get it in a continous data stream
-	unsigned long *pMult = reorderBuffer;
-	memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(unsigned long));  
-	memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(unsigned long));  
+	uint32_t *pMult = reorderBuffer;
+	memcpy( pMult, buffer + iPageStart, (2000 - iPageStart)*sizeof(uint32_t));  
+	memcpy( pMult + 2000 - iPageStart, buffer, iPageStart*sizeof(uint32_t));  
 	
 	int i;
 	int j;	
@@ -1882,8 +1882,8 @@ NSString* ORIpeSLTModelHW_ResetChanged          = @"ORIpeSLTModelHW_ResetChanged
 	
 	// Dislay the matrix of triggered pixel and timing
 	// The xy-Projection is needed to readout only the triggered pixel!!!
-	unsigned long xyProj[20];
-	unsigned long tyProj[100];
+	uint32_t xyProj[20];
+	uint32_t tyProj[100];
 	for (i=0;i<20;i++) xyProj[i] = 0;
 	for (k=0;k<100;k++) tyProj[k] = 0;
 	for (k=0;k<2000;k++){

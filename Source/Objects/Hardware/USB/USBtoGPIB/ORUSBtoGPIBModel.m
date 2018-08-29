@@ -118,7 +118,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		
 		if(!usbInterface){
 			NSBezierPath* path = [NSBezierPath bezierPath];
@@ -187,7 +187,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		[self selectDevice:aPrimaryAddress];
 		NSString* cmd = [NSString stringWithFormat:@"++eoi %d\r",state];
 		if(fd){
-			int n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
+			ssize_t n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
 			if(n<=0){
 				[theHWLock unlock];   //-----end critical section
 				[NSException raise:@"Serial Write" format:@"ORUSBtoBPIBMode.m %u: Write to serial port <%@> failed\n", __LINE__,serialNumber];
@@ -229,7 +229,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		if(aPrimaryAddress != lastSelectedAddress){
 			NSString* cmd = [NSString stringWithFormat:@"++addr %d\r++mode 1\r++auto 0\r++eos 3\r++eoi 1\r",aPrimaryAddress];
 			if(fd){
-				int n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
+				ssize_t n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
 				if(n<=0){
 					[NSException raise:@"Serial Write" format:@"ORUSBtoBPIBMode.m %u: Write to serial port <%@> failed\n", __LINE__,serialNumber];
 				}
@@ -242,10 +242,10 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
     }
 }
 
-- (long) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
-               maxLength: (long) aMaxLength
+- (int32_t) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
+               maxLength: (int32_t) aMaxLength
 {
-    long retVal = 0;
+    int32_t retVal = 0;
     @try {
         
         [theHWLock lock];   //-----begin critical section
@@ -274,7 +274,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 		[cmd replaceOccurrencesOfString:@"\n" withString:@"\033\n" options:NSLiteralSearch range:NSMakeRange(0,[cmd length])];
 		if(![cmd hasSuffix:@"\r"])[cmd appendString:@"\r"];
 		
-		int n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
+		ssize_t n = write(fd,[cmd cStringUsingEncoding:NSASCIIStringEncoding],[cmd length]);
 		if(n<=0){
 			[theHWLock unlock];   //-----end critical section
 			[NSException raise:@"Serial Write" format:@"ORUSBtoBPIBMode.m %u: Write to serial port <%@> failed\n", __LINE__,serialNumber];
@@ -287,10 +287,10 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
     }
 }
 
-- (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (int32_t) aMaxLength
 {
-	int result = 0;
-	if(!fd)return result;
+	ssize_t result = 0;
+	if(!fd)return (uint32_t)result;
     @try {
 		[theHWLock lock];   //-----begin critical section
 		[self selectDevice:aPrimaryAddress];
@@ -319,7 +319,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
         [localException raise];
     }
 	
-	return result;
+	return (uint32_t)result;
 }
 //-------------------------------------------------------------------------------------------------------
 
@@ -481,7 +481,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 			}
 			else {
 				char reply[1024];
-				long n = [self writeReadDevice:gpibAddress command:command data:reply maxLength:1024];
+				int32_t n = [self writeReadDevice:gpibAddress command:command data:reply maxLength:1024];
 				if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
 					NSLog(@"%s\n",reply);
 				}
@@ -498,7 +498,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
     
     [[self undoManager] disableUndoRegistration];
     [self setCommand:[decoder decodeObjectForKey:@"ORUSBtoGPIBModelCommand"]];
-    [self setGpibAddress:[decoder decodeIntForKey:@"ORUSBtoGPIBModelAddress"]];
+    [self setGpibAddress:[decoder decodeIntegerForKey:@"ORUSBtoGPIBModelAddress"]];
     [self setSerialNumber:[decoder decodeObjectForKey:@"ORUSBtoGPIBModelSerialNumber"]];
 	lastSelectedAddress = -1;
     [[self undoManager] enableUndoRegistration];    
@@ -510,7 +510,7 @@ NSString* ORUSBtoGPIBUSBOutConnection			= @"ORUSBtoGPIBUSBOutConnection";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:command forKey:@"ORUSBtoGPIBModelCommand"];
-    [encoder encodeInt:gpibAddress forKey:@"ORUSBtoGPIBModelAddress"];
+    [encoder encodeInteger:gpibAddress forKey:@"ORUSBtoGPIBModelAddress"];
     [encoder encodeObject:serialNumber forKey:@"ORUSBtoGPIBModelSerialNumber"];
 }
 

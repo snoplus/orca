@@ -150,7 +150,7 @@
 
 - (void) chanEnabledChanged:(NSNotification*)aNote
 {
-    unsigned long aMask = [model chanEnabledMask];
+    uint32_t aMask = [model chanEnabledMask];
     int i;
     for(i=0;i<4;i++){
         [[chanEnabledMatrix cellWithTag:i] setState: aMask & (0x1<<i)];
@@ -197,7 +197,7 @@
 #pragma mark •••Actions
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) sendCommandAction:(id)sender
@@ -246,7 +246,7 @@
 
 - (void) validateInterfacePopup
 {
-	NSArray* interfaces = [[model getUSBController] interfacesForVender:[model vendorIDs] product:[model productIDs]];
+	NSArray* interfaces = [[model getUSBController] interfacesForVenders:[model vendorIDs] products:[model productIDs]];
 	NSEnumerator* e = [interfaces objectEnumerator];
 	ORUSBInterface* anInterface;
 	while(anInterface = [e nextObject]){
@@ -303,13 +303,13 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-    int set = [aPlotter tag];
+    int set = (int)[aPlotter tag];
     return [model numPoints:set];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    int set = [aPlotter tag];
+    int set = (int)[aPlotter tag];
     *xValue = i;
     *yValue = [model dataSet:set valueAtChannel:i];
 }

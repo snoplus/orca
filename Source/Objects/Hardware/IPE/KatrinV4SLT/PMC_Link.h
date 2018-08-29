@@ -24,14 +24,14 @@
 @interface PMC_Link : SBC_Link {
 }
 
-#pragma mark ‚Ä¢‚Ä¢‚Ä¢Accessors
-- (void) readLongBlockPmc:(unsigned long *) buffer
-			 atAddress:(unsigned int) aPmcAddress
-			 numToRead:(unsigned int) numberLongs;
+#pragma mark •••Accessors
+- (void) readLongBlockPmc:(uint32_t *) buffer
+			 atAddress:(uint32_t) aPmcAddress
+			 numToRead:(uint32_t) numberLongs;
 
-- (void) writeLongBlockPmc:(unsigned long*) buffer
-			 atAddress:(unsigned int) aPmcAddress
-			 numToWrite:(unsigned int)  numberLongs;
+- (void) writeLongBlockPmc:(uint32_t*) buffer
+			 atAddress:(uint32_t) aPmcAddress
+			 numToWrite:(uint32_t)  numberLongs;
 @end
 
 

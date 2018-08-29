@@ -91,8 +91,8 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:OR2228AModelOverFlowCheckTimeChanged object:self];
 }
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -187,7 +187,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
+    unChangingDataPart   = (uint32_t)((([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16)); //doesn't change so do it here.
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
     
@@ -237,11 +237,11 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 						[controller camacShortNAF:cachedStation a:onlineList[i] f:0 data:&tdcValue];
 						if(!(suppressZeros && tdcValue==0)){
 							if(IsShortForm(dataId)){
-								unsigned long data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (tdcValue & 0xfff);
+								uint32_t data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (tdcValue & 0xfff);
 								[aDataPacket addLongsToFrameBuffer:&data length:1];
 							}
 							else {
-								unsigned long data[2];
+								uint32_t data[2];
 								data[0] =  dataId | 2;
 								data[1] =  unChangingDataPart | (onlineList[i]&0xf)<<12 | (tdcValue & 0xfff);
 								[aDataPacket addLongsToFrameBuffer:data length:2];
@@ -365,9 +365,9 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setOverFlowCheckTime:[decoder decodeIntForKey:@"OR2228AModelOverFlowCheckTime"]];
-    [self setOnlineMask:[decoder decodeIntForKey:@"OR2228OnlineMask"]];
-    [self setSuppressZeros:[decoder decodeIntForKey:@"OR2228SuppressZeros"]];
+    [self setOverFlowCheckTime:[decoder decodeIntegerForKey:@"OR2228AModelOverFlowCheckTime"]];
+    [self setOnlineMask:[decoder decodeIntegerForKey:@"OR2228OnlineMask"]];
+    [self setSuppressZeros:[decoder decodeIntegerForKey:@"OR2228SuppressZeros"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -376,9 +376,9 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:overFlowCheckTime forKey:@"OR2228AModelOverFlowCheckTime"];
-    [encoder encodeInt:onlineMask forKey:@"OR2228OnlineMask"];
-    [encoder encodeInt:suppressZeros forKey:@"OR22281SuppressZeros"];
+    [encoder encodeInteger:overFlowCheckTime forKey:@"OR2228AModelOverFlowCheckTime"];
+    [encoder encodeInteger:onlineMask forKey:@"OR2228OnlineMask"];
+    [encoder encodeInteger:suppressZeros forKey:@"OR22281SuppressZeros"];
 	
 }
 
@@ -468,7 +468,7 @@ NSString* OR2228ASuppressZerosChangedNotification   = @"OR2228ASuppressZerosChan
 			}
 			[overflowAlarm setAcknowledged:NO];
 			[overflowAlarm postAlarm];
-            NSLogError(@"Over Flow",@"2228A TDC",[NSString stringWithFormat:@"Station %d",[self stationNumber]],nil);
+            NSLogError(@"Over Flow",@"2228A TDC",[NSString stringWithFormat:@"Station %d",(int)[self stationNumber]],nil);
 		}
     }
 	

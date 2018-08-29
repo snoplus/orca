@@ -263,8 +263,8 @@ NSString* ORCallBackLabelTypeChanged		   = @"ORCallBackLabelTypeChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:callBackName			forKey:@"callBackName"];
-    [encoder encodeInt:callBackChannel			forKey:@"callBackChannel"];
-    [encoder encodeInt:callBackLabelType		forKey:@"callBackLabelType"];
+    [encoder encodeInteger:callBackChannel			forKey:@"callBackChannel"];
+    [encoder encodeInteger:callBackLabelType		forKey:@"callBackLabelType"];
     [encoder encodeObject:callBackCustomLabel	forKey:@"callBackCustomLabel"];
 }
 
@@ -309,7 +309,7 @@ NSString* ORCallBackLabelTypeChanged		   = @"ORCallBackLabelTypeChanged";
 	NSSize theIconSize = [anImage size];
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	
 	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
 	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];

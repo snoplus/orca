@@ -63,7 +63,7 @@
 - (IBAction) 	write: (id) aSender;
 - (IBAction) 	read: (id) aSender;
 - (IBAction) 	connect: (id) aSender;
-- (IBAction)	changePrimaryAddress: (id) aSender;
+- (IBAction)	changePrimaryAddress: (NSPopUpButton*) aSender;
 - (IBAction) 	changeBoardIndexAction: (id) aSender;
 - (IBAction)    testLockAction:(id)sender;
 - (IBAction)	changeMonitorRead: (NSButton*) aSender;
@@ -71,7 +71,7 @@
 
 #pragma mark ***Support
 - (void)    changeIbstaStatus: (int) aStatus;
-- (void)    changeStatusSummary: (int) aStatus error: (int) anError count: (long) aCount;
+- (void)    changeStatusSummary: (int) aStatus error: (int) anError count: (int32_t) aCount;
 - (void)    populatePullDowns;
 - (void)    setTestButtonsEnabled: (BOOL) aValue;
 - (void)    testLockChanged: (NSNotification*) aNotification;

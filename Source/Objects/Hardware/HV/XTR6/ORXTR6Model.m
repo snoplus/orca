@@ -184,10 +184,10 @@ NSString* ORXTR6Lock                            = @"ORXTR6Lock";
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     if(connectionProtocol == kHPXTR6UseIP){
-        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
         theOffset.x += 10;
     }
-    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     if(connectionProtocol == kHPXTR6UseUSB && ![self isConnected]){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,5)];
@@ -210,11 +210,11 @@ NSString* ORXTR6Lock                            = @"ORXTR6Lock";
 - (NSString*) title 
 {
 	switch (connectionProtocol){
-		case kHPXTR6UseRS232:	return [NSString stringWithFormat:@"XTR6 %lu",[self uniqueIdNumber]];
-		case kHPXTR6UseUSB:     return [NSString stringWithFormat:@"XTR6 %lu (Serial# %@)",[self uniqueIdNumber],[usbInterface serialNumber]];
-		case kHPXTR6UseIP:      return [NSString stringWithFormat:@"XTR6 %lu (%@)",[self uniqueIdNumber],[self ipAddress]];
+		case kHPXTR6UseRS232:	return [NSString stringWithFormat:@"XTR6 %u",[self uniqueIdNumber]];
+		case kHPXTR6UseUSB:     return [NSString stringWithFormat:@"XTR6 %u (Serial# %@)",[self uniqueIdNumber],[usbInterface serialNumber]];
+		case kHPXTR6UseIP:      return [NSString stringWithFormat:@"XTR6 %u (%@)",[self uniqueIdNumber],[self ipAddress]];
 	}
-	return [NSString stringWithFormat:@"XTR6 (%d)",[self tag]];
+	return [NSString stringWithFormat:@"XTR6 (%u)",(uint32_t)[self tag]];
 }
 
 #pragma mark ***Accessors
@@ -630,15 +630,15 @@ NSString* ORXTR6Lock                            = @"ORXTR6Lock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeFloat:targetVoltage      forKey:@"targetVoltage"];
-    [encoder encodeInt:channelAddress       forKey:@"channelAddress"];
+    [encoder encodeInteger:channelAddress       forKey:@"channelAddress"];
     [encoder encodeObject:serialNumber      forKey:@"ORXTR6ModelSerialNumber"];
     [encoder encodeObject:ipAddress         forKey:@"ORXTR6ModelIpAddress"];
-    [encoder encodeInt:connectionProtocol   forKey:@"ORXTR6ModelConnectionProtocol"];
+    [encoder encodeInteger:connectionProtocol   forKey:@"ORXTR6ModelConnectionProtocol"];
 }
 
 #pragma mark ***Comm methods
 
-- (void) readFromDevice: (char*) aData maxLength: (long) aMaxLength
+- (void) readFromDevice: (char*) aData maxLength: (uint32_t) aMaxLength
 {
 	switch(connectionProtocol){
 		case kHPXTR6UseRS232:

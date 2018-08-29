@@ -45,8 +45,8 @@
 {
     [super awakeFromNib];
     NSString* key = [NSString stringWithFormat: @"orca.ORShaper%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
-    if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    if(index>[tabView numberOfTabViewItems])index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	[[rate0 xAxis] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
 	[[totalRate xAxis] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
@@ -287,7 +287,7 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
     NSString* key = [NSString stringWithFormat: @"orca.ORShaper%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:item];
+    NSUInteger index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -332,7 +332,7 @@
 - (void) baseAddressChanged:(NSNotification*)aNotification
 {
 	[self updateStepper:addressStepper setting:[model baseAddress]];
-	[addressText setIntValue: [model baseAddress]];
+	[addressText setIntegerValue: [model baseAddress]];
 }
 
 - (void) thresholdChanged:(NSNotification*)aNotification
@@ -415,12 +415,12 @@
 
 - (void) scanStartChanged:(NSNotification*)aNotification
 {
-	[scanStartField setIntValue: [model scanStart]];
+	[scanStartField setIntegerValue: [model scanStart]];
 }
 
 - (void) scanDeltaChanged:(NSNotification*)aNotification
 {
-	[scanDeltaField setIntValue: [model scanDelta]];
+	[scanDeltaField setIntegerValue: [model scanDelta]];
 }
 - (void) scanNumberChanged:(NSNotification*)aNotification
 {
@@ -608,17 +608,17 @@
 
 - (IBAction) scalerMaskAction:(id)sender
 {
-	if([sender intValue] != [model scalerMaskBit:[[sender selectedCell] tag]]){
+	if([sender intValue] != [model scalerMaskBit:(int)[[sender selectedCell] tag]]){
 		[[self undoManager] setActionName: @"Set Scaler Mask"];
-		[model setScalerMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+		[model setScalerMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
 - (IBAction) onlineAction:(id)sender
 {
-	if([sender intValue] != [model onlineMaskBit:[[sender selectedCell] tag]]){
+	if([sender intValue] != [model onlineMaskBit:(int)[[sender selectedCell] tag]]){
 		[[self undoManager] setActionName: @"Set Online Mask"];
-		[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+		[model setOnlineMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 	}
 }
 
@@ -762,15 +762,15 @@
 	return [[[[model adcRateGroup]rates] objectAtIndex:tag] rate];
 }
 
-- (int) numberPointsInPlot:(id)aPlotter
+- (int)    numberPointsInPlot:(id)aPlotter
 {
-	return [[[model adcRateGroup]timeRate]count];
+	return (int)[[[model adcRateGroup]timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int count = [[[model adcRateGroup]timeRate] count];
-	int index = count-i-1;
+	NSUInteger count = [[[model adcRateGroup]timeRate] count];
+	NSUInteger index = count-i-1;
 	*yValue =  [[[model adcRateGroup]timeRate]valueAtIndex:index];
 	*xValue =  [[[model adcRateGroup]timeRate]timeSampledAtIndex:index];
 }

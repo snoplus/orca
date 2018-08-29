@@ -78,7 +78,7 @@ uint8_t verbose = 0;
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];		
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];		
 		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
 			[path moveToPoint:NSMakePoint(8,13)];
@@ -251,24 +251,24 @@ uint8_t verbose = 0;
     doRange = aDoRange;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3150DoRangeChanged object:self];
 }
-- (unsigned long) rwAddress
+- (uint32_t) rwAddress
 {
     return rwAddress;
 }
 
-- (void) setRwAddress:(unsigned long)aValue
+- (void) setRwAddress:(uint32_t)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRwAddress:[self rwAddress]];
     rwAddress = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3150RWAddressChanged object:self];
 }
 
-- (unsigned long) writeValue
+- (uint32_t) writeValue
 {
     return writeValue;
 }
 
-- (void) setWriteValue:(unsigned long)aValue
+- (void) setWriteValue:(uint32_t)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     writeValue = aValue;
@@ -457,18 +457,18 @@ uint8_t verbose = 0;
 {
 }
 
--(void) readLongBlock:(unsigned long *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberLongs
+-(void) readLongBlock:(uint32_t *) readAddress
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
 	NSLog(@"readLongBlock\n");
 }
 
--(void) writeLongBlock:(unsigned long *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberLongs
+-(void) writeLongBlock:(uint32_t *) writeAddress
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberLongs
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -476,9 +476,9 @@ uint8_t verbose = 0;
 	
 }
 
--(void) readLong:(unsigned long *) readAddress
-	   atAddress:(unsigned int) vmeAddress
-	 timesToRead:(unsigned int) numberLongs
+-(void) readLong:(uint32_t *) readAddress
+	   atAddress:(uint32_t) vmeAddress
+	 timesToRead:(uint32_t) numberLongs
 	  withAddMod:(unsigned short) anAddressModifier
    usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -486,8 +486,8 @@ uint8_t verbose = 0;
 }
 
 -(void) readByteBlock:(unsigned char *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberBytes
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberBytes
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -496,8 +496,8 @@ uint8_t verbose = 0;
 }
 
 -(void) writeByteBlock:(unsigned char *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberBytes
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberBytes
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -506,13 +506,13 @@ uint8_t verbose = 0;
 
 
 -(void) readWordBlock:(unsigned short *) data
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberWords
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberWords
 		   withAddMod:(unsigned short) anAddressModifier
 					   usingAddSpace:(unsigned short) anAddressSpace
 {
 	unsigned int nBytes  = 0;
-	unsigned long req_nof_bytes = numberWords*sizeof(unsigned int);
+	unsigned int req_nof_bytes = (int)numberWords*sizeof(unsigned int);
 	char cUsbBuf[0x100 + USB_MAX_NOF_BYTES];
 	char cInPacket[0x100 + USB_MAX_NOF_BYTES];
 		
@@ -542,8 +542,8 @@ uint8_t verbose = 0;
 	cUsbBuf[11] =   (char) (vmeAddress >> 24);   //addr 31:24
 	
 	
-	unsigned long usb_wlength = 12;
-	unsigned long usb_rlength = (req_nof_bytes) ; // data: (req_nof_lwords * 4) Bytes; 
+	unsigned int usb_wlength = 12;
+	unsigned int usb_rlength = (req_nof_bytes) ; // data: (req_nof_lwords * 4) Bytes;
 	usb_rlength = (usb_rlength + 0x1ff) & 0xffffe00; // 512 byte boundary.
 	
 	
@@ -564,7 +564,7 @@ uint8_t verbose = 0;
 	//}
 	
 	nBytes = return_code;
-	//unsigned long got_nof_bytes = (unsigned long) (nBytes )  ;
+	//uint32_t got_nof_bytes = (uint32_t) (nBytes )  ;
 	
 	//if(nBytes != req_nof_bytes) {
 	//	return_code = sis3150usb_error_code_usb_read_length_error; 
@@ -581,8 +581,8 @@ uint8_t verbose = 0;
 }
 
 -(void) writeWordBlock:(unsigned short *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberWords
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberWords
 			withAddMod:(unsigned short) anAddressModifier
 						   usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -630,7 +630,7 @@ uint8_t verbose = 0;
     [[self undoManager] disableUndoRegistration];
     
     [self setSerialNumber:	  [decoder decodeObjectForKey:@"serialNumber"]];
-    [self setRangeToDo:			[decoder decodeIntForKey:	@"rangeToDo"]];
+    [self setRangeToDo:			[decoder decodeIntegerForKey:	@"rangeToDo"]];
     [self setDoRange:			[decoder decodeBoolForKey:	@"doRange"]];
     [self setRwAddress:			[decoder decodeIntForKey:	@"rwAddress"]];
     [self setWriteValue:		[decoder decodeIntForKey:	@"writeValue"]];
@@ -651,13 +651,13 @@ uint8_t verbose = 0;
     [encoder encodeObject:serialNumber		forKey:@"serialNumber"];
     [encoder encodeObject:inConnector		forKey:@"inConnector"];
     [encoder encodeObject:outConnector		forKey:@"outConnector"];
-    [encoder encodeInt:rangeToDo			forKey:@"rangeToDo"];
+    [encoder encodeInteger:rangeToDo			forKey:@"rangeToDo"];
     [encoder encodeBool:doRange				forKey:@"doRange"];
     [encoder encodeInt:rwAddress			forKey:@"rwAddress"];
     [encoder encodeInt:writeValue			forKey:@"writeValue"];
-    [encoder encodeInt:rwAddressModifier	forKey:@"rwAddressModifier"];
-    [encoder encodeInt:readWriteIOSpace		forKey:@"readWriteIOSpace"];
-    [encoder encodeInt:readWriteType		forKey:@"readWriteType"];
+    [encoder encodeInteger:rwAddressModifier	forKey:@"rwAddressModifier"];
+    [encoder encodeInteger:readWriteIOSpace		forKey:@"readWriteIOSpace"];
+    [encoder encodeInteger:readWriteType		forKey:@"readWriteType"];
 }
 
 
@@ -675,7 +675,7 @@ uint8_t verbose = 0;
 /*  Autor:      R. Fox                                                     */
 /* date:        14.04.2006  (coding begins)                                */
 /* last modification:    20.07.2010  (TH)                                  */
-/*     - in sis3150_vmebus_write: change long to ULONG                     */
+/*     - in sis3150_vmebus_write: change int32_t to ULONG                     */
 /*                                                                         */
 /*                                                                         */
 /*-------------------------------------------------------------------------*/
@@ -795,9 +795,9 @@ initUSB()
  Parameters:
  device      - usb_dev_handle* open on the usb controller.
  outpacket   - Request packet in host byte order.
- outbytes    - bytes in output packet (should be divisible by sizeof(long)
+ outbytes    - bytes in output packet (should be divisible by sizeof(int32_t)
  inpacket    - Space for reply packet.
- inbytes     - bytes for reply packet.(should be divisible by sizeof(long)
+ inbytes     - bytes for reply packet.(should be divisible by sizeof(int32_t)
  
  Returns:
  -1   Write failed, errno has the reason.
@@ -1675,7 +1675,7 @@ static int sis3150_vmebus_write(HANDLE hDevice, ULONG addr, ULONG vme_am, ULONG 
 	unsigned int  i;
 	
 	char cSize, cFifoMode;
-	//long* long_cUsbBuf_ptr;
+	//int32_t* long_cUsbBuf_ptr;
 	ULONG* long_cUsbBuf_ptr;
 	
 	

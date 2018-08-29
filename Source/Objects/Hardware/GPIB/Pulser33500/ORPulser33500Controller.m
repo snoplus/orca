@@ -223,7 +223,7 @@
 
 - (IBAction) connectionProtocolAction:(id)sender
 {
-	[model setConnectionProtocol:[[connectionProtocolMatrix selectedCell] tag]];
+	[model setConnectionProtocol:(int)[[connectionProtocolMatrix selectedCell] tag]];
 	
 	BOOL undoWasEnabled = [[model undoManager] isUndoRegistrationEnabled];
     if(undoWasEnabled)[[model undoManager] disableUndoRegistration];
@@ -313,7 +313,7 @@
 		if(cmd){
 			if([cmd rangeOfString:@"?"].location != NSNotFound){
 				char reply[1024];
-				long n = [model writeReadDevice:cmd data:reply maxLength:1024];
+				int32_t n = [model writeReadDevice:cmd data:reply maxLength:1024];
 				if(n>0)reply[n-1]='\0';
 				NSLog(@"%s\n",reply);
 			}

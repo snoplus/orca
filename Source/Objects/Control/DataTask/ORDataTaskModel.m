@@ -194,11 +194,11 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     [readOutList removeOrcaObject:anObject];
 }
 
-- (unsigned long)cycleRate
+- (uint32_t)cycleRate
 {
 	return cycleRate;
 }
-- (void) setCycleRate:(unsigned long)aRate
+- (void) setCycleRate:(uint32_t)aRate
 {
 	cycleRate = cycleCount;
 	cycleCount = 0;
@@ -210,7 +210,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 // ===========================================================
 // - queueCount:
 // ===========================================================
-- (unsigned long)queueCount
+- (uint32_t)queueCount
 {
     return queueCount;
 }
@@ -218,7 +218,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 // ===========================================================
 // - setQueueCount:
 // ===========================================================
-- (void)setQueueCount:(unsigned long)aQueueCount
+- (void)setQueueCount:(uint32_t)aQueueCount
 {
     queueCount = aQueueCount;
     
@@ -228,7 +228,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     
 }
 
-- (unsigned long) queueMaxSize
+- (uint32_t) queueMaxSize
 {
     return kMaxQueueSize;
 }
@@ -244,19 +244,19 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
     lastFile = [aLastFile copy];
 }
 
-- (unsigned long) dataTimeHist:(int)index
+- (uint32_t) dataTimeHist:(int)index
 {
     return dataTimeHist[index];
 }
-- (unsigned long) processingTimeHist:(int)index
+- (uint32_t) processingTimeHist:(int)index
 {
     return processingTimeHist[index];
 }
 
 - (void) clearTimeHistogram
 {
-    memset(processingTimeHist,0,kTimeHistoSize*sizeof(unsigned long));
-    memset(dataTimeHist,0,kTimeHistoSize*sizeof(unsigned long));
+    memset(processingTimeHist,0,kTimeHistoSize*sizeof(uint32_t));
+    memset(dataTimeHist,0,kTimeHistoSize*sizeof(uint32_t));
 }
 
 - (BOOL) timerEnabled
@@ -316,7 +316,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 		NSLogColor([NSColor redColor],@"----------------------------------------------------------\n");
 	}
 	
-    cachedNumberDataTakers = [dataTakers count];
+    cachedNumberDataTakers = (uint32_t)[dataTakers count];
 
     if(cachedNumberDataTakers) cachedDataTakers = (id*)malloc(cachedNumberDataTakers * sizeof(id));
 	
@@ -432,7 +432,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
 	if(enableTimer){
 		[timerLock lock];	//start critical section
-		long delta = [dataTimer microseconds];
+		int32_t delta = [dataTimer microseconds];
 		if(timeScaler==0)timeScaler=1;
 		if((delta/timeScaler) < kTimeHistoSize)dataTimeHist[(int)delta/timeScaler]++;
 		else dataTimeHist[kTimeHistoSize-1]++;
@@ -492,7 +492,7 @@ NSString* ORDataTaskModelTimerEnableChanged			= @"ORDataTaskModelTimerEnableChan
 	
 	[nextObject endOfRunCleanup:userInfo];
 
-    [self setQueueCount:[transferQueue count]];
+    [self setQueueCount:(uint32_t)[transferQueue count]];
 	[self setCycleRate:0];
 }
 
@@ -601,7 +601,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
     [self setRefreshRate:[decoder decodeIntForKey:@"ORDataTaskModelRefreshRate"]];
     [self setReadOutList:[decoder decodeObjectForKey:ORDataTaskReadOutList]];
     [self setLastFile:[decoder decodeObjectForKey:ORDataTaskLastFile]];
-    [self setTimeScaler:[decoder decodeIntForKey:ORDataTaskTimeScaler]];
+    [self setTimeScaler:[decoder decodeIntegerForKey:ORDataTaskTimeScaler]];
     [[self undoManager] enableUndoRegistration];
   	if(timeScaler==0)timeScaler = 1;
     
@@ -614,10 +614,10 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:refreshRate forKey:@"ORDataTaskModelRefreshRate"];
+    [encoder encodeInteger:refreshRate forKey:@"ORDataTaskModelRefreshRate"];
     [encoder encodeObject:readOutList forKey:ORDataTaskReadOutList];
     [encoder encodeObject:lastFile forKey:ORDataTaskLastFile];
-    [encoder encodeInt:timeScaler forKey:ORDataTaskTimeScaler];
+    [encoder encodeInteger:timeScaler forKey:ORDataTaskTimeScaler];
 }
 
 
@@ -681,7 +681,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 	BOOL singleProcessor = [[ORGlobal sharedGlobal]cpuCount] == 1;
     do {
 		NSAutoreleasePool *pool = [[NSAutoreleasePool allocWithZone:nil] init];
- 		unsigned long qc = [transferQueue count];
+ 		uint32_t qc = (uint32_t)[transferQueue count];
 		if(qc){
 			queueCount = qc;
 			
@@ -729,7 +729,7 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
 		
 		
 		if(timeToStopProcessThread){
-			queueCount = [transferQueue count];
+			queueCount = (uint32_t)[transferQueue count];
 			if(!flushMessagePrintedOnce){
 				if(queueCount){
 					NSLog(@"flushing %d block%@from processing queue\n",queueCount,(queueCount>1)?@"s ":@" ");
@@ -781,14 +781,14 @@ static NSString *ORDataTaskTimeScaler		= @"ORDataTaskTimeScaler";
             if([objGuardian isKindOfClass:NSClassFromString(@"ORCrate")]){
                 [objDictionary setObject:[NSNumber numberWithInt:[anObj crateNumber]] forKey:@"crate"];
                 if([anObj respondsToSelector:@selector(stationNumber)]){
-                    [objDictionary setObject:[NSNumber numberWithInt:[anObj stationNumber]] forKey:@"station"];
+                    [objDictionary setObject:[NSNumber numberWithInteger:[anObj stationNumber]] forKey:@"station"];
                 }
                 else if([anObj respondsToSelector:@selector(slot)]){
                     [objDictionary setObject:[NSNumber numberWithInt:[anObj slot]] forKey:@"slot"];
                 }
             }
             else {
-                [objDictionary setObject:[NSNumber numberWithInt:[anObj uniqueIdNumber]] forKey:@"uniqueID"];
+                [objDictionary setObject:[NSNumber numberWithInteger:[anObj uniqueIdNumber]] forKey:@"uniqueID"];
             }
             someChildren = [anObj children];
             if([someChildren count]){

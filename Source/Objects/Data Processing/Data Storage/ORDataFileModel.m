@@ -121,10 +121,10 @@ static const int currentVersion = 1;           // Current version
     NSImage* aCachedImage = [NSImage imageNamed:@"DataFile"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2)  fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];  
+        [aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2)  fromRect:[aNoticeImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];  
     }
     [i unlockFocus];
     
@@ -183,8 +183,8 @@ static const int currentVersion = 1;           // Current version
 		[configFolder ensureExists:[configFolder finalDirectoryName]]; 
 		if([[ORGlobal sharedGlobal] documentWasEdited] || !savedFirstTime){
             if([[ORGlobal sharedGlobal] runMode] != kOfflineRun){
-                unsigned long runNumber = [[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
-                [[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%lu",runNumber]];
+                uint32_t runNumber = (uint32_t)[[[aNotification userInfo] objectForKey:@"kRunNumber"] longValue];
+                [[self document] copyDocumentTo:[[configFolder finalDirectoryName]stringByExpandingTildeInPath] append:[NSString stringWithFormat:@"%u",runNumber]];
                 savedFirstTime = YES;
                 [[ORGlobal sharedGlobal] setDocumentWasEdited:NO];
             }
@@ -202,7 +202,6 @@ static const int currentVersion = 1;           // Current version
 - (void) statusLogFlushed:(NSNotification*)aNotification
 {
     statusStart -= [[[aNotification userInfo] objectForKey:ORStatusFlushSize] intValue];
-    if(statusStart<0)statusStart = 0;
 }
 
 
@@ -622,7 +621,7 @@ static const int currentVersion = 1;           // Current version
 - (void) closeOutLogFiles:(NSNotification*)aNote
 {
     NSDictionary* userInfo = [aNote userInfo];
-    int statusEnd;
+    NSUInteger statusEnd;
     if(runMode == kNormalRun){
         
         //start a copy of the Status File
@@ -681,12 +680,12 @@ static const int currentVersion = 1;           // Current version
 {
 }
 
-- (unsigned long long)dataFileSize
+- (uint64_t)dataFileSize
 {
     return dataFileSize;
 }
 
-- (void) setDataFileSize:(unsigned long long)aNumber
+- (void) setDataFileSize:(uint64_t)aNumber
 {
     dataFileSize = aNumber;
     
@@ -703,7 +702,7 @@ static const int currentVersion = 1;           // Current version
 {
     NSFileManager* fm = [NSFileManager defaultManager];
     NSString* fullFileName = openFilePath;
-    unsigned  long long fsize= ([[fm attributesOfItemAtPath:fullFileName error:nil] fileSize]);
+    uint64_t fsize= ([[fm attributesOfItemAtPath:fullFileName error:nil] fileSize]);
 
     [self setDataFileSize:fsize];
 	checkCount++;
@@ -718,11 +717,11 @@ static const int currentVersion = 1;           // Current version
 	NSDictionary* diskInfo = [[[[NSFileManager alloc] init] autorelease] attributesOfFileSystemForPath:openFilePath error:&diskError];
 	if (!diskError) {
 		if(diskInfo){
-			long long freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
-			long long totalSpace = [[diskInfo objectForKey:NSFileSystemSize] longLongValue]; 
+			int64_t freeSpace = [[diskInfo objectForKey:NSFileSystemFreeSize] longLongValue];	
+			int64_t totalSpace = [[diskInfo objectForKey:NSFileSystemSize] longLongValue]; 
 			percentFull = 100 - 100*freeSpace/(double)totalSpace;
             
-			if(freeSpace < (long long)kScaryDiskSpace * 1024 * 1024 * 1024){
+			if(freeSpace < (int64_t)kScaryDiskSpace * 1024 * 1024 * 1024){
                 if(!diskFillingAlarm){
 					diskFillingAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Data disk getting full"] severity:kHardwareAlarm];
 					[diskFillingAlarm setSticky:YES];
@@ -736,7 +735,7 @@ static const int currentVersion = 1;           // Current version
                 diskFillingAlarm = nil;
             }
             
-			if(freeSpace < (long long)kMinDiskSpace * 1024 * 1024 * 1024){
+			if(freeSpace < (int64_t)kMinDiskSpace * 1024 * 1024 * 1024){
 				if(!diskFullAlarm){
 					diskFullAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Disk Is Full"] severity:kHardwareAlarm];
 					[diskFullAlarm setSticky:YES];
@@ -851,12 +850,12 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
     [encoder encodeObject:filePrefix		forKey:@"ORDataFileModelFilePrefix"];
     [encoder encodeFloat:maxFileSize		forKey:@"ORDataFileModelMaxFileSize"];
     [encoder encodeBool:limitSize			forKey:@"ORDataFileModelLimitSize"];
-    [encoder encodeInt:currentVersion		forKey:ORDataVersion];
+    [encoder encodeInteger:currentVersion		forKey:ORDataVersion];
     [encoder encodeObject:dataFolder		forKey:ORDataDataFolderName];
     [encoder encodeObject:statusFolder		forKey:ORDataStatusFolderName];
     [encoder encodeObject:configFolder		forKey:ORDataConfigFolderName];
     [encoder encodeBool:saveConfiguration	forKey:ORDataSaveConfiguration];
-    [encoder encodeInt:sizeLimitReachedAction forKey:@"sizeLimitReachedAction"];
+    [encoder encodeInteger:sizeLimitReachedAction forKey:@"sizeLimitReachedAction"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -904,7 +903,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"DataStorage,%lu",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"DataStorage,%u",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle
@@ -973,7 +972,7 @@ static NSString* ORDataSaveConfiguration    = @"ORDataSaveConfiguration";
         NSDate* theDate;
         if(startTime) theDate = startTime;
         else          theDate = [NSDate date];
-		s = [NSString stringWithFormat:@"%d-%d-%d-%@",[theDate yearOfCommonEra], [theDate monthOfYear], [theDate dayOfMonth],s];
+		s = [NSString stringWithFormat:@"%d-%d-%d-%@",(int32_t)[theDate yearOfCommonEra], (int32_t)[theDate monthOfYear], (int32_t)[theDate dayOfMonth],s];
 	}
 	return s;
 }

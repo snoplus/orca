@@ -303,12 +303,12 @@ struct {
 }
 
 #pragma mark ¥¥¥Hardware Test functions
-- (BOOL) adcTooLow:(unsigned long) aRawValue
+- (BOOL) adcTooLow:(uint32_t) aRawValue
 {
 	return (aRawValue & 0x10000)>0;
 }
 
-- (BOOL) adcTooHigh:(unsigned long) aRawValue
+- (BOOL) adcTooHigh:(uint32_t) aRawValue
 {
 	return (aRawValue & 0x20000)>0;
 }
@@ -342,7 +342,7 @@ struct {
 {
 	@synchronized(self){
 		if(enabledMask & (0x1L<<aChan)){
-			unsigned long theRawValue;
+			uint32_t theRawValue;
 			[[self adapter] camacLongNAF:[self stationNumber] a:aChan f:0 data:&theRawValue];
 			BOOL tooLow = [self adcTooLow:theRawValue];
 			BOOL tooHigh = [self adcTooHigh:theRawValue];
@@ -428,8 +428,8 @@ struct {
     [[self undoManager] disableUndoRegistration];
     [self setPollingState:[decoder decodeIntForKey:@"ORJADCLModelPollingState"]];
     [self setRangeIndex:[decoder decodeIntForKey:  @"ORJADCLModelRangeIndex"]];
-    [self setEnabledMask:[decoder decodeIntForKey: @"ORJADCLModelEnabledMask"]];
-    [self setAlarmsEnabledMask:[decoder decodeIntForKey: @"ORJADCLModelAlarmsEnabledMask"]];
+    [self setEnabledMask:[decoder decodeIntegerForKey: @"ORJADCLModelEnabledMask"]];
+    [self setAlarmsEnabledMask:[decoder decodeIntegerForKey: @"ORJADCLModelAlarmsEnabledMask"]];
 	int i;
 	for(i=0;i<16;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
@@ -446,10 +446,10 @@ struct {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];	
-    [encoder encodeInt:pollingState			forKey:@"ORJADCLModelPollingState"];
-    [encoder encodeInt:rangeIndex			forKey:@"ORJADCLModelRangeIndex"];
-    [encoder encodeInt:enabledMask			forKey:	@"ORJADCLModelEnabledMask"];
-    [encoder encodeInt:alarmsEnabledMask	forKey:	@"ORJADCLModelAlarmsEnabledMask"];
+    [encoder encodeInteger:pollingState			forKey:@"ORJADCLModelPollingState"];
+    [encoder encodeInteger:rangeIndex			forKey:@"ORJADCLModelRangeIndex"];
+    [encoder encodeInteger:enabledMask			forKey:	@"ORJADCLModelEnabledMask"];
+    [encoder encodeInteger:alarmsEnabledMask	forKey:	@"ORJADCLModelAlarmsEnabledMask"];
 	
 	int i;
 	for(i=0;i<16;i++){
@@ -500,7 +500,7 @@ struct {
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"%d,%d,JADC-L",[self crateNumber],[self  stationNumber]];
+    return [NSString stringWithFormat:@"%d,%u,JADC-L",(int)[self crateNumber],(int)[self  stationNumber]];
 }
 
 - (double) convertedValue:(int)channel

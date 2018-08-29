@@ -84,7 +84,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	[self loadAlarmHistory];
 	
     if(alarmLogSize > 2*1000*1000){
-        NSLogColor([NSColor redColor],@"The Alarm Log is getting big (%luMB). Please consider clearing it. Otherwise ORCA will take a long time starting\n",alarmLogSize/(1000*1000));
+        NSLogColor([NSColor redColor],@"The Alarm Log is getting big (%uMB). Please consider clearing it. Otherwise ORCA will take a int32_t time starting\n",alarmLogSize/(1000*1000));
     }
     
 	NSString* s = [NSString stringWithFormat:@"%@ ORCA started",[[NSDate date] stdDescription]]; //don't change this string
@@ -109,7 +109,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 	NSString* s = [NSString stringWithContentsOfFile:alarmHistoryPath encoding:NSASCIIStringEncoding error:nil];
 	NSArray* lines = [s componentsSeparatedByString:@"\n"];
-    int total = [lines count];
+    NSUInteger total = [lines count];
     BOOL displayPercent = NO;
     if(total<100000){
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
@@ -211,7 +211,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 -(void) printAlarm: (NSString*)s1
 {
-	int filterIndex = [alarmFilterPU indexOfSelectedItem];
+	NSInteger filterIndex = [alarmFilterPU indexOfSelectedItem];
 	NSString* filter = [[alarmFilterPU titleOfSelectedItem] stringByAppendingString:@"]"];
 	
 	if([s1 length]){
@@ -224,7 +224,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 			else {
 				[alarmLogView setString:s1];
 			}
-			int len = [s1 length];
+			NSUInteger len = [s1 length];
 			
 			if([s1 hasSuffix:@"ORCA started\n"]){
 				[[alarmLogView textStorage] setAttributes:[NSDictionary dictionaryWithObject:[NSColor grayColor] forKey:NSForegroundColorAttributeName ]
@@ -272,7 +272,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
         //get the current date
         NSDate* now = [NSDate date];
-        NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",[now yearOfCommonEra],[now monthOfYear],[now dayOfMonth]];
+        NSString* theFileName = [NSString stringWithFormat:@"StatusLog_%04d_%02d_%02d",(int32_t)[now yearOfCommonEra],(int32_t)[now monthOfYear],(int32_t)[now dayOfMonth]];
         aPath = [aPath stringByAppendingPathComponent:theFileName];
         BOOL fileExists = [[NSFileManager defaultManager] fileExistsAtPath:aPath];
         NSString* contents = [[ORStatusController sharedStatusController] contents];
@@ -289,12 +289,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     }
 }
 
-- (NSString*) contentsTail:(unsigned long)aDuration
+- (NSString*) contentsTail:(uint32_t)aDuration
 {
 	return [self contentsTail:aDuration includeDurationHeader:YES];
 }
 
-- (NSString*) contentsTail:(unsigned long)aDuration includeDurationHeader:(BOOL)header
+- (NSString*) contentsTail:(uint32_t)aDuration includeDurationHeader:(BOOL)header
 {
 	NSString* tailContents	= @"";
 	BOOL	  valid			= NO;
@@ -339,7 +339,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     }
 	
 	if(valid){
-		if(header)return [NSString stringWithFormat:@"Last %lu seconds of ORCA Status log\n\n%@",aDuration,tailContents];
+		if(header)return [NSString stringWithFormat:@"Last %u seconds of ORCA Status log\n\n%@",aDuration,tailContents];
 		else return tailContents;
 	}
 	else return nil;
@@ -351,21 +351,21 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 {
     scheduledToUpdate = NO;
     [outlineView reloadItem:dataSet reloadChildren:YES];
-    [errorField setIntValue:[dataSet totalCounts]];
+    [errorField setIntegerValue:[dataSet totalCounts]];
 }
 
-- (int) statusTextlength
+- (NSUInteger) statusTextlength
 {
-    int theLength;
+    NSUInteger theLength;
     @synchronized(self){
         theLength =  [[statusView textStorage] length];
     }
     return theLength;
 }
 
-- (int) alarmLogTextlength
+- (NSUInteger) alarmLogTextlength
 {
-    int theLength;
+    NSUInteger theLength;
     @synchronized(self){
         theLength = [[alarmLogView textStorage] length];
     }
@@ -389,7 +389,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 
 
 #pragma mark ¥¥¥Data Source Methods
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
+- (NSUInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     return (item == nil) ? 1  : [item numberOfChildren];
 }
@@ -447,7 +447,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [dataSet clear];
     [outlineView reloadItem:dataSet  reloadChildren:YES];
     [outlineView setNeedsDisplay:YES];
-    [errorField setIntValue:[dataSet totalCounts]];
+    [errorField setIntegerValue:[dataSet totalCounts]];
 }
 
 - (IBAction)delete:(id)sender
@@ -483,7 +483,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
 	NSArray* runControlObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 	NSString* theRun;
 	if([runControlObjects count]){
-		theRun = [NSString stringWithFormat:@"Run Number %lu",[[runControlObjects objectAtIndex:0] runNumber]];
+		theRun = [NSString stringWithFormat:@"Run Number %u",[[runControlObjects objectAtIndex:0] runNumber]];
 	}
 	else {
 		theRun = @"No Run Control Obj";
@@ -524,7 +524,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     }
     [outlineView deselectAll:self];
     [dataSet recountTotal];
-    [errorField setIntValue:[dataSet totalCounts]];
+    [errorField setIntegerValue:[dataSet totalCounts]];
     [outlineView reloadData];
     
 }
@@ -664,7 +664,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(StatusController);
     [alert setInformativeText:@"Deletion of the history can not be undone."];
     [alert addButtonWithTitle:@"Yes, Delete It"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
 
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -988,7 +988,7 @@ void NSLogStartTable(NSString* aTitle,int aWidth)
 {
     aTitle = [aTitle stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     NSString* dashes = @"_";
-    int len = [aTitle length];
+    NSUInteger len = [aTitle length];
     int i;
     for(i=0;i<len;i++){
         dashes = [dashes stringByAppendingString:@"_"];
@@ -1084,7 +1084,7 @@ void NSLogError(NSString* aString,...)
         [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,kMaxTextSize/3)];
         NSString* theText = [[statusView textStorage] string];
         NSRange endOfLineRange = [theText rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"\n"]];
-        int extra = 0;
+        NSUInteger extra = 0;
         if(endOfLineRange.location != NSNotFound){
             [[statusView textStorage] deleteCharactersInRange:NSMakeRange(0,endOfLineRange.location)];
             extra = endOfLineRange.location;
@@ -1092,10 +1092,10 @@ void NSLogError(NSString* aString,...)
         [[NSNotificationCenter defaultCenter]postNotificationName:ORStatusFlushedNotification
                                                            object:self
                                                          userInfo: [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                    [NSNumber numberWithInt:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
+                                                                    [NSNumber numberWithInteger:kMaxTextSize/3+extra],ORStatusFlushSize,nil]];
     }
     
-    int len = [now_Attr length];
+    NSUInteger len = [now_Attr length];
     NSUInteger i=0;
     while (i<len) {
         NSRange range;

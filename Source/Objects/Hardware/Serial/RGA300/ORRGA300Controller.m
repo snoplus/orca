@@ -338,7 +338,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"RGA300 (%lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"RGA300 (%u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -464,7 +464,7 @@
 {
 	if([model currentActivity]==kRGAIdle)[currentAmuIndexField setStringValue:@""];
 	else {
-		[currentAmuIndexField setStringValue: [NSString stringWithFormat:@"Index: %d/%lu",[model currentAmuIndex],[model amuCount]]];
+		[currentAmuIndexField setStringValue: [NSString stringWithFormat:@"Index: %d/%u",(int)[model currentAmuIndex],(int)[model amuCount]]];
 	}
 }
 
@@ -871,8 +871,8 @@
 
 #pragma mark •••Actions
 - (IBAction) queryAllAction:(id)sender					{ [model queryAll]; }
-- (IBAction) opModeAction:(id)sender					{ [model setOpMode:						[sender indexOfSelectedItem]];	}
-- (IBAction) ionizerIonEnergyAction:(id)sender			{ [model setIonizerIonEnergy:			[sender indexOfSelectedItem]]; }
+- (IBAction) opModeAction:(id)sender					{ [model setOpMode:						(int)[sender indexOfSelectedItem]];	}
+- (IBAction) ionizerIonEnergyAction:(id)sender			{ [model setIonizerIonEnergy:			(int)[sender indexOfSelectedItem]]; }
 - (IBAction) stepsPerAmuAction:(id)sender				{ [model setStepsPerAmu:				[sender intValue]]; }
 - (IBAction) initialMassAction:(id)sender				{ [model setInitialMass:				[sender intValue]]; }
 - (IBAction) finalMassAction:(id)sender					{ [model setFinalMass:					[sender intValue]]; }
@@ -901,7 +901,7 @@
             [alert setInformativeText:@"Really turn ON Detector?"];
             [alert addButtonWithTitle:@"YES/Turn On Detector"];
             [alert addButtonWithTitle:@"Cancel"];
-            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setAlertStyle:NSAlertStyleWarning];
             
             [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
                 if (result == NSAlertFirstButtonReturn){
@@ -928,7 +928,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnDetectorOnDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model sendDetectorParameters];
+	if(returnCode == NSAlertFirstButtonReturn)[model sendDetectorParameters];
 }
 #endif
 
@@ -950,7 +950,7 @@
             [alert setInformativeText:@"Really turn ON Ionizer?"];
             [alert addButtonWithTitle:@"YES/Turn On Ionizer"];
             [alert addButtonWithTitle:@"Cancel"];
-            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setAlertStyle:NSAlertStyleWarning];
             
             [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
                 if (result == NSAlertFirstButtonReturn){
@@ -975,7 +975,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOnIonizerDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model sendIonizerParameters];
+	if(returnCode == NSAlertFirstButtonReturn)[model sendIonizerParameters];
 }
 #endif
 
@@ -1012,7 +1012,7 @@
     [alert setInformativeText:@"Really transfer the actual HW values to the input fields of this dialog?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes/Do It"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if(result == NSAlertSecondButtonReturn){
@@ -1036,7 +1036,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model syncWithHW]; 
 	}
 }
@@ -1083,7 +1083,7 @@
 - (int) numberPointsInPlot:(id)aPlot
 {
 	if([model opMode] == kRGATableMode){
-		int tag = [aPlot tag];
+		int tag = (int)[aPlot tag];
 		if(tag>=0 && tag<[model amuCount]){
 			return [model countsInAmuTableData:tag];
 		}
@@ -1098,7 +1098,7 @@
 {
 	if([model opMode] == kRGATableMode){
 		*xValue = i;
-		*yValue = [model amuTable:[aPlot tag] valueAtIndex:i];
+		*yValue = [model amuTable:(int)[aPlot tag] valueAtIndex:i];
 	}
 	else {
 		int stepsPerAmu = [model stepsPerAmu];
@@ -1108,12 +1108,12 @@
 	}
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model amuCount];
 }
 
-- (id) tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id) tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	return [model amuAtIndex:row];
 }
@@ -1168,7 +1168,7 @@
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
 {
 	NSArray* allKeys = [constraints allKeys];
-	int n = [allKeys count];
+	int n = (int)[allKeys count];
 	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %@ %d constraint%@ in effect. See below for more info.",
 										  aTitle,
                                           n==1?@"is":@"are",
@@ -1179,8 +1179,7 @@
 		[s appendFormat:@"%@ --> %@\n\n",aKey,[constraints objectForKey:aKey]];
 	}
 	[constraintView setString:s];
-	[NSApp beginSheet:constraintPanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:constraintPanel completionHandler:nil];
 }
 - (IBAction) closeConstraintPanel:(id)sender
 {

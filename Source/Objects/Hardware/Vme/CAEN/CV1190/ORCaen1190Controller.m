@@ -135,7 +135,7 @@
 - (void) enabledMaskChanged:(NSNotification*)aNote
 {
 	int i;
-	unsigned long aMask = [model enabledMask:[model paramGroup]];
+	uint32_t aMask = [model enabledMask:[model paramGroup]];
 	for(i=0;i<32;i++){
 		[[enabledMatrix0  cellWithTag:i] setIntValue:aMask&(1<<i)];
 	}
@@ -169,7 +169,7 @@
     }
 
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    int index = (int)[tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -178,23 +178,23 @@
 
 #pragma mark •••Actions
 
-- (IBAction) deadTimeAction:(id)sender				   { [model setDeadTime:				[sender indexOfSelectedItem]];	}
-- (IBAction) leadingWidthResolutionAction:(id)sender   { [model setLeadingWidthResolution:	[sender indexOfSelectedItem]];	}
-- (IBAction) leadingTimeResolutionAction:(id)sender	   { [model setLeadingTimeResolution:	[sender indexOfSelectedItem]];	}
-- (IBAction) leadingTrailingLSBAction:(id)sender	   { [model setLeadingTrailingLSB:		[sender indexOfSelectedItem]];	}
-- (IBAction) edgeDetectionAction:(id)sender			   { [model setEdgeDetection:			[sender indexOfSelectedItem]];	}
+- (IBAction) deadTimeAction:(id)sender				   { [model setDeadTime:				(int)[sender indexOfSelectedItem]];	}
+- (IBAction) leadingWidthResolutionAction:(id)sender   { [model setLeadingWidthResolution:	(int)[sender indexOfSelectedItem]];	}
+- (IBAction) leadingTimeResolutionAction:(id)sender	   { [model setLeadingTimeResolution:	(int)[sender indexOfSelectedItem]];	}
+- (IBAction) leadingTrailingLSBAction:(id)sender	   { [model setLeadingTrailingLSB:		(int)[sender indexOfSelectedItem]];	}
+- (IBAction) edgeDetectionAction:(id)sender			   { [model setEdgeDetection:			(int)[sender indexOfSelectedItem]];	}
 - (IBAction) windowWidthAction:(id)sender			   { [model setWindowWidth:				[sender intValue] / 25]; }
 - (IBAction) searchMarginAction:(id)sender			   { [model setSearchMargin:			[sender intValue] / 25]; }
 - (IBAction) rejectMarginAction:(id)sender			   { [model setRejectMargin:			[sender intValue] / 25]; }
 - (IBAction) windowOffsetAction:(id)sender			   { [model setWindowOffset:			[sender intValue] / 25]; } 
 - (IBAction) enableTrigTimeSubAction:(id)sender		   { [model setEnableTrigTimeSub:		[sender intValue]]; }
-- (IBAction) acqModeAction:(id)sender				   { [model setAcqMode:					[sender indexOfSelectedItem]]; }
+- (IBAction) acqModeAction:(id)sender				   { [model setAcqMode:					(int)[sender indexOfSelectedItem]]; }
 - (IBAction) paramGroupAction:(id)sender			   { [model setParamGroup:				[sender intValue]]; }
 - (IBAction) loadDefaultsAction:(id)sender			   { [model loadDefaults]; }
 
 - (IBAction) enabledMatrixAction:(id)sender
 {
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	int i;
 	for(i=0;i<32;i++){
 		if([[enabledMatrix0 cellWithTag:i] intValue])aMask |= (1<<i);

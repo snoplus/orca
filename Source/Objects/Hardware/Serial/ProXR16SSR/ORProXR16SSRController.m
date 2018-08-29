@@ -99,7 +99,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"ProXR16SSR (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"ProXR16SSR (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -207,13 +207,13 @@
 
 -(IBAction) outletNameAction:(id)sender
 {
-	int tag = [[sender selectedCell] tag];
+	int tag = (int)[[sender selectedCell] tag];
 	[model setOutlet:tag name:[[sender selectedCell]stringValue]];
 }
 
 - (IBAction) turnOnOffAction:(id)sender
 {
-	int chan = [[turnOnOffMatrix selectedCell] tag];
+	int chan = (int)[[turnOnOffMatrix selectedCell] tag];
 	int state = [model relayState:chan];
 	if(!state)[model closeRelay:chan];
 	else     [model openRelay:chan];
@@ -258,10 +258,10 @@
 	for(i=0;i<8;i++){
 		BOOL state = stateMask & (1<<i);
 		if(state){
-			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:1];
 		}
 		else {
-			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:1];
 		}
 		frame.origin.x += 34;
 	}
@@ -287,10 +287,10 @@
 	for(i=0;i<8;i++){
 		BOOL state = stateMask & (1<<i);
 		if(state){
-			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:1];
 		}
 		else {
-			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:1];
 		}
 		frame.origin.x += 5;
 	}

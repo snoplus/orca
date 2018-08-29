@@ -48,7 +48,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"MJD Vacuum (Cryostat %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MJD Vacuum (Cryostat %u)",[model uniqueIdNumber]]];
 }
 
 #pragma mark •••Notifications
@@ -303,7 +303,7 @@
 
 - (void) coolerModeAction:(id)sender
 {
-	[model setCoolerMode:[sender indexOfSelectedItem]];
+	[model setCoolerMode:(int)[sender indexOfSelectedItem]];
 }
 - (IBAction) showGridAction:(id)sender
 {
@@ -314,14 +314,14 @@
 {
 	[self endEditing];
 	
-	int gateValveTag	  = [sender tag];
+	int gateValveTag	  = (int)[sender tag];
 	ORVacuumGateValve* gv = [model gateValve:gateValveTag];
 	int currentValveState = [gv state];
 	
 	BOOL constraintsInPlace = [[gv constraints] count]>0;
 	if(constraintsInPlace && ![model disableConstraints]){
 		NSArray* allKeys = [[gv constraints] allKeys];
-		int n = [allKeys count];
+		int n = (int)[allKeys count];
 		[constraintTitleField setStringValue:[NSString stringWithFormat:@"%@ can not be opened because it has %d constraint%@ in effect. See below for more info.",
 											  [gv label],
 											  n,
@@ -331,11 +331,10 @@
 			[s appendFormat:@"%@ --> %@\n\n",aKey,[[gv constraints] objectForKey:aKey]];
 		}
 		[gvConstraintView setString:s];
-		[NSApp beginSheet:gvConstraintPanel modalForWindow:[self window]
-			modalDelegate:self didEndSelector:NULL contextInfo:nil];
+        [[self window] beginSheet:gvConstraintPanel completionHandler:nil];
 	}
 	else {
-		unsigned long changesVetoed = ([model vetoMask] & (0x1>>gateValveTag)) != 0;
+		uint32_t changesVetoed = ([model vetoMask] & (0x1>>gateValveTag)) != 0;
 		if(gv){
 			NSString* statusString = [NSString stringWithFormat:@"%@  current state: %@",[gv label],currentValveState==kGVOpen?@"OPEN":(currentValveState==kGVClosed?@"CLOSED":@"UnKnown")];
 			[gvControlValveState setStringValue:statusString];
@@ -412,8 +411,7 @@
 				[gvOpenToText2 setStringValue:@"--"];
 			}
 			[gvControlField setStringValue:s];
-			[NSApp beginSheet:gvControlPanel modalForWindow:[self window]
-				modalDelegate:self didEndSelector:NULL contextInfo:nil];
+            [[self window] beginSheet:gvControlPanel completionHandler:nil];
 		}
 	}
 }
@@ -434,7 +432,7 @@
 {
     [gvControlPanel orderOut:nil];
     [NSApp endSheet:gvControlPanel];
-	int gateValveTag = [gvControlButton tag];
+	int gateValveTag = (int)[gvControlButton tag];
 	int currentValveState = [model stateOfGateValve:gateValveTag];
 	
 	if(currentValveState == kGVOpen)       [model closeGateValve:gateValveTag];
@@ -462,7 +460,7 @@
         [alert setInformativeText:@"This is a dangerous operation. If you are NOT an expert -- CANCEL this operation.\n\nIf you continue, constraints will be disabled for 60 seconds."];
         [alert addButtonWithTitle:@"Cancel"];
         [alert addButtonWithTitle:@"Yes/Disable Constraints!"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertSecondButtonReturn){
@@ -500,7 +498,7 @@
 }
 
 #pragma mark •••Data Source For Tables
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == valueTableView){
 		return [[model valueLabels] count];
@@ -513,7 +511,7 @@
 	}
 	else return 0;
 }
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if((aTableView == valueTableView) || (aTableView == statusTableView)){
 		NSArray* theLabels;
@@ -522,7 +520,7 @@
 		if(rowIndex < [theLabels count]){
 			ORVacuumDynamicLabel* theLabel = [theLabels objectAtIndex:rowIndex];
 			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
-				return [NSNumber numberWithInt:rowIndex];
+				return [NSNumber numberWithInteger:rowIndex];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"label"]){
 				return [theLabel label];
@@ -540,7 +538,7 @@
 		if(rowIndex < [theGateValves count]){
 			ORVacuumGateValve* gv = [theGateValves objectAtIndex:rowIndex];
 			if([[aTableColumn identifier] isEqualToString:@"partTag"]){
-				return [NSNumber numberWithInt:rowIndex];
+				return [NSNumber numberWithInteger:rowIndex];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"label"]){
 				return [gv label];
@@ -550,7 +548,7 @@
 				else return @" ";
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"constraints"]){
-				return [NSNumber numberWithInt:[gv constraintCount]];
+				return [NSNumber numberWithInteger:[gv constraintCount]];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"controlChannel"]){
 				if([gv controlObj])return [NSNumber numberWithInt:[gv controlChannel]];

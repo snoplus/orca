@@ -140,7 +140,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == tableView || aNotification == nil){
-		int selectedIndex = [tableView selectedRow];
+		int selectedIndex = (int)[tableView selectedRow];
 		if(selectedIndex>=0){
 			[self setUpHelpText];
 			//[helpDrawer open];
@@ -154,7 +154,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 		}
 	}
 	if([aNotification object] == addressList || aNotification == nil){
-		int selectedIndex = [addressList selectedRow];
+		int selectedIndex = (int)[addressList selectedRow];
 		[removeAddressButton setEnabled:selectedIndex>=0];
 		if(selectedIndex>=0){
 			[addressField setEnabled:YES];
@@ -164,7 +164,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 			[addressField setStringValue:[addressObj mailAddress]];
 			
 			int i;
-			unsigned long aMask = [addressObj severityMask];
+			uint32_t aMask = [addressObj severityMask];
 			for(i=0;i<kNumAlarmSeverityTypes;i++){
 				[[severityMatrix cellWithTag:i] setState:(aMask & (0x1L<<i))!=0];
 			}
@@ -195,7 +195,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 - (void) setUpHelpText
 {
     if([tableView numberOfSelectedRows] == 1){
-        int selectedIndex = [tableView selectedRow];
+        int selectedIndex = (int)[tableView selectedRow];
         ORAlarm* selectedAlarm = [[self alarmCollection] objectAtIndex:selectedIndex];
         [helpTextView setString:[selectedAlarm helpString]];
     }
@@ -261,7 +261,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 	//only one can be selected at a time. If that restriction is lifted then the following will have to be changed
 	//to something a lot more complicated.
 	NSIndexSet* theSet = [addressList selectedRowIndexes];
-	NSUInteger current_index = [theSet firstIndex];
+	int current_index = (int)[theSet firstIndex];
     if(current_index != NSNotFound){
 		[[self alarmCollection] removeAddressAtIndex:current_index];
 	}
@@ -269,11 +269,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (IBAction) severityAction:(id)sender
 {
-	int selectedIndex = [addressList selectedRow];
+	int selectedIndex = (int)[addressList selectedRow];
 	if(selectedIndex>=0) {
 		id addressObj = [[self alarmCollection] addressAtIndex:selectedIndex];
 		int i;
-		unsigned long aMask = 0L;
+		uint32_t aMask = 0L;
 		for(i=0;i<kNumAlarmSeverityTypes;i++){
 			if([[severityMatrix cellWithTag:i] state] == NSOnState){
 				aMask |= (0x1L<<i);
@@ -286,7 +286,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (IBAction) addressAction:(id)sender
 {
-	int selectedIndex = [addressList selectedRow];
+	int selectedIndex = (int)[addressList selectedRow];
 	if(selectedIndex>=0) {
 		id addressObj = [[self alarmCollection] addressAtIndex:selectedIndex];
 		[addressObj setMailAddress:[sender stringValue]];
@@ -313,12 +313,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (void) severitySelectionChanged:(NSNotification*)aNotification
 {
-	int selectedIndex = [addressList selectedRow];
+	int selectedIndex = (int)[addressList selectedRow];
 	if(selectedIndex>=0) {
 		id addressObj = [[self alarmCollection] addressAtIndex:selectedIndex];
 		if([aNotification object] == addressObj){
 			int i;
-			unsigned long aMask = [addressObj severityMask];
+			uint32_t aMask = [addressObj severityMask];
 			for(i=0;i<kNumAlarmSeverityTypes;i++){
 				[[severityMatrix cellWithTag:i] setState:(aMask & (0x1L<<i))!=0];
 			}
@@ -333,7 +333,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 }
 - (void) addressAdded:(NSNotification*)aNote
 {
-	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+	NSInteger index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
 	index = MIN(index,[[self alarmCollection] eMailCount]);
 	index = MAX(index,0);
 	[addressList reloadData];
@@ -343,7 +343,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (void) addressRemoved:(NSNotification*)aNote
 {
-	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
+	NSInteger index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
 	index = MIN(index,[[self alarmCollection] eMailCount]-1);
 	index = MAX(index,0);
 	[addressList reloadData];
@@ -353,7 +353,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 
 - (void) addressChanged:(NSNotification*)aNotification
 {
-	int selectedIndex = [addressList selectedRow];
+	int selectedIndex = (int)[addressList selectedRow];
 	if(selectedIndex>=0) {
 		id addressObj = [[self alarmCollection] addressAtIndex:selectedIndex];
 		if([aNotification object] == addressObj){
@@ -407,7 +407,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmController);
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == tableView){
 		return [[self alarmCollection] alarmCount];

@@ -168,7 +168,7 @@
 - (void) itemsAdded:(NSNotification*)aNote
 {
 	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
-	index = MIN(index,[model itemCount]);
+	index = MIN(index,(int)[model itemCount]);
 	index = MAX(index,0);
 	[notesListView reloadData];
 	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
@@ -180,7 +180,7 @@
 - (void) itemsRemoved:(NSNotification*)aNote
 {
 	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
-	index = MIN(index,[model itemCount]-1);
+	index = MIN(index,(int)[model itemCount]-1);
 	index = MAX(index,0);
 	[notesListView reloadData];
 	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
@@ -205,7 +205,7 @@
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == notesListView || aNotification == nil){
-		int selectedIndex = [notesListView selectedRow];
+		int selectedIndex = (int)[notesListView selectedRow];
 		[removeItemButton setEnabled:selectedIndex>=0];
 	}
 }
@@ -316,8 +316,7 @@
 	[self endEditing];
     [addItemValueField setObjectValue:@""];
     [addItemNameField setObjectValue:@""];
-    [NSApp beginSheet:addItemPanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:addItemPanel completionHandler:nil];
 }
 
 - (IBAction) closeAddItemPanel:(id)sender
@@ -367,8 +366,9 @@
 }
 
 #pragma mark Data Source Methods
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) aRowIndex
 {
+    int rowIndex = (int)aRowIndex;
 	if(aTableView == notesListView){
 		id anItem = [model itemAtIndex:rowIndex];
         NSArray* allKeys = [anItem allKeys];
@@ -384,8 +384,9 @@
     return nil;
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)aRowIndex
 {
+    int rowIndex = (int)aRowIndex;
 	if(aTableView == notesListView){
 		id anItem = [model itemAtIndex:rowIndex];
         NSArray* allKeys = [anItem allKeys];
@@ -396,7 +397,7 @@
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == notesListView){
 		return [model itemCount];

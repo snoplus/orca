@@ -25,11 +25,11 @@
 
 #define swapLong(x) (((uint32_t)(x) << 24) | (((uint32_t)(x) & 0x0000FF00) <<  8) | (((uint32_t)(x) & 0x00FF0000) >>  8) | ((uint32_t)(x) >> 24))
 
-- (NSString*) decodePMTBundle:(unsigned long*)ptr
+- (NSString*) decodePMTBundle:(uint32_t*)ptr
 {
 	BOOL swapBundle = YES;
 	if (0x0000ABCD != htonl(0x0000ABCD) && indexerSwaps) swapBundle = NO;
-	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
+	//if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
 
     NSMutableString* dsc = [NSMutableString string];
 
@@ -51,7 +51,7 @@
         ptr[2] = swapLong(ptr[2]);
     }
     
-    [dsc appendFormat:@"GTId = 0x%06lx\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
+    [dsc appendFormat:@"GTId = 0x%06x\n", (*ptr & 0x0000ffff) | ((ptr[2] << 4) & 0x000f0000) | ((ptr[2] >> 8) & 0x00f00000)];
     [dsc appendFormat:@"CCCC: %lu, %lu, ", (*ptr >> 21) & 0x1fUL, (*ptr >> 26) & 0x0fUL];
     [dsc appendFormat:@"%lu, %lu\n", (*ptr >> 16) & 0x1fUL, (ptr[1] >> 12) & 0x0fUL];
     [dsc appendFormat:@"QHL = 0x%03lx\n", ptr[2] & 0x0fffUL ^ 0x0800UL];
@@ -64,9 +64,9 @@
     [dsc appendFormat:@"Missed count error: %@\n", ((ptr[1] >> 28) & 0x1UL) ? @"Yes" : @"No"];
     [dsc appendFormat:@"NC/CC: %@, ", ((ptr[1] >> 29) & 0x1UL) ? @"CC" : @"NC"];
     [dsc appendFormat:@"LGI: %@\n", ((ptr[1] >> 30) & 0x1UL) ? @"Long" : @"Short"];
-    [dsc appendFormat:@"Wrd0 = 0x%08lx\n", *ptr];
-    [dsc appendFormat:@"Wrd1 = 0x%08lx\n", ptr[1]];
-    [dsc appendFormat:@"Wrd2 = 0x%08lx\n\n", ptr[2]];
+    [dsc appendFormat:@"Wrd0 = 0x%08x\n", *ptr];
+    [dsc appendFormat:@"Wrd1 = 0x%08x\n", ptr[1]];
+    [dsc appendFormat:@"Wrd2 = 0x%08x\n\n", ptr[2]];
 
     //swap back the PMT bundle 
     if (swapBundle) {
@@ -79,17 +79,17 @@
 }
 
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
 	indexerSwaps = [aDecoder needToSwap]; //won't work for multicatalogs with mixed endianness
 	return length; //must return number of bytes processed.
 }
 
 
 
-- (NSString*) dataRecordDescription:(unsigned long*)ptr
+- (NSString*) dataRecordDescription:(uint32_t*)ptr
 {
 	/*
 	the megaBundle is always big-endian, but ORRecordIndexer could have swapped it
@@ -101,16 +101,16 @@
 
 	BOOL swapBundle = YES;
 	if (0x0000ABCD != htonl(0x0000ABCD) && indexerSwaps) swapBundle = NO;
-	if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
+	//if (0x0000ABCD == htonl(0x0000ABCD) && !indexerSwaps) swapBundle = NO;
 
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t length = ExtractLength(*ptr);
 	unsigned short i = 0;
     unsigned short version = 0;
 	NSMutableString* dsc = [NSMutableString string];
 
     ptr += 1;
     version = ptr[0] >> 5 & 0x7;
-    [dsc appendFormat:@"packetNum: %lu\ncrate_num: %lu\nversion: %d\nnum_longs: %lu\n",
+    [dsc appendFormat:@"packetNum: %u\ncrate_num: %u\nversion: %d\nnum_longs: %u\n",
      ptr[0] >> 16, ptr[0] & 0x1f, version, length];
     ptr += 1;
 
@@ -126,8 +126,8 @@
             if (swapBundle) {
                 ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
             }
-            unsigned int num_longs = ptr[0] & 0xffffff;
-            [dsc appendFormat:@"\ncrate_num: %lu\nnum_longs: %u\npass_min: %lu\nxl3_clock: %lu\n",
+            uint32_t num_longs = ptr[0] & 0xffffff;
+            [dsc appendFormat:@"\ncrate_num: %u\nnum_longs: %u\npass_min: %u\nxl3_clock: %u\n",
              ptr[0] >> 24, num_longs, ptr[1], ptr[2]];
             if (swapBundle) {
                 ptr[0] = swapLong(ptr[0]); ptr[1] = swapLong(ptr[1]); ptr[2] = swapLong(ptr[2]);
@@ -143,7 +143,7 @@
             }
             
             ptr += 3;            
-            unsigned int mini_header = 0;
+            uint32_t mini_header = 0;
             while (num_longs != 0) {
                 mini_header = ptr[0];
                 if (swapBundle) {
@@ -164,7 +164,7 @@
                         if (mini_num_longs % 3 || num_longs < mini_num_longs) {
                             [dsc appendFormat:@"mini bundle header\ncorrupted, quit.\n"];
                             num_longs = 0;
-                            [dsc appendFormat:@"0x%08lx\n0x%08lx\n0x%08lx\n0x%08lx\n", ptr[0], ptr[1], ptr[2], ptr[3]];
+                            [dsc appendFormat:@"0x%08x\n0x%08x\n0x%08x\n0x%08x\n", ptr[0], ptr[1], ptr[2], ptr[3]];
                             break;
                         }
 
@@ -182,7 +182,7 @@
                             num_longs = 0;
                             break;
                         }
-                        unsigned int pass_cur = ptr[0];
+                        uint32_t pass_cur = ptr[0];
                         if (swapBundle) {
                             pass_cur = swapLong(pass_cur);
                         }
@@ -208,36 +208,36 @@
 
 @implementation ORXL3DecoderForCmosRate
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
     indexerSwaps = [aDecoder needToSwap];
 	return length; //must return number of bytes processed.
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(uint32_t*)dataPtr
 {
-    /* data[0] ORCA long header
+    /* data[0] ORCA int32_t header
      * data[1] crate number filled by orca
      * data[2..18] longs by orca
      * data[19] ... big endian longs written by XL3, swapped by orca
      * data[21+8*32] ... timestamp string by orca, 6 longs
      */
 
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"CMOS rates crate %lu\n\nslot mask: 0x%lx\n", dataPtr[1], dataPtr[2]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"CMOS rates crate %u\n\nslot mask: 0x%x\n", dataPtr[1], dataPtr[2]];
     unsigned char slot = 0;
     for (slot=0; slot<16; slot++) {
-        [dsc appendFormat:@"ch mask slot %2d: 0x%08lx\n", slot, dataPtr[3+slot]];
+        [dsc appendFormat:@"ch mask slot %2d: 0x%08x\n", slot, dataPtr[3+slot]];
     }
-    [dsc appendFormat:@"delay: %lu ms\n\nerror flags: 0x%08lx\n", dataPtr[19], dataPtr[20]];
+    [dsc appendFormat:@"delay: %u ms\n\nerror flags: 0x%08x\n", dataPtr[19], dataPtr[20]];
 
     unsigned char ch, slot_idx = 0;
     for (slot=0; slot<16; slot++) {
         if ((dataPtr[2] >> slot) & 0x1) {
             [dsc appendFormat:@"\nslot %d\n", slot];
             for (ch = 0; ch < 32; ch++) {
-                [dsc appendFormat:@"ch %2d: %lu\n", ch, dataPtr[21 + slot_idx*32 + ch]];
+                [dsc appendFormat:@"ch %2d: %u\n", ch, dataPtr[21 + slot_idx*32 + ch]];
             }
             slot_idx++;
         }
@@ -254,22 +254,22 @@
 
 @implementation ORXL3DecoderForFifo
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
     indexerSwaps = [aDecoder needToSwap];
 	return length; //must return number of bytes processed.    
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(uint32_t*)dataPtr
 {
-    /* data[0] ORCA long header
+    /* data[0] ORCA int32_t header
      * data[1] crate number filled by ORCA
      * data[2] ... data[18] floats written by XL3 swapped by ORCA
      */
 
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"FIFO state crate %lu\n\n", dataPtr[1]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"FIFO state crate %u\n\n", dataPtr[1]];
     unsigned char slot=0;
     
     for (slot=2; slot<18; slot++) {
@@ -284,33 +284,33 @@
 
 @implementation ORXL3DecoderForPmtBaseCurrent
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
     indexerSwaps = [aDecoder needToSwap];
 	return length; //must return number of bytes processed.
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(uint32_t*)dataPtr
 {
-    /* data[0] ORCA long header
+    /* data[0] ORCA int32_t header
      * data[1] crate number filled by ORCA
      * data[2] ... data[18] longs written by ORCA
-     * data[19] long written by XL3 swapped by ORCA
+     * data[19] int32_t written by XL3 swapped by ORCA
      * data[20] ... 16*32 chars adc written by XL3
      * data[20+16*8] ... 16*32 chars busyFlagss written by XL3
      * data[20+16*8+16*8] ... timestamp string by ORCA, 6 longs
      */
     
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"PMT base currents crate %lu\n", dataPtr[1]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"PMT base currents crate %u\n", dataPtr[1]];
         
-    [dsc appendFormat:@"slotmask: 0x%04lx\n\nchannel masks:\n", dataPtr[2]];
+    [dsc appendFormat:@"slotmask: 0x%04x\n\nchannel masks:\n", dataPtr[2]];
     unsigned short idx;
     for (idx=3; idx<19; idx++) {
-        [dsc appendFormat:@"slot %02u: 0x%08lx\n", idx-3U, dataPtr[idx]];
+        [dsc appendFormat:@"slot %02u: 0x%08x\n", idx-3U, dataPtr[idx]];
     }
-    [dsc appendFormat:@"\nerrorFlags: 0x%08lx\n", dataPtr[19]];
+    [dsc appendFormat:@"\nerrorFlags: 0x%08x\n", dataPtr[19]];
 
     if (indexerSwaps) for (idx=20; idx < 20+16*8+16*8+6; idx++) dataPtr[idx] = swapLong(dataPtr[idx]);
     [dsc appendFormat:@"\nADC values:"];
@@ -345,7 +345,7 @@
 
     [dsc appendFormat:@"\nraw packet:\n"];
     for (idx = 0; idx < 20+16*8+16*8+6; idx++) {
-        [dsc appendFormat:@"%02hu: 0x%08lx\n", idx, dataPtr[idx]];
+        [dsc appendFormat:@"%02hu: 0x%08x\n", idx, dataPtr[idx]];
     }
     
     return [[dsc retain] autorelease];
@@ -354,23 +354,23 @@
 
 @implementation ORXL3DecoderForHv
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
     indexerSwaps = [aDecoder needToSwap];
 	return length; //must return number of bytes processed.
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(uint32_t*)dataPtr
 {
-    /* data[0] ORCA long header
+    /* data[0] ORCA int32_t header
      * data[1] crate number filled by ORCA
      * data[2] ... data[5] floats written by ORCA
      * data[6] ... timestamp string by ORCA, 6 longs
      */
     
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"HV status %lu\n\n", dataPtr[1]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"HV status %u\n\n", dataPtr[1]];
     float* vlt = (float*)&dataPtr[2];
     [dsc appendFormat:@"voltage A: %4.1f V\n", vlt[0]];
     [dsc appendFormat:@"voltage B: %4.1f V\n", vlt[1]];
@@ -388,23 +388,23 @@
 
 @implementation ORXL3DecoderForVlt
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
     indexerSwaps = [aDecoder needToSwap];
 	return length; //must return number of bytes processed.
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(uint32_t*)dataPtr
 {
-    /* data[0] ORCA long header
+    /* data[0] ORCA int32_t header
      * data[1] crate number filled by ORCA
      * data[2] ... data[9] floats written by XL3, swapped by ORCA
      * data[10] ... timestamp string by ORCA, 6 longs
      */
     
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"XL3 voltages crate: %lu\n\n", dataPtr[1]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"XL3 voltages crate: %u\n\n", dataPtr[1]];
     
     float* vlt = (float*)&dataPtr[2];
     [dsc appendFormat:@"VCC : %6.2f V\n", vlt[0]];
@@ -427,26 +427,26 @@
 
 @implementation ORXL3DecoderForFecVlt
 
-- (unsigned long) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
+- (uint32_t) decodeData:(void*)someData fromDecoder:(ORDecoder*)aDecoder intoDataSet:(ORDataSet*)aDataSet
 {
-	unsigned long* ptr = (unsigned long*)someData;
-	unsigned long length = ExtractLength(*ptr);
+	uint32_t* ptr = (uint32_t*)someData;
+	uint32_t length = ExtractLength(*ptr);
     indexerSwaps = [aDecoder needToSwap];
 	return length; //must return number of bytes processed.
 }
 
-- (NSString*) dataRecordDescription:(unsigned long*)dataPtr
+- (NSString*) dataRecordDescription:(uint32_t*)dataPtr
 {
-    /* data[0] ORCA long header
+    /* data[0] ORCA int32_t header
      * data[1] crate number filled by ORCA
      * data[2] slot ORCA
      * data[3] ... data[23] floats written by XL3, swapped by ORCA
      * data[24] ... timestamp string by ORCA, 6 longs
      */
     
-    NSMutableString* dsc = [NSMutableString stringWithFormat: @"XL3 voltages crate: %lu\n\n", dataPtr[1]];
+    NSMutableString* dsc = [NSMutableString stringWithFormat: @"XL3 voltages crate: %u\n\n", dataPtr[1]];
     
-    [dsc appendFormat:@"slot: %lu\n", dataPtr[2]];
+    [dsc appendFormat:@"slot: %u\n", dataPtr[2]];
     
     float* vlt = (float*)&dataPtr[3];
     [dsc appendFormat:@" -24V Sup: %6.2f V\n", vlt[0]];

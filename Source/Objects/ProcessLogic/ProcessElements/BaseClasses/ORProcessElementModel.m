@@ -114,9 +114,9 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 			[highlightedAltImage release];
 			highlightedAltImage = [[NSImage alloc] initWithSize:[anImage size]];
 			[highlightedAltImage lockFocus];
-            [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+            [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 			[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
-			NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
+			NSRectFillUsingOperation(sourceRect, NSCompositingOperationSourceAtop);
 			[NSBezierPath strokeRect:sourceRect];
 			[highlightedAltImage unlockFocus];
 		}
@@ -176,7 +176,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 				else					imageToDraw = altImage;
 				
 				NSRect sourceRect = NSMakeRect(0,0,[imageToDraw size].width,[imageToDraw size].height);
-				[imageToDraw drawAtPoint:altFrame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:aTransparency];
+				[imageToDraw drawAtPoint:altFrame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:aTransparency];
 			}
 			else {
 				//no icon so fake it with just a square
@@ -332,8 +332,8 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 }
 
 #pragma mark ¥¥¥Accessors
-- (unsigned long) processID { return processID;}
-- (void) setProcessID:(unsigned long)aValue
+- (uint32_t) processID { return processID;}
+- (void) setProcessID:(uint32_t)aValue
 {
 	processID = aValue;
 }
@@ -344,7 +344,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 
 - (NSString*) description:(NSString*)prefix
 {
-    return [NSString stringWithFormat:@"%@%@ %lu",prefix,[self elementName],[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"%@%@ %u",prefix,[self elementName],[self uniqueIdNumber]];
 }
 
 - (NSString*)comment
@@ -364,7 +364,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
                               object:self];
 }
 
-- (void) setUniqueIdNumber :(unsigned long)aNumber
+- (void) setUniqueIdNumber :(uint32_t)aNumber
 {
     [super setUniqueIdNumber:aNumber];
     [self postStateChange]; //force redraw
@@ -460,7 +460,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 	if([self uniqueIdNumber]){
 		NSFont* theFont = [NSFont messageFontOfSize:theSize];
 		return [[[NSAttributedString alloc] 
-				 initWithString:[NSString stringWithFormat:@"%lu",[self processID]] 
+				 initWithString:[NSString stringWithFormat:@"%u",[self processID]] 
 				 attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,textColor,NSForegroundColorAttributeName,nil]]autorelease];
 	}
 	else return nil;
@@ -477,7 +477,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
 	altFrame  =		 [decoder decodeRectForKey:@"altFrame"];
 	altOffset =		 [decoder decodePointForKey:@"altOffset"];
 	altBounds =		 [decoder decodeRectForKey:@"altBounds"];
-	processID =		 [decoder decodeInt32ForKey:@"processID"];
+	processID =		 [decoder decodeIntForKey:@"processID"];
 	if(altFrame.origin.x == 0 && altFrame.origin.y == 0){
 		altFrame.origin.x = frame.origin.x+10;
 		altFrame.origin.y = frame.origin.y+10;
@@ -497,7 +497,7 @@ NSString* ORProcessElementForceUpdateNotification   = @"ORProcessElementForceUpd
     [encoder encodeRect:altFrame   forKey:@"altFrame"];
     [encoder encodePoint:altOffset forKey:@"altOffset"];
 	[encoder encodeRect:altBounds  forKey:@"altBounds"];
-	[encoder encodeInt32:processID forKey:@"processID"];
+	[encoder encodeInt:processID forKey:@"processID"];
 }
 
 @end

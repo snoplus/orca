@@ -31,7 +31,7 @@
 
 #pragma mark •••Static Declarations
 //offsets from the base address (kDefaultBaseAddress)
-static unsigned long register_offsets[kNumberOfVHQ224LSRegisters] = {
+static uint32_t register_offsets[kNumberOfVHQ224LSRegisters] = {
 	0x00,	//kStatusRegister1		[0] 	
 	0x04,	//kSetVoltageA			[1] 	
 	0x08,	//kSetVoltageB			[2] 	
@@ -279,8 +279,8 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORVHQ224LRampRateChanged object:self userInfo: nil];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -469,7 +469,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 			else return @"HV OFF  ";
 		}
 	}
-	else return kHVOff;
+	else return @"HV OFF  ";
 }
 
 - (eVHQ224LRampingState) rampingState:(unsigned short)aChannel
@@ -558,7 +558,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 	for(i=0;i<kNumVHQ224LChannels;i++){
 		[self setVoltage:i withValue:   [decoder decodeFloatForKey:[NSString stringWithFormat:@"voltage%d",i]]];
 		[self setMaxCurrent:i withValue:[decoder decodeFloatForKey:[NSString stringWithFormat:@"maxCurrent%d",i]]];
-		[self setRampRate:i withValue:  [decoder decodeIntForKey:  [NSString stringWithFormat:@"rampRate%d",i]]];
+		[self setRampRate:i withValue:  [decoder decodeIntegerForKey:  [NSString stringWithFormat:@"rampRate%d",i]]];
 	}
 	[self setPollTime:[decoder decodeIntForKey:@"pollTime"]];
     [[self undoManager] enableUndoRegistration];
@@ -573,9 +573,9 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 	for(i=0;i<kNumVHQ224LChannels;i++){
 		[encoder encodeFloat:voltage[i]    forKey:[NSString stringWithFormat:@"voltage%d",i]];
 		[encoder encodeFloat:maxCurrent[i] forKey:[NSString stringWithFormat:@"maxCurrent%d",i]];
-		[encoder encodeInt:rampRate[i]     forKey:[NSString stringWithFormat:@"rampRate%d",i]];
+		[encoder encodeInteger:rampRate[i]     forKey:[NSString stringWithFormat:@"rampRate%d",i]];
 	}
-	[encoder encodeInt:pollTime forKey:@"pollTime"];
+	[encoder encodeInteger:pollTime forKey:@"pollTime"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -615,14 +615,14 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		
-		unsigned long data[11];
+		uint32_t data[11];
 		data[0] = dataId | 11;
 		data[1] = [self uniqueIdNumber]&0xfff;
-		data[2] = ut_Time;
+		data[2] = (uint32_t)ut_Time;
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		int index = 3;
 		int i;
@@ -638,7 +638,7 @@ NSString* ORVHQ224LMaxCurrentChanged		= @"ORVHQ224LMaxCurrentChanged";
 		}
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*11]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*11]];
 	}	
 	statusChanged = NO;
 }

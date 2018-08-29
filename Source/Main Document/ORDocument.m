@@ -131,7 +131,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
     [customRunParameters release];
 
     [[self undoManager] removeAllActions];
-	RestoreApplicationDockTileImage();
+	//RestoreApplicationDockTileImage();
     
 	[(ORAppDelegate*)[NSApp delegate] setDocument:nil];
     //[self setDbConnection:nil];
@@ -214,7 +214,7 @@ NSString* ORDocumentLock					= @"ORDocumentLock";
 {
     if(![objToGetID uniqueIdNumber]){
         NSArray* objects = [self collectObjectsOfClass:[objToGetID class]];
-        unsigned long anId = 1;
+        uint32_t anId = 1;
         do {
             BOOL idAlreadyUsed = NO;
             for(id anObj in objects){
@@ -412,7 +412,7 @@ static NSString* OROrcaControllers	    = @"OROrcaControllers";
 static NSString* ORTaskMasterVisibleKey = @"ORTaskMasterVisibleKey";
 static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 
-- (NSData *)dataRepresentationOfType:(NSString *)type
+- (NSData *)dataOfType:(NSString *)type error:(NSError **)outError
 {
 	//special case -- if the config file came from a fall back config, then we won't store it as the last file
 	NSString* lastFile = [[NSUserDefaults standardUserDefaults] stringForKey:@"config"];
@@ -429,7 +429,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		//PH comment out so archiver uses the default binary plist format
 		//[archiver setOutputFormat:NSPropertyListXMLFormat_v1_0];
 		
-		[archiver encodeInt:ORDocumentVersion forKey:ORDocumentVersionKey];
+		[archiver encodeInteger:ORDocumentVersion forKey:ORDocumentVersionKey];
 		
 		[archiver encodeObject:[self group] forKey:ORGroupKey];
 		
@@ -437,7 +437,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 		
 		[archiver encodeBool:[[[ORTaskMaster sharedTaskMaster] window] isVisible] forKey:ORTaskMasterVisibleKey];
 		
-		[archiver encodeInt:scaleFactor forKey:ORDocumentScaleFactor];						
+		[archiver encodeInteger:scaleFactor forKey:ORDocumentScaleFactor];						
         
 		
 		[[ORAlarmCollection sharedAlarmCollection] encodeEMailList:archiver];
@@ -474,8 +474,7 @@ static NSString* ORDocumentScaleFactor  = @"ORDocumentScaleFactor";
 	afterSaveSelector = aSelector;
 }
 
-
-- (BOOL)loadDataRepresentation:(NSData *)data ofType:(NSString *)type
+- (BOOL)readFromData:(NSData *)data ofType:(NSString *)type error:(NSError **)outError;
 {
 	[[NSNotificationCenter defaultCenter] postNotificationName:@"ORStartUpMessage"
 														object:self

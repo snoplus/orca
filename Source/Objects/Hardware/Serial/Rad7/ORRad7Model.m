@@ -249,16 +249,16 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
         if(!buffer)buffer = [[NSMutableString string] retain];
         [buffer appendString:theString]; //accumulate into the buffer
         
-        [self chunkPrecheck:buffer]; //some of the responses are very long. Check for the special cases
+        [self chunkPrecheck:buffer]; //some of the responses are very int32_t. Check for the special cases
         
         if(gettingData){
-            [self setStatusString:[NSString stringWithFormat:@"Received: %d bytes",[buffer length]]];
+            [self setStatusString:[NSString stringWithFormat:@"Received: %d bytes",(int)[buffer length]]];
         }
         else if(radLinkLoading && !rebooting){
-            [self setStatusString:[NSString stringWithFormat:@"Loaded: %d/%d bytes",[buffer length],radLinkSize]];
+            [self setStatusString:[NSString stringWithFormat:@"Loaded: %d/%d bytes",(int)[buffer length],radLinkSize]];
         }
         else if(gettingReview){
-            [self setStatusString:[NSString stringWithFormat:@"Getting Data: %d bytes (Takes a while -- Be patient)",[buffer length]]];
+            [self setStatusString:[NSString stringWithFormat:@"Getting Data: %d bytes (Takes a while -- Be patient)",(int)[buffer length]]];
         }
        
         NSUInteger eofLocation = [buffer rangeOfString:@"\r\n>"].location;
@@ -379,12 +379,12 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelHumidityAlarmChanged object:self];
 }
 
-- (unsigned long) maxRadon
+- (uint32_t) maxRadon
 {
     return maxRadon;
 }
 
-- (void) setMaxRadon:(unsigned long)aMaxRadon
+- (void) setMaxRadon:(uint32_t)aMaxRadon
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMaxRadon:maxRadon];
     
@@ -393,12 +393,12 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelMaxRadonChanged object:self];
 }
 
-- (unsigned long) alarmLimit
+- (uint32_t) alarmLimit
 {
     return alarmLimit;
 }
 
-- (void) setAlarmLimit:(unsigned long)aAlarmLimit
+- (void) setAlarmLimit:(uint32_t)aAlarmLimit
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setAlarmLimit:alarmLimit];
     
@@ -644,14 +644,14 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRad7ModelThoronChanged object:self];
 }
 
-- (int) mode
+- (int) opMode
 {
     return mode;
 }
 
-- (void) setMode:(int)aMode
+- (void) setOpMode:(int)aMode
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
+    [[[self undoManager] prepareWithInvocationTarget:self] setOpMode:mode];
     
     mode = aMode;
 	
@@ -727,7 +727,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	}
 }
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -824,8 +824,8 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self setPumpCurrentMaxLimit:[decoder decodeFloatForKey:@"pumpCurrentMaxLimit"]];
 	[self setPumpCurrentAlarm:	[decoder decodeFloatForKey:@"pumpCurrentAlarm"]];
 	[self setHumidityAlarm:		[decoder decodeFloatForKey:@"humidityAlarm"]];
-	[self setMaxRadon:			[decoder decodeInt32ForKey:@"maxRadon"]];
-	[self setAlarmLimit:		[decoder decodeInt32ForKey:@"alarmLimit"]];
+	[self setMaxRadon:			[decoder decodeIntForKey:@"maxRadon"]];
+	[self setAlarmLimit:		[decoder decodeIntForKey:@"alarmLimit"]];
 	[self setMakeFile:			[decoder decodeBoolForKey:	@"makeFile"]];
 	[self setVerbose:			[decoder decodeBoolForKey:	@"verbose"]];
 	[self setDeleteDataOnStart:	[decoder decodeBoolForKey:	@"deleteDataOnStart"]];
@@ -836,7 +836,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 	[self setTone:				[decoder decodeIntForKey:	@"tone"]];
 	[self setPumpMode:			[decoder decodeIntForKey:	@"pumpMode"]];
 	[self setThoron:			[decoder decodeBoolForKey:	@"thoron"]];
-	[self setMode:				[decoder decodeIntForKey:	@"mode"]];
+	[self setOpMode:				[decoder decodeIntForKey:	@"mode"]];
 	[self setRecycle:			[decoder decodeIntForKey:	@"recycle"]];
 	[self setCycleTime:			[decoder decodeIntForKey:	@"cycleTime"]];
 	[self setProtocol:			[decoder decodeIntForKey:	@"protocol"]];
@@ -858,23 +858,23 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [encoder encodeFloat:	pumpCurrentMaxLimit forKey:@"pumpCurrentMaxLimit"];
     [encoder encodeFloat:	pumpCurrentAlarm forKey:@"pumpCurrentAlarm"];
     [encoder encodeFloat:	humidityAlarm	forKey:@"humidityAlarm"];
-    [encoder encodeInt32:	maxRadon		forKey:@"maxRadon"];
-    [encoder encodeInt32:	alarmLimit		forKey:@"alarmLimit"];
+    [encoder encodeInt:	maxRadon		forKey:@"maxRadon"];
+    [encoder encodeInt:	alarmLimit		forKey:@"alarmLimit"];
     [encoder encodeBool:	makeFile		forKey:@"makeFile"];
     [encoder encodeBool:	verbose			forKey:@"verbose"];
     [encoder encodeBool:	deleteDataOnStart forKey:@"deleteDataOnStart"];
-    [encoder encodeInt:		runToPrint		forKey:@"runToPrint"];
-    [encoder encodeInt:		rUnits			forKey: @"rUnits"];
-    [encoder encodeInt:		tUnits			forKey: @"tUnits"];
-    [encoder encodeInt:		formatSetting	forKey: @"formatSetting"];
-    [encoder encodeInt:		tone			forKey: @"tone"];
-    [encoder encodeInt:		pumpMode		forKey: @"pumpMode"];
+    [encoder encodeInteger:		runToPrint		forKey:@"runToPrint"];
+    [encoder encodeInteger:		rUnits			forKey: @"rUnits"];
+    [encoder encodeInteger:		tUnits			forKey: @"tUnits"];
+    [encoder encodeInteger:		formatSetting	forKey: @"formatSetting"];
+    [encoder encodeInteger:		tone			forKey: @"tone"];
+    [encoder encodeInteger:		pumpMode		forKey: @"pumpMode"];
     [encoder encodeBool:    thoron			forKey: @"thoron"];
     [encoder encodeInt:     mode			forKey: @"mode"];
-    [encoder encodeInt:     recycle			forKey: @"recycle"];
-    [encoder encodeInt:     cycleTime		forKey: @"cycleTime"];
-    [encoder encodeInt:		protocol		forKey: @"protocol"];
-    [encoder encodeInt:		pollTime		forKey:	@"ORRad7ModelPollTime"];
+    [encoder encodeInteger:     recycle			forKey: @"recycle"];
+    [encoder encodeInteger:     cycleTime		forKey: @"cycleTime"];
+    [encoder encodeInteger:		protocol		forKey: @"protocol"];
+    [encoder encodeInteger:		pollTime		forKey:	@"ORRad7ModelPollTime"];
     [encoder encodeBool:	portWasOpen		forKey:	@"ORRad7ModelPortWasOpen"];
     [encoder encodeObject:	portName		forKey: @"portName"];
 }
@@ -1057,7 +1057,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 - (void) loadDialogFromHardware
 {
     [self addCmdToQueue:@"SETUP REVIEW"];
-    NSLog(@"Getting settings from Rad7.... Takes a long time... Be Patient.\n");
+    NSLog(@"Getting settings from Rad7.... Takes a int32_t time... Be Patient.\n");
 }
 
 - (void) initHardware
@@ -1093,7 +1093,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 
 - (int) numPoints
 {
-	return [dataPointArray count];
+	return (int)[dataPointArray count];
 }
 
 - (double) radonValue:(int)index
@@ -1142,7 +1142,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Rad7,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Rad7,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -1226,7 +1226,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(timeout) object:nil];
     
 	NSString* contents = [NSString stringWithContentsOfFile:filePath encoding:NSASCIIStringEncoding error:nil];
-    radLinkSize = [contents length];
+    radLinkSize = (int)[contents length];
     [self flushAllCommands];
     if([contents length]){
         [self setRadLinkLoading:YES];
@@ -1334,7 +1334,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
             tempVerbose = NO;
             [self flushAllCommands];
             
-            NSLogError(@"",@"Comm Error",@"Rad7",[NSString stringWithFormat:@"unit %lu",[self uniqueIdNumber]],nil);
+            NSLogError(@"",@"Comm Error",@"Rad7",[NSString stringWithFormat:@"unit %u",[self uniqueIdNumber]],nil);
 
             id runStateString = [statusDictionary objectForKey:kRad7RunStatus];
             
@@ -1410,7 +1410,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			[self setDataPointArray:[NSMutableArray array]];
 			if(makeFile){
 				[stopRunFilePath release];
-				stopRunFilePath = [NSString stringWithFormat:@"~/Desktop/Rad7/Rad7_%lu_%@",[self uniqueIdNumber],[NSDate date]];
+				stopRunFilePath = [NSString stringWithFormat:@"~/Desktop/Rad7/Rad7_%u_%@",[self uniqueIdNumber],[NSDate date]];
 				stopRunFilePath = [stopRunFilePath stringByExpandingTildeInPath];
 				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@" " withString:@"_"];
 				stopRunFilePath = [stopRunFilePath stringByReplacingOccurrencesOfString:@"-" withString:@"_"];
@@ -1703,7 +1703,7 @@ static NSString* rad7ThoronNames[kNumberRad7ThoronNames] = {
 			if([parts count]>=3)value1 = [[parts objectAtIndex:2] trimSpacesFromEnds];
 
 				if([tag isEqualToString:@"PUMP"])[self setPumpMode:[self convertPumpModeStringToIndex:value]];
-				else if([tag isEqualToString:@"MODE"])[self setMode:[self convertModeStringToIndex:value]];
+				else if([tag isEqualToString:@"MODE"])[self setOpMode:[self convertModeStringToIndex:value]];
 				else if([tag isEqualToString:@"THORON"])[self setThoron:[self convertThoronStringToIndex:value]];
 				else if([tag isEqualToString:@"RECYCLE"])[self setRecycle:[value intValue]];
 				else if([tag isEqualToString:@"CYCLE"])[self setCycleTime:[self convertCycleHours:value minutes:value1]];

@@ -95,11 +95,11 @@
 - (void) scanConfiguration
 {
     NSArray* objects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:selectionClass];
-    [self setNumberOfItems:[objects count]];
+    [self setNumberOfItems:(int)[objects count]];
     
     if(level == kContainerLevel){
         if([objects count]){
-            [self setMaxValue:[objects count]-1];
+            [self setMaxValue:(int)[objects count]-1];
         }
     }
     else if(level == kChannelLevel){
@@ -113,7 +113,7 @@
         NSEnumerator* e = [objects objectEnumerator];
         OrcaObject<ORHWWizard>* obj;
         while(obj = [e nextObject]){
-            int objectTag = [obj stationNumber]; //some objs, i.e. CAMAC objects aren't zero based.;
+            int objectTag = (int)[obj stationNumber]; //some objs, i.e. CAMAC objects aren't zero based.;
             if(objectTag > maxValue){
                 [self setMaxValue:objectTag];
             }

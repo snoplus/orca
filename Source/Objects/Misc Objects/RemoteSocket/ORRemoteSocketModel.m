@@ -287,7 +287,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
                          change:(NSDictionary *)change context:(void *)context
 {
     if (object == queue && [keyPath isEqual:@"operationCount"]) {
-        NSNumber* n = [NSNumber numberWithInt:[[queue operations] count]];
+        NSNumber* n = [NSNumber numberWithInteger:[[queue operations] count]];
         [self performSelectorOnMainThread:@selector(setQueueCount:) withObject:n waitUntilDone:NO];
     }
     else {
@@ -322,7 +322,7 @@ NSString* ORRemoteSocketQueueCountChanged = @"ORRemoteSocketQueueCountChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:remoteHost forKey:@"remoteHost"];
-    [encoder encodeInt:remotePort    forKey:@"remotePort"];
+    [encoder encodeInteger:remotePort    forKey:@"remotePort"];
 }
 
 #pragma mark ***Delegate Methods

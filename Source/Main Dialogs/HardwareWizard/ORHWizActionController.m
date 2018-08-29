@@ -164,14 +164,14 @@ static NSString* valueChangeString[kNumActions] = {
 - (BOOL)validateMenuItem:(NSMenuItem*)anItem 
 {
     if([anItem action] == @selector(parameterPopupButtonAction:)){
-        int tag = [anItem tag];
+        NSUInteger tag = [anItem tag];
         id param = [paramArray objectAtIndex:tag];
         if(![param enabledWhileRunning] && [gOrcaGlobals runInProgress])return NO;
     }
     else {
         if([anItem action] == @selector(actionPopupButtonAction:)){  
             id param = [paramArray objectAtIndex:[[parameterPopupButton selectedItem] tag]];
-            int tag = [actionPopupButton indexOfItem:anItem];
+            NSUInteger tag = [actionPopupButton indexOfItem:anItem];
             if([param actionMask] == 0)return YES;
             else {
                 if([param actionMask]&(1<<tag))return YES;
@@ -240,7 +240,7 @@ static NSString* valueChangeString[kNumActions] = {
             id param = [paramArray objectAtIndex:parameterTag];
 			int numberOfSettableArguments = 0;
 			SEL paramMethodSelector = [param setMethodSelector];
-            if(paramMethodSelector) numberOfSettableArguments = [[param methodSignatureForSelector:paramMethodSelector] numberOfArguments]-2;
+            if(paramMethodSelector) numberOfSettableArguments = (int)[[param methodSignatureForSelector:paramMethodSelector] numberOfArguments]-2;
             if(numberOfSettableArguments == 0){
                 [valueChangeField setStringValue:@""];
             }
@@ -288,13 +288,13 @@ static NSString* valueChangeString[kNumActions] = {
 
 - (IBAction) actionPopupButtonAction:(id)sender
 {
-    [self setActionTag:[sender indexOfSelectedItem]];
+    [self setActionTag:(int)[sender indexOfSelectedItem]];
     
 }
 
 - (IBAction) parameterPopupButtonAction:(id)sender
 {
-    [self setParameterTag:[sender indexOfSelectedItem]];
+    [self setParameterTag:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) parameterValueTextFieldAction:(id)sender
@@ -350,8 +350,8 @@ static NSString* ORActionControllerParameter	    = @"ORActionControllerParameter
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-	[encoder encodeInt:actionTag forKey:ORActionControllerActionTag];
-	[encoder encodeInt:parameterTag forKey:ORActionControllerParameterTag];
+	[encoder encodeInteger:actionTag forKey:ORActionControllerActionTag];
+	[encoder encodeInteger:parameterTag forKey:ORActionControllerParameterTag];
 	[encoder encodeObject:parameterValue forKey:ORActionControllerParameter];
 }
 

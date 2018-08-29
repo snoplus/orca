@@ -358,10 +358,10 @@ NSString* ORTM700ConstraintsDisabledChanged    = @"ORTM700ConstraintsDisabledCha
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:runUpTime        forKey: @"runUpTime"];
-    [encoder encodeInt:tmpRotSet		forKey: @"tmpRotSet"];
-    [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
-    [encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeInteger:runUpTime        forKey: @"runUpTime"];
+    [encoder encodeInteger:tmpRotSet		forKey: @"tmpRotSet"];
+    [encoder encodeInteger:deviceAddress	forKey: @"deviceAddress"];
+    [encoder encodeInteger:pollTime			forKey: @"pollTime"];
 }
 
 #pragma mark •••HW Methods
@@ -631,7 +631,7 @@ NSString* ORTM700ConstraintsDisabledChanged    = @"ORTM700ConstraintsDisabledCha
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"TM700,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"TM700,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -765,7 +765,7 @@ NSString* ORTM700ConstraintsDisabledChanged    = @"ORTM700ConstraintsDisabledCha
 	int e = [[parts objectAtIndex:1] intValue];
 	s= [NSString stringWithFormat:@"%.1fE%d",m,e];
 	s = [[s componentsSeparatedByString:@".0"] componentsJoinedByString:@""];
-	int len = [s length];
+	NSInteger len = [s length];
 	if(len<6){
 		int i;
 		for(i=0;i<6-len;i++){

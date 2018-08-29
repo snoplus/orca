@@ -117,12 +117,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     return [alarms objectEnumerator];
 }
 
-- (int) alarmCount
+- (NSUInteger) alarmCount
 {
     return [alarms count];
 }
 
-- (ORAlarm*) objectAtIndex:(int)index
+- (ORAlarm*) objectAtIndex:(NSUInteger)index
 {
     return [alarms objectAtIndex:index];
 }
@@ -194,7 +194,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 {
 //  crashes sometimes..... Don't know why... try ensuring it's only executed on main thread
     if ([NSThread isMainThread]) {
-        if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",[alarms count]]];
+        if([alarms count]) [[NSApp dockTile] setBadgeLabel: [NSString stringWithFormat:@"%d",(int)[alarms count]]];
         else			   [[NSApp dockTile] setBadgeLabel: nil];
     }
 }
@@ -283,7 +283,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
 }
 
 #pragma mark •••EMail Management
-- (int) eMailCount
+- (NSUInteger) eMailCount
 {
     return [eMailList count];
 }
@@ -309,48 +309,48 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(AlarmCollection);
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionReloadAddressList object:self];
 }
 
-- (void) addAddress:(NSString*)anAddress severityMask:(unsigned long)aMask
+- (void) addAddress:(NSString*)anAddress severityMask:(uint32_t)aMask
 {
     if(!eMailList) [self setEMailList:[NSMutableArray array]];
     id newAddress = [[[ORAlarmEMailDestination alloc] init] autorelease];
     [newAddress setMailAddress:anAddress];
     [newAddress setSeverityMask:aMask];
-    [self addAddress:newAddress atIndex:[eMailList count]];
+    [self addAddress:newAddress atIndex:(int)[eMailList count]];
 }
 
 - (void) addAddress
 {	
 	if(!eMailList) [self setEMailList:[NSMutableArray array]];
 	id newAddress = [[[ORAlarmEMailDestination alloc] init] autorelease];
-	[self addAddress:newAddress atIndex:[eMailList count]];
+	[self addAddress:newAddress atIndex:(int)[eMailList count]];
     [[ORAlarmCollection sharedAlarmCollection] postAGlobalNotification];
 }
 
-- (void) addAddress:(id)anAddress atIndex:(int)anIndex
+- (void) addAddress:(id)anAddress atIndex:(NSUInteger)anIndex
 {
 	if(!eMailList) eMailList= [[NSMutableArray array] retain];
 	if([eMailList count] == 0)anIndex = 0;
 	anIndex = MIN(anIndex,[eMailList count]);
 	[[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] removeAddressAtIndex:anIndex];
 	[eMailList insertObject:anAddress atIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionAddressAdded object:self userInfo:userInfo];
 }
 
-- (void) removeAddressAtIndex:(int) anIndex
+- (void) removeAddressAtIndex:(NSUInteger) anIndex
 {
 	id anAddress = [eMailList objectAtIndex:anIndex];
 	[[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] addAddress:anAddress atIndex:anIndex];
 	[eMailList removeObjectAtIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmCollectionAddressRemoved object:self userInfo:userInfo];
     [[ORAlarmCollection sharedAlarmCollection] postAGlobalNotification];
 }
 
 
-- (ORAlarmEMailDestination*) addressAtIndex:(int)anIndex
+- (ORAlarmEMailDestination*) addressAtIndex:(NSUInteger)anIndex
 {
-	if(anIndex>=0 && anIndex<[eMailList count])return [eMailList objectAtIndex:anIndex];
+	if(anIndex<[eMailList count])return [eMailList objectAtIndex:anIndex];
 	else return nil;
 }
 
@@ -412,7 +412,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 	return (severityMask & (0x1L<<aType)) != 0;
 }
 
-- (void) setSeverityMask:(unsigned long)aMask
+- (void) setSeverityMask:(uint32_t)aMask
 {
     [[[(ORAppDelegate*)[NSApp delegate] undoManager] prepareWithInvocationTarget:self] setSeverityMask:severityMask];
 
@@ -421,7 +421,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmSeveritySelectionChanged object:self];
 }
 
-- (unsigned long) severityMask
+- (uint32_t) severityMask
 {
 	return severityMask;
 }
@@ -445,7 +445,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
     [[(ORAppDelegate*)[NSApp delegate] undoManager] disableUndoRegistration];
         
     [self setMailAddress:[decoder decodeObjectForKey:@"Address"]];
-    [self setSeverityMask:[decoder decodeInt32ForKey:@"SeverityMask"]];
+    [self setSeverityMask:[decoder decodeIntForKey:@"SeverityMask"]];
     
     [[(ORAppDelegate*)[NSApp delegate] undoManager] enableUndoRegistration];
 	
@@ -463,7 +463,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [encoder encodeObject:mailAddress forKey:@"Address"];
-    [encoder encodeInt32:severityMask forKey:@"SeverityMask"];
+    [encoder encodeInt:severityMask forKey:@"SeverityMask"];
 }
 
 #pragma mark •••Notifications
@@ -563,7 +563,7 @@ NSString* ORAlarmAddressChanged			  = @"ORAlarmAddressChanged";
 				NSArray* names =  [[NSHost currentHost] addresses];
 				id aName;
 				int index = 0;
-				int n = [names count];
+				NSUInteger n = [names count];
 				for(i=0;i<n;i++){
 					aName = [names objectAtIndex:i];
 					if([aName rangeOfString:@"::"].location == NSNotFound){

@@ -234,7 +234,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	if(!emailList) emailList= [[NSMutableArray array] retain];
 	if([emailList count] == 0)anIndex = 0;
-	anIndex = MIN(anIndex,[emailList count]);
+	anIndex = MIN(anIndex,(int)[emailList count]);
 	
 	[[[self undoManager] prepareWithInvocationTarget:self] removeAddressAtIndex:anIndex];
 	[emailList insertObject:anAddress atIndex:anIndex];
@@ -291,7 +291,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	if(![objToGetID respondsToSelector:@selector(processID)])return;
 	if(![objToGetID processID]){
-		unsigned long anId = 1;
+		uint32_t anId = 1;
 		do {
 			BOOL idAlreadyUsed = NO;
 			for(OrcaObject* anObj in [self orcaObjects]){
@@ -349,7 +349,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (NSString*) elementName
 {
 	if([shortName length])return [self shortName];
-	else return [NSString stringWithFormat:@"Process %lu",[self uniqueIdNumber]];
+	else return [NSString stringWithFormat:@"Process %u",[self uniqueIdNumber]];
 }
 
 
@@ -470,7 +470,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 {
 	if(inTestMode){
 		if(!testModeAlarm){
-			testModeAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Process %lu in TestMode",[self uniqueIdNumber]] severity:kInformationAlarm];
+			testModeAlarm = [[ORAlarm alloc] initWithName:[NSString stringWithFormat:@"Process %u in TestMode",[self uniqueIdNumber]] severity:kInformationAlarm];
 			[testModeAlarm setHelpString:@"The Process is in test mode. This means that hardware will NOT be touched. Input relays can be switched by a Cmd-Click"];
 
 		}
@@ -498,7 +498,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
     NSImage* aCachedImage = [NSImage imageNamed:@"Process"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
 	
     if([self uniqueIdNumber]){
         NSString* stateString = @"Idle";
@@ -508,7 +508,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
         }
 				
         NSAttributedString* n = [[NSAttributedString alloc] 
-                                initWithString:[NSString stringWithFormat:@"%lu %@",[self uniqueIdNumber],stateString] 
+                                initWithString:[NSString stringWithFormat:@"%u %@",[self uniqueIdNumber],stateString] 
                                     attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
         
         [n drawInRect:NSMakeRect(10,[i size].height-18,[i size].width-20,16)];
@@ -569,12 +569,12 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 
     if(processRunning && inTestMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage drawAtPoint:NSMakePoint(0,0)fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aNoticeImage drawAtPoint:NSMakePoint(0,0)fromRect:[aNoticeImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
         
     }
     if(processRunning){
         NSImage* aLockedImage = [NSImage imageNamed:@"smallLock"];
-        [aLockedImage drawAtPoint:NSMakePoint([self frame].size.width - [aLockedImage size].width,0) fromRect:[aLockedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aLockedImage drawAtPoint:NSMakePoint([self frame].size.width - [aLockedImage size].width,0) fromRect:[aLockedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     }
 	
 	if([self heartBeatIndex] == 0){
@@ -582,7 +582,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 		float x;
 		if(processRunning && inTestMode) x = 22;
 		else x = 0;
-        [noHeartbeatImage drawAtPoint:NSMakePoint(x,0) fromRect:[noHeartbeatImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [noHeartbeatImage drawAtPoint:NSMakePoint(x,0) fromRect:[noHeartbeatImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	}
 	
 
@@ -670,7 +670,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (void) incrementProcessRunNumber
 {
     NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
-    NSString* aKey = [NSString stringWithFormat:@"Process%luRunNumber",[self uniqueIdNumber]];
+    NSString* aKey = [NSString stringWithFormat:@"Process%uRunNumber",[self uniqueIdNumber]];
     int n = [[defaults objectForKey:aKey] intValue];
     [defaults setObject:[NSNumber numberWithInt:n+1] forKey:aKey];
     [defaults synchronize];
@@ -680,7 +680,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 - (int) processRunNumber
 {
     NSUserDefaults* defaults 	= [NSUserDefaults standardUserDefaults];
-    NSString* aKey = [NSString stringWithFormat:@"Process%luRunNumber",[self uniqueIdNumber]];
+    NSString* aKey = [NSString stringWithFormat:@"Process%uRunNumber",[self uniqueIdNumber]];
     return [[defaults  objectForKey:aKey] intValue];
 }
 
@@ -715,7 +715,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
 		   [aGuardian isMemberOfClass:NSClassFromString(@"ORContainerModel")];
 }
 
-- (void) setUniqueIdNumber :(unsigned long)aNumber
+- (void) setUniqueIdNumber :(uint32_t)aNumber
 {
     [super setUniqueIdNumber:aNumber];
     [self setUpImage];
@@ -812,7 +812,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
                     if([anObj isKindOfClass:NSClassFromString(@"ORAdcModel")]){
                         NSString* theValue = [anObj iconValue];
                         theValue = [theValue trimSpacesFromEnds];
-                        int firstSpace = [theValue rangeOfString:@" "].location;
+                        NSInteger firstSpace = [theValue rangeOfString:@" "].location;
                         if(firstSpace!=NSNotFound) theValue = [theValue substringToIndex:firstSpace];
                         
                         s = [s stringByAppendingFormat:@"\t%@",theValue ];
@@ -1026,7 +1026,7 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
     float aSampleRate = [decoder decodeFloatForKey:@"ORProcessModelSampleRate"];\
 	if(aSampleRate == 0)aSampleRate = 10;
     [self setSampleRate:aSampleRate];
-    [self setInTestMode:[decoder decodeIntForKey:@"inTestMode"]];
+    [self setInTestMode:[decoder decodeIntegerForKey:@"inTestMode"]];
     [self setComment:[decoder decodeObjectForKey:@"comment"]];
     [self setShortName:[decoder decodeObjectForKey:@"shortName"]];
     [self setUseAltView:[decoder decodeBoolForKey:@"useAltView"]];
@@ -1042,12 +1042,12 @@ NSString* ORForceProcessPollNotification			= @"ORForceProcessPollNotification";
     [encoder encodeBool:masterProcess forKey:@"masterProcess"];
     [encoder encodeBool:sendOnStop forKey:@"sendOnStop"];
     [encoder encodeBool:sendOnStart forKey:@"sendOnStart"];
-    [encoder encodeInt:heartBeatIndex forKey:@"heartBeatIndex"];
+    [encoder encodeInteger:heartBeatIndex forKey:@"heartBeatIndex"];
     [encoder encodeObject:emailList forKey:@"emailList"];
     [encoder encodeObject:historyFile forKey:@"historyFile"];
     [encoder encodeBool:keepHistory forKey:@"keepHistory"];
     [encoder encodeFloat:sampleRate forKey:@"ORProcessModelSampleRate"];
-    [encoder encodeInt:inTestMode forKey:@"inTestMode"];
+    [encoder encodeInteger:inTestMode forKey:@"inTestMode"];
     [encoder encodeObject:comment forKey:@"comment"];
     [encoder encodeObject:shortName forKey:@"shortName"];
     [encoder encodeBool:useAltView forKey:@"useAltView"];

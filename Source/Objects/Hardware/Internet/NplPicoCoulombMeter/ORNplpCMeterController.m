@@ -55,8 +55,8 @@
     statusSize          = NSMakeSize(270,240);
     processSize         = NSMakeSize(315,240);
 	
-	NSString* key = [NSString stringWithFormat: @"orca.ORNplpCMeter%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	NSString* key = [NSString stringWithFormat: @"orca.ORNplpCMeter%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
 	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
 	[tabView selectTabViewItemAtIndex: index];
 	
@@ -163,21 +163,21 @@
 	switch([tabView indexOfTabViewItem:tabViewItem]){
 		case  0:
 			[self resizeWindowToSize:ipConnectionSize];
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 		case  1:
 			[self resizeWindowToSize:statusSize];
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 		default:
 			[self resizeWindowToSize:processSize];
-			[[self window] setStyleMask: style | NSResizableWindowMask];
+			[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 			break;
 	}
     [[self window] setContentView:totalView];
 	
-	NSString* key = [NSString stringWithFormat: @"orca.ORNplpCMeter%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+	NSString* key = [NSString stringWithFormat: @"orca.ORNplpCMeter%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -308,22 +308,22 @@
 }
 - (IBAction) lowLimitAction:(id)sender
 {
-	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+	[model setLowLimit:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) hiLimitAction:(id)sender
 {
-	[model setHiLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+	[model setHiLimit:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) minValueAction:(id)sender
 {
-	[model setMinValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+	[model setMinValue:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) maxValueAction:(id)sender
 {
-	[model setMaxValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+	[model setMaxValue:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 @end

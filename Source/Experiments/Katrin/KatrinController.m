@@ -325,7 +325,7 @@
     [alert setInformativeText:fpdOnlyMode?@"This will re-enable veto channels to the state they were before.":@"This will disable ALL Veto channels. The current state will be saved until ORCA quits."];
     [alert addButtonWithTitle:@"Yes,Do It"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -381,18 +381,18 @@
 
 - (IBAction) lowLimitAction:(id)sender
 {
-	[model setLowLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setLowLimit:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) hiLimitAction:(id)sender
 {
-	[model setHiLimit:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setHiLimit:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 
 - (IBAction) maxValueAction:(id)sender
 {
-	[model setMaxValue:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];	
+	[model setMaxValue:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) slowControlNameAction:(id)sender
@@ -469,7 +469,7 @@
 
 - (IBAction) viewTypeAction:(id)sender
 {
-	[model setViewType:[sender indexOfSelectedItem]];
+	[model setViewType:(int)[sender indexOfSelectedItem]];
 }
 
 
@@ -590,7 +590,7 @@
 }
 
 #pragma mark ¥¥¥Table Data Source
-- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(int)row
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row
 {
 	if(tableView == secondaryTableView){
 		return ![gSecurity isLocked:[model experimentMapLock]];
@@ -613,19 +613,19 @@
 	else return [super tableView:tableView shouldSelectRow:row];
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
-		return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
+		return [[model segmentGroup:1] segment:(int)rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == fltSNTableView){
-		return [model fltSN:rowIndex objectForKey:[aTableColumn identifier]];
+		return [model fltSN:(int)rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == preAmpSNTableView){
-		return [model preAmpSN:rowIndex objectForKey:[aTableColumn identifier]];
+		return [model preAmpSN:(int)rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == osbSNTableView){
-		return [model osbSN:rowIndex objectForKey:[aTableColumn identifier]];
+		return [model osbSN:(int)rowIndex objectForKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == otherSNTableView){
 		return [model otherSNForKey:[aTableColumn identifier]];
@@ -634,7 +634,7 @@
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if( aTableView == secondaryTableView || 
 		aTableView == secondaryValuesView)    return [[model segmentGroup:1] numSegments];
@@ -645,16 +645,16 @@
 	else								      return [super numberOfRowsInTableView:aTableView];
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	ORDetectorSegment* aSegment;
 	if(aTableView == secondaryTableView){
-		aSegment = [[model segmentGroup:1] segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:(int)rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
 		[[model segmentGroup:1] configurationChanged:nil];
 	}
 	else if(aTableView == secondaryValuesView){
-		aSegment = [[model segmentGroup:1] segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:(int)rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -664,13 +664,13 @@
 	}
 	
 	else if(aTableView == fltSNTableView){
-		[model fltSN:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+		[model fltSN:(int)rowIndex setObject:anObject forKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == preAmpSNTableView){
-		[model preAmpSN:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+		[model preAmpSN:(int)rowIndex setObject:anObject forKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == osbSNTableView){
-		[model osbSN:rowIndex setObject:anObject forKey:[aTableColumn identifier]];
+		[model osbSN:(int)rowIndex setObject:anObject forKey:[aTableColumn identifier]];
 	}
 	else if(aTableView == otherSNTableView){
 		[model setOtherSNObject:anObject forKey:[aTableColumn identifier]];
@@ -725,7 +725,7 @@
 		[self resizeWindowToSize:newSize];
 		[[self window] setContentView:tabView];
     }
-	int index = [tabView indexOfTabViewItem:tabViewItem];
+	NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.KatrinController.selectedtab"];
 }
 

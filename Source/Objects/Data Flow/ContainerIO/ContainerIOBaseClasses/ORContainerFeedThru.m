@@ -316,7 +316,7 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 			NSPoint aPoint = frame.origin;
 			aPoint.y = frame.origin.y + frame.size.height/2. - [imageToDraw size].height/2.;
 
-			[imageToDraw drawAtPoint:aPoint fromRect:sourceRect operation:NSCompositeSourceOver fraction:aTransparency];
+			[imageToDraw drawAtPoint:aPoint fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:aTransparency];
             
         }
 	}
@@ -486,7 +486,7 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
     
     [self loadDefaults];
 	
-    numberOfFeedThrus = [decoder decodeIntForKey:@"NumberFeedThrus"];
+    numberOfFeedThrus = [decoder decodeIntegerForKey:@"NumberFeedThrus"];
 	[self setRemoteConnectors:[decoder decodeObjectForKey:@"RemoteConnectors"]];
 
 	[self adjustFeedThruPositions];
@@ -511,7 +511,7 @@ NSString* ORContainerFeedThruChangedNotification 	 = @"ORContainerFeedThruChange
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:numberOfFeedThrus forKey:@"NumberFeedThrus"];
+    [encoder encodeInteger:numberOfFeedThrus forKey:@"NumberFeedThrus"];
     [encoder encodeObject:remoteConnectors forKey:@"RemoteConnectors"];
 }
 

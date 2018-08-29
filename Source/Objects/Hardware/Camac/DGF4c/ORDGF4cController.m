@@ -306,7 +306,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"DGF4c (Station %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"DGF4c (Station %d)",(int)[model stationNumber]]];
 }
 - (void) tauChanged:(NSNotification*)aNotification 
 {
@@ -442,7 +442,7 @@
 - (void) runTaskChanged:(NSNotification*)aNote
 {
 	unsigned short aValue = [model runTask];
-	int n = [runTypePopup numberOfItems];
+	int n = (int)[runTypePopup numberOfItems];
 	int i;
 	for(i=0;i<n;i++){
 		if([[runTypePopup itemAtIndex:i] tag] == aValue){
@@ -456,7 +456,7 @@
 
 - (void) runBehaviorChanged:(NSNotification*)aNote
 {
-	unsigned long theRunBehaviorMask = [model runBehaviorMask];
+	uint32_t theRunBehaviorMask = [model runBehaviorMask];
 	[[runBehaviorMatrix cellWithTag:0] setState: theRunBehaviorMask&0x1];	 //synwait
 	[[runBehaviorMatrix cellWithTag:1] setState: (theRunBehaviorMask&0x2)>>1];	 //insynch
 }
@@ -529,8 +529,8 @@
 		for(i=0;i<4;i++){
 			unsigned short ia = [model paramValue:@"FASTPEAKSA" channel:i];
 			unsigned short ib = [model paramValue:@"FASTPEAKSB" channel:i];
-			long fastPeaks=(long)(ia*65536.0+ib);
-			[[inputCountsMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%ld",fastPeaks]];
+			int32_t fastPeaks=(int32_t)(ia*65536.0+ib);
+			[[inputCountsMatrix cellWithTag:i] setStringValue:[NSString stringWithFormat:@"%d",fastPeaks]];
 		}
 	}
 }
@@ -821,7 +821,7 @@
 
 - (IBAction) runBehaviorAction:(id)sender
 {
-	unsigned long theRunBehaviorMask = 0;
+	uint32_t theRunBehaviorMask = 0;
 	if([[runBehaviorMatrix cellWithTag:0] state]) theRunBehaviorMask |= 0x1; //syncwait
 	if([[runBehaviorMatrix cellWithTag:1] state]) theRunBehaviorMask |= 0x2; //insynch
 	[model setRunBehaviorMask:theRunBehaviorMask];
@@ -1079,7 +1079,7 @@
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     if(aTableView == dspParamTableView){
         return [model countForArray:@"DSPParams"];
@@ -1089,7 +1089,7 @@
     }
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if(aTableView == dspParamTableView){
         [model set:@"DSPParams" index:rowIndex toObject:anObject forKey:[aTableColumn identifier]];
@@ -1101,9 +1101,9 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
+	int set = (int)[aPlotter tag];
 	if([model oscEnabledMask] & (1<<set)){
-		return [model numOscPoints];
+		return (int)[model numOscPoints];
 	}
 	else return 0;
 }

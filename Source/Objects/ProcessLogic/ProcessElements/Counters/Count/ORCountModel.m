@@ -76,7 +76,7 @@ NSString* ORCountInputConnection				= @"ORCountInputConnection";
     NSSize theIconSize = [aCachedImage size];
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     NSString* label;
     NSFont* theFont;
     NSAttributedString* n;
@@ -96,7 +96,7 @@ NSString* ORCountInputConnection				= @"ORCountInputConnection";
     if([self uniqueIdNumber]){
         theFont = [NSFont messageFontOfSize:8];
         n = [[NSAttributedString alloc] 
-            initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]] 
+            initWithString:[NSString stringWithFormat:@"%u",[self uniqueIdNumber]] 
                 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
         NSSize textSize = [n size];

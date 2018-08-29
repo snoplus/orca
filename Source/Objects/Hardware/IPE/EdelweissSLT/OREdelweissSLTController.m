@@ -401,7 +401,7 @@ NSString* fltEdelweissV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
             //DEBUG OUTPUT:
             static int debFlag=1;if(debFlag) NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));debFlag=0;//TODO: DEBUG testing ...-tb-
 return;
-	[statusHighRegTextField setIntValue: [model statusHighReg]];
+	//[statusHighRegTextField setIntValue: [model statusHighReg]];
 }
 
 - (void) statusLowRegChanged:(NSNotification*)aNote
@@ -409,7 +409,7 @@ return;
             //DEBUG OUTPUT:
             static int debFlag=1;if(debFlag) NSLog(@"   %@::%@: UNDER CONSTRUCTION \n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));debFlag=0;//TODO: DEBUG testing ...-tb-
 return;
-	[statusLowRegTextField setIntValue: [model statusLowReg]];
+	//[statusLowRegTextField setIntValue: [model statusLowReg]];
 }
 
 - (void) takeADCChannelDataChanged:(NSNotification*)aNote
@@ -524,7 +524,7 @@ return;
 
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote
 {
-	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
+	[pixelBusEnableRegTextField setIntegerValue: [model pixelBusEnableReg]];
 	int i;
 	for(i=0;i<20;i++){
 		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
@@ -642,13 +642,13 @@ return;
 
 - (void) statusRegChanged:(NSNotification*)aNote
 {
-	unsigned long statusReg = [model statusReg];
+	uint32_t statusReg = [model statusReg];
 //DEBUG OUTPUT:  NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! status reg: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),statusReg);//TODO: DEBUG testing ...-tb-
 	
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kEWStatusIrq)?@"1":@"0"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kEWStatusPixErr)?@"1":@"0"];
 
-	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04lx",ExtractValue(statusReg,0xffff,0)]];
+	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04x",ExtractValue(statusReg,0xffff,0)]];
 
 }
 
@@ -693,13 +693,13 @@ return;
 
 - (void) nextPageDelayChanged:(NSNotification*)aNote
 {
-	[nextPageDelaySlider setIntValue:100-[model nextPageDelay]];
+	[nextPageDelaySlider setIntegerValue:100-[model nextPageDelay]];
 	[nextPageDelayField  setFloatValue:[model nextPageDelay]*102.3/100.];
 }
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
 {
-	unsigned long aMaskValue = [model interruptMask];
+	uint32_t aMaskValue = [model interruptMask];
 	int i;
 	for(i=0;i<16;i++){
 		if(aMaskValue & (1L<<i))[[interruptMaskMatrix cellWithTag:i] setIntValue:1];
@@ -709,8 +709,8 @@ return;
 
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
-	[pageSizeField setIntValue: [model pageSize]];
-	[pageSizeStepper setIntValue: [model pageSize]];
+	[pageSizeField setIntegerValue: [model pageSize]];
+	[pageSizeStepper setIntegerValue: [model pageSize]];
 }
 
 
@@ -842,14 +842,14 @@ return;
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	NSString* s = [NSString stringWithFormat:@"%lu,0x%lx,0x%lx",[model projectVersion],[model documentVersion],[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%u,0x%x,0x%x",[model projectVersion],[model documentVersion],[model implementation]];
 	[hwVersionField setStringValue:s];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
-    [regWriteValueTextField setIntValue:[model writeValue]];
+    [regWriteValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) displayEventLoopChanged:(NSNotification*) aNote
@@ -874,12 +874,12 @@ return;
 
 - (void) controlRegChanged:(NSNotification*)aNote
 {
-	unsigned long value = [model controlReg];
+	uint32_t value = [model controlReg];
 	
 	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlInvert];
 	[[miscCntrlBitsMatrix cellWithTag:1] setIntValue:value & kCtrlLedOff];
 	[[miscCntrlBitsMatrix cellWithTag:2] setIntValue:value & kCtrlOnLine];
-	[controlRegNumFifosTextField setIntValue:(value & kCtrlNumFIFOs)>>28];
+	[controlRegNumFifosTextField setIntegerValue:(value & kCtrlNumFIFOs)>>28];
 }
 
 - (void) populatePullDown
@@ -926,7 +926,7 @@ return;
 
 - (void) fifoForUDPDataPortPUAction:(id)sender
 {
-	[model setFifoForUDPDataPort:[sender indexOfSelectedItem]];	
+	[model setFifoForUDPDataPort:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) useStandardUDPDataPortsCBAction:(id)sender
@@ -942,7 +942,7 @@ return;
 - (void) lowLevelRegInHexPUAction:(id)sender /*lowLevelRegInHexPU*/
 {
 	//[model setLowLevelRegInHex:[sender intValue]];	
-	[model setLowLevelRegInHex:[sender indexOfSelectedItem]];	
+	[model setLowLevelRegInHex:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) statusHighRegTextFieldAction:(id)sender
@@ -1036,7 +1036,7 @@ return;
 
 - (IBAction) sltDAQModePUAction:(id)sender
 {
-	[model setSltDAQMode:[[sltDAQModePU selectedItem] tag]];	
+	[model setSltDAQMode:(int)[[sltDAQModePU selectedItem] tag]];	
 	//[model setSltDAQMode:[[sender selectedItem] tag]];	
 }
 
@@ -1099,7 +1099,7 @@ return;
 
 - (void) selectedFifoIndexPUAction:(id)sender
 {
-	[model setSelectedFifoIndex:[sender indexOfSelectedItem]];	//sender is selectedFifoIndexPU
+	[model setSelectedFifoIndex:(int)[sender indexOfSelectedItem]];	//sender is selectedFifoIndexPU
 }
 
 
@@ -1329,7 +1329,7 @@ return;
 
 - (IBAction) miscCntrlBitsAction:(id)sender;
 {
-	unsigned long theRegValue = [model controlReg] & ~(kCtrlInvert | kCtrlLedOff | kCtrlOnLine); 
+	uint32_t theRegValue = [model controlReg] & ~(kCtrlInvert | kCtrlLedOff | kCtrlOnLine); 
 	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlInvert;
 	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlLedOff;
 	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlOnLine;
@@ -1369,7 +1369,7 @@ return;
 
 - (IBAction) interruptMaskAction:(id)sender
 {
-	unsigned long aMaskValue = 0;
+	uint32_t aMaskValue = 0;
 	int i;
 	for(i=0;i<16;i++){
 		if([[interruptMaskMatrix cellWithTag:i] intValue]) aMaskValue |= (1L<<i);
@@ -1433,7 +1433,7 @@ return;
 		NSLogFont(aFont,@"SLT Time   : %lld\n",[model getTime]);
 		//[model printInterruptMask];
 		//[model printInterruptRequests];
-	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
+	    int32_t fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
@@ -1467,7 +1467,7 @@ return;
     //sender is regWriteValueTextField
   	//NSLog(@"   %@::%@:  regWriteValueTextField:%@ (%@)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),regWriteValueTextField,[regWriteValueTextField stringValue]);//TODO: DEBUG testing ...-tb-
 	[self endEditing];
-    //unsigned long converted = strtoul([[regWriteValueTextField stringValue] UTF8String] , 0,0);
+    //uint32_t converted = strtoul([[regWriteValueTextField stringValue] UTF8String] , 0,0);
   	//NSLog(@"   %@::%@:  converted:%i (0x%x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),converted,converted);//TODO: DEBUG testing ...-tb-
     // -> instead I use the OHexFormatter 2013-06 -tb-
     // Make sure that value has changed.
@@ -1479,11 +1479,11 @@ return;
 
 - (IBAction) readRegAction: (id) sender
 {
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
-		//unsigned long value = [model readReg:index];
+		//uint32_t value = [model readReg:index];
 		//NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
-		unsigned long value;
+		uint32_t value;
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    value = [model readReg:index forFifo: fifoIndex ];
@@ -1498,7 +1498,7 @@ return;
         }
 	}
 	@catch(NSException* localException) {
-        //localException is generated by "- (void) throwError:(int)anError address:(unsigned long)anAddress" in SBC_Link.m -tb-
+        //localException is generated by "- (void) throwError:(int)anError address:(uint32_t)anAddress" in SBC_Link.m -tb-
 		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
         ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed (B)", @"OK", nil, nil,
                         localException,[model stationNumber]);
@@ -1507,11 +1507,11 @@ return;
 - (IBAction) writeRegAction: (id) sender
 {
 	[self endEditing];
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
 		//[model writeReg:index value:[model writeValue]];
 		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
-		unsigned long val = [model writeValue];
+		uint32_t val = [model writeValue];
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    [model writeReg:index forFifo: fifoIndex  value:val];
@@ -1537,10 +1537,10 @@ return;
 		[model readHwVersion];
 		//NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 		NSLog(@"%@ Project:%d Doc:0x%x Implementation:0x%x\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
-		long fdhwlibVersion = [model getFdhwlibVersion];
+		int32_t fdhwlibVersion = [model getFdhwlibVersion];
 		int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLog(@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
-		long SltPciDriverVersion = [model getSltPciDriverVersion];
+		int32_t SltPciDriverVersion = [model getSltPciDriverVersion];
 		//NSLog(@"%@: SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
 	    if(SltPciDriverVersion<0) NSLog(@"%@: unknown SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
         else if(SltPciDriverVersion==0) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt)\n",[model fullID],SltPciDriverVersion);
@@ -1548,7 +1548,7 @@ return;
         else if(SltPciDriverVersion==4) NSLog(@"%@: SBC running with SLT PCI driver version: %i (kit_ipe_slt)\n",[model fullID],SltPciDriverVersion);
         else NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt%i)\n",[model fullID],SltPciDriverVersion,SltPciDriverVersion);
         
-		unsigned long presentFLTsMap = [model getPresentFLTsMap];
+		uint32_t presentFLTsMap = [model getPresentFLTsMap];
         NSLog(@"%@: presentFLTsMap: 0x%08x\n",[model fullID],presentFLTsMap);
 	}
 	@catch(NSException* localException) {
@@ -1599,7 +1599,7 @@ return;
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -1713,7 +1713,7 @@ return;
     [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
     [alert addButtonWithTitle:@"Yes/Do Calibrate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){

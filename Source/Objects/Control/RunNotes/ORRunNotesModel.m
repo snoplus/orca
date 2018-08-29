@@ -89,9 +89,9 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-		[aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+		[aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height) fromRect:[aNoticeImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		
 		[i unlockFocus];
 		
@@ -243,36 +243,36 @@ NSString* ORRunNotesItemChanged				 = @"ORRunNotesItemChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesCommentsChanged object: self];
 }
 
-- (void) addItem:(id)anItem atIndex:(int)anIndex
+- (void) addItem:(id)anItem atIndex:(NSInteger)anIndex
 {
 	if(!items) items= [[NSMutableArray array] retain];
 	if([items count] == 0)anIndex = 0;
-	anIndex = MIN(anIndex,[items count]);
+	anIndex = MIN(anIndex,(int)[items count]);
 	[[[self undoManager] prepareWithInvocationTarget:self] removeItemAtIndex:anIndex];
 	[items insertObject:anItem atIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesItemsAdded object:self userInfo:userInfo];
 }
 
 
-- (void) removeItemAtIndex:(int) anIndex
+- (void) removeItemAtIndex:(NSInteger) anIndex
 {
 	id anItem = [items objectAtIndex:anIndex];
 	[[[self undoManager] prepareWithInvocationTarget:self] addItem:anItem atIndex:anIndex];
 	[items removeObjectAtIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunNotesItemsRemoved object:self userInfo:userInfo];
 }
 
-- (id) itemAtIndex:(int)anIndex
+- (id) itemAtIndex:(NSInteger)anIndex
 {
 	if(anIndex>=0 && anIndex<[items count])return [items objectAtIndex:anIndex];
 	else return nil;
 }
 
-- (unsigned long) itemCount
+- (uint32_t) itemCount
 {
-	return [items count];
+	return (uint32_t)[items count];
 }
 
 

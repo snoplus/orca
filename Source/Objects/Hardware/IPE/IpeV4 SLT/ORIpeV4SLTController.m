@@ -240,13 +240,13 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) clockTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:3] setIntValue:[model clockTime]];
+	[[countersMatrix cellWithTag:3] setIntegerValue:[model clockTime]];
 }
 
 - (void) runTimeChanged:(NSNotification*)aNote
 {
-	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",(unsigned long long)[model runTime]]];
-	unsigned long long t=[model runTime];
+	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",(uint64_t)[model runTime]]];
+	uint64_t t=[model runTime];
 	[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 	//[[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
 	//[[countersMatrix cellWithTag:2] setIntValue:  [model runTime]];
@@ -254,7 +254,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
-	unsigned long long t=[model vetoTime];
+	uint64_t t=[model vetoTime];
 	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
 	//[[countersMatrix cellWithTag:1] setIntValue:[model vetoTime]];
@@ -262,7 +262,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
-	unsigned long long t=[model deadTime];
+	uint64_t t=[model deadTime];
 	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 	//[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%llu.%llu", (t>>32) & 0xffffffff, t & 0xffffffff]];
 	//[[countersMatrix cellWithTag:0] setIntValue:[model deadTime]];
@@ -270,17 +270,17 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) secondsSetChanged:(NSNotification*)aNote
 {
-	[secondsSetField setIntValue: [model secondsSet]];
+	[secondsSetField setIntegerValue: [model secondsSet]];
 }
 
 - (void) statusRegChanged:(NSNotification*)aNote
 {
-	unsigned long statusReg = [model statusReg];
+	uint32_t statusReg = [model statusReg];
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusFltRq)?@"ERR":@"OK"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusWDog)?@"ERR":@"OK"];
 	[[statusMatrix cellWithTag:2] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:3] setStringValue: IsBitSet(statusReg,kStatusPpsErr)?@"ERR":@"OK"]; 
-	[[statusMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"0x%02lx",ExtractValue(statusReg,kStatusClkErr,4)]];
+	[[statusMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"0x%02x",ExtractValue(statusReg,kStatusClkErr,4)]];
 	[[statusMatrix cellWithTag:5] setStringValue: IsBitSet(statusReg,kStatusGpsErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:6] setStringValue: IsBitSet(statusReg,kStatusVttErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:7] setStringValue: IsBitSet(statusReg,kStatusFanErr)?@"ERR":@"OK"]; 
@@ -325,13 +325,13 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) nextPageDelayChanged:(NSNotification*)aNote
 {
-	[nextPageDelaySlider setIntValue:100-[model nextPageDelay]];
+	[nextPageDelaySlider setIntegerValue:100-[model nextPageDelay]];
 	[nextPageDelayField  setFloatValue:[model nextPageDelay]*102.3/100.];
 }
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
 {
-	unsigned long aMaskValue = [model interruptMask];
+	uint32_t aMaskValue = [model interruptMask];
 	int i;
 	for(i=0;i<16;i++){
 		if(aMaskValue & (1L<<i))[[interruptMaskMatrix cellWithTag:i] setIntValue:1];
@@ -341,8 +341,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
-	[pageSizeField setIntValue: [model pageSize]];
-	[pageSizeStepper setIntValue: [model pageSize]];
+	[pageSizeField setIntegerValue: [model pageSize]];
+	[pageSizeStepper setIntegerValue: [model pageSize]];
 }
 
 
@@ -447,14 +447,14 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	NSString* s = [NSString stringWithFormat:@"%lu 0x%lx,0x%lx",[model projectVersion],[model documentVersion],[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%u 0x%x,0x%x",[model projectVersion],[model documentVersion],[model implementation]];
 	[hwVersionField setStringValue:s];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
-	[regWriteValueTextField setIntValue:[model writeValue]];
+	[regWriteValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) displayEventLoopChanged:(NSNotification*) aNote
@@ -479,8 +479,8 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) controlRegChanged:(NSNotification*)aNote
 {
-	unsigned long value = [model controlReg];
-	unsigned long aMask = (value & kCtrlTrgEnMask)>>kCtrlTrgEnShift;
+	uint32_t value = [model controlReg];
+	uint32_t aMask = (value & kCtrlTrgEnMask)>>kCtrlTrgEnShift;
 	int i;
 	for(i=0;i<6;i++)[[triggerEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
 	
@@ -554,41 +554,41 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) triggerEnableAction:(id)sender
 {
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	int i;
 	for(i=0;i<6;i++){
 		if([[triggerEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
 		else aMask &= ~(1L<<i);
 	}
-	unsigned long theRegValue = [model controlReg] & ~kCtrlTrgEnMask; 
+	uint32_t theRegValue = [model controlReg] & ~kCtrlTrgEnMask; 
 	theRegValue |= (aMask<< kCtrlTrgEnShift);
 	[model setControlReg:theRegValue];
 }
 
 - (IBAction) inhibitEnableAction:(id)sender;
 {
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	int i;
 	for(i=0;i<4;i++){
 		if([[inhibitEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
 		else aMask &= ~(1L<<i);
 	}
-	unsigned long theRegValue = [model controlReg] & ~kCtrlInhEnMask; 
+	uint32_t theRegValue = [model controlReg] & ~kCtrlInhEnMask; 
 	theRegValue |= (aMask<<kCtrlInhEnShift);
 	[model setControlReg:theRegValue];
 }
 
 - (IBAction) testPatternEnableAction:(id)sender;
 {
-	unsigned long aMask       = [[testPatternEnableMatrix selectedCell] tag];
-	unsigned long theRegValue = [model controlReg] & ~kCtrlTpEnMask; 
+	uint32_t aMask       = (uint32_t)[[testPatternEnableMatrix selectedCell] tag];
+	uint32_t theRegValue = [model controlReg] & ~kCtrlTpEnMask; 
 	theRegValue |= (aMask<<kCtrlTpEnEnShift);
 	[model setControlReg:theRegValue];
 }
 
 - (IBAction) miscCntrlBitsAction:(id)sender;
 {
-	unsigned long theRegValue = [model controlReg] & ~(kCtrlPPSMask | kCtrlShapeMask | kCtrlRunMask | kCtrlTstSltMask | kCtrlIntEnMask | kCtrlLedOffmask); 
+	uint32_t theRegValue = [model controlReg] & ~(kCtrlPPSMask | kCtrlShapeMask | kCtrlRunMask | kCtrlTstSltMask | kCtrlIntEnMask | kCtrlLedOffmask); 
 	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlPPSMask;
 	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlShapeMask;
 	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlRunMask;
@@ -630,7 +630,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) interruptMaskAction:(id)sender
 {
-	unsigned long aMaskValue = 0;
+	uint32_t aMaskValue = 0;
 	int i;
 	for(i=0;i<16;i++){
 		if([[interruptMaskMatrix cellWithTag:i] intValue]) aMaskValue |= (1L<<i);
@@ -696,7 +696,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		NSLogFont(aFont,@"Seconds    : %d\n",  [model getSeconds]);
 		[model printInterruptMask];
 		[model printInterruptRequests];
-	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
+	    int32_t fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
@@ -738,9 +738,9 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) readRegAction: (id) sender
 {
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
-		unsigned long value = [model readReg:index];
+		uint32_t value = [model readReg:index];
 		NSLog(@"SLT reg: %@ value: 0x%x (%u)\n",[model getRegisterName:index],value,value);
 	}
 	@catch(NSException* localException) {
@@ -752,7 +752,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) writeRegAction: (id) sender
 {
 	[self endEditing];
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
 		[model writeReg:index value:[model writeValue]];
 		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
@@ -770,10 +770,10 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
 		[model readHwVersion];
 		//NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 		NSLog(@"%@ Project:%d Doc:0x%x Implementation:0x%x\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
-		long fdhwlibVersion = [model getFdhwlibVersion];
+		int32_t fdhwlibVersion = [model getFdhwlibVersion];
 		int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLog(@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
-		long SltPciDriverVersion = [model getSltPciDriverVersion];
+		int32_t SltPciDriverVersion = [model getSltPciDriverVersion];
 		//NSLog(@"%@: SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
 	    if(SltPciDriverVersion<0) NSLog(@"%@: unknown SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
         else if(SltPciDriverVersion==0) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt)\n",[model fullID],SltPciDriverVersion);
@@ -818,7 +818,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -883,7 +883,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -947,7 +947,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -1059,7 +1059,7 @@ NSString* fltV4TriggerSourceNames[2][kFltNumberTriggerSources] = {
     [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
     [alert addButtonWithTitle:@"Yes/Do Calibrate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){

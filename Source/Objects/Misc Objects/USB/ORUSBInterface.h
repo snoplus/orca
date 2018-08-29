@@ -31,7 +31,7 @@ typedef struct  {
 		unsigned char bTag;
 		unsigned char bTagInverse;
 		unsigned char reserved1;
-		unsigned long transferLength;
+		uint32_t transferLength;
 		unsigned char eom; //bit 0 = 1 if last byte is end of message
 		unsigned char reserved2;
 		unsigned char reserved3;
@@ -44,16 +44,16 @@ typedef struct  {
 		id							callBackObject;
 		id							registeredObject;
 		IOUSBInterfaceInterface197**	interface; 
-		UInt8							transferType;
+		uint8_t							transferType;
 		unsigned char				inPipes[8];
 		unsigned char				outPipes[8];
 		unsigned char				controlPipes[8];
 		unsigned char				interruptInPipes[8];
 		unsigned char				interruptOutPipes[8];
 		NSString*					deviceName;
-		UInt32						locationID;
-		UInt16						vendor;
-		UInt16						product;
+		uint32_t						locationID;
+		uint16_t						vendor;
+		uint16_t						product;
 		io_object_t					notification;
 		NSString*				    connectionState;
 		NSString*					serialNumber;
@@ -67,24 +67,24 @@ typedef struct  {
 #pragma mark ¥¥¥Accessors
 - (id)			callBackObject;
 - (void)		setCallBackObject:(id)anObj;
-- (void)		setUsePipeType:(UInt8)aTransferType;
-- (UInt8)		usingPipeType;
+- (void)		setUsePipeType:(uint8_t)aTransferType;
+- (uint8_t)		usingPipeType;
 - (void)		writeString:(NSString*)aCommand;
 - (void)		writeUSB488Command:(NSString*)aCommand eom:(BOOL)eom;
-- (int)			readUSB488:(char*)resultData length:(unsigned long)amountRead;
-- (void)		writeBytes:(void*)bytes length:(int)length pipe:(int)aPipeIndex;
-- (int)			readBytes:(void*)bytes length:(int)length pipe:(int)aPipeIndex;
-- (void)		writeBytes:(void*)bytes length:(int)length;
-- (int)			readBytes:(void*)bytes length:(int)amountToRead;
-- (int)			readBytesFastNoThrow:(void*)bytes length:(int)amountToRead;
+- (int)			readUSB488:(char*)resultData length:(uint32_t)amountRead;
+- (void)		writeBytes:(void*)bytes length:(uint32_t)length pipe:(uint32_t)aPipeIndex;
+- (int)			readBytes:(void*)bytes length:(uint32_t)length pipe:(int)aPipeIndex;
+- (void)		writeBytes:(void*)bytes length:(uint32_t)length;
+- (int)			readBytes:(void*)bytes length:(uint32_t)amountToRead;
+- (int)			readBytesFastNoThrow:(void*)bytes length:(uint32_t)amountToRead;
 - (void)		setRegisteredObject:(id)anObj;
 - (id)			registeredObject;
-- (UInt16)		product;
-- (void)		setProduct:(UInt16)aProduct;
-- (UInt16)		vendor;
-- (void)		setVendor:(UInt16)aVendor;
-- (UInt32)		locationID;
-- (void)		setLocationID:(UInt32)aLocationID;
+- (uint16_t)		product;
+- (void)		setProduct:(uint16_t)aProduct;
+- (uint16_t)		vendor;
+- (void)		setVendor:(uint16_t)aVendor;
+- (uint32_t)		locationID;
+- (void)		setLocationID:(uint32_t)aLocationID;
 - (NSString*)	deviceName;
 - (void)		setDeviceName:(NSString*)aDeviceName;
 - (NSString*)	serialNumber;
@@ -102,10 +102,10 @@ typedef struct  {
 - (void)		setConnectionState:(NSString*)aState;
 - (void)		interruptRecieved:(IOReturn) result length:(int) len;
 - (void)		startReadingInterruptPipe;
-- (int)			readBytesOnInterruptPipeNoLock:(void*)bytes length:(int)amountRead;
+- (int)			readBytesOnInterruptPipeNoLock:(void*)bytes length:(uint32_t)amountRead;
 
-- (int) readBytesOnInterruptPipe:(void*)bytes length:(int)amountRead;
-- (void) writeBytesOnInterruptPipe:(void*)bytes length:(int)amountRead;
+- (int) readBytesOnInterruptPipe:(void*)bytes length:(uint32_t)amountRead;
+- (void) writeBytesOnInterruptPipe:(void*)bytes length:(uint32_t)amountRead;
 
 @end
 

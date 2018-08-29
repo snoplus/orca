@@ -174,7 +174,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"TM700 (%lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"TM700 (%u)",[model uniqueIdNumber]]];
 }
 
 
@@ -398,7 +398,7 @@
         [alert setInformativeText:@"Is this really what you want?"];
         [alert addButtonWithTitle:@"YES, Turn it OFF"];
         [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertFirstButtonReturn){
@@ -420,7 +420,7 @@
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
 {
 	NSArray* allKeys = [constraints allKeys];
-	int n = [allKeys count];
+	int n = (int)[allKeys count];
 	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %d constraint%@ in effect. See below for more info.",
 										  aTitle,
 										  n,
@@ -430,8 +430,7 @@
 		[s appendFormat:@"%@ --> %@\n\n",aKey,[constraints objectForKey:aKey]];
 	}
 	[constraintView setString:s];
-	[NSApp beginSheet:constraintPanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:constraintPanel completionHandler:nil];
 }
 - (IBAction) closeConstraintPanel:(id)sender
 {
@@ -456,7 +455,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) initAction:(id)sender

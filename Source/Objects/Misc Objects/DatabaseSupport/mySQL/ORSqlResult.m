@@ -59,7 +59,7 @@ NSDate* MCPYear0000;
     return self;    
 }
 
-- (unsigned long long) numOfRows
+- (uint64_t) numOfRows
 {
     if (mResult) {
         return mysql_num_rows(mResult);
@@ -75,9 +75,9 @@ NSDate* MCPYear0000;
     return mNumOfFields = 0;
 }
 
-- (void) dataSeek:(unsigned long long) row
+- (void) dataSeek:(uint64_t) row
 {
-    unsigned long long	theRow = row;
+    uint64_t	theRow = row;
     theRow = (theRow < [self numOfRows])? theRow : ([self numOfRows]-1);
     mysql_data_seek(mResult,theRow);
     return;
@@ -90,7 +90,6 @@ NSDate* MCPYear0000;
     MYSQL_FIELD*	theField;
     int				i;
     id				theReturn;
-
     if (mResult == NULL) {
         return nil;
     }
@@ -145,24 +144,75 @@ NSDate* MCPYear0000;
                     theCurrentObj = [NSNumber numberWithDouble:atof(theData)];
                     break;
                 case FIELD_TYPE_TIMESTAMP:
-                    theCurrentObj = [NSDate dateFromString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y%m%d%H%M%S"];
-                    [theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
-                    break;
+                    //------------------------
+                    //deprecated method
+                    // theCurrentObj = [NSDate dateFromString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y%m%d%H%M%S"];
+                    //[theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
+                    //------------------------
+
+                    //replacement:
+                    {
+                        NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                        [dateFormatter setDateFormat:@"%Y%m%d%H%M%S"];
+                        NSDate* tempDate = [dateFormatter dateFromString:[NSString stringWithUTF8String:theData]];
+                    
+                        [dateFormatter setDateFormat:@"%Y-%m-%d %H:%M:%S"];
+                        theCurrentObj = [dateFormatter dateFromString:[dateFormatter stringFromDate:tempDate]];
+                    }
+                    //------------------------
+                   break;
                 case FIELD_TYPE_DATE:
-                    theCurrentObj = [NSDate dateFromString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y-%m-%d"];
-                    [theCurrentObj setCalendarFormat:@"%Y-%m-%d"];
+                    //------------------------
+                    //deprecated method
+                    //theCurrentObj = [NSDate dateFromString:[NSString stringWithUTF8String:theData] calendarFormat:@"%Y-%m-%d"];
+                    //[theCurrentObj setCalendarFormat:@"%Y-%m-%d"];
+                    //------------------------
+                    //replacement:
+                    {
+                        NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                        [dateFormatter setDateFormat:@"%Y-%m-%d"];
+                        NSDate* tempDate = [dateFormatter dateFromString:[NSString stringWithUTF8String:theData]];
+                    
+                        [dateFormatter setDateFormat:@"%Y-%m-%d"];
+                        theCurrentObj = [dateFormatter dateFromString:[dateFormatter stringFromDate:tempDate]];
+                    }
                     break;
                 case FIELD_TYPE_TIME:
                     theCurrentObj = [NSString stringWithUTF8String:theData];
 				    break;
                 case FIELD_TYPE_DATETIME:
-                    theCurrentObj = [NSDate dateFromString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y-%m-%d %H:%M:%S"];
-                    [theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
+                    //------------------------
+                    //deprecated method
+                    //theCurrentObj = [NSDate dateFromString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y-%m-%d %H:%M:%S"];
+                    //[theCurrentObj setCalendarFormat:@"%Y-%m-%d %H:%M:%S"];
+                    //------------------------
+                    //replacement:
+                    {
+                        NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                        [dateFormatter setDateFormat:@"%Y-%m-%d %H:%M:%S"];
+                        NSDate* tempDate = [dateFormatter dateFromString:[NSString stringWithUTF8String:theData]];
+                    
+                        [dateFormatter setDateFormat:@"%Y-%m-%d %H:%M:%S"];
+                        theCurrentObj = [dateFormatter dateFromString:[dateFormatter stringFromDate:tempDate]];
+                    }
+
                     break;
                 case FIELD_TYPE_YEAR:
-                    theCurrentObj = [NSDate dateFromString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y"];
-                    [theCurrentObj setCalendarFormat:@"%Y"];
-                    if (! theCurrentObj) {
+                    //------------------------
+                    //deprecated method
+                   // theCurrentObj = [NSDate dateFromString:[NSString stringWithCString:theData encoding:NSISOLatin1StringEncoding] calendarFormat:@"%Y"];
+                    //[theCurrentObj setCalendarFormat:@"%Y"];
+                    //------------------------
+                    //replacement:
+                    {
+                        NSDateFormatter* dateFormatter = [[[NSDateFormatter alloc] init] autorelease];
+                        [dateFormatter setDateFormat:@"%Y"];
+                        NSDate* tempDate = [dateFormatter dateFromString:[NSString stringWithUTF8String:theData]];
+                    
+                        [dateFormatter setDateFormat:@"%Y"];
+                        theCurrentObj = [dateFormatter dateFromString:[dateFormatter stringFromDate:tempDate]];
+                    }
+                    if (!theCurrentObj) {
                         theCurrentObj = MCPYear0000;
                     }
                     break;
@@ -310,7 +360,7 @@ NSDate* MCPYear0000;
                 theType = @"short";
                 break;
             case FIELD_TYPE_LONG:
-                theType = @"long";
+                theType = @"int32_t";
                 break;
             case FIELD_TYPE_INT24:
                 theType = @"int24";
@@ -442,7 +492,7 @@ NSDate* MCPYear0000;
 - (unsigned int) fetchFlagsForKey:(NSString *) key
 {
    unsigned int     theRet;
-   unsigned int		index;
+   NSUInteger		index;
    MYSQL_FIELD*		theField;
 
    if (mResult == NULL) {
@@ -498,7 +548,7 @@ NSDate* MCPYear0000;
 - (BOOL) isBlobForKey:(NSString *) key
 {
     BOOL			theRet;
-    unsigned int	index;
+    NSInteger	index;
     MYSQL_FIELD*	theField;
 
     if (mResult == NULL) {
@@ -549,7 +599,7 @@ NSDate* MCPYear0000;
         NSArray			*theRow;
         MYSQL_ROW_OFFSET	thePosition;
 
-        [theString appendFormat:@"ORSqlResult: (dim %ld x %ld)\n",(long)mNumOfFields, (long)[self numOfRows]];
+        [theString appendFormat:@"ORSqlResult: (dim %d x %d)\n",(int32_t)mNumOfFields, (int32_t)[self numOfRows]];
         [self fetchFieldsName];
         for (i=0; i<(mNumOfFields-1); i++) {
             [theString appendFormat:@"%@\t", [mNames objectAtIndex:i]];

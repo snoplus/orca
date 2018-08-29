@@ -276,7 +276,7 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 
 - (void) performSysReset
 {
-    unsigned long registerRead = 0x0;
+    uint32_t registerRead = 0x0;
     [self readLongBlock:&registerRead 
 			  atAddress:0x404 
 			  numToRead:1
@@ -312,9 +312,9 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	
 }
 
-- (long) getSBCCodeVersion
+- (int32_t) getSBCCodeVersion
 {
-	long theVersion = 0;
+	int32_t theVersion = 0;
 	if(![sbcLink isConnected]){
 		[NSException raise:@"SBC Not Connected" format:@"Socket not connected."];
 	}
@@ -325,9 +325,9 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	return theVersion;
 }
 
--(void) readLongBlock:(unsigned long *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberLongs
+-(void) readLongBlock:(uint32_t *) readAddress
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberLongs
 		   withAddMod:(unsigned short) anAddressModifier
 		usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -341,9 +341,9 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 			 usingAddSpace:anAddressSpace];
 }
 
--(void) writeLongBlock:(unsigned long *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberLongs
+-(void) writeLongBlock:(uint32_t *) writeAddress
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberLongs
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -358,13 +358,13 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 	
 }
 
-/* readLong is for reading a long from a single address 
+/* readLong is for reading a int32_t from a single address 
  so that the address never changes, i.e. it does not
  auto-increment.  We use a specific address space to
  do this: 0xFF. */
--(void) readLong:(unsigned long *) readAddress
-	   atAddress:(unsigned int) vmeAddress
-	 timesToRead:(unsigned int) numberLongs
+-(void) readLong:(uint32_t *) readAddress
+	   atAddress:(uint32_t) vmeAddress
+	 timesToRead:(uint32_t) numberLongs
 	  withAddMod:(unsigned short) anAddressModifier
    usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -379,8 +379,8 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 
 -(void) readByteBlock:(unsigned char *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberBytes
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberBytes
 		   withAddMod:(unsigned short) anAddressModifier
 		usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -396,8 +396,8 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 
 -(void) writeByteBlock:(unsigned char *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberBytes
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberBytes
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -413,8 +413,8 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 
 -(void) readWordBlock:(unsigned short *) readAddress
-			atAddress:(unsigned int) vmeAddress
-			numToRead:(unsigned int) numberWords
+			atAddress:(uint32_t) vmeAddress
+			numToRead:(uint32_t) numberWords
 		   withAddMod:(unsigned short) anAddressModifier
 		usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -431,8 +431,8 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 
 -(void) writeWordBlock:(unsigned short *) writeAddress
-			 atAddress:(unsigned int) vmeAddress
-			numToWrite:(unsigned int) numberWords
+			 atAddress:(uint32_t) vmeAddress
+			numToWrite:(uint32_t) numberWords
 			withAddMod:(unsigned short) anAddressModifier
 		 usingAddSpace:(unsigned short) anAddressSpace
 {
@@ -489,8 +489,4 @@ NSString* ORVmecpuLock = @"ORVmecpuLock";
 }
 @end
 
-@implementation ORVmecpuModel (OROrderedObjHolding)
-- (int) maxNumberOfObjects	{ return 7; }
-- (int) objWidth			{ return 48; }
-@end
 

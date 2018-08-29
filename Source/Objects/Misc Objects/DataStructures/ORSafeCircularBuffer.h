@@ -25,7 +25,7 @@
 @interface ORSafeCircularBuffer : NSObject {
 	@private
 		NSMutableData* buffer;
-		unsigned long*	 dataPtr;
+		NSUInteger*	 dataPtr;
 		unsigned bufferSize;
 		unsigned readMark;
 		unsigned writeMark;
@@ -34,23 +34,23 @@
 		unsigned numBytesWritten;
 		unsigned numBytesRead;
 		NSLock*  bufferLock;
-		long freeSpace;
+		int32_t freeSpace;
 }
 
-- (id) initWithBufferSize:(NSUInteger) aBufferSize;
+- (id) initWithBufferSize:(int32_t) aBufferSize;
 - (BOOL) writeData:(NSData*)someData;
-- (BOOL) writeBlock:(char*)someBytes length:(NSUInteger)numBytes;
+- (BOOL) writeBlock:(char*)someBytes length:(int32_t)numBytes;
 - (NSData*) readNextBlock;
 - (NSData*) readNextBlockAppendedTo:(NSData*)someData;
-- (NSUInteger) numBlocksWritten;
-- (NSUInteger) numBlocksRead;
+- (int32_t) numBlocksWritten;
+- (int32_t) numBlocksRead;
 - (void) reset;
 - (BOOL) dataAvailable;
-- (NSUInteger) bufferSize;
-- (NSUInteger) readMark;
-- (NSUInteger) writeMark;
+- (int32_t) bufferSize;
+- (int32_t) readMark;
+- (int32_t) writeMark;
 
 + (void) fullTest;
-+ (void) test:(long)bufferSize;
++ (void) test:(int32_t)bufferSize;
 
 @end

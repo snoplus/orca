@@ -40,7 +40,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 @interface ORTristanFLTModel (private)
 - (void) addCurrentState:(NSMutableDictionary*)dictionary boolArray:(bool*)anArray forKey:(NSString*)aKey;
-- (void) addCurrentState:(NSMutableDictionary*)dictionary longArray:(unsigned long*)anArray forKey:(NSString*)aKey;
+- (void) addCurrentState:(NSMutableDictionary*)dictionary longArray:(uint32_t*)anArray forKey:(NSString*)aKey;
 - (int)  restrictIntValue:(int)aValue min:(int)aMinValue max:(int)aMaxValue;
 @end
 @implementation ORTristanFLTModel
@@ -235,13 +235,13 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     [[NSNotificationCenter defaultCenter]postNotificationName:ORTristanFLTModelEnabledChanged object:self];
 }
 
-- (unsigned long) threshold:(unsigned short)aChan
+- (uint32_t) threshold:(unsigned short)aChan
 {
     if(aChan<kNumTristanFLTChannels)return threshold[aChan];
     else return NO;
 }
 
--(void) setThreshold:(unsigned short) aChan withValue:(unsigned long) aValue
+-(void) setThreshold:(unsigned short) aChan withValue:(uint32_t) aValue
 {
     if(aChan>=kNumTristanFLTChannels)return;
     [[[self undoManager] prepareWithInvocationTarget:self] setThreshold:aChan withValue:threshold[aChan]];
@@ -270,8 +270,8 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 }
 
 #pragma mark Data Taking
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) aDataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) aDataId
 {
     dataId = aDataId;
 }
@@ -454,12 +454,12 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 #pragma mark ***HW Access
 - (void) enableChannels
 {
-    unsigned long data = 0x0;
+    uint32_t data = 0x0;
     int i;
     for(i=0;i<kNumTristanFLTChannels;i++){
         data |= ((enabled[i]&0x1)<<i);
     }
-    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltTriggerDisable,~data]; //???inverted to disable
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08x\r",kTristanFltTriggerDisable,~data]; //???inverted to disable
     
     NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
     
@@ -480,7 +480,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 - (void) loadThresholds
 {
     //eventually there will be 8 channels. this test version only sends the first channel
-    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltThreshold,threshold[0]];
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08x\r",kTristanFltThreshold,threshold[0]];
     NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
     [self sendData:cmdAsData];
     NSLog(@"Threshold Cmd: %@",cmd);
@@ -496,8 +496,8 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 - (void) loadFilterParameters
 {
-    unsigned long data = ((gapLength&0xf)<<4) | (shapingLength & 0xf);
-    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltFilterSet,data];
+    uint32_t data = ((gapLength&0xf)<<4) | (shapingLength & 0xf);
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08x\r",kTristanFltFilterSet,data];
     NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
     [self sendData:cmdAsData];
     NSLog(@"Filter Cmd: %@",cmd);
@@ -505,8 +505,8 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 
 - (void) loadTraceControl
 {
-    unsigned long data = ((postTriggerTime&0xffff)<<8) | (udpFrameSize & 0xffff);
-    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08lx\r",kTristanFltTraceCntrl,data];
+    uint32_t data = ((postTriggerTime&0xffff)<<8) | (udpFrameSize & 0xffff);
+    NSString* cmd = [NSString stringWithFormat:@"w_%08x_%08x\r",kTristanFltTraceCntrl,data];
     NSData* cmdAsData = [cmd dataUsingEncoding:NSUTF8StringEncoding];
     [self sendData:cmdAsData];
     NSLog(@"Trace Cmd: %@",cmd);
@@ -570,15 +570,15 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     NSLog(@"%@\n",[self DisplayStringFromData:udpData]);
     
     //only data so far is the trace....
-    unsigned long len = ([udpData length]/sizeof(unsigned long)) + 2;
-    unsigned long data[len];
+    uint32_t len = (uint32_t) + 2;
+    uint32_t data[len];
     data[0] = dataId | len;
-    data[1] =    (([self crateNumber] & 0x0000000f)<<21) | (([self stationNumber] & 0x0000001f)<<16);
-    unsigned long ptr = (unsigned long*)[udpData bytes];
+    data[1] =    (uint32_t)((([self crateNumber] & 0x0000000f)<<21) | (([self stationNumber] & 0x0000001f)<<16));
+    uint32_t* ptr = (uint32_t*)[udpData bytes];
     int i;
-    int n = [udpData length]/sizeof(unsigned long);
+    int n = (int)([udpData length]/sizeof(uint32_t));
     for(i=0;i<n;i++){
-        data[2+i] = ptr++;
+        data[2+i] = *ptr++;
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
                                                         object:[NSData dataWithBytes:data length:len]];
@@ -617,16 +617,16 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setPort:              [decoder decodeIntForKey:@"port"]];
+    [self setPort:              [decoder decodeIntegerForKey:@"port"]];
     [self setHostName:          [decoder decodeObjectForKey:@"hostName"]];
 
-    [self setShapingLength:     [decoder decodeIntForKey:   @"shapingLength"]];
+    [self setShapingLength:     [decoder decodeIntegerForKey:   @"shapingLength"]];
     [self setGapLength:         [decoder decodeIntForKey:   @"gapLength"]];
-    [self setPostTriggerTime:   [decoder decodeIntForKey:   @"postTriggerTime"]];
-    [self setUdpFrameSize:      [decoder decodeIntForKey:   @"udpFrameSize"]];
+    [self setPostTriggerTime:   [decoder decodeIntegerForKey:   @"postTriggerTime"]];
+    [self setUdpFrameSize:      [decoder decodeIntegerForKey:   @"udpFrameSize"]];
     int i;
     for(i=0;i<kNumTristanFLTChannels;i++) {
-        [self setThreshold:i withValue:[decoder decodeInt32ForKey: [NSString stringWithFormat:@"threshold%d",i]]];
+        [self setThreshold:i withValue:[decoder decodeIntForKey: [NSString stringWithFormat:@"threshold%d",i]]];
         [self setEnabled:i   withValue:[decoder decodeBoolForKey:  [NSString stringWithFormat:@"enabled%d",i]]];
     }
     
@@ -646,15 +646,15 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
 {
     [super encodeWithCoder:encoder];
     
-    [encoder encodeInt:port                forKey:@"port"];
+    [encoder encodeInteger:(int32_t)port                forKey:@"port"];
     [encoder encodeObject:hostName         forKey:@"hostName"];
-    [encoder encodeInt:shapingLength       forKey:@"shapingLength"];
-    [encoder encodeInt:gapLength           forKey:@"gapLength"];
-    [encoder encodeInt:postTriggerTime     forKey:@"postTriggerTime"];
-    [encoder encodeInt:udpFrameSize        forKey:@"udpFrameSize"];
+    [encoder encodeInteger:shapingLength       forKey:@"shapingLength"];
+    [encoder encodeInteger:gapLength           forKey:@"gapLength"];
+    [encoder encodeInteger:postTriggerTime     forKey:@"postTriggerTime"];
+    [encoder encodeInteger:udpFrameSize        forKey:@"udpFrameSize"];
     int i;
     for(i=0;i<kNumTristanFLTChannels;i++) {
-        [encoder encodeInt32: threshold[i] forKey:[NSString stringWithFormat:@"threshold%d",i]];
+        [encoder encodeInt: threshold[i] forKey:[NSString stringWithFormat:@"threshold%d",i]];
         [encoder encodeBool:  enabled[i]   forKey:[NSString stringWithFormat:@"enabled%d",i]];
     }
 }
@@ -671,7 +671,7 @@ NSString* ORTristanFLTSettingsLock                   = @"ORTristanFLTSettingsLoc
     [dictionary setObject:ar forKey:aKey];
 }
 
-- (void) addCurrentState:(NSMutableDictionary*)dictionary longArray:(unsigned long*)anArray forKey:(NSString*)aKey
+- (void) addCurrentState:(NSMutableDictionary*)dictionary longArray:(uint32_t*)anArray forKey:(NSString*)aKey
 {
     NSMutableArray* ar = [NSMutableArray array];
     int i;

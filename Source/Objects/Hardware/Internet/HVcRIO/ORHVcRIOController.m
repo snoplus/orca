@@ -137,7 +137,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"HV-cRIO Control (Unit %lu)",[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"HV-cRIO Control (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -187,7 +187,7 @@
 - (void) postRegulationPointRemoved:(NSNotification*)aNote
 {
     int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
-    index = MIN(index,[model numPostRegulationPoints]-1);
+    index = MIN(index,(int)[model numPostRegulationPoints]-1);
     index = MAX(index,0);
     [postRegulationTableView reloadData];
     NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
@@ -225,7 +225,7 @@
 
 - (void) queCountChanged:(NSNotification*)aNotification
 {
-	[cmdQueCountField setIntValue:[model queCount]];
+	[cmdQueCountField setIntegerValue:[model queCount]];
     [queueValueBar setNeedsDisplay:YES];
 }
 
@@ -312,7 +312,7 @@
     NSIndexSet* theSet = [postRegulationTableView selectedRowIndexes];
     NSUInteger current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
-        [model removePostRegulationPointAtIndex:current_index];
+        [model removePostRegulationPointAtIndex:(int)current_index];
     }
     [self setButtonStates];
 }
@@ -329,17 +329,17 @@
 }
 
 #pragma mark ***Table Data Source
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
     if(setPointTableView == aTableView){
         if([[aTableColumn identifier] isEqualToString:@"index"]){
-            return  [NSNumber numberWithInt:rowIndex];
+            return  [NSNumber numberWithInteger:rowIndex];
         }
         else {
             if([model showFormattedDates] &&
-               ([[aTableColumn identifier] isEqualToString:@"readBack"] && [[model setPointItem:rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"])){
+               ([[aTableColumn identifier] isEqualToString:@"readBack"] && [[model setPointItem:(int)rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"])){
                 
-                NSTimeInterval s = [[model setPointItem:rowIndex forKey:@"readBack"]doubleValue] - kSecsBetween1904and1070;
+                NSTimeInterval s = [[model setPointItem:(int)rowIndex forKey:@"readBack"]doubleValue] - kSecsBetween1904and1070;
                 if(s<1)return @"?";
                 NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:s];
                 NSDateFormatter* dateFormat = [[[NSDateFormatter alloc] init] autorelease];
@@ -347,19 +347,19 @@
                 
                 return [dateFormat stringFromDate:theDate];
             }
-            else return [model setPointItem:rowIndex forKey:[aTableColumn identifier]];
+            else return [model setPointItem:(int)rowIndex forKey:[aTableColumn identifier]];
         }
     }
     else if(measuredValueTableView == aTableView){
 
         if([[aTableColumn identifier] isEqualToString:@"index"]){
-            return  [NSNumber numberWithInt:rowIndex];
+            return  [NSNumber numberWithInt:(int)rowIndex];
         }
         else {
             if([model showFormattedDates] &&
-               ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"]) ||
-               ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:rowIndex forKey:@"data"] isEqualToString:@"Zeitstempel"])){
-                NSTimeInterval s = [[model measuredValueItem:rowIndex forKey:@"value"]doubleValue] - kSecsBetween1904and1070;
+               ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:(int)rowIndex forKey:@"item"] isEqualToString:@"Zeitstempel"]) ||
+               ([[aTableColumn identifier] isEqualToString:@"value"] && [[model measuredValueItem:(int)rowIndex forKey:@"data"] isEqualToString:@"Zeitstempel"])){
+                NSTimeInterval s = [[model measuredValueItem:(int)rowIndex forKey:@"value"]doubleValue] - kSecsBetween1904and1070;
                 if(s<1)return @"?";
 
                 NSDate* theDate = [NSDate dateWithTimeIntervalSince1970:s];
@@ -368,22 +368,22 @@
                 return [dateFormat stringFromDate:theDate];
             }
 
-            else return [model measuredValueItem:rowIndex forKey:[aTableColumn identifier]];
+            else return [model measuredValueItem:(int)rowIndex forKey:[aTableColumn identifier]];
         }
     }
     else if(postRegulationTableView == aTableView){
         if([[aTableColumn identifier] isEqualToString:@"index"]){
-            return  [NSNumber numberWithInt:rowIndex];
+            return  [NSNumber numberWithInt:(int)rowIndex];
         }
         else {
-            return [[model postRegulationPointAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
+            return [[model postRegulationPointAtIndex:(int)rowIndex] objectForKey:[aTableColumn identifier]];
         }
     }
     else return nil;
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(setPointTableView == aTableView)return [model numSetPoints];
     else if(measuredValueTableView == aTableView)return [model numMeasuredValues];
@@ -391,7 +391,7 @@
 	else return 0;
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if(anObject == nil)return;
     
@@ -400,12 +400,12 @@
         if([[aTableColumn identifier] isEqualToString:@"data"]) return;
         if([[aTableColumn identifier] isEqualToString:@"readback"]) return;
         if([[aTableColumn identifier] isEqualToString:@"setPoint"]){
-            [model setSetPoint:rowIndex  withValue:[anObject floatValue]];
+            [model setSetPoint:(int)rowIndex  withValue:[anObject floatValue]];
             return;
         }
     }
     else if(postRegulationTableView == aTableView){
-        id aPoint = [model postRegulationPointAtIndex:rowIndex];
+        id aPoint = [model postRegulationPointAtIndex:(int)rowIndex];
         [aPoint setValue:anObject forKey:[aTableColumn identifier]];
     }
 }
@@ -534,7 +534,7 @@
 }
 - (IBAction) pollTimeAction: (id) aSender
 {
-    [model setPollTime:[[aSender selectedItem]tag]];
+    [model setPollTime:(int)[[aSender selectedItem]tag]];
 }
 
 #pragma  mark ***Delegate Responsiblities

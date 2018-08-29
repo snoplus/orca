@@ -155,13 +155,13 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	if(shipPressures) {
 		if([[ORGlobal sharedGlobal] runInProgress]){
 			
-			unsigned long data[kTPG256ARecordLength];
+			uint32_t data[kTPG256ARecordLength];
 			data[0] = dataId | kTPG256ARecordLength;
 			data[1] = [self uniqueIdNumber]&0xfff;
 			
 			union {
 				float asFloat;
-				unsigned long asLong;
+				uint32_t asLong;
 			}theData;
 			int index = 2;
 			int i;
@@ -174,7 +174,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 				index++;
 			}
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:sizeof(long)*kTPG256ARecordLength]];
+																object:[NSData dataWithBytes:data length:sizeof(int32_t)*kTPG256ARecordLength]];
 		}
 	}
 }
@@ -278,7 +278,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 	else return 0.0;
 }
 
-- (unsigned long) timeMeasured:(int)index
+- (uint32_t) timeMeasured:(int)index
 {
 	if(index>=0 && index<6)return timeMeasured[index];
 	else return 0;
@@ -295,7 +295,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 		//get the time(UT!)
 		time_t	ut_Time;
 		time(&ut_Time);
-		timeMeasured[index] = ut_Time;
+		timeMeasured[index] = (uint32_t)ut_Time;
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORTPG256APressureChanged 
 															object:self 
@@ -400,10 +400,10 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:units			forKey: @"units"];
-    [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
+    [encoder encodeInteger:units			forKey: @"units"];
+    [encoder encodeInteger:pressureScale	forKey: @"pressureScale"];
     [encoder encodeBool:shipPressures	forKey: @"shipPressures"];
-    [encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeInteger:pollTime			forKey: @"pollTime"];
 	
 	int i;
 	for(i=0;i<6;i++){
@@ -442,8 +442,8 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -487,7 +487,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"TPG256A,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"TPG256A,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -584,7 +584,7 @@ NSString* ORTPG256ALock = @"ORTPG256ALock";
 		int channel = [[lastRequest substringWithRange:NSMakeRange(2,1)] intValue]-1;
 		if(channel>=0 && channel<6){
 			NSArray* parts = [theResponse componentsSeparatedByString:@","];
-			int n = [parts count];
+			int n = (int)[parts count];
 			if(n == 2){
 				[self setMeasurementState:channel value:[[parts objectAtIndex:0] intValue]];
 				float thePressure = 0;

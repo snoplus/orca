@@ -247,7 +247,7 @@
 
 - (void) baseAddressChanged:(NSNotification*)aNotification
 {
-	[addressText setIntValue: [model baseAddress]];
+	[addressText setIntegerValue: [model baseAddress]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -349,7 +349,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];	
+	[model setPollTime:(int)[[sender selectedItem] tag]];	
 }
 
 - (IBAction) readModuleID:(id)sender
@@ -448,7 +448,7 @@
     [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -481,7 +481,7 @@
 {
 	NSDecimalNumber* theChannelNumber = (NSDecimalNumber*)info;
 	int channel = [theChannelNumber intValue] ;
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		@try {
 			if(channel == 0xFFFF || channel == 0)[model panicToZero:0];
 			if(channel == 0xFFFF || channel == 1)[model panicToZero:1];

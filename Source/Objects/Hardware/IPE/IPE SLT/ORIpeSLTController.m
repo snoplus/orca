@@ -241,13 +241,13 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) nextPageDelayChanged:(NSNotification*)aNote
 {
-	[nextPageDelaySlider setIntValue:100-[model nextPageDelay]];
+	[nextPageDelaySlider setIntegerValue:(int)(100-[model nextPageDelay])];
 	[nextPageDelayField  setFloatValue:[model nextPageDelay]*102.3/100.];
 }
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
 {
-	unsigned long aMaskValue = [model interruptMask];
+	uint32_t aMaskValue = [model interruptMask];
 	int i;
 	for(i=0;i<9;i++){
 		if(aMaskValue & (1L<<i))[[interruptMaskMatrix cellWithTag:i] setIntValue:1];
@@ -287,8 +287,8 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
-	[pageSizeField setIntValue: [model pageSize]];
-	[pageSizeStepper setIntValue: [model pageSize]];
+	[pageSizeField setIntegerValue: [model pageSize]];
+	[pageSizeStepper setIntegerValue: [model pageSize]];
 }
 
 
@@ -395,7 +395,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
-	[regWriteValueTextField setIntValue:[model writeValue]];
+	[regWriteValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) usePBusSimChanged:(NSNotification*) aNote
@@ -443,9 +443,9 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 {
 	if(!xImage)xImage = [[NSImage imageNamed:@"exMark"] retain];
 	if(!yImage)yImage = [[NSImage imageNamed:@"checkMark"] retain];
-	unsigned long lowWord = [model pageStatusLow];
-	unsigned long highWord = [model pageStatusHigh];
-	unsigned long theWord;
+	uint32_t lowWord = [model pageStatusLow];
+	uint32_t highWord = [model pageStatusHigh];
+	uint32_t theWord;
 	int i;
 	for(i=0;i<64;i++){
 		NSCell* aCell = [[pageStatusMatrix cells] objectAtIndex:i];
@@ -460,8 +460,8 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 	}
 	[pageStatusMatrix setNeedsDisplay:YES];
 	
-	[actualPageField setIntValue:[model actualPage]+1];
-	[nextPageField setIntValue:  [model nextPage]+1];
+	[actualPageField setIntegerValue:[model actualPage]+1];
+	[nextPageField setIntegerValue:  [model nextPage]+1];
 	
 }
 
@@ -484,7 +484,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 	
 	int i;
 	for(i=0;i<kFltNumberTriggerSources;i++){
-		unsigned long aTriggerMask = [model triggerSource];
+		uint32_t aTriggerMask = [model triggerSource];
 		if(aTriggerMask & (1L<<i)) [[triggerSrcMatrix cellWithTag:i] setIntValue:1];
 		else [[triggerSrcMatrix cellWithTag:i] setIntValue:0];
 	}
@@ -543,7 +543,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (void) dumpPageStatus:(id)sender
 {
 	if([[NSApp currentEvent] clickCount] >=2){
-		int pageIndex = [sender selectedRow]*32 + [sender selectedColumn];
+		int pageIndex = (int)([sender selectedRow]*32 + [sender selectedColumn]);
 		@try {
 			[model dumpTriggerRAM:pageIndex];
 		}
@@ -567,7 +567,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) interruptMaskAction:(id)sender
 {
-	unsigned long aMaskValue = 0;
+	uint32_t aMaskValue = 0;
 	int i;
 	for(i=0;i<9;i++){
 		if([[interruptMaskMatrix cellWithTag:i] intValue]) aMaskValue |= (1L<<i);
@@ -667,8 +667,8 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) controlRegAction:(id)sender
 {
-	int tag		= [sender tag];
-	int value	= [sender indexOfSelectedItem];
+	int tag		= (int)[sender tag];
+	int value	= (int)[sender indexOfSelectedItem];
 	switch(tag){
 		case 0:	[model setWatchDogStart:value]; break;
 		case 1:	[model setSecStrobeSource:value]; break;
@@ -699,9 +699,9 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) readRegAction: (id) sender
 {
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
-		unsigned long value = [model readReg:index];
+		uint32_t value = [model readReg:index];
 		NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
 	}
 	@catch(NSException* localException) {
@@ -713,7 +713,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 - (IBAction) writeRegAction: (id) sender
 {
 	[self endEditing];
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
 		[model writeReg:index value:[model writeValue]];
 		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
@@ -785,7 +785,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) inhibitCheckBoxAction:(id) sender
 {
-	int tag = [[sender selectedCell]tag];
+	int tag = (int)[[sender selectedCell]tag];
 	int value = [model inhibitSource];
 	
 	if([[sender selectedCell]state])value |= (1<<tag);
@@ -831,13 +831,13 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
 
 - (IBAction) triggerSourceAction:(id)sender
 {
-	unsigned long aTriggerMask = 0;
+	uint32_t aTriggerMask = 0;
 	int i;
 	for(i=0;i<kFltNumberTriggerSources;i++){
 		if([[triggerSrcMatrix cellWithTag:i] intValue]) aTriggerMask |= (1L<<i);
 		else aTriggerMask &= ~(1L<<i);
 	}
-	[model setTriggerSource:aTriggerMask];
+	[model setTriggerSource:(int)aTriggerMask];
 }
 
 - (IBAction) releaseAllPagesAction:(id)sender
@@ -935,7 +935,7 @@ NSString* fltTriggerSourceNames[2][kFltNumberTriggerSources] = {
     [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
     [alert addButtonWithTitle:@"Yes/Do Calibrate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){

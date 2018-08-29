@@ -73,7 +73,10 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 - (void) dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [view removeFromSuperview];
+    if(![NSThread isMainThread]){
+        [view performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:YES];
+    }
+    else [view removeFromSuperview];
     [title release];
     [remoteHost release];
     [remotePath release];
@@ -251,8 +254,8 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 	NSString* path = @"~"; //default
 	if(useFolderStructure){
 		NSDate* date = [NSDate date];
-		NSString* year  = [NSString stringWithFormat:@"%d",[date yearOfCommonEra]];
-		NSString* month = [NSString stringWithFormat:@"%02d",[date monthOfYear]];
+		NSString* year  = [NSString stringWithFormat:@"%d",(int)[date yearOfCommonEra]];
+		NSString* month = [NSString stringWithFormat:@"%02ld",[date monthOfYear]];
 		path = [self directoryName];
 		path = [path stringByAppendingPathComponent:year];
 		path = [path stringByAppendingPathComponent:month];
@@ -720,7 +723,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     [alert setInformativeText:s];
     [alert addButtonWithTitle:[self queueIsRunning]?@"Stop":@"Send"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window]?[self window]:[view window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -750,7 +753,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
     [alert setInformativeText:s];
     [alert addButtonWithTitle:@"Delete"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -798,7 +801,7 @@ NSString* ORFolderPercentDoneChanged                = @"ORFolderPercentDoneChang
 
 - (IBAction) transferPopupButtonAction:(id)sender
 {
-	[self setTransferType:[sender indexOfSelectedItem]];
+	[self setTransferType:(int)[(NSPopUpButton*)sender indexOfSelectedItem]];
 }
 
 
@@ -853,7 +856,7 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
     [encoder encodeBool:verbose forKey:ORFolderVerbose];
     [encoder encodeObject:directoryName forKey:ORFolderDirectoryName];
     [encoder encodeObject:title forKey:ORFolderTitle];
-    [encoder encodeInt:transferType forKey:@"transferType"];
+    [encoder encodeInteger:transferType forKey:@"transferType"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -876,14 +879,14 @@ static NSString* ORFolderDirectoryName    = @"ORFolderDirectoryName";
 @implementation ORSmartFolder (private)
 - (void)_deleteAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         [self deleteAll];
     }
 }
 
 - (void)_sendAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         if(![self queueIsRunning])[self sendAll];
         else [self stopTheQueue];
     }

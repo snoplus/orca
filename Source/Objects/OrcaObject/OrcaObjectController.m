@@ -241,11 +241,11 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 	NSPrintInfo* printInfo = [NSPrintInfo sharedPrintInfo];
 	NSSize imageSize = [tempImage size];
 	if(imageSize.width>imageSize.height){
-		[printInfo setOrientation:NSLandscapeOrientation];
+		[printInfo setOrientation:NSPaperOrientationLandscape];
 		[printInfo setHorizontalPagination: NSFitPagination];
 	}
 	else {
-		[printInfo setOrientation:NSPortraitOrientation];
+		[printInfo setOrientation:NSPaperOrientationPortrait];
 		[printInfo setVerticalPagination: NSFitPagination];
 	}
 
@@ -275,7 +275,7 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 	[self endEditing];
 	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
-	int index = [allModels indexOfObject:model] + 1;
+	uint32_t index = (uint32_t)[allModels indexOfObject:model] + 1;
 	if(index>[allModels count]-1) index = 0;
 	[self setModel:[allModels objectAtIndex:index]];
  	[allModels release];
@@ -286,8 +286,8 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 	[self endEditing];
 	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
-	int index = [allModels indexOfObject:model] - 1;
-	if(index<0) index = [allModels count]-1;
+	uint32_t index = (uint32_t)[allModels indexOfObject:model] - 1;
+	//if(index<0) index = [allModels count]-1;
 	[self setModel:[allModels objectAtIndex:index]];
  	[allModels release];
 }
@@ -323,26 +323,26 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
     }
 }
 
-- (void)updateSlider:(NSSlider *)control setting:(int)inValue
+- (void)updateSlider:(NSSlider *)control setting:(NSInteger)inValue
 { 
 	// Updates a slider. The inValue parameter must be a int.
     if (inValue != [control intValue]) {
-        [control setIntValue:inValue];
+        [control setIntegerValue:inValue];
     }
 }
 
-- (void)updateStepper:(NSStepper *)control setting:(int)inValue
+- (void)updateStepper:(NSStepper *)control setting:(NSInteger)inValue
 {
 	// Updates a slider. The inValue parameter must be a int.
     if (inValue != [control intValue]) {
-        [control setIntValue:inValue];
+        [control setIntegerValue:inValue];
     }
 }
-- (void)updateIntText:(NSTextField *)control setting:(int)inValue
+- (void)updateIntText:(NSTextField *)control setting:(NSInteger)inValue
 {
 	// Updates a slider. The inValue parameter must be a int.
     if (inValue != [control intValue]) {
-        [control setIntValue:inValue];
+        [control setIntegerValue:inValue];
     }
 }
 
@@ -524,16 +524,16 @@ static NSString *OROrcaObjectControllerNibName	= @"OROrcaObjectControllerNibName
                 break;
            case 'l':
             {
-                long aValue;
+                int32_t aValue;
                 [invocation getReturnValue:&aValue];
-                if(!updatedOnce || ([aCell intValue] != aValue))[aCell setIntValue:aValue];
+                if(!updatedOnce || ([aCell intValue] != aValue))[aCell setIntegerValue:aValue];
             }
                 break;
             case 'L':
             {
-                unsigned long aValue;
+                uint32_t aValue;
                 [invocation getReturnValue:&aValue];
-                if(!updatedOnce || ([aCell intValue] != aValue))[aCell setIntValue:aValue];
+                if(!updatedOnce || ([aCell intValue] != aValue))[aCell setIntegerValue:aValue];
             }
                 break;
        }

@@ -50,7 +50,7 @@
     symbolTable = aTable;
 }
 
-- (void) startFilterScript:(nodeType**)someNodes nodeCount:(long)nodeCount delegate:(id) delegate
+- (void) startFilterScript:(nodeType**)someNodes nodeCount:(int32_t)nodeCount delegate:(id) delegate
 {	
 	time_t seconds;
 	time(&seconds);
@@ -66,7 +66,7 @@
 	}
 }
 
-- (void) finishFilterScript:(nodeType**)someNodes nodeCount:(long)nodeCount delegate:(id) delegate
+- (void) finishFilterScript:(nodeType**)someNodes nodeCount:(int32_t)nodeCount delegate:(id) delegate
 {
 	unsigned node;
 	for(node=0;node<nodeCount;node++){
@@ -78,7 +78,7 @@
 	}
 }
 
-- (void) runFilterNodes:(nodeType**)someNodes nodeCount:(long)nodeCount delegate:(id) delegate
+- (void) runFilterNodes:(nodeType**)someNodes nodeCount:(int32_t)nodeCount delegate:(id) delegate
 {
 	if(symbolTable){
 		unsigned node;
@@ -191,9 +191,9 @@
 
 - (void) defineArray:(nodeType*)p delegate:(id) delegate
 {
-	int n = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
-	unsigned long* ptr = 0;
-	if(n>0) ptr = calloc(n, sizeof(unsigned long)); //freed in 'freeArray'
+	int n = (int)[self ex:p->opr.op[1] delegate:delegate].val.lValue;
+	uint32_t* ptr = 0;
+	if(n>0) ptr = calloc(n, sizeof(uint32_t)); //freed in 'freeArray'
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
@@ -218,7 +218,7 @@
 		}
 	}
 }
-- (unsigned long*) loadArray:(unsigned long*) ptr nodeType:(nodeType*)p
+- (uint32_t*) loadArray:(uint32_t*) ptr nodeType:(nodeType*)p
 {
     if(!ptr)return ptr;
 	filterData tempData;
@@ -244,9 +244,9 @@
 - (void) arrayList:(nodeType*)p delegate:(id) delegate
 
 {
-	int n = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
-	unsigned long* ptr = 0;
-	if(n>0) ptr = calloc(n, sizeof(unsigned long)); //freed in 'freeArray'
+	int n = (int)[self ex:p->opr.op[1] delegate:delegate].val.lValue;
+	uint32_t* ptr = 0;
+	if(n>0) ptr = calloc(n, sizeof(uint32_t)); //freed in 'freeArray'
 	filterData tempData;
 	tempData.type		= kFilterPtrType;
 	tempData.val.pValue = ptr;
@@ -293,10 +293,10 @@
 				case PRINT:
 					tempData = [self ex:p->opr.op[0] delegate:delegate];
 					if(tempData.type == kFilterPtrType){
-						if(tempData.val.pValue) NSLog(@"%ld\n", *tempData.val.pValue); 
+						if(tempData.val.pValue) NSLog(@"%d\n", *tempData.val.pValue); 
 						else					NSLog(@"<nil ptr>\n"); 
 					}
-					else NSLog(@"%ld\n", tempData.val.lValue); 
+					else NSLog(@"%d\n", tempData.val.lValue); 
 					return tempData;
 					
 				case PRINTH:
@@ -408,7 +408,7 @@
 					//array stuff
 				case kArrayAssign:
 				{
-					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
+					uint32_t* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr!=0){
 						*ptr = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 						tempData.type = kFilterLongType;
@@ -422,9 +422,9 @@
 					
 				case kLeftArray:
 				{
-					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
+					uint32_t* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr!=0){
-						unsigned long offset = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+						uint32_t offset = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 						tempData.type = kFilterPtrType;
 						tempData.val.pValue = ptr+offset;
 					}
@@ -436,9 +436,9 @@
 					
 				case kArrayElement:
 				{
-					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
+					uint32_t* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr!=0){
-						unsigned long offset = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+						uint32_t offset = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 						tempData.type = kFilterLongType;
 						tempData.val.lValue = ptr[offset];
 					}
@@ -474,16 +474,16 @@
 					
 				case SHIP_RECORD:
 				{
-					unsigned long* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
+					uint32_t* ptr = [self ex:p->opr.op[0] delegate:delegate].val.pValue;
 					if(ptr) [delegate shipRecord:ptr length:ExtractLength(*ptr)]; 
 				}
 					break;
 					
 				case PUSH_RECORD:
 				{
-					long stack = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
-					unsigned long* ptr  = [self ex:p->opr.op[1] delegate:delegate].val.pValue;
-					unsigned long ptrValue  = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+					uint32_t stack = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
+					uint32_t* ptr  = [self ex:p->opr.op[1] delegate:delegate].val.pValue;
+					uint32_t ptrValue  = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					[delegate pushOntoStack:stack ptrCheck:ptrValue record:ptr]; 
 				}
 					break;
@@ -509,22 +509,22 @@
 					return tempData;
 					
 				case HISTO_1D:				
-					[delegate histo1D:[self ex:p->opr.op[0] delegate:delegate].val.lValue value:[self ex:p->opr.op[1] delegate:delegate].val.lValue];
+					[delegate histo1D:(int)[self ex:p->opr.op[0] delegate:delegate].val.lValue value:[self ex:p->opr.op[1] delegate:delegate].val.lValue];
 					break;
 					
 				case HISTO_2D:	
 				{
-					unsigned long x = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
-					unsigned long y = [self ex:p->opr.op[2] delegate:delegate].val.lValue;
-					[delegate histo2D:[self ex:p->opr.op[0] delegate:delegate].val.lValue x:x y:y];
+					uint32_t x = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+					uint32_t y = [self ex:p->opr.op[2] delegate:delegate].val.lValue;
+					[delegate histo2D:(int)[self ex:p->opr.op[0] delegate:delegate].val.lValue x:x y:y];
 				}
 					break;
 					
 				case STRIPCHART:	
 				{
-					unsigned long aTime = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
-					unsigned long aValue = [self ex:p->opr.op[2] delegate:delegate].val.lValue;
-					[delegate stripChart:[self ex:p->opr.op[0] delegate:delegate].val.lValue time:aTime value:aValue];
+					uint32_t aTime = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+					uint32_t aValue = [self ex:p->opr.op[2] delegate:delegate].val.lValue;
+					[delegate stripChart:(int)[self ex:p->opr.op[0] delegate:delegate].val.lValue time:aTime value:aValue];
 				}
 					break;
 					
@@ -532,22 +532,22 @@
 				{
 					time_t theTime;
 					time(&theTime);
-					tempData.val.lValue = theTime;
+					tempData.val.lValue = (uint32_t)theTime;
 				}
 					break;
 					
 					
 				case DISPLAY_VALUE:	
-					[delegate setOutput:[self ex:p->opr.op[0] delegate:delegate].val.lValue 
+					[delegate setOutput:(int)[self ex:p->opr.op[0] delegate:delegate].val.lValue
 							  withValue:[self ex:p->opr.op[1] delegate:delegate].val.lValue];
 					break;
 					
 				case RANDOM:
 				{
-					int high = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
-					int low  = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
+					uint32_t high = [self ex:p->opr.op[0] delegate:delegate].val.lValue;
+					uint32_t low  = [self ex:p->opr.op[1] delegate:delegate].val.lValue;
 					if(low>high){
-						int temp = high;
+						uint32_t temp = high;
 						high = low;
 						low = temp;
 					}
@@ -580,7 +580,7 @@
 	NSMutableString* line = nil;
 	
     switch(p->type) {
-        case typeCon: line = [NSMutableString stringWithFormat:@"c(%ld)", p->con.value]; break;
+        case typeCon: line = [NSMutableString stringWithFormat:@"c(%d)", p->con.value]; break;
         case typeId:  line = [NSMutableString stringWithFormat:@"(%s)", p->ident.key]; break;
         case typeOpr:
             switch(p->opr.oper){
@@ -705,7 +705,7 @@
 	while(1) {
 		NSRange r = NSMakeRange(r1,2);
 		BOOL delete = YES;
-		int count = [lines count];
+		int count = (int)[lines count];
 		int i;
 		BOOL done = YES;
 		for(i=count-1;i>=0;i--){

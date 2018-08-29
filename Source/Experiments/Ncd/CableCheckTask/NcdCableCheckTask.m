@@ -204,7 +204,7 @@ enum {
     return width;
 }
 
-- (void)setWidth:(float)aWidth 
+- (void)setWidth:(CGFloat)aWidth 
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWidth:width];
     width = aWidth;
@@ -525,8 +525,8 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         [self setAmplitude:[decoder decodeFloatForKey:NcdCableCheckAmplitude]];
         [self setWidth:[decoder decodeFloatForKey:NcdCableCheckWidth]];
         [self setNumPulses:[decoder decodeIntForKey:NcdCableCheckNumPulses]];
-        [self setShaperThreshold:[decoder decodeIntForKey:NcdCableCheckShaperThreshold]];
-        [self setMuxThreshold:[decoder decodeIntForKey:NcdCableCheckMuxThreshold]];
+        [self setShaperThreshold:[decoder decodeIntegerForKey:NcdCableCheckShaperThreshold]];
+        [self setMuxThreshold:[decoder decodeIntegerForKey:NcdCableCheckMuxThreshold]];
         [self setVerbose:[decoder decodeBoolForKey:NcdCableCheckMuxVerbose]];
     }
     else {
@@ -541,9 +541,9 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     [super encodeWithCoder:encoder];
     [encoder encodeFloat:amplitude forKey:NcdCableCheckAmplitude];
     [encoder encodeFloat:width forKey:NcdCableCheckWidth];
-    [encoder encodeInt:numPulses forKey:NcdCableCheckNumPulses];
-    [encoder encodeInt:shaperThreshold forKey:NcdCableCheckShaperThreshold];
-    [encoder encodeInt:muxThreshold forKey:NcdCableCheckMuxThreshold];
+    [encoder encodeInteger:numPulses forKey:NcdCableCheckNumPulses];
+    [encoder encodeInteger:shaperThreshold forKey:NcdCableCheckShaperThreshold];
+    [encoder encodeInteger:muxThreshold forKey:NcdCableCheckMuxThreshold];
     [encoder encodeBool:verbose forKey:NcdCableCheckMuxVerbose];
 }
 @end
@@ -579,7 +579,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
         pulseCount = 0;
         [self setCurrentTube:[tubeArray objectAtIndex:tubeIndex]];  //get the next tube to work on
         
-        [self setMessage:[NSString stringWithFormat:@" Checking %@ (%d/%d)",[currentTube objectForKey:@"kLabel"],tubeIndex+1,[tubeArray count]]];
+        [self setMessage:[NSString stringWithFormat:@" Checking %@ (%d/%d)",[currentTube objectForKey:@"kLabel"],tubeIndex+1,(int)[tubeArray count]]];
 		
         [self findShaperForCurrentTube];
         [self findMuxForCurrentTube];
@@ -695,7 +695,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
     NSArray* allShapers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORShaperModel")];
     int slot    = [[currentTube objectForKey:@"kAdcSlot"] intValue];    
     int channel = [[currentTube objectForKey:@"kAdcChannel"] intValue];
-    unsigned long address = strtol([[currentTube objectForKey:@"kAdcHWAddress"] cStringUsingEncoding:NSASCIIStringEncoding],0,16);;
+    uint32_t address = (uint32_t)strtol([[currentTube objectForKey:@"kAdcHWAddress"] cStringUsingEncoding:NSASCIIStringEncoding],0,16);;
     NSEnumerator* e = [allShapers objectEnumerator];
     ORShaperModel* shaper;
     while(shaper = [e nextObject]){
@@ -854,7 +854,7 @@ static NSString* NcdCableCheckMuxVerbose  = @"NcdCableCheckMuxVerbose";
 - (void) checkCurrentScope
 {
     if([currentScopes count]!=0){
-        unsigned long currentScopeCounts = 0;
+        uint32_t currentScopeCounts = 0;
         NSEnumerator* e = [currentScopes objectEnumerator];
         OROscBaseModel* aScope;
         currentScopeCounts = 0;

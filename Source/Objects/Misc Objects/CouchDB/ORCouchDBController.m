@@ -24,14 +24,14 @@
 #import "ORCouchDB.h"
 #import "ORValueBarGroupView.h"
 
-#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORCouchDBController (private)
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) createActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) deleteActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) stealthActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 - (void) historyActionDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
-@end
 #endif
+@end
 
 @implementation ORCouchDBController
 
@@ -63,11 +63,11 @@
 	NSOperationQueue* queue = [[ORCouchDBQueue sharedCouchDBQueue] queue];
     NSOperationQueue* lowPriorityQueue = [[ORCouchDBQueue sharedCouchDBQueue] lowPriorityQueue];
     if (object == queue && [keyPath isEqual:@"operationCount"]) {
-		NSNumber* n = [NSNumber numberWithInt:[[[ORCouchDBQueue queue] operations] count]];
+		NSNumber* n = [NSNumber numberWithInteger:[[[ORCouchDBQueue queue] operations] count]];
 		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
     }
     else if (object == lowPriorityQueue && [keyPath isEqual:@"operationCount"]) {
-        NSNumber* n = [NSNumber numberWithInt:[[[ORCouchDBQueue lowPriorityQueue] operations] count]];
+        NSNumber* n = [NSNumber numberWithInteger:[[[ORCouchDBQueue lowPriorityQueue] operations] count]];
         [self performSelectorOnMainThread:@selector(setLowPriorityQueCount:) withObject:n waitUntilDone:NO];
     }
     else {
@@ -298,18 +298,18 @@
 - (void) dataBaseInfoChanged:(NSNotification*)aNote
 {
 	NSDictionary* dbInfo = [model dBInfo];
-	unsigned long dbSize = [[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
+	uint32_t dbSize = (uint32_t)[[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
 	if(dbSize > 1000000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f GB",dbSize/1000000000.]];
 	else if(dbSize > 1000000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
 	else if(dbSize > 1000)[dbSizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
-	else [dbSizeField setStringValue:[NSString stringWithFormat:@"%lu Bytes",dbSize]];
+	else [dbSizeField setStringValue:[NSString stringWithFormat:@"%u Bytes",dbSize]];
 
 	dbInfo = [model dBHistoryInfo];
-	dbSize = [[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
+	dbSize = (uint32_t)[[dbInfo objectForKey:@"disk_size"] unsignedLongValue];
 	if(dbSize > 1000000000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.2f GB",dbSize/1000000000.]];
 	else if(dbSize > 1000000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.2f MB",dbSize/1000000.]];
 	else if(dbSize > 1000)[dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%.1f KB",dbSize/1000.]];
-	else [dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%lu Bytes",dbSize]];
+	else [dbHistorySizeField setStringValue:[NSString stringWithFormat:@"%u Bytes",dbSize]];
 	
 }
 
@@ -339,7 +339,7 @@
         [alert setInformativeText:@"There will be NO history (only run status) kept if you deactivate this option."];
         [alert addButtonWithTitle:@"Cancel"];
         [alert addButtonWithTitle:@"Yes, Disable History"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if(result == NSAlertSecondButtonReturn){
@@ -377,7 +377,7 @@
         [alert setInformativeText:@"There will be NO values automatically put in to the database if you activate this option."];
         [alert addButtonWithTitle:@"Cancel"];
         [alert addButtonWithTitle:@"Yes, Disable Database"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if(result == NSAlertSecondButtonReturn){
@@ -440,7 +440,7 @@
     [alert setInformativeText:@"If the database already exists, this operation will do no harm."];
     [alert addButtonWithTitle:@"Yes, Create Database"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -469,7 +469,7 @@
     [alert setInformativeText:@"If the database doesn't exist, this operation will do no harm."];
     [alert addButtonWithTitle:@"Yes, Delete Database"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -512,7 +512,7 @@
 
 - (IBAction) alertTypeAction:(id)sender
 {
-    [model setAlertType:[sender indexOfSelectedItem]];
+    [model setAlertType:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) alertMessageAction:(id)sender

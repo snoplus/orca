@@ -28,31 +28,31 @@
 
 #import <IOKit/IOKitLib.h>
 
-long 	convertTimeCharToLong( char* aTime );
+int32_t 	convertTimeCharToLong( char* aTime );
 void	convertTimeLongToChar( time_t aTime, char *pTime );
 id		ORKeyFromId(id anObj);
 int		random_range(int lowest_number, int highest_number);
-io_service_t rootService();
+io_service_t rootService(void);
 NSString* commonScriptMethodsByClass(Class aClass,BOOL includeSuperClass);
 NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass);
 NSString* methodsInCommonSection(id anObj);
 NSString* listMethods(Class aClass);
 NSString* listMethodWithOptions(Class aClass,BOOL verbose,BOOL includeSuperClass);
 NSString* listMethodWithExtendedOptions(Class aClass,BOOL verbose,BOOL includeSuperClass,BOOL sort);
-NSString* hexToString(unsigned long aHexValue);
+NSString* hexToString(uint32_t aHexValue);
 const char* decodeType(const char* aType);
-NSString* macAddress();
-NSString* computerName();
-NSString* appPath();
-NSString* launchPath();
-NSString* fullVersion();
+NSString* macAddress(void);
+NSString* computerName(void);
+NSString* appPath(void);
+NSString* launchPath(void);
+NSString* fullVersion(void);
 
 //alert panels for 10.10 and before
 BOOL ORRunAlertPanel(NSString* mainMessage, NSString* informativeMessage, NSString* defaultButtonTitle, NSString* alternateButtonTitle, NSString* otherButtonTitle, ...);
 
 #pragma mark ***private
 kern_return_t findEthernetInterfaces(io_iterator_t *matchingServices);
-kern_return_t getMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize);
+kern_return_t getMACAddress(io_iterator_t intfIterator, uint8 *MACAddress, uint8 bufferSize);
 
 @interface NSObject (scriptExtensions)
 - (NSString*) commonScriptMethods;

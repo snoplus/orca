@@ -85,18 +85,18 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPulseCheckMachineAdded object:self];
 }
 
-- (void) removeMachineAtIndex:(int) anIndex
+- (void) removeMachineAtIndex:(NSInteger) anIndex
 {
     if(anIndex < [machines count]){
         ORMachineToCheck* aMachine = [machines objectAtIndex:anIndex];
         [aMachine clearHeartbeatAlarm];
         [machines removeObjectAtIndex:anIndex];
-        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORPulseCheckMachineRemoved object:self userInfo:userInfo];
    }
 }
 
-- (ORMachineToCheck*) machineAtIndex:(int)anIndex
+- (ORMachineToCheck*) machineAtIndex:(NSInteger)anIndex
 {
 	if(anIndex>=0 && anIndex<[machines count])return [machines objectAtIndex:anIndex];
 	else return nil;
@@ -302,7 +302,7 @@ NSString* ORPulseCheckModelReloadTable      = @"ORPulseCheckModelReloadTable";
             else if([lines count]>=2){
                 time_t postTime = [[[lines objectAtIndex:0] substringFromIndex:5] unsignedLongValue];
                 time_t nextTime = [[[lines objectAtIndex:1] substringFromIndex:5] unsignedLongValue];
-                time_t delta  = abs(nextTime - postTime);
+                time_t delta  = labs(nextTime - postTime);
                 time_t overDue  = nextTime + 6*delta;
                 //if the postTime is older than the delta, then something is wrong
                 time_t	now;

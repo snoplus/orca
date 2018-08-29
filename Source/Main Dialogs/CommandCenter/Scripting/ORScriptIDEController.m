@@ -354,7 +354,7 @@
 - (void) debuggerStateChanged:(NSNotification*)aNote
 {
 	int debuggerState = [[model scriptRunner] debuggerState];
-	int line = [[model scriptRunner] lastLine];
+	int32_t line = [[model scriptRunner] lastLine];
 	NSString* functionName = [[[model scriptRunner] eval] functionName];
 	if(debuggerState == kDebuggerPaused) {
 		[debugStatusField setStringValue:[NSString stringWithFormat:@"<%@()> Stopped on Line: %d",functionName,line]];
@@ -362,7 +362,7 @@
 		[stepButton setEnabled:YES];
 		[stepInButton setEnabled:YES];
 		[stepOutButton setEnabled:YES];
-		unsigned long line = [[model scriptRunner] lastLine]-1;
+		uint32_t line = [[model scriptRunner] lastLine]-1;
 		[scriptView selectLine:line];
 	}
 	else if(debuggerState == kDebuggerRunning) {
@@ -730,7 +730,7 @@
 {
 	NSIndexSet* indexSet = [inputVariablesTableView selectedRowIndexes];
 	NSUInteger i;
-	NSUInteger last = [indexSet lastIndex];
+	NSUInteger last = (int)[indexSet lastIndex];
 	for(i=last;i!=NSNotFound;i = [indexSet indexLessThanIndex:i]){
 		[model removeInputValue:i];
 	}
@@ -758,11 +758,11 @@
 	}
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)aTable
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTable
 {
-	if(aTable == inputVariablesTableView)		return ([[model inputValues] count]);
-	else if(aTable == outputVariablesTableView)	return ([[[model scriptRunner] displayDictionary] count]);
-	else if(aTable == debuggerTableView)		return ([[model evaluator] symbolTableCount]);
+	if(aTable == inputVariablesTableView)		return (NSInteger)([[model inputValues] count]);
+	else if(aTable == outputVariablesTableView)	return (NSInteger)([[[model scriptRunner] displayDictionary] count]);
+	else if(aTable == debuggerTableView)		return (NSInteger)([[model evaluator] symbolTableCount]);
 	else return 0;
 }
 

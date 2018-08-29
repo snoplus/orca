@@ -456,7 +456,7 @@
 		[[self window] setContentView:tabView];
     }
     
-	int index = [tabView indexOfTabViewItem:tabViewItem];
+	int index = (int)[tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.HaloController.selectedtab"];
 }
 
@@ -526,7 +526,7 @@
 }
 - (IBAction) addAddress:(id)sender
 {
-	int index = [[model emailList] count];
+	int index = (int)[[model emailList] count];
 	[model addAddress:@"<eMail>" atIndex:index];
 	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
 	[emailListTable selectRowIndexes:indexSet byExtendingSelection:NO];
@@ -549,7 +549,7 @@
 
 - (IBAction) heartBeatIndexAction:(id)sender
 {
-	[model setHeartBeatIndex:[sender indexOfSelectedItem]];
+	[model setHeartBeatIndex:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) sbcPasswordAction:(id)sender
@@ -569,7 +569,7 @@
 
 - (IBAction) viewTypeAction:(id)sender
 {
-	[model setViewType:[sender indexOfSelectedItem]];
+	[model setViewType:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) ip1Action:(id)sender
@@ -589,7 +589,7 @@
     [alert setInformativeText:@"Really switch which machine is the one in control of the run?"];
     [alert addButtonWithTitle:@"Yes/Switch Machines"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -624,7 +624,7 @@
     [alert setInformativeText:@"Really send the Threshods and Gains to the other machine?\nThey will be loaded into HW at start of next run."];
     [alert addButtonWithTitle:@"Yes/Update"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -676,7 +676,7 @@
 //SV
 - (IBAction)schedulerSetupChanged:(id)sender
 {
-    int index = [sender indexOfSelectedItem];
+    int index = (int)[sender indexOfSelectedItem];
     int seconds = 0;
     
     switch(index){
@@ -701,12 +701,12 @@
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == emailListTable || aNotification == nil){
-		int selectedIndex = [emailListTable selectedRow];
+		NSInteger selectedIndex = [emailListTable selectedRow];
 		[removeAddressButton setEnabled:selectedIndex>=0];
 	}
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == emailListTable){
 		if(rowIndex < [[model emailList] count]){
@@ -716,12 +716,12 @@
 		else return @"";
 	}
 	else if(aTableView == secondaryTableView || aTableView == secondaryValuesView){
-		return [[model segmentGroup:1] segment:rowIndex objectForKey:[aTableColumn identifier]];
+		return [[model segmentGroup:1] segment:(int)rowIndex objectForKey:[aTableColumn identifier]];
 	}
     else return [super tableView:aTableView objectValueForTableColumn:aTableColumn row:rowIndex];
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     ORDetectorSegment* aSegment;
 	if(aTableView == emailListTable){
@@ -730,12 +730,12 @@
 		}
 	}
 	else if(aTableView == secondaryTableView){
-        aSegment = [[model segmentGroup:1] segment:rowIndex];
+        aSegment = [[model segmentGroup:1] segment:(int)rowIndex];
 		[aSegment setObject:anObject forKey:[aTableColumn identifier]];
 		[[model segmentGroup:1] configurationChanged:nil];
 	}
 	else if(aTableView == secondaryValuesView){
-		aSegment = [[model segmentGroup:1] segment:rowIndex];
+		aSegment = [[model segmentGroup:1] segment:(int)rowIndex];
 		if([[aTableColumn identifier] isEqualToString:@"threshold"]){
 			[aSegment setThreshold:anObject];
 		}
@@ -747,10 +747,10 @@
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
  	if(aTableView == emailListTable){
-		return [[model emailList] count];
+		return (NSInteger)[[model emailList] count];
     }
     else if( aTableView == secondaryTableView ||
            aTableView == secondaryValuesView)    return [[model segmentGroup:1] numSegments];

@@ -301,7 +301,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
     oilDeficiency = aOilDeficiency;
 	if(oilDeficiency){
 		if(!noOilAlarm){
-			NSString* s = [NSString stringWithFormat:@"No Oil -- DCU %lu",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"No Oil -- DCU %u",[self uniqueIdNumber]];
 			noOilAlarm = [[ORAlarm alloc] initWithName:s severity:kImportantAlarm];
 			[noOilAlarm setSticky:YES];
 			[noOilAlarm setHelpStringFromFile:@"NoOilHelp"];
@@ -387,10 +387,10 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:tmpRotSet		forKey:@"tmpRotSet"];
-    [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
-    [encoder encodeInt:deviceAddress	forKey: @"deviceAddress"];
-    [encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeInteger:tmpRotSet		forKey:@"tmpRotSet"];
+    [encoder encodeInteger:pressureScale	forKey: @"pressureScale"];
+    [encoder encodeInteger:deviceAddress	forKey: @"deviceAddress"];
+    [encoder encodeInteger:pollTime			forKey: @"pollTime"];
 }
 
 #pragma mark •••HW Methods
@@ -538,8 +538,8 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -692,7 +692,7 @@ NSString* ORPDcuLock						= @"ORPDcuLock";
 	int e = [[parts objectAtIndex:1] intValue];
 	s= [NSString stringWithFormat:@"%.1fE%d",m,e];
 	s = [[s componentsSeparatedByString:@".0"] componentsJoinedByString:@""];
-	int len = [s length];
+	NSUInteger len = [s length];
 	if(len<6){
 		int i;
 		for(i=0;i<6-len;i++){

@@ -100,7 +100,7 @@
 						}
 					}
 					else {
-						[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet.\nReason: %s\n",snmp_errstring(response->errstat)] forKey:@"Error"];
+						[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet.\nReason: %s\n",snmp_errstring((int)response->errstat)] forKey:@"Error"];
 						[resultArray addObject:responseDictionary];
 						break;
 					}
@@ -171,7 +171,7 @@
 					
 					if (status == STAT_SUCCESS){
 						if (response->errstat != SNMP_ERR_NOERROR){
-							[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet: %s",snmp_errstring(response->errstat)] forKey:@"Error"];
+							[responseDictionary setObject:[NSString stringWithFormat:@"Error in packet: %s",snmp_errstring((int)response->errstat)] forKey:@"Error"];
 							[resultArray addObject:responseDictionary];
 							break;
 						}
@@ -320,18 +320,18 @@
 		else [aDictionary setObject:[NSNumber numberWithFloat:[s floatValue]] forKey:@"Value"];
 	}
 }
-- (unsigned long) convertBitString:(NSString*)s
+- (uint32_t) convertBitString:(NSString*)s
 {
-	unsigned long finalReversedValue = 0;
-	int n = [s length];
-	int i;
+	uint32_t finalReversedValue = 0;
+	NSUInteger n = [s length];
+	NSInteger i;
 	for(i=n-1 ; i>=0 ; i--){
 		NSScanner* scanner = [NSScanner scannerWithString:[s substringWithRange:NSMakeRange(i,1)]];
 		unsigned unreversedHexByte;
 		[scanner scanHexInt:&unreversedHexByte];
 		int j;
 		//flip the bits
-		unsigned long reversedHexByte = 0;
+		uint32_t reversedHexByte = 0;
 		for(j=0;j<4;j++){
 			if(unreversedHexByte & 0x1) reversedHexByte |= (0x8>>j);
 			unreversedHexByte >>= 1;

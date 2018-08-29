@@ -300,8 +300,8 @@
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
-    [registerAddressPopUp setAlignment:NSCenterTextAlignment];
-    [channelPopUp setAlignment:NSCenterTextAlignment];
+    [registerAddressPopUp setAlignment:NSTextAlignmentCenter];
+    [channelPopUp setAlignment:NSTextAlignmentCenter];
 	
     [self populatePullDown];
     
@@ -335,8 +335,8 @@
     [super awakeFromNib];
 
     
-    NSString* key = [NSString stringWithFormat: @"orca.%@%lu.selectedtab",[model className],[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.%@%u.selectedtab",[model className],[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -689,7 +689,7 @@
 - (void) triggerSourceEnableMaskChanged:(NSNotification*)aNote
 {
     int i;
-    unsigned long mask = [model triggerSourceMask];
+    uint32_t mask = [model triggerSourceMask];
     for(i=0;i<kNumDT5720Channels;i++){
         [[triggerSourceEnableMaskMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
@@ -698,7 +698,7 @@
 - (void) triggerOutMaskChanged:(NSNotification*)aNote
 {
     int i;
-    unsigned long mask = [model triggerOutMask];
+    uint32_t mask = [model triggerOutMask];
     for(i=0;i<kNumDT5720Channels;i++){
         [[triggerOutMatrix cellWithTag:i] setIntValue:(mask & (1L << i)) !=0];
     }
@@ -716,7 +716,7 @@
 
 - (void) postTriggerSettingChanged:(NSNotification*)aNote
 {
-    [postTriggerSettingTextField setIntValue:[model postTriggerSetting]];
+    [postTriggerSettingTextField setIntegerValue:(int)[model postTriggerSetting]];
 }
 
 - (void) gpoEnabledChanged:(NSNotification*)aNote
@@ -796,7 +796,7 @@
 {
 	//  Set value of both text and stepper
 	[self updateStepper:writeValueStepper setting:[model selectedRegValue]];
-	[writeValueTextField setIntValue:[model selectedRegValue]];
+	[writeValueTextField setIntegerValue:[model selectedRegValue]];
 }
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
@@ -933,7 +933,7 @@
 #pragma mark •••Actions
 - (IBAction) logicTypeAction:(id)sender
 {
-    [model setLogicType:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+    [model setLogicType:[sender selectedRow] withValue:(int)[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) zsThresholdAction:(id) sender
@@ -976,7 +976,7 @@
 
 - (IBAction) zsAlgorithmAction:(id)sender
 {
-    [model setZsAlgorithm:[sender indexOfSelectedItem]];
+    [model setZsAlgorithm:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) packedAction:(id)sender
@@ -1001,7 +1001,7 @@
 
 - (void) eventSizeAction:(id)sender
 {
-    [model setEventSize:[sender indexOfSelectedItem]];
+    [model setEventSize:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) clockSourceAction:(id)sender
@@ -1038,7 +1038,7 @@
 - (IBAction) triggerSourceEnableMaskAction:(id)sender
 {
     int i;
-    unsigned long mask = 0;
+    uint32_t mask = 0;
     for(i=0;i<kNumDT5720Channels;i++){
         if([[triggerSourceEnableMaskMatrix cellWithTag:i] intValue]) mask |= (1L << i);
     }
@@ -1050,7 +1050,7 @@
 - (IBAction) triggerOutMaskAction:(id)sender
 {
     int i;
-    unsigned long mask = 0;
+    uint32_t mask = 0;
     for(i=0;i<kNumDT5720Channels;i++){
         if([[triggerOutMatrix cellWithTag:i] intValue]) mask |= (1L << i);
     }
@@ -1076,7 +1076,7 @@
 
 - (IBAction) ttlEnabledAction:(id)sender
 {
-    [model setTtlEnabled:[[sender selectedCell] tag]];
+    [model setTtlEnabled:(int)[[sender selectedCell] tag]];
 }
 
 - (void) enabledMaskAction:(id)sender
@@ -1238,7 +1238,7 @@
     };
 	
     [registerOffsetTextField setStringValue:
-	 [NSString stringWithFormat:@"0x%04lx",
+	 [NSString stringWithFormat:@"0x%04x",
 	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
@@ -1267,15 +1267,15 @@
 		[[self window] setContentView:tabView];
     }
 	
-    NSString* key = [NSString stringWithFormat: @"orca.%@%lu.selectedtab",[model className],[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.%@%u.selectedtab",[model className],[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
 
 #pragma mark •••Data Source
 
-- (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
+- (void) getQueMinValue:(uint32_t*)aMinValue maxValue:(uint32_t*)aMaxValue head:(uint32_t*)aHeadValue tail:(uint32_t*)aTailValue
 {
     [model getQueMinValue:aMinValue maxValue:aMaxValue head:aHeadValue tail:aTailValue];
     
@@ -1288,12 +1288,12 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[[model waveFormRateGroup]timeRate]count];
+	return (int)[[[model waveFormRateGroup]timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int count = [[[model waveFormRateGroup]timeRate] count];
+	int count = (int)[[[model waveFormRateGroup]timeRate] count];
 	int index = count-i-1;
 	*yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
 	*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];

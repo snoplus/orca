@@ -109,7 +109,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Mod Bus (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Mod Bus (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -200,7 +200,7 @@
 {
 	if(!sensorControllers)	sensorControllers = [[NSMutableArray array] retain];
 
-	unsigned long numToAdd = [[model sensors] count] - [sensorControllers count];
+	uint32_t numToAdd = (uint32_t)([[model sensors] count] - [sensorControllers count]);
 	int i;
 	for(i=0;i<numToAdd;i++){
 		ORiTransGasSensorController* aSensorPanel = [ORiTransGasSensorController sensorPanel];
@@ -211,7 +211,7 @@
 
 - (void) sensorRemoved:(NSNotification*)aNotification
 {
-	unsigned long numToRemove = [sensorControllers count] - [[model sensors]count];
+	uint32_t numToRemove = (uint32_t)([sensorControllers count] - [[model sensors]count]);
 	int i;
 	for(i=0;i<numToRemove;i++){
 		[sensorControllers removeLastObject];
@@ -222,7 +222,7 @@
 - (void) sensorsChanged:(NSNotification*)aNotification
 {
 	if(!sensorControllers)	sensorControllers = [[NSMutableArray array] retain];
-	unsigned long numToAdd = [[model sensors] count] - [sensorControllers count];
+	uint32_t numToAdd = (uint32_t)([[model sensors] count] - [sensorControllers count]);
 	int i;
 	for(i=0;i<numToAdd;i++){
 		[sensorControllers addObject:[ORiTransGasSensorController sensorPanel]];
@@ -233,8 +233,8 @@
 - (void) tileSensors
 {
 	//space Needed
-	int numViewsNeeded = [sensorControllers count];
-	int numViews = [[sensorsView subviews] count];
+	int numViewsNeeded = (int)[sensorControllers count];
+	int numViews       = (int)[[sensorsView subviews] count];
 	if(numViewsNeeded < numViews){
 		int i;
 		int n = numViews-numViewsNeeded;
@@ -263,7 +263,7 @@
 	
 	//loop over all and assign the model
 	int i;
-	int n = [sensorControllers count];
+	int n = (int)[sensorControllers count];
 	for(i=0;i<n;i++){
 		id aController = [sensorControllers objectAtIndex:i];
 		[aController setModel:[model sensor:i]];
@@ -289,7 +289,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) addSensorAction:(id)sender

@@ -84,7 +84,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
     NSImage* aCachedImage = [NSImage imageNamed:@"BootBar"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	
     int chan;
 	int xOffset = 0;
@@ -98,7 +98,7 @@ NSString* ORBootBarModelOutletNameChanged	 = @"ORBootBarModelOutletNameChanged";
 	
 	NSDictionary* attDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSFont labelFontOfSize:12],NSFontAttributeName, [NSColor whiteColor],NSForegroundColorAttributeName,nil];
 	NSAttributedString* n = [[NSAttributedString alloc] 
-							 initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]]
+							 initWithString:[NSString stringWithFormat:@"%u",[self uniqueIdNumber]]
 							 attributes:attDict];
 	
 

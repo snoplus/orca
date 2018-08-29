@@ -59,7 +59,7 @@
 
 // Retrieve sourceMasks with given value from 'allSourceMasks'
 // (see NSCoding methods).
-+ (SourceMask *)sourceMaskForValue:(unsigned long)theValue
++ (SourceMask *)sourceMaskForValue:(uint32_t)theValue
 {
 	NSEnumerator *sourceMaskEnumerator = [[SourceMask allSourceMasks] objectEnumerator];
 	SourceMask *sourceMask;
@@ -73,7 +73,7 @@
 
 
 // Convenience constructor
-+ (id)sourceMaskWithTitle:(NSString *)aTitle andValue:(unsigned long)aValue
++ (id)sourceMaskWithTitle:(NSString *)aTitle andValue:(uint32_t)aValue
 {
     SourceMask* newSourceMask = [[[self alloc] init] autorelease];
     [newSourceMask setTitle:aTitle];
@@ -92,18 +92,18 @@
  To encode, simply save 'value'; on decode, replace self with
  the existing instance from 'allSourceMasks' with the same value
  */
-- (void)encodeWithCoder:(NSCoder *)encoder
-{
-    [encoder encodeInt: value forKey:@"value"];
-}
 
 - (id)initWithCoder:(NSCoder *)decoder
 {
-	unsigned long theValue = 0;
+	uint32_t theValue = 0;
     theValue = [decoder decodeIntForKey:@"value"];
 	[self autorelease];
 	// returning "static" object from init method -- ensure retain count maintained
 	return [[SourceMask sourceMaskForValue:theValue] retain];
+}
+- (void)encodeWithCoder:(NSCoder *)encoder
+{
+    [encoder encodeInt: (int32_t)value forKey:@"value"];
 }
 
 
@@ -122,11 +122,11 @@
     return;
 }
 
-- (unsigned long)value
+- (uint32_t)value
 {
     return value;
 }
-- (void)setValue:(unsigned long)aValue
+- (void)setValue:(uint32_t)aValue
 {
     value = aValue;
 }

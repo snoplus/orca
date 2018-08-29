@@ -208,7 +208,8 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
 
 - (void) clearAlarm
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmWasClearedNotification object:self];
+//    [[NSNotificationCenter defaultCenter] postNotificationName:ORAlarmWasClearedNotification object:self];
+    [[NSNotificationCenter defaultCenter] postNotificationOnMainThreadWithName:ORAlarmWasClearedNotification object:self];
 }
 
 - (void) setIsPosted:(BOOL)state
@@ -260,7 +261,7 @@ NSString* severityName[kNumAlarmSeverityTypes] = {
     [dateFormatter setTimeZone:gmt];
     NSString*   lastTimeStamp       = [dateFormatter stringFromDate:timePosted];
     NSDate*     gmtTime             = [dateFormatter dateFromString:lastTimeStamp];
-    unsigned long secondsSince1970  = [gmtTime timeIntervalSince1970];
+    uint32_t secondsSince1970  = [gmtTime timeIntervalSince1970];
     [dateFormatter release];
 
     

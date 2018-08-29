@@ -111,7 +111,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     NSImage* aCachedImage = [NSImage imageNamed:@"ICS8065Box"];
     NSImage* i = [[[NSImage alloc] initWithSize:[aCachedImage size]]autorelease];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     if(![self isEnabled]){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSZeroPoint];
@@ -320,7 +320,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
         [theHWLock lock];   //-----begin critical section
 		
 		Create_LinkParms crlp;
-		crlp.clientId = (long)rpcClient;
+		crlp.clientId = (int)rpcClient;
 		crlp.lockDevice = 0;
 		crlp.lock_timeout = 10000;
 		char device[64];
@@ -366,12 +366,12 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     
 }
 
-- (long) readFromDevice: (short) aPrimaryAddress data: (char*) data maxLength: (long) aMaxLength
+- (int32_t) readFromDevice: (short) aPrimaryAddress data: (char*) data maxLength: (int32_t) aMaxLength
 {
 	
     if ( ! [self isEnabled] || !rpcClient) return 0;
     
-	long nReadBytes = 0;
+	int32_t nReadBytes = 0;
     @try {
         // Make sure that device is initialized.
         [theHWLock lock];   //-----begin critical section
@@ -387,7 +387,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 	        thisRead = -1;
 			// Perform the read.				
 			devReadP.lid = mDeviceLink[aPrimaryAddress].lid; 
-			devReadP.requestSize = aMaxLength;
+			devReadP.requestSize = (unsigned int)aMaxLength;
 			devReadP.io_timeout = 1000; 
 			devReadP.lock_timeout = 10000;
 			devReadP.flags = 0;
@@ -419,7 +419,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		if ( mMonitorRead ) {
 			NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];	
 			NSString* dataStr = [[NSString alloc] initWithBytes: data length: nReadBytes encoding: NSASCIIStringEncoding];
-			[userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %ld data: %@\n", 
+			[userInfo setObject: [NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n", 
 								  aPrimaryAddress, nReadBytes, dataStr] 
 						 forKey: ORGpib1Monitor]; 
 			
@@ -475,7 +475,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 		devReadP.lock_timeout = 10000;
 		devReadP.flags = 0;
 		if(![aCommand hasSuffix:@"\n"])aCommand = [aCommand stringByAppendingString:@"\n"];
-		devReadP.data.data_len = [aCommand length];
+		devReadP.data.data_len = (unsigned int)[aCommand length];
 		devReadP.data.data_val = (char *)[aCommand cStringUsingEncoding:NSASCIIStringEncoding];
 		dwrr = device_write_1(&devReadP, rpcClient); 
 		if(dwrr == 0){
@@ -500,10 +500,10 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
 }
 
 
-- (long) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
-               maxLength: (long) aMaxLength
+- (int32_t) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
+               maxLength: (int32_t) aMaxLength
 {
-    long retVal = 0;
+    int32_t retVal = 0;
     if ( ! [self isEnabled]) return -1;
     @try {
         
@@ -584,7 +584,7 @@ NSString*	ORICS8065ModelIpAddressChanged		= @"ORICS8065ModelIpAddressChanged";
     [super encodeWithCoder: encoder];
 	[encoder encodeObject:command		forKey: @"command"];
 	[encoder encodeObject:ipAddress		forKey: @"ipAddress"];
-	[encoder encodeInt:primaryAddress	forKey: @"primaryAddress"];
+	[encoder encodeInteger:primaryAddress	forKey: @"primaryAddress"];
 }
 
 @end

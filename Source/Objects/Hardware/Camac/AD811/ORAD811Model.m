@@ -81,8 +81,8 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 	
     [[NSNotificationCenter defaultCenter] postNotificationName:ORAD811ModelIncludeTimingChanged object:self];
 }
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -155,7 +155,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     int len = 1;						//default to the short form
 	if(includeTiming)len = 4;			//including timing adds two timing words
 	else {
-		if(IsLongForm(dataId))len = 2;	//not timing, long form = 2 words total
+		if(IsLongForm(dataId))len = 2;	//not timing, int32_t form = 2 words total
 	}
 	NSDictionary* aDictionary = [NSDictionary dictionaryWithObjectsAndKeys:
 								 @"ORAD811DecoderForAdc",                        @"decoder",
@@ -182,7 +182,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
+    unChangingDataPart   = (uint32_t)((([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16)); //doesn't change so do it here.
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
     
@@ -216,7 +216,7 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 	
 	union {
 		NSTimeInterval asTimeInterval;
-		unsigned long asLongs[2];
+		uint32_t asLongs[2];
 	}theTimeRef;
 	
     @try {
@@ -238,13 +238,13 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
                     [controller camacShortNAF:cachedStation a:onlineList[i] f:2 data:&adcValue];
 					if(!(suppressZeros && adcValue==0)){
 						if(IsShortForm(dataId)){
-							unsigned long data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0xfff);
+							uint32_t data = dataId | unChangingDataPart | (onlineList[i]&0xf)<<12 | (adcValue & 0xfff);
 							[aDataPacket addLongsToFrameBuffer:&data length:1];
 						}
 						else {
-							unsigned long data[4];
+							uint32_t data[4];
 							int len = 2;			//default to no timing info
-							long includeTimingMask = 0;
+							int32_t includeTimingMask = 0;
 							if(includeTiming){
 								len = 4;
 								includeTimingMask = 1L<<25;
@@ -372,8 +372,8 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 	
     [[self undoManager] disableUndoRegistration];
     [self setIncludeTiming:[decoder decodeBoolForKey:@"ORAD811ModelIncludeTiming"]];
-	[self setOnlineMask:[decoder decodeIntForKey:@"OR811OnlineMask"]];
-    [self setSuppressZeros:[decoder decodeIntForKey:@"OR811SuppressZeros"]];
+	[self setOnlineMask:[decoder decodeIntegerForKey:@"OR811OnlineMask"]];
+    [self setSuppressZeros:[decoder decodeIntegerForKey:@"OR811SuppressZeros"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -383,8 +383,8 @@ NSString* ORAD811SuppressZerosChangedNotification   = @"ORAD811SuppressZerosChan
 {
     [super encodeWithCoder:encoder];
 	[encoder encodeBool:includeTiming forKey:@"ORAD811ModelIncludeTiming"];
-    [encoder encodeInt:onlineMask forKey:@"OR811OnlineMask"];
-    [encoder encodeInt:suppressZeros forKey:@"OR811SuppressZeros"];
+    [encoder encodeInteger:onlineMask forKey:@"OR811OnlineMask"];
+    [encoder encodeInteger:suppressZeros forKey:@"OR811SuppressZeros"];
 	
 }
 

@@ -95,7 +95,7 @@
 {
 	NSIndexSet* theSelectedSet =  [commandTable selectedRowIndexes];
 	if(theSelectedSet){
-		int rowIndex = [theSelectedSet firstIndex];
+		int rowIndex = (int)[theSelectedSet firstIndex];
 		id obj = [model commandAtIndex:rowIndex];
 		[objectField setStringValue: [obj objectForKey:@"Object"]];
 		[setSelectorField setStringValue: [obj objectForKey:@"SetSelector"]];
@@ -109,8 +109,8 @@
 {
 	NSIndexSet* theSelectedSet =  [commandTable selectedRowIndexes];
 	if(theSelectedSet){
-		int rowIndex = [theSelectedSet firstIndex];
-		[itemCountField setStringValue:[NSString stringWithFormat:@"%d of %d",rowIndex+1,[model commandCount]]];
+		int rowIndex = (int)[theSelectedSet firstIndex];
+		[itemCountField setStringValue:[NSString stringWithFormat:@"%d of %d",rowIndex+1,(int)[model commandCount]]];
 	}
 	else [itemCountField setStringValue:@""];
 }
@@ -121,7 +121,7 @@
 	[self endEditing];
 	NSIndexSet* theSelectedSet =  [commandTable selectedRowIndexes];
 	if(theSelectedSet){
-		int rowIndex = [theSelectedSet firstIndex];
+		int rowIndex = (int)[theSelectedSet firstIndex];
 		[model executeCommand:rowIndex];
 	}
 	[warningField setStringValue:@"Executed"];
@@ -130,7 +130,7 @@
 - (IBAction) okAllAction:(id)sender
 {
 	[self endEditing];
-	int n = [model commandCount];
+	int n = (int)[model commandCount];
 	int i;
 	for(i=0;i<n;i++){
 		[model executeCommand:i];
@@ -144,7 +144,7 @@
 	[self endEditing];
 	NSIndexSet* theSelectedSet =  [commandTable selectedRowIndexes];
 	if(theSelectedSet){
-		int rowIndex = [theSelectedSet firstIndex];
+		int rowIndex = (int)[theSelectedSet firstIndex];
 		if(![model checkSyntax:rowIndex]){
 			[warningField setStringValue:@"Problems: see status log"];
 			id cmd = [model commandAtIndex:rowIndex];
@@ -170,7 +170,7 @@
 	NSIndexSet* theSelectedSet =  [commandTable selectedRowIndexes];
 	if(theSelectedSet){
 		
-		int rowIndex = [theSelectedSet firstIndex];
+		int rowIndex = (int)[theSelectedSet firstIndex];
 		id obj = [model commandAtIndex:rowIndex];
 		
 		NSString* s;
@@ -205,10 +205,10 @@
 {
 	NSIndexSet* theSelectedSet =  [commandTable selectedRowIndexes];
 	if(theSelectedSet){
-		int index = [theSelectedSet firstIndex];
+		int index = (int)[theSelectedSet firstIndex];
 		[model removeCommand:index];
 		if(index>1)index--;
-		else index = [model commandCount]-1;
+		else index = (int)[model commandCount]-1;
 		NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
 		[commandTable selectRowIndexes:indexSet byExtendingSelection:NO];
 		[model postDetailsChanged];
@@ -216,20 +216,20 @@
 }
 
 #pragma mark •••DataSource
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [model commandCount];
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
-    id obj = [model commandAtIndex:rowIndex];
+    id obj = [model commandAtIndex:(int)rowIndex];
     return [obj valueForKey:[aTableColumn identifier]];
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
-    id obj = [model commandAtIndex:rowIndex];
+    id obj = [model commandAtIndex:(int)rowIndex];
 	[obj setObject:anObject forKey:[aTableColumn identifier]];
 	[self commandSelectionChanged:nil];
 	[model postDetailsChanged];

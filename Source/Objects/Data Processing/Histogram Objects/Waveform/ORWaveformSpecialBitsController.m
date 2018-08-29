@@ -48,18 +48,18 @@
 #pragma mark ¥¥¥Data Source
 - (void) plotter:(id)aPlot index:(int)index x:(double*)x y:(double*)y
 {
-    int thePlotTag = [aPlot tag];
+    int thePlotTag = (int)[aPlot tag];
 	if(thePlotTag == 0){
-		unsigned long aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
+		uint32_t aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
 		*y =  ([model value:index] & aMask) + [model scaleOffset];
 		*x = index;
 	}
 	else {
 		int bit;
-        unsigned long aMask =  [model firstBitMask];
+        uint32_t aMask =  [model firstBitMask];
 		for(bit=0;bit<[model numBits];bit++){
 			if(thePlotTag == bit+1){
- 				unsigned long aValue = [model value:index];
+ 				uint32_t aValue = [model value:index];
 				*y =  ((aValue & (aMask << bit)))!=0;
 				*x = index;
 				break;
@@ -78,18 +78,18 @@
     double* yptr = (double*)[y bytes];
     NSUInteger i;
     if ([aPlot tag] == 0) {
-		unsigned long aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
-        long scaleOffset = [model scaleOffset];
+		uint32_t aMask =  [(ORMaskedIndexedWaveformWithSpecialBits*)model mask];
+        int32_t scaleOffset = [model scaleOffset];
         for (i=0;i<length;i++) {
-            yptr[i] = (((long)yptr[i]) & aMask) + scaleOffset;
+            yptr[i] = (((int32_t)yptr[i]) & aMask) + scaleOffset;
         }
     } else {
 		int bit;
 		for(bit=0;bit<[model numBits];bit++){
 			if([aPlot tag] == bit+1){
-				unsigned long aMask =  [model firstBitMask];
+				uint32_t aMask =  [model firstBitMask];
                 for (i=0;i<length;i++) {
-                    yptr[i] = (((long)yptr[i]) & (aMask << bit)) != 0;
+                    yptr[i] = (((int32_t)yptr[i]) & (aMask << bit)) != 0;
                 }
 				break;
 			}

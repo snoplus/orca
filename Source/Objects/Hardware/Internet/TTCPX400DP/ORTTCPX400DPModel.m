@@ -817,8 +817,8 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
 	
 	[self setIpAddress:[decoder decodeObjectForKey:@"ipAddress"]];
 	[self setSerialNumber:[decoder decodeObjectForKey:@"serialNumber"]];    
-    [self setPort:[decoder decodeIntForKey:@"portNumber"]];
-    [self setVerbose:[decoder decodeIntForKey:@"verbose"]];
+    [self setPort:[decoder decodeIntegerForKey:@"portNumber"]];
+    [self setVerbose:[decoder decodeIntegerForKey:@"verbose"]];
     NSString* ul = [decoder decodeObjectForKey:@"kORTTCPX400DPUL"];
     if (ul != nil) [self setUserLock:YES withString:ul];
     
@@ -831,8 +831,8 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
 	[super encodeWithCoder:encoder];
  	[encoder encodeObject:ipAddress	forKey:@"ipAddress"];
  	[encoder encodeObject:serialNumber	forKey:@"serialNumber"];    
-    [encoder encodeInt:port forKey:@"portNumber"];
-    [encoder encodeInt:verbose forKey:@"verbose"];
+    [encoder encodeInteger:port forKey:@"portNumber"];
+    [encoder encodeInteger:verbose forKey:@"verbose"];
     [encoder encodeObject:userLocked forKey:@"kORTTCPX400DPUL"];
 }
 
@@ -892,10 +892,10 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     [readConditionLock lock];
     
     // First add the write command
-    [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],cmdStr,@"",[NSNumber numberWithUnsignedInt:output],nil]];
+    [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(uint32_t)theCmd],cmdStr,@"",[NSNumber numberWithUnsignedInt:output],nil]];
     // If there's a read command, add it as well.
     if (selName != nil) {
-        [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(unsigned long)theCmd],@"",selName,[NSNumber numberWithUnsignedInt:output],nil]];
+        [dataQueue addObject:[NSArray arrayWithObjects:[NSNumber numberWithUnsignedLong:(uint32_t)theCmd],@"",selName,[NSNumber numberWithUnsignedInt:output],nil]];
     }
     // We only call the next write command if we are not doing any processing.
     BOOL callProcessing = !isProcessingCommands;
@@ -963,7 +963,7 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     assert(cmd != nil && cmd->responds);
     
     float readBackValue = 0;
-    int numberOfOutputs = [[cmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
+    int numberOfOutputs = (int)[[cmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
     @try {
         switch (numberOfOutputs) {
             case 1:
@@ -991,7 +991,7 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
         [e raise];
     }
     if (callSelector) {
-        numberOfOutputs = [[NSStringFromSelector(callSelector) componentsSeparatedByString:@":"] count] - 1;
+        numberOfOutputs = (int)[[NSStringFromSelector(callSelector) componentsSeparatedByString:@":"] count] - 1;
         switch (numberOfOutputs) {
             case 1:
                 [self performSelector:callSelector
@@ -1115,7 +1115,7 @@ ORTTCPX_READ_IMPLEMENT(GetSTB, int)
     struct ORTTCPX400DPCmdInfo* theCmd = &gORTTCPXCmds[cmd];
     if (theCmd->responds) {
         if (selName == nil){
-            int numberOfOutputs = [[theCmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
+            uint32_t numberOfOutputs = (uint32_t)[[theCmd->responseFormat componentsSeparatedByString:@"%"] count] - 1;
             switch (numberOfOutputs) {
                 case 1:
                     selName = NSStringFromSelector(@selector(_processGeneralReadback:));

@@ -241,8 +241,8 @@
     ioSize			= NSMakeSize(421,665);
     setupSize		= NSMakeSize(521,551);
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%ld.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 }
@@ -283,7 +283,7 @@
 
 - (void) deviceSerialNumberChanged:(NSNotification*)aNote
 {
-	[deviceSerialNumberField setIntValue: [model deviceSerialNumber]];
+	[deviceSerialNumberField setIntegerValue: [model deviceSerialNumber]];
 }
 
 - (void)tabView:(NSTabView *)aTabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
@@ -295,8 +295,8 @@
     }
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%ld.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORLabJac%d.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
@@ -443,7 +443,7 @@
 
 - (void) counterChanged:(NSNotification*)aNote
 {
-	[counterField setIntValue: [model counter]];
+	[counterField setIntegerValue: [model counter]];
 }
 
 - (void) checkGlobalSecurity
@@ -690,7 +690,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];	
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (void) digitalOutputEnabledAction:(id)sender
@@ -747,22 +747,22 @@
 
 - (IBAction) channelNameAction:(id)sender
 {
-	[model setChannel:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
+	[model setChannel:(int)[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) channelUnitAction:(id)sender
 {
-	[model setChannel:[[sender selectedCell] tag] unit:[[sender selectedCell] stringValue]];
+	[model setChannel:(int)[[sender selectedCell] tag] unit:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) ioNameAction:(id)sender
 {
-	[model setIo:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
+	[model setIo:(int)[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) doNameAction:(id)sender
 {
-	[model setDo:[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
+	[model setDo:(int)[[sender selectedCell] tag] name:[[sender selectedCell] stringValue]];
 }
 
 - (IBAction) updateAllAction:(id)sender
@@ -772,29 +772,29 @@
 
 - (IBAction) adcDiffBitAction:(id)sender
 {
-	[model setAdcDiffBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setAdcDiffBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) ioDirectionBitAction:(id)sender
 {
-	[model setIoDirectionBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setIoDirectionBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) doDirectionBitAction:(id)sender
 {
-	int theIndex = [[sender selectedCell] tag];
+	int theIndex = (int)[[sender selectedCell] tag];
 	[model setDoDirectionBit:theIndex withValue:[sender intValue]];
 }
 
 
 - (IBAction) ioValueOutBitAction:(id)sender
 {
-	[model setIoValueOutBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setIoValueOutBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) doValueOutBitAction:(id)sender
 {
-	int theIndex = [[sender selectedCell] tag];
+	int theIndex = (int)[[sender selectedCell] tag];
 	[model setDoValueOutBit:theIndex withValue:[sender intValue]];
 }
 
@@ -805,37 +805,37 @@
 
 - (IBAction) lowLimitAction:(id)sender
 {
-	[model setLowLimit:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+	[model setLowLimit:(int)[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) hiLimitAction:(id)sender
 {
-	[model setHiLimit:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+	[model setHiLimit:(int)[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) minValueAction:(id)sender
 {
-	[model setMinValue:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+	[model setMinValue:(int)[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) maxValueAction:(id)sender
 {
-	[model setMaxValue:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+	[model setMaxValue:(int)[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) gainAction:(id)sender
 {
-	[model setGain:[sender tag] withValue:[sender indexOfSelectedItem]];
+	[model setGain:(int)[sender tag] withValue:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) slopeAction:(id)sender
 {
-	[model setSlope:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+	[model setSlope:(int)[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) interceptAction:(id)sender
 {
-	[model setIntercept:[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];	
+	[model setIntercept:(int)[[sender selectedCell] tag] withValue:[[sender selectedCell] floatValue]];
 }
 
 @end

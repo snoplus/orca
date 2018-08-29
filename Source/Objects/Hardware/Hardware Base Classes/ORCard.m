@@ -88,7 +88,7 @@
 
 - (int) 	slot
 {
-    return [self tag];    
+    return (int)[self tag];    
 }
 
 - (int) displayedSlotNumber
@@ -98,7 +98,7 @@
 
 - (void) 	setSlot:(int)aSlot
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setSlot:[self tag]];
+    [[[self undoManager] prepareWithInvocationTarget:self] setSlot:(int)[self tag]];
     [self setTag:aSlot];
     
     NSMutableDictionary* userInfo = [NSMutableDictionary dictionary];
@@ -180,8 +180,8 @@
 	NSDictionary* crateDictionary;
 	NSDictionary* cardDictionary;
 	//could be old style
-	crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",[[self crate] tag]]];
-	cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",[self slot]]];
+	crateDictionary = [fileHeader objectForKey:     [NSString stringWithFormat:@"crate %d",(int)[[self crate] tag]]];
+	cardDictionary  = [crateDictionary objectForKey:[NSString stringWithFormat:@"card %d",(int)[self slot]]];
 	if(!cardDictionary){
 		//nope, new style -- a little harder....
 		NSDictionary* objectInfo = [fileHeader objectForKey:@"ObjectInfo"];

@@ -24,23 +24,23 @@
 
 #pragma mark ¥¥¥Accessors
 
-- (unsigned long) mask
+- (uint32_t) mask
 {
 	return mask;
 }
 
-- (void) setMask:(unsigned long)aMask
+- (void) setMask:(uint32_t)aMask
 {
 	mask=aMask;
 }
 
--(long) value:(unsigned long)aChan
+-(int32_t) value:(uint32_t)aChan
 {
 	if(!mask)return [super value:aChan];
 	return [super value:aChan] & mask;
 }
 
--(long) unMaskedValue:(unsigned short)aChan
+-(int32_t) unMaskedValue:(unsigned short)aChan
 {
 	return [super value:aChan];
 }
@@ -49,7 +49,7 @@
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setMask:[decoder decodeInt32ForKey:@"mask"]];
+    [self setMask:[decoder decodeIntForKey:@"mask"]];
     [[self undoManager] enableUndoRegistration];
 
     return self;
@@ -58,7 +58,7 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt32:mask forKey:@"mask"];
+    [encoder encodeInt:mask forKey:@"mask"];
 }
 
 @end
@@ -67,17 +67,17 @@
 
 #pragma mark ¥¥¥Accessors
 
-- (void) setStartIndex:(unsigned long)anIndex
+- (void) setStartIndex:(uint32_t)anIndex
 {
 	startIndex = anIndex;
 }
 
-- (unsigned long) startIndex
+- (uint32_t) startIndex
 {
 	return startIndex;
 }
 
--(long) value:(unsigned long)aChan
+-(int32_t) value:(uint32_t)aChan
 {
 	aChan = (aChan + startIndex)%[self numberBins];;
 	if(!mask)return [super value:aChan];
@@ -88,7 +88,7 @@
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setStartIndex:[decoder decodeInt32ForKey:@"startIndex"]];
+    [self setStartIndex:[decoder decodeIntForKey:@"startIndex"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -97,7 +97,7 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt32:startIndex forKey:@"startIndex"];
+    [encoder encodeInt:startIndex forKey:@"startIndex"];
 }
 @end
 
@@ -113,12 +113,12 @@
 }
 
 #pragma mark ¥¥¥Accessors
-- (void) setScaleOffset:(long)aValue
+- (void) setScaleOffset:(int32_t)aValue
 {
     scaleOffset = aValue;
 }
 
-- (long) scaleOffset
+- (int32_t) scaleOffset
 {
     return scaleOffset;
 }
@@ -135,7 +135,7 @@
 	return bitNames;
 }
 
-- (void) setSpecialBitMask:(unsigned long)aMask
+- (void) setSpecialBitMask:(uint32_t)aMask
 {
 	specialBitMask=aMask;
 	numBits = 0;
@@ -144,12 +144,12 @@
 	for(i=0;i<32;i++){
 		if(specialBitMask & (1UL<<i)) {
 			numBits++;
-			if(firstBitMask==0)firstBitMask = (1L<<i);
+			if(firstBitMask==0)firstBitMask = (uint32_t)(1L<<i);
 		}
 	}
 }
 
-- (unsigned long) specialBitMask
+- (uint32_t) specialBitMask
 {
 	return specialBitMask;
 }
@@ -159,12 +159,12 @@
 	return numBits;
 }
 
-- (unsigned long) firstBitMask
+- (uint32_t) firstBitMask
 {
 	return firstBitMask;
 }
 
--(long) value:(unsigned long)aChan
+-(int32_t) value:(uint32_t)aChan
 {
 	aChan = (aChan + startIndex)%[self numberBins];
     return [self unMaskedValue:aChan];
@@ -174,8 +174,8 @@
 {
     self = [super initWithCoder:decoder];
     [[self undoManager] disableUndoRegistration];
-    [self setSpecialBitMask:[decoder decodeInt32ForKey:@"specialBitMask"]];
-    [self setScaleOffset:   [decoder decodeInt32ForKey:@"scaleOffset"]];
+    [self setSpecialBitMask:[decoder decodeIntForKey:@"specialBitMask"]];
+    [self setScaleOffset:   [decoder decodeIntForKey:@"scaleOffset"]];
     [self setBitNames:      [decoder decodeObjectForKey:@"bitNames"]];
     [[self undoManager] enableUndoRegistration];
 	
@@ -185,8 +185,8 @@
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt32:specialBitMask forKey:@"specialBitMask"];
-    [encoder encodeInt32:scaleOffset    forKey:@"scaleOffset"];
+    [encoder encodeInt:specialBitMask forKey:@"specialBitMask"];
+    [encoder encodeInt:scaleOffset    forKey:@"scaleOffset"];
     [encoder encodeObject:bitNames      forKey:@"bitNames"];
 }
 

@@ -27,7 +27,7 @@
 	int tag;
 	int groupTag;
 	NSDate* lastTime;
-	unsigned long lastCount;
+	uint32_t lastCount;
 	float rate;
 	ORTimeRate* timeRate;
 }
@@ -41,7 +41,7 @@
 - (NSString*) rateNotification;
 - (NSDate*) lastTime;
 - (void) setLastTime:(NSDate*)newLastTime;
-- (int) tag;
+- (NSUInteger) tag;
 - (void) setTag:(int)newTag;
 - (float) rate:(int)paramIgnored;
 - (float) rate;
@@ -69,5 +69,5 @@ extern NSString* ORRateValue;
 
 
 @interface NSObject (ORRate_Catagory)
-- (unsigned long) getCounter:(int)tag forGroup:(int)aGroupTag;
+- (uint32_t) getCounter:(int)tag forGroup:(int)aGroupTag;
 @end

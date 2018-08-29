@@ -338,7 +338,7 @@
     else {
 	
 		[quickStartCB setEnabled:YES];
-        int n = [model waitRequestersCount];
+        NSUInteger n = [model waitRequestersCount];
         if(n>0){
             [startRunButton setEnabled:NO];
             [endSubRunButton setEnabled:NO];
@@ -396,12 +396,12 @@
 
 - (void) numberOfWaitsChanged:(NSNotification*)aNote
 {
-    int n = [model waitRequestersCount];
+    NSUInteger n = [model waitRequestersCount];
     [showWaitRequestersButton setHidden:n==0 && ([waitRequestersDrawer state] == NSDrawerClosedState)];
     [forceClearWaitsButton setEnabled:n>0];
     [abortRunFromWaitButton setEnabled:n>0];
-    [waitCountField setIntValue:n];
-    [waitCountField1 setIntValue:n];
+    [waitCountField setIntegerValue:n];
+    [waitCountField1 setIntegerValue:n];
     [waitCountField2 setStringValue:n==0?@"":@"Waits In Place"];
     [waitRequestersTableView reloadData];
     [self updateButtons];
@@ -477,8 +477,8 @@
 
 - (void) vetosChanged:(NSNotification*)aNotification
 {
-	int vetoCount = [[ORGlobal sharedGlobal] vetoCount];
-	[vetoCountField setIntValue: vetoCount]; 
+	NSUInteger vetoCount = [[ORGlobal sharedGlobal] vetoCount];
+	[vetoCountField setIntegerValue: vetoCount]; 
 	[listVetosButton setHidden:vetoCount==0];
 	[vetoedTextField setStringValue:vetoCount?@"Vetoed":@""];
 	[self updateButtons];
@@ -501,7 +501,7 @@
 
 - (void) runNumberChanged:(NSNotification*)aNotification
 {
-	[runNumberText setIntValue:[model runNumber]];
+	[runNumberText setIntegerValue:[model runNumber]];
 	if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
 		[runNumberField setStringValue:[model fullRunNumberString]];
 	}
@@ -571,7 +571,7 @@
 
 - (void) runTypeChanged:(NSNotification *)notification
 {
-	unsigned long runType = [model runType];
+	uint32_t runType = [model runType];
 	int i;
 	for(i=0;i<32;i++){
 		[[runTypeMatrix cellWithTag:i] setState:(runType &(1UL<<i))!=0];
@@ -791,7 +791,7 @@
         [alert setInformativeText:@"Having a unique run number is important for most experiments. If you change it you may end up with data with duplicate run numbers."];
         [alert addButtonWithTitle:@"Yes/Change It"];
         [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if(result == NSAlertFirstButtonReturn){
@@ -799,7 +799,7 @@
                 [self performSelector:@selector(deferredRunNumberChange) withObject:nil afterDelay:0];
             }
             else {
-                [runNumberText setIntValue:[model runNumber]];
+                [runNumberText setIntegerValue:[model runNumber]];
             }
         }];
 #else
@@ -823,7 +823,7 @@
 
 - (IBAction) runModeAction:(id)sender
 {
-    int tag = [[runModeMatrix selectedCell] tag];
+    int tag = (int)[[runModeMatrix selectedCell] tag];
     if(tag != [[ORGlobal sharedGlobal] runMode]){
         [[self undoManager] setActionName: @"Set Run Mode"];
 		[model setOfflineRun:tag];
@@ -838,7 +838,7 @@
     [alert setInformativeText:@"Having a unique run number is important for most experiments. If you change the run number folder you may end up with duplicate run numbers."];
     [alert addButtonWithTitle:@"Yes/Select New Location"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if(result == NSAlertFirstButtonReturn){
@@ -919,8 +919,8 @@
 - (IBAction) runTypeAction:(id)sender
 {
     short i     = [[sender selectedCell] tag];
-    BOOL state  = [[sender selectedCell] state];
-    unsigned long currentRunMask = [model runType];
+    BOOL state  = [(NSButton*)[sender selectedCell] state];
+    uint32_t currentRunMask = [model runType];
     if(state) currentRunMask |= (1L<<i);
     else      currentRunMask &= ~(1L<<i);
     
@@ -1040,7 +1040,7 @@
 - (void) setupRunTypeNames
 {
     NSArray* theNames = [model runTypeNames];
-    int n = [theNames count];
+    NSUInteger n = [theNames count];
     int i;
     if(n){
         for(i=1;i<n;i++){
@@ -1065,7 +1065,7 @@
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == waitRequestersTableView){
 		return [model waitRequestersCount];

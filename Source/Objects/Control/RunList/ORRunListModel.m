@@ -29,6 +29,24 @@
 
 #define kTimeDelta .1
 
+enum eRunListStates {
+    kStartup,
+    kWaitForRunToStop,
+    kWaitForSubRun,
+    kReadyToStart,
+    kStartRun,
+    kStartSubRun,
+    kStartScript,
+    kWaitForScript,
+    kWaitForRunTime,
+    kStartEndScript,
+    kWaitForEndScript,
+    kRunFinished,
+    kCheckForRepeat,
+    kFinishUp,
+    kPause,
+}eRunListStates;
+
 #pragma mark •••Local Strings
 NSString* ORRunListModelTimesToRepeatChanged	= @"ORRunListModelTimesToRepeatChanged";
 NSString* ORRunListModelLastFileChanged			= @"ORRunListModelLastFileChanged";
@@ -56,7 +74,6 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 - (void) calcTotalExpectedTime;
 - (void) setUpWorkingOrder;
 - (void) collectSubRunsAtIndex:(int)anIndex intoRun:(NSMutableDictionary*) aRun;
-- (BOOL) isNextRunSubrun;
 
 @end
 
@@ -216,35 +233,35 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 	[self addItem:newItem atIndex:[items count]];
 }
 
-- (void) addItem:(id)anItem atIndex:(int)anIndex
+- (void) addItem:(id)anItem atIndex:(NSInteger)anIndex
 {
 	if(!items) items= [[NSMutableArray array] retain];
 	if([items count] == 0)anIndex = 0;
 	anIndex = MIN(anIndex,[items count]);
 	[[[self undoManager] prepareWithInvocationTarget:self] removeItemAtIndex:anIndex];
 	[items insertObject:anItem atIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListItemsAdded object:self userInfo:userInfo];
 }
 
-- (void) removeItemAtIndex:(int) anIndex
+- (void) removeItemAtIndex:(NSInteger) anIndex
 {
 	id anItem = [items objectAtIndex:anIndex];
 	[[[self undoManager] prepareWithInvocationTarget:self] addItem:anItem atIndex:anIndex];
 	[items removeObjectAtIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListItemsRemoved object:self userInfo:userInfo];
 }
 
-- (id) itemAtIndex:(int)anIndex
+- (id) itemAtIndex:(NSInteger)anIndex
 {
 	if(anIndex>=0 && anIndex<[items count])return [items objectAtIndex:anIndex];
 	else return nil;
 }
 
-- (unsigned long) itemCount
+- (uint32_t) itemCount
 {
-	return [items count];
+	return (uint32_t)[items count];
 }
 
 - (void) registerNotificationObservers
@@ -288,7 +305,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt:timesToRepeat    forKey:@"timesToRepeat"];
+	[encoder encodeInteger:timesToRepeat    forKey:@"timesToRepeat"];
 	[encoder encodeObject:lastFile      forKey:@"lastFile"];
 	[encoder encodeBool:randomize       forKey:@"randomize"];
 	[encoder encodeObject:items			forKey:@"items"];
@@ -296,18 +313,18 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 
 - (void) saveToFile:(NSString*)aPath
 {
-    NSString* s = @"#StartArgs:EndArgs:RunLength:SubRun\n";
+	NSString* s = @"#Script Parameters:RunLength:SubRun\n";
 	for(id anItem in items){ 
         id isSubRun             = [anItem objectForKey:@"SubRun"];
         if(!isSubRun)isSubRun   = [NSNumber numberWithBool:NO];
 		s = [s stringByAppendingFormat:@"%@:%@:%@:%@\n",
              [[anItem objectForKey:@"ScriptParameters"]length]   > 0 ? [anItem objectForKey:@"ScriptParameters"]:@"",
              [[anItem objectForKey:@"EndScriptParameters"]length]> 0 ? [anItem objectForKey:@"EndScriptParameters"]:@"",
-			 [anItem objectForKey:@"RunLength"]  ? [anItem objectForKey:@"RunLength"]:@"0",
+			 [[anItem objectForKey:@"RunLength"]length]          > 0 ? [anItem objectForKey:@"RunLength"]:@"0",
              isSubRun];
 	}
+    [[NSFileManager defaultManager] removeItemAtPath:aPath error:nil];
 	[s writeToFile:aPath atomically:YES encoding:NSASCIIStringEncoding error:nil];
-    [self setLastFile:aPath];
 }
 
 - (void) restoreFromFile:(NSString*)aPath
@@ -318,6 +335,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 	[items release];
 	items = [[NSMutableArray array] retain];
 	NSArray* lines = [s componentsSeparatedByString:@"\n"];
+    int lineNumber = 0;
 	for(id aLine in lines){
 		aLine = [aLine trimSpacesFromEnds];
 		if(![aLine hasPrefix:@"#"]){
@@ -330,7 +348,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 				NSMutableDictionary* anItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
 										args,@"ScriptParameters",endArgs,@"EndScriptParameters",
 										[NSNumber numberWithFloat:[[[parts objectAtIndex:2] trimSpacesFromEnds]floatValue]],@"RunLength",
-										[NSNumber numberWithInt:[[[parts objectAtIndex:3] trimSpacesFromEnds]intValue]],@"SubRun",
+                                               lineNumber==0?@0:[NSNumber numberWithInt:[[[parts objectAtIndex:3] trimSpacesFromEnds]intValue]],@"SubRun",
 										@"",@"RunState",
 										nil];
 				[items addObject:anItem];
@@ -342,12 +360,12 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
                 NSMutableDictionary* anItem = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                args,@"ScriptParameters",@"",@"EndScriptParameters",
                                                [NSNumber numberWithFloat:[[[parts objectAtIndex:1] trimSpacesFromEnds]floatValue]],@"RunLength",
-                                               [NSNumber numberWithInt:[[[parts objectAtIndex:2] trimSpacesFromEnds]intValue]],@"SubRun",
+                                               lineNumber==0?@0:[NSNumber numberWithInt:[[[parts objectAtIndex:2] trimSpacesFromEnds]intValue]],@"SubRun",
                                                @"",@"RunState",
                                                nil];
                 [items addObject:anItem];
             }
-
+            lineNumber++;
 		}
 	}
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelReloadTable object:self];    
@@ -362,13 +380,12 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 		case kReadyToStart:     return @"Ready";
 		case kStartRun:			return @"StartRun";
 		case kStartSubRun:		return @"StartSubRun";
-		case kRunStartScript:   return @"Starting Script";
-        case kWaitForStartScript: return @"Running Start Script";
+		case kStartScript:		return @"Starting Script";
+		case kWaitForScript:	return @"Script Wait";
 		case kWaitForRunTime:	return [NSString stringWithFormat:@"%.0f",runLength - runTimeElapsed];
-        case kRunEndScript:     return @"Starting End Script";
-        case kWaitForEndScript:	return @"Running End Script";
-        case kEndOfRun:         return @"End Of Run";
-        case kNextRun:          return @"Done";
+        case kStartEndScript:   return @"Starting End Script";
+        case kWaitForEndScript:	return @"Script Wait";
+		case kRunFinished:		return @"Done";
 		case kCheckForRepeat:	return @"Repeat Check";
         case kFinishUp:         return @"Manual Quit";
         case kPause:            return @"Paused";
@@ -538,7 +555,7 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 			
         case kReadyToStart:
 			if(!scriptAtStartModel) runListState = kStartRun;
-			else                    runListState = kRunStartScript;
+			else                    runListState = kStartScript;
 			[self calcTotalExpectedTime];
 			[self setUpWorkingOrder];
 		break;
@@ -561,14 +578,14 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 			runListState = kWaitForRunTime;
 			break;
 			
-		case kRunStartScript:
+		case kStartScript:
 			[self setWorkingItemState];
 			[scriptAtStartModel setInputValue:[self getScriptParameters]];
 			[scriptAtStartModel runScript];
-			runListState = kWaitForStartScript;
+			runListState = kWaitForScript;
 		break;
 			
-		case kWaitForStartScript:
+		case kWaitForScript:
 			[self setWorkingItemState];
 			if(![[scriptAtStartModel scriptRunner] running]) {
 				doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
@@ -583,11 +600,12 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
             runTimeElapsed = [[NSDate date] timeIntervalSinceDate:timeRunStarted];
 			accumulatedTime = dt+skippedTime;
             if(runTimeElapsed>=runLength){
-                runListState = kEndOfRun;
+                if(scriptAtEndModel)runListState = kStartEndScript;
+                else                runListState = kRunFinished;
             }
 		break;
 			
-        case kRunEndScript:
+        case kStartEndScript:
             [self setWorkingItemState];
             [scriptAtEndModel setInputValue:[self getEndScriptParameters]];
             [scriptAtEndModel runScript];
@@ -597,44 +615,32 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
         case kWaitForEndScript:
             [self setWorkingItemState];
             if(![[scriptAtEndModel scriptRunner] running]) {
-                runListState = kNextRun;
+                //doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
+                runListState = kRunFinished;
             }
             break;
             
-		case kEndOfRun:
+		case kRunFinished:
 			[self setWorkingItemState];
-            if([self isNextRunSubrun]){
-                [runModel prepareForNewSubRun]; //ends a subrun
-                runListState = kWaitForSubRun;
-                if(scriptAtEndModel) nextState = kRunEndScript;
-                else                 nextState = kNextRun;
-            }
-            else {
-                [runModel stopRun];
-                runListState = kWaitForRunToStop;
-                if(scriptAtEndModel) nextState = kRunEndScript;
-                else                 nextState = kNextRun;
-            }
+			[self goToNextWorkingIndex];
+			if([orderArray count]==0) runListState = kCheckForRepeat;
+			else {
+				doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
+				if(doSubRun){
+					[runModel prepareForNewSubRun];
+					runListState = kWaitForSubRun;
+					if(!scriptAtStartModel) nextState = kStartSubRun;
+					else                    nextState = kStartScript;
+				}
+				else {
+					[runModel stopRun];
+					runListState = kWaitForRunToStop;
+					if(!scriptAtStartModel) nextState = kStartRun;
+					else                    nextState = kStartScript;
+				}
+			}
 		break;
 			
-            
-        case kNextRun:
-            [self setWorkingItemState];
-            [self goToNextWorkingIndex];
-           if([orderArray count]==0) runListState = kCheckForRepeat;
-            else {
-                doSubRun = [[[self objectAtWorkingIndex] objectForKey:@"SubRun"] intValue];
-                if(doSubRun){
-                    if(!scriptAtStartModel) runListState = kStartSubRun;
-                    else                    runListState = kRunStartScript;
-                }
-                else {
-                    if(!scriptAtStartModel) runListState = kStartRun;
-                    else                    runListState = kRunStartScript;
-                }
-            }
-            break;
-            
 		case kCheckForRepeat:
 			executionCount++;
 			if(executionCount>=timesToRepeat){
@@ -700,15 +706,6 @@ static NSString* ORRunListDataOut1	= @"ORRunListDataOut1";
 {
     [orderArray popTop];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORRunListModelWorkingItemIndexChanged object:self];
-}
-
-- (BOOL) isNextRunSubrun
-{
-    if([orderArray count]>1){
-        int index = [[orderArray objectAtIndex:1] intValue];
-        return [[[items objectAtIndex:index] objectForKey:@"SubRun"] boolValue];
-    }
-    else return NO;
 }
 
 - (id) getScriptParameters

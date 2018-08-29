@@ -41,7 +41,7 @@
 {
    // [[self window] setBackgroundColor:[NSColor colorWithDeviceRed:240/255. green:235/255. blue:191/255. alpha:1]];
     [runProgress setStyle:NSProgressIndicatorSpinningStyle];
-	[runProgress setControlSize:NSSmallControlSize];
+	[runProgress setControlSize:NSControlSizeSmall];
     [runBar setIndeterminate:NO];
     [super awakeFromNib];
     [self updateButtons];
@@ -300,7 +300,7 @@
 
 - (void) remotePortChanged:(NSNotification*)aNotification
 {
-	[remotePortField setIntValue:[model remotePort]];
+	[remotePortField setIntegerValue:[model remotePort]];
 }
 
 -(void)runStatusChanged:(NSNotification*)aNotification

@@ -203,7 +203,7 @@ enum {
 - (void) connectionChanged:(NSNotification*)aNote
 {
     if([aNote object] == model){
-		[[self window] setTitle:[NSString stringWithFormat:@"Stepper Motor (%d)",[model tag]]];
+		[[self window] setTitle:[NSString stringWithFormat:@"Stepper Motor (%d)",(int32_t)[model tag]]];
 	}
 }
 - (BOOL) validateMenuItem:(NSMenuItem*)menuItem
@@ -246,7 +246,7 @@ enum {
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"Stepper Motor (%d)",[model tag]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Stepper Motor (%d)",(int)[model tag]]];
 }
 
 - (void) updateButtons:(NSNotification*)aNote
@@ -362,8 +362,8 @@ enum {
 
 - (void) motorPositionChanged:(NSNotification*)aNote
 {
-	[motorPositionField setIntValue:[model motorPosition]];
-	[[statusMatrix cellWithTag:kPatternPositionTag] setIntValue:[model motorPosition]];
+	[motorPositionField setIntegerValue:[model motorPosition]];
+	[[statusMatrix cellWithTag:kPatternPositionTag] setIntegerValue:[model motorPosition]];
 	[queueView setNeedsDisplay:YES];
 }
 
@@ -460,7 +460,7 @@ enum {
 - (IBAction) readMotorAction:(id)sender
 {
     @try {
-        long thePosition = [model readMotor];
+        int32_t thePosition = [model readMotor];
         
         NSString* movingState;
         if([model motorRunning])  movingState = @"Moving";
@@ -518,23 +518,23 @@ enum {
 
 - (IBAction) stepModeAction:(id)sender
 {
-    [model setStepMode:[[sender selectedCell] tag]];
+    [model setStepMode:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) holdCurrentAction:(id)sender
 {
-    [model setHoldCurrent:[sender indexOfSelectedItem]];
+    [model setHoldCurrent:(int)[sender indexOfSelectedItem]];
 }
 
 
 - (IBAction) multiplierAction:(id)sender
 {
-    [model setMultiplierX:[[sender selectedCell] tag]];
+    [model setMultiplierX:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) risingEdgeAction:(id)sender
 {
-    [model setRisingEdge:[[sender selectedCell] tag]];
+    [model setRisingEdge:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) readHomeAction:(id)sender
@@ -618,12 +618,12 @@ enum {
 
 - (IBAction) patternTypeAction:(id)sender
 {
-    [model setPatternType:[[patternTypeMatrix selectedCell] tag]];
+    [model setPatternType:(int)[[patternTypeMatrix selectedCell] tag]];
 }
 
 - (IBAction) optionMaskAction:(id)sender
 {
-    int  whichOption = [[sender selectedCell]tag];
+    int  whichOption = (int)[[sender selectedCell]tag];
     if([[sender cellWithTag:whichOption] state])[model setOption:whichOption];
     else [model clearOption:whichOption];
 }
@@ -670,11 +670,11 @@ enum {
     [[self window] setTitle:[NSString stringWithFormat:@"Stepper Motor (%@)",[model motorName]]];
 }
 
-- (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
+- (void) getQueMinValue:(uint32_t*)aMinValue maxValue:(uint32_t*)aMaxValue head:(uint32_t*)aHeadValue tail:(uint32_t*)aTailValue
 {
     *aMinValue = [model patternStartCount];
     *aMaxValue = [model patternEndCount];
-    long thePosition = [model motorPosition];
+    int32_t thePosition = [model motorPosition];
     *aHeadValue = thePosition+1;
     *aTailValue = thePosition-1;
 }

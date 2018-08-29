@@ -245,7 +245,7 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
 	 object:self];
 }
 
-- (unsigned long) rateCount:(unsigned short)index
+- (uint32_t) rateCount:(unsigned short)index
 {
     if(index<kNumMuxChannels)return rateCount[index];
     else return 0;
@@ -620,8 +620,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
 -(void) runMuxBitTest
 {
     unsigned char aValue;
-    long aChanHighBitStruct[8];  	//number of times incorrect when a 1 is written to the bit
-    long aChanLowBitStruct[8];  	//number of times incorrect when a 0 is written to the bit
+    int32_t aChanHighBitStruct[8];  	//number of times incorrect when a 1 is written to the bit
+    int32_t aChanLowBitStruct[8];  	//number of times incorrect when a 0 is written to the bit
     short i,thebit,numTests;
     bool anError = false;
     unsigned short kMaxTests = 50;
@@ -636,8 +636,8 @@ static NSString* MuxBoxToControllerConnect      = @"Ncd Mux Box to Mux Controlle
     [oldValues addObjectsFromArray:thresholdDacs];
     
     for(i=0;i<kNumMuxChannels;i++){
-        memset(aChanHighBitStruct,0,sizeof(long)*8);
-        memset(aChanLowBitStruct,0,sizeof(long)*8);
+        memset(aChanHighBitStruct,0,sizeof(int32_t)*8);
+        memset(aChanLowBitStruct,0,sizeof(int32_t)*8);
         NSLog(@"Testing channel:%d\n",i);
         for(thebit=0;thebit<8;thebit++){
             for(numTests=0;numTests<kMaxTests;numTests++){
@@ -736,9 +736,9 @@ static NSString* ORMuxBoxBusNumber          = @"ORMuxBoxBusNumber";
     [self setTimeRateXAttributes:[decoder decodeObjectForKey:ORMuxBoxTimeRateXAttributes]];
     [self setTimeRateYAttributes:[decoder decodeObjectForKey:ORMuxBoxTimeRateYAttributes]];
     
-    [self setSelectedChannel:[decoder decodeIntForKey:ORMuxBoxSelectedChannel]];
-    [self setDacValue:[decoder decodeIntForKey:ORMuxBoxDacValue]];
-    [self setBusNumber:[decoder decodeIntForKey:ORMuxBoxBusNumber]];
+    [self setSelectedChannel:[decoder decodeIntegerForKey:ORMuxBoxSelectedChannel]];
+    [self setDacValue:[decoder decodeIntegerForKey:ORMuxBoxDacValue]];
+    [self setBusNumber:[decoder decodeIntegerForKey:ORMuxBoxBusNumber]];
     
     
     id scopeChanObj = [decoder decodeObjectForKey:ORNcdMuxBoxScopeChan];
@@ -748,7 +748,7 @@ static NSString* ORMuxBoxBusNumber          = @"ORMuxBoxBusNumber";
 	calibrationFinalDelta = 10;
 	calibrationEnabledMask = 0xff;
 	
-    [self setCalibrationEnabledMask:[decoder decodeIntForKey:ORMuxBoxCalibrationEnabledMask]];
+    [self setCalibrationEnabledMask:[decoder decodeIntegerForKey:ORMuxBoxCalibrationEnabledMask]];
     [self setCalibrationFinalDelta:[decoder decodeIntForKey:ORMuxBoxCalibrationFinalDelta]];
     
     [self setThresholdCalibrationStates:[decoder decodeObjectForKey:ORMuxCalibrationStates]];
@@ -820,13 +820,13 @@ static NSString* ORMuxBoxBusNumber          = @"ORMuxBoxBusNumber";
     [encoder encodeObject:[self timeRateXAttributes] forKey:ORMuxBoxTimeRateYAttributes];
     [encoder encodeObject:[self timeRateYAttributes] forKey:ORMuxBoxTimeRateXAttributes];
     
-    [encoder encodeInt:[self selectedChannel] forKey:ORMuxBoxSelectedChannel];
-    [encoder encodeInt:[self dacValue] forKey:ORMuxBoxDacValue];
+    [encoder encodeInteger:[self selectedChannel] forKey:ORMuxBoxSelectedChannel];
+    [encoder encodeInteger:[self dacValue] forKey:ORMuxBoxDacValue];
     [encoder encodeObject:[NSNumber numberWithInt:scopeChan] forKey:ORNcdMuxBoxScopeChan];
     
-    [encoder encodeInt:[self calibrationEnabledMask] forKey:ORMuxBoxCalibrationEnabledMask];
-    [encoder encodeInt:[self calibrationFinalDelta] forKey:ORMuxBoxCalibrationFinalDelta];
-    [encoder encodeInt:[self busNumber] forKey:ORMuxBoxBusNumber];
+    [encoder encodeInteger:[self calibrationEnabledMask] forKey:ORMuxBoxCalibrationEnabledMask];
+    [encoder encodeInteger:[self calibrationFinalDelta] forKey:ORMuxBoxCalibrationFinalDelta];
+    [encoder encodeInteger:[self busNumber] forKey:ORMuxBoxBusNumber];
     
     [encoder encodeObject:[self thresholdCalibrationStates] forKey:ORMuxCalibrationStates];
     
@@ -909,7 +909,7 @@ static NSString* ORMuxBoxBusNumber          = @"ORMuxBoxBusNumber";
 }
 
 #pragma mark ¥¥¥Rates
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+- (uint32_t) getCounter:(int)counterTag forGroup:(int)groupTag
 {
     if(groupTag == 0){
         if(counterTag>=0 && counterTag<kNumMuxChannels){
@@ -949,7 +949,7 @@ static NSString* ORMuxBoxBusNumber          = @"ORMuxBoxBusNumber";
 #pragma mark ¥¥¥Threshold Calibration
 
 
-- (int) tag
+- (NSUInteger) tag
 {
     ORConnector* aConnection = [[[self connectors] objectForKey:MuxBoxToControllerConnect] connector];
     return [aConnection identifer];

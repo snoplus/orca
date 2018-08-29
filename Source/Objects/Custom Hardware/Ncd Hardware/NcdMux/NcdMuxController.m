@@ -65,8 +65,8 @@
 
 - (void) errorCountChanged:(NSNotification*)aNotification
 {
-	[armErrorField setIntValue: [model armError]];
-	[eventReadErrorField setIntValue: [model eventReadError]];
+	[armErrorField setIntegerValue: [model armError]];
+	[eventReadErrorField setIntegerValue: [model eventReadError]];
 }
 
 #pragma mark ¥¥¥Interface Management
@@ -82,7 +82,7 @@
 {
 	if([model scopeSelection] != [[scopeSelectionMatrix selectedCell] tag]){
 		[[self undoManager] setActionName: @"Set Mux Scope Selection"];
-		[model setScopeSelection:[[sender selectedCell] tag]];
+		[model setScopeSelection:(int)[[sender selectedCell] tag]];
 	}
 }
 

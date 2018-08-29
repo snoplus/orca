@@ -82,7 +82,20 @@
 
 - (void) beginSheetFor:(NSWindow *)aWindow delegate:(id)aDelegate didEndSelector:(SEL)aDidEndSelector contextInfo:(id)aContextInfo
 {
-    [NSApp beginSheet:[self window] modalForWindow:aWindow modalDelegate:aDelegate didEndSelector:aDidEndSelector contextInfo:aContextInfo];
+ //   [NSApp beginSheet:[self window] modalForWindow:aWindow modalDelegate:aDelegate didEndSelector:aDidEndSelector contextInfo:aContextInfo];
+    
+    [aWindow beginSheet:[self window] completionHandler:^(NSModalResponse returnCode){
+        NSInvocation* callBack = [NSInvocation invocationWithMethodSignature:[aDelegate methodSignatureForSelector:aDidEndSelector]];
+        [callBack setSelector:aDidEndSelector];
+        NSWindow* aPanel = [self window];
+        [callBack setArgument:&aPanel atIndex:2];
+        [callBack setArgument:&returnCode atIndex:3];
+        [callBack setArgument:aContextInfo atIndex:4];
+        [callBack performSelectorOnMainThread:@selector(invoke) withObject:nil waitUntilDone:YES];
+    }];
+    
+//    - (void) _calibrationDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
+
 }
 
 - (void) calibrate
@@ -279,13 +292,13 @@
 }
 
 #pragma mark •••Table Data Source
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if( aTableView == calibrationTableView)return [[calibration calibrationArray] count];
 	else return 0;
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == calibrationTableView ){
 		return [[[calibration calibrationArray] objectAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
@@ -293,7 +306,7 @@
 	else return nil;
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if(aTableView == calibrationTableView){
 		[[[calibration calibrationArray] objectAtIndex:rowIndex] setObject: anObject forKey:[aTableColumn identifier]];
@@ -334,12 +347,12 @@
     
     NSMutableArray* dataArray = [NSMutableArray arrayWithArray:calibrationArray];
 
-	int n = [dataArray count];
+	int n = (int)[dataArray count];
     
 	if(n!=0){
         if(n==1){
             [dataArray insertObject:[NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithDouble:0],@"Channel",[NSNumber numberWithDouble:0],@"Energy", nil] atIndex:0];
-            n = [dataArray count];
+            n = (int)[dataArray count];
         }
 		for(id pt in dataArray){
 			double x = [[pt objectForKey:@"Channel"] doubleValue];
@@ -464,7 +477,7 @@
 	[encoder encodeObject:label				forKey: @"label"];
 	[encoder encodeBool:ignoreCalibration	forKey: @"ignoreCalibration"];
 	[encoder encodeObject:calibrationName	forKey: @"calibrationName"];
-	[encoder encodeInt:type					forKey: @"type"];
+	[encoder encodeInteger:type					forKey: @"type"];
 }
 
 

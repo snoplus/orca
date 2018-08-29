@@ -36,7 +36,7 @@
 @interface ORPlot : NSObject {
 	ORPlotView*				plotView;
     id						dataSource;
-    int						tag;
+    NSUInteger						tag;
  	NSMutableDictionary*	attributes;
 	BOOL					showCursorPosition;
 	NSPoint					cursorPosition;
@@ -53,8 +53,8 @@
 - (NSMutableDictionary*) attributes;
 - (void) setAttributes:(NSMutableDictionary *)anAttributes;
 
-- (void) setTag:(int)aTag;
-- (int) tag;
+- (void) setTag:(NSUInteger)aTag;
+- (NSUInteger) tag;
 - (NSString*) name;
 - (void) setName:(NSString*)aName;
 
@@ -110,13 +110,13 @@
 #pragma mark ***Scaling (Abstract)
 - (void) logLin;
 
-- (long) numberPoints;
-- (NSString*) valueAsStringAtPoint:(long)i;
+- (int32_t) numberPoints;
+- (NSString*) valueAsStringAtPoint:(int32_t)i;
 
 - (void) getyMin:(double*)yMin yMax:(double*)yMax;
 - (void) getxMin:(double*)xMin xMax:(double*)xMax;
 - (float) getzMax;
 
-- (long) maxValueChannelinXRangeFrom:(long)minChannel to:(long)maxChannel;
+- (int32_t) maxValueChannelinXRangeFrom:(int32_t)minChannel to:(int32_t)maxChannel;
 
 @end

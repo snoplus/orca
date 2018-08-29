@@ -25,8 +25,8 @@
 #import "ORProcessCenter.h"
 #import "SynthesizeSingleton.h"
 
-int sortUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
-int sortDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
+NSInteger sortUpFunc(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
+NSInteger sortDnFunc(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
 
 @implementation ORProcessCenter
 
@@ -258,7 +258,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (IBAction) modeAction:(id)sender
 {
-	[self setProcessMode:[[sender selectedCell] tag]]; 
+	[self setProcessMode:(int)[[sender selectedCell] tag]];
 }
 
 #pragma mark ¥¥¥OutlineView Data Source
@@ -274,7 +274,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
 
 - (int)  outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-    return item == nil?[processorList count]:[[item children] count];
+    return (int)(item == nil?[processorList count]:[[item children] count]);
 }
 
 - (id)  outlineView:(NSOutlineView *)outlineView  objectValueForTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
@@ -313,7 +313,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(ProcessCenter);
     NSString *key = [self sortColumn];
     NSArray *a = [processView tableColumns];
     NSTableColumn *column = [processView tableColumnWithIdentifier:key];
-    unsigned i = [a count];
+    NSUInteger i = [a count];
     
     while (i-- > 0) [processView setIndicatorImage:nil inTableColumn:[a objectAtIndex:i]];
     

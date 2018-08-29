@@ -112,7 +112,7 @@
 {
 	NSOperationQueue* queue = [[ORSqlDBQueue sharedSqlDBQueue] queue];
     if (object == queue && [keyPath isEqual:@"operationCount"]) {
-		NSNumber* n = [NSNumber numberWithInt:[[[ORSqlDBQueue queue] operations] count]];
+		NSNumber* n = [NSNumber numberWithInteger:[[[ORSqlDBQueue queue] operations] count]];
 		[self performSelectorOnMainThread:@selector(setQueCount:) withObject:n waitUntilDone:NO];
     }
     else {
@@ -239,7 +239,7 @@
     [alert setInformativeText:@"If the database and tables already exist, this operation will do no harm."];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Create Database"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -269,7 +269,7 @@
     [alert setInformativeText:@"You can recreate the database with the 'Create Database' button"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Drop All"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){

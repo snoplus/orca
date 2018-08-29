@@ -72,12 +72,12 @@
 	
 }
 
-- (void) setTag:(int)aTag
+- (void) setTag:(NSUInteger)aTag
 {
 	tag = aTag;
 }
 
-- (int)tag									{ return tag; }
+- (NSUInteger)tag						    { return tag; }
 - (id) dataSource							{ return dataSource; }
 - (BOOL) dataSourceIsSetupToAllowDrawing	{ return dataSource!=nil; }
 - (NSMutableDictionary *)attributes			{ return attributes;  }
@@ -239,18 +239,18 @@
 	//draw the data 
 
 	double xValue,yValue;
-	long ix;
+	int ix;
     
 	float maxXValue = [mXScale maxValue];
-    NSUInteger minX = (NSUInteger)[mXScale minValue];
-    NSUInteger maxX = (NSUInteger) maxXValue;
+    int minX = (int)[mXScale minValue];
+    int maxX = (int) maxXValue;
     NSBezierPath* theDataPath = [NSBezierPath bezierPath];
     
     // We limit the total number of plotted points by using a stride    
     NSUInteger totalLength = MIN(maxX - minX,numPoints);
-    NSUInteger stride = (NSUInteger)((double)totalLength)/kMaximumPlotPoints;
+    int stride = (int)((double)totalLength)/kMaximumPlotPoints;
     if (stride == 0) stride = 1;
-    maxX = MIN(maxX, stride*numPoints + minX);
+    maxX = (int)MIN(maxX, stride*numPoints + minX);
     if (![dataSource conformsToProtocol:@protocol(ORFastPlotDataSourceMethods)]) {
         [dataSource plotter:self index:minX x:&xValue y:&yValue];
         x  = [mXScale getPixAbs:minX];
@@ -381,7 +381,7 @@
 	//tab will shift to next plot curve -- shift/tab goes backward.
 	unsigned short keyCode = [theEvent keyCode];
     if(keyCode == 48){
-        if([theEvent modifierFlags] & NSShiftKeyMask){
+        if([theEvent modifierFlags] & NSEventModifierFlagShift){
 			[self lastComponent];
 		}
         else {
@@ -394,7 +394,7 @@
 
 - (BOOL) mouseDown:(NSEvent*)theEvent
 {
-	if(([theEvent modifierFlags] & NSCommandKeyMask) && !([theEvent modifierFlags] & NSShiftKeyMask)) {		
+	if(([theEvent modifierFlags] & NSEventModifierFlagCommand) && !([theEvent modifierFlags] & NSEventModifierFlagShift)) {		
 		[NSCursor hide];
 		[self showCrossHairsForEvent:theEvent];
 	}
@@ -405,7 +405,7 @@
 {
     [[plotView window] disableCursorRects];
 	showCursorPosition	= NO;
-	if([theEvent modifierFlags] & NSCommandKeyMask) {	
+	if([theEvent modifierFlags] & NSEventModifierFlagCommand) {	
 		[self showCrossHairsForEvent:theEvent];
 	}
 }
@@ -431,17 +431,17 @@
 }
 
 #pragma mark ***Scaling
-- (long) maxValueChannelinXRangeFrom:(long)minChannel to:(long)maxChannel;
+- (int32_t) maxValueChannelinXRangeFrom:(int32_t)minChannel to:(int32_t)maxChannel;
 {
 	int n  = [dataSource numberPointsInPlot:self];
 	if(n!=0){
 		double maxX = 0;
 		double maxY = -9E9;
 		
-		 int i;
+		 int32_t i;
 		 for (i=minChannel; i<maxChannel; ++i) {
 			 double xValue,yValue;
-			 [dataSource plotter:self index:i x:&xValue y:&yValue];
+			 [dataSource plotter:self index:(int)i x:&xValue y:&yValue];
 			 if (yValue > maxY) {
 				 maxY = yValue;
 				 maxX = i;
@@ -551,15 +551,15 @@
 	return YES;
 }
 
-- (long) numberPoints
+- (int32_t) numberPoints
 {
 	return [dataSource numberPointsInPlot:self];
 }
 
-- (NSString*) valueAsStringAtPoint:(long)i
+- (NSString*) valueAsStringAtPoint:(int32_t)i
 {		
 	double xValue,yValue;
-	[dataSource plotter:self index:i x:&xValue y:&yValue];
+	[dataSource plotter:self index:(int)i x:&xValue y:&yValue];
 	return [NSString stringWithFormat:@"%f",yValue]; 
 }
 

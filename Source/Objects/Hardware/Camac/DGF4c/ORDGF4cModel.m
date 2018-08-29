@@ -96,8 +96,8 @@ enum {
 - (unsigned short) getDSPParamAddress:(NSString*)aName;
 - (void) generateLookUpTable;
 - (void) constraintViolated:(NSString*)reasonString;
-- (long) computeMaxEvents:(long) runType;
-- (void) sampleWaveforms:(unsigned long*)recordPtr;
+- (int32_t) computeMaxEvents:(int32_t) runType;
+- (void) sampleWaveforms:(uint32_t*)recordPtr;
 - (BOOL) multipleCardEnvironment;
 - (void) updateOsc;
 @end
@@ -149,12 +149,12 @@ enum {
 	return @"DGF4c";
 }
 
-- (unsigned long) runBehaviorMask
+- (uint32_t) runBehaviorMask
 {
     return runBehaviorMask;
 }
 
-- (void) setRunBehaviorMask:(unsigned long)aRunBehaviorMask
+- (void) setRunBehaviorMask:(uint32_t)aRunBehaviorMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunBehaviorMask:runBehaviorMask];
     
@@ -165,7 +165,7 @@ enum {
 
 - (void) setSyncWait:(BOOL)state
 {
-	unsigned long theMask = runBehaviorMask;
+	uint32_t theMask = runBehaviorMask;
 	if(state)theMask |= 0x1;
 	else theMask &= ~0x1;
 	[self setRunBehaviorMask:theMask];
@@ -178,7 +178,7 @@ enum {
 
 - (void) setInSync:(BOOL)state
 {
-	unsigned long theMask = runBehaviorMask;
+	uint32_t theMask = runBehaviorMask;
 	if(state)theMask |= 0x2;
 	else theMask &= ~0x2;
 	[self setRunBehaviorMask:theMask];
@@ -533,32 +533,32 @@ enum {
     
 }
 
-- (unsigned long) dataId 
+- (uint32_t) dataId 
 { 
     return dataId; 
 }
 
-- (void) setDataId: (unsigned long) aDataId
+- (void) setDataId: (uint32_t) aDataId
 {
     dataId = aDataId;
 }
 
-- (unsigned long) liveTimeId 
+- (uint32_t) liveTimeId 
 { 
     return liveTimeId; 
 }
 
-- (void) setLiveTimeId: (unsigned long) aDataId
+- (void) setLiveTimeId: (uint32_t) aDataId
 {
     liveTimeId = aDataId;
 }
 
-- (unsigned long) mcaDataId 
+- (uint32_t) mcaDataId 
 { 
     return mcaDataId; 
 }
 
-- (void) setMcaDataId: (unsigned long) aDataId
+- (void) setMcaDataId: (uint32_t) aDataId
 {
     mcaDataId = aDataId;
 }
@@ -732,7 +732,7 @@ enum {
 		 object:self
 		 userInfo: [NSDictionary dictionaryWithObjectsAndKeys: 
 					arrayName, @"ArrayName",
-					[NSNumber numberWithInt:index], @"ArrayIndex",
+					[NSNumber numberWithInteger:index], @"ArrayIndex",
 					[item objectForKey:@"name"], @"ParamName",
 					nil]];
         
@@ -820,7 +820,7 @@ enum {
 		
 		NSLog(@"Begining DFG4c (station %d) System Configuration\n",[self stationNumber]);
 		NSData* fpgaData = [NSData dataWithContentsOfFile:filePath];
-		int len = [fpgaData length];
+		uint32_t len = (uint32_t)[fpgaData length];
 		if(fpgaData){
 			int i;
 			const unsigned char* dataPtr = (unsigned char*)[fpgaData bytes];
@@ -845,8 +845,8 @@ enum {
 	[self writeICSR:0xF0];	//configure the Trigger/Filter FPGA
 	[ORTimer delay:0.060];	//delay at least 50ms
     
-	NSData* fpgaData        = [NSData dataWithContentsOfFile:filePath];
-	unsigned long len		= [fpgaData length];
+	NSData* fpgaData    = [NSData dataWithContentsOfFile:filePath];
+	uint32_t len		= (uint32_t)[fpgaData length];
 	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 	if(fpgaData){
 		int i;
@@ -927,7 +927,7 @@ enum {
 	}
 }
 
-- (unsigned long) readDSPProgramWord
+- (uint32_t) readDSPProgramWord
 {
 	unsigned short dataWord[2];
 	[controller camacShortNAF:[self stationNumber] a:0 f:0 data:&dataWord[0]];
@@ -936,12 +936,12 @@ enum {
 	return dataWord[0]<<8 | (dataWord[1]&0x00ff);
 }
 
-- (void) writeDSPProgramWord:(unsigned long)data
+- (void) writeDSPProgramWord:(uint32_t)data
 {
 	//data is in PC format. so swap it. The next problem is that the DSP program memory
 	//is 24 bit. So load the higher 16 bits first, followed by a second write for the rest 
 	//of the 24 bit word.
-	unsigned long d = Swap8Bits(data);
+	uint32_t d = Swap8Bits(data);
 	unsigned short dataWordHigh = (d & 0x00ffff00)>>8;
 	unsigned short dataWordLow = d & 0x0000ff;
 	
@@ -968,10 +968,10 @@ enum {
         
         NSLog(@"Begining DFG4c (station %d) DSP load/boot\n",[self stationNumber]);
         NSData* fpgaData = [NSData dataWithContentsOfFile:dspCodePath];
-        int len = [fpgaData length]/4;
+        uint32_t len = (uint32_t)[fpgaData length]/4;
         if(fpgaData && len){
             int i;
-            const unsigned long* dataPtr = (unsigned long*)[fpgaData bytes];
+            const uint32_t* dataPtr = (uint32_t*)[fpgaData bytes];
             //load the DSP--note the first word is skipped, it must be loaded last
             for(i=1;i<len;i++){
                 [self writeDSPProgramWord:dataPtr[i]];
@@ -982,7 +982,7 @@ enum {
             [ORTimer delay:0.060];
             
             //check the values........
-            long errorCount = 0;
+            int32_t errorCount = 0;
             for(i=1;i<len;i++){
                 if([self readDSPProgramWord] != Swap8Bits(dataPtr[i])){
                     errorCount++;
@@ -1024,7 +1024,7 @@ enum {
 	if(okToLoadWhileRunning && [gOrcaGlobals runInProgress])[paramLoadLock lock];
 	
     [self setComputableParams];
-	long errorCount = 0;
+	int32_t errorCount = 0;
 	controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 	
 	@try { 
@@ -1042,7 +1042,7 @@ enum {
 		
 		//first the DSP Chan Params
 		paramArray = [params objectForKey:@"DSPChanParams"];
-		int n = [paramArray count];
+		NSUInteger n = [paramArray count];
 		for(i=0;i<n;i++){
 			paramDict = [paramArray objectAtIndex:i];
 			int chan;
@@ -1178,7 +1178,7 @@ enum {
 		
 		//first the DSP Chan Params
 		paramArray = [params objectForKey:@"DSPChanParams"];
-		int n = [paramArray count];
+		NSUInteger n = [paramArray count];
 		for(i=0;i<n;i++){
 			paramDict = [paramArray objectAtIndex:i];
 			int chan;
@@ -1310,7 +1310,7 @@ enum {
 {
 	NSLog(@"Running Baselines DF4c Station %d channel %d\n",[self stationNumber],chan);
 	double tim;
-	long k;
+	int32_t k;
 	unsigned short SL,SG,BLcut,LC,KeepLog,KeepHostIO;
 	unsigned short buffer[kLinearBufferSize*2]={0};
 	double sdev,sdevCount,val,BLsigma;
@@ -1448,7 +1448,8 @@ enum {
 
 - (void) calcOffsets
 {
-	long j, ret;
+    int j;
+    int32_t ret;
 	double a, b, abdiff, abmid;
 	unsigned short adcMax = 4095;
 	double coeff[2], TDACwave[kLinearBufferSize],low,high;
@@ -1554,14 +1555,14 @@ enum {
 
 -(double) tauFinder:(double)Tau channel:(short)chan
 {
-	long Trig[8192];
+	int32_t Trig[8192];
 	double FF[8192],FF2[8192],TimeStamp[2048];
 	double dt,Xwait;    /* dt is the time between Trace samples. */
-	long FL,FG;   /* fast filter times are set here */
-	long ndat,k,kmin,kmax,n,tcount,MaxTimeIndex = 0;
+	int32_t FL,FG;   /* fast filter times are set here */
+	int32_t ndat,k,kmin,kmax,n,tcount,MaxTimeIndex = 0;
 	double threshold,t0,t1,TriggerLevelShift,avg,MaxTimeDiff;
 	double localAmplitude, s1,s0; // used to determine which tau fit was best
-	long TFcount;
+	int32_t TFcount;
 	
 	ndat=8192;
 	/* Generate random indices */
@@ -1609,8 +1610,8 @@ enum {
 			TriggerLevelShift=0.0;
 			for(n=0; n<(tcount-1); n+=1){
 				avg=0.0;
-				kmin=(long)(TimeStamp[n]+2*FL+FG);
-				kmax=(long)(TimeStamp[n+1]-1);
+				kmin=(int32_t)(TimeStamp[n]+2*FL+FG);
+				kmax=(int32_t)(TimeStamp[n+1]-1);
 				if((kmax-kmin)>0){
 					for(k=kmin;k<kmax;k+=1)
 						avg+=FF2[k];
@@ -1656,13 +1657,13 @@ enum {
 		t1=MIN(t1,(t0+round(6*Tau/dt+4)));
 		
 		s0=0;	s1=0;
-		kmin=(long)t0-(2*FL+FG)-FL-1;
+		kmin=(int32_t)t0-(2*FL+FG)-FL-1;
 		for(k=0;k<FL;k++){
 			s0+=oscModeData[chan][kmin+k];
-			s1+=oscModeData[chan][(long)(t0+k)];
+			s1+=oscModeData[chan][(int32_t)(t0+k)];
 		}
 		if((s1-s0)/FL > localAmplitude){
-			Tau=Tau_Fit((unsigned int*)oscModeData[chan], (long)t0, (long)t1, dt);
+			Tau=Tau_Fit((unsigned int*)oscModeData[chan], (int32_t)t0, (int32_t)t1, dt);
 			localAmplitude=(s1-s0)/FL;
 		}
 	}
@@ -1695,18 +1696,18 @@ enum {
 	[self loadParamsWithReadBack:YES]; //load all params to HW
 }
 
-- (long) oscData:(short)chan value:(short)index
+- (int32_t) oscData:(short)chan value:(short)index
 {
 	[oscLock lock];
-	long val =  oscModeData[chan][index];
+	int32_t val =  oscModeData[chan][index];
 	[oscLock unlock];
 	return val;
 }
 
-- (long) numOscPoints
+- (int32_t) numOscPoints
 {
 	[oscLock lock];
-	long val = numOscPoints;
+	int32_t val = numOscPoints;
 	[oscLock unlock];
 	return val;
 }
@@ -1773,7 +1774,7 @@ enum {
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
+    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | (((uint32_t)[self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
     
@@ -1797,7 +1798,7 @@ enum {
 		[self loadParamsWithReadBack:YES]; //load all params to HW
 	}
 	else {
-		[NSException raise:@"Trace Length Too long" format:@"DGF4c station %d",[self stationNumber]];
+		[NSException raise:@"Trace Length Too int32_t" format:@"DGF4c station %d",(int)[self stationNumber]];
 	}
 }
 
@@ -1829,13 +1830,13 @@ enum {
 						numLongsInBuffer = 2+(numWordsInBuffer/2);
 					}
 					else {
-						//must pad to long word boundary
+						//must pad to int32_t word boundary
 						numLongsInBuffer = 2+((numWordsInBuffer+1)/2);
 						padIt = YES;
 					}
 					
-					NSMutableData* theData = [[NSMutableData allocWithZone:nil] initWithLength:numLongsInBuffer*sizeof(long)];
-					unsigned long* ptr     = (unsigned long*)[theData mutableBytes];
+					NSMutableData* theData = [[NSMutableData allocWithZone:nil] initWithLength:numLongsInBuffer*sizeof(int32_t)];
+					uint32_t* ptr     = (uint32_t*)[theData mutableBytes];
 					ptr[0] = dataId | (kLongFormLengthMask & numLongsInBuffer); //note size in longs
 					ptr[1] = unChangingDataPart;
 					unsigned short* sptr = (unsigned short*)(&ptr[2]);
@@ -1852,7 +1853,7 @@ enum {
 					[aDataPacket addData:theData];
 					
 					if(sampleWaveforms){
-						[self sampleWaveforms:(unsigned long*)[theData bytes]];
+						[self sampleWaveforms:(uint32_t*)[theData bytes]];
 					}
 					//[aDataPacket addLongsToFrameBuffer:ptr length:2+numLongsInBuffer];
 					[theData release];
@@ -1917,18 +1918,18 @@ enum {
 - (void) shipLiveTime
 {      
 	//this routine assumes that the params have been read from the board
-	unsigned long liveTimeData[19];
+	uint32_t liveTimeData[19];
 	
 	
 	liveTimeData[0] = liveTimeId | 19;		//old version == 13 new version == 19
 	liveTimeData[1] = 0;					//spare
-	liveTimeData[2] = (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16);
+	liveTimeData[2] = (([self crateNumber]&0xf)<<21) | (((uint32_t)[self stationNumber]& 0x0000001f)<<16);
 	
 	int chan;
 	
-	unsigned long rta = [self paramValue:@"REALTIMEA"];
-	unsigned long rtb = [self paramValue:@"REALTIMEB"];
-	unsigned long rtc = [self paramValue:@"REALTIMEC"];
+	uint32_t rta = [self paramValue:@"REALTIMEA"];
+	uint32_t rtb = [self paramValue:@"REALTIMEB"];
+	uint32_t rtc = [self paramValue:@"REALTIMEC"];
 	//double realTime = (rta*pow(65536.0,2.0)+rtb*65536.0+rtc)*1.0e-6/40.;
 	//packedDGF4LiveTime.asDouble = realTime;
 	liveTimeData[3] = rta;
@@ -1960,22 +1961,22 @@ enum {
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-														object:[NSData dataWithBytes:liveTimeData length:19*sizeof(long)]];
+														object:[NSData dataWithBytes:liveTimeData length:19*sizeof(int32_t)]];
 }
 
 - (void) readMCA:(ORDataPacket*)aDataPacket channel:(short)aChannel
 {
 	if([self paramValue:@"CHANCSRA" channel:aChannel] & 0x0004){
 		unsigned short bufferAddress = [self readParam:@"AOUTBUFFER"];
-		unsigned long bufferLength   = [self readParam:@"LOUTBUFFER"]; //number of shorts
+		uint32_t bufferLength   = [self readParam:@"LOUTBUFFER"]; //number of shorts
 		
 		[self setParam:@"HOSTIO" to:aChannel];
 		
 		//reconstructed data (size in longs + extra head stuff
-		NSMutableData* mcaData = [NSMutableData dataWithLength:(8*2*bufferLength)+2*sizeof(long)];
-		unsigned long* mcaPtr = (unsigned long*)[mcaData bytes];
+		NSMutableData* mcaData = [NSMutableData dataWithLength:(8*2*bufferLength)+2*sizeof(int32_t)];
+		uint32_t* mcaPtr = (uint32_t*)[mcaData bytes];
 		
-		long wordCount = 2;
+		int32_t wordCount = 2;
 		
 		controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
 		cachedStation = [self stationNumber];
@@ -2048,12 +2049,12 @@ enum {
     for(i=0;i<4;i++){
         [self setTau:i withValue:[decoder decodeDoubleForKey:NAME(@"ORDGF4cModelTauD%d")]];
         [self setTauSigma:i withValue:[decoder decodeDoubleForKey:NAME(@"ORDGF4cModelTauSigma%d")]];
-        [self setBinFactor:i withValue:[decoder decodeIntForKey:NAME(@"ORDGF4cModelBinFactor%d")]];
-        [self setEMin:i withValue:[decoder decodeIntForKey:NAME(@"ORDGF4cModelEMin%d")]];
+        [self setBinFactor:i withValue:[decoder decodeIntegerForKey:NAME(@"ORDGF4cModelBinFactor%d")]];
+        [self setEMin:i withValue:[decoder decodeIntegerForKey:NAME(@"ORDGF4cModelEMin%d")]];
         [self setPsaEnd:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelPsaEndF%d")]];
         [self setPsaStart:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelPsaStartF%d")]];
         [self setTraceDelay:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelTraceDelayF%d")]];
-        [self setTraceLength:i withValue:[decoder decodeIntForKey:NAME(@"ORDGF4cModelTraceLength%d")]];
+        [self setTraceLength:i withValue:[decoder decodeIntegerForKey:NAME(@"ORDGF4cModelTraceLength%d")]];
         [self setVOffset:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelVOffset%d")]];
         [self setVGain:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelVGain%d")]];
         [self setTriggerThreshold:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelTriggerThreshold%d")]];
@@ -2061,7 +2062,7 @@ enum {
         [self setTriggerRiseTime:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelTriggerRiseTime%d")]];
         [self setEnergyFlatTop:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelEnergyFlatTop%d")]];
         [self setEnergyRiseTime:i withValue:[decoder decodeFloatForKey:NAME(@"ORDGF4cModelEnergyRiseTime%d")]];
-        [self setXwait:i withValue:[decoder decodeIntForKey:NAME(@"ORDGF4cModelXwait%d")]];
+        [self setXwait:i withValue:[decoder decodeIntegerForKey:NAME(@"ORDGF4cModelXwait%d")]];
     }
 	//[self calcUserParams];
     [self setComputableParams];
@@ -2075,27 +2076,27 @@ enum {
 - (void)encodeWithCoder:(NSCoder*)coder
 {
     [super encodeWithCoder:coder];
-    [coder encodeInt32:runBehaviorMask forKey:@"ORDGF4cModelRunBehaviorMask"];
-    [coder encodeInt:runTask forKey:@"ORDGF4cModelRunTask"];
+    [coder encodeInteger:runBehaviorMask forKey:@"ORDGF4cModelRunBehaviorMask"];
+    [coder encodeInteger:runTask forKey:@"ORDGF4cModelRunTask"];
     [coder encodeObject: firmWarePath forKey:@"firmWarePath"];
     [coder encodeObject: dspCodePath forKey:@"dspCodePath"];
     [coder encodeObject: params forKey: @"params"];
     [coder encodeObject: lastParamPath forKey: @"lastParamPath"];
     [coder encodeObject: lastNewSetPath forKey: @"lastNewSetPath"];
-    [coder encodeInt:channel forKey:@"channel"];
-    [coder encodeInt:revision forKey:@"revision"];
-    [coder encodeInt:decimation forKey:@"decimation"];
-	[coder encodeInt:oscEnabledMask forKey:@"oscEnabledMask"];
+    [coder encodeInteger:channel forKey:@"channel"];
+    [coder encodeInteger:revision forKey:@"revision"];
+    [coder encodeInteger:decimation forKey:@"decimation"];
+	[coder encodeInteger:oscEnabledMask forKey:@"oscEnabledMask"];
     int i;
     for(i=0;i<4;i++){
         [coder encodeDouble:tau[i] forKey:NAME(@"ORDGF4cModelTauD%d")];
         [coder encodeDouble:tauSigma[i] forKey:NAME(@"ORDGF4cModelTauSigma%d")];
-        [coder encodeInt:binFactor[i] forKey:NAME(@"ORDGF4cModelBinFactor%d")];
-        [coder encodeInt:eMin[i] forKey:NAME(@"ORDGF4cModelEMin%d")];
+        [coder encodeInteger:binFactor[i] forKey:NAME(@"ORDGF4cModelBinFactor%d")];
+        [coder encodeInteger:eMin[i] forKey:NAME(@"ORDGF4cModelEMin%d")];
         [coder encodeFloat:psaEnd[i] forKey:NAME(@"ORDGF4cModelPsaEndF%d")];
         [coder encodeFloat:psaStart[i] forKey:NAME(@"ORDGF4cModelPsaStartF%d")];
         [coder encodeFloat:traceDelay[i] forKey:NAME(@"ORDGF4cModelTraceDelayF%d")];
-        [coder encodeInt:traceLength[i] forKey:NAME(@"ORDGF4cModelTraceLength%d")];
+        [coder encodeInteger:traceLength[i] forKey:NAME(@"ORDGF4cModelTraceLength%d")];
         [coder encodeFloat:vOffset[i] forKey:NAME(@"ORDGF4cModelVOffset%d")];
         [coder encodeFloat:vGain[i] forKey:NAME(@"ORDGF4cModelVGain%d")];
         [coder encodeFloat:triggerThreshold[i] forKey:NAME(@"ORDGF4cModelTriggerThreshold%d")];
@@ -2103,7 +2104,7 @@ enum {
         [coder encodeFloat:triggerRiseTime[i] forKey:NAME(@"ORDGF4cModelTriggerRiseTime%d")];
         [coder encodeFloat:energyFlatTop[i] forKey:NAME(@"ORDGF4cModelEnergyFlatTop%d")];
         [coder encodeFloat:energyRiseTime[i] forKey:NAME(@"ORDGF4cModelEnergyRiseTime%d")];
-        [coder encodeInt:xwait[i] forKey:NAME(@"ORDGF4cModelXwait%d")];
+        [coder encodeInteger:xwait[i] forKey:NAME(@"ORDGF4cModelXwait%d")];
     }
     
 }
@@ -2201,7 +2202,7 @@ enum {
     NSMutableArray* dspChanArray = [NSMutableArray array];
     
     
-    int numLines = [theLines count];
+    NSUInteger numLines = [theLines count];
     int i;
     for(i=0;i<numLines;i++){
         NSString* lineNoSpaces = [[theLines objectAtIndex:i] removeExtraSpaces];
@@ -2264,7 +2265,7 @@ enum {
     //will end up being set to zero.
     { //--start a new scope so no conflict with above code
         NSArray* dspParams = [params objectForKey:@"DSPParams"];
-        int count = [dspParams count];
+        NSUInteger count = [dspParams count];
         int i;
         for(i=0;i<count;i++){
             NSDictionary* item = [dspParams objectAtIndex:i];
@@ -2285,7 +2286,7 @@ enum {
     { //--start a new scope so no conflict with above code
         
         NSArray* dspChanParams = [params objectForKey:@"DSPChanParams"];
-        int count = [dspChanParams count];
+        NSUInteger count = [dspChanParams count];
         int i;
         for(i=0;i<count;i++){
             NSDictionary* item = [dspChanParams objectAtIndex:i];
@@ -2531,10 +2532,11 @@ enum {
 
 @implementation ORDGF4cModel (private)
 
-- (long) computeMaxEvents:(long) runType
+- (int32_t) computeMaxEvents:(int32_t) runType
 {
 	
-	long k,maximumEvents;
+    int k;
+    int32_t maximumEvents;
 	unsigned short bhl,ehl,chl,leventbuffer,loutputbuffer,lengthin,lengthout;
 	
 	/* Check InputEventSize for list modes (0x101, 0x102, 0x103)  */
@@ -2566,7 +2568,7 @@ enum {
 				}
 			}
 			if (lengthin > leventbuffer){
-				NSLogColor([NSColor redColor],@"The event is too long for DGF4d station %d. Please shorten traces\n",[self stationNumber]);
+				NSLogColor([NSColor redColor],@"The event is too int32_t for DGF4d station %d. Please shorten traces\n",[self stationNumber]);
 				return -1;
 			}
 		}
@@ -2607,12 +2609,12 @@ enum {
 		}
 		
 		if(lengthout > (loutputbuffer-bhl)){
-			NSLogColor([NSColor redColor],@"The event is too long for DGF4d station %d. Please shorten traces\n",[self stationNumber]);
+			NSLogColor([NSColor redColor],@"The event is too int32_t for DGF4d station %d. Please shorten traces\n",[self stationNumber]);
 			return -1;
 		}
 		
 		/* Calculate maximumEvents */
-		maximumEvents = (long)floor((loutputbuffer-bhl)/lengthout);
+		maximumEvents = (int32_t)floor((loutputbuffer-bhl)/lengthout);
 	}				
 	else{ /* No need to check MCA run mode 0x301 */
 		maximumEvents=0;
@@ -2844,7 +2846,7 @@ enum {
 {
     NSDictionary* paramDict;
     NSArray* paramArray = [params objectForKey:@"DSPParams"];
-    int n = [paramArray count];
+    NSUInteger n = [paramArray count];
     int i;
     for(i=0;i<n;i++){
         paramDict = [paramArray objectAtIndex:i];
@@ -2861,7 +2863,7 @@ enum {
 {
     if(!lookUpTable)[self setLookUpTable:[NSMutableDictionary dictionary]];
     NSMutableArray* array = [params objectForKey:@"DSPParams"];
-    int n = [array count];
+    NSUInteger n = [array count];
     int i;
     for(i=0;i<n;i++){
         NSDictionary* dictionary = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -2897,12 +2899,12 @@ enum {
 
 
 
-- (void) sampleWaveforms:(unsigned long*)recordPtr
+- (void) sampleWaveforms:(uint32_t*)recordPtr
 {
 	[oscLock lock];
 	
 	if(recordPtr != NULL) {
-		long totalWords			= (recordPtr[0] & kLongFormLengthMask)*2;	//length was in longs, convert to words
+		int32_t totalWords			= (recordPtr[0] & kLongFormLengthMask)*2;	//length was in longs, convert to words
 		unsigned short* dataPtr = (unsigned short*)&recordPtr[2];	//recast to short
 		unsigned short* endDataPtr;
 		

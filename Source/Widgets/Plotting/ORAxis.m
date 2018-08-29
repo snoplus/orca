@@ -41,7 +41,7 @@ enum {
     kDefFontSize	= 12,		    // default point size for text
     kShortTickLength	= 1,		    // length of short tick
     kMediumTickLength   = 2,		    // length of medium tick
-    kLongTickLength     = 3		    // length of long tick
+    kLongTickLength     = 3		    // length of int32_t tick
 };
 NSString* kDefFont = @"Helvetica";
 /*
@@ -483,9 +483,9 @@ enum {
         if (dv < [self minimumRange]) {
             if (dv < 0) {
 				return NO;
-                v1 = [self minLimit];
-                v2 = [self maxLimit];
-                dv = v2 - v1;
+//                v1 = [self minLimit];
+//                v2 = [self maxLimit];
+//                dv = v2 - v1;
 			} 
             else {
                 /* expand scale, keeping the same center */
@@ -757,12 +757,12 @@ enum {
     else return label;
 }
 
-- (long) axisMinLimit
+- (int32_t) axisMinLimit
 {
-	return (long)[self minLimit];
+	return (int32_t)[self minLimit];
 }
 
-- (void) setAxisMinLimit:(long)aValue
+- (void) setAxisMinLimit:(int32_t)aValue
 {
 	double dv = (double)aValue;
 	[self setMinLimit:dv];
@@ -771,11 +771,11 @@ enum {
  	[self setNeedsDisplay:YES];
 }
 
-- (long) axisMaxLimit
+- (int32_t) axisMaxLimit
 {
-	return (long)[self maxLimit];
+	return (int32_t)[self maxLimit];
 }
-- (void) setAxisMaxLimit:(long)aValue
+- (void) setAxisMaxLimit:(int32_t)aValue
 {
 	double dv = (double)aValue;
 	[self setMaxLimit:dv];
@@ -883,7 +883,7 @@ enum {
 {
     if ([self ignoreMouse]) return;
 	
-	NSEventType modifierKeys = [theEvent modifierFlags];
+	NSEventModifierFlags modifierKeys = [theEvent modifierFlags];
     NSPoint mouseLoc         = [self convertPoint:[theEvent locationInWindow] fromView:nil];
 	
 	NSMutableArray* markers = [attributes objectForKey:ORAxisMarkers];
@@ -897,7 +897,7 @@ enum {
             else				checkValue = mouseLoc.y-lowOffset;
             
             if(checkValue <= (markerPixel+5) && checkValue>=(markerPixel-5)){
-                if(modifierKeys & NSCommandKeyMask){
+                if(modifierKeys & NSEventModifierFlagCommand){
                     [markers removeObject:markerNumber];
                     if([markers count] == 0){
                         [attributes removeObjectForKey:ORAxisMarkers];
@@ -920,9 +920,9 @@ enum {
 	if(!markerBeingDragged){
 		firstDrag = YES;   
 
-		if(modifierKeys & NSCommandKeyMask)  [self markClick:mouseLoc];
+		if(modifierKeys & NSEventModifierFlagCommand)  [self markClick:mouseLoc];
 		else {
-			if(!(modifierKeys & NSControlKeyMask)) {
+			if(!(modifierKeys & NSEventModifierFlagControl)) {
 				[[NSCursor closedHandCursor] push];
 				[self setPin:[self minValue]];
 			}
@@ -934,7 +934,7 @@ enum {
 			
 			
 			/* last chance to set the cursor before a grab */
-			dragFlag = !(modifierKeys & NSControlKeyMask);
+			dragFlag = !(modifierKeys & NSEventModifierFlagControl);
 			nearPinFlag = [self nearPinPoint:mouseLoc];
 			
 			/* invert the pin if we are grabbing near the pin-point */
@@ -1172,7 +1172,7 @@ enum {
 		else           imageOffset = -imageSize.width-2;
 		p = NSMakePoint(axisPosition+imageOffset,val-imageSize.height/2+lowOffset);
 	}
-	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositeSourceOver fraction:.8];
+	[markerImage drawAtPoint:p fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:.8];
 }
 
 - (void) drawMarkInFrame:(NSRect)aFrame usingColor:(NSColor*)aColor
@@ -1299,11 +1299,11 @@ enum {
         }
         
         
-        if([[NSApp currentEvent] modifierFlags] & NSControlKeyMask){
+        if([[NSApp currentEvent] modifierFlags] & NSEventModifierFlagControl){
             if([self isXAxis])[self addCursorRect:aRect cursor:[NSCursor resizeLeftRightCursor]];
             else [self addCursorRect:aRect cursor:[NSCursor resizeUpDownCursor]];
         }
-        else if([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask){
+        else if([[NSApp currentEvent] modifierFlags] & NSEventModifierFlagCommand){
             if(markerNumber){
                 [self addCursorRect:lowRect cursor:cursor];
                 [self addCursorRect:markerRect cursor:[NSCursor disappearingItemCursor]];
@@ -1725,7 +1725,7 @@ enum {
 	}    
 	
 	[theAxis moveToPoint:NSMakePoint(ticStartX,ticStartY)];
-	[theAxis lineToPoint:NSMakePoint(longTicEndX,longTicEndY)];				// draw long tick
+	[theAxis lineToPoint:NSMakePoint(longTicEndX,longTicEndY)];				// draw int32_t tick
 	if (gridCount<kMaxLongTicks) gridArray[gridCount++] =0;
             
 	NSString* axisNumberString = @"0";
@@ -1774,7 +1774,7 @@ enum {
 			[theAxis moveToPoint:NSMakePoint(ticStartX,ticStartY)];
 			if ((!(n%label_sep)) || (n==2 && label_sep==5)) {
 				if (!n) n = 1;
-				[theAxis lineToPoint:NSMakePoint(longTicEndX,longTicEndY)];	// draw long tick
+				[theAxis lineToPoint:NSMakePoint(longTicEndX,longTicEndY)];	// draw int32_t tick
 				if (gridCount<kMaxLongTicks){
 					gridArray[gridCount++] = gridPosition;
 				}
@@ -2027,7 +2027,7 @@ enum {
 			++i;
 		}
 		else {
-			[theAxis lineToPoint:NSMakePoint(longTicEndX,longTicEndY)];				// draw long tick
+			[theAxis lineToPoint:NSMakePoint(longTicEndX,longTicEndY)];				// draw int32_t tick
 			if (gridCount<kMaxLongTicks) {
 				gridArray[gridCount++] = gridPosition;
 			}
@@ -2146,9 +2146,9 @@ enum {
 @end //private
 
 
-long roundToLong(double x)
+int32_t roundToLong(double x)
 {
-    return(x>0 ? (long)(x+0.5) : (long)(x-0.499999999999));
+    return(x>0 ? (int32_t)(x+0.5) : (int32_t)(x-0.499999999999));
 }
 
 

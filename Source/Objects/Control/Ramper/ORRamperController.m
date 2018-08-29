@@ -229,7 +229,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Ramper %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Ramper %u",[model uniqueIdNumber]]];
 }
 
 - (void) checkGlobalSecurity
@@ -366,7 +366,7 @@
 
 - (IBAction) downRampPathAction:(id)sender
 {
-	[[model selectedRampItem]  setDownRampPath: [[sender selectedCell] tag]];	
+	[[model selectedRampItem]  setDownRampPath: (int)[[sender selectedCell] tag]];	
 }
 
 - (IBAction) downRateTextFieldAction:(id)sender
@@ -411,7 +411,7 @@
     [alert setInformativeText:@"REALLY Panic all enabled parameters to zero?\nIs this really what you want?"];
     [alert addButtonWithTitle:@"Yes, Do Panic"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){

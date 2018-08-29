@@ -42,7 +42,7 @@ NSString* ORcPCIBaseAddressChanged 			= @"ORcPCIBaseAddressChanged";
 }
 
 
-- (unsigned long)   exceptionCount
+- (uint32_t)   exceptionCount
 {
     return exceptionCount;
 }
@@ -66,7 +66,7 @@ NSString* ORcPCIBaseAddressChanged 			= @"ORcPCIBaseAddressChanged";
 					   object:self]; 
 }
 
-- (void) setBaseAddress:(unsigned long) address
+- (void) setBaseAddress:(uint32_t) address
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setBaseAddress:baseAddress];
     baseAddress = address;
@@ -77,7 +77,7 @@ NSString* ORcPCIBaseAddressChanged 			= @"ORcPCIBaseAddressChanged";
     
 }
 
-- (unsigned long) baseAddress
+- (uint32_t) baseAddress
 {
     return baseAddress;
 }
@@ -87,14 +87,14 @@ NSString* ORcPCIBaseAddressChanged 			= @"ORcPCIBaseAddressChanged";
 {
 	self = [super initWithCoder:decoder];
 	[[self undoManager] disableUndoRegistration];
-	[self setBaseAddress:[decoder decodeInt32ForKey:@"baseAddress"]];
+	[self setBaseAddress:[decoder decodeIntForKey:@"baseAddress"]];
 	[[self undoManager] enableUndoRegistration];
 	return self;
 }
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
 	[super encodeWithCoder:encoder];
-	[encoder encodeInt32:baseAddress forKey:@"baseAddress"];
+	[encoder encodeInt:baseAddress forKey:@"baseAddress"];
 }
 
 @end

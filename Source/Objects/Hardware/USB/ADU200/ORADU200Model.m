@@ -143,7 +143,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-		[aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+		[aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		
 		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
@@ -386,8 +386,8 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:pollTime forKey:@"ORADU200ModelPollTime"];
-    [encoder encodeInt:debounce forKey:@"ORADU200ModelDebounce"];
+    [encoder encodeInteger:pollTime forKey:@"ORADU200ModelPollTime"];
+    [encoder encodeInteger:debounce forKey:@"ORADU200ModelDebounce"];
     [encoder encodeObject:serialNumber forKey:@"ORADU200ModelSerialNumber"];
 }
 
@@ -582,7 +582,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 - (void) endProcessCycle
 {
 	if(usbInterface && [self getUSBController]){
-		NSString* aCommand = [NSString stringWithFormat:@"SPK%04lx",processOutputValue & 0xf];
+		NSString* aCommand = [NSString stringWithFormat:@"SPK%04x",processOutputValue & 0xf];
 		char data[8];
 		[self formatCommand:aCommand buffer:data];
 		[usbInterface writeBytesOnInterruptPipe:data length:8];
@@ -602,7 +602,7 @@ NSString* ORADU200USBNextConnection			= @"ORADU200USBNextConnection";
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"ADU200,%lu",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"ADU200,%u",[self uniqueIdNumber]];
 }
 
 @end

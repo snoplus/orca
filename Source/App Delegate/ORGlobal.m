@@ -127,7 +127,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 - (void) runStatusChanged:(NSNotification*)aNotification
 {
     [self setRunState: [[[aNotification userInfo] objectForKey:ORRunStatusValue] intValue]];
-    [self setRunType: [[[aNotification userInfo] objectForKey:ORRunTypeMask] longValue]];
+    [self setRunType: (uint32_t)[[[aNotification userInfo] objectForKey:ORRunTypeMask] longValue]];
     if(runState == eRunStarting){
         [[ORStatusController sharedStatusController] clearAllAction:nil];
     }
@@ -209,7 +209,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 					}
 
 					if(runType & ~eMaintenanceRunType){
-						rs = [rs stringByAppendingFormat:@" Mask: 0x%lX",runType & ~eMaintenanceRunType];
+						rs = [rs stringByAppendingFormat:@" Mask: 0x%X",runType & ~eMaintenanceRunType];
 					}
 				}
             }
@@ -219,7 +219,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
     }
 }
 
-- (int) cpuCount
+- (NSUInteger) cpuCount
 {
 	if(!cpuCount) {
 		//NSProcessInfo* pinfo = [NSProcessInfo processInfo];
@@ -295,11 +295,11 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 	[[(ORAppDelegate*)[NSApp delegate] document] setStatusText:testInProgress?@"Testing":@""];
 }
 
-- (unsigned long)runType {
+- (uint32_t)runType {
     
     return runType;
 }
-- (void)setRunType:(unsigned long)aRunType {
+- (void)setRunType:(uint32_t)aRunType {
     runType = aRunType;
 }
 
@@ -335,14 +335,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 	return [runVetos count];
 }
 
-- (int) vetoCount
+- (NSUInteger) vetoCount
 {
 	return [runVetos count];
 }
 
 - (void) listVetoReasons
 {
-	int n = [runVetos count];
+	NSUInteger n = [runVetos count];
 	if(n){
 		NSLog(@"There %@ %d veto%@in force:\n",n>1?@"are":@"is",n,n>1?@"s ":@" ");
 		NSEnumerator* e = [runVetos keyEnumerator];
@@ -366,7 +366,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(Global);
 
 - (void)saveParams:(NSCoder*)encoder
 {
-    [encoder encodeInt:[self runMode]           forKey:@"ORRunMode"];
+    [encoder encodeInteger:[self runMode]           forKey:@"ORRunMode"];
     [encoder encodeBool:[self inProductionMode] forKey:@"ORInProductionMode"];
 }
 

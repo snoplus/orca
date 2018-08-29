@@ -54,8 +54,8 @@ extern NSString* ORObjArrayPtrPBType;
     @private
         //internal flags
         BOOL		aWake;
-        int   tag; //used by subclasses for identification
-        unsigned long uniqueIdNumber;
+        NSUInteger   tag; //used by subclasses for identification
+        uint32_t uniqueIdNumber;
 }
 
 #pragma mark ¥¥¥Inialization
@@ -101,14 +101,14 @@ extern NSString* ORObjArrayPtrPBType;
 - (NSMutableArray*) 	children;
 - (NSMutableArray*) 	familyList;
 - (int)         stationNumber;
-- (int)	        tag;
-- (void)		setTag:(int)aTag;
+- (NSUInteger)	tag;
+- (void)		setTag:(NSUInteger)aTag;
 - (int)         tagBase;
 - (BOOL)        solitaryObject;
 - (BOOL)		solitaryInViewObject;
 - (void)        askForUniqueIDNumber;
-- (void)        setUniqueIdNumber:(unsigned long)anIdNumber;
-- (unsigned long) uniqueIdNumber;
+- (void)        setUniqueIdNumber:(uint32_t)anIdNumber;
+- (uint32_t) uniqueIdNumber;
 - (BOOL)        selectionAllowed;
 - (int) compareStringTo:(id)anElement usingKey:(NSString*)aKey;
 - (BOOL) isObjectInConnectionChain:(id)anObject;
@@ -196,8 +196,8 @@ extern NSString* ORObjArrayPtrPBType;
 - (void) addRunWaitFor:(id)anObject reason:(NSString*)aReason;
 - (void) releaseRunWaitFor:(id)anObject;
 
-- (unsigned long) processID;
-- (void) setProcessID:(unsigned long)aValue;
+- (uint32_t) processID;
+- (void) setProcessID:(uint32_t)aValue;
 
 @end
 
@@ -211,12 +211,12 @@ extern NSString* ORObjArrayPtrPBType;
 
 @interface OrcaObject (scriptingAdditions)
 - (long) longValue;
-- (int) second;
-- (int) minute; 
-- (int) hour; 
-- (int) day; 
-- (int) month; 
-- (int) year; 
+- (NSInteger) second;
+- (NSInteger) minute;
+- (NSInteger) hour;
+- (NSInteger) day;
+- (NSInteger) month;
+- (NSInteger) year; 
 @end
 
 @interface OrcaObject (compilerErrorFix)

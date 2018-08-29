@@ -110,17 +110,17 @@
 
 - (void) writeValueChanged:(NSNotification*)aNotification
 {
-	unsigned long value = [model writeValue];
+	uint32_t value = [model writeValue];
 	short i;
     for(i=0;i<32;i++){
-        [[writeBitMatrix cellAtRow:0 column:31 - i] setIntValue:(value & (1L<<i))];
+        [[writeBitMatrix cellAtRow:0 column:31 - i] setIntegerValue:(value & (1L<<i))];
     }
-    [writeHexField setIntValue:value];
+    [writeHexField setIntegerValue:value];
 }
 
 - (void) baseAddressChanged:(NSNotification *)aNotification
 {
-    [baseAddress setIntValue:[model baseAddress]];
+    [baseAddress setIntegerValue:[model baseAddress]];
 }
 
 #pragma mark •••Actions
@@ -188,8 +188,8 @@
 
 - (IBAction) writeValueBitAction:(id)sender
 {
-    unsigned long value = [model writeValue];
-    int bit      = [[sender selectedCell] tag];
+    uint32_t value = [model writeValue];
+    int bit      = (int)[[sender selectedCell] tag];
     int bitValue = [sender intValue];
     
     if(bitValue) value |=  (0x1<<bit);

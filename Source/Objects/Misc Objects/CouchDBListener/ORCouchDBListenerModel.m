@@ -28,8 +28,8 @@
 #import "NSArray+Extensions.h"
 #import "NSDictionary+Extensions.h"
 #import "ORScriptRunner.h"
-#import <YAJL/NSObject+YAJL.h>
-#import <YAJL/YAJLDocument.h>
+//#import <YAJL/NSObject+YAJL.h>
+//#import <YAJL/YAJLDocument.h>
 
 #define kListDB             @"kListDB"
 #define kChangesfeed        @"kChangesfeed"
@@ -251,13 +251,13 @@ if (strcmp(@encode(atype), the_type) == 0)     \
     HANDLE_NUMBER_TYPE(Float, float)
     HANDLE_NUMBER_TYPE(Char, char)
     HANDLE_NUMBER_TYPE(Int, int)
-    HANDLE_NUMBER_TYPE(Long, long)
-    HANDLE_NUMBER_TYPE(LongLong, long long)
+    HANDLE_NUMBER_TYPE(Long, int32_t)
+    HANDLE_NUMBER_TYPE(LongLong, int64_t)
     HANDLE_NUMBER_TYPE(Short, short)
     HANDLE_NUMBER_TYPE(UnsignedChar, unsigned char)
     HANDLE_NUMBER_TYPE(UnsignedInt, unsigned int)
-    HANDLE_NUMBER_TYPE(UnsignedLong, unsigned long)
-    HANDLE_NUMBER_TYPE(UnsignedLongLong, unsigned long long)
+    HANDLE_NUMBER_TYPE(UnsignedLong, uint32_t)
+    HANDLE_NUMBER_TYPE(UnsignedLongLong, uint64_t)
     HANDLE_NUMBER_TYPE(UnsignedShort, unsigned short)
     return [NSNull null];
 }
@@ -653,7 +653,10 @@ if (strcmp(@encode(atype), the_type) == 0)     \
 			@try {
 				NSMutableString* setterString	= [[[aCommand objectForKey:@"Selector"] mutableCopy] autorelease];
                 
-                NSArray* theValue = (val) ? val : [[aCommand objectForKey:@"Value"] yajl_JSON];
+                NSData* sData = [[aCommand objectForKey:@"Value"] dataUsingEncoding:NSASCIIStringEncoding];
+                NSArray* theValue = [NSJSONSerialization JSONObjectWithData:sData options:NSJSONReadingMutableContainers error:nil];
+                
+                //NSArray* theValue = (val) ? val : [[aCommand objectForKey:@"Value"] yajl_JSON];
                 if (theValue && ![theValue isKindOfClass:[NSArray class]]) {
                     [NSException raise:@"Invalid arguments"
                                 format:@"Arguments must be an array (e.g. [1, 2.3]) of arguments"];
@@ -665,11 +668,11 @@ if (strcmp(@encode(atype), the_type) == 0)     \
 				NSInvocation*		theInvocation	= [NSInvocation invocationWithMethodSignature:theSignature];
 				
 				[theInvocation setSelector:theSetterSelector];
-				int n = [theSignature numberOfArguments];
+				int n = (int)[theSignature numberOfArguments];
 				int i;
                 if ((n-2) != [theValue count]) {
                     [NSException raise:@"ORCouchDBListenerInvalidArguments"
-                                format:@"Invalid argument number: (%i) seen, (%i) needed",[theValue count],(n-2)];
+                                format:@"Invalid argument number: (%d) seen, (%i) needed",(int)[theValue count],(n-2)];
                 }
 				for(i=2;i<n;i++){
                     id o = [theValue objectAtIndex:i-2];
@@ -693,12 +696,12 @@ if (strcmp(@encode(atype), the_type) == 0)         \
                         HANDLE_NUMBER_ARG(int, int)
                         HANDLE_NUMBER_ARG(double, double)
                         HANDLE_NUMBER_ARG(long, long)
-                        HANDLE_NUMBER_ARG(longLong, long long)
+                        HANDLE_NUMBER_ARG(longLong, int64_t)
                         HANDLE_NUMBER_ARG(short, short)
                         HANDLE_NUMBER_ARG(unsignedChar, unsigned char)
                         HANDLE_NUMBER_ARG(unsignedInt, unsigned int)
                         HANDLE_NUMBER_ARG(unsignedLong, unsigned long)
-                        HANDLE_NUMBER_ARG(unsignedLongLong, unsigned long)
+                        HANDLE_NUMBER_ARG(unsignedLongLong, unsigned long long)
                         HANDLE_NUMBER_ARG(unsignedShort, unsigned short)
                         [NSException raise:@"ORCouchDBListenerInvalidArguments"
                                     format:@"Found invalid requested number type as argument(%s)?!",the_type];
@@ -761,7 +764,12 @@ if (strcmp(@encode(atype), the_type) == 0)         \
             if ([new_str characterAtIndex:0] != '[' && [new_str characterAtIndex:[new_str length]-1] != ']') {
                 new_str = [NSString stringWithFormat:@"[%@]",new_str];
             }
-            if (![[new_str yajl_JSON] isKindOfClass:[NSArray class]]) {
+            NSData* sData = [new_str dataUsingEncoding:NSASCIIStringEncoding];
+            NSArray* anArray = [NSJSONSerialization JSONObjectWithData:sData options:NSJSONReadingMutableContainers error:nil];
+
+    
+            if (![anArray isKindOfClass:[NSArray class]]) {
+               // if (![[new_str yajl_JSON] isKindOfClass:[NSArray class]]) {
                 [NSException raise:@"ORCouchDBListerCommand"
                             format:@"Value must be parsable array/list: (e.g. [ 1, 23.4 ] )"];
             }

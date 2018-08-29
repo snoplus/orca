@@ -201,7 +201,7 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 	[timeRate addDataToTimeAverage:aPressure];
 	time_t	ut_Time;
 	time(&ut_Time);
-	timeMeasured = ut_Time;
+	timeMeasured = (uint32_t)ut_Time;
 	[self shipPressure];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVarianTPSModelPressureChanged object:self];
 }
@@ -282,8 +282,8 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:remote forKey:@"remote"];
-    [encoder encodeInt:pressureScale	forKey: @"pressureScale"];
-    [encoder encodeInt:pollTime			forKey: @"pollTime"];
+    [encoder encodeInteger:pressureScale	forKey: @"pressureScale"];
+    [encoder encodeInteger:pollTime			forKey: @"pollTime"];
 }
 
 #pragma mark •••HW Methods
@@ -422,8 +422,8 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -469,7 +469,7 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 		do {
 			char* p = (char*)[inComingData bytes];
 			int i;
-			int n = [inComingData length];
+			int n = (int)[inComingData length];
 			BOOL foundEnd = NO;
 			for(i=0;i<n;i++){
 				if(p[i] == kEtx && n>=i+2){
@@ -537,20 +537,20 @@ NSString* ORVarianTPSModelControllerTempChanged	= @"ORVarianTPSModelControllerTe
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[4];
+		uint32_t data[4];
 		data[0] = dataId | 4;
 		data[1] = [self uniqueIdNumber]&0xfff;
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		theData.asFloat = pressure;
 		data[2] = theData.asLong;			
 		data[3] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*4]];
 	}
 }
 

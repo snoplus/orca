@@ -506,17 +506,17 @@ NSString* fltEdelweissV4TriggerSourceNamesXXX[2][kFltNumberTriggerSources] = {
 
 - (void) deviceIDChanged:(NSNotification*)aNote
 {
-    if([model deviceID] == 0) [deviceIDTextField setStringValue: @"0 (DP5)"];
+    if([model deviceId] == 0) [deviceIDTextField setStringValue: @"0 (DP5)"];
     else
-    if([model deviceID] == 1) [deviceIDTextField setStringValue: @"1 (PX5)"];
+    if([model deviceId] == 1) [deviceIDTextField setStringValue: @"1 (PX5)"];
     else
-    if([model deviceID] == 2) [deviceIDTextField setStringValue: @"2 (DP5G)"];
+    if([model deviceId] == 2) [deviceIDTextField setStringValue: @"2 (DP5G)"];
     else
-    if([model deviceID] == 3) [deviceIDTextField setStringValue: @"3 (MCA8000D)"];
+    if([model deviceId] == 3) [deviceIDTextField setStringValue: @"3 (MCA8000D)"];
     else
-    if([model deviceID] == 4) [deviceIDTextField setStringValue: @"4 (TB5)"];
+    if([model deviceId] == 4) [deviceIDTextField setStringValue: @"4 (TB5)"];
     else
-	[deviceIDTextField setIntValue: [model deviceID]];
+	[deviceIDTextField setIntegerValue: [model deviceId]];
 }
 
 - (void) boardTemperatureChanged:(NSNotification*)aNote
@@ -959,13 +959,13 @@ return;
 
 - (void) statusRegChanged:(NSNotification*)aNote
 {
-	unsigned long statusReg = [model statusReg];
+	uint32_t statusReg = [model statusReg];
 //DEBUG OUTPUT:  NSLog(@"WARNING: %@::%@: UNDER CONSTRUCTION! status reg: 0x%08x\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),statusReg);//TODO: DEBUG testing ...-tb-
 	
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kEWStatusIrq)?@"1":@"0"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kEWStatusPixErr)?@"1":@"0"];
 
-	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04lx",ExtractValue(statusReg,0xffff,0)]];
+	[[statusMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"0x%04x",ExtractValue(statusReg,0xffff,0)]];
 
 }
 
@@ -1008,15 +1008,15 @@ return;
 
 - (void) nextPageDelayChanged:(NSNotification*)aNote
 {
-	[nextPageDelaySlider setIntValue:100-[model nextPageDelay]];
+	[nextPageDelaySlider setIntegerValue:100-[model nextPageDelay]];
 	[nextPageDelayField  setFloatValue:[model nextPageDelay]*102.3/100.];
 }
 
 
 - (void) pageSizeChanged:(NSNotification*)aNote
 {
-	[pageSizeField setIntValue: [model pageSize]];
-	[pageSizeStepper setIntValue: [model pageSize]];
+	[pageSizeField setIntegerValue: [model pageSize]];
+	[pageSizeStepper setIntegerValue: [model pageSize]];
 }
 
 
@@ -1106,7 +1106,7 @@ return;
 
 - (void) setWindowTitle
 {
-	[[self window] setTitle: [NSString stringWithFormat:@"Amptek DP5 - %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle: [NSString stringWithFormat:@"Amptek DP5 - %u",[model uniqueIdNumber]]];
 }
 
 - (void) checkGlobalSecurity
@@ -1178,14 +1178,14 @@ return;
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	NSString* s = [NSString stringWithFormat:@"%lu,0x%lx,0x%lx",[model projectVersion],[model documentVersion],[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%u,0x%x,0x%x",[model projectVersion],[model documentVersion],[model implementation]];
 	[hwVersionField setStringValue:s];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
-    [regWriteValueTextField setIntValue:[model writeValue]];
+    [regWriteValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) displayEventLoopChanged:(NSNotification*) aNote
@@ -1210,12 +1210,12 @@ return;
 
 - (void) controlRegChanged:(NSNotification*)aNote
 {
-	unsigned long value = [model controlReg];
+	uint32_t value = [model controlReg];
 	
 	[[miscCntrlBitsMatrix cellWithTag:0] setIntValue:value & kCtrlInvert];
 	[[miscCntrlBitsMatrix cellWithTag:1] setIntValue:value & kCtrlLedOff];
 	[[miscCntrlBitsMatrix cellWithTag:2] setIntValue:value & kCtrlOnLine];
-	[controlRegNumFifosTextField setIntValue:(value & kCtrlNumFIFOs)>>28];
+	[controlRegNumFifosTextField setIntegerValue:(value & kCtrlNumFIFOs)>>28];
 }
 
 - (void) populatePullDown
@@ -1329,7 +1329,7 @@ return;
     //DEBUG     
            NSLog(@"Called %@::%@! index %i [sender intValue] %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),[commandTableView selectedRow],[commandTableView intValue]);//TODO: DEBUG -tb-
 NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
-    int row=[commandTableView selectedRow];
+    int row=(int)[commandTableView selectedRow];
     if(row<0){
         NSLog(@"Nothing selected!\n");
         return;
@@ -1341,7 +1341,7 @@ NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
 {
     //DEBUG    
         NSLog(@"Called %@::%@\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd));//TODO: DEBUG -tb-
-    int row=[commandTableView selectedRow];
+    int row=(int)[commandTableView selectedRow];
     if(row<0){
         NSLog(@"Nothing selected!\n");
         return;
@@ -1429,7 +1429,7 @@ NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
 - (void) spectrumRequestRatePUAction:(id)sender
 {
 	//[model setSpectrumRequestRate:[sender intValue]];	
-	[model setSpectrumRequestRate:[[spectrumRequestRatePU selectedItem] tag]];	
+	[model setSpectrumRequestRate:(int)[[spectrumRequestRatePU selectedItem] tag]];
 }
 
 - (void) spectrumRequestNowButtonAction:(id)sender
@@ -1440,7 +1440,7 @@ NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
 
 - (void) spectrumRequestTypePUAction:(id)sender
 {
-	[model setSpectrumRequestType:[sender indexOfSelectedItem]+1];	
+	[model setSpectrumRequestType:(int)[sender indexOfSelectedItem]+1];
 }
 
 - (void) numSpectrumBinsPUAction:(id)sender
@@ -1464,7 +1464,7 @@ NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
 - (void) lowLevelRegInHexPUAction:(id)sender /*lowLevelRegInHexPU*/
 {
 	//[model setLowLevelRegInHex:[sender intValue]];	
-	[model setLowLevelRegInHex:[sender indexOfSelectedItem]];	
+	[model setLowLevelRegInHex:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) statusHighRegTextFieldAction:(id)sender
@@ -1566,7 +1566,7 @@ NSLog(@"sender: %p, commandTableView:%p\n",sender,commandTableView);
 
 - (IBAction) sltDAQModePUAction:(id)sender
 {
-	[model setSltDAQMode:[[sltDAQModePU selectedItem] tag]];	
+	[model setSltDAQMode:(int)[[sltDAQModePU selectedItem] tag]];
 	//[model setSltDAQMode:[[sender selectedItem] tag]];	
 }
 
@@ -1921,7 +1921,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
 
 - (IBAction) miscCntrlBitsAction:(id)sender;
 {
-	unsigned long theRegValue = [model controlReg] & ~(kCtrlInvert | kCtrlLedOff | kCtrlOnLine); 
+	uint32_t theRegValue = [model controlReg] & ~(kCtrlInvert | kCtrlLedOff | kCtrlOnLine); 
 	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlInvert;
 	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlLedOff;
 	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlOnLine;
@@ -2021,7 +2021,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
 		NSLogFont(aFont,@"SLT Time   : %lld\n",[model getTime]);
 		//[model printInterruptMask];
 		//[model printInterruptRequests];
-	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
+	    int32_t fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
@@ -2055,7 +2055,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
     //sender is regWriteValueTextField
   	//NSLog(@"   %@::%@:  regWriteValueTextField:%@ (%@)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),regWriteValueTextField,[regWriteValueTextField stringValue]);//TODO: DEBUG testing ...-tb-
 	[self endEditing];
-    //unsigned long converted = strtoul([[regWriteValueTextField stringValue] UTF8String] , 0,0);
+    //uint32_t converted = strtoul([[regWriteValueTextField stringValue] UTF8String] , 0,0);
   	//NSLog(@"   %@::%@:  converted:%i (0x%x)\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),converted,converted);//TODO: DEBUG testing ...-tb-
     // -> instead I use the OHexFormatter 2013-06 -tb-
     // Make sure that value has changed.
@@ -2073,9 +2073,9 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
 
 	int index = [registerPopUp indexOfSelectedItem];
 	@try {
-		//unsigned long value = [model readReg:index];
+		//uint32_t value = [model readReg:index];
 		//NSLog(@"SLT reg: %@ value: 0x%x\n",[model getRegisterName:index],value);
-		unsigned long value;
+		uint32_t value;
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    value = [model readReg:index forFifo: fifoIndex ];
@@ -2088,7 +2088,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
         }
 	}
 	@catch(NSException* localException) {
-        //localException is generated by "- (void) throwError:(int)anError address:(unsigned long)anAddress" in SBC_Link.m -tb-
+        //localException is generated by "- (void) throwError:(int)anError address:(uint32_t)anAddress" in SBC_Link.m -tb-
 		NSLog(@"Exception reading SLT reg: %@\n",[model getRegisterName:index]);
         ORRunAlertPanel([localException name], @"%@\nSLT%d Access failed (B)", @"OK", nil, nil,
                         localException,[model stationNumber]);
@@ -2109,7 +2109,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
 	@try {
 		//[model writeReg:index value:[model writeValue]];
 		//NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
-		unsigned long val = [model writeValue];
+		uint32_t val = [model writeValue];
         if(([model getAccessType:index] & kIpeRegNeedsIndex)){
             int fifoIndex = [model selectedFifoIndex];
 		    [model writeReg:index forFifo: fifoIndex  value:val];
@@ -2134,10 +2134,10 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
 		[model readHwVersion];
 		//NSLog(@"%@ Project:%d Doc:%d Implementation:%d\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
 		NSLog(@"%@ Project:%d Doc:0x%x Implementation:0x%x\n",[model fullID], [model projectVersion], [model documentVersion], [model implementation]);
-		long fdhwlibVersion = [model getFdhwlibVersion];
+		int32_t fdhwlibVersion = [model getFdhwlibVersion];
 		int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLog(@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
-		long SltPciDriverVersion = [model getSltPciDriverVersion];
+		int32_t SltPciDriverVersion = [model getSltPciDriverVersion];
 		//NSLog(@"%@: SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
 	    if(SltPciDriverVersion<0) NSLog(@"%@: unknown SLT PCI driver version: %i\n",[model fullID],SltPciDriverVersion);
         else if(SltPciDriverVersion==0) NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt)\n",[model fullID],SltPciDriverVersion);
@@ -2145,7 +2145,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
         else if(SltPciDriverVersion==4) NSLog(@"%@: SBC running with SLT PCI driver version: %i (kit_ipe_slt)\n",[model fullID],SltPciDriverVersion);
         else NSLog(@"%@: SBC running with SLT PCI driver version: %i (fzk_ipe_slt%i)\n",[model fullID],SltPciDriverVersion,SltPciDriverVersion);
         
-		unsigned long presentFLTsMap = [model getPresentFLTsMap];
+		uint32_t presentFLTsMap = [model getPresentFLTsMap];
         NSLog(@"%@: presentFLTsMap: 0x%08x\n",[model fullID],presentFLTsMap);
 	}
 	@catch(NSException* localException) {
@@ -2196,7 +2196,7 @@ NSLog(@"Called %@::%@!\n",NSStringFromClass([self class]),NSStringFromSelector(_
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -2315,7 +2315,7 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
     [alert setInformativeText:@"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Delete It"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -2345,7 +2345,7 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 
 
 #pragma mark •••Data Source Methods (TableView)
-- (int) numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)tableView
 {
 	if(tableView==commandTableView){
         return [model commandTableCount];
@@ -2369,7 +2369,7 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 }
 
 
-- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 //return @"till";
     if(tableView==commandTableView){
@@ -2378,33 +2378,33 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 			NSString* theIdentifier				= [[tableColumn headerCell] stringValue];
 	        //DEBUG                  NSLog(@"%@::%@  theIdentifier:%@\n", NSStringFromClass([self class]), NSStringFromSelector(_cmd),theIdentifier);//DEBUG OUTPUT -tb-  
 			if([theIdentifier isEqual:@"Name"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: @"Name"];
                 //return @"name";
 			}
 			else if([theIdentifier isEqual:@"Setpoint"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: theIdentifier];
 			}
 			else if([theIdentifier isEqual:@"Value"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: @"Value"];
 			}
 			else if([theIdentifier isEqual:@"Init"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: @"Init"];
 			}
 			else if([theIdentifier isEqual:@"ID"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: @"ID"];
 			}
 			else if([theIdentifier isEqual:@"Comment"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: @"Comment"];
                 //return @"comment";
 			}
 			else if([theIdentifier isEqual:@"Test"]){
-                NSDictionary* theRow = [model commandTableRow:row];
+                NSDictionary* theRow = [model commandTableRow:(int)row];
                 return [theRow objectForKey: @"Init"];
                 //return @"comment";
 			}
@@ -2417,7 +2417,7 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 }
 
 
-- (void) tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (void) tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	if(tableView==commandTableView){
 		if(row<[model commandTableCount]){
@@ -2446,12 +2446,12 @@ NSLog(@"This is my _killCrateDidEnd: -tb-\n");
 #endif
             if([key isEqual:@"Test"]){
                 //[model setCommandTableRow:row setObject:object forKey:@"Init"];//-tb-: works, but this is better:
-                [model setCommandTableRow:row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];
+                [model setCommandTableRow:(int)row setObject:[NSNumber numberWithInt:[object intValue]] forKey:@"Init"];
                                 [commandTableView  reloadData];
 
                 return;
             }
-            [model setCommandTableRow:row setObject:object forKey:key];
+            [model setCommandTableRow:(int)row setObject:object forKey:key];
 		}
 		//[self tableViewSelectionDidChange:nil];
     }
