@@ -286,8 +286,8 @@ NSString* ORModelChangedNotification = @"ORModelChangedNotification";
 	[self endEditing];
 	NSMutableArray* allModels = [[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:[model class]] mutableCopy];
 	[allModels sortUsingSelector:aSelector];
-	uint32_t index = (uint32_t)[allModels indexOfObject:model] - 1;
-	//if(index<0) index = [allModels count]-1;
+	long index = (long)[allModels indexOfObject:model] - 1;
+	if (index < 0) index = [allModels count]-1;
 	[self setModel:[allModels objectAtIndex:index]];
  	[allModels release];
 }
