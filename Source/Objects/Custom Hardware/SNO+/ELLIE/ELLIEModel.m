@@ -715,7 +715,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     @try{
         channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:[NSString stringWithFormat:@"%d",(int)channel]];
     }@catch(NSException* e) {
-        channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
+        channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:(id)channel];
     }
     NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
     return fibre;
@@ -778,7 +778,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
                                                    withNPhotons:photons
                                               withFireFrequency:frequency
                                                         inSlave:mode
-                                                      isAMELLIE:@YES];
+                                                      isAMELLIE:YES];
     NSString* modeString;
     if(mode == YES){
         modeString = @"Slave";
