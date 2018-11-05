@@ -121,6 +121,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 @synthesize interlockClient = _interlockClient;
 
 @synthesize ellieFireFlag = _ellieFireFlag;
+@synthesize tellieRunFlag = _tellieRunFlag;
 @synthesize tellieMultiFlag = _tellieMultiFlag;
 @synthesize exampleTask = _exampleTask;
 @synthesize pulseByPulseDelay = _pulseByPulseDelay;
@@ -714,7 +715,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     @try{
         channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:[NSString stringWithFormat:@"%d",(int)channel]];
     }@catch(NSException* e) {
-        channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:[NSString stringWithFormat:@"%d",(int)channel]];
+        channelIndex = [[[self tellieFibreMapping] objectForKey:@"channels"] indexOfObject:channel];
     }
     NSString* fibre = [[[self tellieFibreMapping] objectForKey:@"fibres"] objectAtIndex:channelIndex];
     return fibre;
@@ -777,7 +778,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
                                                    withNPhotons:photons
                                               withFireFrequency:frequency
                                                         inSlave:mode
-                                                      isAMELLIE:YES];
+                                                      isAMELLIE:@YES];
     NSString* modeString;
     if(mode == YES){
         modeString = @"Slave";
@@ -812,12 +813,11 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     */
     //////////////////////
     // Make invocation so we can pass multiple args into thread
-    NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieRun: forTELLIE:)];
+    NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieRun:)];
     NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
     [invocation setTarget:self];
-    [invocation setSelector:@selector(startTellieRun: forTELLIE:)];
+    [invocation setSelector:@selector(startTellieRun:)];
     [invocation setArgument:&fireCommands atIndex:2];
-    [invocation setArgument:&forTELLIE atIndex:3];
     [invocation retainArguments];
 
     //////////////////////
@@ -831,15 +831,17 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     /*
      Launch a thread to host the tellie multi run functionality.
      */
+    /////////////////////////////////////
+    // Set Flag for TELLIE / AMELLIE run
+    [self setTellieRunFlag:forTELLIE];
 
     //////////////////////
     // Make invocation so we can pass multiple args into thread
-    NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieMultiRun: forTELLIE:)];
+    NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieMultiRun:)];
     NSInvocation* invocation = [NSInvocation invocationWithMethodSignature:signature];
     [invocation setTarget:self];
-    [invocation setSelector:@selector(startTellieMultiRun: forTELLIE:)];
+    [invocation setSelector:@selector(startTellieMultiRun:)];
     [invocation setArgument:&fireCommandArray atIndex:2];
-    [invocation setArgument:&forTELLIE atIndex:3];
     [invocation retainArguments];
 
     //////////////////////
@@ -848,7 +850,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [[self tellieThread] start];
 }
 
--(void) startTellieMultiRun:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE
+-(void) startTellieMultiRun:(NSArray*)fireCommandArray
 {
     /*
      Fire light down one or more fibres using fireCommands given in the passed array.
@@ -880,7 +882,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         if(counter == nloops){
             [self setTellieMultiFlag:NO];
         }
-        [self startTellieRun:fireCommands forTELLIE:forTELLIE];
+        [self startTellieRun:fireCommands];
     }
 
 err:
@@ -903,12 +905,7 @@ err:
 }
 }
 
--(void) startTellieRun:(NSDictionary *)fireCommands
-{
-    [self startTellieRun:fireCommands forTELLIE:YES];
-}
-
--(void) startTellieRun:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE
+-(void) startTellieRun:(NSDictionary*)fireCommands
 {
     /*
      Fire a tellie using hardware settings passed as dictionary. This function
@@ -934,7 +931,7 @@ err:
     // Make a sting accessable inside err; incase of error.
     NSString* errorString;
     NSString* prefix = @"[TELLIE]";
-    if(!forTELLIE){
+    if(![self tellieRunFlag]){
         prefix = @"[AMELLIE]";
     }
     //////////////
@@ -966,7 +963,7 @@ err:
 
     ///////////////////////
     // Check TELLIE run type is masked in
-    if(forTELLIE){
+    if([self tellieRunFlag]){
         if(!([snopModel lastRunTypeWord] & kTELLIERun)){
             NSLogColor([NSColor redColor], @"%@: TELLIE bit is not masked into the run type word.\n",prefix);
             NSLogColor([NSColor redColor], @"[TELLIE]: Please load the TELLIE standard run type.\n");
@@ -1072,9 +1069,9 @@ err:
 
     ///////////////
     // Now set-up is done, push initial run document
-    if([runControl isRunning]){
+    if([runControl isRunning] && ([runControl subRunNumber] == 0)){
         @try{
-            if(forTELLIE){
+            if([self tellieRunFlag]){
                 [self pushInitialTellieRunDocument];
             } else {
                 [self pushInitialAmellieRunDocument];
@@ -1107,7 +1104,6 @@ err:
         //////////////////////
         // Set loop independent tellie channel settings
         if(i == 0){
-
             ////////
             // Send stop command to ensure buffer is clear
             @try{
@@ -1219,7 +1215,7 @@ err:
         }
         //////////////////
         // Poll tellie for a pin reading. Give the sequence a 3s grace period to finish
-        // int32_t for some reason
+        // long for some reason
         float pollTimeOut = (1./rate)*[noShots floatValue] + 3.;
         NSArray* pinReading = nil;
         @try{
@@ -1241,23 +1237,13 @@ err:
         
         ////////////
         // Update run document
-        if([runControl isRunning]){
-            @try{
-                if(forTELLIE){
-                    [self updateTellieRunDocument:valuesToFillPerSubRun];
-                } else {
-                    [self updateAmellieRunDocument:valuesToFillPerSubRun];
-                }
-            } @catch(NSException* e){
-                NSLogColor([NSColor redColor],@"%@: Problem updating run description document: %@\n", prefix, [e reason]);
-                goto err;
-            }
+        [[[self tellieRunDoc] objectForKey:@"sub_run_info"] addObject:valuesToFillPerSubRun];
+        [[[self amellieRunDoc] objectForKey:@"sub_run_info"] addObject:valuesToFillPerSubRun];
 
-            //////////////////
-            // Start a new subrun
-            [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
-            [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
-        }
+        //////////////////
+        // Start a new subrun
+        [runControl performSelectorOnMainThread:@selector(prepareForNewSubRun) withObject:nil waitUntilDone:YES];
+        [runControl performSelectorOnMainThread:@selector(startNewSubRun) withObject:nil waitUntilDone:YES];
     }
 
     // Set fire flag
@@ -1400,6 +1386,18 @@ err:
         ORRunModel* runControl = [runModels objectAtIndex:0];
         // Roll over the run.
         [runControl performSelectorOnMainThread:@selector(restartRun) withObject:nil waitUntilDone:YES];
+
+        @try{
+            if([self tellieRunFlag]){
+                [self updateTellieRunDocument];
+            } else {
+                [self updateAmellieRunDocument];
+            }
+        }@catch(NSException* e){
+            NSLogColor([NSColor redColor], @"[ELLIE]: Problem updating run document on couchdb: %@\n", [e reason]);
+            goto err;
+        }
+
     }
 
 err:{
@@ -1434,7 +1432,7 @@ err:{
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
     NSString* docType = [NSMutableString stringWithFormat:@"TELLIE_RUN"];
-    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:1000];
 
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
@@ -1451,7 +1449,7 @@ err:{
     [pool release];
 }
 
-- (void) updateTellieRunDocument:(NSDictionary*)subRunDoc
+- (void) updateTellieRunDocument
 {
     /*
      Update [self tellieRunDoc] with subrun information.
@@ -1460,37 +1458,15 @@ err:{
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    // Get run control
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[TELLIE_UPLOAD]: Couldn't find ORRunModel\n");
-        return;
-    }
-    ORRunModel* runControl = [runModels objectAtIndex:0];
-    
-    NSMutableDictionary* runDocDict = [[self tellieRunDoc] mutableCopy];
-    NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
-
-    [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-
-    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-    [subRunInfo addObject:subRunDocDict];
-    [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
-
-    //Update tellieRunDoc property.
-    [self setTellieRunDoc:runDocDict];
 
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [[self couchDBRef:self withDB:@"telliedb"]
-         updateDocument:runDocDict
-         documentId:[runDocDict objectForKey:@"_id"]
+         updateDocument:[self tellieRunDoc]
+         documentId:[[self tellieRunDoc] objectForKey:@"_id"]
          tag:kTellieRunDocumentUpdated];
     }
 
-    [runDocDict release];
-    [subRunDocDict release];
-    [subRunInfo release];
     [pool release];
 }
 
@@ -1596,7 +1572,7 @@ err:{
     [[self couchDBRef:self withDB:@"amellie"] addDocument:runDocDict tag:kAmellieRunDocumentAdded];
 }
 
-- (void) updateAmellieRunDocument:(NSDictionary*)subRunDoc
+- (void) updateAmellieRunDocument
 {
     /*
      Update [self amellieRunDoc] with subrun information.
@@ -1605,36 +1581,17 @@ err:{
      NSDictionary* subRunDoc:  Subrun information to be added to the current [self tellieRunDoc].
      */
 
-    // Get run control
-    NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
-    if(![runModels count]){
-        NSLogColor([NSColor redColor], @"[AMELLIE_UPLOAD]: Couldn't find ORRunModel\n");
-        return;
-    }
-    ORRunModel* runControl = [runModels objectAtIndex:0];
-
-    NSMutableDictionary* runDocDict = [[self amellieRunDoc] mutableCopy];
-    NSMutableDictionary* subRunDocDict = [subRunDoc mutableCopy];
-
-    [subRunDocDict setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
-
-    NSMutableArray * subRunInfo = [[runDocDict objectForKey:@"sub_run_info"] mutableCopy];
-    [subRunInfo addObject:subRunDocDict];
-    [runDocDict setObject:subRunInfo forKey:@"sub_run_info"];
-
-    //Update tellieRunDoc property.
-    [self setAmellieRunDoc:runDocDict];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
     //check to see if run is offline or not
     if([[ORGlobal sharedGlobal] runMode] == kNormalRun){
         [[self couchDBRef:self withDB:@"amellie"]
-         updateDocument:runDocDict
-         documentId:[runDocDict objectForKey:@"_id"]
+         updateDocument:[self amellieRunDoc]
+         documentId:[[self amellieRunDoc] objectForKey:@"_id"]
          tag:kAmellieRunDocumentUpdated];
     }
-    [subRunInfo release];
-    [runDocDict release];
-    [subRunDocDict release];
+
+    [pool release];
 }
 
 -(void) loadAMELLIEStaticsFromDB
