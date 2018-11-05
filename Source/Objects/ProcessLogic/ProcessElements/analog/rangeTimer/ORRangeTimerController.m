@@ -170,13 +170,13 @@
 
 - (IBAction) directionAction:(id)sender
 {
-	[model setDirection:[sender indexOfSelectedItem]];
+	[model setDirection:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) delete:(id)sender
 {
 	if([addressList selectedRow]>=0){
-		[model removeAddressAtIndex:[addressList selectedRow]];
+		[model removeAddressAtIndex:(int)[addressList selectedRow]];
 		[addressList reloadData];
 	}
 }
@@ -184,7 +184,7 @@
 - (IBAction) cut:(id)sender
 {
 	if([addressList selectedRow]>=0){
-		[model removeAddressAtIndex:[addressList selectedRow]];
+		[model removeAddressAtIndex:(int)[addressList selectedRow]];
 		[addressList reloadData];
 	}
 }
@@ -198,12 +198,12 @@
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [model addressCount];
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     NSParameterAssert(rowIndex >= 0 && rowIndex < [model addressCount]);
     id entry = [model addressEntry:rowIndex];

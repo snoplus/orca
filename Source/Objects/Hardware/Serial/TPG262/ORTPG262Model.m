@@ -169,13 +169,13 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[6];
+		uint32_t data[6];
 		data[0] = dataId | 6;
 		data[1] = [self uniqueIdNumber]&0xfff;
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		int index = 2;
 		int i;
@@ -188,7 +188,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*6]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*6]];
 	}
 }
 
@@ -274,7 +274,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 	else return 0.0;
 }
 
-- (unsigned long) timeMeasured:(int)index
+- (uint32_t) timeMeasured:(int)index
 {
 	if(index>=0 && index<2)return timeMeasured[index];
 	else return 0;
@@ -288,7 +288,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 		time_t	ut_Time;
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		timeMeasured[index] = ut_Time;
+		timeMeasured[index] = (uint32_t)ut_Time;
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORTPG262PressureChanged 
 															object:self 
@@ -407,9 +407,9 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:pressureScale	forKey:@"ORTPG262ModelPressureScale"];
+    [encoder encodeInteger:pressureScale	forKey:@"ORTPG262ModelPressureScale"];
     [encoder encodeBool:shipPressures	forKey:@"ORTPG262ModelShipPressures"];
-    [encoder encodeInt:pollTime			forKey:@"ORTPG262ModelPollTime"];
+    [encoder encodeInteger:pollTime			forKey:@"ORTPG262ModelPollTime"];
     [encoder encodeBool:portWasOpen		forKey:@"ORTPG262ModelPortWasOpen"];
     [encoder encodeObject:portName		forKey: @"portName"];
 }
@@ -433,8 +433,8 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -517,7 +517,7 @@ NSString* ORTPG262Lock = @"ORTPG262Lock";
 	theResponse = [theResponse stringByReplacingOccurrencesOfString:@"\r" withString:@""];
 	if([lastRequest hasPrefix:@"PR"]){
 		NSArray* parts = [theResponse componentsSeparatedByString:@","];
-		int n = [parts count];
+		int n = (int)[parts count];
 		if(n >= 2){
 			[self setMeasurementState:[[parts objectAtIndex:0] intValue]];
 			int i;

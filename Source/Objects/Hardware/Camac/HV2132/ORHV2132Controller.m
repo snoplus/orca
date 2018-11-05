@@ -135,7 +135,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"HV2132 (Station %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"HV2132 (Station %d)",(int)[model stationNumber]]];
 }
 
 - (void) dirChanged:(NSNotification*)aNotification
@@ -223,7 +223,7 @@
 		[model setMainFrame:0xff];
 	}
 	else {
-		[model setMainFrame:[sender indexOfSelectedItem]-1];
+		[model setMainFrame:(int)[sender indexOfSelectedItem]-1];
 	}
 }
 
@@ -233,7 +233,7 @@
 		[model setChannel:0xff];
 	}
 	else {
-		[model setChannel:[sender indexOfSelectedItem]-1];
+		[model setChannel:(int)[sender indexOfSelectedItem]-1];
 	}
 }
 

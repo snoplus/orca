@@ -91,9 +91,9 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 		[highlightedImage release];
 		highlightedImage = [[NSImage alloc] initWithSize:[image size]];
 		[highlightedImage lockFocus];
-		[image drawAtPoint:NSZeroPoint fromRect:[image imageRect] operation:NSCompositeSourceOver fraction:1.0];
+		[image drawAtPoint:NSZeroPoint fromRect:[image imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		[[NSColor colorWithCalibratedWhite:0.0 alpha:0.5] set];
-		NSRectFillUsingOperation(sourceRect, NSCompositeSourceAtop);
+		NSRectFillUsingOperation(sourceRect, NSCompositingOperationSourceAtop);
 		[highlightedImage unlockFocus];
 	}
 	else {
@@ -307,15 +307,15 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 {
     //some objects use stationNumber. they can override for special situations.
     //hardware wizard uses this instead of a slot or tag number.
-    return [self tag] + [self tagBase];
+    return (int)[self tag] + [self tagBase];
 }
 
-- (int) tag
+- (NSUInteger) tag
 {
     return tag;
 }
 
-- (void) setTag:(int)aTag
+- (void) setTag:(NSUInteger)aTag
 {
     tag = aTag;
     
@@ -332,7 +332,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (NSString*) fullID
 {
-    return [NSString stringWithFormat:@"%@,%lu",NSStringFromClass([self class]),[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"%@,%u",NSStringFromClass([self class]),[self uniqueIdNumber]];
 }
 
 - (void) askForUniqueIDNumber
@@ -340,7 +340,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
     [[self document] assignUniqueIDNumber:self];
 }
 
-- (void) setUniqueIdNumber:(unsigned long)anIdNumber
+- (void) setUniqueIdNumber:(uint32_t)anIdNumber
 {
     uniqueIdNumber = anIdNumber;
     
@@ -348,7 +348,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
          postNotificationName:ORIDChangedNotification
                        object:self];
 }
-- (unsigned long) uniqueIdNumber
+- (uint32_t) uniqueIdNumber
 {
     return uniqueIdNumber;
 }
@@ -484,7 +484,7 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 			else imageToDraw = image;
 			
 			NSRect sourceRect = NSMakeRect(0,0,[imageToDraw size].width,[imageToDraw size].height);
-			[imageToDraw drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:aTransparency];
+			[imageToDraw drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:aTransparency];
             
         }
         else {
@@ -558,8 +558,8 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 
 - (void) flagsChanged:(NSEvent *)theEvent
 {
-    BOOL shiftKeyDown = ([[NSApp currentEvent] modifierFlags] & NSShiftKeyMask) != 0 ;
-    BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSCommandKeyMask) != 0;
+    BOOL shiftKeyDown = ([[NSApp currentEvent] modifierFlags] & NSEventModifierFlagShift) != 0 ;
+    BOOL cmdKeyDown = ([[NSApp currentEvent] modifierFlags] & NSEventModifierFlagCommand) != 0;
     [self setEnableIconControls:shiftKeyDown && cmdKeyDown];
 }
 - (void) setEnableIconControls:(BOOL) aState
@@ -584,12 +584,12 @@ NSString* ORMiscAttributeKey		= @"ORMiscAttributeKey";
 - (void) doCntrlClick:(NSView*)aView
 {
 	NSEvent* theCurrentEvent = [NSApp currentEvent];
-    NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+    NSEvent *event =  [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown
                                          location:[theCurrentEvent locationInWindow]
-                                    modifierFlags:NSLeftMouseDownMask // 0x100
+                                    modifierFlags:NSEventModifierFlagControl // 0x100
                                         timestamp:(NSTimeInterval)0
                                      windowNumber:[theCurrentEvent windowNumber]
-                                          context:[theCurrentEvent context]
+                                          context:nil
                                       eventNumber:0
                                        clickCount:1
                                          pressure:1];
@@ -662,8 +662,8 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 	      
 
     [self setConnectors:[decoder decodeObjectForKey:OROrcaObjectConnectors]];
-    [self setTag:[decoder decodeIntForKey:OROrcaObjectTag]];
-    [self setUniqueIdNumber:[decoder decodeInt32ForKey:OROrcaObjectUniqueIDNumber]];
+    [self setTag:[decoder decodeIntegerForKey:OROrcaObjectTag]];
+    [self setUniqueIdNumber:[decoder decodeIntForKey:OROrcaObjectUniqueIDNumber]];
     miscAttributes = [[decoder decodeObjectForKey:@"miscAttributes"] retain];
 	
     [[self undoManager] enableUndoRegistration];
@@ -672,14 +672,14 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-	[encoder encodeInt:1 forKey:@"newVersion"];
+	[encoder encodeInteger:1 forKey:@"newVersion"];
 
     [encoder encodeRect:frame forKey:@"localFrame"];
     [encoder encodePoint:offset forKey:@"offset"];
     [encoder encodeRect: bounds forKey:@"bounds"];
     [encoder encodeObject:connectors forKey:OROrcaObjectConnectors];
-    [encoder encodeInt:[self tag] forKey:OROrcaObjectTag];
-    [encoder encodeInt32:uniqueIdNumber forKey:OROrcaObjectUniqueIDNumber];
+    [encoder encodeInteger:[self tag] forKey:OROrcaObjectTag];
+    [encoder encodeInt:uniqueIdNumber forKey:OROrcaObjectUniqueIDNumber];
 	[encoder encodeObject:miscAttributes forKey:@"miscAttributes"];
 }
 
@@ -968,8 +968,8 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
     [[NSNotificationCenter defaultCenter] postNotificationOnMainThread:aNote waitUntilDone:YES];
 }
 
-- (unsigned long) processID{return 0;}
-- (void) setProcessID:(unsigned long)aValue
+- (uint32_t) processID{return 0;}
+- (void) setProcessID:(uint32_t)aValue
 {
     //subclasses should override
 }
@@ -995,32 +995,32 @@ static NSString* OROrcaObjectUniqueIDNumber = @"OROrcaObjectUniqueIDNumber";
 	return 1;
 }
 
-- (int) second 
+- (NSInteger) second
 {
 	return [[NSDate date] secondOfMinute];
 }
 
-- (int) minute 
+- (NSInteger) minute
 {
 	return [[NSDate date] minuteOfHour];
 }
 
-- (int) hour 
+- (NSInteger) hour
 {
 	return [[NSDate date] hourOfDay];
 }
 
-- (int) day 
+- (NSInteger) day
 {
 	return [[NSDate date] dayOfMonth];
 }
 
-- (int) month 
+- (NSInteger) month
 {
 	return [[NSDate date] monthOfYear];
 }
 
-- (int) year
+- (NSInteger) year
 {
 	return [[NSDate date] yearOfCommonEra];
 }

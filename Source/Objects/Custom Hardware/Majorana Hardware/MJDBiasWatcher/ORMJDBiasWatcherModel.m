@@ -212,27 +212,27 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
     return [[mjd segmentGroup:0] numSegments]/2;
 }
 
-- (unsigned long) numberPointsInHVPlot:(int)index
+- (uint32_t) numberPointsInHVPlot:(int)index
 {
      //index is detector segment number
     return [self numberPointsInHvPlot: [self hvObj:index] channel:[self hvChannel:index]];
 }
 
-- (unsigned long) numberPointsInPreAmpPlot:(int)index
+- (uint32_t) numberPointsInPreAmpPlot:(int)index
 {
      //index is detector segment number
-    unsigned long n =  [self numberPointsInPreAmpPlot: [self preAmpObj:index] channel:[self preAmpChannel:index]];
+    uint32_t n =  [self numberPointsInPreAmpPlot: [self preAmpObj:index] channel:[self preAmpChannel:index]];
     return n;
 }
 
-- (unsigned long) numberPointsInHvPlot:(ORiSegHVCard*)anHVCard channel:(int)aChan
+- (uint32_t) numberPointsInHvPlot:(ORiSegHVCard*)anHVCard channel:(int)aChan
 {
-   return [[anHVCard currentHistory:aChan] count];
+   return (uint32_t)[[anHVCard currentHistory:aChan] count];
 }
 
-- (unsigned long) numberPointsInPreAmpPlot:(ORMJDPreAmpModel*)aPreAmpCard channel:(int)aChan
+- (uint32_t) numberPointsInPreAmpPlot:(ORMJDPreAmpModel*)aPreAmpCard channel:(int)aChan
 {
-    return [[aPreAmpCard adcHistory:aChan] count];
+    return (uint32_t)[[aPreAmpCard adcHistory:aChan] count];
 }
 
 //scripting method for testing
@@ -293,7 +293,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
 
     NSString* key = [self hvId:index];
     //this will include crate,card,chan. We have to strip off the chan part
-    int lastCommaPosition = [key rangeOfString:@"," options:NSBackwardsSearch].location;
+    int lastCommaPosition = (int)[key rangeOfString:@"," options:NSBackwardsSearch].location;
     if(lastCommaPosition == NSNotFound)return nil;
     else {
         key = [key substringWithRange:NSMakeRange(0,lastCommaPosition)];
@@ -320,7 +320,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
     if(index<0)return nil;
     NSString* key = [self preAmpId:index];
     //this will include crate,card,chan. We have to strip off the chan part
-    int lastCommaPosition = [key rangeOfString:@"," options:NSBackwardsSearch].location;
+    int lastCommaPosition = (int)[key rangeOfString:@"," options:NSBackwardsSearch].location;
     if(lastCommaPosition == NSNotFound)return nil;
     else {
         key = [key substringWithRange:NSMakeRange(0,lastCommaPosition)];
@@ -358,7 +358,7 @@ NSString* ORMJDBiasWatcherForceUpdate			= @"ORMJDBiasWatcherForceUpdate";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"MJDBiasWatcher,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"MJDBiasWatcher,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }

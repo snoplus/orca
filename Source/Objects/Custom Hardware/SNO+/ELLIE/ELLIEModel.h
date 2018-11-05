@@ -55,6 +55,7 @@
     NSMutableDictionary* _tellieNodeMapping;
     NSArray* _tellieRunNames;
     BOOL _ellieFireFlag;
+    BOOL _tellieRunFlag;
     BOOL _tellieMultiFlag;
     BOOL _maintenanceRollOver;
     BOOL _smellieStopButton;
@@ -98,6 +99,7 @@
 @property (nonatomic,retain) NSMutableDictionary* smellieRunDoc;
 @property (nonatomic,retain) NSMutableDictionary* amellieRunDoc;
 @property (nonatomic,assign) BOOL ellieFireFlag;
+@property (nonatomic,assign) BOOL tellieRunFlag;
 @property (nonatomic,assign) BOOL tellieMultiFlag;
 @property (nonatomic,retain) NSTask* exampleTask;
 @property (nonatomic,retain) NSMutableDictionary* smellieRunHeaderDocList;
@@ -168,15 +170,14 @@
 -(NSString*)selectPriorityFibre:(NSArray*)fibres forNode:(NSUInteger)node;
 -(void)startTellieRunThread:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
 -(void)startTellieMultiRunThread:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
--(void)startTellieMultiRun:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE;
--(void)startTellieRun:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE;
--(void)startTellieRun:(NSDictionary *)fireCommands forTELLIE:(BOOL)forTELLIE;
+-(void)startTellieMultiRun:(NSArray*)fireCommandArray;
+-(void)startTellieRun:(NSDictionary*)fireCommands;
 -(void)stopTellieRun;
 -(void)tellieRunTransition;
 
 // TELLIE database interactions
 -(void)pushInitialTellieRunDocument;
--(void)updateTellieRunDocument:(NSDictionary*)subRunDoc;
+-(void)updateTellieRunDocument;
 -(void)loadTELLIEStaticsFromDB;
 -(void)loadTELLIERunPlansFromDB;
 -(void)parseTellieFirePars:(id)aResult;
@@ -195,7 +196,7 @@
                                          inSlave:(BOOL)mode;
 // AMELLIE database interactions
 -(void) pushInitialAmellieRunDocument;
--(void) updateAmellieRunDocument:(NSDictionary*)subRunDoc;
+-(void) updateAmellieRunDocument;
 -(void) loadAMELLIEStaticsFromDB;
 
 /************************/

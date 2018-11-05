@@ -284,7 +284,7 @@
 {
 	int i;
 	for(i=0;i<2;i++){
-		unsigned long optionsMask = [model runOptions:i];
+		uint32_t optionsMask = [model runOptions:i];
 		[[runOptionsMatrix cellAtRow:0 column:i] setIntValue: (optionsMask&kChannelEnabledMask) != 0];
 		[[runOptionsMatrix cellAtRow:1 column:i] setIntValue: (optionsMask&kChannelAutoStopMask) != 0];
 	}
@@ -312,7 +312,7 @@
 
 - (void) zdtModeChanged:(NSNotification*)aNote
 {
-	unsigned long zdtMode = [model zdtMode:[model selectedChannel]];
+	uint32_t zdtMode = [model zdtMode:[model selectedChannel]];
 	[zdtSpeedPU selectItemWithTag:zdtMode & kZDTSpeedMask];
 	[[zdtModeMatrix cellWithTag:0] setIntValue: (zdtMode & kEnableZDTMask)!=0];
 	[[zdtModeMatrix cellWithTag:1] setIntValue: (zdtMode & kZDTModeMask)!=0];
@@ -321,7 +321,7 @@
 
 - (void) lowerDiscriminatorChanged:(NSNotification*)aNote
 {
-	int raw = [model lowerDiscriminator:[model selectedChannel]];
+	int raw = (int)[model lowerDiscriminator:[model selectedChannel]];
 	int n = [model numChannels:[model selectedChannel]];
 	[lowerDiscriminatorField setIntValue:raw*n/16384.];	
 	[lowerDiscriminatorPercentField setFloatValue:raw/16384.];	
@@ -329,7 +329,7 @@
 
 - (void) upperDiscriminatorChanged:(NSNotification*)aNote
 {
-	int raw = [model upperDiscriminator:[model selectedChannel]];
+	int raw = (int)[model upperDiscriminator:[model selectedChannel]];
 	int n = [model numChannels:[model selectedChannel]];
 	[upperDiscriminatorField setIntValue:raw*n/16384.];
 	[upperDiscriminatorPercentField setFloatValue:raw/16384.];	
@@ -349,12 +349,12 @@
 
 - (void) roiPresetChanged:(NSNotification*)aNote
 {
-	[roiPresetField setIntValue: [model roiPreset:[model selectedChannel]]];
+	[roiPresetField setIntegerValue: [model roiPreset:[model selectedChannel]]];
 }
 
 - (void) roiPeakPresetChanged:(NSNotification*)aNote
 {
-	[roiPeakPresetField setIntValue: [model roiPeakPreset:[model selectedChannel]]];
+	[roiPeakPresetField setIntegerValue: [model roiPeakPreset:[model selectedChannel]]];
 }
 
 - (void) statusParamsChanged:(NSNotification*)aNote
@@ -416,7 +416,7 @@
 #pragma mark •••Notifications
 - (void) controlRegChanged:(NSNotification*)aNote
 {
-	unsigned long mask = [model controlReg:[model selectedChannel]];
+	uint32_t mask = [model controlReg:[model selectedChannel]];
 	int i;
 	for(i=0;i<32;i++){
 		BOOL bitSet = (mask&(1<<i))>0;
@@ -429,7 +429,7 @@
 - (void) presetCtrlRegChanged:(NSNotification*)aNote
 {
 
-	unsigned long mask = [model presetCtrlReg:[model selectedChannel]];
+	uint32_t mask = [model presetCtrlReg:[model selectedChannel]];
 	int i;
 	for(i=0;i<32;i++){
 		BOOL bitSet = (mask&(1<<i))>0;
@@ -529,7 +529,7 @@
 - (IBAction) runOptionsAction:(id)sender
 {
 	int i;
-	unsigned long optionsMask[2] = {0,0};
+	uint32_t optionsMask[2] = {0,0};
 	for(i=0;i<2;i++){
 		if([[runOptionsMatrix cellAtRow:0 column:i] intValue]) optionsMask[i] |= kChannelEnabledMask;
 		if([[runOptionsMatrix cellAtRow:1 column:i] intValue]) optionsMask[i] |= kChannelAutoStopMask;
@@ -547,7 +547,7 @@
 - (IBAction) selectedChannelAction:(id)sender
 {
 	[self endEditing];
-	[model setSelectedChannel:[[sender selectedCell] tag]];	
+	[model setSelectedChannel:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) clearSpectrumAction:(id)sender;
@@ -559,7 +559,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Yes, Clear All"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -714,7 +714,7 @@
 
 - (IBAction) convGainAction:(id)sender
 {
-	[model setConvGain:[model selectedChannel] withValue:[sender indexOfSelectedItem]];	
+	[model setConvGain:[model selectedChannel] withValue:(uint32_t)[sender indexOfSelectedItem]];	
 }
 
 - (IBAction) liveTimeAction:(id)sender
@@ -743,7 +743,7 @@
 
 - (IBAction) zdtModeAction:(id)sender
 {
-	unsigned long aValue = [model zdtMode:[model selectedChannel]];
+	uint32_t aValue = [model zdtMode:[model selectedChannel]];
 	aValue &= ~kZDTMask;
 	if([[sender cellWithTag:0] intValue]) aValue |= kEnableZDTMask;
 	if([[sender cellWithTag:1] intValue]) aValue |= kZDTModeMask;
@@ -752,7 +752,7 @@
 	 
  - (IBAction) zdtSpeedAction:(id)sender
 {
-	unsigned long aValue = [model zdtMode:[model selectedChannel]];
+	uint32_t aValue = [model zdtMode:[model selectedChannel]];
 	aValue &= ~kZDTSpeedMask;
 	aValue |= [[sender selectedItem] tag];
 	[model setZdtMode:[model selectedChannel] withValue:aValue];	
@@ -796,14 +796,14 @@
 
 - (IBAction) controlRegAction:(id)sender
 {
-	unsigned long mask = [model controlReg:[model selectedChannel]];
+	uint32_t mask = [model controlReg:[model selectedChannel]];
 	mask &= 0x00000001; //clear all but start bit
-	int rows,columns;
+	NSInteger rows,columns;
 	[sender getNumberOfRows:&rows columns:&columns];
-	int i;
+	NSInteger i;
 	for(i=0;i<rows;i++){
 		if([[sender cellAtRow:i column:0] intValue]){
-			int bit = [[sender cellAtRow:i column:0] tag];
+			int bit = (int)[[sender cellAtRow:i column:0] tag];
 			mask |= (0x1L<<bit);
 		}
 	}
@@ -813,13 +813,13 @@
 
 - (IBAction) presetCtrlRegAction:(id)sender
 {
-	unsigned long mask = 0;
-	int rows,columns;
+	uint32_t mask = 0;
+	NSInteger rows,columns;
 	[sender getNumberOfRows:&rows columns:&columns];
 	int i;
 	for(i=0;i<rows;i++){
 		if([[sender cellAtRow:i column:0] intValue]){
-			int bit = [[sender cellAtRow:i column:0] tag];
+			int bit = (int)[[sender cellAtRow:i column:0] tag];
 			mask |= (0x1L<<bit);
 		}
 	}
@@ -887,7 +887,7 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
+	int set = (int)[aPlotter tag];
 	if(set == 0 || set == 1)return [model numChannels:set];
 	else {
 		if(set==2){
@@ -904,7 +904,7 @@
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
+	int set = (int)[aPlotter tag];
 	*xValue = i;
 	*yValue = [model spectrum:set valueAtChannel:i];
 }

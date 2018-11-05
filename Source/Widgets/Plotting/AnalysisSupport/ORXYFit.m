@@ -58,7 +58,7 @@
 		//get the data for the fit
 		NSMutableArray* dataArray = [NSMutableArray array];
 		int numPoints = [dataSource numberPointsInPlot:aPlot];
-		long maxChan = MIN([self maxChannel],numPoints-1);
+		int32_t maxChan = MIN([self maxChannel],numPoints-1);
 		int ix;
 		for (ix=0; ix<=maxChan;++ix) {	
 			double x,y;
@@ -85,8 +85,8 @@
 			
 			NSMutableDictionary* requestInputs = [NSMutableDictionary dictionary];
 
-			[requestInputs setObject:[NSNumber numberWithInt:minChannel] forKey:@"FitLowerBound"];
-			[requestInputs setObject:[NSNumber numberWithInt:maxChannel] forKey:@"FitUpperBound"];	
+			[requestInputs setObject:[NSNumber numberWithInteger:minChannel] forKey:@"FitLowerBound"];
+			[requestInputs setObject:[NSNumber numberWithInteger:maxChannel] forKey:@"FitUpperBound"];
 			
 			NSString* 	theFitFunction = kORCARootFitShortNames[fitType];
 			

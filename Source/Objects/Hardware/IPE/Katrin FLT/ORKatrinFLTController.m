@@ -65,8 +65,8 @@
 	
     blankView = [[NSView alloc] init];
     
-    NSString* key = [NSString stringWithFormat: @"orca.ORKatrinFLT%d.selectedtab",[model stationNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORKatrinFLT%d.selectedtab",(int)[model stationNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 		
@@ -828,8 +828,8 @@
 - (void) slotChanged:(NSNotification*)aNotification
 {
 	// Set title of FLT configuration window, ak 15.6.07
-	[[self window] setTitle:[NSString stringWithFormat:@"Katrin FLT Card (Slot %d)",[model stationNumber]]];
-	[fltNumberField setStringValue:[NSString stringWithFormat:@"FLT%d",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Katrin FLT Card (Slot %u)",(int)[model stationNumber]]];
+	[fltNumberField setStringValue:[NSString stringWithFormat:@"FLT%u",(int)[model stationNumber]]];
     //added a field with the number at the left border for better visibility -tb-
     
     //reread the firmware version -tb-
@@ -1118,8 +1118,8 @@
     }
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORKatrinFLT%d.selectedtab",[model stationNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORKatrinFLT%u.selectedtab",(int)[model stationNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
@@ -1270,7 +1270,7 @@
 - (IBAction) daqRunModeAction: (id) sender
 {
 	//[model setDaqRunMode:[daqRunModeButton indexOfSelectedItem]];
-	[model setDaqRunMode: [[daqRunModeButton selectedItem]tag]  ];
+	[model setDaqRunMode: (int)[[daqRunModeButton selectedItem]tag]  ];
 }
 
 - (IBAction) versionAction: (id) sender
@@ -1372,7 +1372,7 @@
 
 - (IBAction) readWriteRegisterChanPopUpButtonAction:(id)sender
 {
-    [model setReadWriteRegisterChan:[sender indexOfSelectedItem]];
+    [model setReadWriteRegisterChan:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) readWriteRegisterNamePopUpButtonAction:(id)sender
@@ -1383,42 +1383,42 @@
 
 - (IBAction) readRegisterAdressButtonAction:(id)sender
 {
-    unsigned long adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
+    uint32_t adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
     NSLog(@"Address for Register %@ for chan/group %i is %i (0x%08x)\n",
 		  [model readWriteRegisterName],[model readWriteRegisterChan],adress,adress);
 }
 
 - (IBAction) readRegisterButtonAction:(id)sender
 {
-    unsigned long val = [model readRegisterWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
-    //unsigned long adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
+    uint32_t val = [model readRegisterWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
+    //uint32_t adress = [model registerAdressWithName:[model readWriteRegisterName] forChan:[model readWriteRegisterChan]];
     NSLog(@"Value of Register  %@ for chan/group %i is %i (0x%08x)\n",
 		  [model readWriteRegisterName],[model readWriteRegisterChan],val,val);
 }
 
 - (IBAction) writeRegisterButtonAction:(id)sender
 {
-	unsigned long val;//   =	[readWriteRegisterField integerValue];
+	uint32_t val;//   =	[readWriteRegisterField integerValue];
     //NSString *s=[NSString stringWithString: [readWriteRegisterField stringValue] ];
     //NSLog(@"String is %@\n",s);
-    unsigned long  val2 = [[NSString stringWithString: [readWriteRegisterField stringValue] ] longLongValue];
+    uint32_t  val2 = (uint32_t)[[NSString stringWithString: [readWriteRegisterField stringValue] ] longLongValue];
     val=val2;
     NSLog(@"LongLong  is %Lu\n",val2);
     int aChan = [model readWriteRegisterChan];
-    NSLog(@"Write to Register: >%@< for chan/group %i  value %lu\n",[model readWriteRegisterName],aChan,val);
+    NSLog(@"Write to Register: >%@< for chan/group %i  value %u\n",[model readWriteRegisterName],aChan,val);
     [model writeRegisterWithName: [model readWriteRegisterName] forChan:aChan value: val];
 }
 
 - (IBAction) readRegisterWithAdressButtonAction:(id)sender
 {
 	int adr   =	[readWriteRegisterAdressField intValue];
-    unsigned long val = [model read: adr];
+    uint32_t val = [model read: adr];
     NSLog(@"Value of Register  %i  is %i (0x%08x)\n",adr,val,val);
 }
 
 - (IBAction) writeRegisterWithAdressButtonAction:(id)sender
 {
-    unsigned long  val = [[NSString stringWithString: [readWriteRegisterField stringValue] ] longLongValue];
+    uint32_t  val = (uint32_t)[[NSString stringWithString: [readWriteRegisterField stringValue] ] longLongValue];
 	int adr   =	[readWriteRegisterAdressField intValue];
     NSLog(@"writeRegisterWithAdressButtonAction: write adr: %i  val %i\n",adr,val);
     [model write: adr   value: val];
@@ -1484,7 +1484,7 @@
 - (IBAction) readTimeAction: (id) sender
 {
 	@try {
-		unsigned long timeLoaded = [model readTime];
+		uint32_t timeLoaded = [model readTime];
 		NSLog(@"FLT %d time:%d = %@\n",[model stationNumber],timeLoaded,[NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval)timeLoaded]);
 	}
 	@catch(NSException* localException) {
@@ -1496,8 +1496,8 @@
 
 - (IBAction) shapingTimeAction: (id) sender
 {
-    int tag=[sender  tag];// now tag is the group
-    int selectedCellTag = [[sender selectedCell] tag];
+    NSInteger tag = [sender  tag];// now tag is the group
+    NSInteger selectedCellTag = [[sender selectedCell] tag];
     //NSLog(@"shapingTimeAction: sender intValue %i and tag %i; selectedCell-tag %i,  [model shapingTime:tag] %i \n",
 	//  [sender intValue], tag,selectedCellTag,[model shapingTime:tag]);
 	if(selectedCellTag != [model shapingTime:tag]){// bug: was intValue instead of tag and gain instead of shapingTime -tb-
@@ -1564,7 +1564,7 @@
 
 - (IBAction) tModeAction: (id) sender
 {
-	unsigned long pattern = 0;
+	uint32_t pattern = 0;
 	int i;
 	for(i=0;i<2;i++){
 		BOOL state = [[tModeMatrix cellWithTag:i] state];
@@ -1628,9 +1628,9 @@
 {
     //TODO: CATCH EXCEPTIONS -tb-
     
-    unsigned int tRec = [model readTRec];
-    NSLog(@"This is  readTRecButtonAction: tRec = %i\n",tRec);
-    [tRecField setIntValue:tRec ];
+    uint32_t tRec = [model readTRec];
+    NSLog(@"This is  readTRecButtonAction: tRec = %u\n",tRec);
+    [tRecField setIntegerValue:tRec ];
 }
 
 - (IBAction) readTRunAction:(id)sender//TODO: remove (the button,too) - moved to low-level -tb-
@@ -1647,39 +1647,39 @@
 {
     unsigned int Pixel = [model histoCalibrationChan];
     //NSLog(@"This is   readFirstBinButtonAction:%i for chan %i\n", [model readFirstBinForChan: Pixel],Pixel);
-    [firstBinField setIntValue: [model readFirstBinForChan: Pixel] ];
+    [firstBinField setIntegerValue: [model readFirstBinForChan: Pixel] ];
 }
 
 - (IBAction) readLastBinButtonAction:(id)sender
 {
     unsigned int Pixel = [model histoCalibrationChan];
     //NSLog(@"This is   readLastBinButtonAction: %i\n",[model readLastBinForChan: Pixel]);
-    [lastBinField setIntValue: [model readLastBinForChan: Pixel] ];
+    [lastBinField setIntegerValue: [model readLastBinForChan: Pixel] ];
 }
 
 - (IBAction) changedBinWidthPopupButtonAction:(id)sender;
 {
     //NSLog(@"This is    changedESamplePopupButtonAction: selected %i\n",[sender indexOfSelectedItem]);
     //[model setHistoBinWidth:[sender indexOfSelectedItem]];
-    [model setHistoBinWidth:[[sender selectedItem] tag]];
+    [model setHistoBinWidth:(int)[[sender selectedItem] tag]];
 }
 - (IBAction) changedHistoMinEnergyAction:(id)sender
-{    [model setHistoMinEnergy:[sender intValue]];  }
+{    [model setHistoMinEnergy:(unsigned int)[sender intValue]];  }
 
 - (IBAction) changedHistoMaxEnergyAction:(id)sender // for now: unused -tb- 2008-03-06
 {    [model setHistoMaxEnergy:[sender intValue]];  }
 
 - (IBAction) changedHistoFirstBinAction:(id)sender
-{    [model setHistoFirstBin:[sender indexOfSelectedItem]];  }
+{    [model setHistoFirstBin:(unsigned int)[sender indexOfSelectedItem]];  }
 
 - (IBAction) changedHistoLastBinAction:(id)sender
-{    [model setHistoLastBin:[sender indexOfSelectedItem]];  }
+{    [model setHistoLastBin:(unsigned int)[sender indexOfSelectedItem]];  }
 
 - (IBAction) changedHistoRunTimeAction:(id)sender
 {    [model setHistoRunTime:[sender intValue]];  }
 
 - (IBAction) changedHistoRecordingTimeAction:(id)sender//TODO: unused, remove it -tb-
-{    [model setHistoRecordingTime:[sender indexOfSelectedItem]];  }
+{    [model setHistoRecordingTime:(unsigned int)[sender indexOfSelectedItem]];  }
 
 
 
@@ -1742,8 +1742,8 @@
     int chan = [model histoCalibrationChan];
     //[model readHistogramDataForChan: chan];
     //update first/last bin
-    int first = [model readFirstBinForChan:chan];
-    int last = [model readLastBinForChan:chan];
+    unsigned int first = (unsigned int)[model readFirstBinForChan:chan];
+    unsigned int last = (unsigned int)[model readLastBinForChan:chan];
     [model setHistoFirstBin:first];
     [model setHistoLastBin:last];
     
@@ -1862,8 +1862,8 @@
 #pragma mark ¥¥¥Plot DataSource
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int tag = [aPlotter tag];
-	if(tag == 0) return [[model  totalRate]count];
+	int tag = (int)[aPlotter tag];
+	if(tag == 0) return (int)[[model  totalRate]count];
 	else if(tag == 1){
         if([model  histogramData]) return 512;//return 512;
         else return 1024;
@@ -1873,9 +1873,9 @@
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int tag = [aPlotter tag];
+	int tag = (int)[aPlotter tag];
 	if(tag == 0){
-		int count = [[model totalRate]count];
+		int count = (int)[[model totalRate]count];
 		int index = count-i-1;
 		*yValue = [[model totalRate] valueAtIndex:index];
 		*xValue = [[model totalRate] timeSampledAtIndex:index];
@@ -1914,12 +1914,12 @@
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [[model testPatterns] count];
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if(rowIndex>=0 && rowIndex<24){
 		[[model testPatterns] replaceObjectAtIndex:rowIndex withObject:anObject];

@@ -150,20 +150,20 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[4];
+		uint32_t data[4];
 		data[0] = dataId | 4;
 		data[1] =  ([self uniqueIdNumber]&0x0000fffff);
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		theData.asFloat = pressure;
 		data[2] = theData.asLong;
 		data[3] = timeMeasured;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*4]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*4]];
 	}
 }
 
@@ -205,7 +205,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORKJL2200IonGaugeModelSensitivityReadChanged object:self];
 }
-- (int) queCount
+- (NSUInteger) queCount
 {
 	return [cmdQueue count];
 }
@@ -335,7 +335,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	time_t	ut_Time;
 	time(&ut_Time);
 	//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-	timeMeasured = ut_Time;
+	timeMeasured = (uint32_t)ut_Time;
 		
 	if(timeRate == nil) timeRate = [[ORTimeRate alloc] init];
 	[timeRate addDataToTimeAverage:aPressure];
@@ -401,7 +401,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 }
 
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -521,12 +521,12 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:pressureScale forKey:@"pressureScale"];
-    [encoder encodeInt:degasTime forKey:@"degasTime "];
+    [encoder encodeInteger:pressureScale forKey:@"pressureScale"];
+    [encoder encodeInteger:degasTime forKey:@"degasTime "];
     [encoder encodeFloat:emissionCurrent forKey:@"emissionCurrent"];
-    [encoder encodeInt:sensitivity forKey:@"sensitivity"];
+    [encoder encodeInteger:sensitivity forKey:@"sensitivity"];
     [encoder encodeBool:shipPressure forKey:@"shipPressure"];
-    [encoder encodeInt:pollTime		forKey:@"pollTime"];
+    [encoder encodeInteger:pollTime		forKey:@"pollTime"];
     [encoder encodeBool:portWasOpen forKey:@"portWasOpen"];
     [encoder encodeObject:portName	forKey: @"portName"];
 	int i;
@@ -602,8 +602,8 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 }
 
 #pragma mark ***Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -664,7 +664,7 @@ NSString* ORKJL2200IonGaugeModelQueCountChanged			= @"ORKJL2200IonGaugeModelQueC
 	else if([aCmd hasPrefix:@"*="]){
 		aCmd = [aCmd substringFromIndex:2];
 		int i;
-		int n = [aCmd length];
+		int n = (int)[aCmd length];
 		unsigned short aMask = 0;
 		for(i=0;i<n;i++){
 			if([aCmd characterAtIndex:i] == '1'){

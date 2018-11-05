@@ -250,10 +250,10 @@
 
 - (void) loadHeader
 {
-    int n = [fileListView numberOfSelectedRows];
+    int n = (int)[fileListView numberOfSelectedRows];
     if(n <= 1){
         int index;
-        if(n == 1)index = [fileListView selectedRow];
+        if(n == 1)index = (int)[fileListView selectedRow];
         else index = 0;
         [model readHeaderForFileIndex:index];
         if([[model filesToReplay] count]){
@@ -299,8 +299,8 @@
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item 
 {
     if(outlineView == headerView){
-        if(!item) return [[model header] count];
-        else      return [(ORHeaderItem*)item count];
+        if(!item) return (int)[[model header] count];
+        else      return (int)[(ORHeaderItem*)item count];
     }
     else return 0;
 }
@@ -336,7 +336,7 @@
         else if([[tableColumn identifier] isEqualToString:@"Value"]){
             if(item==0){
                 return [[[NSAttributedString alloc] 
-                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[[model header] count]] 
+                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",(int)[[model header] count]]
                             attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]] autorelease];
             }
             else {
@@ -345,7 +345,7 @@
                 }
                 else {
                     return [[[NSAttributedString alloc] 
-                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[(ORHeaderItem*)item count]] 
+                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",(int)[(ORHeaderItem*)item count]]
                             attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]] autorelease];            
                 }
             }
@@ -358,7 +358,7 @@
 
 
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
     if([[model filesToReplay] count]){
         id obj = [[model filesToReplay]  objectAtIndex:rowIndex];
@@ -368,20 +368,20 @@
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     
     return [[model filesToReplay] count];
 }
 
 
-- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(int)rowIndex
+- (BOOL)tableView:(NSTableView *)aTableView shouldSelectRow:(NSInteger)rowIndex
 {
     [headerView setNeedsDisplay:YES];
     return YES;
 }
 
-- (NSDragOperation) tableView:(NSTableView *) tableView validateDrop:(id <NSDraggingInfo>) info proposedRow:(int) row proposedDropOperation:(NSTableViewDropOperation) operation
+- (NSDragOperation) tableView:(NSTableView *) tableView validateDrop:(id <NSDraggingInfo>) info proposedRow:(NSInteger) row proposedDropOperation:(NSTableViewDropOperation) operation
 {
     return NSDragOperationCopy;
 }

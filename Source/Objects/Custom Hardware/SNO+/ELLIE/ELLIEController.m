@@ -83,7 +83,7 @@
 
 - (void) updateTuningRunCB:(NSNotification *)aNote
 {
-    [tellieExpertTuningCb setState:[model tuningRun]];
+    [tellieExpertTuningCb setState:[[model tuningRun]boolValue]];
 }
 
 - (IBAction) serverSettingsChanged:(id)sender {
@@ -259,7 +259,7 @@
             continue;
         } else {
             NSUInteger num = [[self extractNumberFromText:key] integerValue];
-            [panels addObject:[NSString stringWithFormat:@"%d",num]];
+            [panels addObject:[NSString stringWithFormat:@"%d",(int)num]];
         }
     }
     // Once we get a note saying mapping is loaded, fill the push button

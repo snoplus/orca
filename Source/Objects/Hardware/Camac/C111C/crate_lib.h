@@ -132,7 +132,7 @@ typedef struct {
 //	CRATE_INFO Structure
 ////////////////////////////////////////////
 
-typedef void (*IRQ_CALLBACK) (short, short, unsigned int, unsigned long);
+typedef void (*IRQ_CALLBACK) (short, short, unsigned int, uint32_t);
 
 typedef struct {
 	unsigned char		connected;
@@ -147,7 +147,7 @@ typedef struct {
 
 	IRQ_CALLBACK		irq_callback;
 	HANDLE				irq_tid;
-	unsigned long		userInfo;
+	uint32_t		userInfo;
 } CRATE_INFO;
 
 ////////////////////////////////////////////
@@ -179,27 +179,27 @@ extern "C" {
 SOCKET csock_connect	(char *ipAddress, int port);
 SOCKET csock_udpconnect	(char *ipAddress, int port, struct sockaddr_in *dest);
 
-int csock_close			(SOCKET sck);
+ssize_t csock_close			(SOCKET sck);
 
-int csock_canwrite		(SOCKET sck);
-int csock_canread		(SOCKET sck);
-int csock_send			(SOCKET sck, void *buffer, int size);
-int csock_sendto		(SOCKET sck, void *buffer, int size, struct sockaddr *dest);
+ssize_t csock_canwrite		(SOCKET sck);
+ssize_t csock_canread		(SOCKET sck);
+ssize_t csock_send			(SOCKET sck, void *buffer, int size);
+ssize_t csock_sendto		(SOCKET sck, void *buffer, int size, struct sockaddr *dest);
 
-int csock_recv			(SOCKET sck, void *buffer, int size);
-int csock_recvfrom		(SOCKET sck, void *buffer, int size, struct sockaddr *dest);
+ssize_t csock_recv			(SOCKET sck, void *buffer, int size);
+ssize_t csock_recvfrom		(SOCKET sck, void *buffer, int size, struct sockaddr *dest);
 
-int csock_recv_nb       (SOCKET sck, void *buffer, int size);
-int csock_recv_t		(SOCKET sck, void *buffer, int size, int timeout);
+ssize_t csock_recv_nb       (SOCKET sck, void *buffer, int size);
+ssize_t csock_recv_t		(SOCKET sck, void *buffer, int size, int timeout);
 
-int csock_recvline		(SOCKET sck, char *buffer, int size);
-int csock_recvline_f	(SOCKET sck, char *buffer, int size);
-int csock_recvline_t	(SOCKET sck, char *buffer, int size, int timeout);
+ssize_t csock_recvline		(SOCKET sck, char *buffer, int size);
+ssize_t csock_recvline_f	(SOCKET sck, char *buffer, int size);
+ssize_t csock_recvline_t	(SOCKET sck, char *buffer, int size, int timeout);
 
-int csock_sendrecvline  (SOCKET sck, char *cmd, char* response, int size);
-int csock_sendrecvline_t(SOCKET sck, char *cmd, char* response, int size, int timeout);
+ssize_t csock_sendrecvline  (SOCKET sck, char *cmd, char* response, int size);
+ssize_t csock_sendrecvline_t(SOCKET sck, char *cmd, char* response, int size, int timeout);
 
-int csock_flush			(SOCKET sck);
+ssize_t csock_flush			(SOCKET sck);
 
 ////////////////////////////////////////////
 //	Config Functions declaration
@@ -208,7 +208,7 @@ int csock_flush			(SOCKET sck);
 short CROPEN	(char *address);
 short CRCLOSE	(short crate_id);
 
-short CRIRQ		(short crate_id, IRQ_CALLBACK irq_callback, unsigned long userInfo);
+short CRIRQ		(short crate_id, IRQ_CALLBACK irq_callback, uint32_t userInfo);
 
 short CRGET		(short crate_id, CRATE_INFO *cr_info);
 short CRSET		(short crate_id, CRATE_INFO *cr_info);

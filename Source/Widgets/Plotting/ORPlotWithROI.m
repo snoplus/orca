@@ -48,11 +48,11 @@
 	[roi setDataSource:dataSource];
 	if(roi){
 		NSArray* rois =  [dataSource roiArrayForPlotter:self];
-		int index = [rois indexOfObject:roi];
+		NSUInteger index = [rois indexOfObject:roi];
 		NSString* s;
 		if([[self name] length]>0)s = [self name];
-		else s = [NSString stringWithFormat:@"Plot %d",tag+1];;
-		[roi setLabel:[NSString stringWithFormat:@"%@ Roi %d of %d",s,index+1,[rois count]]];
+		else s = [NSString stringWithFormat:@"Plot %ld",tag+1];;
+		[roi setLabel:[NSString stringWithFormat:@"%@ Roi %ld of %ld",s,index+1,[rois count]]];
 	}
 }
 
@@ -65,7 +65,7 @@
 	if([dataSource respondsToSelector:@selector(roiArrayForPlotter:)]){
 		NSMutableArray* rois =  [dataSource roiArrayForPlotter:self];
 		BOOL didWrap = NO;
-		int roiIndex = [rois indexOfObject:roi];
+		NSUInteger roiIndex = [rois indexOfObject:roi];
 		roiIndex++;
 		if(roiIndex>=[rois count]){
 			roiIndex=0;
@@ -85,7 +85,7 @@
 	if([dataSource respondsToSelector:@selector(roiArrayForPlotter:)]){
 		NSArray* rois =  [dataSource roiArrayForPlotter:self];
 		BOOL didWrap = NO;
-		int roiIndex = [rois indexOfObject:roi]-1;
+		NSInteger roiIndex = [rois indexOfObject:roi]-1;
 		if(roiIndex<0){
 			roiIndex= [rois count]-1;
 			didWrap = YES;
@@ -135,8 +135,8 @@
 - (void) moveRoiToCenter
 {
 	ORAxis* mXScale = [plotView xScale];
-	long numberVisibleChannels  = [mXScale maxValue] - [mXScale minValue] +1;
-	long centerChannel			= [mXScale minValue] + numberVisibleChannels/2;
+	int32_t numberVisibleChannels  = [mXScale maxValue] - [mXScale minValue] +1;
+	int32_t centerChannel			= [mXScale minValue] + numberVisibleChannels/2;
 	[roi setMinChannel:centerChannel - numberVisibleChannels*.1];
 	[roi setMaxChannel:centerChannel + numberVisibleChannels*.1];
 }
@@ -173,11 +173,11 @@
 - (id) roiAtPoint:(NSPoint)aPoint
 {
 	NSPoint plotPoint = [self convertFromWindowToPlot:aPoint];
-	long mouseChannel  = plotPoint.x;
+	int32_t mouseChannel  = plotPoint.x;
 	ORAxis* mXScale = [plotView xScale];
 	
-	long aMinChannel = MAX([mXScale minLimit],mouseChannel-3);
-	long aMaxChannel = MIN([mXScale maxLimit],mouseChannel+3);
+	int32_t aMinChannel = MAX([mXScale minLimit],mouseChannel-3);
+	int32_t aMaxChannel = MIN([mXScale maxLimit],mouseChannel+3);
 	return [[[OR1dRoi alloc] initWithMin:aMinChannel max:aMaxChannel] autorelease];
 }
 
@@ -189,7 +189,7 @@
 		roiVisible = [dataSource plotterShouldShowRoi:self];
 	}
 	
-	if(([theEvent modifierFlags] & NSShiftKeyMask) && !([theEvent modifierFlags] & NSCommandKeyMask)){
+	if(([theEvent modifierFlags] & NSEventModifierFlagShift) && !([theEvent modifierFlags] & NSEventModifierFlagCommand)){
 		id anRoi = [self roiAtPoint:[theEvent locationInWindow]];
 		if(anRoi){
 			[self addRoi:anRoi];
@@ -197,7 +197,7 @@
 		}
 	}
 	
-	else if(([theEvent modifierFlags] & NSCommandKeyMask) && !([theEvent modifierFlags] & NSShiftKeyMask)) {		
+	else if(([theEvent modifierFlags] & NSEventModifierFlagCommand) && !([theEvent modifierFlags] & NSEventModifierFlagShift)) {		
 		[self showCrossHairsForEvent:theEvent];
 		[NSCursor hide];
 	}
@@ -288,8 +288,8 @@
 		
 		[roi analyzeData];
 		
-		long minChan = MAX(0,[roi minChannel]);
-		long maxChan = MIN([roi maxChannel],numPoints-1);
+		int32_t minChan = MAX(0,[roi minChannel]);
+		int32_t maxChan = MIN([roi maxChannel],numPoints-1);
 		NSColor* fillColor = [[self lineColor] highlightWithLevel:.7];
 		fillColor = [fillColor colorWithAlphaComponent:.3];
 		[fillColor set];
@@ -297,11 +297,11 @@
 		x	= [mXScale getPixAbs:minChan];
 		xl	= x;
 		double xValue,yValue;
-		[dataSource plotter:self index:minChan x:&xValue y:&yValue];
+		[dataSource plotter:self index:(int)minChan x:&xValue y:&yValue];
 		yl	= [mYScale getPixAbs:yValue];
-		long ix;
+		int32_t ix;
 		for (ix=minChan; ix<=maxChan+1;++ix) {		
-			[dataSource plotter:self index:ix x:&xValue y:&yValue];
+			[dataSource plotter:self index:(int)ix x:&xValue y:&yValue];
 			x = [mXScale getPixAbsFast:ix log:NO integer:YES minPad:aMinPadx];
 			y = [mYScale getPixAbsFast:yValue log:aLog integer:aInt minPad:aMinPad];
 			[NSBezierPath fillRect:NSMakeRect(xl,1,x-xl+1,yl)];
@@ -314,8 +314,8 @@
 	
 	//draw the roi bounds
 	if(roi && roiVisible){
-		long minChan = MAX(0,[roi minChannel]);
-		long maxChan = MIN([roi maxChannel],[mXScale maxLimit]);
+		int32_t minChan = MAX(0,[roi minChannel]);
+		int32_t maxChan = MIN([roi maxChannel],[mXScale maxLimit]);
 		
 		[[NSColor blackColor] set];
 		[NSBezierPath setDefaultLineWidth:.5];

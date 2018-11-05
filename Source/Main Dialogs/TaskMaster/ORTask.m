@@ -77,8 +77,14 @@ NSString* ORTaskDidFinishNotification   = @"ORTaskDidFinishNotification";
         delegate = nil;
     }
     
-    [extraView removeFromSuperview];
-    [view removeFromSuperview];
+    if(![NSThread isMainThread]){
+        [view performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:YES];
+        [extraView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:YES];
+    }
+    else {
+        [view removeFromSuperview];
+        [extraView removeFromSuperview];
+    }
     [title release];
     [[ORTaskMaster sharedTaskMaster] removeTask:self];
     [topLevelObjects release];
@@ -519,8 +525,8 @@ static NSString* ORTaskExpanded		= @"ORTaskExpanded";
 {
     [[self undoManager] disableUndoRegistration];
     
-    [self setTimeDelay:[decoder decodeIntForKey:ORTaskTimeDelay]];
-    [self setTimeInterval:[decoder decodeIntForKey:ORTaskTimeInterval]];
+    [self setTimeDelay:[decoder decodeIntegerForKey:ORTaskTimeDelay]];
+    [self setTimeInterval:[decoder decodeIntegerForKey:ORTaskTimeInterval]];
     [self setStartIsDelayed:[decoder decodeBoolForKey:ORTaskStartDelayed]];
     [self setWillRepeat:[decoder decodeBoolForKey:ORTaskWillRepeat]];
     [self setTitle:[decoder decodeObjectForKey:ORTaskTitle]];
@@ -531,8 +537,8 @@ static NSString* ORTaskExpanded		= @"ORTaskExpanded";
 
 - (void)saveMemento:(NSCoder*)encoder
 {
-    [encoder encodeInt:timeDelay forKey:ORTaskTimeDelay];
-    [encoder encodeInt:timeInterval forKey:ORTaskTimeInterval];
+    [encoder encodeInteger:timeDelay forKey:ORTaskTimeDelay];
+    [encoder encodeInteger:timeInterval forKey:ORTaskTimeInterval];
     [encoder encodeBool:startIsDelayed forKey:ORTaskStartDelayed];
     [encoder encodeBool:willRepeat forKey:ORTaskWillRepeat];
     [encoder encodeObject:title forKey:ORTaskTitle];

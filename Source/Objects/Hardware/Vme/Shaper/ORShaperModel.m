@@ -45,7 +45,7 @@
 
 #pragma mark ¥¥¥Static Declarations
 //offsets from the base address (kDefaultBaseAddress)
-static unsigned long register_offsets[kNumberOfADCSRegisters] = {
+static uint32_t register_offsets[kNumberOfADCSRegisters] = {
 0x1f,		// [0]  kConversionStatusRegister
 0x1d,		// [1]	kModeSelectRegister
 0x1b,		// [2]  kThresholdAddressRegister
@@ -184,7 +184,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
     NSImage* aCachedImage = [NSImage imageNamed:@"ShaperCard"];
     NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];	
     int chan;
     for(chan=0;chan<kNumShaperChannels;chan++){
 		NSBezierPath* circle = [NSBezierPath bezierPathWithOvalInRect:NSMakeRect(6,12+chan*12.5,7,7)];
@@ -481,12 +481,12 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 	[self postAdcInfoProvidingValueChanged];
 }
 
-- (unsigned long) scanStart
+- (uint32_t) scanStart
 {
     return scanStart;
 }
 
-- (void) setScanStart:(unsigned long)value
+- (void) setScanStart:(uint32_t)value
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setScanStart:[self scanStart]];
     scanStart = value;
@@ -495,12 +495,12 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 	 object:self];
 }
 
-- (unsigned long) scanDelta
+- (uint32_t) scanDelta
 {
     return scanDelta;
 }
 
-- (void) setScanDelta:(unsigned long)value
+- (void) setScanDelta:(uint32_t)value
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setScanDelta:[self scanDelta]];
     scanDelta = value;
@@ -584,14 +584,14 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 	 object:self];    
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
 
-- (unsigned long) scalerDataId { return scalerDataId; }
-- (void) setScalerDataId: (unsigned long) ScalerDataId
+- (uint32_t) scalerDataId { return scalerDataId; }
+- (void) setScalerDataId: (uint32_t) ScalerDataId
 {
     scalerDataId = ScalerDataId;
 }
@@ -1200,11 +1200,11 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 					
                     
                     if(IsShortForm(dataId)){
-                        unsigned long data = dataId | slotMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
+                        uint32_t data = dataId | slotMask | ((channel & 0x0000000f) << 12) | (aValue & 0x0fff);
                         [aDataPacket addLongsToFrameBuffer:&data length:1];
                     }
                     else {
-                        unsigned long data[4];
+                        uint32_t data[4];
 						short len = 2;
 						if(shipTimeStamp) {
 							len = 4;
@@ -1221,8 +1221,8 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
                              */
                             struct timeval ts;
                             if(gettimeofday(&ts,NULL) ==0){
-  								data[2] = ts.tv_sec;
-								data[3] = ts.tv_usec;
+  								data[2] = (uint32_t)ts.tv_sec;
+								data[3] = (uint32_t)ts.tv_usec;
                             }
 							else {
 								data[2] = 0xFFFFFFFF;
@@ -1268,7 +1268,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
     return YES;
 }
 
-- (unsigned long) adcCount:(int)aChannel
+- (uint32_t) adcCount:(int)aChannel
 {
     return adcCount[aChannel];
 }
@@ -1319,10 +1319,10 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 	configStruct->total_cards++;
 	configStruct->card_info[index].hw_type_id = kShaper; //should be unique
 	configStruct->card_info[index].hw_mask[0] = dataId; //better be unique
-	configStruct->card_info[index].slot 	 = [self slot];
-	configStruct->card_info[index].crate 	 = [self crateNumber];
-	configStruct->card_info[index].add_mod 	 = [self addressModifier];
-	configStruct->card_info[index].base_add  = [self baseAddress];
+	configStruct->card_info[index].slot 	  = [self slot];
+	configStruct->card_info[index].crate 	  = [self crateNumber];
+	configStruct->card_info[index].add_mod 	  = [self addressModifier];
+	configStruct->card_info[index].base_add   = [self baseAddress];
 	configStruct->card_info[index].deviceSpecificData[0] = onlineMask;
 	configStruct->card_info[index].deviceSpecificData[1] = register_offsets[kConversionStatusRegister];
 	configStruct->card_info[index].deviceSpecificData[2] = register_offsets[kADC1OutputRegister];
@@ -1335,7 +1335,7 @@ NSString* ORShaperSettingsLock							= @"ORShaperSettingsLock";
 }
 
 #pragma mark ¥¥¥Rates
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+- (uint32_t) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
 		if(counterTag>=0 && counterTag<kNumShaperChannels){
@@ -1382,16 +1382,16 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     [self setContinous:			[decoder decodeBoolForKey:ORShaperContinous]];
     [self setScalersEnabled:	[decoder decodeBoolForKey:ORShaperScalersEnabled]];
     [self setMultiBoardEnabled:	[decoder decodeBoolForKey:ORShaperMultiBoardEnabled]];
-    [self setScalerMask:		[decoder decodeIntForKey:ORShaperScalerMask]];
+    [self setScalerMask:		[decoder decodeIntegerForKey:ORShaperScalerMask]];
     if([decoder containsValueForKey:ORShaperOnlineMask]){
-		[self setOnlineMask:[decoder decodeIntForKey:ORShaperOnlineMask]];
+		[self setOnlineMask:[decoder decodeIntegerForKey:ORShaperOnlineMask]];
     }
     else {
 		[self setOnlineMask:0xff];
     }
-    [self setScanStart:[decoder decodeInt32ForKey:ORShaperScanStart]];
+    [self setScanStart:[decoder decodeIntForKey:ORShaperScanStart]];
     [self setScanDelta:[decoder decodeIntForKey:ORShaperScanDelta]];
-    [self setScanNumber:[decoder decodeIntForKey:ORShaperScanNumber]];
+    [self setScanNumber:[decoder decodeIntegerForKey:ORShaperScanNumber]];
 	
     [self setAdcRateGroup:[decoder decodeObjectForKey:ORShaperAdcRateGroup]];
     [self setDisplayRaw:[decoder decodeBoolForKey:ORShaperDisplayRaw]];
@@ -1429,12 +1429,12 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
     [encoder encodeBool:[self continous]		forKey:ORShaperContinous];
     [encoder encodeBool:[self scalersEnabled]	forKey:ORShaperScalersEnabled];
     [encoder encodeBool:[self multiBoardEnabled] forKey:ORShaperMultiBoardEnabled];
-    [encoder encodeInt:[self scalerMask]		forKey:ORShaperScalerMask];
-    [encoder encodeInt:[self onlineMask]		forKey:ORShaperOnlineMask];
+    [encoder encodeInteger:[self scalerMask]		forKey:ORShaperScalerMask];
+    [encoder encodeInteger:[self onlineMask]		forKey:ORShaperOnlineMask];
 	
-    [encoder encodeInt32:[self scanStart]		forKey:ORShaperScanStart];
+    [encoder encodeInt:[self scanStart]		forKey:ORShaperScanStart];
     [encoder encodeInt:[self scanDelta]			forKey:ORShaperScanDelta];
-    [encoder encodeInt:[self scanNumber]		forKey:ORShaperScanNumber];
+    [encoder encodeInteger:[self scanNumber]		forKey:ORShaperScanNumber];
 	
     [encoder encodeObject:[self adcRateGroup] forKey:ORShaperAdcRateGroup];
 	
@@ -1531,7 +1531,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 - (void) scanForShapers
 {
     NSLog(@"Scanning for %d Shaper Boards starting @ 0x%04x inc of 0x%04x\n",scanNumber,scanStart,scanDelta);
-    unsigned long anAddress;
+    uint32_t anAddress;
     for(anAddress = scanStart;anAddress<scanStart+(scanDelta*scanNumber);anAddress+=scanDelta){
         @try {
 			unsigned short aValue = 0;
@@ -1687,14 +1687,14 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 { 
     short channel;
     if([self scalersEnabled] && [self scalerMask]){
-        unsigned long dataWord[16]; 
+        uint32_t dataWord[16]; 
         int index;
         @try {
             //create the crate card info (used twice below)
-            unsigned long crateAndCard 	= ([self crateNumber]&0x0000000f)<<25 | ([self slot]& 0x0000001f)<<20;
+            uint32_t crateAndCard 	= ([self crateNumber]&0x0000000f)<<25 | ([self slot]& 0x0000001f)<<20;
 			
             //add the gtid
-            unsigned long gtid = [[self crate] requestGTID];
+            uint32_t gtid = [[self crate] requestGTID];
 			NSLog(@"Soft GTID requested for Scaler record: %d\n",gtid);
             dataWord[1] = gtid;
             dataWord[2] = crateAndCard;
@@ -1710,7 +1710,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
             //now that we know the size we fill in the header and ship
             dataWord[0] = scalerDataId | (index & kLongFormLengthMask);
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:dataWord length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:dataWord length:index*sizeof(int32_t)]];
         }
 		@catch(NSException* localException) {
 		}
@@ -1721,7 +1721,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 	//included to satisfy the protocal... change if needed
 	return NO;
 }
-- (unsigned long) eventCount:(int)aChannel
+- (uint32_t) eventCount:(int)aChannel
 {
     return eventCount[aChannel];
 }
@@ -1733,7 +1733,7 @@ static NSString *ORShaperDisplayRaw 		= @"ORShaper DisplayRaw";
 		eventCount[i]=0;
     }
 }
-- (unsigned long) thresholdForDisplay:(unsigned short) aChan
+- (uint32_t) thresholdForDisplay:(unsigned short) aChan
 {
 	return [self threshold:aChan];
 }

@@ -140,13 +140,13 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		time_t	ut_time;
 		time(&ut_time);
         
-		unsigned long data[5];
+		uint32_t data[5];
 		data[0] = dataId | 5;
-		data[1] = ut_time;
+		data[1] = (uint32_t)ut_time;
 		data[2] = ([aMotor motorId]<<16) | ([self uniqueIdNumber]&0x0000fffff);
 		//encode the position
 		union {
-			long asLong;
+			int32_t asLong;
 			float asFloat;
 		}thePosition;
         
@@ -157,7 +157,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 		data[4] = thePosition.asLong;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-															object:[NSData dataWithBytes:data length:sizeof(long)*5]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*5]];
 	}
 }
 
@@ -497,11 +497,11 @@ NSString* ORVXMLock							= @"ORVXMLock";
     [encoder encodeBool:useCmdQueue		forKey: @"useCmdQueue"];
     [encoder encodeObject:customCmd		forKey: @"customCmd"];
     [encoder encodeBool:shipRecords		forKey: @"shipRecords"];
-    [encoder encodeInt:repeatCount		forKey: @"repeatCount"];
-    [encoder encodeInt:numTimesToRepeat forKey: @"numTimesToRepeat"];
+    [encoder encodeInteger:repeatCount		forKey: @"repeatCount"];
+    [encoder encodeInteger:numTimesToRepeat forKey: @"numTimesToRepeat"];
     [encoder encodeBool:stopRunWhenDone forKey: @"stopRunWhenDone"];
     [encoder encodeBool:repeatCmds		forKey: @"repeatCmds"];
-    [encoder encodeInt:syncWithRun		forKey: @"syncWithRun"];
+    [encoder encodeInteger:syncWithRun		forKey: @"syncWithRun"];
     [encoder encodeBool:displayRaw		forKey: @"displayRaw"];
     [encoder encodeObject:motors		forKey: @"motors"];
     [encoder encodeObject:listFile		forKey: @"listFile"];
@@ -527,23 +527,23 @@ NSString* ORVXMLock							= @"ORVXMLock";
 	}
 }
 
-- (void) addItem:(id)anItem atIndex:(int)anIndex
+- (void) addItem:(id)anItem atIndex:(NSInteger)anIndex
 {
 	if(!cmdList) cmdList= [[NSMutableArray array] retain];
 	if([cmdList count] == 0)anIndex = 0;
-	anIndex = MIN(anIndex,[cmdList count]);
+	anIndex = MIN(anIndex,(int)[cmdList count]);
 	[[[self undoManager] prepareWithInvocationTarget:self] removeItemAtIndex:anIndex];
 	[cmdList insertObject:anItem atIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListItemsAdded object:self userInfo:userInfo];
 }
 
-- (void) removeItemAtIndex:(int) anIndex
+- (void) removeItemAtIndex:(NSInteger) anIndex
 {
 	id anItem = [cmdList objectAtIndex:anIndex];
 	[[[self undoManager] prepareWithInvocationTarget:self] addItem:anItem atIndex:anIndex];
 	[cmdList removeObjectAtIndex:anIndex];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:anIndex] forKey:@"Index"];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInteger:anIndex] forKey:@"Index"];
     [[NSNotificationCenter defaultCenter] postNotificationName:ORVXMModelListItemsRemoved object:self userInfo:userInfo];
 }
 
@@ -723,8 +723,8 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 
 #pragma mark ***Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -994,7 +994,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 }
 - (void) delayedRunStop
 {
-	id s = [NSString stringWithFormat:@"VXM %lu Finished Pattern",[self uniqueIdNumber]];
+	id s = [NSString stringWithFormat:@"VXM %u Finished Pattern",[self uniqueIdNumber]];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRequestRunStop object:self userInfo:s];
 }
 
@@ -1049,7 +1049,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
     self = [super init];
 	self.description		= [decoder decodeObjectForKey:	@"description"];
 	self.cmd				= [decoder decodeObjectForKey:	@"cmd"];
-	self.waitToSendNextCmd	= [decoder decodeIntForKey:		@"waitToSendNextCmd"];
+	self.waitToSendNextCmd	= [decoder decodeIntegerForKey:		@"waitToSendNextCmd"];
 	return self;
 }
 
@@ -1057,7 +1057,7 @@ NSString* ORVXMLock							= @"ORVXMLock";
 {
     [encoder encodeObject:	description			forKey:@"description"];	
     [encoder encodeObject:	cmd					forKey:@"cmd"];	
-    [encoder encodeInt:		waitToSendNextCmd	forKey:@"waitToSendNextCmd"];
+    [encoder encodeInteger:		waitToSendNextCmd	forKey:@"waitToSendNextCmd"];
 }
 
 @end

@@ -249,7 +249,7 @@
 	NSSize theIconSize = [anImage size];
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	
 	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
 	NSAttributedString* iconLabel = [self iconLabelWithSize:9 color:[NSColor blackColor]];
@@ -275,13 +275,13 @@
 - (id) eval
 {
 	[guardian eval];
-	BOOL aValue = [guardian valueTooLow];
+	BOOL aValue = [(ORAdcProcessorModel*)guardian valueTooLow];
 	return [ORProcessResult processState:aValue value:aValue];
 }
 
 - (int) evaluatedState
 {
-	return [guardian valueTooLow];
+	return [(ORAdcProcessorModel*)guardian valueTooLow];
 }
 
 @end
@@ -291,13 +291,13 @@
 - (id) eval
 {
 	[guardian eval];
-	BOOL aValue = [guardian valueTooHigh];
+	BOOL aValue = [(ORAdcProcessorModel*)guardian valueTooHigh];
 	return [ORProcessResult processState:aValue value:aValue];
 	
 }
 - (int) evaluatedState
 {
-	return [guardian valueTooHigh];
+	return [(ORAdcProcessorModel*)guardian valueTooHigh];
 }
 
 @end

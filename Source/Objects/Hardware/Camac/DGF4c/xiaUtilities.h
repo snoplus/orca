@@ -22,12 +22,12 @@
 
 #define SYSTEM_CLOCK_MHZ		40		//in MHz
 
-unsigned short Random_Set[8192];	/* Random indices used by TauFinder and BLCut */
+static unsigned short Random_Set[8192];	/* Random indices used by TauFinder and BLCut */
 
 double Tau_Finder(double Tau);
-double Tau_Fit(unsigned int* Trace, long kmin, long kmax, double dt);
-double Phi_Value(unsigned int* ydat,double qq, long kmin, long kmax);
-double Thresh_Finder(unsigned int* Trace, double Tau, double* FF, double* FF2, long FL, long FG, unsigned short Xwait);
-long RandomSwap();
-long linefit (double* data, double* coeff);
+double Tau_Fit(unsigned int* Trace, int32_t kmin, int32_t kmax, double dt);
+double Phi_Value(unsigned int* ydat,double qq, int32_t kmin, int32_t kmax);
+double Thresh_Finder(unsigned int* Trace, double Tau, double* FF, double* FF2, int32_t FL, int32_t FG, unsigned short Xwait);
+int32_t RandomSwap(void);
+int32_t linefit (double* data, double* coeff);
 

@@ -176,11 +176,11 @@ static int redisSetTcpNoDelay(redisContext *c) {
     return REDIS_OK;
 }
 
-#define __MAX_MSEC (((LONG_MAX) - 999) / 1000)
+#define __MAX_MSEC (((INT_MAX) - 999) / 1000)
 
 static int redisContextWaitReady(redisContext *c, const struct timeval *timeout) {
     struct pollfd   wfd[1];
-    long msec;
+    int32_t msec;
 
     msec          = -1;
     wfd[0].fd     = c->fd;
@@ -194,7 +194,7 @@ static int redisContextWaitReady(redisContext *c, const struct timeval *timeout)
             return REDIS_ERR;
         }
 
-        msec = (timeout->tv_sec * 1000) + ((timeout->tv_usec + 999) / 1000);
+        msec = (int32_t)(timeout->tv_sec * 1000) + ((timeout->tv_usec + 999) / 1000);
 
         if (msec < 0 || msec > INT_MAX) {
             msec = INT_MAX;
@@ -202,9 +202,9 @@ static int redisContextWaitReady(redisContext *c, const struct timeval *timeout)
     }
 
     if (errno == EINPROGRESS) {
-        int res;
+        int32_t res;
 
-        if ((res = poll(wfd, 1, msec)) == -1) {
+        if ((res = poll(wfd, 1, (int)msec)) == -1) {
             __redisSetErrorFromErrno(c, REDIS_ERR_IO, "poll(2)");
             redisContextCloseFd(c);
             return REDIS_ERR;

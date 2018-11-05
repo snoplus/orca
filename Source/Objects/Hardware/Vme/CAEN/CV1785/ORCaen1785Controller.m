@@ -46,15 +46,15 @@
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
-    [registerAddressPopUp setAlignment:NSCenterTextAlignment];
-    [channelPopUp setAlignment:NSCenterTextAlignment];
+    [registerAddressPopUp setAlignment:NSTextAlignmentCenter];
+    [channelPopUp setAlignment:NSTextAlignmentCenter];
 	
     [self populatePullDown];
     
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaen1785%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -149,7 +149,7 @@
 
 - (void) baseAddressChanged:(NSNotification*)aNote
 {
-	[baseAddressField setIntValue: [model baseAddress]];
+	[baseAddressField setIntegerValue: [model baseAddress]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -167,13 +167,13 @@
 - (void) lowThresholdChanged:(NSNotification*) aNote
 {
 	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[lowThresholdMatrix cellWithTag:chnl] setIntValue:[model lowThreshold:chnl]];
+	[[lowThresholdMatrix cellWithTag:chnl] setIntegerValue:[model lowThreshold:chnl]];
 }
 
 - (void) highThresholdChanged:(NSNotification*) aNote
 {
 	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[highThresholdMatrix cellWithTag:chnl] setIntValue:[model highThreshold:chnl]];
+	[[highThresholdMatrix cellWithTag:chnl] setIntegerValue:[model highThreshold:chnl]];
 }
 
 - (void) basicLockChanged:(NSNotification*)aNotification
@@ -218,7 +218,7 @@
 {
 	//  Set value of both text and stepper
 	[self updateStepper:writeValueStepper setting:[model writeValue]];
-	[writeValueTextField setIntValue:[model writeValue]];
+	[writeValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
@@ -316,7 +316,7 @@
 
 - (IBAction) onlineAction:(id)sender
 {
-	[model setOnlineMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setOnlineMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) report:(id) sender
@@ -386,7 +386,7 @@
     };
 	
     [registerOffsetTextField setStringValue:
-	 [NSString stringWithFormat:@"0x%04lx",
+	 [NSString stringWithFormat:@"0x%04x",
 	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
@@ -411,7 +411,7 @@
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }

@@ -513,8 +513,8 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORTDC3377ModelRunModeChanged object:self];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -529,30 +529,30 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	[[self undoManager] disableUndoRegistration];
 	[self setTestingEnabled:[decoder decodeObjectForKey:@"ORTDC3377ModelTestingEnabled"]];
 	[self setTestingStatus:[decoder decodeObjectForKey:@"ORTDC3377ModelTestingStatus"]];
-	[self setDataShift:[decoder decodeIntForKey:@"ORTDC3377ModelDataShift"]];
-	[self setPulsesToGenerate:[decoder decodeIntForKey:@"ORTDC3377ModelPulsesToGenerate"]];
-	[self setTestClock:[decoder decodeIntForKey:@"ORTDC3377ModelTestClock"]];
+	[self setDataShift:[decoder decodeIntegerForKey:@"ORTDC3377ModelDataShift"]];
+	[self setPulsesToGenerate:[decoder decodeIntegerForKey:@"ORTDC3377ModelPulsesToGenerate"]];
+	[self setTestClock:[decoder decodeIntegerForKey:@"ORTDC3377ModelTestClock"]];
 	[self setTestEnabled:[decoder decodeBoolForKey:@"ORTDC3377ModelTestEnabled"]];
-	[self setTimeOut:[decoder decodeIntForKey:@"ORTDC3377ModelTimeout"]];
-	[self setDataOffset:[decoder decodeIntForKey:@"ORTDC3377ModelDataOffset"]];
-	[self setRequestDelay:[decoder decodeIntForKey:@"ORTDC3377ModelRequestDelay"]];
-	[self setMaxFullScaleTime:[decoder decodeIntForKey:@"ORTDC3377ModelMaxFullScaleTime"]];
-	[self setMaxHitsPerTDC:[decoder decodeIntForKey:@"ORTDC3377ModelMaxHitsPerTDC"]];
+	[self setTimeOut:[decoder decodeIntegerForKey:@"ORTDC3377ModelTimeout"]];
+	[self setDataOffset:[decoder decodeIntegerForKey:@"ORTDC3377ModelDataOffset"]];
+	[self setRequestDelay:[decoder decodeIntegerForKey:@"ORTDC3377ModelRequestDelay"]];
+	[self setMaxFullScaleTime:[decoder decodeIntegerForKey:@"ORTDC3377ModelMaxFullScaleTime"]];
+	[self setMaxHitsPerTDC:[decoder decodeIntegerForKey:@"ORTDC3377ModelMaxHitsPerTDC"]];
 	[self setFastFeraMode:[decoder decodeBoolForKey:@"ORTDC3377ModelFastFeraMode"]];
-	[self setPauseInterval:[decoder decodeIntForKey:@"ORTDC3377ModelPauseInterval"]];
-	[self setClockUnit:[decoder decodeIntForKey:@"ORTDC3377ModelClockUnit"]];
-	[self setPulseDelay:[decoder decodeIntForKey:@"ORTDC3377ModelPulseDelay"]];
-	[self setPulseWidth:[decoder decodeIntForKey:@"ORTDC3377ModelPulseWidth"]];
+	[self setPauseInterval:[decoder decodeIntegerForKey:@"ORTDC3377ModelPauseInterval"]];
+	[self setClockUnit:[decoder decodeIntegerForKey:@"ORTDC3377ModelClockUnit"]];
+	[self setPulseDelay:[decoder decodeIntegerForKey:@"ORTDC3377ModelPulseDelay"]];
+	[self setPulseWidth:[decoder decodeIntegerForKey:@"ORTDC3377ModelPulseWidth"]];
 	[self setSkipHeader:[decoder decodeBoolForKey:@"ORTDC3377ModelSkipHeader"]];
 	[self setMultiEventBufferMode:[decoder decodeBoolForKey:@"ORTDC3377ModelMultiEventBufferMode"]];
 	[self setFeraMode:[decoder decodeBoolForKey:@"ORTDC3377ModelFeraMode"]];
 	[self setBothEdges:[decoder decodeBoolForKey:@"ORTDC3377ModelBothEdges"]];
-	[self setControlReg5:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg5"]];
-	[self setControlReg4:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg4"]];
-	[self setControlReg3:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg3"]];
-	[self setControlReg2:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg2"]];
-	[self setControlReg1:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg1"]];
-	[self setControlReg0:[decoder decodeIntForKey:@"ORTDC3377ModelControlReg0"]];
+	[self setControlReg5:[decoder decodeIntegerForKey:@"ORTDC3377ModelControlReg5"]];
+	[self setControlReg4:[decoder decodeIntegerForKey:@"ORTDC3377ModelControlReg4"]];
+	[self setControlReg3:[decoder decodeIntegerForKey:@"ORTDC3377ModelControlReg3"]];
+	[self setControlReg2:[decoder decodeIntegerForKey:@"ORTDC3377ModelControlReg2"]];
+	[self setControlReg1:[decoder decodeIntegerForKey:@"ORTDC3377ModelControlReg1"]];
+	[self setControlReg0:[decoder decodeIntegerForKey:@"ORTDC3377ModelControlReg0"]];
 	[self setControlMode:[decoder decodeIntForKey:      @"ORTDC3377ModelControlMode"]];
 	
 	if(!testingStatus){
@@ -582,31 +582,31 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:testingEnabled forKey:@"ORTDC3377ModelTestingEnabled"];
     [encoder encodeObject:testingStatus forKey:@"ORTDC3377ModelTestingStatus"];
-    [encoder encodeInt:dataShift forKey:@"ORTDC3377ModelDataShift"];
-    [encoder encodeInt:pulsesToGenerate forKey:@"ORTDC3377ModelPulsesToGenerate"];
-    [encoder encodeInt:testClock forKey:@"ORTDC3377ModelTestClock"];
+    [encoder encodeInteger:dataShift forKey:@"ORTDC3377ModelDataShift"];
+    [encoder encodeInteger:pulsesToGenerate forKey:@"ORTDC3377ModelPulsesToGenerate"];
+    [encoder encodeInteger:testClock forKey:@"ORTDC3377ModelTestClock"];
     [encoder encodeBool:testEnabled forKey:@"ORTDC3377ModelTestEnabled"];
-    [encoder encodeInt:timeOut forKey:@"ORTDC3377ModelTimeout"];
-    [encoder encodeInt:dataOffset forKey:@"ORTDC3377ModelDataOffset"];
-    [encoder encodeInt:requestDelay forKey:@"ORTDC3377ModelRequestDelay"];
-    [encoder encodeInt:maxFullScaleTime forKey:@"ORTDC3377ModelMaxFullScaleTime"];
-    [encoder encodeInt:maxHitsPerTDC forKey:@"ORTDC3377ModelMaxHitsPerTDC"];
+    [encoder encodeInteger:timeOut forKey:@"ORTDC3377ModelTimeout"];
+    [encoder encodeInteger:dataOffset forKey:@"ORTDC3377ModelDataOffset"];
+    [encoder encodeInteger:requestDelay forKey:@"ORTDC3377ModelRequestDelay"];
+    [encoder encodeInteger:maxFullScaleTime forKey:@"ORTDC3377ModelMaxFullScaleTime"];
+    [encoder encodeInteger:maxHitsPerTDC forKey:@"ORTDC3377ModelMaxHitsPerTDC"];
     [encoder encodeBool:fastFeraMode forKey:@"ORTDC3377ModelFastFeraMode"];
-    [encoder encodeInt:pauseInterval forKey:@"ORTDC3377ModelPauseInterval"];
-    [encoder encodeInt:clockUnit forKey:@"ORTDC3377ModelClockUnit"];
-    [encoder encodeInt:pulseDelay forKey:@"ORTDC3377ModelPulseDelay"];
-    [encoder encodeInt:pulseWidth forKey:@"ORTDC3377ModelPulseWidth"];
+    [encoder encodeInteger:pauseInterval forKey:@"ORTDC3377ModelPauseInterval"];
+    [encoder encodeInteger:clockUnit forKey:@"ORTDC3377ModelClockUnit"];
+    [encoder encodeInteger:pulseDelay forKey:@"ORTDC3377ModelPulseDelay"];
+    [encoder encodeInteger:pulseWidth forKey:@"ORTDC3377ModelPulseWidth"];
     [encoder encodeBool:skipHeader forKey:@"ORTDC3377ModelSkipHeader"];
     [encoder encodeBool:multiEventBufferMode forKey:@"ORTDC3377ModelMultiEventBufferMode"];
     [encoder encodeBool:feraMode forKey:@"ORTDC3377ModelFeraMode"];
     [encoder encodeBool:bothEdges forKey:@"ORTDC3377ModelBothEdges"];
-    [encoder encodeInt:controlReg5 forKey:@"ORTDC3377ModelControlReg5"];
-    [encoder encodeInt:controlReg4 forKey:@"ORTDC3377ModelControlReg4"];
-    [encoder encodeInt:controlReg3 forKey:@"ORTDC3377ModelControlReg3"];
-    [encoder encodeInt:controlReg2 forKey:@"ORTDC3377ModelControlReg2"];
-    [encoder encodeInt:controlReg1 forKey:@"ORTDC3377ModelControlReg1"];
-    [encoder encodeInt:controlReg0 forKey:@"ORTDC3377ModelControlReg0"];
-    [encoder encodeInt:controlMode forKey:    @"ORTDC3377ModelControlMode"];
+    [encoder encodeInteger:controlReg5 forKey:@"ORTDC3377ModelControlReg5"];
+    [encoder encodeInteger:controlReg4 forKey:@"ORTDC3377ModelControlReg4"];
+    [encoder encodeInteger:controlReg3 forKey:@"ORTDC3377ModelControlReg3"];
+    [encoder encodeInteger:controlReg2 forKey:@"ORTDC3377ModelControlReg2"];
+    [encoder encodeInteger:controlReg1 forKey:@"ORTDC3377ModelControlReg1"];
+    [encoder encodeInteger:controlReg0 forKey:@"ORTDC3377ModelControlReg0"];
+    [encoder encodeInteger:controlMode forKey:    @"ORTDC3377ModelControlMode"];
 }
 
 #pragma mark ¥¥¥HW Wizard
@@ -1093,8 +1093,8 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-	long version = 1;
-    unChangingDataPart   = version<<25 | (([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16); //doesn't change so do it here.
+	int32_t version = 1;
+    unChangingDataPart   = version<<25 | (uint32_t)((([self crateNumber]&0xf)<<21) | (([self stationNumber]& 0x0000001f)<<16)); //doesn't change so do it here.
 	
 	cachedStation = [self stationNumber];
     [self clearExceptionCount];
@@ -1119,7 +1119,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
     NSString* errorLocation = @"";
 	union {
 		NSTimeInterval asTimeInterval;
-		unsigned long asLongs[2];
+		uint32_t asLongs[2];
 	}theTimeRef;
 	
 	
@@ -1134,7 +1134,7 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 				//grab the event time as reference from Jan 1, 2004.
 				theTimeRef.asTimeInterval = [NSDate timeIntervalSinceReferenceDate];
 				
-				//read the events, Q Bit will be set as long as data is valid
+				//read the events, Q Bit will be set as int32_t as data is valid
 				NSMutableData* eventBuffer = nil;
 				BOOL printedHeaderErrorOnce = NO;
 				unsigned short dataWordCount = 0;
@@ -1147,15 +1147,15 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 						}
 						//start an event
 						[eventBuffer release];
-						eventBuffer = [[NSMutableData allocWithZone:nil] initWithCapacity:1024*sizeof(long)];
+						eventBuffer = [[NSMutableData allocWithZone:nil] initWithCapacity:1024*sizeof(int32_t)];
 						dataWordCount = 0;
 						
-						[eventBuffer appendBytes:&dataId length:sizeof(long)];               //we'll add in the length when we know it.
-						[eventBuffer appendBytes:&unChangingDataPart length:sizeof(long)];   //add in the crate, card info
-						unsigned long highPart = theTimeRef.asLongs[1];
-						unsigned long lowPart  = theTimeRef.asLongs[0];
-						[eventBuffer appendBytes:&highPart length:sizeof(long)];  
-						[eventBuffer appendBytes:&lowPart  length:sizeof(long)];  
+						[eventBuffer appendBytes:&dataId length:sizeof(int32_t)];               //we'll add in the length when we know it.
+						[eventBuffer appendBytes:&unChangingDataPart length:sizeof(int32_t)];   //add in the crate, card info
+						uint32_t highPart = theTimeRef.asLongs[1];
+						uint32_t lowPart  = theTimeRef.asLongs[0];
+						[eventBuffer appendBytes:&highPart length:sizeof(int32_t)];  
+						[eventBuffer appendBytes:&lowPart  length:sizeof(int32_t)];  
 						[eventBuffer appendBytes:&dataWord length:sizeof(short)];			//add in the header word
 					}
 					else {
@@ -1198,12 +1198,12 @@ NSString* ORTDC3377SettingsLock					= @"ORTDC3377SettingsLock";
 	if(dataWordCount){
 		if(eventBuffer){
 			//pad to a longword boundary
-			if([eventBuffer length]%sizeof(long)){
+			if([eventBuffer length]%sizeof(int32_t)){
 				short dataWord = 0x0;
 				[eventBuffer appendBytes:&dataWord length:sizeof(short)];
 			}
-			unsigned long* ptr = (unsigned long*)[eventBuffer mutableBytes];
-			*ptr |= (([eventBuffer length]/sizeof(long)) & kLongFormLengthMask);
+			uint32_t* ptr = (uint32_t*)[eventBuffer mutableBytes];
+			*ptr |= (([eventBuffer length]/sizeof(int32_t)) & kLongFormLengthMask);
 			
 			ptr++;
 			*ptr |= dataWordCount;

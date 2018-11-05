@@ -507,7 +507,7 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 	NSSize theIconSize = [anImage size];
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 
 	NSAttributedString* idLabel   = [self idLabelWithSize:9 color:[NSColor blackColor]];
 	NSAttributedString* iconValue = [self iconValueWithSize:9 color:[NSColor blackColor]];
@@ -618,7 +618,7 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	
 	float slope = (195. + 15.)/(minValue-maxValue);
 	float intercept = 195. - slope*minValue;
@@ -713,11 +713,11 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	if(!normalGradient){
-		float red   = 1.0; 
-		float green = 1.0; 
-		float blue  = 1.0;
+		CGFloat red   = 1.0;
+		CGFloat green = 1.0;
+		CGFloat blue  = 1.0;
 		
 		normalGradient = [[NSGradient alloc] 
 						  initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
@@ -804,7 +804,7 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	if(iconValue){		
 		NSSize textSize = [iconValue size];
 		float x = iconStart + 10;
@@ -837,11 +837,11 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSMakePoint(iconStart,0) fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	if(!normalGradient){
-		float red   = 0.0; 
-		float green = 1.0; 
-		float blue  = 0.0;
+		CGFloat red   = 0.0;
+		CGFloat green = 1.0;
+		CGFloat blue  = 0.0;
 		
 		normalGradient = [[NSGradient alloc] 
 						   initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:1]
@@ -849,9 +849,9 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 	}
 	
 	if(!alarmGradient){
-		float red   = 1.0; 
-		float green = 0.0; 
-		float blue  = 0.0;
+		CGFloat red   = 1.0;
+		CGFloat green = 0.0;
+		CGFloat blue  = 0.0;
 		
 		alarmGradient = [[NSGradient alloc]
 						  initWithStartingColor:[NSColor colorWithCalibratedRed:red green:green blue:blue alpha:.3]
@@ -907,13 +907,13 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 - (id) eval
 {
 	[guardian eval];
-	BOOL aValue = [guardian valueTooLow];
+	BOOL aValue = [(ORAdcModel*)guardian valueTooLow];
 	return [ORProcessResult processState:aValue value:aValue];
 }
 
 - (int) evaluatedState
 {
-	return [guardian valueTooLow];
+	return [(ORAdcModel*)guardian valueTooLow];
 }
 
 @end
@@ -923,13 +923,13 @@ NSString* ORSimpleInConnection   = @"ORSimpleInConnection";
 - (id) eval
 {
 	[guardian eval];
-	BOOL aValue = [guardian valueTooHigh];
+	BOOL aValue = [(ORAdcModel*)guardian valueTooHigh];
 	return [ORProcessResult processState:aValue value:aValue];
 
 }
 - (int) evaluatedState
 {
-	return [guardian valueTooHigh];
+	return [(ORAdcModel*)guardian valueTooHigh];
 }
 
 @end

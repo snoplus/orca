@@ -25,7 +25,7 @@
 #include <IOKit/network/IOEthernetController.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
-NSString* fullVersion()
+NSString* fullVersion(void)
 {
 	CFBundleRef localInfoBundle = CFBundleGetMainBundle();
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
@@ -45,7 +45,7 @@ NSString* fullVersion()
 	return [NSString stringWithFormat:@"%@%@%@",versionString,[svnVersion length]?@":":@"",[svnVersion length]?svnVersion:@""];
 }
 
-NSString* appPath()
+NSString* appPath(void)
 {
 	NSArray* args = [[NSProcessInfo processInfo] arguments];
 	if([args count]){
@@ -59,7 +59,7 @@ NSString* appPath()
 	else return nil;
 }
 
-NSString* launchPath()
+NSString* launchPath(void)
 {
 	NSArray* args = [[NSProcessInfo processInfo] arguments];
 	if([args count]){
@@ -70,14 +70,14 @@ NSString* launchPath()
 
 //-----------------------------------------------------------------------------
 /*!\func	convertTimeCharToLong
- * \brief	Converts a date/time string in standard format to a long.
+ * \brief	Converts a date/time string in standard format to a int32_t.
  * \param	aTime			- Pointer to char holding time as characters
  * \note 	Long is assumed to use time_t format. aTime is assumed to be in the format
  *          yyyy/mm/dd hh:mm:ss given mm: 1-12, dd: 1-31, and hh as 0-24.
  *  		asTime has to be 20 chars wide.
  */
 //-----------------------------------------------------------------------------
-long 	convertTimeCharToLong( char* aTime )
+int32_t 	convertTimeCharToLong( char* aTime )
 {
 // set the tm structure using the character format
     NSString*	timeStr;
@@ -104,7 +104,7 @@ long 	convertTimeCharToLong( char* aTime )
 	[[timeStr substringWithRange:NSMakeRange( 17,2 )] getCString:tmpStorage maxLength:4 encoding:NSASCIIStringEncoding];
 	timeStruct.tm_sec = atoi( tmpStorage );	
 	
-	return( mktime( &timeStruct ) );	
+	return (uint32_t)mktime( &timeStruct) ;	
 
 }
 
@@ -130,7 +130,7 @@ void convertTimeLongToChar( time_t anTime, char *asTime )
 //-----------------------------------------------------------------------------
 id		ORKeyFromId(id anObj)
 {
-	return [NSNumber numberWithLong:(long)anObj];
+	return [NSNumber numberWithLong:(int32_t)anObj];
 }
 
 int random_range(int lowest_number, int highest_number)
@@ -151,7 +151,7 @@ int random_range(int lowest_number, int highest_number)
  * \brief	Returns the service associated with the master IO port.
  */
 //-----------------------------------------------------------------------------
-io_service_t rootService()
+io_service_t rootService(void)
 {
 	static io_service_t gRootService = 0 ;
 
@@ -230,7 +230,7 @@ NSString* listMethodWithExtendedOptions(Class aClass,BOOL verbose,BOOL includeSu
 		NSString* aName = NSStringFromSelector(method_getName(methods[i]));
 		NSArray* parts = [aName componentsSeparatedByString:@":"];
 		NSMethodSignature* sig = [aClass instanceMethodSignatureForSelector:method_getName(methods[i])];
-		int n = [sig numberOfArguments];
+		NSUInteger n = [sig numberOfArguments];
 		int j;
 		NSString* finalName = @"";
 		if(n==2){
@@ -296,9 +296,9 @@ NSString* methodsInCommonSection(id anObj)
 }
 
 
-NSString* hexToString(unsigned long aHexValue)
+NSString* hexToString(uint32_t aHexValue)
 {
-	return [NSString stringWithFormat:@"%lx",aHexValue];
+	return [NSString stringWithFormat:@"%x",aHexValue];
 }
 
 const char* decodeType(const char* aType)
@@ -307,13 +307,13 @@ const char* decodeType(const char* aType)
 	else if(!strcmp(aType,"c"))return "char";
 	else if(!strcmp(aType,"i"))return "int";
 	else if(!strcmp(aType,"s"))return "short";
-	else if(!strcmp(aType,"l"))return "long";
-	else if(!strcmp(aType,"q"))return "long long";
+	else if(!strcmp(aType,"l"))return "int32_t";
+	else if(!strcmp(aType,"q"))return "int64_t";
 	else if(!strcmp(aType,"C"))return "unsigned char";
 	else if(!strcmp(aType,"I"))return "unsigned int";
 	else if(!strcmp(aType,"S"))return "unsigned short";
-	else if(!strcmp(aType,"L"))return "unsigned long";
-	else if(!strcmp(aType,"Q"))return "unsigned long long";
+	else if(!strcmp(aType,"L"))return "uint32_t";
+	else if(!strcmp(aType,"Q"))return "uint64_t";
 	else if(!strcmp(aType,"f"))return "float";
 	else if(!strcmp(aType,"d"))return "double";
 	else if(!strcmp(aType,"B"))return "bool";
@@ -356,7 +356,7 @@ NSString* commonScriptMethodsByObj(id anObj,BOOL includeSuperClass)
 }
 
 
-NSString* computerName()
+NSString* computerName(void)
 {
 	//return  [(NSString*)CSCopyMachineName() autorelease];
     CFStringRef temp = SCDynamicStoreCopyComputerName(NULL,NULL);
@@ -365,7 +365,7 @@ NSString* computerName()
     return name;
 }
 
-NSString* macAddress()
+NSString* macAddress(void)
 {
 	kern_return_t	kernResult = KERN_SUCCESS; // on PowerPC this is an int (4 bytes)
 	/*
@@ -376,7 +376,7 @@ NSString* macAddress()
 	 */
 	
 	io_iterator_t	intfIterator;
-	UInt8			MACAddress[kIOEthernetAddressSize];
+	uint8			MACAddress[kIOEthernetAddressSize];
 	
 	kernResult = findEthernetInterfaces(&intfIterator);
 	NSString* theResult = @"";
@@ -406,7 +406,7 @@ NSString* macAddress()
 // Given an iterator across a set of Ethernet interfaces, return the MAC address of the last one.
 // If no interfaces are found the MAC address is set to an empty string.
 // In this sample the iterator should contain just the primary interface.
-kern_return_t getMACAddress(io_iterator_t intfIterator, UInt8 *MACAddress, UInt8 bufferSize)
+kern_return_t getMACAddress(io_iterator_t intfIterator, uint8 *MACAddress, uint8 bufferSize)
 {
     io_object_t		intfService;
     io_object_t		controllerService;
@@ -556,13 +556,13 @@ BOOL ORRunAlertPanel(NSString* mainMessage, NSString* msg, NSString* defaultButt
     if(defaultButtonTitle)  [alert addButtonWithTitle:defaultButtonTitle];
     if(alternateButtonTitle)[alert addButtonWithTitle:alternateButtonTitle];
     if(otherButtonTitle)    [alert addButtonWithTitle:otherButtonTitle];
-    int choice = [alert runModal];
+    NSInteger choice = [alert runModal];
     if(choice == NSAlertFirstButtonReturn)  result = YES;
     else                                    result = NO;
 #else
     NSString* s = [NSString stringWithFormat:msg parameters:ap];
     int choice = NSRunAlertPanel(mainMessage,@"%@",defaultButtonTitle,alternateButtonTitle,otherButtonTitle,s);
-    if(choice == NSAlertDefaultReturn) result = YES;
+    if(choice == NSAlertFirstButtonReturn) result = YES;
     else                               result = NO;
 #endif
  

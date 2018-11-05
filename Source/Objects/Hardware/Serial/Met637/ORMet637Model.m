@@ -181,7 +181,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	if(((missedCycleCount >= 3) && (countingMode == kMet637Auto)) || 
        ((missedCycleCount > 0) && (countingMode == kMet637Manual))){
 		if(!missingCyclesAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu) Missing Cycles",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %u) Missing Cycles",[self uniqueIdNumber]];
 			missingCyclesAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[missingCyclesAlarm setSticky:YES];
             if(countingMode == kMet637Manual)[missingCyclesAlarm setHelpString:@"The particle counter did not report counts at the end of its last single cycle.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];			
@@ -289,7 +289,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	if(statusBits & 0x10){
 		if(!lowBatteryAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu)",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %u)",[self uniqueIdNumber]];
 			lowBatteryAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[lowBatteryAlarm setSticky:YES];
 			[lowBatteryAlarm setHelpString:@"The battery on the particle counter is low. Is it supposed to be running on the battery?\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -304,7 +304,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	
 	if(statusBits & 0x20){
 		if(!sensorErrorAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu)",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %u)",[self uniqueIdNumber]];
 			sensorErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[sensorErrorAlarm setSticky:YES];
 			[sensorErrorAlarm setHelpString:@"The sensor is reporting a hardware error.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -319,7 +319,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	
 	if(statusBits & 0x40){
 		if(!flowErrorAlarm){
-			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %lu)",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"Met637 (Unit %u)",[self uniqueIdNumber]];
 			flowErrorAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[flowErrorAlarm setSticky:YES];
 			[flowErrorAlarm setHelpString:@"The particle counter is reporting a flow error.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -589,12 +589,12 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:	isLog			forKey:@"isLog"];
-    [encoder encodeInt:		holdTime		forKey: @"holdTime"];
-    [encoder encodeInt:		tempUnits		forKey: @"tempUnits"];
-    [encoder encodeInt:		countUnits		forKey: @"countUnits"];
-    [encoder encodeInt:		location		forKey: @"location"];
-    [encoder encodeInt:		cycleDuration	forKey: @"cycleDuration"];
-    [encoder encodeInt:		countingMode	forKey: @"countingMode"];
+    [encoder encodeInteger:		holdTime		forKey: @"holdTime"];
+    [encoder encodeInteger:		tempUnits		forKey: @"tempUnits"];
+    [encoder encodeInteger:		countUnits		forKey: @"countUnits"];
+    [encoder encodeInteger:		location		forKey: @"location"];
+    [encoder encodeInteger:		cycleDuration	forKey: @"cycleDuration"];
+    [encoder encodeInteger:		countingMode	forKey: @"countingMode"];
     [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
 	int i; 
 	for(i=0;i<8;i++){
@@ -634,8 +634,8 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 	NSCalendar *gregorian = [[[NSCalendar alloc]  initWithCalendarIdentifier:NSGregorianCalendar] autorelease];
 #endif
 	NSDateComponents *comps = [gregorian components:unitFlags fromDate:today];
-	[self addCmdToQueue:[NSString stringWithFormat:@"D %02d/%02d/%02d",[comps month],[comps day],[comps year]-2000]]; 
-	[self addCmdToQueue:[NSString stringWithFormat:@"T %02d:%02d",[comps hour],[comps minute]]]; 
+	[self addCmdToQueue:[NSString stringWithFormat:@"D %02ld/%02ld/%02ld",[comps month],[comps day],[comps year]-2000]];
+	[self addCmdToQueue:[NSString stringWithFormat:@"T %02ld:%02ld",[comps hour],[comps minute]]];
 }
 - (void) sendClearData				{ [self addCmdToQueue:@"C\rY"]; }
 - (void) sendStart					{ [self addCmdToQueue:@"S"]; }
@@ -732,7 +732,7 @@ NSString* ORMet637Lock = @"ORMet637Lock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Met637,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Met637,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }

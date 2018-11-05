@@ -269,7 +269,7 @@ isLoaded = isLoaded;
             // currently this is always 0, but write this if we ever add it to the GUI
         }
         if (pqCrate->valid[kCrate_hvRelayMask1] && pqCrate->valid[kCrate_hvRelayMask2]) {
-            unsigned long long mask = ((unsigned long long)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
+            uint64_t mask = ((uint64_t)pqCrate->hvRelayMask2 << 32) | pqCrate->hvRelayMask1;
             [self setRelayMask:mask];
             [self setRelayStatus:@"status: set"];
         }
@@ -522,7 +522,7 @@ isLoaded = isLoaded;
 	return reg[anIndex].regName;
 }
 
-- (unsigned long) getRegisterAddress: (short) anIndex
+- (uint32_t) getRegisterAddress: (short) anIndex
 {
 	return reg[anIndex].address;
 }
@@ -550,12 +550,12 @@ isLoaded = isLoaded;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeRunningChanged object:self];
 }
 
-- (unsigned long) slotMask
+- (uint32_t) slotMask
 {
 	return selectedSlotMask;
 }
 
-- (void) setSlotMask:(unsigned long)aSlotMask
+- (void) setSlotMask:(uint32_t)aSlotMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setSlotMask:selectedSlotMask];
 	selectedSlotMask = aSlotMask;
@@ -604,12 +604,12 @@ isLoaded = isLoaded;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRepeatCountChanged object:self];
 }
 
-- (unsigned long) writeValue
+- (uint32_t) writeValue
 {
 	return writeValue;
 }
 
-- (void) setWriteValue:(unsigned long)aWriteValue
+- (void) setWriteValue:(uint32_t)aWriteValue
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
 	
@@ -660,24 +660,24 @@ isLoaded = isLoaded;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3ModeRunningChanged object:self];
 }
 
-- (unsigned long) xl3RWAddressValue
+- (uint32_t) xl3RWAddressValue
 {
 	return xl3RWAddressValue;
 }
 
-- (void) setXl3RWAddressValue:(unsigned long)anXl3RWAddressValue
+- (void) setXl3RWAddressValue:(uint32_t)anXl3RWAddressValue
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setXl3RWAddressValue:xl3RWAddressValue];
 	xl3RWAddressValue = anXl3RWAddressValue;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3RWAddressValueChanged object:self];
 }
 
-- (unsigned long) xl3RWDataValue
+- (uint32_t) xl3RWDataValue
 {
 	return xl3RWDataValue;
 }
 
-- (void) setXl3RWDataValue:(unsigned long)anXl3RWDataValue;
+- (void) setXl3RWDataValue:(uint32_t)anXl3RWDataValue;
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setXl3RWDataValue:xl3RWDataValue];
 	xl3RWDataValue = anXl3RWDataValue;
@@ -696,12 +696,12 @@ isLoaded = isLoaded;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelXl3OpsRunningChanged object:self];
 }
 
-- (unsigned long) xl3PedestalMask
+- (uint32_t) xl3PedestalMask
 {
 	return xl3PedestalMask;
 }
 
-- (void) setXl3PedestalMask:(unsigned long)anXl3PedestalMask;
+- (void) setXl3PedestalMask:(uint32_t)anXl3PedestalMask;
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setXl3PedestalMask:xl3PedestalMask];
 	xl3PedestalMask = anXl3PedestalMask;
@@ -709,12 +709,12 @@ isLoaded = isLoaded;
 }
  
 
-- (unsigned long) xl3ChargeInjMask
+- (uint32_t) xl3ChargeInjMask
 {
     return xl3ChargeInjMask;
 }
 
-- (void) setXl3ChargeInjMask:(unsigned long)aXl3ChargeInjMask
+- (void) setXl3ChargeInjMask:(uint32_t)aXl3ChargeInjMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setXl3ChargeInjMask:xl3ChargeInjMask];
 	xl3ChargeInjMask = aXl3ChargeInjMask;
@@ -1088,24 +1088,24 @@ BOOL owlSupplyState = false;
     });
 }
 
-- (unsigned long) hvAVoltageDACSetValue
+- (uint32_t) hvAVoltageDACSetValue
 {
     return hvAVoltageDACSetValue;
 }
 
-- (void) setHvAVoltageDACSetValue:(unsigned long)aHvAVoltageDACSetValue {
+- (void) setHvAVoltageDACSetValue:(uint32_t)aHvAVoltageDACSetValue {
     hvAVoltageDACSetValue = aHvAVoltageDACSetValue;
     dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
     });
 }
 
-- (unsigned long) hvBVoltageDACSetValue
+- (uint32_t) hvBVoltageDACSetValue
 {
     return hvBVoltageDACSetValue;
 }
 
-- (void) setHvBVoltageDACSetValue:(unsigned long)aHvBVoltageDACSetValue {
+- (void) setHvBVoltageDACSetValue:(uint32_t)aHvBVoltageDACSetValue {
     hvBVoltageDACSetValue = aHvBVoltageDACSetValue;
     dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHvStatusChanged object:self];        
@@ -1164,12 +1164,12 @@ BOOL owlSupplyState = false;
     });
 }
 
-- (unsigned long) hvAVoltageTargetValue
+- (uint32_t) hvAVoltageTargetValue
 {
     return _hvAVoltageTargetValue;
 }
 
-- (void) setHvAVoltageTargetValue:(unsigned long)hvAVoltageTargetValue
+- (void) setHvAVoltageTargetValue:(uint32_t)hvAVoltageTargetValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvAVoltageTargetValue:_hvAVoltageTargetValue];
     _hvAVoltageTargetValue = hvAVoltageTargetValue;
@@ -1178,12 +1178,12 @@ BOOL owlSupplyState = false;
     });
 }
 
-- (unsigned long) hvBVoltageTargetValue
+- (uint32_t) hvBVoltageTargetValue
 {
     return _hvBVoltageTargetValue;
 }
 
-- (void) setHvBVoltageTargetValue:(unsigned long)hvBVoltageTargetValue
+- (void) setHvBVoltageTargetValue:(uint32_t)hvBVoltageTargetValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvBVoltageTargetValue:_hvBVoltageTargetValue];
     _hvBVoltageTargetValue = hvBVoltageTargetValue;
@@ -1192,12 +1192,12 @@ BOOL owlSupplyState = false;
     });
 }
 
-- (unsigned long) hvNominalVoltageA
+- (uint32_t) hvNominalVoltageA
 {
     return _hvNominalVoltageA;
 }
 
-- (void) setHvNominalVoltageA:(unsigned long)hvNominalVoltageA
+- (void) setHvNominalVoltageA:(uint32_t)hvNominalVoltageA
 {
     _hvNominalVoltageA = hvNominalVoltageA;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1205,12 +1205,12 @@ BOOL owlSupplyState = false;
     });
 }
 
-- (unsigned long) hvNominalVoltageB
+- (uint32_t) hvNominalVoltageB
 {
     return _hvNominalVoltageB;
 }
 
-- (void) setHvNominalVoltageB:(unsigned long)hvNominalVoltageB
+- (void) setHvNominalVoltageB:(uint32_t)hvNominalVoltageB
 {
     _hvNominalVoltageB = hvNominalVoltageB;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1218,72 +1218,72 @@ BOOL owlSupplyState = false;
     });
 }
 
-- (unsigned long) hvACMOSRateLimit
+- (uint32_t) hvACMOSRateLimit
 {
     return _hvACMOSRateLimit;
 }
 
-- (void) setHvACMOSRateLimit:(unsigned long)hvACMOSRateLimit
+- (void) setHvACMOSRateLimit:(uint32_t)hvACMOSRateLimit
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvACMOSRateLimit:_hvACMOSRateLimit];
     _hvACMOSRateLimit = hvACMOSRateLimit;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateLimitChanged object:self];            
 }
 
-- (unsigned long) hvBCMOSRateLimit
+- (uint32_t) hvBCMOSRateLimit
 {
     return _hvBCMOSRateLimit;
 }
 
-- (void) setHvBCMOSRateLimit:(unsigned long)hvBCMOSRateLimit
+- (void) setHvBCMOSRateLimit:(uint32_t)hvBCMOSRateLimit
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvBCMOSRateLimit:_hvBCMOSRateLimit];
     _hvBCMOSRateLimit = hvBCMOSRateLimit;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateLimitChanged object:self];            
 }
 
-- (unsigned long) hvACMOSRateIgnore
+- (uint32_t) hvACMOSRateIgnore
 {
     return _hvACMOSRateIgnore;
 }
 
-- (void) setHvACMOSRateIgnore:(unsigned long)hvACMOSRateIgnore
+- (void) setHvACMOSRateIgnore:(uint32_t)hvACMOSRateIgnore
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvACMOSRateIgnore:_hvACMOSRateIgnore];
     _hvACMOSRateIgnore = hvACMOSRateIgnore;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateIgnoreChanged object:self];            
 }
 
-- (unsigned long) hvBCMOSRateIgnore
+- (uint32_t) hvBCMOSRateIgnore
 {
     return _hvBCMOSRateIgnore;
 }
 
-- (void) setHvBCMOSRateIgnore:(unsigned long)hvBCMOSRateIgnore
+- (void) setHvBCMOSRateIgnore:(uint32_t)hvBCMOSRateIgnore
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setHvBCMOSRateIgnore:_hvBCMOSRateIgnore];
     _hvBCMOSRateIgnore = hvBCMOSRateIgnore;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelHVCMOSRateIgnoreChanged object:self];            
 }
 
-- (unsigned long long) relayMask
+- (uint64_t) relayMask
 {
     return relayMask;
 }
 
-- (void) setRelayMask:(unsigned long long)aRelayMask
+- (void) setRelayMask:(uint64_t)aRelayMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRelayMask:relayMask];
     relayMask = aRelayMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORXL3ModelRelayMaskChanged object:self];        
 }
 
-- (unsigned long long) relayViewMask
+- (uint64_t) relayViewMask
 {
     return relayViewMask;
 }
 
-- (void) setRelayViewMask:(unsigned long long)aRelayViewMask
+- (void) setRelayViewMask:(uint64_t)aRelayViewMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRelayViewMask:relayViewMask];
     relayViewMask = aRelayViewMask;
@@ -1339,7 +1339,7 @@ BOOL owlSupplyState = false;
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"SNO Crate %d, card %d",[self crateNumber], [self stationNumber]];
+    return [NSString stringWithFormat:@"SNO Crate %d, card %u",(int)[self crateNumber], (int)[self stationNumber]];
 }
 
 - (NSComparisonResult)	slotCompare:(id)otherCard
@@ -1421,7 +1421,7 @@ void SwapLongBlock(void* p, int32_t n)
 	uint8_t s_tDisc_rmp[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // back edge timing ramp
 	uint8_t s_tDisc_rmpup[8] = { 115, 115, 115, 115, 115, 115, 115, 115 }; // front edge timing ramp
 	uint8_t s_tDisc_vsi[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // short integrate voltage
-	uint8_t s_tDisc_vli[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // long integrate voltage
+	uint8_t s_tDisc_vli[8] =   { 120, 120, 120, 120, 120, 120, 120, 120 }; // int32_t integrate voltage
 	
 
 	//tCmos: the following are motherboard wide constants
@@ -1606,7 +1606,7 @@ void SwapLongBlock(void* p, int32_t n)
     mb->tCmos.tacRef = [fec cmos:4];
     mb->tCmos.vMax = [fec cmos:5];
 
-    mb->disableMask = [fec seqDisabledMask];
+    mb->disableMask = (unsigned int)[fec seqDisabledMask];
 }
 
 #pragma mark •••Archival
@@ -1623,24 +1623,24 @@ void SwapLongBlock(void* p, int32_t n)
     xl3Link = [[decoder decodeObjectForKey:@"XL3_Link"] retain];
 
     [self setAutoIncrement:         [decoder decodeBoolForKey:@"ORXL3ModelAutoIncrement"]];
-    [self setRepeatDelay:           [decoder decodeIntForKey:@"ORXL3ModelRepeatDelay"]];
-    [self setRepeatOpCount:         [decoder decodeIntForKey:@"ORXL3ModelRepeatOpCount"]];
+    [self setRepeatDelay:           [decoder decodeIntegerForKey:@"ORXL3ModelRepeatDelay"]];
+    [self setRepeatOpCount:         [decoder decodeIntegerForKey:@"ORXL3ModelRepeatOpCount"]];
     [self setXl3Mode:               [decoder decodeIntForKey:@"ORXL3ModelXl3Mode"]];
     [self setSlotMask:              [decoder decodeIntForKey:@"ORXL3ModelSlotMask"]];
     [self setXl3RWAddressValue:     [decoder decodeIntForKey:@"ORXL3ModelXl3RWAddressValue"]];
     [self setXl3RWDataValue:        [decoder decodeIntForKey:@"ORXL3ModelXl3RWDataValue"]];
     [self setXl3PedestalMask:       [decoder decodeIntForKey:@"ORXL3ModelXl3PedestalMask"]];
     [self setXl3ChargeInjMask:      [decoder decodeIntForKey:@"ORXL3ModelXl3ChargeInjMask"]];
-    [self setXl3ChargeInjCharge:    [decoder decodeIntForKey:@"ORXL3ModelXl3ChargeInjCharge"]];
-    [self setPollXl3Time:           [decoder decodeIntForKey:@"ORXL3ModelPollXl3Time"]];
+    [self setXl3ChargeInjCharge:    [decoder decodeIntegerForKey:@"ORXL3ModelXl3ChargeInjCharge"]];
+    [self setPollXl3Time:           [decoder decodeIntegerForKey:@"ORXL3ModelPollXl3Time"]];
     //[self setIsPollingXl3:          [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3"]];
     [self setIsPollingXl3:NO];
     [self setIsPollingCMOSRates:    [decoder decodeBoolForKey:@"ORXL3ModelIsPollingCMOSRates"]];
-    [self setPollCMOSRatesMask:     [decoder decodeIntForKey:@"ORXL3ModelPollCMOSRatesMask"]];
+    [self setPollCMOSRatesMask:     [decoder decodeIntegerForKey:@"ORXL3ModelPollCMOSRatesMask"]];
     [self setIsPollingPMTCurrents:  [decoder decodeBoolForKey:@"ORXL3ModelIsPollingPMTCurrents"]];
-    [self setPollPMTCurrentsMask:   [decoder decodeIntForKey:@"ORXL3ModelPollPMTCurrentsMask"]];
+    [self setPollPMTCurrentsMask:   [decoder decodeIntegerForKey:@"ORXL3ModelPollPMTCurrentsMask"]];
     [self setIsPollingFECVoltages:  [decoder decodeBoolForKey:@"ORXL3ModelIsPollingFECVoltages"]];
-    [self setPollFECVoltagesMask:   [decoder decodeIntForKey:@"ORXL3ModelPollFECVoltagesMask"]];
+    [self setPollFECVoltagesMask:   [decoder decodeIntegerForKey:@"ORXL3ModelPollFECVoltagesMask"]];
     [self setIsPollingXl3Voltages:  [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3Voltages"]];
     [self setIsPollingHVSupply:     [decoder decodeBoolForKey:@"ORXL3ModelIsPollingHVSupply"]];
     [self setIsPollingXl3WithRun:   [decoder decodeBoolForKey:@"ORXL3ModelIsPollingXl3WithRun"]];
@@ -1701,24 +1701,24 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:[self slot]          forKey:@"slot"];
     [encoder encodeObject:xl3Link           forKey:@"XL3_Link"];
     [encoder encodeBool:autoIncrement       forKey:@"ORXL3ModelAutoIncrement"];
-    [encoder encodeInt:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
-    [encoder encodeInt:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
+    [encoder encodeInteger:repeatDelay          forKey:@"ORXL3ModelRepeatDelay"];
+    [encoder encodeInteger:repeatOpCount        forKey:@"ORXL3ModelRepeatOpCount"];
     [encoder encodeInt:xl3Mode              forKey:@"ORXL3ModelXl3Mode"];
     [encoder encodeInt:selectedSlotMask     forKey:@"ORXL3ModelSlotMask"];
     [encoder encodeInt:xl3RWAddressValue    forKey:@"ORXL3ModelXl3RWAddressValue"];
     [encoder encodeInt:xl3RWDataValue       forKey:@"ORXL3ModelXl3RWDataValue"];
     [encoder encodeInt:xl3PedestalMask      forKey:@"ORXL3ModelXl3PedestalMask"];
     [encoder encodeInt:xl3ChargeInjMask     forKey:@"ORXL3ModelXl3ChargeInjMask"];
-    [encoder encodeInt:xl3ChargeInjCharge   forKey:@"ORXL3ModelXl3ChargeInjCharge"];
+    [encoder encodeInteger:xl3ChargeInjCharge   forKey:@"ORXL3ModelXl3ChargeInjCharge"];
 
-    [encoder encodeInt:pollXl3Time              forKey:@"ORXL3ModelPollXl3Time"];
+    [encoder encodeInteger:pollXl3Time              forKey:@"ORXL3ModelPollXl3Time"];
     [encoder encodeBool:isPollingXl3            forKey:@"ORXL3ModelIsPollingXl3"];
     [encoder encodeBool:isPollingCMOSRates      forKey:@"ORXL3ModelIsPollingCMOSRates"];
-    [encoder encodeInt:pollCMOSRatesMask        forKey:@"ORXL3ModelPollCMOSRatesMask"];
+    [encoder encodeInteger:pollCMOSRatesMask        forKey:@"ORXL3ModelPollCMOSRatesMask"];
     [encoder encodeBool:isPollingPMTCurrents    forKey:@"ORXL3ModelIsPollingPMTCurrents"];
-    [encoder encodeInt:pollPMTCurrentsMask      forKey:@"ORXL3ModelPollPMTCurrentsMask"];
+    [encoder encodeInteger:pollPMTCurrentsMask      forKey:@"ORXL3ModelPollPMTCurrentsMask"];
     [encoder encodeBool:isPollingFECVoltages    forKey:@"ORXL3ModelIsPollingFECVoltages"];
-    [encoder encodeInt:pollFECVoltagesMask      forKey:@"ORXL3ModelPollFECVoltagesMask"];
+    [encoder encodeInteger:pollFECVoltagesMask      forKey:@"ORXL3ModelPollFECVoltagesMask"];
     [encoder encodeBool:isPollingXl3Voltages    forKey:@"ORXL3ModelIsPollingXl3Voltages"];
     [encoder encodeBool:isPollingHVSupply       forKey:@"ORXL3ModelIsPollingHVSupply"];
     [encoder encodeBool:isPollingXl3WithRun     forKey:@"ORXL3ModelIsPollingXl3WithRun"];
@@ -1727,10 +1727,10 @@ void SwapLongBlock(void* p, int32_t n)
     [encoder encodeInt:hvBVoltageDACSetValue    forKey:@"ORXL3ModelHvBVoltageDACSetValue"];
     [encoder encodeInt:_hvAVoltageTargetValue   forKey:@"ORXL3ModelhvAVoltageTargetValue"];
     [encoder encodeInt:_hvBVoltageTargetValue   forKey:@"ORXL3ModelhvBVoltageTargetValue"];
-    [encoder encodeInt:_hvNominalVoltageA       forKey:@"ORXL3ModelHvNominalVoltageA"];
-    [encoder encodeInt:_hvNominalVoltageB       forKey:@"ORXL3ModelHvNominalVoltageB"];
+    [encoder encodeInteger:_hvNominalVoltageA       forKey:@"ORXL3ModelHvNominalVoltageA"];
+    [encoder encodeInteger:_hvNominalVoltageB       forKey:@"ORXL3ModelHvNominalVoltageB"];
     [encoder encodeInt64:relayMask              forKey:@"ORXL3ModelRelayMask"];
-    [encoder encodeInt32:relayViewMask          forKey:@"ORXL3ModelRelayViewMask"];
+    [encoder encodeInteger:relayViewMask          forKey:@"ORXL3ModelRelayViewMask"];
     [encoder encodeInt:_hvACMOSRateLimit        forKey:@"ORXL3ModelhvACMOSRateLimit"];
     [encoder encodeInt:_hvBCMOSRateLimit        forKey:@"ORXL3ModelhvBCMOSRateLimit"];
     [encoder encodeInt:_hvACMOSRateIgnore       forKey:@"ORXL3ModelhvACMOSRateIgnore"];
@@ -1748,8 +1748,9 @@ void SwapLongBlock(void* p, int32_t n)
 
 - (void) nominalSettingsCallback: (ORPQResult *) result
 {
-    int i, nrows, ncols, slot, channel;
+    int i, slot, channel;
     int n100, n20, sequencer, hv, resistor_pulled;
+    NSInteger nrows,ncols;
     ORFec32Model *fec;
 
     if (!result) {
@@ -1771,12 +1772,12 @@ void SwapLongBlock(void* p, int32_t n)
     }
 
     for (i = 0; i < nrows; i++) {
-        slot = [result getInt64atRow:i column:0];
-        channel = [result getInt64atRow:i column:1];
-        n100 = [result getInt64atRow:i column:2];
-        n20 = [result getInt64atRow:i column:3];
-        sequencer = [result getInt64atRow:i column:4];
-        resistor_pulled = [result getInt64atRow:i column:5];
+        slot = (int)[result getInt64atRow:i column:0];
+        channel = (int)[result getInt64atRow:i column:1];
+        n100 = (int)[result getInt64atRow:i column:2];
+        n20 = (int)[result getInt64atRow:i column:3];
+        sequencer = (int)[result getInt64atRow:i column:4];
+        resistor_pulled = (int)[result getInt64atRow:i column:5];
 
         fec = [[OROrderedObjManager for:[self guardian]] objectInSlot:16-slot];
 
@@ -2074,7 +2075,7 @@ void SwapLongBlock(void* p, int32_t n)
 
         args->slotMask |= 1 << slot;
 
-        args->channelMasks[slot] = ~[fec seqDisabledMask];
+        args->channelMasks[slot] = ~(unsigned int)[fec seqDisabledMask];
     }
 
     /* Convert args to network byte order. */
@@ -2101,7 +2102,7 @@ void SwapLongBlock(void* p, int32_t n)
 	[[self xl3Link] sendCommand:DESELECT_FECS_ID expectResponse:YES];
 }
 
-- (void) selectCards:(unsigned long) selectBits
+- (void) selectCards:(uint32_t) selectBits
 {
 	//??? xl2 compatibility
 	//[self writeToXL2Register:XL2_SELECT_REG value: selectBits]; // select the cards by writing to the XL2 REG 0 
@@ -2112,7 +2113,7 @@ void SwapLongBlock(void* p, int32_t n)
 {
 	//???xl2 compatibility
 	/*
-	unsigned long selectBits;
+	uint32_t selectBits;
 	if(aCard == self)	selectBits = 0; //XL2_SELECT_XL2;
 	else				selectBits = (1L<<[aCard stationNumber]);
 	//NSLog(@"selectBits for card in slot %d: 0x%x\n", [aCard slot], selectBits);
@@ -2120,10 +2121,10 @@ void SwapLongBlock(void* p, int32_t n)
 	*/
 }
 
-- (void) writeHardwareRegister:(unsigned long)regAddress value:(unsigned long) aValue
+- (void) writeHardwareRegister:(uint32_t)regAddress value:(uint32_t) aValue
 {
-	uint32_t address = regAddress | WRITE_REG;
-    uint32_t value = aValue;
+	uint32_t address = (uint32_t)(regAddress | WRITE_REG);
+    uint32_t value = (uint32_t)aValue;
 
 	@try {
 		[xl3Link sendCommand:0UL toAddress:address withData:&value];
@@ -2134,9 +2135,9 @@ void SwapLongBlock(void* p, int32_t n)
 	}
 }
 
-- (unsigned long) readHardwareRegister:(unsigned long)regAddress
+- (uint32_t) readHardwareRegister:(uint32_t)regAddress
 {
-	uint32_t xl3Address = regAddress | READ_REG;
+	uint32_t xl3Address = (uint32_t)(regAddress | READ_REG);
 	uint32_t aValue = 0UL;
 
 	@try {
@@ -2150,13 +2151,13 @@ void SwapLongBlock(void* p, int32_t n)
 	return aValue;
 }
 
-- (void) writeHardwareMemory:(unsigned long)memAddress value:(unsigned long)aValue
+- (void) writeHardwareMemory:(uint32_t)memAddress value:(uint32_t)aValue
 {
-	uint32_t address = memAddress | WRITE_MEM;
-    uint32_t value = aValue;
+	uint32_t address = (uint32_t)(memAddress | WRITE_MEM);
+    uint32_t value = (uint32_t)aValue;
 
 	@try {
-		[xl3Link sendCommand:0UL toAddress:address withData:&value];
+		[xl3Link sendCommand:0UL toAddress:(uint32_t)address withData:&value];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 writeHadwareMemory at address: 0x%08x failed\n", memAddress);
@@ -2164,12 +2165,12 @@ void SwapLongBlock(void* p, int32_t n)
 	}
 }
 
-- (unsigned long) readHardwareMemory:(unsigned long) memAddress
+- (uint32_t) readHardwareMemory:(uint32_t) memAddress
 {
-	uint32_t xl3Address = memAddress | READ_MEM;
+	uint32_t xl3Address = (uint32_t)(memAddress | READ_MEM);
 	uint32_t aValue = 0UL;
 	@try {
-		[xl3Link sendCommand:0UL toAddress:xl3Address withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:(uint32_t)xl3Address withData:&aValue];
 	}
 	@catch (NSException* e) {
 		NSLog(@"XL3 readHadwareMemory at address: 0x%08x failed\n", memAddress);
@@ -2178,46 +2179,46 @@ void SwapLongBlock(void* p, int32_t n)
 	return aValue;
 }
 
-- (void) writeXL3Register:(short)aRegister value:(unsigned long)aValue
+- (void) writeXL3Register:(short)aRegister value:(uint32_t)aValue
 {
 	if (aRegister >= kXl3NumRegisters) {
 		NSLog(@"Error writing XL3 register out of range\n");
 		return;
 	}
 	
-	unsigned long address = XL3_SEL | [self getRegisterAddress:aRegister] | WRITE_REG;
+	uint32_t address = XL3_SEL | [self getRegisterAddress:aRegister] | WRITE_REG;
 	[self writeHardwareRegister:address value:aValue];
 	return;
 }
 
 
-- (unsigned long) readXL3Register:(short)aRegister
+- (uint32_t) readXL3Register:(short)aRegister
 {
 	if (aRegister >= kXl3NumRegisters) {
 		NSLog(@"Error reading XL3 register out of range\n");
 		return 0;
 	}
 
-	unsigned long address = XL3_SEL | [self getRegisterAddress:aRegister] | READ_REG;
-	unsigned long value = [self readHardwareRegister:address];
+	uint32_t address = XL3_SEL | [self getRegisterAddress:aRegister] | READ_REG;
+	uint32_t value = [self readHardwareRegister:address];
 	return value;
 }
 
 
 //multi command calls
-- (id) writeHardwareRegisterCmd:(unsigned long) aRegister value:(unsigned long) aBitPattern
+- (id) writeHardwareRegisterCmd:(uint32_t) aRegister value:(uint32_t) aBitPattern
 {
 	//return [[self xl1] writeHardwareRegisterCmd:aRegister value:aBitPattern];
 	return self;
 }
 
-- (id) readHardwareRegisterCmd:(unsigned long) regAddress
+- (id) readHardwareRegisterCmd:(uint32_t) regAddress
 {
 	//return [[self xl1] readHardwareRegisterCmd:regAddress];
 	return self;
 }
 
-- (id) delayCmd:(unsigned long) milliSeconds
+- (id) delayCmd:(uint32_t) milliSeconds
 {
 	//return [[self xl1] delayCmd:milliSeconds]; 
 	return self;
@@ -2793,7 +2794,7 @@ err:
     [self updateUIFromEcalBundle:hwDic slot:slotNum];
     [self synthesizeFECIntoBundle:&hw_bundle[slotNum] forSlot:slotNum];
     
-    [self setEcal_received:[self ecal_received] | 1UL << slotNum];
+    [self setEcal_received:(uint32_t)([self ecal_received] | 1UL << slotNum)];
     //NSLog(@"ecal received mask: 0x%08x\n", [self ecal_received]);
     if ([self ecal_received] == 0xffffUL) {
         [self ecalToOrcaDocumentsReceived];
@@ -3017,12 +3018,12 @@ err:
 
 - (void) compositeXl3RW
 {
-	uint32_t aValue = [self xl3RWDataValue];
+	uint32_t aValue = (uint32_t)[self xl3RWDataValue];
 	NSLog(@"%@ XL3_rw to address: 0x%08x with data: 0x%08x\n",[[self xl3Link] crateName], [self xl3RWAddressValue], aValue);
 	[self setXl3OpsRunning:YES forKey:@"compositeXl3RW"];
 	
 	@try {
-		[xl3Link sendCommand:0UL toAddress:[self xl3RWAddressValue] withData:&aValue];
+		[xl3Link sendCommand:0UL toAddress:(uint32_t)[self xl3RWAddressValue] withData:&aValue];
 		NSLog(@"XL3_rw returned data: 0x%08x\n", aValue);
 	}
 	@catch (NSException* e) {
@@ -3035,7 +3036,7 @@ err:
 - (void) compositeQuit
 {
 	char payload[XL3_PAYLOAD_SIZE];
-	unsigned long* data = (unsigned long*) payload;
+	uint32_t* data = (uint32_t*) payload;
 	
 	if ([xl3Link needToSwap]) {
 		data[0] = 0x20657942UL;
@@ -3077,7 +3078,7 @@ err:
 
     for (id aFec in fecs) {
         args->slotMask |= 1 << [aFec stationNumber];
-        args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+        args->channelMasks[[aFec stationNumber]] = (uint32_t)[aFec pedEnabledMask];
     }
 
     args->slotMask = htonl(args->slotMask);
@@ -3171,7 +3172,7 @@ err:
 - (void) compositeSetPedestal
 {
 	char payload[XL3_PAYLOAD_SIZE];
-	unsigned long* data = (unsigned long*) payload;
+	uint32_t* data = (uint32_t*) payload;
 
 	if ([xl3Link needToSwap]) {
 		data[0] = swapLong([self slotMask]);
@@ -3218,7 +3219,7 @@ err:
         slotMaskPresent |= 1 << [aFec stationNumber];
     }
     
-    unsigned int slotMaskSet = [self slotMask];
+    uint32_t slotMaskSet = [self slotMask];
     [self setSlotMask:slotMaskPresent];
     [self setXl3PedestalMask:0];
     [self compositeSetPedestal];
@@ -3228,7 +3229,7 @@ err:
 - (unsigned short) getBoardIDForSlot:(unsigned short)aSlot chip:(unsigned short)aChip
 {
 	char payload[XL3_PAYLOAD_SIZE];
-	unsigned long* data = (unsigned long*) payload;
+	uint32_t* data = (uint32_t*) payload;
 	
 	data[0] = aSlot;
 	data[1] = aChip;
@@ -3255,7 +3256,7 @@ err:
 - (void) getBoardIDs
 {
 	unsigned short i, j, val;
-	unsigned long msk;
+	uint32_t msk;
 	NSString* bID[6];
 	
 	[self setXl3OpsRunning:YES forKey:@"compositeBoardID"];
@@ -3293,7 +3294,7 @@ err:
 	@try {
 		[self deselectCards];
 		//read XL3 select register
-		unsigned long aValue = [self readXL3Register:kXl3CsReg];
+		uint32_t aValue = [self readXL3Register:kXl3CsReg];
 		if ((aValue & 0x100UL) == 0) { 
 			NSLog(@"Xilinx doesn't seem to be loaded, keeping it anyway!\n");
 		}
@@ -3342,7 +3343,7 @@ err:
 	[self setXl3OpsRunning:YES forKey:@"compositResetFIFOAndSeuencer"];
 	NSLog(@"Reset FIFO and Sequencer to be implemented.\n");
 	//slot mask?
-	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3SelectReg] | WRITE_REG;
+	uint32_t xl3Address = (uint32_t)(XL3_SEL | [self getRegisterAddress:kXl3SelectReg] | WRITE_REG);
 	uint32_t aValue = 0xffffffffUL;
     
 	@try {
@@ -3375,7 +3376,7 @@ err:
 {
 	@try {
 		[self deselectCards];
-		//unsigned long readValue = 0; //[self readFromXL2Register: XL2_CONTROL_STATUS_REG];
+		//uint32_t readValue = 0; //[self readFromXL2Register: XL2_CONTROL_STATUS_REG];
 /*
 		if (readValue & XL2_CONTROL_DONE_PROG) {
 			NSLog(@"XilinX code found in the crate, keeping it.\n");
@@ -3406,7 +3407,7 @@ err:
 
     NSLog(@"%@, charge injection setup...\n", [[self xl3Link] crateName]);
     unsigned int i;
-    unsigned long msk = [self slotMask];
+    uint32_t msk = [self slotMask];
     for (i=0; i < 16; i++) {
 		if (1 << i & msk) {
             //NSLog(@"%d ", i);
@@ -3419,7 +3420,7 @@ err:
 }
 
 
-- (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(unsigned long) aChannelMask
+- (void) enableChargeInjectionForSlot:(unsigned short) aSlot channelMask:(uint32_t) aChannelMask
 {
     //borrowed from penn_daq EnableChargeInjection
     
@@ -3478,7 +3479,7 @@ err:
     
 	char payload[XL3_PAYLOAD_SIZE];
 	memset(payload, 0, XL3_PAYLOAD_SIZE);
-	unsigned long* data = (unsigned long*) payload;
+	uint32_t* data = (uint32_t*) payload;
     
     uint32_t slot = aSlot;
     uint32_t mask = aChannelMask;
@@ -3562,13 +3563,13 @@ err:
     memcpy(aCounts, data, sizeof(CheckTotalCountResults));
 }
 
-- (void) readCMOSCountForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask
+- (void) readCMOSCountForSlot:(unsigned short)aSlot withChannelMask:(uint32_t)aChannelMask
 {
     CheckTotalCountArgs args;
     CheckTotalCountResults results;
     
     args.slotMask |= 0x1 << aSlot;
-    args.channelMasks[aSlot] = aChannelMask;
+    args.channelMasks[aSlot] = (uint32_t)aChannelMask;
     
     @try {
         [self readCMOSCountWithArgs:&args counts:&results];
@@ -3684,14 +3685,14 @@ err:
     memcpy(aRates, data, sizeof(CrateNoiseRateResults));
 }
 
-- (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask withDelay:(unsigned long)aDelay
+- (void) readCMOSRateForSlot:(unsigned short)aSlot withChannelMask:(uint32_t)aChannelMask withDelay:(uint32_t)aDelay
 {
     CrateNoiseRateArgs args;
     CrateNoiseRateResults results;
     
     args.slotMask |= 0x1 << aSlot;
-    args.channelMask[aSlot] = aChannelMask;
-    args.period = aDelay;
+    args.channelMask[aSlot] = (uint32_t)aChannelMask;
+    args.period = (uint32_t)aDelay;
     
     @try {
         [self readCMOSRateWithArgs:&args rates:&results];
@@ -3771,7 +3772,7 @@ err:
     }
     else {
         unsigned char slot_idx = 0;
-        unsigned long counts[32];
+        uint32_t counts[32];
         
         CrateNoiseRateResults rates_lo;
         CrateNoiseRateResults rates_hi;
@@ -3784,7 +3785,7 @@ err:
                     //NSLog(@"slot %d:\n", i);
                     for (j=0; j<32; j++) {
                         counts[j] = results_lo.count[slot_idx*32 + j];
-                        //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
+                        //NSLog(@"channel: %d cnt: %d\n", j, counts[j]);
                     }
                     ORFec32Model* fec=nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 
@@ -3806,7 +3807,7 @@ err:
                     //NSLog(@"slot %d:\n", i+8);
                     for (j=0; j<32; j++) {
                         counts[j] = results_hi.count[slot_idx*32 + j];
-                        //NSLog(@"channel: %d cnt: %ld\n", j, counts[j]);
+                        //NSLog(@"channel: %d cnt: %d\n", j, counts[j]);
                     }
                     ORFec32Model* fec = nil;
                     for (id anObj in [[self guardian] orcaObjects]) { 
@@ -3922,7 +3923,7 @@ err:
 
         //data packet
         if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
-            unsigned long data[21+8*32+6];
+            uint32_t data[21+8*32+6];
             data[0] = [self cmosRateDataId] | (21+8*32+6);
             data[1] = [self crateNumber];
             data[2] = args_lo.slotMask;
@@ -3932,7 +3933,7 @@ err:
             memcpy(data+21, results_lo.count, 8*32*4);
             const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
             memcpy(data+21+8*32, timestamp, 6*4);
-            NSData* cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32+6)];
+            NSData* cmosData = [[NSData alloc] initWithBytes:data length:sizeof(int32_t)*(21+8*32+6)];
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
             [cmosData release];
             cmosData = nil;
@@ -3941,7 +3942,7 @@ err:
                 data[2] = args_hi.slotMask;
                 data[20] = results_hi.errorFlags;
                 memcpy(data+21, results_hi.count, 8*32*4);
-                cmosData = [[NSData alloc] initWithBytes:data length:sizeof(long)*(21+8*32+6)];
+                cmosData = [[NSData alloc] initWithBytes:data length:sizeof(int32_t)*(21+8*32+6)];
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:cmosData];
                 [cmosData release];
                 cmosData = nil;
@@ -3981,13 +3982,13 @@ err:
 
 
 
-- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask
+- (void) readPMTBaseCurrentsForSlot:(unsigned short)aSlot withChannelMask:(uint32_t)aChannelMask
 {
     ReadPMTCurrentArgs args;
     ReadPMTCurrentResults results;
 
     args.slotMask |= 0x1 << aSlot;
-    args.channelMask[aSlot] = aChannelMask;
+    args.channelMask[aSlot] = (uint32_t)aChannelMask;
     
     @try {
         [self readPMTBaseCurrentsWithArgs:&args currents:&results];
@@ -4091,7 +4092,7 @@ err:
     //data packet
     const unsigned short packet_length = 20+16*8+16*8+6;
     if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
-        unsigned long data[packet_length];
+        uint32_t data[packet_length];
         data[0] = [self pmtBaseCurrentDataId] | packet_length;
         data[1] = [self crateNumber];
         data[2] = args.slotMask;
@@ -4101,7 +4102,7 @@ err:
         memcpy(data+20+16*8, results.busyFlags, 16*32);
         const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
         memcpy(data+20+16*8+16*8, timestamp, 6*4);
-        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
+        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(int32_t)*(packet_length)];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
         [pdata release];
         pdata = nil;
@@ -4236,12 +4237,12 @@ err:
     }
 }
 
-- (void) setHVRelays:(unsigned long long)aRelayMask error:(unsigned long*)aError
+- (void) setHVRelays:(uint64_t)aRelayMask error:(uint32_t*)aError
 {
 	char payload[XL3_PAYLOAD_SIZE];
 	memset(payload, 0, XL3_PAYLOAD_SIZE);
 
-    unsigned long* data = (unsigned long*)payload;
+    uint32_t* data = (uint32_t*)payload;
     data[0] = aRelayMask & 0xffffffffUL; //mask1 bottom
     data[1] = aRelayMask >> 32;          //mask2 top
 
@@ -4268,9 +4269,9 @@ err:
     }    
 }
 
-- (void) setHVRelays:(unsigned long long)aRelayMask
+- (void) setHVRelays:(uint64_t)aRelayMask
 {
-    unsigned long error;
+    uint32_t error;
     
     @try {
         [self setHVRelays:aRelayMask error:&error];
@@ -4317,7 +4318,7 @@ err:
 
 - (void) closeHVRelays
 {
-    unsigned long error;
+    uint32_t error;
     
     @try {
         [self setHVRelays:relayMask error:&error];
@@ -4338,7 +4339,7 @@ err:
 
 - (void) openHVRelays
 {
-    unsigned long error;
+    uint32_t error;
     
     [self setRelayMask:0ULL];
     
@@ -4361,7 +4362,7 @@ err:
 
 - (void) setHVSwitchOnForA:(BOOL)aIsOn forB:(BOOL)bIsOn
 {
-	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG;
+	uint32_t xl3Address = (uint32_t)(XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | WRITE_REG);
 	uint32_t aValue = 0UL;
 
     if (aIsOn) aValue |= 1UL;
@@ -4378,7 +4379,7 @@ err:
 
 - (void) readHVSwitchOnForA:(BOOL*)aIsOn forB:(BOOL*)bIsOn
 {
-	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	uint32_t xl3Address = (uint32_t)(XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG);
 	uint32_t aValue = 0UL;
     
 	@try {
@@ -4712,7 +4713,7 @@ err:
 
 - (void) readHVInterlockGood:(BOOL*)isGood
 {
-	uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG;
+	uint32_t xl3Address = (uint32_t)(XL3_SEL | [self getRegisterAddress:kXl3HvCsReg] | READ_REG);
 	uint32_t aValue = 0UL;
     
 	@try {
@@ -4745,7 +4746,7 @@ err:
 {
     //todo a dedicated HV lock
     @synchronized (self) {
-        uint32_t xl3Address = XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG;
+        uint32_t xl3Address = (uint32_t)(XL3_SEL | [self getRegisterAddress:kXl3HvSetPointReg] | WRITE_REG);
         uint32_t aValue = 0UL;
         
         aValue |= aDac & 0xFFFUL;
@@ -4842,14 +4843,14 @@ err:
     //data packet
     const unsigned char packet_length = 3+21+6;
     if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
-        unsigned long data[packet_length];
+        uint32_t data[packet_length];
         data[0] = [self fecVltDataId] | packet_length;
         data[1] = [self crateNumber];
         data[2] = aSlot;
         memcpy(&data[3], result.voltages, 21*4);
         const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
         memcpy(data+24, timestamp, 6*4);
-        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
+        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(int32_t)*(packet_length)];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
         [pdata release];
         pdata = nil;
@@ -4905,14 +4906,14 @@ err:
             //data packet
             const unsigned char packet_length = 3+21+6;
             if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
-                unsigned long data[packet_length];
+                uint32_t data[packet_length];
                 data[0] = [self fecVltDataId] | packet_length;
                 data[1] = [self crateNumber];
                 data[2] = slot;
                 memcpy(&data[3], result[slot].voltages, 21*4);
                 const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
                 memcpy(data+24, timestamp, 6*4);
-                NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
+                NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(int32_t)*(packet_length)];
                 [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
                 [pdata release];
                 pdata = nil;
@@ -5043,13 +5044,13 @@ err:
     //data packet
     const unsigned char packet_length = 16;
     if (isPollingXl3 && [[ORGlobal sharedGlobal] runInProgress]) {
-        unsigned long data[packet_length];
+        uint32_t data[packet_length];
         data[0] = [self xl3VltDataId] | packet_length;
         data[1] = [self crateNumber];
         memcpy(&data[2], result.voltages, 8*4);
         const char* timestamp = [[self stringDate] cStringUsingEncoding:NSASCIIStringEncoding];
         memcpy(data+10, timestamp, 6*4);
-        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(long)*(packet_length)];
+        NSData* pdata = [[NSData alloc] initWithBytes:data length:sizeof(int32_t)*(packet_length)];
         [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:pdata];
         [pdata release];
         pdata = nil;
@@ -5174,7 +5175,7 @@ err:
     }
 }
 
-- (void) setVthrDACsForSlot:(unsigned short)aSlot withChannelMask:(unsigned long)aChannelMask dac:(unsigned char)aDac
+- (void) setVthrDACsForSlot:(unsigned short)aSlot withChannelMask:(uint32_t)aChannelMask dac:(unsigned char)aDac
 {
     //setVthr loading single DAC at the time. works fine. takes 0.5 sec per DAC.
 /*
@@ -5248,7 +5249,7 @@ err:
         if (!db && nodb < 10) {
             nodb++;
             // inform user of missing db object
-            if (nodb == 10) { //exactly how long this takes depends on the number of XL3's connected - max 10s from first connect
+            if (nodb == 10) { //exactly how int32_t this takes depends on the number of XL3's connected - max 10s from first connect
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     ORRunAlertPanel(@"PostgresDB object not found",@"Cannot get the PostgresDB object, please add one to the experiment and restart ORCA.",@"OK",nil,nil);
             
@@ -5738,7 +5739,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         bool aUp = false, bUp = false, achanging = false, bchanging = false;
         
         if (!self.hvANeedsUserIntervention && [self hvANextStepValue] != [self hvAVoltageDACSetValue]) {
-            unsigned long aValueToSet = [self hvANextStepValue];
+            uint32_t aValueToSet = [self hvANextStepValue];
             achanging = true;
             
             if ([self hvANextStepValue] > [self hvAVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096) {
@@ -5762,7 +5763,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
         }
         
         if ([self crateNumber] == 16 && !self.hvBNeedsUserIntervention && [self hvBNextStepValue] != [self hvBVoltageDACSetValue]) {
-            unsigned long aValueToSet = [self hvBNextStepValue];
+            uint32_t aValueToSet = [self hvBNextStepValue];
             bchanging = true;
             
             if ([self hvBNextStepValue] > [self hvBVoltageDACSetValue] + [self hvramp_a_up] / 3000. * 4096) {
@@ -5969,7 +5970,7 @@ float nominals[] = {2110.0, 2240.0, 2075.0, 2160.0, 2043.0, 2170.0, 2170.0, 2170
 
         for (id aFec in fecs) {
             args->slotMask |= 1 << [aFec stationNumber];
-            args->channelMasks[[aFec stationNumber]] = [aFec pedEnabledMask];
+            args->channelMasks[(int)[aFec stationNumber]] = (int)[aFec pedEnabledMask];
         }
 
         args->slotMask = htonl(args->slotMask);

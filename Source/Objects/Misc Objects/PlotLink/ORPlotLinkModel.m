@@ -161,7 +161,7 @@ NSString* ORPlotLinkLock							 = @"ORPlotLinkLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:iconType forKey:@"ORPlotLinkModelIconType"];
+    [encoder encodeInteger:iconType forKey:@"ORPlotLinkModelIconType"];
     [encoder encodeObject:plotName	forKey:@"plotName"];
     [encoder encodeObject:dataCatalogName	forKey:@"dataCatalogName"];
 }
@@ -169,12 +169,12 @@ NSString* ORPlotLinkLock							 = @"ORPlotLinkLock";
 - (void) doCntrlClick:(NSView*)aView
 {
 	NSEvent* theCurrentEvent = [NSApp currentEvent];
-    NSEvent *event =  [NSEvent mouseEventWithType:NSLeftMouseDown
+    NSEvent *event =  [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown
                                          location:[theCurrentEvent locationInWindow]
-                                    modifierFlags:NSLeftMouseDownMask // 0x100
+                                    modifierFlags:NSEventModifierFlagControl // 0x100
                                         timestamp:(NSTimeInterval)0
                                      windowNumber:[theCurrentEvent windowNumber]
-                                          context:[theCurrentEvent context]
+                                          context:nil
                                       eventNumber:0
                                        clickCount:1
                                          pressure:1];

@@ -115,8 +115,8 @@ struct {
 
 #pragma mark •••Accessors
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -398,7 +398,7 @@ struct {
 {
 	@synchronized(self){
 		if(enabledMask & (0x1L<<aChan)){
-			unsigned long theRawValue;
+			uint32_t theRawValue;
 			[[self adapter] camacLongNAF:[self stationNumber] a:aChan f:0 data:&theRawValue];
 			float theValue = [self convertRawAdcToVolts:theRawValue  chan:aChan];
 			[self setAdcValue:aChan withValue:theValue];
@@ -472,8 +472,8 @@ struct {
     [self setScanEnabled:[decoder decodeBoolForKey:@"ORJAMFModelScanEnabled"]];
     [self setScanLimit:[decoder decodeIntForKey:@"ORJAMFModelScanLimit"]];
     [self setPollingState:[decoder decodeIntForKey:@"ORJAMFModelPollingState"]];
-    [self setEnabledMask:[decoder decodeIntForKey: @"ORJAMFModelEnabledMask"]];
-    [self setAlarmsEnabledMask:[decoder decodeIntForKey: @"ORJAMFModelAlarmsEnabledMask"]];
+    [self setEnabledMask:[decoder decodeIntegerForKey: @"ORJAMFModelEnabledMask"]];
+    [self setAlarmsEnabledMask:[decoder decodeIntegerForKey: @"ORJAMFModelAlarmsEnabledMask"]];
 	int i;
 	for(i=0;i<16;i++){
 		timeRates[i] = [[ORTimeRate alloc] init];
@@ -493,16 +493,16 @@ struct {
     [super encodeWithCoder:encoder];	
     [encoder encodeBool:shipRecords forKey:@"ORJAMFModelShipRecords"];
     [encoder encodeBool:scanEnabled forKey:@"ORJAMFModelScanEnabled"];
-    [encoder encodeInt:scanLimit forKey:@"ORJAMFModelScanLimit"];
-    [encoder encodeInt:pollingState			forKey:@"ORJAMFModelPollingState"];
-    [encoder encodeInt:enabledMask			forKey:	@"ORJAMFModelEnabledMask"];
-    [encoder encodeInt:alarmsEnabledMask	forKey:	@"ORJAMFModelAlarmsEnabledMask"];
+    [encoder encodeInteger:scanLimit forKey:@"ORJAMFModelScanLimit"];
+    [encoder encodeInteger:pollingState			forKey:@"ORJAMFModelPollingState"];
+    [encoder encodeInteger:enabledMask			forKey:	@"ORJAMFModelEnabledMask"];
+    [encoder encodeInteger:alarmsEnabledMask	forKey:	@"ORJAMFModelAlarmsEnabledMask"];
 	
 	int i;
 	for(i=0;i<16;i++){
 		[encoder encodeFloat: lowLimits[i] forKey: [NSString stringWithFormat:@"ORJAMFModelLowLimit_%d",i]];
 		[encoder encodeFloat: highLimits[i] forKey: [NSString stringWithFormat:@"ORJAMFModelHighLimit_%d",i]];
-		[encoder encodeInt:rangeIndex[i]	forKey:[NSString stringWithFormat:@"ORJAMFModelRangeIndex_%d",i]];
+		[encoder encodeInteger:rangeIndex[i]	forKey:[NSString stringWithFormat:@"ORJAMFModelRangeIndex_%d",i]];
 	}
 }
 
@@ -544,7 +544,7 @@ struct {
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"%d,%d,JAM-F",[self crateNumber],[self  stationNumber]];
+    return [NSString stringWithFormat:@"%d,%u,JAM-F",(int)[self crateNumber],(int)[self  stationNumber]];
 }
 
 - (double) convertedValue:(int)channel
@@ -671,16 +671,16 @@ struct {
 -(void) shipValues
 {
 	if([gOrcaGlobals runInProgress]){
-		unsigned long data[32];
+		uint32_t data[32];
 		
-		data[1] = (([self crateNumber]&0x01e)<<21) | (([self stationNumber]& 0x0000001f)<<16);
+		data[1] = (uint32_t)((([self crateNumber]&0x01e)<<21) | (([self stationNumber]& 0x0000001f)<<16));
 		
 		//get the time(UT!)
 		time_t	ut_time;
 		time(&ut_time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		//time_t ut_time = mktime(theTimeGMTAsStruct);
-		data[2] = ut_time;	//seconds since 1970
+		data[2] = (uint32_t)ut_time;	//seconds since 1970
 		
 		int index = 3;
 		int i;
@@ -693,7 +693,7 @@ struct {
 		
 		if(index>3){
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(int32_t)]];
 		}
 	}
 }

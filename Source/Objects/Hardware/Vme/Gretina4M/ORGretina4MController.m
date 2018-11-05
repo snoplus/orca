@@ -101,7 +101,7 @@
 	}
 
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4M%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -753,7 +753,7 @@
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
 {
-	[registerWriteValueField setIntValue: [model registerWriteValue]];
+	[registerWriteValueField setIntegerValue: [model registerWriteValue]];
 }
 
 - (void) registerIndexChanged:(NSNotification*)aNote
@@ -764,7 +764,7 @@
 
 - (void) spiWriteValueChanged:(NSNotification*)aNote
 {
-	[spiWriteValueField setIntValue: [model spiWriteValue]];
+	[spiWriteValueField setIntegerValue: [model spiWriteValue]];
 }
 
 - (void) fpgaDownInProgressChanged:(NSNotification*)aNote
@@ -970,12 +970,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumGretina4MChannels;i++){
-            [[trapThresholdMatrix cellWithTag:i] setIntValue:[model trapThreshold:i]];
+            [[trapThresholdMatrix cellWithTag:i] setIntegerValue:[model trapThreshold:i]];
         }
     }
     else {
         int chan = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[trapThresholdMatrix cellWithTag:chan] setIntValue:[model trapThreshold:chan]];
+        [[trapThresholdMatrix cellWithTag:chan] setIntegerValue:[model trapThreshold:chan]];
     }
 }
 
@@ -1110,7 +1110,7 @@
     [diagnosticsClearButton  setEnabled:[model diagnosticsEnabled]];
     
     
-    [viewPreampButton setEnabled:[model spiConnector]];
+    [viewPreampButton setEnabled:(int)[model spiConnector]];
     
     if(lockedOrRunningMaintenance || downloading){
         [ledThresholdMatrix setEnabled:NO];
@@ -1401,7 +1401,7 @@
 
 - (IBAction) registerIndexPUAction:(id)sender
 {
-	unsigned int index = [sender indexOfSelectedItem];
+    int index = (int)[sender indexOfSelectedItem];
 	[model setRegisterIndex:index];
 	[self setRegisterDisplay:index];
 }
@@ -1500,7 +1500,7 @@
 }
 - (IBAction) trapThresholdAction:(id)sender
 {
-    long value = [sender intValue];
+    int32_t value = [sender intValue];
     short channel = [[sender selectedCell] tag];
     
 	if(value != [model trapThreshold:channel]){
@@ -1525,7 +1525,7 @@
 - (IBAction) readRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4MRegisters) {
 		aValue = [model readRegister:index];
@@ -1542,7 +1542,7 @@
 - (IBAction) writeRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = [model registerWriteValue];
+	uint32_t aValue = [model registerWriteValue];
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4MRegisters) {
 		[model writeRegister:index withValue:aValue];
@@ -1571,8 +1571,8 @@
 - (IBAction) writeSPIAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = [model spiWriteValue];
-	unsigned long readback = [model writeAuxIOSPI:aValue];
+	uint32_t aValue = [model spiWriteValue];
+	uint32_t readback = [model writeAuxIOSPI:aValue];
 	NSLog(@"Gretina4M(%d,%d) writeSPI(%u) readback: (0x%0x)\n",[model crateNumber],[model slot], aValue, readback);
 }
 
@@ -1681,8 +1681,7 @@
 - (IBAction) openNoiseFloorPanel:(id)sender
 {
 	[self endEditing];
-    [NSApp beginSheet:noiseFloorPanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:noiseFloorPanel completionHandler:nil];
 }
 
 - (IBAction) closeNoiseFloorPanel:(id)sender
@@ -1709,8 +1708,7 @@
 - (IBAction) openEasySetPanel:(id)sender
 {
 	[self endEditing];
-    [NSApp beginSheet:easySetPanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:easySetPanel completionHandler:nil];
 }
 
 - (IBAction) closeEasySetPanel:(id)sender
@@ -1726,7 +1724,7 @@
         NSLog(@"Gretina BoardID (slot %d): [0x%x] ID = 0x%x\n",[model slot],[model baseAddress],[model readBoardID]);
         int chan;
         for(chan = 0;chan<kNumGretina4MChannels;chan++){
-            unsigned value = [model readControlReg:chan];
+            uint32_t value = [model readControlReg:chan];
 			
 			int pol=(value>>10)&0x3;
 			NSString* polString = @"  ?  ";
@@ -1800,7 +1798,7 @@
     }  
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORGretina4M%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -1873,12 +1871,12 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[[model waveFormRateGroup]timeRate]count];
+	return (int)[[[model waveFormRateGroup]timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int count = [[[model waveFormRateGroup]timeRate] count];
+	int count = (int)[[[model waveFormRateGroup]timeRate] count];
 	int index = count-i-1;
 	*yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
 	*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];

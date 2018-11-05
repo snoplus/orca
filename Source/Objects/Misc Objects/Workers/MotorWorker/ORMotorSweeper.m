@@ -165,7 +165,7 @@
 - (int) numSteps
 {
     if(positionArray){
-        return [positionArray count];
+        return (int)[positionArray count];
     }
     else  return numSteps;
 }
@@ -314,18 +314,18 @@
     return end == [self motorPosition];
 }
 
-- (long) motorPosition
+- (int32_t) motorPosition
 {
     return [motor readMotor];
 }
 
 - (void) moveDeltaSteps
 {
-    long aValue;
+    int32_t aValue;
     if(positionArray){
         stepIndex++;
         if(stepIndex<[positionArray count]){
-            aValue = [[positionArray objectAtIndex:stepIndex] longValue];
+            aValue = (int32_t)[[positionArray objectAtIndex:stepIndex] longValue];
             [motor moveMotor:motor to:aValue];
         }
     }
@@ -337,7 +337,7 @@
 
 - (void) moveToStart
 {
-    long startValue;
+    int32_t startValue;
     if(positionArray){
         startValue = [[positionArray objectAtIndex:stepIndex] floatValue];
         stepIndex = 0;

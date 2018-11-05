@@ -206,24 +206,24 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPxi8336MacModelDoRangeChanged object:self];
 }
 
-- (unsigned long) rwAddress
+- (uint32_t) rwAddress
 {
     return rwAddress;
 }
 
-- (void) setRwAddress:(unsigned long)aValue
+- (void) setRwAddress:(uint32_t)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRwAddress:[self rwAddress]];
     rwAddress = aValue;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPxi8336MacRWAddressChangedNotification object:self];
 }
 
-- (unsigned long) writeValue
+- (uint32_t) writeValue
 {
     return writeValue;
 }
 
-- (void) setWriteValue:(unsigned long)aValue
+- (void) setWriteValue:(uint32_t)aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     writeValue = aValue;
@@ -265,14 +265,14 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 {
 }
 
-- (void) readLongBlock:(unsigned long *) readAddress
-             atAddress:(unsigned long) pxiAddress
-             numToRead:(unsigned int) numberLongs
+- (void) readLongBlock:(uint32_t *) readAddress
+             atAddress:(uint32_t) pxiAddress
+             numToRead:(uint32_t) numberLongs
 {
     @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){
-			//insert call to driver to read long(s)
+			//insert call to driver to read int32_t(s)
         }
 		else *readAddress = 0;
     }
@@ -285,15 +285,15 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 }
 
 //a special read for reading fifos that reads one address multiple times
-- (void) readLong:(unsigned long *) readAddress
-		atAddress:(unsigned long) pxiAddress
-	  timesToRead:(unsigned int) numberLongs
+- (void) readLong:(uint32_t *) readAddress
+		atAddress:(uint32_t) pxiAddress
+	  timesToRead:(uint32_t) numberLongs
 
 {
     @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){           
-			//insert call to driver to read long(s). In this case the address should not be
+			//insert call to driver to read int32_t(s). In this case the address should not be
 			//incremented. Use for reading an autoincrementingin fifo.
         }
 		else *readAddress = 0;
@@ -306,14 +306,14 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 	}
 }
 
-- (void) writeLongBlock:(unsigned long *) writeAddress
-              atAddress:(unsigned long) pxiAddress
-             numToWrite:(unsigned int) numberLongs
+- (void) writeLongBlock:(uint32_t *) writeAddress
+              atAddress:(uint32_t) pxiAddress
+             numToWrite:(uint32_t) numberLongs
 {
     @try {
         [theHWLock lock];   //-----begin critical section
         if(hardwareExists){            
- 			//insert call to driver to write long(s)
+ 			//insert call to driver to write int32_t(s)
        }
     }
 	@catch(NSException* localException) {
@@ -325,8 +325,8 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 }
 
 - (void) readByteBlock:(unsigned char *) readAddress
-             atAddress:(unsigned long) pxiAddress
-             numToRead:(unsigned int) numberBytes
+             atAddress:(uint32_t) pxiAddress
+             numToRead:(uint32_t) numberBytes
 {
     @try {
         [theHWLock lock];   //-----begin critical section
@@ -344,8 +344,8 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 }
 
 - (void) writeByteBlock:(unsigned char *) writeAddress
-              atAddress:(unsigned long) pxiAddress
-             numToWrite:(unsigned int) numberBytes
+              atAddress:(uint32_t) pxiAddress
+             numToWrite:(uint32_t) numberBytes
  {	
     @try {        
         [theHWLock lock];   //-----begin critical section
@@ -362,8 +362,8 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 }
 
 -  (void) readWordBlock:(unsigned short *) readAddress
-              atAddress:(unsigned long) pxiAddress
-              numToRead:(unsigned int) numberWords
+              atAddress:(uint32_t) pxiAddress
+              numToRead:(uint32_t) numberWords
 {	
     @try {
         [theHWLock lock];   //-----begin critical section
@@ -381,8 +381,8 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 }
 
 -  (void) writeWordBlock:(unsigned short *) writeAddress
-               atAddress:(unsigned long) pxiAddress
-              numToWrite:(unsigned int) numberWords
+               atAddress:(uint32_t) pxiAddress
+              numToWrite:(uint32_t) numberWords
 {	
     
     @try {        
@@ -408,7 +408,7 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
     
     [[self undoManager] disableUndoRegistration];
     
-    [self setRangeToDo:[decoder decodeIntForKey:@"rangeToDo"]];
+    [self setRangeToDo:[decoder decodeIntegerForKey:@"rangeToDo"]];
     [self setDoRange:[decoder decodeBoolForKey:@"doRange"]];
     [self setRwAddress:[decoder decodeIntForKey:@"rwAddress"]];
     [self setWriteValue:[decoder decodeIntForKey:@"writeValue"]];
@@ -422,11 +422,11 @@ NSString* ORPxi8336MacLock										= @"ORPxi8336MacLock";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:rangeToDo forKey:@"rangeToDo"];
+    [encoder encodeInteger:rangeToDo forKey:@"rangeToDo"];
     [encoder encodeBool:doRange forKey:@"doRange"];
 	[encoder encodeInt:rwAddress forKey:@"rwAddress"];
     [encoder encodeInt:writeValue forKey:@"writeValue"];
-    [encoder encodeInt:readWriteType forKey:@"readWriteType"];
+    [encoder encodeInteger:readWriteType forKey:@"readWriteType"];
 }
 
 #pragma mark •••NSOrderedObjHolding Protocol

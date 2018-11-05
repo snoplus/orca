@@ -538,7 +538,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	
 	if(!parameterObject || !targetObject) return;
 	
-	int n = [wayPoints count];
+	int n = (int)[wayPoints count];
 	int i;
 	
 	SEL targetGetter = [parameterObject getMethodSelector];
@@ -587,7 +587,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) scaleToMaxTime:(float)aMaxTime
 {
-	int n = [wayPoints count];
+	int n = (int)[wayPoints count];
 	int i;
 	ORWayPoint* aWayPoint = [wayPoints objectAtIndex:n-1];
 	float scaleFactor = aMaxTime/[aWayPoint xyPosition].x;
@@ -617,7 +617,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) rescaleTo:(float)aMax scaleTarget:(BOOL)scaleTarget
 {
-	int n = [wayPoints count];
+	int n = (int)[wayPoints count];
 	int i;
 	ORWayPoint* aWayPoint = [wayPoints objectAtIndex:n-1];
 	float scaleFactor = aMax / [aWayPoint xyPosition].y;
@@ -635,7 +635,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) scaleFromOldMax
 {
-	int n = [wayPoints count];
+	int n = (int)[wayPoints count];
 	int i;
 	ORWayPoint* aWayPoint;
 	float scaleFactor = [self maxValueForParameter]/[self oldMaxValue];
@@ -706,7 +706,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 	SEL targetIniter = [parameterObject initMethodSelector];
 	if(!targetIniter && [targetObject respondsToSelector:@selector(wizardParameters)]){
 		NSArray* allParams = [targetObject wizardParameters];
-		int n = [allParams count];
+		int n = (int)[allParams count];
 		int i;
 		for(i=0;i<n;i++){
 			ORHWWizParam* aParam = [allParams objectAtIndex:i];
@@ -878,7 +878,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		newValue = time*downRate;
 	}
 	else {
-		int n = [wayPoints count];
+		int n = (int)[wayPoints count];
 		int i;
 		for(i=1;i<n;i++){
 			ORWayPoint* aWayPoint1 = [wayPoints objectAtIndex:i-1];
@@ -913,7 +913,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 		newTime = value/downRate;
 	}
 	else {
-		int n = [wayPoints count];
+		int n = (int)[wayPoints count];
 		int i;
 		for(i=1;i<n;i++){
 			ORWayPoint* aWayPoint1 = [wayPoints objectAtIndex:i-1];
@@ -938,7 +938,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) makeLinear
 {
-	int n = [wayPoints count];
+	int n = (int)[wayPoints count];
 	if(n<=2)return;
 	
 	int i;
@@ -969,7 +969,7 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 
 - (void) makeLog
 {
-	int n = [wayPoints count];
+	int n = (int)[wayPoints count];
 	if(n<=2)return;
 	
 	int i;
@@ -1048,13 +1048,13 @@ NSString* ORRampItemTargetChanged			= @"ORRampItemTargetChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     //[encoder encodeObject:owner forKey:@"owner"];
-    [encoder encodeInt:downRampPath forKey:@"downRampPath"];
+    [encoder encodeInteger:downRampPath forKey:@"downRampPath"];
     [encoder encodeFloat:downRate forKey:@"downRate"];
     [encoder encodeObject:targetName forKey:@"targetName"];
     [encoder encodeObject:parameterName forKey:@"parameterName"];
-    [encoder encodeInt:crateNumber forKey:@"crateNumber"];
-    [encoder encodeInt:cardNumber forKey:@"cardNumber"];
-    [encoder encodeInt:channelNumber forKey:@"channelNumber"];
+    [encoder encodeInteger:crateNumber forKey:@"crateNumber"];
+    [encoder encodeInteger:cardNumber forKey:@"cardNumber"];
+    [encoder encodeInteger:channelNumber forKey:@"channelNumber"];
     [encoder encodeFloat:rampTarget forKey:@"rampTarget"];
     [encoder encodeObject:wayPoints forKey:@"waypoints"];
     [encoder encodeBool:visible forKey:@"visible"];

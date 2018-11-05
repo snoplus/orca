@@ -130,7 +130,7 @@
 - (void) setModel:(id)aModel
 {
     [super setModel:aModel];
-    [[self window] setTitle:[NSString stringWithFormat:@"Web Raker %lu",[model uniqueIdNumber]]];
+    [[self window] setTitle:[NSString stringWithFormat:@"Web Raker %u",[model uniqueIdNumber]]];
 }
 - (void) updateWindow
 {
@@ -148,12 +148,12 @@
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote
 {
     if([aNote object] == dataTableView || !aNote){
-        int index = [dataTableView selectedRow];
+        NSInteger index = [dataTableView selectedRow];
         if(index<0 || index>[model numDataItems]){
             [detailsView setString:@""];
         }
         else {
-            NSDictionary* dict = [model dataAtIndex:index];
+            NSDictionary* dict = [model dataAtIndex:(int)index];
             NSString* s = [NSString stringWithFormat:@"%@",dict];
             s = [s stringByReplacingOccurrencesOfString:@"{" withString:@""];
             s = [s stringByReplacingOccurrencesOfString:@"}" withString:@""];
@@ -233,7 +233,7 @@
         
         //do the plot set up here since we didn't know the number of plots until now
         
-        int plotCountDiff = [model numDataItems] - [plotter0 numberOfPlots];
+        int32_t plotCountDiff = (int32_t)[model numDataItems] - [plotter0 numberOfPlots];
         if(plotCountDiff != 0){
         [plotter0 removeAllPlots];
             NSColor* theColors[10] =
@@ -334,7 +334,7 @@
     }
     else if(aTableView == dataTableView){
         if([[aTableColumn identifier] isEqualToString:@"time"]){
-            unsigned long t = [[[model dataAtIndex:rowIndex] objectForKey:[aTableColumn identifier]] intValue];
+            uint32_t t = [[[model dataAtIndex:rowIndex] objectForKey:[aTableColumn identifier]] intValue];
             return [[NSDate dateWithTimeIntervalSince1970:t] stdDescription];
         }
         else return [[model dataAtIndex:rowIndex] objectForKey:[aTableColumn identifier]];
@@ -346,16 +346,16 @@
 - (void) tableView:(NSTableView *) aTableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if(aTableView == processTableView){
-        if([[aTableColumn identifier]      isEqualToString:@"LowLimit"]) [model setLowLimit:rowIndex value:[object floatValue]];
-        else if([[aTableColumn identifier] isEqualToString:@"HiLimit"])  [model setHiLimit:rowIndex value:[object floatValue]];
-        else if([[aTableColumn identifier] isEqualToString:@"MinValue"])  [model setMinValue:rowIndex value:[object floatValue]];
-        else if([[aTableColumn identifier] isEqualToString:@"MaxValue"])  [model setMaxValue:rowIndex value:[object floatValue]];
+        if([[aTableColumn identifier]      isEqualToString:@"LowLimit"]) [model setLowLimit:(int)rowIndex value:[object floatValue]];
+        else if([[aTableColumn identifier] isEqualToString:@"HiLimit"])  [model setHiLimit:(int)rowIndex value:[object floatValue]];
+        else if([[aTableColumn identifier] isEqualToString:@"MinValue"])  [model setMinValue:(int)rowIndex value:[object floatValue]];
+        else if([[aTableColumn identifier] isEqualToString:@"MaxValue"])  [model setMaxValue:(int)rowIndex value:[object floatValue]];
     }
 }
 
 //
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [model numDataItems];
 }
@@ -363,15 +363,15 @@
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-    int aTag = [aPlotter tag];
-	return [[model timeRate:aTag] count];
+    int aTag = (int)[aPlotter tag];
+	return (int)[[model timeRate:aTag] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    int aTag = [aPlotter tag];
-	int count = [[model timeRate:aTag] count];
-	int index = count-i-1;
+    int aTag = (int)[aPlotter tag];
+	NSUInteger count = [[model timeRate:aTag] count];
+	NSUInteger index = count-i-1;
 	*xValue = [[model timeRate:aTag] timeSampledAtIndex:index];
 	*yValue = [[model timeRate:aTag] valueAtIndex:index];
 }

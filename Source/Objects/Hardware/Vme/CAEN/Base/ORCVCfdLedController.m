@@ -136,7 +136,7 @@
 
 - (void) baseAddressChanged:(NSNotification*)aNote
 {
-	[baseAddressField setIntValue: [model baseAddress]];
+	[baseAddressField setIntegerValue: [model baseAddress]];
 }
 
 - (void) thresholdLockChanged:(NSNotification*)aNotification
@@ -186,7 +186,7 @@
 {
 	[patternInhibitField setIntValue:[model patternInhibit]];		
 	short i;
-	unsigned long theMask = [model patternInhibit];
+	uint32_t theMask = [model patternInhibit];
 	for(i=0;i<16;i++){
 		[[inhibitMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
@@ -227,7 +227,7 @@
 
 - (IBAction) inhibitAction:(id)sender
 {
-	[model setInhibitMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setInhibitMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) majorityThresholdAction:(id)sender

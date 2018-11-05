@@ -235,11 +235,11 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
     [socket setDelegate:self];
 }
 
-- (unsigned long) remotePort
+- (uint32_t) remotePort
 {
     return remotePort;
 }
-- (void) setRemotePort:(unsigned long)aRemotePort
+- (void) setRemotePort:(uint32_t)aRemotePort
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRemotePort:remotePort];
     
@@ -266,12 +266,12 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 	 object:self];
 }
 
--(unsigned long)runNumber
+-(uint32_t)runNumber
 {
     return runNumber;
 }
 
--(void)setRunNumber:(unsigned long)aRunNumber
+-(void)setRunNumber:(uint32_t)aRunNumber
 {
     runNumber = aRunNumber;
     
@@ -477,10 +477,10 @@ NSString* ORRemoteRunShutDownScriptNameChanged = @"ORRemoteRunShutDownScriptName
 {
 	NSString* rn;
 	if([self subRunNumber] > 0){
-		rn = [NSString stringWithFormat:@"%lu.%d",[self runNumber],[self subRunNumber]];
+		rn = [NSString stringWithFormat:@"%u.%d",[self runNumber],[self subRunNumber]];
 	}
 	else {
-		rn = [NSString stringWithFormat:@"%lu",[self runNumber]];
+		rn = [NSString stringWithFormat:@"%u",[self runNumber]];
 	}
 	return rn;
 }
@@ -625,7 +625,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
     [[self undoManager] disableUndoRegistration];
     
     [self setOffline:[decoder decodeBoolForKey:@"offline"]];
-    [self setTimeLimit:[decoder decodeInt32ForKey:ORRunTimeLimit]];
+    [self setTimeLimit:[decoder decodeIntegerForKey:ORRunTimeLimit]];
     [self setTimedRun:[decoder decodeBoolForKey:ORRunTimedRun]];
     [self setRepeatRun:[decoder decodeBoolForKey:ORRunRepeatRun]];
     [self setQuickStart:[decoder decodeBoolForKey:ORRunQuickStart]];
@@ -645,7 +645,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:offline forKey:@"offline"];
-    [encoder encodeInt32:timeLimit forKey:ORRunTimeLimit];
+    [encoder encodeInteger:timeLimit forKey:ORRunTimeLimit];
     [encoder encodeBool:timedRun forKey:ORRunTimedRun];
     [encoder encodeBool:repeatRun forKey:ORRunRepeatRun];
     [encoder encodeBool:quickStart forKey:ORRunQuickStart];
@@ -696,7 +696,7 @@ static NSString *ORRunRemoteConnectAtStart	= @"ORRunRemoteConnectAtStart";
 {
     [[self undoManager] disableUndoRegistration];
     NSArray* lines= [inString componentsSeparatedByString:@"\n"];
-    int n = [lines count];
+    int n = (int)[lines count];
     int i;
     NSCharacterSet* numberSet =  [NSCharacterSet decimalDigitCharacterSet];
     

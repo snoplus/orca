@@ -133,7 +133,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"MJD Bias Watcher (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MJD Bias Watcher (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -255,33 +255,33 @@
 
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-    int theTag = [aPlotter tag];
+    int theTag = (int)[aPlotter tag];
 
     if(theTag<kMaxDetectors){
         //hv plot
-        return [model numberPointsInHVPlot:theTag];
+        return (int)[model numberPointsInHVPlot:theTag];
     }
     else if(theTag >= kMaxDetectors){
         theTag -= kMaxDetectors;
-        return [model numberPointsInPreAmpPlot:theTag];
+        return (int)[model numberPointsInPreAmpPlot:theTag];
     }
     else return 0;
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-    int theTag = [aPlotter tag];
+    int theTag = (int)[aPlotter tag];
     if(theTag<kMaxDetectors){
         //hv plot
-        int count = [model numberPointsInHVPlot:theTag];
+        int count = (int)[model numberPointsInHVPlot:theTag];
         int index = count-i-1;
         [model hvPlot:theTag dataIndex:index x:xValue y:yValue];
      }
     else {
         theTag -= kMaxDetectors;
-        int count = [model numberPointsInPreAmpPlot:theTag];
-        int index = count-i-1;
-        [model preAmpPlot:theTag dataIndex:index x:xValue y:yValue];
+        NSUInteger count = [model numberPointsInPreAmpPlot:theTag];
+        NSUInteger index = count-i-1;
+        [model preAmpPlot:theTag dataIndex:(int)index x:xValue y:yValue];
        
     }
 }

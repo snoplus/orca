@@ -61,15 +61,15 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
 	
-    [registerAddressPopUp setAlignment:NSCenterTextAlignment];
-    [channelPopUp setAlignment:NSCenterTextAlignment];
+    [registerAddressPopUp setAlignment:NSTextAlignmentCenter];
+    [channelPopUp setAlignment:NSTextAlignmentCenter];
 	
     [self populatePullDown];
     
     [super awakeFromNib];
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -286,7 +286,7 @@
 {
 	//  Set value of both text and stepper
 	[self updateStepper:writeValueStepper setting:[model writeValue]];
-	[writeValueTextField setIntValue:[model writeValue]];
+	[writeValueTextField setIntegerValue:[model writeValue]];
 }
 
 //--------------------------------------------------------------------------------
@@ -566,7 +566,7 @@
 	
     [registerOffsetTextField setStringValue:
 	 [NSString stringWithFormat:@"0x%04lx",
-	  [model getAddressOffset:aRegisterIndex]]];
+	  (unsigned long)[model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
     [regNameField setStringValue:[model getRegisterName:aRegisterIndex]];
@@ -590,7 +590,7 @@
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaenCard%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }

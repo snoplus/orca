@@ -361,7 +361,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     return homeDetected;
 }
 
-- (long) motorPosition
+- (int32_t) motorPosition
 {
     return motorPosition;
 }
@@ -592,12 +592,12 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 	 object:self];
 }
 
-- (unsigned long)  optionMask
+- (uint32_t)  optionMask
 {
     return optionMask;
 }
 
-- (void) setOptionMask:(unsigned long)aMask 
+- (void) setOptionMask:(uint32_t)aMask 
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setOptionMask:optionMask];
     optionMask = aMask;
@@ -609,14 +609,14 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 
 - (void) setOption:(int)anOption 
 {
-    long aMask = optionMask;
+    int32_t aMask = optionMask;
     aMask |= (0x1L<<anOption);
     [self setOptionMask:aMask];
 }
 
 - (void) clearOption:(int)anOption 
 {
-    long aMask = optionMask;
+    int32_t aMask = optionMask;
     aMask &= ~(0x1L<<anOption);
     [self setOptionMask:aMask];
 }
@@ -648,7 +648,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 }
 
 
-- (long) readMotor
+- (int32_t) readMotor
 {
     [[self motorController] readMotor:self];
     return motorPosition;
@@ -670,12 +670,12 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     
 }
 
-- (void) moveMotor:(id)aMotor amount:(long)amount
+- (void) moveMotor:(id)aMotor amount:(int32_t)amount
 {
     [[self motorController]  moveMotor:self amount:amount];
 }
 
-- (void) moveMotor:(id)aMotor to:(long)aPosition
+- (void) moveMotor:(id)aMotor to:(int32_t)aPosition
 {
     [[self motorController]  moveMotor:self to:aPosition];
 }
@@ -723,9 +723,9 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [self setStepMode:[decoder decodeIntForKey:@"StepMode"]];
     [self setXyPosition:[decoder decodeIntForKey:@"Position"]];
     [self setHoldCurrent:[decoder decodeIntForKey:@"HoldCurrent"]];
-    [self setRisingEdge:[decoder decodeIntForKey:@"RisingEdge"]];
+    [self setRisingEdge:[decoder decodeIntegerForKey:@"RisingEdge"]];
     [self setBreakPoint:[decoder decodeIntForKey:@"BreakPoint"]];
-    [self setAbsoluteBrkPt:[decoder decodeIntForKey:@"AbsBreakPoint"]];
+    [self setAbsoluteBrkPt:[decoder decodeIntegerForKey:@"AbsBreakPoint"]];
     [self setStepCount:[decoder decodeIntForKey:@"StepCount"]];
     [self setSeekAmount:[decoder decodeIntForKey:@"SeekAmount"]];
     
@@ -735,14 +735,14 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
     [self setPatternDwellTime:[decoder decodeFloatForKey:@"PatternDwellTime"]];
     [self setPatternNumSweeps:[decoder decodeIntForKey:@"PatternNumSweeps"]];
     [self setPatternType:[decoder decodeIntForKey:@"PatternType"]];
-    [self setOptionMask:[decoder decodeInt32ForKey:@"OptionMask"]];
-    [self setUseFileForPattern:[decoder decodeIntForKey:@"UsePatternFileName"]];
+    [self setOptionMask:[decoder decodeIntForKey:@"OptionMask"]];
+    [self setUseFileForPattern:[decoder decodeIntegerForKey:@"UsePatternFileName"]];
     [self setPatternFileName:[decoder decodeObjectForKey:@"PatternFileName"]];
     
     [self roundPatternEnd];
     
     [self setMultiplierX:[decoder decodeIntForKey:@"Multiplier"]];
-    [self setAbsoluteMotion:[decoder decodeIntForKey:@"AbsoluteMotion"]];
+    [self setAbsoluteMotion:[decoder decodeIntegerForKey:@"AbsoluteMotion"]];
     [self setRiseFreq:[decoder decodeIntForKey:@"RiseFreq"]];
     [self setDriveFreq:[decoder decodeIntForKey:@"DriveFreq"]];
     [self setAcceleration:[decoder decodeIntForKey:@"Acceration"]];
@@ -757,38 +757,38 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 {
     [super encodeWithCoder:encoder];
     
-    [encoder encodeInt:stepCount forKey:@"StepCount"];
-    [encoder encodeInt:holdCurrent forKey:@"HoldCurrent"];
-    [encoder encodeInt:xyPosition forKey:@"Position"];
-    [encoder encodeInt:stepMode forKey:@"StepMode"];
-    [encoder encodeInt:risingEdge forKey:@"RisingEdge"];
-    [encoder encodeInt:breakPoint forKey:@"BreakPoint"];
-    [encoder encodeInt:absoluteBrkPt forKey:@"AbsBreakPoint"];
-    [encoder encodeInt:seekAmount forKey:@"SeekAmount"];
+    [encoder encodeInteger:stepCount forKey:@"StepCount"];
+    [encoder encodeInteger:holdCurrent forKey:@"HoldCurrent"];
+    [encoder encodeInteger:xyPosition forKey:@"Position"];
+    [encoder encodeInteger:stepMode forKey:@"StepMode"];
+    [encoder encodeInteger:risingEdge forKey:@"RisingEdge"];
+    [encoder encodeInteger:breakPoint forKey:@"BreakPoint"];
+    [encoder encodeInteger:absoluteBrkPt forKey:@"AbsBreakPoint"];
+    [encoder encodeInteger:seekAmount forKey:@"SeekAmount"];
     
-    [encoder encodeInt:patternStartCount forKey:@"PatternStartCount"];
-    [encoder encodeInt:patternEndCount forKey:@"PatternEndCount"];
-    [encoder encodeInt:patternDeltaSteps forKey:@"PatternDeltaSteps"];
+    [encoder encodeInteger:patternStartCount forKey:@"PatternStartCount"];
+    [encoder encodeInteger:patternEndCount forKey:@"PatternEndCount"];
+    [encoder encodeInteger:patternDeltaSteps forKey:@"PatternDeltaSteps"];
     [encoder encodeFloat:patternDwellTime forKey:@"PatternDwellTime"];
-    [encoder encodeInt:patternNumSweeps forKey:@"PatternNumSweeps"];
-    [encoder encodeInt:patternType forKey:@"PatternType"];
-    [encoder encodeInt32:optionMask forKey:@"OptionMask"];
-    [encoder encodeInt:useFileForPattern forKey:@"UsePatternFileName"];
+    [encoder encodeInteger:patternNumSweeps forKey:@"PatternNumSweeps"];
+    [encoder encodeInteger:patternType forKey:@"PatternType"];
+    [encoder encodeInt:optionMask forKey:@"OptionMask"];
+    [encoder encodeInteger:useFileForPattern forKey:@"UsePatternFileName"];
     [encoder encodeObject:patternFileName forKey:@"PatternFileName"];
     
-    [encoder encodeInt:multiplierX forKey:@"Multiplier"];
-    [encoder encodeInt:absoluteMotion forKey:@"AbsoluteMotion"];
-    [encoder encodeInt:riseFreq forKey:@"RiseFreq"];
-    [encoder encodeInt:driveFreq forKey:@"DriveFreq"];
-    [encoder encodeInt:acceleration forKey:@"Acceration"];
+    [encoder encodeInteger:multiplierX forKey:@"Multiplier"];
+    [encoder encodeInteger:absoluteMotion forKey:@"AbsoluteMotion"];
+    [encoder encodeInteger:riseFreq forKey:@"RiseFreq"];
+    [encoder encodeInteger:driveFreq forKey:@"DriveFreq"];
+    [encoder encodeInteger:acceleration forKey:@"Acceration"];
     [encoder encodeObject:motorName forKey:@"MotorName"];
     
     
 }
 
 #pragma mark ¥¥¥RunControl Ops
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -877,7 +877,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
             NSString* processedContent = [[fileContents componentsSeparatedByString:@"\r"] componentsJoinedByString:@"\n"];
             processedContent = [[processedContent componentsSeparatedByString:@"\n\n"] componentsJoinedByString:@"\n"];
             NSArray* lines = [processedContent componentsSeparatedByString:@"\n"];
-            long numSweeps = [[lines objectAtIndex:0] intValue];
+            int numSweeps = [[lines objectAtIndex:0] intValue];
             NSMutableArray* somePositions = [NSMutableArray array];
             NSMutableArray* someDwells = [NSMutableArray array];
             int i;
@@ -958,19 +958,19 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
             //struct tm* theTimeGMTAsStruct = gmtime(&theTime);
             //time_t ut_time = mktime(theTimeGMTAsStruct);
             
-            unsigned long data[4];
+            uint32_t data[4];
             data[0] = dataId | 4;
-            data[1] = ut_time;
-            data[2] = ([[self motorController] crateNumber]&0x0000000f) << 28 | 
+            data[1] = (uint32_t)ut_time;
+            data[2] = (uint32_t)(([[self motorController] crateNumber]&0x0000000f) << 28 |
 			([[[self motorController] guardian] slot] & 0x0000001f) << 23     |
 			([[self motorController] slot]          & 0x00000007) << 20		|
 			([[aWorker motor] tag]   & 0x00000003) << 16		|
-			([aWorker stateId]    & 0x0000000F) << 12;
+			([aWorker stateId]    & 0x0000000F) << 12);
             
             data[3] = [self motorPosition];
             
             [[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-                                                                object:[NSData dataWithBytes:data length:sizeof(long)*4]];
+                                                                object:[NSData dataWithBytes:data length:sizeof(int32_t)*4]];
         }
     }
 }
@@ -1012,7 +1012,7 @@ static NSString *ORMotorLinkInConnection = @"ORMotorLinkInConnection";
 	 object:self];
 }
 
-- (void) setMotorPosition:(long)aValue 
+- (void) setMotorPosition:(int32_t)aValue 
 {
     //not undoable
     motorPosition = aValue;

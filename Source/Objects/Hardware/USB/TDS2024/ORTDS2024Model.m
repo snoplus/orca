@@ -35,8 +35,8 @@ NSString* ORTDS2024BusyChanged             = @"ORTDS2024BusyChanged";
 NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 @interface ORTDS2024Model (private)
-- (long) writeReadFromDevice: (NSString*) aCommand data: (char*) aData
-                   maxLength: (long) aMaxLength;
+- (int32_t) writeReadFromDevice: (NSString*) aCommand data: (char*) aData
+                   maxLength: (int32_t) aMaxLength;
 - (id) threadToGetCurves:(NSDictionary*)userInfo thread:tw;
 @end
 
@@ -122,7 +122,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 
 - (void) connectionChanged
 {
-	NSArray* interfaces = [[self getUSBController] interfacesForVender:[self vendorIDs] product:[self productIDs]];
+	NSArray* interfaces = [[self getUSBController] interfacesForVenders:[self vendorIDs] products:[self productIDs]];
 	NSString* sn = serialNumber;
 	if([interfaces count] == 1 && ![sn length]){
 		sn = [[interfaces objectAtIndex:0] serialNumber];
@@ -149,7 +149,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
 
-    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
+    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];	
     if(!usbInterface || ![self getUSBController]){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,2)];
@@ -349,13 +349,13 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 {
     if([aCmd rangeOfString:@"?"].location != NSNotFound){
         char  reply[256];
-        long n = [self writeReadFromDevice: aCmd
+        int32_t n = [self writeReadFromDevice: aCmd
                                       data: reply
                                  maxLength: 256 ];
         n = MIN(256,n);
-        reply[n] = "\n";
+        reply[n] = '\n';
         NSString* s =  [NSString stringWithCString:reply encoding:NSASCIIStringEncoding];
-        long nlPos = [s rangeOfString:@"\n"].location;
+        NSInteger nlPos = [s rangeOfString:@"\n"].location;
         if(nlPos != NSNotFound){
             s = [s substringWithRange:NSMakeRange(0,nlPos)];
             NSLog(@"%@\n",s);
@@ -369,12 +369,12 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 - (void) readWaveformPreamble
 {
     char  reply[256];
-    long n = [self writeReadFromDevice: @"WFMPre?"
+    int32_t n = [self writeReadFromDevice: @"WFMPre?"
                                   data: reply
                              maxLength: 256 ];
-    reply[n] = "\n";
+    reply[n] = '\n';
     NSString* s =  [NSString stringWithCString:reply encoding:NSASCIIStringEncoding];
-    long nlPos = [s rangeOfString:@"\n"].location;
+    NSInteger nlPos = [s rangeOfString:@"\n"].location;
     if(nlPos != NSNotFound){
         s = [s substringWithRange:NSMakeRange(0,nlPos)];
         NSLog(@"%@\n",s);
@@ -383,12 +383,12 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 - (void) readDataInfo
 {
     char  reply[256];
-    long n = [self writeReadFromDevice: @"DAT?"
+    int32_t n = [self writeReadFromDevice: @"DAT?"
                                   data: reply
                              maxLength: 256 ];
-    reply[n] = "\n";
+    reply[n] = '\n';
     NSString* s =  [NSString stringWithCString:reply encoding:NSASCIIStringEncoding];
-    long nlPos = [s rangeOfString:@"\n"].location;
+    NSInteger nlPos = [s rangeOfString:@"\n"].location;
     if(nlPos != NSNotFound){
         s = [s substringWithRange:NSMakeRange(0,nlPos)];
         NSLog(@"%@\n",s);
@@ -397,12 +397,12 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 - (void) readIDString
 {
     char  reply[256];
-    long n = [self writeReadFromDevice: @"*IDN?"
+    int32_t n = [self writeReadFromDevice: @"*IDN?"
                                   data: reply
                              maxLength: 256 ];
-    reply[n] = "\n";
+    reply[n] = '\n';
     NSString* s =  [NSString stringWithCString:reply encoding:NSASCIIStringEncoding];
-    long nlPos = [s rangeOfString:@"\n"].location;
+    NSInteger nlPos = [s rangeOfString:@"\n"].location;
     if(nlPos != NSNotFound){
         s = [s substringWithRange:NSMakeRange(0,nlPos)];
         NSLog(@"%@\n",s);
@@ -444,7 +444,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
         int i;
         if(chanEnabledMask & (0x1<<curve)){
             for(i=6;i<2500-6;i++){
-                [curveStr[curve] appendFormat:@"%ld,",[self dataSet:curve valueAtChannel:i]];
+                [curveStr[curve] appendFormat:@"%d,",[self dataSet:curve valueAtChannel:i]];
                 
             }
         }
@@ -481,7 +481,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     [[self undoManager] disableUndoRegistration];
     [self setSerialNumber:          [decoder decodeObjectForKey:    @"serialNumber"]];
     [self setPollTime:              [decoder decodeIntForKey:       @"pollTime"]];
-    [self setChanEnabledMask:       [decoder decodeIntForKey:       @"chanEnabledMask"]];
+    [self setChanEnabledMask:       [decoder decodeIntegerForKey:       @"chanEnabledMask"]];
     [[self undoManager] enableUndoRegistration];
     
     return self;
@@ -491,16 +491,16 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:serialNumber      forKey:@"serialNumber"];
-    [encoder encodeInt:pollTime             forKey:@"pollTime"];
-    [encoder encodeInt:chanEnabledMask      forKey:@"chanEnabledMask"];
+    [encoder encodeInteger:pollTime             forKey:@"pollTime"];
+    [encoder encodeInteger:chanEnabledMask      forKey:@"chanEnabledMask"];
 }
 
 #pragma mark ***Comm methods
-- (long) readFromDevice: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) readFromDevice: (char*) aData maxLength: (uint32_t) aMaxLength
 {
     if(usbInterface && [self getUSBController]){
         @try {
-            return [usbInterface readUSB488:aData length:aMaxLength];;
+            return [usbInterface readUSB488:aData length:(uint32_t)aMaxLength];;
         }
         @catch(NSException* e){
         }
@@ -534,7 +534,7 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     return numPoints[chan]-6;
 }
 
-- (long) dataSet:(int)chan valueAtChannel:(int)x
+- (int32_t) dataSet:(int)chan valueAtChannel:(int)x
 {
     return waveForm[chan][x+6]; //first 6 bytes are '#42500'
 }
@@ -568,15 +568,15 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
             [self writeToDevice:@"DATa:START 1"];
             [self writeToDevice:@"DATa:STOP 2500"];
             
-            int numBtyes = [self writeReadFromDevice: @"WFMPre?"
+            int32_t numBtyes = [self writeReadFromDevice: @"WFMPre?"
                                       data: wfmPre[chan]
                                  maxLength: 256];
-            wfmPre[chan][numBtyes] = "\0";
+            wfmPre[chan][numBtyes] = '\0';
             
             unsigned char  reply[2600];
-            long n1 = 0;
-            long n2 = 0;
-            long n3 = 0;
+            int32_t n1 = 0;
+            int32_t n2 = 0;
+            int32_t n3 = 0;
             n1 = [self writeReadFromDevice: @"CURVE?"
                                       data: (char*)reply
                                  maxLength: 2500];
@@ -599,9 +599,9 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
                     for(i=0;i<n3;i++)waveForm[chan][i+n1+n2] = reply[i];
                 }
             }
-            long total = n1+n2+n3;
+            int32_t total = n1+n2+n3;
             if(total > 2500)total = 2500;
-            numPoints[chan] = total;
+            numPoints[chan] = (int)total;
         }
         @catch(NSException* e){
         }
@@ -609,8 +609,8 @@ NSString* ORWaveFormDataChanged            = @"ORWaveFormDataChanged";
     return @"done";
 }
 
-- (long) writeReadFromDevice: (NSString*) aCommand data: (char*) aData
-                   maxLength: (long) aMaxLength
+- (int32_t) writeReadFromDevice: (NSString*) aCommand data: (char*) aData
+                   maxLength: (int32_t) aMaxLength
 {
     [self writeToDevice: aCommand];
     return [self readFromDevice: aData maxLength: aMaxLength];

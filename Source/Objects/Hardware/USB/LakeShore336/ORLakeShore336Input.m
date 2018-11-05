@@ -241,17 +241,17 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt:channel          forKey:@"channel"];
+    [encoder encodeInteger:channel          forKey:@"channel"];
     [encoder encodeObject:label         forKey:@"label"];
     [encoder encodeBool:autoRange       forKey:@"autoRange"];
     [encoder encodeBool:compensation    forKey:@"compensation"];
-    [encoder encodeInt:units            forKey:@"units"];
+    [encoder encodeInteger:units            forKey:@"units"];
     [encoder encodeFloat:lowLimit       forKey:@"lowLimit"];
     [encoder encodeFloat:highLimit      forKey:@"highLimit"];
     [encoder encodeFloat:minValue       forKey:@"minValue"];
     [encoder encodeFloat:maxValue       forKey:@"maxValue"];
-    [encoder encodeInt:sensorType       forKey:@"sensorType"];
-    [encoder encodeInt:[self range]     forKey:@"range"];
+    [encoder encodeInteger:sensorType       forKey:@"sensorType"];
+    [encoder encodeInteger:[self range]     forKey:@"range"];
     [encoder encodeFloat:setPoint       forKey:@"setPoint"];
 }
 
@@ -266,15 +266,15 @@ NSString* ORLakeShore336InputTemperatureChanged  = @"ORLakeShore336InputTemperat
 }
 
 
-- (int) numberPointsInTimeRate
+- (NSUInteger) numberPointsInTimeRate
 {
     return [timeRate count];
 }
 
 - (void) timeRateAtIndex:(int)i x:(double*)xValue y:(double*)yValue
 {
-    int count   = [timeRate count];
-    int index   = count-i-1;
+    NSUInteger count   = [timeRate count];
+    NSUInteger index   = count-i-1;
     *xValue     = [timeRate timeSampledAtIndex:index];
     *yValue     = [timeRate valueAtIndex:index];
 }

@@ -52,7 +52,7 @@
 	[registerIndexPU setAutoenablesItems:NO];
 	int i;
 	for (i=0;i<kNumberOfGretinaTriggerRegisters;i++) {
-        NSString* itemName = [NSString stringWithFormat:@"(0x%04lx) %@",[model registerOffsetAt:i],[model registerNameAt:i]];
+        NSString* itemName = [NSString stringWithFormat:@"(0x%04x) %@",[model registerOffsetAt:i],[model registerNameAt:i]];
 		[registerIndexPU insertItemWithTitle:itemName	atIndex:i];
 	}
     
@@ -82,7 +82,7 @@
     
     
     NSString* key = [NSString stringWithFormat: @"orca.ORGretinaTrigger%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 
@@ -514,7 +514,7 @@
 - (IBAction) readRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretinaTriggerRegisters) {
 		aValue = [model readRegister:index];
@@ -549,7 +549,7 @@
 
 - (IBAction) registerIndexPUAction:(id)sender
 {
-	unsigned int index = [sender indexOfSelectedItem];
+	int index = (int)[sender indexOfSelectedItem];
 	[model setRegisterIndex:index];
 	[self setRegisterDisplay:index];
 }
@@ -558,9 +558,9 @@
 {
     [self endEditing];
     @try {
-        unsigned long rev = [model readCodeRevision];
+        uint32_t rev = [model readCodeRevision];
         NSLog(@"Gretina Trigger Code Revision (slot %d): 0x%x\n",[model slot],rev);
-        unsigned long date = [model readCodeDate];
+        uint32_t date = [model readCodeDate];
         NSLog(@"Gretina Trigger Code Date (slot %d): 0x%x\n",[model slot],date);
         [model readDisplayRegs];
     }
@@ -599,7 +599,7 @@
     }
 
     NSString* key = [NSString stringWithFormat: @"orca.ORGretinaTrigger%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -768,7 +768,7 @@
 	return @"";
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == miscStatTable)return 8;
     else if(aTableView == stateStatusTable){

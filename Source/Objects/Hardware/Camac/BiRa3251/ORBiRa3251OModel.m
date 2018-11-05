@@ -89,7 +89,7 @@ NSString* ORBiRa3251OModelOutputRegisterChanged = @"ORBiRa3251OModelOutputRegist
 {
 	@synchronized(self){
 		if(verbose)NSLog(@"output mask for BiRa 3251 Output (station %d)\n",[self stationNumber]);
-		unsigned long theRawValue = outputRegister;
+		uint32_t theRawValue = outputRegister;
 		[[self adapter] camacLongNAF:[self stationNumber] a:0 f:16 data:&theRawValue];
 	}
 }
@@ -106,7 +106,7 @@ NSString* ORBiRa3251OModelOutputRegisterChanged = @"ORBiRa3251OModelOutputRegist
     self = [super initWithCoder:decoder];
 	
     [[self undoManager] disableUndoRegistration];
-    [self setOutputRegister:[decoder decodeIntForKey:  @"outputRegister"]];
+    [self setOutputRegister:[decoder decodeIntegerForKey:  @"outputRegister"]];
     [[self undoManager] enableUndoRegistration];
 	
     return self;
@@ -115,7 +115,7 @@ NSString* ORBiRa3251OModelOutputRegisterChanged = @"ORBiRa3251OModelOutputRegist
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];	
-    [encoder encodeInt:outputRegister forKey:@"outputRegister"];
+    [encoder encodeInteger:outputRegister forKey:@"outputRegister"];
 }
 
 #pragma mark ¥¥¥Bit Processing Protocol
@@ -148,7 +148,7 @@ NSString* ORBiRa3251OModelOutputRegisterChanged = @"ORBiRa3251OModelOutputRegist
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat:@"%d,%d,%@",[self crateNumber],[self  stationNumber],[self identifier]];
+    return [NSString stringWithFormat:@"%d,%d,%@",(int)[self crateNumber],(int)[self  stationNumber],[self identifier]];
 }
 - (BOOL) processValue:(int)channel;
 {

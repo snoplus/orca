@@ -72,17 +72,17 @@
     processLimitSize = NSMakeSize(425,295);
     plotSize		 = NSMakeSize(425,295);
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORTPG256A%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORTPG256A%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
 	NSUInteger style = [[self window] styleMask];
 	if(index == 1){
-		[[self window] setStyleMask: style | NSResizableWindowMask];
+		[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 	}
 	else {
-		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+		[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 	}
 	
 	[super awakeFromNib];
@@ -165,7 +165,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"TPG256A (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"TPG256A (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -192,24 +192,24 @@
 			
 		case  0: 
 			[self resizeWindowToSize:basicOpsSize];   
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 			
 		case  1: 
 			[self resizeWindowToSize:plotSize];	
-			[[self window] setStyleMask: style | NSResizableWindowMask];
+			[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 			break;
 			
 		default:
 			[self resizeWindowToSize:processLimitSize];     
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 	}
 	
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORTPG256A%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORTPG256A%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -345,13 +345,13 @@
 
 - (void) unitsAction:(id)sender
 {
-	[model setUnits:[sender indexOfSelectedItem]];	
+	[model setUnits:(int)[sender indexOfSelectedItem]];
 	[model sendUnits];
 }
 
 - (void) pressureScaleAction:(id)sender
 {
-	[model setPressureScale:[sender indexOfSelectedItem]];	
+	[model setPressureScale:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) shipPressuresAction:(id)sender
@@ -371,7 +371,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 
@@ -390,37 +390,37 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	return [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	return (int)[[model timeRate:set] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[[model timeRate:set] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index] * [model pressureScaleValue];
 }
 
 #pragma mark •••Table Data Source
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	return 6;
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == pressureTableView){
 		if(rowIndex < 6){
 			if([[aTableColumn identifier] isEqualToString:@"channel"]){
-				return [NSNumber numberWithInt:rowIndex];
+				return [NSNumber numberWithInt:(int)rowIndex];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"pressure"]){
-				return [self pressureValuesForIndex:rowIndex];
+				return [self pressureValuesForIndex:(int)rowIndex];
 			}
 			else if([[aTableColumn identifier] isEqualToString:@"time"]){
-				unsigned long theTime = [model timeMeasured:rowIndex];
+				uint32_t theTime = [model timeMeasured:(int)rowIndex];
 				NSDate* theDate;
 				if(theTime){
 					theDate = [NSDate dateWithTimeIntervalSince1970:theTime];
@@ -434,19 +434,19 @@
 	}
 	else if(aTableView == processLimitTableView){
 		if([[aTableColumn identifier] isEqualToString:@"channel"]){
-			return [NSNumber numberWithInt:rowIndex];
+			return [NSNumber numberWithInt:(int)rowIndex];
 		}
 		else if([[aTableColumn identifier] isEqualToString:@"hiLimit"]){
-			return [NSString stringWithFormat:@"%.2E",[model highLimit:rowIndex]];
+			return [NSString stringWithFormat:@"%.2E",[model highLimit:(int)rowIndex]];
 		}
 		else if([[aTableColumn identifier] isEqualToString:@"lowLimit"]){
-			return [NSString stringWithFormat:@"%.2E",[model lowLimit:rowIndex]];
+			return [NSString stringWithFormat:@"%.2E",[model lowLimit:(int)rowIndex]];
 		}
 		else if([[aTableColumn identifier] isEqualToString:@"lowAlarm"]){
-			return [NSString stringWithFormat:@"%.2E",[model lowAlarm:rowIndex]];
+			return [NSString stringWithFormat:@"%.2E",[model lowAlarm:(int)rowIndex]];
 		}
 		else if([[aTableColumn identifier] isEqualToString:@"hiAlarm"]){
-			return [NSString stringWithFormat:@"%.2E",[model highAlarm:rowIndex]];
+			return [NSString stringWithFormat:@"%.2E",[model highAlarm:(int)rowIndex]];
 		}
 		else return @"";
 	}

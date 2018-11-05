@@ -24,24 +24,7 @@
 @class ORRunModel;
 @class ORScriptIDEModel;
 
-enum eRunListStates {
-	kStartup,
-    kWaitForRunToStop,
-    kWaitForSubRun,
-    kReadyToStart,
-	kStartRun,
-	kStartSubRun,
-	kRunStartScript,
-	kWaitForStartScript,
-	kWaitForRunTime,
-    kRunEndScript,
-    kWaitForEndScript,
-	kEndOfRun,
-    kNextRun,
-	kCheckForRepeat,
-    kFinishUp,
-    kPause,
-}eRunListStates;
+
 
 @interface ORRunListModel : OrcaObject  {
 	NSMutableArray* items;
@@ -88,10 +71,10 @@ enum eRunListStates {
 - (void) restartRunning;
 - (void) stopRunning;
 - (void) addItem;
-- (void) removeItemAtIndex:(int) anIndex;
-- (void) addItem:(id)anItem atIndex:(int)anIndex;
-- (id) itemAtIndex:(int)anIndex;
-- (unsigned long) itemCount;
+- (void) removeItemAtIndex:(NSInteger) anIndex;
+- (void) addItem:(id)anItem atIndex:(NSInteger)anIndex;
+- (id) itemAtIndex:(NSInteger)anIndex;
+- (uint32_t) itemCount;
 - (TimedWorker*) timedWorker;
 - (NSString*) runStateName;
 

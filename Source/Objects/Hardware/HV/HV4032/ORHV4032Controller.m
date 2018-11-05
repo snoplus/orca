@@ -201,8 +201,8 @@
 
 - (void) uniqueIDChanged:(NSNotification*)aNotification
 {
-	unsigned long i = [model mainFrameID];
-	if(i!=0xffffffff)[[self window] setTitle:[NSString stringWithFormat:@"HV4032-%lu",[model mainFrameID]]];
+	uint32_t i = [model mainFrameID];
+	if(i!=0xffffffff)[[self window] setTitle:[NSString stringWithFormat:@"HV4032-%u",[model mainFrameID]]];
 	else [[self window] setTitle:[NSString stringWithFormat:@"HV4032-NOT CONNECTED"]];
 }
 
@@ -470,7 +470,7 @@
         [alert setInformativeText:@"You can not Ramp HV until this problem is resolved.\nWhat would like to do?"];
         [alert addButtonWithTitle:@"Cancel"];
         [alert addButtonWithTitle:@"Set DACs = ADC's"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertSecondButtonReturn){
@@ -536,7 +536,7 @@
     [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes, Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -562,7 +562,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
         [model setStates:kHV4032Panic onlyControlled:YES];
 		[model startRamping];
 		[self updateButtons];
@@ -578,7 +578,7 @@
     [alert setInformativeText:@"Really Panic ALL High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes, Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -603,7 +603,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
         [model setStates:kHV4032Panic onlyControlled:NO];
 		[model startRamping];
 		[self updateButtons];
@@ -619,7 +619,7 @@
     [alert setInformativeText:@"Really move ADC values into DAC fields?"];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -643,7 +643,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model forceDacToAdc];
 		[self updateButtons];
     }
@@ -665,7 +665,7 @@
 - (IBAction) controllAction:(id)sender
 {
     [self endEditing];
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender intValue] != [[[model supplies] objectAtIndex:i] controlled]){
 		[[self undoManager] setActionName: @"Set HV Controlled"];
 		[[[model supplies] objectAtIndex:i] setControlled: [sender intValue]];
@@ -676,7 +676,7 @@
 - (IBAction) rampTimeAction:(id)sender
 {
     [self endEditing];
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender intValue] != [[[model supplies] objectAtIndex:i] rampTime]){
 		[[self undoManager] setActionName: @"Set HV Ramp Time"];
 		[[[model supplies] objectAtIndex:i] setRampTime: [sender intValue]];
@@ -685,7 +685,7 @@
 
 - (IBAction) targetAction:(id)sender
 {
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender intValue] != [[[model supplies] objectAtIndex:i] targetVoltage]){
 		[[self undoManager] setActionName: @"Set HV Ramp Time"];
 		[[[model supplies] objectAtIndex:i] setTargetVoltage: [sender intValue]];
@@ -694,7 +694,7 @@
 
 - (IBAction) adcOffsetAction:(id)sender
 {
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender floatValue] != [[[model supplies] objectAtIndex:i] voltageAdcOffset]){
 		[[self undoManager] setActionName: @"Set HV Adc Offset"];
 		[[[model supplies] objectAtIndex:i] setVoltageAdcOffset: [sender floatValue]];
@@ -704,7 +704,7 @@
 
 - (IBAction) adcSlopeAction:(id)sender
 {
-	int i = [[sender selectedCell] tag];
+	int i = (int)[[sender selectedCell] tag];
     if([sender floatValue] != [[[model supplies] objectAtIndex:i] voltageAdcSlope]){
 		[[self undoManager] setActionName: @"Set HV ADC Slope"];
 		[[[model supplies] objectAtIndex:i] setVoltageAdcSlope: [sender floatValue]];

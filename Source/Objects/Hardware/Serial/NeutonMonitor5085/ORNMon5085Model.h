@@ -30,11 +30,11 @@
 {
     @private
 		NSMutableData*	inComingData;
-        int             mode;
+        int             opMode;
         int             modeTime;
         float           radValue;
         NSString*       units;
-        unsigned long   timeMeasured;
+        uint32_t   timeMeasured;
         NSDate*         dateMeasured;
         ORTimeRate*		timeRate;
         BOOL			isLog;
@@ -75,15 +75,15 @@
 - (NSDate*) dateMeasured;
 - (BOOL)    isRunning;
 - (void)    setIsRunning:(BOOL)aValue;
-- (unsigned long) timeMeasured;
+- (uint32_t) timeMeasured;
 - (NSString*) units;
 - (void)    setUnits:(NSString*)aUnits;
 - (float)   radValue;
 - (void)    setRadValue:(float)aRadValue;
 - (int)     modeTime;
 - (void)    setModeTime:(int)aSeconds;
-- (int)     mode;
-- (void)    setMode:(int)aMode;
+- (int)     opMode;
+- (void)    setOpMode:(int)aMode;
 - (void)    dataReceived:(NSNotification*)note;
 - (BOOL)    isLog;
 - (void)    setIsLog:(BOOL)aIsLog;

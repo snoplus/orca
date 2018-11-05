@@ -40,7 +40,7 @@
     blankView = [[NSView alloc] init];
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
     
-    [registerAddressPopUp setAlignment:NSCenterTextAlignment];
+    [registerAddressPopUp setAlignment:NSTextAlignmentCenter];
 	
     [self populatePullDown];
 
@@ -56,7 +56,7 @@
 	[super awakeFromNib];
     
     NSString* key = [NSString stringWithFormat: @"orca.ORCaen977%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 
@@ -218,51 +218,51 @@
 - (void) inputSetChanged:(NSNotification*)aNotification
 {
 	short i;
-	unsigned long theMask = [model inputSet];
+	uint32_t theMask = [model inputSet];
 	for(i=0;i<16;i++){
 		[[inputSetMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
-    [inputSetField setIntValue:theMask];
+    [inputSetField setIntegerValue:theMask];
 }
 
 - (void) inputMaskChanged:(NSNotification*)aNotification
 {
 	short i;
-	unsigned long theMask = [model inputMask];
+	uint32_t theMask = [model inputMask];
 	for(i=0;i<16;i++){
 		[[inputMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
-    [inputMaskField setIntValue:theMask];
+    [inputMaskField setIntegerValue:theMask];
 }
 
 - (void) outputSetChanged:(NSNotification*)aNotification
 {
 	short i;
-	unsigned long theMask = [model outputSet];
+	uint32_t theMask = [model outputSet];
 	for(i=0;i<16;i++){
 		[[outputSetMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
-    [outputSetField setIntValue:theMask];
+    [outputSetField setIntegerValue:theMask];
 }
 
 - (void) outputMaskChanged:(NSNotification*)aNotification
 {
 	short i;
-	unsigned long theMask = [model outputMask];
+	uint32_t theMask = [model outputMask];
 	for(i=0;i<16;i++){
 		[[outputMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
-    [outputMaskField setIntValue:theMask];
+    [outputMaskField setIntegerValue:theMask];
 }
 
 - (void) interruptMaskChanged:(NSNotification*)aNotification
 {
 	short i;
-	unsigned long theMask = [model interruptMask];
+	uint32_t theMask = [model interruptMask];
 	for(i=0;i<16;i++){
 		[[interruptMaskMatrix cellWithTag:i] setIntValue:(theMask&(1<<i))!=0];
 	}
-    [interruptMaskField setIntValue:theMask];
+    [interruptMaskField setIntegerValue:theMask];
 }
 
 - (void) lowLevelLockChanged:(NSNotification*)aNotification
@@ -298,7 +298,7 @@
 }
 - (void) writeValueChanged:(NSNotification*) aNotification
 {
-	[writeValueTextField setIntValue:[model writeValue]];
+	[writeValueTextField setIntegerValue:[model writeValue]];
 }
 - (void) selectedRegIndexChanged:(NSNotification*) aNotification
 {
@@ -388,23 +388,23 @@
 
 - (IBAction) inputSetAction:(id)sender
 {
-	[model setInputSetBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setInputSetBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 - (IBAction) inputMaskAction:(id)sender
 {
-	[model setInputMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setInputMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 - (IBAction) outputSetAction:(id)sender
 {
-	[model setOutputSetBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setOutputSetBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 - (IBAction) outputMaskAction:(id)sender
 {
-	[model setOutputMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setOutputMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 - (IBAction) interruptMaskAction:(id)sender
 {
-	[model setInterruptMaskBit:[[sender selectedCell] tag] withValue:[sender intValue]];
+	[model setInterruptMaskBit:(int)[[sender selectedCell] tag] withValue:[sender intValue]];
 }
 
 - (IBAction) clearOutputRegisterAction:(id)sender
@@ -490,7 +490,7 @@
     };
 	
     [registerOffsetTextField setStringValue:
-	 [NSString stringWithFormat:@"0x%04lx",
+	 [NSString stringWithFormat:@"0x%04x",
 	  [model getAddressOffset:aRegisterIndex]]];
 	
     [registerReadWriteTextField setStringValue:types[[model getAccessType:aRegisterIndex]]];
@@ -511,7 +511,7 @@
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORCaen977%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 @end

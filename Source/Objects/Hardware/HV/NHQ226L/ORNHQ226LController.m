@@ -292,7 +292,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"NHQ226L (%lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"NHQ226L (%u)",[model uniqueIdNumber]]];
 }
 
 - (void) setVoltageChanged:(NSNotification*)aNote
@@ -383,7 +383,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];	
+	[model setPollTime:(int)[[sender selectedItem] tag]];	
 }
 
 - (IBAction) readModuleID:(id)sender
@@ -473,7 +473,7 @@
     [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -507,7 +507,7 @@
 {
 	NSDecimalNumber* theChannelNumber = (NSDecimalNumber*)info;
 	int channel = [theChannelNumber intValue] ;
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		@try {
 			if(channel == 0xFFFF || channel == 0)[model panicToZero:0];
 			if(channel == 0xFFFF || channel == 1)[model panicToZero:1];
@@ -539,7 +539,7 @@
     [alert setInformativeText:@"This will make Target Voltage == Actual Voltage\nAnd sync the rest of the values also."];
     [alert addButtonWithTitle:@"Yes/Do It"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -563,7 +563,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model syncDialog];
 	}
 }

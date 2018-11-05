@@ -44,7 +44,7 @@
 	BOOL					logBookDirty;
 	NSString*				logBookFile;
 	NSDate*					lastSnapShot;
-    unsigned  long long     alarmLogSize;
+    uint64_t                alarmLogSize;
     BOOL                    scheduledToPostToDB;
     BOOL                    notFirstTime;
 }
@@ -52,16 +52,16 @@
 #pragma mark ¥¥¥Accessors
 + (ORStatusController*) sharedStatusController;
 
-- (int) statusTextlength;
-- (int) alarmLogTextlength;
+- (NSUInteger) statusTextlength;
+- (NSUInteger) alarmLogTextlength;
 - (void) setDataSet: (ORDataSet *) aDataSet;
 - (NSString*) substringWithRange:(NSRange)aRange;
 - (void) handleInvocation:(NSInvocation*) anInvocation;
 - (void) removeDataSet:(ORDataSet*)item;
 - (void) setLogBookFile:(NSString*)aFilePath;
 - (NSString*) contents;
-- (NSString*) contentsTail:(unsigned long)aDuration includeDurationHeader:(BOOL)header;
-- (NSString*) contentsTail:(unsigned long)aDuration;
+- (NSString*) contentsTail:(uint32_t)aDuration includeDurationHeader:(BOOL)header;
+- (NSString*) contentsTail:(uint32_t)aDuration;
 - (NSString*) alarmLogContents;
 - (void) populateFilterPopup;
 - (void) loadAlarmHistory;
@@ -82,7 +82,7 @@
 
 #pragma mark ¥¥¥Data Source Methods
 - (BOOL) outlineView:(NSOutlineView*)ov isItemExpandable:(id)item;
-- (int)  outlineView:(NSOutlineView*)ov numberOfChildrenOfItem:(id)item;
+- (NSUInteger)  outlineView:(NSOutlineView*)ov numberOfChildrenOfItem:(id)item;
 - (id)   outlineView:(NSOutlineView*)ov child:(NSUInteger)index ofItem:(id)item;
 - (id)   outlineView:(NSOutlineView*)ov objectValueForTableColumn:(NSTableColumn*)tableColumn byItem:(id)item;
 - (NSUInteger)  numberOfChildren;

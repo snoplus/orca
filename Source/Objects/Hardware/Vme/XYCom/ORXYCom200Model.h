@@ -62,7 +62,7 @@ enum {
   @private
 	int selectedPLT;
 	unsigned short  selectedRegIndex;
-    unsigned long   writeValue;
+    uint32_t   writeValue;
 	NSArray*		chips;
 }
 #pragma mark ***Initialization
@@ -81,8 +81,8 @@ enum {
 - (ORPISlashTChip*) chip:(int)anIndex;
 - (unsigned short) 	selectedRegIndex;
 - (void)			setSelectedRegIndex: (unsigned short) anIndex;
-- (unsigned long) 	writeValue;
-- (void)			setWriteValue: (unsigned long) anIndex;
+- (uint32_t) 	writeValue;
+- (void)			setWriteValue: (uint32_t) anIndex;
 
 #pragma mark •••Hardware Access
 - (void) read;
@@ -114,7 +114,7 @@ enum {
 #pragma mark ***Register - Register specific routines
 - (short)			getNumberRegisters;
 - (NSString*) 		getRegisterName: (short) anIndex;
-- (unsigned long) 	getAddressOffset: (short) anIndex;
+- (uint32_t) 	getAddressOffset: (short) anIndex;
 
 #pragma mark •••Archival
 - (id)initWithCoder:(NSCoder*)decoder;
@@ -134,7 +134,7 @@ extern NSString* ORXYCom200WriteValueChanged;
 	@private
 		int				chipIndex;
 		//Gen Reg
-		int				mode;
+		int				opMode;
 		BOOL			H34Enable;
 		BOOL			H12Enable;
 		BOOL			H4Sense;
@@ -177,8 +177,8 @@ extern NSString* ORXYCom200WriteValueChanged;
 - (NSString*) subModeName:(int)subModeIndex;
 
 #pragma mark •••Gen Reg
-- (int) mode;
-- (void) setMode:(int)aMode;
+- (int) opMode;
+- (void) setOpMode:(int)aMode;
 - (BOOL) H1Sense;
 - (void) setH1Sense:(BOOL)aH1Sense;
 - (BOOL) H2Sense;

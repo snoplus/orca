@@ -409,12 +409,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelUsbTransferSetupChanged object:self];
 }
 
-- (unsigned long) LAMMaskValue
+- (uint32_t) LAMMaskValue
 {
     return LAMMaskValue;
 }
 
-- (void) setLAMMaskValue:(unsigned long)aLAMMask
+- (void) setLAMMaskValue:(uint32_t)aLAMMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setLAMMaskValue:LAMMaskValue];
     
@@ -423,12 +423,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelLAMMaskChanged object:self];
 }
 
-- (unsigned long) scalerB
+- (uint32_t) scalerB
 {
     return scalerB;
 }
 
-- (void) setScalerB:(unsigned long)aScalerB
+- (void) setScalerB:(uint32_t)aScalerB
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setScalerB:scalerB];
     
@@ -437,12 +437,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelScalerBChanged object:self];
 }
 
-- (unsigned long) scalerA
+- (uint32_t) scalerA
 {
     return scalerA;
 }
 
-- (void) setScalerA:(unsigned long)aScalerA
+- (void) setScalerA:(uint32_t)aScalerA
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setScalerA:scalerA];
     
@@ -451,12 +451,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelScalerAChanged object:self];
 }
 
-- (unsigned long) delayAndGateExt
+- (uint32_t) delayAndGateExt
 {
     return delayAndGateExt;
 }
 
-- (void) setDelayAndGateExt:(unsigned long)aDelayAndGateExt
+- (void) setDelayAndGateExt:(uint32_t)aDelayAndGateExt
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDelayAndGateExt:delayAndGateExt];
     
@@ -465,12 +465,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelDelayAndGateExtChanged object:self];
 }
 
-- (unsigned long) delayAndGateB
+- (uint32_t) delayAndGateB
 {
     return delayAndGateB;
 }
 
-- (void) setDelayAndGateB:(unsigned long)aDelayAndGateB
+- (void) setDelayAndGateB:(uint32_t)aDelayAndGateB
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDelayAndGateB:delayAndGateB];
     
@@ -479,12 +479,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelDelayAndGateBChanged object:self];
 }
 
-- (unsigned long) delayAndGateA
+- (uint32_t) delayAndGateA
 {
     return delayAndGateA;
 }
 
-- (void) setDelayAndGateA:(unsigned long)aDelayAndGateA
+- (void) setDelayAndGateA:(uint32_t)aDelayAndGateA
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setDelayAndGateA:delayAndGateA];
     
@@ -493,12 +493,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelDelayAndGateAChanged object:self];
 }
 
-- (unsigned long) scalerReadout
+- (uint32_t) scalerReadout
 {
     return scalerReadout;
 }
 
-- (void) setScalerReadout:(unsigned long)aScalerReadout
+- (void) setScalerReadout:(uint32_t)aScalerReadout
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setScalerReadout:scalerReadout];
     
@@ -507,12 +507,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelScalerReadoutChanged object:self];
 }
 
-- (unsigned long) userDeviceSelector
+- (uint32_t) userDeviceSelector
 {
     return userDeviceSelector;
 }
 
-- (void) setUserDeviceSelector:(unsigned long)aUserDeviceSelector
+- (void) setUserDeviceSelector:(uint32_t)aUserDeviceSelector
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setUserDeviceSelector:userDeviceSelector];
     
@@ -521,12 +521,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelUserDeviceSelectorChanged object:self];
 }
 
-- (unsigned long) userNIMSelector
+- (uint32_t) userNIMSelector
 {
     return userNIMSelector;
 }
 
-- (void) setUserNIMSelector:(unsigned long)aUserNIMSelector
+- (void) setUserNIMSelector:(uint32_t)aUserNIMSelector
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setUserNIMSelector:userNIMSelector];
     
@@ -535,12 +535,12 @@ enum {
     [[NSNotificationCenter defaultCenter] postNotificationName:ORCCUSBModelUserNIMSelectorChanged object:self];
 }
 
-- (unsigned long) userLEDSelector
+- (uint32_t) userLEDSelector
 {
     return userLEDSelector;
 }
 
-- (void) setUserLEDSelector:(unsigned long)aUserLEDSelector
+- (void) setUserLEDSelector:(uint32_t)aUserLEDSelector
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setUserLEDSelector:userLEDSelector];
     
@@ -627,25 +627,25 @@ enum {
     [self setLastStackFilePath:[decoder decodeObjectForKey:@"ORCCUSBModelLastStackFilePath"]];
     [self setCustomStack:[decoder decodeObjectForKey:@"ORCCUSBModelCustomStackArray"]];
     [self setUseDataModifier:[decoder decodeBoolForKey:@"ORCCUSBModelUseDataModifier"]];
-    [self setDataWord:[decoder decodeIntForKey:@"ORCCUSBModelDataWord"]];
-    [self setDataModifierBits:[decoder decodeIntForKey:@"ORCCUSBModelDataModifierBits"]];
-    [self setNafModBits:[decoder decodeIntForKey:@"ORCCUSBModelNafModBits"]];
-    [self setFValue:[decoder decodeIntForKey:@"ORCCUSBModelFValue"]];
-    [self setAValue:[decoder decodeIntForKey:@"ORCCUSBModelAValue"]];
-    [self setNValue:[decoder decodeIntForKey:@"ORCCUSBModelNValue"]];
-    [self setUsbTransferSetup:[decoder decodeIntForKey:@"ORCCUSBModelUsbTransferSetup"]];
-    [self setLAMMaskValue:[decoder decodeInt32ForKey:@"ORCCUSBModelLAMMaskValue"]];
-    [self setScalerB:[decoder decodeInt32ForKey:@"ORCCUSBModelScalerB"]];
-    [self setScalerA:[decoder decodeInt32ForKey:@"ORCCUSBModelScalerA"]];
-    [self setDelayAndGateExt:[decoder decodeInt32ForKey:@"ORCCUSBModelDelayAndGateExt"]];
-    [self setDelayAndGateB:[decoder decodeInt32ForKey:@"ORCCUSBModelDelayAndGateB"]];
-    [self setDelayAndGateA:[decoder decodeInt32ForKey:@"ORCCUSBModelDelayAndGateA"]];
-    [self setScalerReadout:[decoder decodeInt32ForKey:@"ORCCUSBModelScalerReadout"]];
-    [self setUserDeviceSelector:[decoder decodeInt32ForKey:@"ORCCUSBModelUserDeviceSelector"]];
+    [self setDataWord:[decoder decodeIntegerForKey:@"ORCCUSBModelDataWord"]];
+    [self setDataModifierBits:[decoder decodeIntegerForKey:@"ORCCUSBModelDataModifierBits"]];
+    [self setNafModBits:[decoder decodeIntegerForKey:@"ORCCUSBModelNafModBits"]];
+    [self setFValue:[decoder decodeIntegerForKey:@"ORCCUSBModelFValue"]];
+    [self setAValue:[decoder decodeIntegerForKey:@"ORCCUSBModelAValue"]];
+    [self setNValue:[decoder decodeIntegerForKey:@"ORCCUSBModelNValue"]];
+    [self setUsbTransferSetup:[decoder decodeIntegerForKey:@"ORCCUSBModelUsbTransferSetup"]];
+    [self setLAMMaskValue:[decoder decodeIntForKey:@"ORCCUSBModelLAMMaskValue"]];
+    [self setScalerB:[decoder decodeIntForKey:@"ORCCUSBModelScalerB"]];
+    [self setScalerA:[decoder decodeIntForKey:@"ORCCUSBModelScalerA"]];
+    [self setDelayAndGateExt:[decoder decodeIntForKey:@"ORCCUSBModelDelayAndGateExt"]];
+    [self setDelayAndGateB:[decoder decodeIntForKey:@"ORCCUSBModelDelayAndGateB"]];
+    [self setDelayAndGateA:[decoder decodeIntForKey:@"ORCCUSBModelDelayAndGateA"]];
+    [self setScalerReadout:[decoder decodeIntForKey:@"ORCCUSBModelScalerReadout"]];
+    [self setUserDeviceSelector:[decoder decodeIntForKey:@"ORCCUSBModelUserDeviceSelector"]];
     [self setUserNIMSelector:[decoder decodeIntForKey:@"ORCCUSBModelUserNIMSelector"]];
     [self setUserLEDSelector:[decoder decodeIntForKey:@"ORCCUSBModelUserLEDSelector"]];
-    [self setDelays:[decoder decodeIntForKey:@"ORCCUSBModelDelays"]];
-    [self setGlobalMode:[decoder decodeIntForKey:@"ORCCUSBModelGlobalMode"]];
+    [self setDelays:[decoder decodeIntegerForKey:@"ORCCUSBModelDelays"]];
+    [self setGlobalMode:[decoder decodeIntegerForKey:@"ORCCUSBModelGlobalMode"]];
     [self setRegisterValue:[decoder decodeIntForKey:@"ORCCUSBModelRegisterValue"]];
     [self setInternalRegSelection:[decoder decodeIntForKey:@"ORCCUSBModelInternalRegSelection"]];
     [self setSerialNumber:[decoder decodeObjectForKey:@"ORCCUSBModelSerialNumber"]];
@@ -660,39 +660,39 @@ enum {
     [encoder encodeObject:lastStackFilePath forKey:@"ORCCUSBModelLastStackFilePath"];
     [encoder encodeObject:customStack forKey:@"ORCCUSBModelCustomStackArray"];
     [encoder encodeBool:useDataModifier forKey:@"ORCCUSBModelUseDataModifier"];
-    [encoder encodeInt:dataWord forKey:@"ORCCUSBModelDataWord"];
-    [encoder encodeInt:dataModifierBits forKey:@"ORCCUSBModelDataModifierBits"];
-    [encoder encodeInt:nafModBits forKey:@"ORCCUSBModelNafModBits"];
-    [encoder encodeInt:fValue forKey:@"ORCCUSBModelFValue"];
-    [encoder encodeInt:aValue forKey:@"ORCCUSBModelAValue"];
-    [encoder encodeInt:nValue forKey:@"ORCCUSBModelNValue"];
-    [encoder encodeInt:usbTransferSetup forKey:@"ORCCUSBModelUsbTransferSetup"];
-    [encoder encodeInt32:LAMMaskValue forKey:@"ORCCUSBModelLAMMaskValue"];
-    [encoder encodeInt32:scalerB forKey:@"ORCCUSBModelScalerB"];
-    [encoder encodeInt32:scalerA forKey:@"ORCCUSBModelScalerA"];
-    [encoder encodeInt32:delayAndGateExt forKey:@"ORCCUSBModelDelayAndGateExt"];
-    [encoder encodeInt32:delayAndGateB forKey:@"ORCCUSBModelDelayAndGateB"];
-    [encoder encodeInt32:delayAndGateA forKey:@"ORCCUSBModelDelayAndGateA"];
-    [encoder encodeInt32:scalerReadout forKey:@"ORCCUSBModelScalerReadout"];
-    [encoder encodeInt32:userDeviceSelector forKey:@"ORCCUSBModelUserDeviceSelector"];
+    [encoder encodeInteger:dataWord forKey:@"ORCCUSBModelDataWord"];
+    [encoder encodeInteger:dataModifierBits forKey:@"ORCCUSBModelDataModifierBits"];
+    [encoder encodeInteger:nafModBits forKey:@"ORCCUSBModelNafModBits"];
+    [encoder encodeInteger:fValue forKey:@"ORCCUSBModelFValue"];
+    [encoder encodeInteger:aValue forKey:@"ORCCUSBModelAValue"];
+    [encoder encodeInteger:nValue forKey:@"ORCCUSBModelNValue"];
+    [encoder encodeInteger:usbTransferSetup forKey:@"ORCCUSBModelUsbTransferSetup"];
+    [encoder encodeInt:LAMMaskValue forKey:@"ORCCUSBModelLAMMaskValue"];
+    [encoder encodeInt:scalerB forKey:@"ORCCUSBModelScalerB"];
+    [encoder encodeInt:scalerA forKey:@"ORCCUSBModelScalerA"];
+    [encoder encodeInt:delayAndGateExt forKey:@"ORCCUSBModelDelayAndGateExt"];
+    [encoder encodeInt:delayAndGateB forKey:@"ORCCUSBModelDelayAndGateB"];
+    [encoder encodeInt:delayAndGateA forKey:@"ORCCUSBModelDelayAndGateA"];
+    [encoder encodeInt:scalerReadout forKey:@"ORCCUSBModelScalerReadout"];
+    [encoder encodeInt:userDeviceSelector forKey:@"ORCCUSBModelUserDeviceSelector"];
     [encoder encodeInt:userNIMSelector forKey:@"ORCCUSBModelUserNIMSelector"];
     [encoder encodeInt:userLEDSelector forKey:@"ORCCUSBModelUserLEDSelector"];
-    [encoder encodeInt:delays forKey:@"ORCCUSBModelDelays"];
-    [encoder encodeInt:globalMode forKey:@"ORCCUSBModelGlobalMode"];
-    [encoder encodeInt:registerValue forKey:@"ORCCUSBModelRegisterValue"];
-    [encoder encodeInt:internalRegSelection forKey:@"ORCCUSBModelInternalRegSelection"];
+    [encoder encodeInteger:delays forKey:@"ORCCUSBModelDelays"];
+    [encoder encodeInteger:globalMode forKey:@"ORCCUSBModelGlobalMode"];
+    [encoder encodeInteger:registerValue forKey:@"ORCCUSBModelRegisterValue"];
+    [encoder encodeInteger:internalRegSelection forKey:@"ORCCUSBModelInternalRegSelection"];
     [encoder encodeObject:serialNumber forKey:@"ORCCUSBModelSerialNumber"];
 }
 
 
 //camac low level functions
-- (unsigned short)  readLAMMask:(unsigned long *)mask
+- (unsigned short)  readLAMMask:(uint32_t *)mask
 {
 	return  [[self controller] camacLongNAF:25 a:9 f:24 data:mask];
 } 
 
 
-- (unsigned long) setLAMMask:(unsigned long) mask
+- (uint32_t) setLAMMask:(uint32_t) mask
 {
 	return  [[self controller] camacLongNAF:25 a:9 f:25 data:&mask];
 }
@@ -719,7 +719,7 @@ enum {
 								f:(unsigned short) f
 							 data:(unsigned short*) data
 {
-	unsigned long iData = 0;
+	uint32_t iData = 0;
 	if(data) iData = *data;
 	int status = [self sendNAF:n a:a f:f d24:NO data:&iData];
 	if(data) *data = iData;
@@ -730,14 +730,14 @@ enum {
 								a:(unsigned short) a 
 								f:(unsigned short) f;
 {
-	unsigned long dummy = 0;
+	uint32_t dummy = 0;
 	return  [self sendNAF:n a:a f:f d24:NO data:&dummy];
 }
 
 - (unsigned short)  camacLongNAF:(unsigned short) n 
 							   a:(unsigned short) a 
 							   f:(unsigned short) f
-							data:(unsigned long*) data
+							data:(uint32_t*) data
 {
 	return [self sendNAF:n a:a f:f d24:YES data:data];
 }
@@ -747,11 +747,11 @@ enum {
 									 a:(unsigned short) a 
 									 f:(unsigned short) f
 								  data:(unsigned short*) data
-                                length:(unsigned long)    numWords
+                                length:(uint32_t)    numWords
 {
 	int i;
 	for(i=0;i<numWords;i++){
-		unsigned long iData = 0;
+		uint32_t iData = 0;
 		[self sendNAF:n a:a f:f d24:NO data:&iData];
 		*data++ = iData;
 	}
@@ -761,12 +761,12 @@ enum {
 - (unsigned short)  camacLongNAFBlock:(unsigned short) n 
 									 a:(unsigned short) a 
 									 f:(unsigned short) f
-								  data:(unsigned long*) data
-                                length:(unsigned long)    numWords
+								  data:(uint32_t*) data
+                                length:(uint32_t)    numWords
 {
 	int i;
 	for(i=0;i<numWords;i++){
-		unsigned long iData = 0;
+		uint32_t iData = 0;
 		[self sendNAF:n a:a f:f d24:YES data:&iData];
 		*data++ = iData;
 	}
@@ -799,22 +799,22 @@ enum {
 	return -1;
 }
 
-- (long) readReg:(int) ireg
+- (uint32_t) readReg:(int) ireg
 {
-	unsigned long lValue; 
+	uint32_t lValue; 
 	[self camacLongNAF:25 a:ireg f:0 data:&lValue];
 	return  lValue & ccusbRegs[ireg].mask;
 }
 
-- (int) writeReg:(int) ireg value:(int) value
+- (int) writeReg:(int) ireg value:(uint32_t) value
 {
-	unsigned long lValue = ccusbRegs[ireg].mask & value;
+	uint32_t lValue = ccusbRegs[ireg].mask & value;
 	return [self camacLongNAF:25 a:ireg f:16 data:&lValue];
 }
 
 -(int) reset
 {
-	char cmd[512];
+	unsigned char cmd[512];
 
 	cmd[0] = 255;
 	cmd[1] = 255;
@@ -831,7 +831,7 @@ enum {
 	NSLog(@"CCUSB status:\n");
 	int reg;
 	for(reg= 0;reg<kNumInternalRegs;reg++){
-		long value = [self readReg:reg];
+		int32_t value = [self readReg:reg];
 		NSLog(@"Reg%d  %@: 0x%08lx\n",reg,ccusbRegs[reg].regName,value);
 		if(reg == 1){
 			NSLog(@"     BuffOpt=%d\n",   value&7);
@@ -846,7 +846,7 @@ enum {
 
 /********************************************************************/
 
--(int) sendNAF:(int)n a:(int) a f:(int) f d24:(BOOL) d24 data:(unsigned long*) data
+-(int) sendNAF:(int)n a:(int) a f:(int) f d24:(BOOL) d24 data:(uint32_t*) data
 {
 	
 	int rd, bcount;
@@ -1011,7 +1011,7 @@ enum {
     
     NSLog(@"Set LAM Mask - CC32 Status: 0x%08x\n",[self setLAMMask:0x00ffffff]);
         
-    unsigned long theMask;
+    uint32_t theMask;
     unsigned int status = [self  readLAMMask:&theMask];
     NSLog(@"LAM Mask: 0x%08x, CC32 Status: 0x%04x\n",theMask,status);
         

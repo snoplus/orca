@@ -2,7 +2,7 @@
 #define _ORSLTv4Readout_hh_
 #include "ORVCard.hh"
 #include <iostream>
-#include <sys/time.h> 
+#include <sys/time.h>
 
 typedef enum readoutModeType {
     kStandard,
@@ -11,23 +11,23 @@ typedef enum readoutModeType {
 } readoutMode;
 
 /** For each IPE4 crate in the Orca configuration one instance of ORSLTv4Readout is constructed.
-  *
-  * Short firmware history:
-  * - Project:1 Doc:0x214 Implementation:0xc063 - current version 2010 - 2011-06-16
-  *
-  * NOTE: UPDATE 'kCodeVersion': After all major changes in HW_Readout.cc, FLTv4Readout.cc, FLTv4Readout.hh, SLTv4Readout.cc, SLTv4Readout.hh
-  * 'kCodeVersion' in HW_Readout.cc should be increased!
-  *
-  *
-  */
+ *
+ * Short firmware history:
+ * - Project:1 Doc:0x214 Implementation:0xc063 - current version 2010 - 2011-06-16
+ *
+ * NOTE: UPDATE 'kCodeVersion': After all major changes in HW_Readout.cc, FLTv4Readout.cc, FLTv4Readout.hh, SLTv4Readout.cc, SLTv4Readout.hh
+ * 'kCodeVersion' in HW_Readout.cc should be increased!
+ *
+ *
+ */
 class ORSLTv4Readout : public ORVCard
 {
-  public:
+public:
     ORSLTv4Readout(SBC_card_info* ci);
     virtual ~ORSLTv4Readout() {}
     virtual bool Start();
     virtual bool Readout(SBC_LAM_Data*);
-
+    
     virtual bool Stop();
     
     /** Readout energy mode with firmware 3.1 */
@@ -38,23 +38,23 @@ class ORSLTv4Readout : public ORVCard
     
     /** Readout energies and write to local disk */
     bool LocalReadoutEnergyV31(SBC_LAM_Data*);
-
+    
     /** Open readout file */
     void LocalReadoutInit();
-
+    
     /** Open readout file */
     void LocalReadoutClose();
-
+    
     /** Simulate readout for performnace tests.
-      * Parameter: block size, data rate 
-      */
+     * Parameter: block size, data rate
+     */
     bool SimulationReadoutEnergyV31(SBC_LAM_Data*);
     
     /** Generate a template readout block */
     void SimulationInit();
     
     
-   private:
+private:
     bool firstTime;
     unsigned long long int nNoData; //< Number of loops where no data was read
     
@@ -73,7 +73,7 @@ class ORSLTv4Readout : public ORVCard
     bool activateFltReadout; //< Loop over Flts only trace and histogram mode
     
     readoutMode mode; //< control the readout function (standard, local storage, simulation)
-
+    
     int filePtr; //< File pointer
     int fileSnapshotPtr; //< File pointer for single block file (used by simulation mode)
     uint32_t dataBuffer[8192]; //< maximal DMA block size
@@ -83,7 +83,7 @@ class ORSLTv4Readout : public ORVCard
     uint32_t simDataRate; //< desired data in simulation (MB/s)
     
     bool (ORSLTv4Readout::*readoutCall)(SBC_LAM_Data*); //< pointer to the readout code
-
+    
 };
 
 #endif /* _ORSLTv4Readout_hh_*/

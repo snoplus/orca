@@ -145,13 +145,13 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[18];
+		uint32_t data[18];
 		data[0] = dataId | 18;
 		data[1] = ((unitsType&0x3)<<16) | ([self uniqueIdNumber]&0x0000fffff);
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		}theData;
 		int index = 2;
 		int i;
@@ -164,7 +164,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 			index++;
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*18]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*18]];
 	}
 }
 
@@ -232,7 +232,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 	else return 0.0;
 }
 
-- (unsigned long) timeMeasured:(int)index
+- (uint32_t) timeMeasured:(int)index
 {
 	if(index>=0 && index<8)return timeMeasured[index];
 	else return 0;
@@ -246,7 +246,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 		time_t	ut_Time;
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		timeMeasured[index] = ut_Time;
+		timeMeasured[index] = (uint32_t)ut_Time;
 
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORLakeShore210TempChanged 
 															object:self 
@@ -366,8 +366,8 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:shipTemperatures	forKey: @"ORLakeShore210ModelShipTemperatures"];
-    [encoder encodeInt:unitsType			forKey: @"unitsType"];
-    [encoder encodeInt: pollTime			forKey: @"ORLakeShore210ModelPollTime"];
+    [encoder encodeInteger:unitsType			forKey: @"unitsType"];
+    [encoder encodeInteger: pollTime			forKey: @"ORLakeShore210ModelPollTime"];
 	int i;
 	for(i=0;i<8;i++){
 		[encoder encodeDouble:lowAlarm[i] forKey: [NSString stringWithFormat:@"lowAlarm%d",i]];
@@ -398,8 +398,8 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 }
 
 #pragma mark ***Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -443,7 +443,7 @@ NSString* ORLakeShore210Lock = @"ORLakeShore210Lock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"LakeShore210,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"LakeShore210,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }

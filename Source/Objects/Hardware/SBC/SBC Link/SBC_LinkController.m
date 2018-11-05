@@ -36,9 +36,6 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _killCrateDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 #endif
-- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
-- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
-- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo;
 @end
 
 @implementation SBC_LinkController
@@ -63,7 +60,7 @@
 	[groupView setGroup:model];
 	
     NSString* key = [NSString stringWithFormat: @"orca.%@%d.selectedtab",[model className],[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -128,7 +125,7 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
     NSString* key = [NSString stringWithFormat: @"orca.%@%d.selectedtab",[model className],[model slot]];
-    int index = [tabView indexOfTabViewItem:item];
+    NSInteger index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -394,7 +391,7 @@
 - (void) timeSkewChanged:(NSNotification*)aNote
 {
     if([[model sbcLink] timeSkewValid]){
-        [timeSkewField setStringValue:[NSString stringWithFormat:@"%ld Secs",[[model sbcLink] timeSkew]]];
+        [timeSkewField setStringValue:[NSString stringWithFormat:@"%d Secs",[[model sbcLink] timeSkew]]];
     }
     else {
         [timeSkewField setStringValue:@"Not Checked"];
@@ -403,8 +400,8 @@
 
 - (void) codeVersionChanged:(NSNotification*)aNote
 {
-	int theVersion = [[model sbcLink] sbcCodeVersion];
-	if(theVersion)	[codeVersionField setIntValue:theVersion];
+	int32_t theVersion = [[model sbcLink] sbcCodeVersion];
+	if(theVersion)	[codeVersionField setIntegerValue:theVersion];
 	else			[codeVersionField setObjectValue:@"?"];
 }
 
@@ -423,9 +420,9 @@
 - (void) payloadSizeChanged:(NSNotification*)aNote
 {
 	[plotter setNeedsDisplay:YES];
-	long size = [[model sbcLink] payloadSize]/1000;
-	[payloadSizeSlider setIntValue:size];
-	[payloadSizeField setIntValue:size];
+	int32_t size = [[model sbcLink] payloadSize]/1000;
+	[payloadSizeSlider setIntegerValue:size];
+	[payloadSizeField setIntegerValue:size];
 	if(size<25)[payloadSizeField setTextColor:[NSColor colorWithCalibratedRed:.6 green:0 blue:0 alpha:1.0]];
 	else [payloadSizeField setTextColor:[NSColor blackColor]];
 	
@@ -462,8 +459,8 @@
 	
 	[plotter setNeedsDisplay:YES];
 	[cbTestButton setNeedsDisplay:YES];
-	[numRecordsField setIntValue:[[model sbcLink] totalRecordsChecked]];
-	[numErrorsField setIntValue:[[model sbcLink] totalErrors]];
+	[numRecordsField setIntegerValue:[[model sbcLink] totalRecordsChecked]];
+	[numErrorsField setIntegerValue:[[model sbcLink] totalErrors]];
 	[histogram setNeedsDisplay:YES];
 }
 
@@ -646,7 +643,7 @@
 	NSString* theInfoString       = @"";
 	int i,num;
 	
-	unsigned long aMinValue,aMaxValue,aWriteMark,aReadMark;
+	uint32_t aMinValue,aMaxValue,aWriteMark,aReadMark;
 	[[model sbcLink] getQueMinValue:&aMinValue maxValue:&aMaxValue head:&aWriteMark tail:&aReadMark];
 	NSString* runState = @"?";
 	if((theRunInfo.statusBits & kSBC_RunningMask)){
@@ -659,7 +656,7 @@
 		case 0:
 			theInfoString =                                        [NSString stringWithFormat: @"Connected     : %@\t\t# Records   : %d\n",[[model sbcLink] isConnected]?@"YES":@"NO ",theRunInfo.recordsTransfered];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Config loaded : %@\t\tWrap Arounds: %d\n",(theRunInfo.statusBits & kSBC_ConfigLoadedMask) ? @"YES":@"NO ",theRunInfo.wrapArounds]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %lu\n",runState,[[model sbcLink] throttle]]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running       : %@\t\tThrottle    : %u\n",runState,[[model sbcLink] throttle]]];
             if(theRunInfo.pollingRate==0){
                 theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Cycles * 10K  : %-9u Polling     : Fastest\n",theRunInfo.readCycles/10000]];
             }
@@ -668,8 +665,8 @@
             }
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Lost Bytes    : %u\n",theRunInfo.lostByteCount]];
 			
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9lu Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
-			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9lu Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Write Mark : %-9u Bus Errors  : %d\n",aWriteMark,theRunInfo.busErrorCount]];
+			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"CB Read Mark  : %-9u Err Count   : %d\n",aReadMark,theRunInfo.err_count]];
 			theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"In Buffer Now : %-9d Msg Count   : %d",theRunInfo.amountInBuffer,theRunInfo.msg_count]];
 		break;
 			
@@ -694,7 +691,7 @@
 				if([jobStatus running]){
 					theInfoString =                                        [NSString stringWithFormat: @"Current Job Status\n-----------------------\n"];
 					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Running  : %@\n", [jobStatus running]?@"Running":@"Done" ]];
-					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Progress : %lu%%\n",[jobStatus progress]]];
+					theInfoString = [theInfoString stringByAppendingString:[NSString stringWithFormat: @"Progress : %u%%\n",[jobStatus progress]]];
 				}
 				else {
 					theInfoString =                                        [NSString stringWithFormat: @"Last Job Status\n-----------------------\n"];
@@ -732,7 +729,7 @@
 	}
 }
 
-- (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
+- (void) getQueMinValue:(uint32_t*)aMinValue maxValue:(uint32_t*)aMaxValue head:(uint32_t*)aHeadValue tail:(uint32_t*)aTailValue
 {
 	[[model sbcLink]  getQueMinValue:aMinValue maxValue:aMaxValue head:aHeadValue tail:aTailValue];
 	
@@ -766,14 +763,14 @@
 
 - (void) addressChanged:(NSNotification*)aNote
 {
-	[addressField setIntValue:[[model sbcLink] writeAddress]];
-	[addressStepper setIntValue:[[model sbcLink] writeAddress]];
+	[addressField setIntegerValue:[[model sbcLink] writeAddress]];
+	[addressStepper setIntegerValue:[[model sbcLink] writeAddress]];
 }
 
 - (void) writeValueChanged:(NSNotification*)aNote
 {
-	[writeValueField setIntValue:[[model sbcLink] writeValue]];
-	[writeValueStepper setIntValue:[[model sbcLink] writeValue]];
+	[writeValueField setIntegerValue:[[model sbcLink] writeValue]];
+	[writeValueStepper setIntegerValue:[[model sbcLink] writeValue]];
 }
 
 #pragma mark ¥¥¥Actions
@@ -783,7 +780,7 @@
 }
 - (IBAction) sbcPollingTimeAction:(id)sender
 {
-    [[model sbcLink] setSbcPollingRate:[[sender selectedItem]tag]];
+    [[model sbcLink] setSbcPollingRate:(unsigned int)[[sender selectedItem]tag]];
 }
 
 - (IBAction) clearHistory:(id) sender
@@ -818,7 +815,7 @@
 
 - (IBAction) loadModeAction:(id)sender
 {
-	[[model sbcLink] setLoadMode:[[sender selectedCell] tag]];	
+	[[model sbcLink] setLoadMode:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) toggleCrateAction:(id)sender
@@ -834,7 +831,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Yes,  Kill Crate"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -855,22 +852,22 @@
 
 - (IBAction) downloadDriverAction:(id)sender
 {
-		[driverPassWordField setStringValue:@""];
-		[NSApp beginSheet: driverInstallPanel
-		   modalForWindow: [self window]
-			modalDelegate: self
-		   didEndSelector: @selector(_driverInstallPanelDidEnd:returnCode:contextInfo:)
-			  contextInfo: nil];
+    [driverPassWordField setStringValue:@""];
+    [[self window] beginSheet:driverInstallPanel completionHandler:^(NSModalResponse returnCode){
+        if(returnCode == NSModalResponseOK){
+            [[model sbcLink] installDriver:[driverPassWordField stringValue]];
+        }
+    }];
 }
 
 - (IBAction)  shutdownAction:(id)sender;     
 {
     [rootPassWordField setStringValue:@""];
-    [NSApp beginSheet: passWordPanel
-	   modalForWindow: [self window]
-		modalDelegate: self
-	   didEndSelector: @selector(_validatePasswordPanelDidEnd:returnCode:contextInfo:)
-		  contextInfo: nil];
+    [[self window] beginSheet:driverInstallPanel completionHandler:^(NSModalResponse returnCode){
+        if(returnCode == NSModalResponseOK){
+            [[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[[rebootMatrix selectedCell]tag]];
+        }
+    }];
 }
 
 - (IBAction) rebootHaltSelectionAction:(id)sender
@@ -942,7 +939,7 @@
 
 - (IBAction) errorTimeOutAction:(id)sender
 {
-	[[model sbcLink] setErrorTimeOut:[sender indexOfSelectedItem]];
+	[[model sbcLink] setErrorTimeOut:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) portNumberAction:(id)sender
@@ -987,15 +984,15 @@
     unsigned short sdata;
     unsigned char  cdata;
 	[self endEditing];
-	long value = [[model sbcLink] writeValue];
-	int address = 0;
+	int32_t value = [[model sbcLink] writeValue];
+	uint32_t address = 0;
     @try {
 		if([model isKindOfClass:[ORVmeAdapter class]]){
-			int 			startAddress 	= [[model sbcLink] writeAddress];
-			int				endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
+			uint32_t 			startAddress 	= [[model sbcLink] writeAddress];
+			uint32_t				endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
 			unsigned short 	addressModifier = [[model sbcLink] addressModifier];
 			unsigned short 	addressSpace	= 1;  //[[model sbcLink] rwIOSpaceValue];
-			unsigned long  	ldata			= [[model sbcLink] writeValue];
+			uint32_t  	ldata			= [[model sbcLink] writeValue];
 			
 			address = startAddress;
 			if([[model sbcLink] doRange] && [[model sbcLink] range]==0){
@@ -1025,7 +1022,7 @@
 						ldata = sdata;
 						break;
 						
-					case 2: //long
+					case 2: //int32_t
 						[[model sbcLink] writeLongBlock:&ldata
 											  atAddress:address
 											 numToWrite:1
@@ -1056,15 +1053,15 @@
 
 - (IBAction) readAction:(id)sender
 {
-    unsigned long ldata;
+    uint32_t ldata;
     unsigned short sdata;
     unsigned char  cdata;
 	[self endEditing];
-	unsigned long address = 0;
+	uint32_t address = 0;
 	@try {
 		if([model isKindOfClass:[ORVmeAdapter class]]){
-			unsigned long 	startAddress 	= [[model sbcLink] writeAddress];
-			unsigned long	endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
+			uint32_t 	startAddress 	= [[model sbcLink] writeAddress];
+			uint32_t	endAddress		= [[model sbcLink] doRange]?startAddress + [[model sbcLink] range]*[addressStepper increment] : startAddress;
 			unsigned short 	addressModifier = [[model sbcLink] addressModifier];
 			unsigned short 	addressSpace	= 1;  //[model rwIOSpaceValue];
 			
@@ -1095,7 +1092,7 @@
 						
 						break;
 						
-					case 2: //long
+					case 2: //int32_t
 						[[model sbcLink] readLongBlock:&ldata
 											 atAddress:address
 											 numToRead:1
@@ -1109,7 +1106,7 @@
 			}while(address<endAddress);
 		}
 		else {
-			long result;
+			int32_t result;
 			address = [[model sbcLink] writeAddress];
 			[[model sbcLink] readLongBlock:&result
 								 atAddress:address
@@ -1145,19 +1142,19 @@
 - (IBAction) readWriteTypeMatrixAction:(id)sender
 { 
     if ([[model sbcLink] readWriteType] != [sender selectedTag]){
-        [[model sbcLink] setReadWriteType:[sender selectedTag]];
+        [[model sbcLink] setReadWriteType:(unsigned int)[sender selectedTag]];
     }
 }
 
 - (IBAction) addressModifierPUAction:(id)sender
 {
-	[[model sbcLink] setAddressModifier:[[sender selectedItem] tag]];
+	[[model sbcLink] setAddressModifier:(unsigned int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) infoTypeAction:(id)sender
 {
     if ([[model sbcLink] infoType] != [sender selectedTag]){
-        [[model sbcLink] setInfoType:[sender selectedTag]];
+        [[model sbcLink] setInfoType:(int)[sender selectedTag]];
     }
 }
 
@@ -1192,7 +1189,7 @@
 
 - (IBAction) getSbcCodeVersion:(id)sender
 {
-	long theVersion = [model getSBCCodeVersion];
+	int32_t theVersion = [model getSBCCodeVersion];
 	[[model sbcLink] setSbcCodeVersion:theVersion];
 }
 
@@ -1204,24 +1201,23 @@
 - (IBAction) setTimeAction:(id)sender;
 {
     [rootPassWordField setStringValue:@""];
-    [NSApp beginSheet: setTimePanel
-       modalForWindow: [self window]
-        modalDelegate: self
-       didEndSelector: @selector(_validateSetTimePanelDidEnd:returnCode:contextInfo:)
-          contextInfo: nil];
-
+     [[self window] beginSheet:setTimePanel completionHandler:^(NSModalResponse returnCode){
+        if(returnCode == NSModalResponseOK){
+            [[model sbcLink] setSBCTime:[setTimePassWordField stringValue]];
+        }
+    }];
 }
 
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-	int tag = [aPlotter tag];
+	int tag = (int)[aPlotter tag];
     if(tag == 0) return [[model sbcLink] cbTestCount];
 	else		 return 1000;
 }
    
-- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
+- (void) plotter:(id)aPlotter index:(uint32_t)index x:(double*)xValue y:(double*)yValue
 {
-	int tag = [aPlotter tag];
+	int tag = (int)[aPlotter tag];
     if(tag == 0){
 		if(index>100){
 			*xValue = 0;
@@ -1234,7 +1230,7 @@
 		}
 	}
 	else {
-		*yValue = [[model sbcLink] recordSizeHisto:index];
+		*yValue = [[model sbcLink] recordSizeHisto:(int)index];
 		*xValue = index;
 	}
 }
@@ -1273,40 +1269,8 @@
 }
 #endif
 
-- (void) _validatePasswordPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
-{
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-    if(returnCode == NSModalResponseOK){
-#else
-    if(returnCode == NSOKButton){
-#endif
-		[[model sbcLink] shutDown:[rootPassWordField stringValue] reboot:[[rebootMatrix selectedCell]tag]];
-	}
-}
-
-- (void) _validateSetTimePanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
-{
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-    if(returnCode == NSModalResponseOK){
-#else
-    if(returnCode == NSOKButton){
-#endif
-        [[model sbcLink] setSBCTime:[setTimePassWordField stringValue]];
-    }
-}
-
-
     
-- (void) _driverInstallPanelDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
-{
-#if defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
-    if(returnCode == NSModalResponseOK){
-#else
-    if(returnCode == NSOKButton){
-#endif
-		[[model sbcLink] installDriver:[driverPassWordField stringValue]];
-	}
-}
+
 @end
 
 @implementation OrcaObject (SBC_Link)

@@ -768,7 +768,7 @@ snopGreenColor;
     [self endEditing];
 
     /* Action when the user clicks on the Start or Restart Button. */
-    unsigned long dbruntypeword = 0;
+    uint32_t dbruntypeword = 0;
 
     /* If we are not going to maintenance we shouldn't be polling */
     NSMutableDictionary* runSettings = [[[model standardRunCollection] objectForKey:[model standardRunType]] objectForKey:[model standardRunVersion]];
@@ -779,7 +779,7 @@ snopGreenColor;
     }
 
     // Get the run type word of the next run
-    dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
+    dbruntypeword = (uint32_t)[[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
 
     if (!((dbruntypeword & kMaintenanceRun) || (dbruntypeword & kDiagnosticRun))) {
         // Make sure we are not polling
@@ -893,7 +893,7 @@ snopGreenColor;
 
 - (IBAction) nhitMonitorCrateAction: (id) sender
 {
-    [model setNhitMonitorCrate:[sender indexOfSelectedItem]];
+    [model setNhitMonitorCrate:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) nhitMonitorPulserRateAction: (id) sender
@@ -913,7 +913,7 @@ snopGreenColor;
 
 - (IBAction) nhitMonitorAutoRunAction: (id) sender
 {
-    [model setNhitMonitorAutoRun:[sender state]];
+    [model setNhitMonitorAutoRun:[(NSButton*)sender state]];
 }
 
 - (IBAction) nhitMonitorAutoPulserRateAction: (id) sender
@@ -934,27 +934,27 @@ snopGreenColor;
 - (IBAction) nhitMonitorRunTypeAction: (id) sender
 {
     short bit = [sender selectedRow];
-    BOOL state  = [[sender selectedCell] state];
-    unsigned long currentRunMask = [model nhitMonitorRunType];
+    BOOL state  = [(NSButton*)[sender selectedCell] state];
+    uint32_t currentRunMask = [model nhitMonitorRunType];
     if (state) {
         currentRunMask |= (1L << bit);
     } else {
         currentRunMask &= ~(1L << bit);
     }
-    [model setNhitMonitorRunType:currentRunMask];
+    [model setNhitMonitorRunType:(uint32_t)currentRunMask];
 }
 
 - (IBAction) nhitMonitorCrateMaskAction: (id) sender
 {
     short bit = [sender selectedRow];
-    BOOL state  = [[sender selectedCell] state];
-    unsigned long currentCrateMask = [model nhitMonitorCrateMask];
+    BOOL state  = [(NSButton*)[sender selectedCell] state];
+    uint32_t currentCrateMask = [model nhitMonitorCrateMask];
     if (state) {
         currentCrateMask |= (1L << bit);
     } else {
         currentCrateMask &= ~(1L << bit);
     }
-    [model setNhitMonitorCrateMask:currentCrateMask];
+    [model setNhitMonitorCrateMask:(uint32_t)currentCrateMask];
 }
     
 - (IBAction) nhitMonitorTimeIntervalAction: (id) sender
@@ -983,7 +983,7 @@ snopGreenColor;
     waitingForBuffersAlert = [[[NSAlert alloc] init] autorelease];
     [waitingForBuffersAlert setMessageText:s];
     [waitingForBuffersAlert addButtonWithTitle:@"Force Stop and LOSE DATA!"];
-    [waitingForBuffersAlert setAlertStyle:NSInformationalAlertStyle];
+    [waitingForBuffersAlert setAlertStyle:NSAlertStyleInformational];
     [waitingForBuffersAlert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn) {
             [model abortWaitingForBuffers]; // don't wait for buffers to clear
@@ -1013,14 +1013,14 @@ snopGreenColor;
         NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
         
         // bit wise mask of xl3s
-        unsigned long xl3Mask = 0x7ffff;
+        uint32_t xl3Mask = 0x7ffff;
         
         //loop through all xl3 instances in Orca
         for (id xl3 in xl3s) {
             
             xl3Mask ^= 1 << [xl3 crateNumber];
-            int mRow;
-            int mColumn;
+            NSInteger mRow;
+            NSInteger mColumn;
             bool found;
             
             found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:[xl3 crateNumber]]];
@@ -1043,8 +1043,8 @@ snopGreenColor;
                  [NSString stringWithFormat:@"%3.1f mA",[xl3 hvACurrentReadValue]]];
             }
             if ([xl3 crateNumber] == 16) {//16B
-                int mRow;
-                int mColumn;
+                NSInteger mRow;
+                NSInteger mColumn;
                 bool found;
                 found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:19]];
                 if (found) {
@@ -1084,8 +1084,8 @@ snopGreenColor;
         }
         for (crate_num=0; crate_num<20; crate_num++) {
             if (xl3Mask & 1 << crate_num) {
-                int mRow;
-                int mColumn;
+                NSInteger mRow;
+                NSInteger mColumn;
                 bool found;
                 found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:crate_num]];
                 if (found) {
@@ -1100,8 +1100,8 @@ snopGreenColor;
         }
     }
     else { //update from a notification
-        int mRow;
-        int mColumn;
+        NSInteger mRow;
+        NSInteger mColumn;
         bool found;
         found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:
                  [hvStatusMatrix cellWithTag:[[aNote object] crateNumber]]];
@@ -1124,8 +1124,8 @@ snopGreenColor;
              [NSString stringWithFormat:@"%3.1f mA",[[aNote object] hvACurrentReadValue]]];
         }
         if ([[aNote object] crateNumber] == 16) {//16B
-            int mRow;
-            int mColumn;
+            NSInteger mRow;
+            NSInteger mColumn;
             bool found;
             found = [hvStatusMatrix getRow:&mRow column:&mColumn ofCell:[hvStatusMatrix cellWithTag:19]];
             if (found) {
@@ -1246,8 +1246,9 @@ snopGreenColor;
 {
     
     NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@",[model orcaDBUserName],[model orcaDBPassword],[model orcaDBIPAddress],[model orcaDBPort],[model orcaDBName]];
-    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    
+   // NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *urlScaped = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
@@ -1255,8 +1256,9 @@ snopGreenColor;
 {
     
     NSString *url = [NSString stringWithFormat:@"http://%@:%@@%@:%d/_utils/database.html?%@", [model debugDBUserName], [model debugDBPassword],[model debugDBIPAddress],[model debugDBPort], [model debugDBName]];
-    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    
+    //NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *urlScaped = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
@@ -1293,7 +1295,7 @@ snopGreenColor;
 {
 
     NSArray* xl3s = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORXL3Model")];
-    int crateNumber = [sender selectedRow];
+    int crateNumber = (int)[sender selectedRow];
 
     //Handle crates 16B, 17 and 18
     NSString *HVBlabel = @"";
@@ -1322,21 +1324,24 @@ snopGreenColor;
 - (IBAction) reportAction:(id)sender
 {
     NSString *url = [NSString stringWithFormat:@"https://github.com/snoplus/orca/issues/new"];
-    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
+   // NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *urlScaped = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+   [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
 - (IBAction) logAction:(id)sender
 {
     NSString *url = [NSString stringWithFormat:@"http://snopl.us/shift/"];
-    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+   // NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *urlScaped = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
 - (IBAction) opManualAction:(id)sender
 {
     NSString *url = [NSString stringWithFormat:@"http://snopl.us/detector/operator_manual/operator_manual.html"];
-    NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    //NSString* urlScaped = [url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *urlScaped = [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlScaped]];
 }
 
@@ -1379,7 +1384,7 @@ snopGreenColor;
         [[self window] setContentView:snopView];
     }
 
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    int index = (int)[tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.SNOPController.selectedtab"];
 }
 
@@ -1396,7 +1401,7 @@ snopGreenColor;
     return 0;
 }
 
-- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(NSInteger)index
+- (id)comboBox:(NSComboBox *)aComboBox objectValueForItemAtIndex:(int)index
 {
     if (aComboBox == orcaDBIPAddressPU) {
         return [model orcaDBConnectionHistoryItem:index];
@@ -1646,7 +1651,7 @@ snopGreenColor;
 
     /////////////////////////
     // If this call is from a button press push an acknowledgement
-    // to the logs. Seeing as SMELLIE takes so long to shut down, it
+    // to the logs. Seeing as SMELLIE takes so int32_t to shut down, it
     // is important to let the user know whats going on.
     if(![sender isKindOfClass:[NSNotification class]]){
         NSLog(@"#############################################\n");
@@ -1764,7 +1769,7 @@ snopGreenColor;
 
                 // Estimate run time
                 int no_pulses = [[tellieRunFile objectForKey:@"trigger_per_node"] intValue];
-                int no_nodes = [nodes count];
+                NSUInteger no_nodes = [nodes count];
                 int rate = [[tellieRunFile objectForKey:@"trigger_rate"] intValue];
                 float total_time = (no_nodes*no_pulses)/(rate*60)*1.1;
                 [loadedTellieRunTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",total_time]];
@@ -1876,7 +1881,7 @@ snopGreenColor;
                                                                     withNPulses:no_pulses
                                                                withTriggerDelay:delay
                                                                         inSlave:inSlave
-                                                                      isAMELLIE:@NO];
+                                                                      isAMELLIE:NO];
 
         [settingsArray addObject:settings];
     }
@@ -1960,7 +1965,7 @@ snopGreenColor;
 
                 // Estimate run time
                 int no_pulses = [[amellieRunFile objectForKey:@"trigger_per_node"] intValue];
-                int no_nodes = [fibres count];
+                NSUInteger no_nodes = [fibres count];
                 int rate = [[amellieRunFile objectForKey:@"trigger_rate"] intValue];
                 float total_time = (no_nodes*no_pulses)/(rate*60)*1.1;
                 [loadedAmellieRunTimeLabel setStringValue:[NSString stringWithFormat:@"%0.1f",total_time]];
@@ -2070,7 +2075,7 @@ snopGreenColor;
                                                                     withNPulses:no_pulses
                                                                withTriggerDelay:delay
                                                                         inSlave:inSlave
-                                                                      isAMELLIE:@YES];
+                                                                      isAMELLIE:YES];
 
         [settingsArray addObject:settings];
     }
@@ -2125,8 +2130,8 @@ snopGreenColor;
 - (IBAction)runTypeWordAction:(id)sender
 {
     short bit = [sender selectedRow];
-    BOOL state  = [[sender selectedCell] state];
-    unsigned long currentRunMask = [model runTypeWord];
+    BOOL state  = [(NSButton*)[sender selectedCell] state];
+    uint32_t currentRunMask = [model runTypeWord];
     if(state) currentRunMask |= (1L<<bit);
     else      currentRunMask &= ~(1L<<bit);
     //Unset bits for the mutually exclusive part so that it's impossible to mess up with it
@@ -2411,7 +2416,7 @@ snopGreenColor;
         return;
     }
 
-    int activeCell = [sender selectedRow];
+    NSInteger activeCell = [sender selectedRow];
     float raw;
     int threshold_index;
     float threshold_value;
@@ -2481,7 +2486,7 @@ snopGreenColor;
             break;
     }
     @try{
-        units = [self decideUnitsToUseForRow:activeCell usingModel:mtcModel];
+        units = (int)[self decideUnitsToUseForRow:(int)activeCell usingModel:mtcModel];
         [mtcModel setThresholdOfType:threshold_index fromUnits:units toValue:threshold_value];
     }
     @catch(NSException *excep) {
@@ -2722,7 +2727,7 @@ snopGreenColor;
 {
 
     if ([[aNote name] isEqualTo:ORRunTypeChangedNotification]) {
-        unsigned long currentRunWord = [runControl runType];
+        uint32_t currentRunWord = [runControl runType];
         [model setRunTypeWord:currentRunWord];
     }
 
@@ -2785,7 +2790,7 @@ snopGreenColor;
     }
 
     //Get run type word first
-    unsigned long dbruntypeword = [[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
+    uint32_t dbruntypeword = (uint32_t)[[runSettings valueForKey:@"run_type_word"] unsignedLongValue];
 
     //If in DIAGNOSTIC run: display null threshold values
     if(dbruntypeword & kDiagnosticRun){

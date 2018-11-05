@@ -37,7 +37,7 @@
 
 @interface ThresholdCalibrationTask : NSObject {
 	NSString* name;
-    int tag;
+    NSUInteger tag;
     id delegate;
     double savedIntegrationTime;
     NSMutableArray* channelArray;
@@ -53,8 +53,8 @@
 - (void) setStepTime:(float)aTime;
 - (NSString*) name;
 - (void) setName:(NSString*)aName;
-- (void) setTag:(int)aTag;
-- (int) tag;
+- (void) setTag:(NSUInteger)aTag;
+- (NSUInteger) tag;
 - (id) delegate;
 - (void) setDelegate:(id)aDelegate;
 - (NSMutableArray *)channelArray;
@@ -64,7 +64,7 @@
 - (unsigned int)maxThreshold;
 - (void) setMaxThreshold:(unsigned int)aValue;
 
-- (void) start:(int)numChannels enabledMask:(unsigned long)enabledMask 
+- (void) start:(int)numChannels enabledMask:(uint32_t)enabledMask 
      rateGroup:(ORRateGroup*)aRateGroup tag:(int)aTag;
 - (void) abort;
 - (void) stop;

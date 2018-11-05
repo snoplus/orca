@@ -34,7 +34,7 @@ NSString* ORXYCom200SelectedPLTChanged		= @"ORXYCom200SelectedPLTChanged";
 
 static struct {
 	NSString*	  regName;
-	unsigned long addressOffset;
+	uint32_t addressOffset;
 } mIOXY200Reg[kNumRegs]={
 {@"General Control",		0x01},
 {@"Service Request",		0x03},
@@ -146,12 +146,12 @@ NSString* mIOXY200SubModeName[4][3] = {
 	 object:self];
 }
 
-- (unsigned long) writeValue
+- (uint32_t) writeValue
 {
     return writeValue;
 }
 
-- (void) setWriteValue:(unsigned long) aValue
+- (void) setWriteValue:(uint32_t) aValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:[self writeValue]];
     
@@ -187,7 +187,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 {
 	
  	//write hw based on the dialog settings
-	long theValue			=  [self writeValue];
+	int32_t theValue			=  [self writeValue];
     short theRegIndex 		= [self selectedRegIndex];
     
     @try {
@@ -356,7 +356,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	aValue |= (([chip H4Sense]   & 0x1)<<3);	//H4 Sense
 	aValue |= (([chip H12Enable] & 0x1)<<4);	//H12 Enable
 	aValue |= (([chip H34Enable] & 0x1)<<5);	//H34 Enable
-	aValue |= (([chip mode]      & 0x3)<<6);	//Port Mode
+	aValue |= (([chip opMode]      & 0x3)<<6);	//Port Mode
 	
 	[self write:kGeneralControl sendValue:aValue chip:anIndex];
 }
@@ -453,7 +453,7 @@ NSString* mIOXY200SubModeName[4][3] = {
     return mIOXY200Reg[anIndex].regName;
 }
 
-- (unsigned long) getAddressOffset:(short) anIndex
+- (uint32_t) getAddressOffset:(short) anIndex
 {
     return mIOXY200Reg[anIndex].addressOffset;
 }
@@ -465,7 +465,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	[chip setPortAData:0x00];			// all A output lines will be low
 	[chip setPortCData:0xf];			// all C (control) output lines will be high
 	[chip setPortCDirection:0x1b];		// manual rec. for control register direction
-	[chip setMode:0x00];
+	[chip setOpMode:0x00];
 	[chip setH34Enable:0x00];
 	[chip setH12Enable:0x00];
 	[chip setH1Sense:0x00];
@@ -488,7 +488,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 	[chip setPortBData:0x00];			// all A output lines will be low
 	[chip setPortCData:0xf];			// all C (control) output lines will be high
 	[chip setPortCDirection:0x1b];		// manual rec. for control register direction
-	[chip setMode:0x00];
+	[chip setOpMode:0x00];
 	[chip setH34Enable:0x00];
 	[chip setH12Enable:0x00];
 	[chip setH1Sense:0x00];
@@ -564,7 +564,7 @@ NSString* mIOXY200SubModeName[4][3] = {
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt:selectedPLT		forKey:@"selectedPLT"];
+	[encoder encodeInteger:selectedPLT		forKey:@"selectedPLT"];
 	[encoder encodeObject:chips			forKey:@"chips"];
 	
 }
@@ -635,21 +635,21 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 	return [(ORAppDelegate*)[NSApp delegate] undoManager];
 }
 
-- (int) mode
+- (int) opMode
 {
-    return mode;
+    return opMode;
 }
 
-- (void) setMode:(int)aMode
+- (void) setOpMode:(int)aMode
 {
-    [[[self undoManager] prepareWithInvocationTarget:self] setMode:mode];
-    mode = aMode;
+    [[[self undoManager] prepareWithInvocationTarget:self] setOpMode:opMode];
+    opMode = aMode;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPISlashTChipModeChanged object:self];
 }
 
 - (NSString*) subModeName:(int)subModeIndex
 {
-	return mIOXY200SubModeName[mode][subModeIndex];
+	return mIOXY200SubModeName[opMode][subModeIndex];
 }
 
 #pragma mark --------------------
@@ -914,7 +914,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     [[self undoManager] disableUndoRegistration];
 	
 	//Gen Cntrl Reg
-    [self setMode:				[decoder decodeIntForKey:@"mode"]];
+    [self setOpMode:				[decoder decodeIntForKey:@"mode"]];
     [self setH1Sense:			[decoder decodeBoolForKey:@"H1Sense"]];
     [self setH2Sense:			[decoder decodeBoolForKey:@"H2Sense"]];
     [self setH3Sense:			[decoder decodeBoolForKey:@"H3Sense"]];
@@ -929,7 +929,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     [self setPortAH2Control:	[decoder decodeIntForKey:@"portAH2Control"]];
     [self setPortADirection:	[decoder decodeIntForKey:@"portADirection"]];
  	[self setPortATransceiverDir:	[decoder decodeIntForKey:@"portATransceiverDir"]];
-	[self setPortAData:			[decoder decodeIntForKey:@"portAData"]];
+	[self setPortAData:			[decoder decodeIntegerForKey:@"portAData"]];
 	
 	//Port B
 	[self setPortBSubMode:		[decoder decodeIntForKey:@"portBSubMode"]];
@@ -938,11 +938,11 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     [self setPortBH2Control:	[decoder decodeIntForKey:@"portBH2Control"]];
 	[self setPortBDirection:	[decoder decodeIntForKey:@"portBDirection"]];
 	[self setPortBTransceiverDir:	[decoder decodeIntForKey:@"portBTransceiverDir"]];
-    [self setPortBData:			[decoder decodeIntForKey:@"portBData"]];
+    [self setPortBData:			[decoder decodeIntegerForKey:@"portBData"]];
 	
 	//Port B
     [self setPortCDirection:	[decoder decodeIntForKey:@"portCDirection"]];
-    [self setPortCData:			[decoder decodeIntForKey:@"portCData"]];
+    [self setPortCData:			[decoder decodeIntegerForKey:@"portCData"]];
 	
 	//Timer
 	[self setPreloadLow:		[decoder decodeIntForKey:@"preloadLow"]];
@@ -960,7 +960,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
 	//Gen Cntrl Reg
-	[encoder encodeInt:mode				forKey:@"mode"];
+	[encoder encodeInteger:opMode			forKey:@"mode"];
 	[encoder encodeBool:H1Sense			forKey:@"H1Sense"];
 	[encoder encodeBool:H2Sense			forKey:@"H2Sense"];
 	[encoder encodeBool:H3Sense			forKey:@"H3Sense"];
@@ -969,33 +969,33 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
 	[encoder encodeBool:H34Enable		forKey:@"H34Enable"];
 	
 	//Port A
-	[encoder encodeInt:portASubMode		forKey:@"portASubMode"];
-	[encoder encodeInt:portAH1Control	forKey:@"portAH1Control"];
-	[encoder encodeInt:portAH2Interrupt	forKey:@"portAH2Interrupt"];
-	[encoder encodeInt:portAH2Control	forKey:@"portAH2Control"];
-	[encoder encodeInt:portADirection	forKey:@"portADirection"];
-	[encoder encodeInt:portATransceiverDir	forKey:@"portATransceiverDir"];
-	[encoder encodeInt:portAData		forKey:@"portAData"];
+	[encoder encodeInteger:portASubMode		forKey:@"portASubMode"];
+	[encoder encodeInteger:portAH1Control	forKey:@"portAH1Control"];
+	[encoder encodeInteger:portAH2Interrupt	forKey:@"portAH2Interrupt"];
+	[encoder encodeInteger:portAH2Control	forKey:@"portAH2Control"];
+	[encoder encodeInteger:portADirection	forKey:@"portADirection"];
+	[encoder encodeInteger:portATransceiverDir	forKey:@"portATransceiverDir"];
+	[encoder encodeInteger:portAData		forKey:@"portAData"];
 	
 	//Port B
-	[encoder encodeInt:portBSubMode		forKey:@"portBSubMode"];
-	[encoder encodeInt:portBH1Control	forKey:@"portBH1Control"];
-	[encoder encodeInt:portBH2Interrupt	forKey:@"portBH2Interrupt"];
-	[encoder encodeInt:portBH2Control	forKey:@"portBH2Control"];
-	[encoder encodeInt:portBDirection	forKey:@"portBDirection"];
-	[encoder encodeInt:portBTransceiverDir	forKey:@"portBTransceiverDir"];
-	[encoder encodeInt:portBData		forKey:@"portBData"];
+	[encoder encodeInteger:portBSubMode		forKey:@"portBSubMode"];
+	[encoder encodeInteger:portBH1Control	forKey:@"portBH1Control"];
+	[encoder encodeInteger:portBH2Interrupt	forKey:@"portBH2Interrupt"];
+	[encoder encodeInteger:portBH2Control	forKey:@"portBH2Control"];
+	[encoder encodeInteger:portBDirection	forKey:@"portBDirection"];
+	[encoder encodeInteger:portBTransceiverDir	forKey:@"portBTransceiverDir"];
+	[encoder encodeInteger:portBData		forKey:@"portBData"];
 	
 	//Port C
-	[encoder encodeInt:portCDirection	forKey:@"portCDirection"];
- 	[encoder encodeInt:portCData		forKey:@"portCData"];
+	[encoder encodeInteger:portCDirection	forKey:@"portCDirection"];
+ 	[encoder encodeInteger:portCData		forKey:@"portCData"];
 	
 	//Timer
-	[encoder encodeInt:preloadLow		forKey:@"preloadLow"];
-	[encoder encodeInt:preloadMiddle	forKey:@"preloadMiddle"];
-	[encoder encodeInt:preloadHigh		forKey:@"preloadHigh"];
-	[encoder encodeInt:timerControl		forKey:@"timerControl"];
-	[encoder encodeInt:period			forKey:@"period"];
+	[encoder encodeInteger:preloadLow		forKey:@"preloadLow"];
+	[encoder encodeInteger:preloadMiddle	forKey:@"preloadMiddle"];
+	[encoder encodeInteger:preloadHigh		forKey:@"preloadHigh"];
+	[encoder encodeInteger:timerControl		forKey:@"timerControl"];
+	[encoder encodeInteger:period			forKey:@"period"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -1004,7 +1004,7 @@ NSString* ORPISlashTChipPeriodChanged			= @"ORPISlashTChipPeriodChanged";
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
 	
 	//Gen Cntrl Reg
-    [objDictionary setObject:[NSNumber numberWithInt:mode]				forKey:@"mode"];
+    [objDictionary setObject:[NSNumber numberWithInt:opMode]				forKey:@"mode"];
     [objDictionary setObject:[NSNumber numberWithBool:H1Sense]			forKey:@"H1Sense"];
     [objDictionary setObject:[NSNumber numberWithBool:H2Sense]			forKey:@"H2Sense"];
     [objDictionary setObject:[NSNumber numberWithBool:H3Sense]			forKey:@"H3Sense"];

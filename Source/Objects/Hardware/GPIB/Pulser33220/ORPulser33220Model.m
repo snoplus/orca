@@ -189,10 +189,10 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     if(connectionProtocol == kHPPulserUseIP){
-        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
         theOffset.x += 10;
     }
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];	
     if(connectionProtocol == kHPPulserUseUSB && (!usbInterface || ![self getUSBController])){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,10)];
@@ -226,7 +226,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 		case kHPPulserUseUSB:	return [NSString stringWithFormat:@"33220 Pulser (Serial# %@)",[usbInterface serialNumber]];
 		case kHPPulserUseIP:	return [NSString stringWithFormat:@"33220 Pulser (%@)",[self ipAddress]];
 	}
-	return [NSString stringWithFormat:@"33220 Pulser (%d)",[self tag]];
+	return [NSString stringWithFormat:@"33220 Pulser (%d)",(int)[self tag]];
 }
 
 - (NSUInteger) vendorID
@@ -657,7 +657,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     [self setSerialNumber:[decoder decodeObjectForKey:@"ORPulser33220ModelSerialNumber"]];
 	[self setIpAddress:[decoder decodeObjectForKey:@"ORPulser33220ModelIpAddress"]];
     [self setConnectionProtocol:[decoder decodeIntForKey:@"ORPulser33220ModelConnectionProtocol"]];
-    [[self undoManager] enableUndoRegistration];    
+    [[self undoManager] enableUndoRegistration];
 	
     return self;
 }
@@ -667,7 +667,7 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
     [super encodeWithCoder:encoder];
     [encoder encodeObject:serialNumber forKey:@"ORPulser33220ModelSerialNumber"];
     [encoder encodeObject:ipAddress forKey:@"ORPulser33220ModelIpAddress"];
-    [encoder encodeInt:connectionProtocol forKey:@"ORPulser33220ModelConnectionProtocol"];
+    [encoder encodeInteger:connectionProtocol forKey:@"ORPulser33220ModelConnectionProtocol"];
 }
 
 
@@ -682,13 +682,13 @@ NSString* ORPulser33220ModelUSBInterfaceChanged = @"ORPulser33220ModelUSBInterfa
 }
 
 #pragma mark ***Comm methods
-- (long) readFromGPIBDevice: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) readFromGPIBDevice: (char*) aData maxLength: (int32_t) aMaxLength
 {
 	switch(connectionProtocol){
 		case kHPPulserUseGPIB: return [super readFromGPIBDevice:aData maxLength:aMaxLength];
 		case kHPPulserUseUSB:  
 			if(usbInterface && [self getUSBController]){
-				return [usbInterface readUSB488:aData length:aMaxLength];;
+				return [usbInterface readUSB488:aData length:(uint32_t)aMaxLength];;
 			}
 			else {
 				NSString *errorMsg = @"Must establish connection prior to issuing command\n";

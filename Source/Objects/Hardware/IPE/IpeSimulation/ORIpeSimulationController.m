@@ -48,8 +48,8 @@
 	[setPointButton setEnabled:NO];
 	[webViewButton setTitle:@"See Web View"];
 	[treeViewButton setTitle:@"See ADEI Tree"];
-	[treeDetailsView setAlignment:NSLeftTextAlignment];
-	[itemDetailsView setAlignment:NSLeftTextAlignment];
+	[treeDetailsView setAlignment:NSTextAlignmentLeft];
+	[itemDetailsView setAlignment:NSTextAlignmentLeft];
 	
 	[[timingPlotter yAxis] setRngLimitsLow:0 withHigh:1e10 withMinRng:5];
     [[timingPlotter yAxis] setRngLow:0 withHigh:200];
@@ -325,7 +325,7 @@
 
 - (void) setWindowTitle
 {
-	[[self window] setTitle: [NSString stringWithFormat:@"IPE-KATRIN-Simulation-Interface - %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle: [NSString stringWithFormat:@"IPE-KATRIN-Simulation-Interface - %u",[model uniqueIdNumber]]];
 }
 
 
@@ -378,7 +378,7 @@
 	if(([aNote object] == itemTableView) || (aNote==nil)){
 		NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
 		if([selectedSet count] == 1){
-			unsigned index = [selectedSet firstIndex];
+			int index = (int)[selectedSet firstIndex];
 			if([model itemExists:index]){
 				[viewItemInWebButton setEnabled:YES];
 				[itemDetailsView setString: [model itemDetails:index]]; 
@@ -581,14 +581,14 @@
 	[self endEditing];
 	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
 	if([selectedSet count] == 1){
-		unsigned index = [selectedSet firstIndex];
+		int index = (int)[selectedSet firstIndex];
 		[model writeSetPoint:index value:[model setPoint]];
 	}
 }
 
 - (IBAction) itemTypeAction:(id)sender
 {
-	[model setItemType:[[sender selectedCell]tag]];	
+	[model setItemType:(int)[[sender selectedCell]tag]];
 }
 
 - (void) viewItemNameAction:(id)sender
@@ -600,7 +600,7 @@
 {	
 	NSIndexSet* selectedSet = [itemTableView selectedRowIndexes];
 	if([selectedSet count] == 1){
-		unsigned index = [selectedSet firstIndex];
+		int index = (int)[selectedSet firstIndex];
 		NSString* requestString = [model createWebRequestForItem:index];
 		[[webView mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString: requestString ]]];
 		[webDrawer open: nil];
@@ -654,7 +654,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) pollNowAction:(id)sender
@@ -678,8 +678,8 @@
 
 - (IBAction)adeiListContextMenuLoadValueAction:(id)sender
 {
-    int row = [itemTableView selectedRow] ; 
-    int numRow = [itemTableView numberOfSelectedRows] ; 
+    int row = (int)[itemTableView selectedRow] ;
+    int numRow = (int)[itemTableView numberOfSelectedRows] ;
     if(numRow != 1){//
         NSLog(@"ORIpeSimulationController: Nothing selected or bad selection!\n");
         return;
@@ -702,8 +702,8 @@
 
 - (IBAction)adeiListContextMenuRemoveAction:(id)sender
 {
-    int row = [itemTableView selectedRow] ; 
-    int numRow = [itemTableView numberOfSelectedRows] ; 
+    int row = (int)[itemTableView selectedRow] ;
+    int numRow = (int)[itemTableView numberOfSelectedRows] ;
     if(numRow != 1){//
         NSLog(@"ORIpeSimulationController: Nothing selected or bad selection! %i\n",row);
         return;
@@ -754,7 +754,7 @@
 {
     //NSLog(@"STILL UNDER DEVELOPMENT! -tb-\n");
     //int row = [itemTableView selectedRow] ; 
-    int numRow = [itemTableView numberOfSelectedRows] ; 
+    int numRow = (int)[itemTableView numberOfSelectedRows] ;
     //NSLog(@"numberOfSelectedRows: %i, selectedRow: %i\n",numRow,row);
     if(numRow != 1){//
         NSLog(@"ORIpeSimulationController: Nothing selected or bad selection!\n");
@@ -805,7 +805,7 @@
 	//[model ChannelNumber:[[[sender selectedItem] title] intValue]; //TODO: -tb-
     #endif
     
-    int row = [itemTableView selectedRow] ; 
+    int row = (int)[itemTableView selectedRow] ;
 
     [model setChannelNumber: [[[sender selectedItem]title]intValue]      forItemKey: [model requestCacheItemKey:row]  ];
     [self cancelEditChannelNumberAction: nil];
@@ -841,13 +841,13 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source Methods  (OutlineView)
 - (int) outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item 
 {
-	if (item == nil)return [[model itemTreeRoot] count];
+	if (item == nil)return (int)[[model itemTreeRoot] count];
 	else {
 		if ([item isKindOfClass:[NSArray class]]) {
-			return [item count];
+			return (int)[item count];
 		}
 		else if ([item isKindOfClass:[NSDictionary class]]) {
-			return [[item objectForKey:@"Children"] count];
+			return (int)[[item objectForKey:@"Children"] count];
 		}
 		else return 0;
 	}
@@ -904,7 +904,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 		[pboard declareTypes:types owner:self];
 		NSString* s = @"";
 		for(id obj in writeItems){
-			int componentCount = [[[obj objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
+			int componentCount = (int)[[[obj objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
 			if(componentCount==4){
 				[draggedNodes addObject:[[obj mutableCopy] autorelease]];
 				NSString* aUrl = [obj objectForKey:@"URL"];
@@ -948,7 +948,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 }
 
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Data Source Methods (TableView)
-- (int) numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)tableView
 {
     if(tableView==itemTableView){
         return [model pollingLookUpCount];
@@ -959,12 +959,12 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 	return 0;
 }
 
-- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id) tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     if(tableView==itemTableView){
 		if(row<[model pollingLookUpCount]){
 			//things are slightly complicated because some of the items are in the topLevelDictionary and some are in the item's dictionary
-			NSString*		itemKey				= [model requestCacheItemKey:row];
+			NSString*		itemKey				= [model requestCacheItemKey:(int)row];
 			NSDictionary*	topLevelDictionary	= [model topLevelPollingDictionary:itemKey];
 			NSDictionary*	itemDictionary		= [topLevelDictionary objectForKey:itemKey];
 			//BOOL isControl						= [[itemDictionary objectForKey:@"Control"] boolValue];
@@ -1017,7 +1017,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 		}
 	}
 	else if(tableView == pendingRequestsTable){
-		return [model pendingRequest:[tableColumn identifier] forIndex:row];
+		return [model pendingRequest:[tableColumn identifier] forIndex:(int)row];
 	}
     return @"-";
 }
@@ -1079,7 +1079,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 {
     if(aTableView==itemTableView){
 		if(row<[model pollingLookUpCount]){
-			if([model isControlItem:row]) return [NSColor colorWithCalibratedRed:1.0 green:.5 blue:.5 alpha:.3];
+			if([model isControlItem:(int)row]) return [NSColor colorWithCalibratedRed:1.0 green:.5 blue:.5 alpha:.3];
 			else return nil;
 		}
     }
@@ -1088,12 +1088,12 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 
 - (BOOL) tableView:(NSTableView *)tv writeRowsWithIndexes:(NSIndexSet*)rowIndexes toPasteboard:(NSPasteboard*)pboard
 {
-	unsigned current_index = [rowIndexes firstIndex];
+	int current_index = (int)[rowIndexes firstIndex];
 	NSString* s = @"";
     while (current_index != NSNotFound) {
 		NSDictionary* itemDictionary = [model requestCacheItem:current_index];
 		if(itemDictionary){
-			int componentCount = [[[itemDictionary objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
+			NSUInteger componentCount = [[[itemDictionary objectForKey:@"Path"] componentsSeparatedByString:@"/"] count];
 			if(componentCount==4){
 				NSString* aUrl = [itemDictionary objectForKey:@"URL"];
 				NSString* aPath = [itemDictionary objectForKey:@"Path"];
@@ -1102,7 +1102,7 @@ autoselect an edge, and we want this drawer to open only on specific edges. */
 				s = [s stringByAppendingFormat:@"webRequest = %@\n",[ORAdeiLoader webRequestStringUrl:aUrl itemPath:aPath]];
 			}
 		}
-		current_index = [rowIndexes indexGreaterThanIndex: current_index];
+		current_index = (int)[rowIndexes indexGreaterThanIndex: current_index];
     }
 	
 	if([s length]){

@@ -92,7 +92,7 @@
 {
     errorCount = aValue;
     //also save to persistant storage
-    [persistantStorageObj step:self setObject:[NSNumber numberWithInt:aValue] forKey:@"errorCount"];
+    [persistantStorageObj step:self setObject:[NSNumber numberWithInteger:aValue] forKey:@"errorCount"];
 }
 
 - (void) runStep
@@ -187,9 +187,9 @@
         }
         else {
             if(ac>0){
-                s = [NSString stringWithFormat: @"%ld/%ld error%s", (long)ec,(long)ac,ec>1?"s":""];
+                s = [NSString stringWithFormat: @"%d/%d error%s", (int32_t)ec,(int32_t)ac,ec>1?"s":""];
             }
-            else s = [NSString stringWithFormat: @"%ld error%s", (long)ec,ec>1?"s":""];
+            else s = [NSString stringWithFormat: @"%d error%s", (int32_t)ec,ec>1?"s":""];
             
             if((self.errorString && ec>=ac) || forceError) s = self.errorTitle;
         }

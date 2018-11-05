@@ -277,7 +277,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
 						theContent = [theContent stringByAppendingFormat:@"The dead band time is: %d seconds.\n\n",deadband];
 						
 						theContent = [theContent stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
-						theContent = [theContent stringByAppendingFormat:@"This message generated from %@ %lu\n",[self className],[self uniqueIdNumber]];
+						theContent = [theContent stringByAppendingFormat:@"This message generated from %@ %u\n",[self className],[self uniqueIdNumber]];
 						theContent = [theContent stringByAppendingFormat:@"+++++++++++++++++++++++++++++++++++++++++++++++++++++\n"];						
 						NSDictionary* item;
 						NSEnumerator* e = [eMailList objectEnumerator];
@@ -317,7 +317,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
 	[[NSColor blackColor] set];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];        
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];        
     NSString* label;
     NSFont* theFont;
     NSAttributedString* n;
@@ -355,7 +355,7 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
     if([self uniqueIdNumber]){
         theFont = [NSFont messageFontOfSize:9];
         n = [[NSAttributedString alloc] 
-            initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]] 
+            initWithString:[NSString stringWithFormat:@"%u",[self uniqueIdNumber]] 
                 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
         NSSize textSize = [n size];
@@ -393,9 +393,9 @@ NSString* ORRangeTimerModelOKConnection     = @"ORRangeTimerModelOKConnection";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:  eMailList forKey:	@"ORRangeTimerModelEMailList"];
     [encoder encodeBool:	enableMail forKey:	@"ORRangeTimerModelEnableMail"];
-    [encoder encodeInt:		direction forKey:	@"ORRangeTimerModelDirection"];
+    [encoder encodeInteger:		direction forKey:	@"ORRangeTimerModelDirection"];
     [encoder encodeFloat:	limit forKey:		@"ORRangeTimerModelLimit"];
-    [encoder encodeInt:		deadband forKey:	@"ORRangeTimerModelDeadband"];
+    [encoder encodeInteger:		deadband forKey:	@"ORRangeTimerModelDeadband"];
 }
 
 - (void) mailSent:(NSString*)address

@@ -94,8 +94,8 @@
     processLimitsSize	= NSMakeSize(470,515);
     trendSize           = NSMakeSize(555,515);
 
-    NSString* key = [NSString stringWithFormat: @"orca.PacFP%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.PacFP%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
     
@@ -234,7 +234,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Power and Control (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Power and Control (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -475,7 +475,7 @@
 - (void) loadLcmTimeValues
 {
 	[[adcMatrix cellWithTag:0] setFloatValue:[model convertedLcm]];
-	unsigned long t = [model lcmTimeMeasured];
+	uint32_t t = [model lcmTimeMeasured];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -502,7 +502,7 @@
 {
  	    //DEBUG                NSLog(@"%@::%@:  index: %i\n",NSStringFromClass([self class]),NSStringFromSelector(_cmd),index);//TODO: DEBUG testing ...-tb-
 	[[adcMatrix cellWithTag:index+1] setFloatValue:[model convertedAdc:index]];
-	unsigned long t = [model timeMeasured:index];
+	uint32_t t = [model timeMeasured:index];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -675,7 +675,7 @@
 }
 
 // just returns the number of items we have.
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(gainTableView == aTableView)return 37;
 	else if(gainReadBackTableView == aTableView)return 37;
@@ -683,7 +683,7 @@
 	else return 0;
 }
 
-- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if(anObject == nil)return;
     
@@ -694,8 +694,8 @@
         else if([[aTableColumn identifier] isEqualToString:@"Board1"])board = 1;
         else if([[aTableColumn identifier] isEqualToString:@"Board2"])board = 2;
         else board = 3;
-        [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
-        [model setGain:rowIndex+(board*37) withValue:[anObject intValue]];
+        [model setGain:(int)(rowIndex+(board*37)) withValue:[anObject intValue]];
+        [model setGain:(int)(rowIndex+(board*37)) withValue:[anObject intValue]];
 
     }
     else if(processLimitsTableView == aTableView){
@@ -719,29 +719,29 @@
 		default: [self resizeWindowToSize:normalSize];	    break;
     }
 
-    int index = [tabView indexOfTabViewItem:item];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.PacFP%lu.selectedtab",[model uniqueIdNumber]]];
+    NSInteger index = [tabView indexOfTabViewItem:item];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.PacFP%u.selectedtab",[model uniqueIdNumber]]];
     [[self window] setContentView:totalView];
 }
 
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate:[aPlotter tag]]   count];
+	return (int)[[model timeRate:(int)[aPlotter tag]]   count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
-	int index = count-i-1;
-	*yValue = [[model timeRate:set] valueAtIndex:index];
-	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
+	int set = (int)[aPlotter tag];
+	NSUInteger count = (int)[[model timeRate:set] count];
+    NSUInteger index = count-i-1;
+ 	*yValue = [[model timeRate:set] valueAtIndex:(int)index];
+	*xValue = [[model timeRate:set] timeSampledAtIndex:(int)index];
 }
 
 - (IBAction) gainDisplayTypeAction:(id)sender
 {
-	[model setGainDisplayType:[[sender selectedCell] tag]];
+	[model setGainDisplayType:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) readGainFileAction:(id)sender

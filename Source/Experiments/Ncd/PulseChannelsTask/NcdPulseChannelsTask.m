@@ -203,19 +203,19 @@ enum {
 
 - (void) neutrinoMatrixAction:(id)sender
 {
-	[self setNeutrinoParam:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+	[self setNeutrinoParam:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (void) sourceMatrixAction:(id)sender
 {
-	[self setSourceParam:[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
+	[self setSourceParam:(int)[[sender selectedCell] tag] value:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) neutrinoWaveformAction:(id)sender;
 {
     if([sender indexOfSelectedItem] != neutrinoWaveform){ 	
         [[self undoManager] setActionName: @"Selected Neutrino Waveform"];
-        [self setNeutrinoWaveform:[neutrinoWaveformPopUpButton indexOfSelectedItem]];
+        [self setNeutrinoWaveform:(int)[neutrinoWaveformPopUpButton indexOfSelectedItem]];
     }
 }
 
@@ -223,7 +223,7 @@ enum {
 {
     if([sender indexOfSelectedItem] != sourceWaveform){ 	
         [[self undoManager] setActionName: @"Selected Source Waveform"];
-        [self setSourceWaveform:[sourceWaveformPopUpButton indexOfSelectedItem]];
+        [self setSourceWaveform:(int)[sourceWaveformPopUpButton indexOfSelectedItem]];
     }
 }
 
@@ -448,11 +448,11 @@ enum {
 	
 	[self setNeutrinoWaveform:[decoder decodeIntForKey:	@"neutrinoWaveform"]];
 	[self setSourceWaveform:[decoder decodeIntForKey:	@"sourceWaveform"]];
-	[self setAutoStart:[decoder decodeIntForKey:		@"autoStart"]];
-	[self setAutoStartForSourceRun:[decoder decodeIntForKey:@"autoStartForSourceRun"]];
-	[self setPulseOneOnly:[decoder decodeIntForKey:		@"pulseOneOnly"]];
-	[self setCardToPulse:[decoder decodeIntForKey:		@"cardToPulse"]];
-	[self setChannelToPulse:[decoder decodeIntForKey:	@"channelToPulse"]];
+	[self setAutoStart:[decoder decodeIntegerForKey:		@"autoStart"]];
+	[self setAutoStartForSourceRun:[decoder decodeIntegerForKey:@"autoStartForSourceRun"]];
+	[self setPulseOneOnly:[decoder decodeIntegerForKey:		@"pulseOneOnly"]];
+	[self setCardToPulse:[decoder decodeIntegerForKey:		@"cardToPulse"]];
+	[self setChannelToPulse:[decoder decodeIntegerForKey:	@"channelToPulse"]];
 	
     [[self undoManager] enableUndoRegistration];    
     return self;
@@ -468,13 +468,13 @@ enum {
         [encoder encodeFloat:sourceParam[i] forKey:  [NSString stringWithFormat:@"NcdPulseChannelsSourceParam%d",i]];    
     }
 	
-	[encoder encodeInt:neutrinoWaveform forKey: @"neutrinoWaveform"];
-	[encoder encodeInt:sourceWaveform forKey:	@"sourceWaveform"];
-	[encoder encodeInt:autoStart forKey:		@"autoStart"];
-	[encoder encodeInt:autoStartForSourceRun forKey:  @"autoStartForSourceRun"];
-	[encoder encodeInt:pulseOneOnly forKey:		@"pulseOneOnly"];
-	[encoder encodeInt:cardToPulse forKey:		@"cardToPulse"];
-	[encoder encodeInt:channelToPulse forKey:	@"channelToPulse"];
+	[encoder encodeInteger:neutrinoWaveform forKey: @"neutrinoWaveform"];
+	[encoder encodeInteger:sourceWaveform forKey:	@"sourceWaveform"];
+	[encoder encodeInteger:autoStart forKey:		@"autoStart"];
+	[encoder encodeInteger:autoStartForSourceRun forKey:  @"autoStartForSourceRun"];
+	[encoder encodeInteger:pulseOneOnly forKey:		@"pulseOneOnly"];
+	[encoder encodeInteger:cardToPulse forKey:		@"cardToPulse"];
+	[encoder encodeInteger:channelToPulse forKey:	@"channelToPulse"];
     
     [self updateWindow];
     

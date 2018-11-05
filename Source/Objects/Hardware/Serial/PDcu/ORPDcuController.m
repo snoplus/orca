@@ -184,7 +184,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"DCU (%lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"DCU (%u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -383,7 +383,7 @@
 
 - (IBAction) pressureScaleAction:(id)sender
 {
-	[model setPressureScale:[sender indexOfSelectedItem]];	
+	[model setPressureScale:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) turnOnAction:(id)sender
@@ -399,7 +399,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Turn it OFF"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -435,7 +435,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) initAction:(id)sender
@@ -447,12 +447,12 @@
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate] count];
+	return (int)[[model timeRate] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model timeRate] count];
+	int count = (int)[[model timeRate] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate] timeSampledAtIndex:index];
 	*yValue = [[model timeRate] valueAtIndex:index] * [model pressureScaleValue];

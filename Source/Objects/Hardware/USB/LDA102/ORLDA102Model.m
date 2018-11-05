@@ -169,7 +169,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];		
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];		
 		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
 			[path moveToPoint:NSMakePoint(20,10)];
@@ -510,7 +510,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	[self setRampRunning:NO];
 }
 
-- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count value:(unsigned long)aValue
+- (void) writeCommand:(unsigned char)cmdWord count:(unsigned char)count value:(uint32_t)aValue
 {
 	if(usbInterface && [self getUSBController]){
 		unsigned char data[8];
@@ -534,7 +534,7 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 	}
 }
 
-- (void) packData:(unsigned char*)data withLong:(unsigned long)aValue
+- (void) packData:(unsigned char*)data withLong:(uint32_t)aValue
 {
 	data[0] = aValue & 0xff;
 	data[1] = (aValue>>8) & 0xff;
@@ -550,11 +550,11 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
     [[self undoManager] disableUndoRegistration];
     [self setRepeatRamp:	[decoder decodeBoolForKey:@"repeatRamp"]];
     [self setIdleTime:		[decoder decodeIntForKey:	@"idleTime"]];
-    [self setDwellTime:		[decoder decodeIntForKey:	@"dwellTime"]];
+    [self setDwellTime:		[decoder decodeIntegerForKey:	@"dwellTime"]];
     [self setRampEnd:		[decoder decodeFloatForKey:	@"rampEnd"]];
     [self setRampStart:		[decoder decodeFloatForKey:	@"rampStart"]];
     [self setStepSize:		[decoder decodeFloatForKey:	@"stepSize"]];
-    [self setAttenuation:	[decoder decodeIntForKey:	@"attenuation"]];
+    [self setAttenuation:	[decoder decodeIntegerForKey:	@"attenuation"]];
     [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
     [[self undoManager] enableUndoRegistration];    
 	
@@ -565,12 +565,12 @@ NSString* ORLDA102ModelLock					= @"ORLDA102ModelLock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeBool:repeatRamp		forKey:@"repeatRamp"];
-    [encoder encodeInt:idleTime			forKey: @"idleTime"];
-    [encoder encodeInt:dwellTime		forKey: @"dwellTime"];
+    [encoder encodeInteger:idleTime			forKey: @"idleTime"];
+    [encoder encodeInteger:dwellTime		forKey: @"dwellTime"];
     [encoder encodeFloat:rampEnd		forKey: @"rampEnd"];
     [encoder encodeFloat:rampStart		forKey: @"rampStart"];
     [encoder encodeFloat:stepSize		forKey: @"stepSize"];
-    [encoder encodeInt:attenuation		forKey: @"attenuation"];
+    [encoder encodeInteger:attenuation		forKey: @"attenuation"];
     [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
 }
 

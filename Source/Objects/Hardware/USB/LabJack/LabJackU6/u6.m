@@ -5,7 +5,7 @@
 
 #include "u6.h"
 #include <stdlib.h>
-
+#include <stdint.h>
 u6CalibrationInfo U6_CALIBRATION_INFO_DEFAULT = {
     6,
     1,
@@ -60,7 +60,7 @@ void normalChecksum(uint8 *b, int n)
 
 void extendedChecksum(uint8 *b, int n)
 {
-    uint16 a;
+    uint16_t a;
 
     a = extendedChecksum16(b,n);
     b[4] = (uint8)(a & 0xff);
@@ -81,13 +81,13 @@ int makeShort(BYTE* buffer, int offset)
 uint8 normalChecksum8(uint8 *b, int n)
 {
     int i;
-    uint16 a, bb;
+    uint16_t a, bb;
 
     //Sums bytes 1 to n-1 unsigned to a 2 byte value. Sums quotient and
     //remainder of 256 division.  Again, sums quotient and remainder of
     //256 division.
     for( i = 1, a = 0; i < n; i++ ){
-        a += (uint16)b[i];
+        a += (uint16_t)b[i];
     }
 
     bb = a/256;
@@ -98,13 +98,13 @@ uint8 normalChecksum8(uint8 *b, int n)
 }
 
 
-uint16 extendedChecksum16(uint8 *b, int n)
+uint16_t extendedChecksum16(uint8 *b, int n)
 {
     int i, a = 0;
 
     //Sums bytes 6 to n-1 to a unsigned 2 byte value
     for( i = 6; i < n; i++ ){
-        a += (uint16)b[i];
+        a += (uint16_t)b[i];
     }
 
     return a;
@@ -118,7 +118,7 @@ uint8 extendedChecksum8(uint8 *b)
     //Sums bytes 1 to 5. Sums quotient and remainder of 256 division. Again, sums
     //quotient and remainder of 256 division.
     for( i = 1, a = 0; i < 6; i++ ){
-        a += (uint16)b[i];
+        a += (uint16_t)b[i];
     }
 
     bb = a/256;
@@ -141,12 +141,12 @@ HANDLE openU6Connection(int searchValue)
 HANDLE openUSBConnection(int searchValue, BOOL verbose) //-1 is probe only
 {
     BYTE sendBuffer[26], recBuffer[38];
-    uint16 checksumTotal = 0;
-    uint32 dev = 0;
+    uint16_t checksumTotal = 0;
+    uint32_t dev = 0;
     int i;
     HANDLE hDevice = 0;
 
-    uint32 numDevices = LJUSB_GetDevCount(U6_PRODUCT_ID);
+    uint32_t numDevices = LJUSB_GetDevCount(U6_PRODUCT_ID);
     if( numDevices == 0 ){
         NSLog(@"Open error: No U6 devices could be found\n");
         return NULL;
@@ -233,17 +233,17 @@ void closeUSBConnection(HANDLE hDevice)
 }
 
 
-long getTickCount()
+int32_t getTickCount()
 {
     struct timeval tv;
 
     gettimeofday(&tv, NULL);
 
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+    return (uint32_t)((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
 }
 
 
-long isCalibrationInfoValid(u6CalibrationInfo *caliInfo)
+int32_t isCalibrationInfoValid(u6CalibrationInfo *caliInfo)
 {
     if( caliInfo == NULL )      goto invalid;
     if( caliInfo->prodID != 6 ) goto invalid;
@@ -255,7 +255,7 @@ invalid:
 }
 
 
-long isTdacCalibrationInfoValid(u6TdacCalibrationInfo *caliInfo)
+int32_t isTdacCalibrationInfoValid(u6TdacCalibrationInfo *caliInfo)
 {
     if( caliInfo == NULL )      goto invalid;
     if( caliInfo->prodID != 6 ) goto invalid;
@@ -266,10 +266,10 @@ invalid:
 }
 
 
-long getCalibrationInfo(HANDLE hDevice, u6CalibrationInfo *caliInfo)
+int32_t getCalibrationInfo(HANDLE hDevice, u6CalibrationInfo *caliInfo)
 {
     uint8 sendBuffer[64], recBuffer[64];
-    int sentRec = 0, offset = 0, i = 0;
+    uint32_t sentRec = 0, offset = 0, i = 0;
 
     /* sending ConfigU6 command to get see if hi res */
     sendBuffer[1] = (uint8)(0xF8);  //command byte
@@ -358,9 +358,9 @@ commandByteError:
 }
 
 
-long getTdacCalibrationInfo(HANDLE hDevice, u6TdacCalibrationInfo *caliInfo, uint8 DIOAPinNum)
+int32_t getTdacCalibrationInfo(HANDLE hDevice, u6TdacCalibrationInfo *caliInfo, uint8 DIOAPinNum)
 {
-    int err;
+    int32_t err;
     uint8 options, speedAdjust, sdaPinNum, sclPinNum;
     uint8 address, numByteToSend, numBytesToReceive, errorcode;
     uint8 bytesCommand[1], bytesResponse[32], ackArray[4];
@@ -400,23 +400,23 @@ long getTdacCalibrationInfo(HANDLE hDevice, u6TdacCalibrationInfo *caliInfo, uin
 
 double FPuint8ArrayToFPDouble(uint8 *buffer, int startIndex)
 {
-    uint32 resultDec = 0, resultWh = 0;
+    uint32_t resultDec = 0, resultWh = 0;
 
-    resultDec = (uint32)buffer[startIndex] |
-                ((uint32)buffer[startIndex + 1] << 8) |
-                ((uint32)buffer[startIndex + 2] << 16) |
-                ((uint32)buffer[startIndex + 3] << 24);
+    resultDec = (uint32_t)buffer[startIndex] |
+                ((uint32_t)buffer[startIndex + 1] << 8) |
+                ((uint32_t)buffer[startIndex + 2] << 16) |
+                ((uint32_t)buffer[startIndex + 3] << 24);
 
-    resultWh = (uint32)buffer[startIndex + 4] |
-                ((uint32)buffer[startIndex + 5] << 8) |
-                ((uint32)buffer[startIndex + 6] << 16) |
-                ((uint32)buffer[startIndex + 7] << 24);
+    resultWh = (uint32_t)buffer[startIndex + 4] |
+                ((uint32_t)buffer[startIndex + 5] << 8) |
+                ((uint32_t)buffer[startIndex + 6] << 16) |
+                ((uint32_t)buffer[startIndex + 7] << 24);
 
     return ( (double)((int)resultWh) + (double)(resultDec)/4294967296.0 );
 }
 
 
-long getAinVoltCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int gainIndex, int bits24, uint32 bytesVolt, double *analogVolt)
+int32_t getAinVoltCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int gainIndex, int bits24, uint32_t bytesVolt, double *analogVolt)
 {
     double value = 0;
     int indexAdjust = 0;
@@ -442,9 +442,9 @@ long getAinVoltCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int 
 }
 
 
-long getDacBinVoltCalibrated8Bit(u6CalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint8 *bytesVolt8)
+int32_t getDacBinVoltCalibrated8Bit(u6CalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint8 *bytesVolt8)
 {
-    uint16 u16BytesVolt = 0;
+    uint16_t u16BytesVolt = 0;
 
     if( getDacBinVoltCalibrated16Bit(caliInfo, dacNumber, analogVolt, &u16BytesVolt) != -1 ){
         *bytesVolt8 = (uint8)(u16BytesVolt/256);
@@ -454,9 +454,9 @@ long getDacBinVoltCalibrated8Bit(u6CalibrationInfo *caliInfo, int dacNumber, dou
 }
 
 
-long getDacBinVoltCalibrated16Bit(u6CalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint16 *bytesVolt16)
+int32_t getDacBinVoltCalibrated16Bit(u6CalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint16_t *bytesVolt16)
 {
-    uint32 dBytesVolt;
+    uint32_t dBytesVolt;
 
     if( isCalibrationInfoValid(caliInfo) == 0 )return -1;
 
@@ -470,13 +470,13 @@ long getDacBinVoltCalibrated16Bit(u6CalibrationInfo *caliInfo, int dacNumber, do
     //Checking to make sure bytesVolt will be a value between 0 and 65535.
     if( dBytesVolt > 65535 ) dBytesVolt = 65535;
 
-    *bytesVolt16 = (uint16)dBytesVolt;
+    *bytesVolt16 = (uint16_t)dBytesVolt;
 
     return 0;
 }
 
 
-long getTempKCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int gainIndex, int bits24, uint32 bytesTemp, double *kelvinTemp)
+int32_t getTempKCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int gainIndex, int bits24, uint32_t bytesTemp, double *kelvinTemp)
 {
     double value;
 
@@ -487,9 +487,9 @@ long getTempKCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int ga
     return 0;
 }
 
-long getTdacBinVoltCalibrated(u6TdacCalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint16 *bytesVolt)
+int32_t getTdacBinVoltCalibrated(u6TdacCalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint16_t *bytesVolt)
 {
-    uint32 dBytesVolt;
+    uint32_t dBytesVolt;
 
     if( isTdacCalibrationInfoValid(caliInfo) == 0 )return -1;
 
@@ -504,41 +504,42 @@ long getTdacBinVoltCalibrated(u6TdacCalibrationInfo *caliInfo, int dacNumber, do
     if( dBytesVolt > 65535 )
         dBytesVolt = 65535;
 
-    *bytesVolt = (uint16)dBytesVolt;
+    *bytesVolt = (uint16_t)dBytesVolt;
 
     return 0;
 }
 
 
-long getAinVoltUncalibrated(int resolutionIndex, int gainIndex, int bits24, uint32 bytesVolt, double *analogVolt)
+int32_t getAinVoltUncalibrated(int resolutionIndex, int gainIndex, int bits24, uint32_t bytesVolt, double *analogVolt)
 {
     return getAinVoltCalibrated(&U6_CALIBRATION_INFO_DEFAULT, resolutionIndex, gainIndex, bits24, bytesVolt, analogVolt);
 }
 
 
-long getDacBinVoltUncalibrated8Bit(int dacNumber, double analogVolt, uint8 *bytesVolt8)
+int32_t getDacBinVoltUncalibrated8Bit(int dacNumber, double analogVolt, uint8 *bytesVolt8)
 {
     return getDacBinVoltCalibrated8Bit(&U6_CALIBRATION_INFO_DEFAULT, dacNumber, analogVolt, bytesVolt8);
 }
 
 
-long getDacBinVoltUncalibrated16Bit(int dacNumber, double analogVolt, uint16 *bytesVolt16)
+int32_t getDacBinVoltUncalibrated16Bit(int dacNumber, double analogVolt, uint16_t *bytesVolt16)
 {
     return getDacBinVoltCalibrated16Bit(&U6_CALIBRATION_INFO_DEFAULT, dacNumber, analogVolt, bytesVolt16);
 }
 
 
-long getTempKUncalibrated(int resolutionIndex, int gainIndex, int bits24, uint32 bytesTemp, double *kelvinTemp)
+int32_t getTempKUncalibrated(int resolutionIndex, int gainIndex, int bits24, uint32_t bytesTemp, double *kelvinTemp)
 {
     return getTempKCalibrated(&U6_CALIBRATION_INFO_DEFAULT, resolutionIndex, gainIndex, bits24, bytesTemp, kelvinTemp);
 }
 
-long I2C(HANDLE hDevice, uint8 I2COptions, uint8 SpeedAdjust, uint8 SDAPinNum, uint8 SCLPinNum, uint8 Address, uint8 NumI2CBytesToSend, uint8 NumI2CBytesToReceive, uint8 *I2CBytesCommand, uint8 *Errorcode, uint8 *AckArray, uint8 *I2CBytesResponse)
+int32_t I2C(HANDLE hDevice, uint8 I2COptions, uint8 SpeedAdjust, uint8 SDAPinNum, uint8 SCLPinNum, uint8 Address, uint8 NumI2CBytesToSend, uint8 NumI2CBytesToReceive, uint8 *I2CBytesCommand, uint8 *Errorcode, uint8 *AckArray, uint8 *I2CBytesResponse)
 {
     uint8 *sendBuff, *recBuff;
-    uint16 checksumTotal = 0;
-    uint32 ackArrayTotal, expectedAckArray;
-    int sendChars, recChars, sendSize, recSize, i, ret;
+    uint16_t checksumTotal = 0;
+    uint32_t ackArrayTotal, expectedAckArray;
+    uint32_t sendChars, recChars;
+    int sendSize, recSize, i, ret;
 
     *Errorcode = 0;
     ret = 0;
@@ -644,11 +645,11 @@ cleanmem:
 }
 
 
-long eAIN(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long ChannelP, long ChannelN, double *Voltage, long Range, long Resolution, long Settling, long Binary, long Reserved1, long Reserved2)
+int32_t eAIN(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, int32_t ChannelP, int32_t ChannelN, double *Voltage, int32_t Range, int32_t Resolution, int32_t Settling, int32_t Binary, int32_t Reserved1, int32_t Reserved2)
 {
     uint8 diff, gain, Errorcode, ErrorFrame;
     uint8 sendDataBuff[4], recDataBuff[5];
-    uint32 bytesV;
+    uint32_t bytesV;
 
     if( isCalibrationInfoValid(CalibrationInfo) == 0 ){
         NSLog(@"eAIN error: Invalid calibration information.\n");
@@ -703,9 +704,9 @@ long eAIN(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long ChannelP, long
     sendDataBuff[3] = (uint8)Settling   + diff*128; //Settling factor (0-2), Differential (7)
 
     if( ehFeedback(Handle, sendDataBuff, 4, &Errorcode, &ErrorFrame, recDataBuff, 5) < 0 )return -1;
-    if( Errorcode )return (long)Errorcode;
+    if( Errorcode )return (int32_t)Errorcode;
 
-    bytesV = recDataBuff[0] + ((uint32)recDataBuff[1])*256 + ((uint32)recDataBuff[2])*65536;
+    bytesV = recDataBuff[0] + ((uint32_t)recDataBuff[1])*256 + ((uint32_t)recDataBuff[2])*65536;
     gain = recDataBuff[3]/16;
 
     if( Binary != 0 ){
@@ -713,12 +714,12 @@ long eAIN(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long ChannelP, long
     }
     else {
         if( ChannelP == 14 ){
-            if( getTempKCalibrated(CalibrationInfo, Resolution, gain, 1, bytesV, Voltage) < 0 )
+            if( getTempKCalibrated(CalibrationInfo, (int)Resolution, gain, 1, bytesV, Voltage) < 0 )
                 return -1;
         }
         else {
             gain = recDataBuff[3]/16;
-            if( getAinVoltCalibrated(CalibrationInfo, Resolution, gain, 1, bytesV, Voltage) < 0 )
+            if( getAinVoltCalibrated(CalibrationInfo, (int)Resolution, gain, 1, bytesV, Voltage) < 0 )
                 return -1;
         }
     }
@@ -727,12 +728,12 @@ long eAIN(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long ChannelP, long
 }
 
 
-long eDAC(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long Channel, double Voltage, long Binary, long Reserved1, long Reserved2)
+int32_t eDAC(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, int32_t Channel, double Voltage, int32_t Binary, int32_t Reserved1, int32_t Reserved2)
 {
     uint8 Errorcode, ErrorFrame;
     uint8 sendDataBuff[3];
-    uint16 bytesV;
-    long sendSize;
+    uint16_t bytesV;
+    int32_t sendSize;
 
     if( isCalibrationInfoValid(CalibrationInfo) == 0 ){
         NSLog(@"eDAC error: Invalid calibration information.\n");
@@ -754,13 +755,13 @@ long eDAC(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long Channel, doubl
     sendDataBuff[2] = (uint8)((bytesV&65280)/256);  //Value MSB
 
     if( ehFeedback(Handle, sendDataBuff, sendSize, &Errorcode, &ErrorFrame, NULL, 0) < 0 )return -1;
-    if( Errorcode )return (long)Errorcode;
+    if( Errorcode )return (int32_t)Errorcode;
 
     return 0;
 }
 
 
-long eDI(HANDLE Handle, long Channel, long *State)
+int32_t eDI(HANDLE Handle, int32_t Channel, int32_t *State)
 {
     uint8 sendDataBuff[4], recDataBuff[1];
     uint8 Errorcode, ErrorFrame;
@@ -779,14 +780,14 @@ long eDI(HANDLE Handle, long Channel, long *State)
     sendDataBuff[3] = Channel;  //IONumber
 
     if( ehFeedback(Handle, sendDataBuff, 4, &Errorcode, &ErrorFrame, recDataBuff, 1) < 0 ) return -1;
-    if( Errorcode )return (long)Errorcode;
+    if( Errorcode )return (int32_t)Errorcode;
 
     *State = recDataBuff[0];
     return 0;
 }
 
 
-long eDO(HANDLE Handle, long Channel, long State)
+int32_t eDO(HANDLE Handle, int32_t Channel, int32_t State)
 {
     uint8 Errorcode, ErrorFrame;
     uint8 sendDataBuff[4];
@@ -804,18 +805,18 @@ long eDO(HANDLE Handle, long Channel, long State)
     sendDataBuff[3] = Channel + 128*((State > 0) ? 1 : 0);  //IONumber(bits 0-4) + State (bit 7)
 
     if( ehFeedback(Handle, sendDataBuff, 4, &Errorcode, &ErrorFrame, NULL, 0) < 0 )return -1;
-    if( Errorcode )return (long)Errorcode;
+    if( Errorcode )return (int32_t)Errorcode;
 
     return 0;
 }
 
 
-long eTCConfig(HANDLE Handle, long *aEnableTimers, long *aEnableCounters, long TCPinOffset, long TimerClockBaseIndex, long TimerClockDivisor, long *aTimerModes, double *aTimerValues, long Reserved1, long Reserved2)
+int32_t eTCConfig(HANDLE Handle, int32_t *aEnableTimers, int32_t *aEnableCounters, int32_t TCPinOffset, int32_t TimerClockBaseIndex, int32_t TimerClockDivisor, int32_t *aTimerModes, double *aTimerValues, int32_t Reserved1, int32_t Reserved2)
 {
     uint8 sendDataBuff[20];
     uint8 numTimers, counters, cNumTimers, cCounters, cPinOffset, Errorcode, ErrorFrame;
     int sendDataBuffSize, i;
-    long error;
+    int32_t error;
  
     if( TCPinOffset < 0 && TCPinOffset > 8){
         NSLog(@"eTCConfig error: Invalid TCPinOffset.\n");
@@ -858,21 +859,21 @@ long eTCConfig(HANDLE Handle, long *aEnableTimers, long *aEnableCounters, long T
         for( i = 0; i < numTimers; i++ ){
             sendDataBuff[i*4] = 43 + i*2;                                         //TimerConfig
             sendDataBuff[1 + i*4] = (uint8)aTimerModes[i];                        //TimerMode
-            sendDataBuff[2 + i*4] = (uint8)(((long)aTimerValues[i])&0x00ff);        //Value LSB
-            sendDataBuff[3 + i*4] = (uint8)((((long)aTimerValues[i])&0xff00)/256);  //Value MSB
+            sendDataBuff[2 + i*4] = (uint8)(((int32_t)aTimerValues[i])&0x00ff);        //Value LSB
+            sendDataBuff[3 + i*4] = (uint8)((((int32_t)aTimerValues[i])&0xff00)/256);  //Value MSB
         }
 
         sendDataBuffSize = 4*numTimers;
 
         if( ehFeedback(Handle, sendDataBuff, sendDataBuffSize, &Errorcode, &ErrorFrame, NULL, 0) < 0 )return -1;
-        if( Errorcode )return (long)Errorcode;
+        if( Errorcode )return (int32_t)Errorcode;
     }
 
     return 0;
 }
 
 
-long eTCValues(HANDLE Handle, long *aReadTimers, long *aUpdateResetTimers, long *aReadCounters, long *aResetCounters, double *aTimerValues, double *aCounterValues, long Reserved1, long Reserved2)
+int32_t eTCValues(HANDLE Handle, int32_t *aReadTimers, int32_t *aUpdateResetTimers, int32_t *aReadCounters, int32_t *aResetCounters, double *aTimerValues, double *aCounterValues, int32_t Reserved1, int32_t Reserved2)
 {
     uint8 Errorcode, ErrorFrame;
     uint8 sendDataBuff[20], recDataBuff[24];
@@ -890,8 +891,8 @@ long eTCValues(HANDLE Handle, long *aReadTimers, long *aUpdateResetTimers, long 
         if( aReadTimers[i] != 0 || aUpdateResetTimers[i] != 0 ){
             sendDataBuff[sendDataBuffSize] = 42 + i*2;                                          //Timer
             sendDataBuff[1 + sendDataBuffSize] = ((aUpdateResetTimers[i] != 0) ? 1 : 0);        //UpdateReset
-            sendDataBuff[2 + sendDataBuffSize] = (uint8)(((long)aTimerValues[i])&0x00ff);       //Value LSB
-            sendDataBuff[3 + sendDataBuffSize] = (uint8)((((long)aTimerValues[i])&0xff00)/256); //Value MSB
+            sendDataBuff[2 + sendDataBuffSize] = (uint8)(((int32_t)aTimerValues[i])&0x00ff);       //Value LSB
+            sendDataBuff[3 + sendDataBuffSize] = (uint8)((((int32_t)aTimerValues[i])&0xff00)/256); //Value MSB
             sendDataBuffSize += 4;
             recDataBuffSize += 4;
             numTimers++;
@@ -908,13 +909,13 @@ long eTCValues(HANDLE Handle, long *aReadTimers, long *aUpdateResetTimers, long 
     }
 
     if( ehFeedback(Handle, sendDataBuff, sendDataBuffSize, &Errorcode, &ErrorFrame, recDataBuff, recDataBuffSize) < 0 )return -1;
-    if( Errorcode )return (long)Errorcode;
+    if( Errorcode )return (int32_t)Errorcode;
 
     for( i = 0; i < 4; i++ ){
         aTimerValues[i] = 0;
         if( aReadTimers[i] != 0 ){
             for( j = 0; j < 4; j++ )
-                aTimerValues[i] += (double)((long)recDataBuff[j + dataCountTimer*4]*pow(2, 8*j));
+                aTimerValues[i] += (double)((int32_t)recDataBuff[j + dataCountTimer*4]*pow(2, 8*j));
         }
         if( aReadTimers[i] != 0 || aUpdateResetTimers[i] != 0 )dataCountTimer++;
 
@@ -922,7 +923,7 @@ long eTCValues(HANDLE Handle, long *aReadTimers, long *aUpdateResetTimers, long 
             aCounterValues[i] = 0;
             if( aReadCounters[i] != 0 ){
                 for( j = 0; j < 4; j++ )
-                    aCounterValues[i] += (double)((long)recDataBuff[j + numTimers*4 + dataCountCounter*4]*pow(2, 8*j));
+                    aCounterValues[i] += (double)((int32_t)recDataBuff[j + numTimers*4 + dataCountCounter*4]*pow(2, 8*j));
             }
             if( aReadCounters[i] != 0 || aResetCounters[i] != 0 )dataCountCounter++;
         }
@@ -932,11 +933,11 @@ long eTCValues(HANDLE Handle, long *aReadTimers, long *aUpdateResetTimers, long 
 }
 
 
-long ehConfigIO(HANDLE hDevice, uint8 inWriteMask, uint8 inNumberTimersEnabled, uint8 inCounterEnable, uint8 inPinOffset, uint8 *outNumberTimersEnabled, uint8 *outCounterEnable, uint8 *outPinOffset)
+int32_t ehConfigIO(HANDLE hDevice, uint8 inWriteMask, uint8 inNumberTimersEnabled, uint8 inCounterEnable, uint8 inPinOffset, uint8 *outNumberTimersEnabled, uint8 *outCounterEnable, uint8 *outPinOffset)
 {
     uint8 sendBuff[16], recBuff[16];
-    uint16 checksumTotal;
-    int sendChars, recChars, i;
+    uint16_t checksumTotal;
+    uint32_t sendChars, recChars, i;
 
     sendBuff[1] = (uint8)(0xF8);  //Command byte
     sendBuff[2] = (uint8)(0x05);  //Number of data words
@@ -1000,11 +1001,11 @@ long ehConfigIO(HANDLE hDevice, uint8 inWriteMask, uint8 inNumberTimersEnabled, 
 }
 
 
-long ehConfigTimerClock(HANDLE hDevice, uint8 inTimerClockConfig, uint8 inTimerClockDivisor, uint8 *outTimerClockConfig, uint8 *outTimerClockDivisor)
+int32_t ehConfigTimerClock(HANDLE hDevice, uint8 inTimerClockConfig, uint8 inTimerClockDivisor, uint8 *outTimerClockConfig, uint8 *outTimerClockDivisor)
 {
     uint8 sendBuff[10], recBuff[10];
-    uint16 checksumTotal;
-    int sendChars, recChars;
+    uint16_t checksumTotal;
+    uint32_t sendChars, recChars;
 
     sendBuff[1] = (uint8)(0xF8);  //Command byte
     sendBuff[2] = (uint8)(0x02);  //Number of data words
@@ -1068,10 +1069,11 @@ long ehConfigTimerClock(HANDLE hDevice, uint8 inTimerClockConfig, uint8 inTimerC
 }
 
 
-long ehFeedback(HANDLE hDevice, uint8 *inIOTypesDataBuff, long inIOTypesDataSize, uint8 *outErrorcode, uint8 *outErrorFrame, uint8 *outDataBuff, long outDataSize)
+int32_t ehFeedback(HANDLE hDevice, uint8 *inIOTypesDataBuff, int32_t inIOTypesDataSize, uint8 *outErrorcode, uint8 *outErrorFrame, uint8 *outDataBuff, int32_t outDataSize)
 {
-    uint16 checksumTotal;
-    int sendChars, recChars, i, sendDWSize, recDWSize;
+    uint16_t checksumTotal;
+    int32_t sendChars, recChars, i;
+    int32_t sendDWSize, recDWSize;
 
     int ret          = 0;
     int commandBytes = 6;
@@ -1099,7 +1101,7 @@ long ehFeedback(HANDLE hDevice, uint8 *inIOTypesDataBuff, long inIOTypesDataSize
 
     for( i = 0; i < inIOTypesDataSize; i++ )sendBuff[i+commandBytes+1] = inIOTypesDataBuff[i];
 
-    extendedChecksum(sendBuff, (sendDWSize+commandBytes));
+    extendedChecksum(sendBuff, (int)(sendDWSize+commandBytes));
 
     //Sending command to U6
     if( (sendChars = LJUSB_Write(hDevice, sendBuff, (sendDWSize+commandBytes))) < sendDWSize+commandBytes ){
@@ -1127,7 +1129,7 @@ long ehFeedback(HANDLE hDevice, uint8 *inIOTypesDataBuff, long inIOTypesDataSize
             NSLog(@"ehFeedback error : did not read all of the expected buffer (received %d, expected %d )\n", recChars, commandBytes+recDWSize);
     }
 
-    checksumTotal = extendedChecksum16(recBuff, recChars);
+    checksumTotal = extendedChecksum16(recBuff, (int)recChars);
     if( (uint8)((checksumTotal / 256 ) & 0xff) != recBuff[5] ){
         NSLog(@"ehFeedback error : read buffer has bad checksum16(MSB)\n");
         ret = -1;

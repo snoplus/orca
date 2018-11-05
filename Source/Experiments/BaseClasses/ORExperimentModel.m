@@ -165,7 +165,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 
 - (int) numberOfSegmentGroups
 {
-	return [segmentGroups count];
+	return (int)[segmentGroups count];
 }
 
 - (ORSegmentGroup*) segmentGroup:(int)aSet
@@ -561,7 +561,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
     
     [self setIgnoreHWChecks:[decoder decodeBoolForKey:	@"ignoreHWChecks"]];
     [self setShowNames:		[decoder decodeBoolForKey:	@"ORExperimentModelShowNames"]];
-    [self setDisplayType:	[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];	
+    [self setDisplayType:	[decoder decodeIntForKey:   @"ExperimentModelDisplayType"]];
     [self setCaptureDate:	[decoder decodeObjectForKey:@"ExperimentCaptureDate"]];
     [self setColorScaleType:[decoder decodeIntForKey:   @"colorScaleType"]];
     
@@ -600,8 +600,8 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
     [super encodeWithCoder:encoder];
     [encoder encodeBool:ignoreHWChecks	forKey: @"ignoreHWChecks"];
     [encoder encodeBool:showNames		forKey: @"ORExperimentModelShowNames"];
-    [encoder encodeInt:displayType		forKey: @"ExperimentModelDisplayType"];
-    [encoder encodeInt:colorScaleType   forKey: @"colorScaleType"];
+    [encoder encodeInteger:displayType		forKey: @"ExperimentModelDisplayType"];
+    [encoder encodeInteger:colorScaleType   forKey: @"colorScaleType"];
     [encoder encodeObject:captureDate	forKey: @"ExperimentCaptureDate"];
     [encoder encodeObject:segmentGroups forKey: @"ExperimentSegmentGroups"];
     [encoder encodeObject:customColor1  forKey: @"customColor1"];
@@ -792,10 +792,10 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 {
 	NSMutableData* theData;
 	int numSegments = [self numberSegmentsInGroup:aSet];
-	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(int32_t)];
 	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
 	int i;
-	unsigned long* p = (unsigned long*)[theData bytes];
+	uint32_t* p = (uint32_t*)[theData bytes];
 	for(i = 0;i<numSegments;i++){
 		p[i] = [segmentGroup getThreshold:i];
 	}
@@ -821,7 +821,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
     if([[[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORCouchDBModel")] count]==0)return;
     NSMutableDictionary*  values  = [NSMutableDictionary dictionary];
     int aSet;
-    int numGroups = [segmentGroups count];
+    int numGroups = (int)[segmentGroups count];
     for(aSet=0;aSet<numGroups;aSet++){
         NSMutableDictionary* aDictionary= [NSMutableDictionary dictionary];
         NSMutableArray* thresholdArray  = [NSMutableArray array];
@@ -857,10 +857,10 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 {
 	NSMutableData* theData;
 	int numSegments = [self numberSegmentsInGroup:aSet];
-	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(int32_t)];
 	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
 	int i;
-	unsigned long* p = (unsigned long*)[theData bytes];
+	uint32_t* p = (uint32_t*)[theData bytes];
 	for(i = 0;i<numSegments;i++){
 		p[i] = [segmentGroup getGain:i];
 	}
@@ -884,7 +884,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 {
 	NSMutableData* theData;
 	int numSegments = [self numberSegmentsInGroup:aSet];
-	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(int32_t)];
 	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
 	int i;
 	float* p = (float*)[theData bytes];
@@ -910,10 +910,10 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 {
 	NSMutableData* theData;
 	int numSegments = [self numberSegmentsInGroup:aSet];
-	theData = [NSMutableData dataWithLength:numSegments*sizeof(long)];
+	theData = [NSMutableData dataWithLength:numSegments*sizeof(int32_t)];
 	ORSegmentGroup* segmentGroup = [self segmentGroup:aSet];
 	int i;
-	unsigned long* p = (unsigned long*)[theData bytes];
+	uint32_t* p = (uint32_t*)[theData bytes];
 	for(i = 0;i<numSegments;i++){
 		p[i] = [segmentGroup getTotalCounts:i];
 	}
@@ -978,7 +978,7 @@ NSString* ExperimentModelCustomColor2Changed             = @"ExperimentModelCust
 				if(!segmentErrorNoted){
 					segmentErrorNoted = YES;
 					if([newValues isKindOfClass:NSClassFromString(@"NSArray")]){
-						int numChannels = [newValues count];
+						int numChannels = (int)[newValues count];
 						int channel;
 						for(channel = 0;channel<numChannels;channel++){
 							id newValue = [newValues objectAtIndex:channel];

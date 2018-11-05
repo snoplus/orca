@@ -409,10 +409,10 @@
 
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-    return [model validTrackCount];
+    return (int)[model validTrackCount];
 }
 
-- (void) plotter:(id)aPlotter index:(unsigned long)index x:(double*)xValue y:(double*)yValue
+- (void) plotter:(id)aPlotter index:(uint32_t)index x:(double*)xValue y:(double*)yValue
 {
     if(index>kNumTrackPoints){
         *xValue = 0;
@@ -438,12 +438,12 @@
 
 - (IBAction) patternTypeAction:(id)sender
 {
-    [model setPatternType:[[patternTypeMatrix selectedCell] tag]];
+    [model setPatternType:(int)[[patternTypeMatrix selectedCell] tag]];
 }
 
 - (IBAction) patternAction:(id)sender
 {
-    int  tag = [[sender selectedCell]tag];
+    int  tag = (int)[[sender selectedCell]tag];
     float value = [[sender selectedCell] floatValue];
     if(tag == 0) [model setStartPoint:NSMakePoint(value,[model startPoint].y)];
     else if(tag == 1) [model setEndPoint:NSMakePoint(value,[model endPoint].y)];
@@ -460,7 +460,7 @@
 
 - (IBAction) optionsAction:(id)sender
 {
-    int  whichOption = [[sender selectedCell]tag];
+    int  whichOption = (int)[[sender selectedCell]tag];
     if([[sender cellWithTag:whichOption] state])[model setOption:whichOption];
     else [model clearOption:whichOption];
 }

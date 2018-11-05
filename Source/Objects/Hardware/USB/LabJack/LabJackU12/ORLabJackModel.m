@@ -188,7 +188,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		
 		if(!usbInterface || ![self getUSBController]){
 			NSBezierPath* path = [NSBezierPath bezierPath];
@@ -236,12 +236,12 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 #pragma mark ***Accessors
 
-- (unsigned long) deviceSerialNumber
+- (uint32_t) deviceSerialNumber
 {
     return deviceSerialNumber;
 }
 
-- (void) setDeviceSerialNumber:(unsigned long)aDeviceSerialNumber
+- (void) setDeviceSerialNumber:(uint32_t)aDeviceSerialNumber
 {
     deviceSerialNumber = aDeviceSerialNumber;
 
@@ -459,12 +459,12 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackDigitalOutputEnabledChanged object:self];
 }
 
-- (unsigned long) counter
+- (uint32_t) counter
 {
     return counter;
 }
 
-- (void) setCounter:(unsigned long)aCounter
+- (void) setCounter:(uint32_t)aCounter
 {
     counter = aCounter;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORLabJackCounterChanged object:self];
@@ -933,8 +933,8 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 }
 
 #pragma mark ***Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -969,7 +969,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
     return dataDictionary;
 }
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -979,13 +979,13 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[kLabJackDataSize];
+		uint32_t data[kLabJackDataSize];
 		data[0] = dataId | kLabJackDataSize;
 		data[1] = ((adcDiff & 0xf) << 16) | ([self uniqueIdNumber] & 0x0000fffff);
 		
 		union {
 			float asFloat;
-			unsigned long asLong;
+			uint32_t asLong;
 		} theData;
 		
 		int index = 2;
@@ -1005,7 +1005,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 		data[index++] = 0;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-															object:[NSData dataWithBytes:data length:sizeof(long)*kLabJackDataSize]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*kLabJackDataSize]];
 	}
 }
 #pragma mark •••Bit Processing Protocol
@@ -1066,7 +1066,7 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"LabJack,%lu",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"LabJack,%u",[self uniqueIdNumber]];
 }
 
 - (NSString*) processingTitle
@@ -1115,8 +1115,8 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
     self = [super initWithCoder:decoder];
     
     [[self undoManager] disableUndoRegistration];
-    [self setAOut1:[decoder decodeIntForKey:@"aOut1"]];
-    [self setAOut0:[decoder decodeIntForKey:@"aOut0"]];
+    [self setAOut1:[decoder decodeIntegerForKey:@"aOut1"]];
+    [self setAOut0:[decoder decodeIntegerForKey:@"aOut0"]];
     [self setShipData:[decoder decodeBoolForKey:@"shipData"]];
     [self setDigitalOutputEnabled:[decoder decodeBoolForKey:@"digitalOutputEnabled"]];
     [self setSerialNumber:	[decoder decodeObjectForKey:@"serialNumber"]];
@@ -1151,9 +1151,9 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 		else [self setIo:i name:[NSString stringWithFormat:@"IO%d",i]];
 		[self setGain:i withValue:[decoder decodeIntForKey:[NSString stringWithFormat:@"gain%d",i]]];
 	}
-	[self setAdcDiff:	[decoder decodeIntForKey:@"adcDiff"]];
-	[self setDoDirection:	[decoder decodeIntForKey:@"doDirection"]];
-	[self setIoDirection:	[decoder decodeIntForKey:@"ioDirection"]];
+	[self setAdcDiff:	[decoder decodeIntegerForKey:@"adcDiff"]];
+	[self setDoDirection:	[decoder decodeIntegerForKey:@"doDirection"]];
+	[self setIoDirection:	[decoder decodeIntegerForKey:@"ioDirection"]];
     [self setPollTime:		[decoder decodeIntForKey:@"pollTime"]];
 
     [[self undoManager] enableUndoRegistration];    
@@ -1164,10 +1164,10 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:aOut1 forKey:@"aOut1"];
-    [encoder encodeInt:aOut0 forKey:@"aOut0"];
+    [encoder encodeInteger:aOut1 forKey:@"aOut1"];
+    [encoder encodeInteger:aOut0 forKey:@"aOut0"];
     [encoder encodeBool:shipData forKey:@"shipData"];
-    [encoder encodeInt:pollTime forKey:@"pollTime"];
+    [encoder encodeInteger:pollTime forKey:@"pollTime"];
     [encoder encodeBool:digitalOutputEnabled forKey:@"digitalOutputEnabled"];
     [encoder encodeObject:serialNumber	forKey: @"serialNumber"];
 	int i;
@@ -1187,12 +1187,12 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
 	}
 	for(i=0;i<4;i++) {
 		[encoder encodeObject:ioName[i] forKey:[NSString stringWithFormat:@"IO%d",i]];
-		[encoder encodeInt:gain[i] forKey:[NSString stringWithFormat:@"gain%d",i]];
+		[encoder encodeInteger:gain[i] forKey:[NSString stringWithFormat:@"gain%d",i]];
 	}
 
-    [encoder encodeInt:adcDiff		forKey:@"adcDiff"];
-    [encoder encodeInt:doDirection	forKey:@"doDirection"];
-    [encoder encodeInt:ioDirection	forKey:@"ioDirection"];
+    [encoder encodeInteger:adcDiff		forKey:@"adcDiff"];
+    [encoder encodeInteger:doDirection	forKey:@"doDirection"];
+    [encoder encodeInteger:ioDirection	forKey:@"ioDirection"];
 }
 
 - (NSMutableDictionary*) addParametersToDictionary:(NSMutableDictionary*)dictionary
@@ -1331,12 +1331,12 @@ NSString* ORLabJackMaxValueChanged				= @"ORLabJackMaxValueChanged";
                     //always this is the last query so timestamp here
                     time_t	ut_Time;
                     time(&ut_Time);
-                    timeMeasured = ut_Time;
+                    timeMeasured = (uint32_t)ut_Time;
                     
                     if(shipData) [self shipIOData];
                 }
                 else if((data0 & 0x50) == 0x50){
-                    unsigned long n = (data1<<1) + (data2<<8) + (data3<<4) + data4;
+                    uint32_t n = (data1<<1) + (data2<<8) + (data3<<4) + data4;
                     [self setDeviceSerialNumber:n];
                 }
             });

@@ -34,16 +34,16 @@
 	NSTimeInterval timeSampled[kTimeAverageBufferSize];
 	int timeAverageWrite;
 	int timeAverageRead;
-	int averageStackCount;
+	NSUInteger averageStackCount;
 	NSDate* lastAverageTime;
-	unsigned long sampleTime;
+	uint32_t sampleTime;
 }
 
 
 - (NSDate*) lastAverageTime;
 - (void) setLastAverageTime:(NSDate*)newLastAverageTime;
-- (unsigned long) sampleTime;
-- (void) setSampleTime:(unsigned long)newSampleTime;
+- (uint32_t) sampleTime;
+- (void) setSampleTime:(uint32_t)newSampleTime;
 - (NSUInteger) count;
 - (double)valueAtIndex:(NSUInteger)index;
 - (NSTimeInterval)timeSampledAtIndex:(NSUInteger)index;

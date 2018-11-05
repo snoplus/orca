@@ -384,7 +384,7 @@ tubRegister;
 
 - (void) waitForTriggerScan: (ORPQResult *) result
 {
-    int numRows, numCols;
+    uint64_t numRows, numCols;
     int threshold_index;
     int error_count = 0;
     NSString* name = nil;
@@ -457,7 +457,7 @@ tubRegister;
 
 - (void) waitForThresholds: (ORPQResult *) result
 {
-    int numRows, numCols;
+    uint64_t numRows, numCols;
 
     if (!result) {
         NSLogColor([NSColor redColor], @"Failed to receive threshold results from database.\n");
@@ -595,12 +595,12 @@ tubRegister;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelRepeatCountChanged object:self];
 }
 
-- (unsigned long) writeValue
+- (uint32_t) writeValue
 {
     return writeValue;
 }
 
-- (void) setWriteValue:(unsigned long)aWriteValue
+- (void) setWriteValue:(uint32_t)aWriteValue
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWriteValue:writeValue];
     
@@ -609,12 +609,12 @@ tubRegister;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelWriteValueChanged object:self];
 }
 
-- (unsigned long) memoryOffset
+- (uint32_t) memoryOffset
 {
     return memoryOffset;
 }
 
-- (void) setMemoryOffset:(unsigned long)aMemoryOffset
+- (void) setMemoryOffset:(uint32_t)aMemoryOffset
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setMemoryOffset:memoryOffset];
     
@@ -652,12 +652,12 @@ tubRegister;
 	
 }
 
-- (unsigned long) fixedPulserRateCount
+- (uint32_t) fixedPulserRateCount
 {
 	return fixedPulserRateCount;
 }
 
-- (void) setFixedPulserRateCount:(unsigned long) aFixedPulserRateCount
+- (void) setFixedPulserRateCount:(uint32_t) aFixedPulserRateCount
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setFixedPulserRateCount:aFixedPulserRateCount];
 
@@ -756,99 +756,99 @@ tubRegister;
 }
 
 //hardcoded base addresses (unlikely to ever change)
-- (unsigned long) memBaseAddress
+- (uint32_t) memBaseAddress
 {
     return kMTCMemAddressBase;
 }
 
-- (unsigned long) memAddressModifier
+- (uint32_t) memAddressModifier
 {
 	return kMTCMemAddressModifier;
 }
 
-- (unsigned long) baseAddress
+- (uint32_t) baseAddress
 {
     return kMTCRegAddressBase;
 }
 
-- (unsigned long) mtcaN100Mask
+- (uint32_t) mtcaN100Mask
 {
     return _mtcaN100Mask;
 }
 
-- (void) setMtcaN100Mask:(unsigned long)aMtcaN100Mask
+- (void) setMtcaN100Mask:(uint32_t)aMtcaN100Mask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaN100Mask:[self mtcaN100Mask]];
     _mtcaN100Mask = aMtcaN100Mask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
-- (unsigned long) mtcaN20Mask
+- (uint32_t) mtcaN20Mask
 {
     return _mtcaN20Mask;
 }
 
-- (void) setMtcaN20Mask:(unsigned long)aMtcaN20Mask
+- (void) setMtcaN20Mask:(uint32_t)aMtcaN20Mask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaN20Mask:[self mtcaN20Mask]];
     _mtcaN20Mask = aMtcaN20Mask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
-- (unsigned long) mtcaEHIMask
+- (uint32_t) mtcaEHIMask
 {
     return _mtcaEHIMask;
 }
 
-- (void) setMtcaEHIMask:(unsigned long)aMtcaEHIMask
+- (void) setMtcaEHIMask:(uint32_t)aMtcaEHIMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaEHIMask:[self mtcaEHIMask]];
     _mtcaEHIMask = aMtcaEHIMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
-- (unsigned long) mtcaELOMask
+- (uint32_t) mtcaELOMask
 {
     return _mtcaELOMask;
 }
 
-- (void) setMtcaELOMask:(unsigned long)aMtcaELOMask
+- (void) setMtcaELOMask:(uint32_t)aMtcaELOMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaELOMask:[self mtcaELOMask]];
     _mtcaELOMask = aMtcaELOMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
-- (unsigned long) mtcaOELOMask
+- (uint32_t) mtcaOELOMask
 {
     return _mtcaOELOMask;
 }
 
-- (void) setMtcaOELOMask:(unsigned long)aMtcaOELOMask
+- (void) setMtcaOELOMask:(uint32_t)aMtcaOELOMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOELOMask:[self mtcaOELOMask]];
     _mtcaOELOMask = aMtcaOELOMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
-- (unsigned long) mtcaOEHIMask
+- (uint32_t) mtcaOEHIMask
 {
     return _mtcaOEHIMask;
 }
 
-- (void) setMtcaOEHIMask:(unsigned long)aMtcaOEHIMask
+- (void) setMtcaOEHIMask:(uint32_t)aMtcaOEHIMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOEHIMask:[self mtcaOEHIMask]];
     _mtcaOEHIMask = aMtcaOEHIMask;
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORMTCModelMTCAMaskChanged object:self];
 }
 
-- (unsigned long) mtcaOWLNMask
+- (uint32_t) mtcaOWLNMask
 {
     return _mtcaOWLNMask;
 }
 
-- (void) setMtcaOWLNMask:(unsigned long)aMtcaOWLNMask
+- (void) setMtcaOWLNMask:(uint32_t)aMtcaOWLNMask
 {
 	[[[self undoManager] prepareWithInvocationTarget:self] setMtcaOWLNMask:[self mtcaOWLNMask]];
     _mtcaOWLNMask = aMtcaOWLNMask;
@@ -1020,10 +1020,10 @@ tubRegister;
     [[self undoManager] disableUndoRegistration];
     [self setAutoIncrement:	[decoder decodeBoolForKey:		@"ORMTCModelAutoIncrement"]];
     [self setUseMemory:		[decoder decodeIntForKey:		@"ORMTCModelUseMemory"]];
-    [self setRepeatDelay:	[decoder decodeIntForKey:		@"ORMTCModelRepeatDelay"]];
-    [self setRepeatOpCount:	[decoder decodeIntForKey:		@"ORMTCModelRepeatCount"]];
-    [self setWriteValue:	[decoder decodeInt32ForKey:		@"ORMTCModelWriteValue"]];
-    [self setMemoryOffset:	[decoder decodeInt32ForKey:		@"ORMTCModelMemoryOffset"]];
+    [self setRepeatDelay:	[decoder decodeIntegerForKey:		@"ORMTCModelRepeatDelay"]];
+    [self setRepeatOpCount:	[decoder decodeIntegerForKey:		@"ORMTCModelRepeatCount"]];
+    [self setWriteValue:	[decoder decodeIntForKey:		@"ORMTCModelWriteValue"]];
+    [self setMemoryOffset:	[decoder decodeIntForKey:		@"ORMTCModelMemoryOffset"]];
     [self setSelectedRegister:[decoder decodeIntForKey:		@"ORMTCModelSelectedRegister"]];
 	[self setIsPulserFixedRate:	[decoder decodeBoolForKey:	@"ORMTCModelIsPulserFixedRate"]];
 	[self setFixedPulserRateCount:	[decoder decodeIntForKey:	@"ORMTCModelFixedPulserRateCount"]];
@@ -1040,10 +1040,10 @@ tubRegister;
     [self setPulserEnabled:[decoder decodeBoolForKey:@"pulserEnabled"]];
 
 
-    [self setLockoutWidth:[decoder decodeIntForKey:@"MTCLockoutWidth"]];
-    [self setPedestalWidth:[decoder decodeIntForKey:@"MTCPedestalWidth"]];
-    [self setPrescaleValue:[decoder decodeIntForKey:@"MTCPrescaleValue"]];
-    [self setPgtRate:[decoder decodeIntForKey:@"MTCPulserRate"]];
+    [self setLockoutWidth:[decoder decodeIntegerForKey:@"MTCLockoutWidth"]];
+    [self setPedestalWidth:[decoder decodeIntegerForKey:@"MTCPedestalWidth"]];
+    [self setPrescaleValue:[decoder decodeIntegerForKey:@"MTCPrescaleValue"]];
+    [self setPgtRate:[decoder decodeIntegerForKey:@"MTCPulserRate"]];
     [self setFineDelay: [decoder decodeIntForKey:@"MTCPedestalFineDelay"]];
     [self setCoarseDelay: [decoder decodeIntForKey:@"MTCPedestalCoarseDelay"]];
     [self setGtMask:[decoder decodeIntForKey:@"MTCGTMask"]];
@@ -1067,34 +1067,34 @@ tubRegister;
 {
     [super encodeWithCoder:encoder];
 	[encoder encodeBool:autoIncrement	forKey:@"ORMTCModelAutoIncrement"];
-	[encoder encodeInt:useMemory		forKey:@"ORMTCModelUseMemory"];
-	[encoder encodeInt:repeatDelay		forKey:@"ORMTCModelRepeatDelay"];
-	[encoder encodeInt:repeatOpCount	forKey:@"ORMTCModelRepeatCount"];
-	[encoder encodeInt32:writeValue		forKey:@"ORMTCModelWriteValue"];
-	[encoder encodeInt32:memoryOffset	forKey:@"ORMTCModelMemoryOffset"];
-	[encoder encodeInt:selectedRegister	forKey:@"ORMTCModelSelectedRegister"];
+	[encoder encodeInteger:useMemory		forKey:@"ORMTCModelUseMemory"];
+	[encoder encodeInteger:repeatDelay		forKey:@"ORMTCModelRepeatDelay"];
+	[encoder encodeInteger:repeatOpCount	forKey:@"ORMTCModelRepeatCount"];
+	[encoder encodeInt:writeValue		forKey:@"ORMTCModelWriteValue"];
+	[encoder encodeInt:memoryOffset	forKey:@"ORMTCModelMemoryOffset"];
+	[encoder encodeInteger:selectedRegister	forKey:@"ORMTCModelSelectedRegister"];
 	[encoder encodeBool:isPulserFixedRate	forKey:@"ORMTCModelIsPulserFixedRate"];
 	[encoder encodeInt:fixedPulserRateCount forKey:@"ORMTCModelFixedPulserRateCount"];
 	[encoder encodeFloat:fixedPulserRateDelay forKey:@"ORMTCModelFixedPulserRateDelay"];
-    [encoder encodeInt:[self mtcaN100Mask] forKey:@"mtcaN100Mask"];
-    [encoder encodeInt:[self mtcaN20Mask] forKey:@"mtcaN20Mask"];
-    [encoder encodeInt:[self mtcaEHIMask] forKey:@"mtcaEHIMask"];
-    [encoder encodeInt:[self mtcaELOMask] forKey:@"mtcaELOMask"];
-    [encoder encodeInt:[self mtcaOELOMask] forKey:@"mtcaOELOMask"];
-    [encoder encodeInt:[self mtcaOEHIMask] forKey:@"mtcaOEHIMask"];
-    [encoder encodeInt:[self mtcaOWLNMask] forKey:@"mtcaOWLNMask"];
+    [encoder encodeInt:(int32_t)[self mtcaN100Mask] forKey:@"mtcaN100Mask"];
+    [encoder encodeInt:(int32_t)[self mtcaN20Mask] forKey:@"mtcaN20Mask"];
+    [encoder encodeInt:(int32_t)[self mtcaEHIMask] forKey:@"mtcaEHIMask"];
+    [encoder encodeInt:(int32_t)[self mtcaELOMask] forKey:@"mtcaELOMask"];
+    [encoder encodeInt:(int32_t)[self mtcaOELOMask] forKey:@"mtcaOELOMask"];
+    [encoder encodeInt:(int32_t)[self mtcaOEHIMask] forKey:@"mtcaOEHIMask"];
+    [encoder encodeInt:(int32_t)[self mtcaOWLNMask] forKey:@"mtcaOWLNMask"];
     [encoder encodeBool:[self isPedestalEnabledInCSR] forKey:@"isPedestalEnabledInCSR"];
     
     [encoder encodeBool:[self pulserEnabled] forKey:@"pulserEnabled"];
-    [encoder encodeInt:[self lockoutWidth] forKey:@"MTCLockoutWidth"];
-    [encoder encodeInt:[self pedestalWidth] forKey:@"MTCPedestalWidth"];
-    [encoder encodeInt:[self prescaleValue] forKey:@"MTCPrescaleValue"];
-    [encoder encodeInt:[self pgtRate] forKey:@"MTCPulserRate"];
-    [encoder encodeInt:[self fineDelay] forKey:@"MTCPedestalFineDelay"];
-    [encoder encodeInt:[self coarseDelay] forKey:@"MTCPedestalCoarseDelay"];
-    [encoder encodeInt:[self gtMask] forKey:@"MTCGTMask"];
-    [encoder encodeInt:[self GTCrateMask] forKey:@"MTCGTCrateMask"];
-    [encoder encodeInt:[self pedCrateMask] forKey:@"MTCPedCrateMask"];
+    [encoder encodeInteger:[self lockoutWidth] forKey:@"MTCLockoutWidth"];
+    [encoder encodeInteger:[self pedestalWidth] forKey:@"MTCPedestalWidth"];
+    [encoder encodeInteger:[self prescaleValue] forKey:@"MTCPrescaleValue"];
+    [encoder encodeInteger:[self pgtRate] forKey:@"MTCPulserRate"];
+    [encoder encodeInteger:[self fineDelay] forKey:@"MTCPedestalFineDelay"];
+    [encoder encodeInteger:[self coarseDelay] forKey:@"MTCPedestalCoarseDelay"];
+    [encoder encodeInteger:[self gtMask] forKey:@"MTCGTMask"];
+    [encoder encodeInteger:[self GTCrateMask] forKey:@"MTCGTCrateMask"];
+    [encoder encodeInteger:[self pedCrateMask] forKey:@"MTCPedCrateMask"];
 }
 
 
@@ -1115,7 +1115,7 @@ tubRegister;
     if (type < 0 || type > MTC_NUM_USED_THRESHOLDS) {
         [NSException raise:@"MTCModelError" format:@"Unknown threshold index specified. Cannot continue."];
     }
-    uint16_t threshold_in_dac_counts = (uint16)[self convertThreshold:aThreshold OfType:type fromUnits:units toUnits:MTC_RAW_UNITS];
+    uint16_t threshold_in_dac_counts = (uint16_t)[self convertThreshold:aThreshold OfType:type fromUnits:units toUnits:MTC_RAW_UNITS];
     if (mtca_thresholds[type] != threshold_in_dac_counts) {
         mtca_thresholds[type] = threshold_in_dac_counts;
         [[NSNotificationCenter defaultCenter] postNotificationName:ORMTCAThresholdChanged object:self];
@@ -1348,7 +1348,7 @@ tubRegister;
 {
 	uint32_t theValue = 0;
 	@try {
-        theValue = [mtc intCommand:"mtcd_read %d", reg[aReg].addressOffset];
+        theValue = (uint32_t)[mtc intCommand:"mtcd_read %d", reg[aReg].addressOffset];
 	} @catch(NSException* localException) {
 		NSLog(@"Couldn't read the MTC %@!\n",reg[aReg].regName);
 		[localException raise];
@@ -1368,15 +1368,15 @@ tubRegister;
 
 - (void) setBits:(int)aReg mask:(uint32_t)aMask
 {
-	unsigned long old_value = [self read:aReg];
-	unsigned long new_value = (old_value & ~aMask) | aMask;
+	uint32_t old_value = [self read:aReg];
+	uint32_t new_value = (old_value & ~aMask) | aMask;
 	[self write:aReg value:new_value];
 }
 
 - (void) clrBits:(int)aReg mask:(uint32_t)aMask
 {
-	unsigned long old_value = [self read:aReg];
-	unsigned long new_value = (old_value & ~aMask);
+	uint32_t old_value = [self read:aReg];
+	uint32_t new_value = (old_value & ~aMask);
 	[self write:aReg value:new_value];
 }
 
@@ -1438,7 +1438,7 @@ tubRegister;
 - (void) clearGlobalTriggerWordMask
 {
     @try {
-        [mtc okCommand:"set_gt_mask %lu", 0];
+        [mtc okCommand:"set_gt_mask %u", 0];
         NSLog(@"Cleared GT Mask\n");
     } @catch(NSException* localException) {
         NSLog(@"Could not clear GT word mask!\n");
@@ -1450,7 +1450,7 @@ tubRegister;
 - (void) setGlobalTriggerWordMask
 {
 	@try {
-		[mtc okCommand:"set_gt_mask %lu",[self gtMask]];
+		[mtc okCommand:"set_gt_mask %u",[self gtMask]];
 		NSLog(@"Set GT Mask: 0x%08x\n",[self gtMask]);
 	} @catch(NSException* localException) {
 		NSLog(@"Could not set a set GT word mask!\n");					
@@ -1461,18 +1461,18 @@ tubRegister;
 
 - (uint32_t) getGTMaskFromHardware
 {
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	@try {	
-        aValue =  [mtc intCommand:"get_gt_mask"];
+        aValue =  (uint32_t)[mtc intCommand:"get_gt_mask"];
 	} @catch(NSException* localException) {
 		NSLog(@"Could not get GT word mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
 	}
-	return aValue;
+	return (uint32_t)aValue;
 }
 
-- (void) setSingleGTWordMask:(unsigned long) gtWordMask
+- (void) setSingleGTWordMask:(uint32_t) gtWordMask
 {	
 	@try {
 		[self setBits:kMtcMaskReg mask:gtWordMask];
@@ -1483,7 +1483,7 @@ tubRegister;
 	}
 }
 
-- (void) clearSingleGTWordMask:(unsigned long) gtWordMask
+- (void) clearSingleGTWordMask:(uint32_t) gtWordMask
 {
 	@try {
 		[self clrBits:kMtcMaskReg mask:gtWordMask];
@@ -1513,7 +1513,7 @@ tubRegister;
     uint32_t pedMaskValue = [self pedCrateMask];
 
 	@try {
-		[mtc okCommand:"set_ped_crate_mask %lu", pedMaskValue];
+		[mtc okCommand:"set_ped_crate_mask %u", pedMaskValue];
 		NSLog(@"Set Ped Mask: 0x%08x\n",pedMaskValue);
 	} @catch(NSException* localException) {
 		NSLog(@"Could not set a Ped crate mask!\n");					
@@ -1540,7 +1540,7 @@ tubRegister;
     uint32_t gtCrateMaskValue = [self GTCrateMask];
 
 	@try {
-        [mtc okCommand:"set_gt_crate_mask %lu", gtCrateMaskValue];
+        [mtc okCommand:"set_gt_crate_mask %u", gtCrateMaskValue];
         NSLog(@"Set GT Crate Mask: 0x%08x\n",gtCrateMaskValue);
 	} @catch(NSException* localException) {
 		NSLog(@"Could not set GT crate mask!\n");					
@@ -1551,17 +1551,17 @@ tubRegister;
 
 - (uint32_t) getGTCrateMaskFromHardware
 {
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 
 	@try {
-		aValue = [mtc intCommand:"get_gt_crate_mask"];
+		aValue = (uint32_t)[mtc intCommand:"get_gt_crate_mask"];
 	} @catch(NSException* localException) {
 		NSLog(@"Could not get GT crate mask!\n");					
 		NSLog(@"Exception: %@\n",localException);
 		[localException raise];
 	}
 
-	return aValue;	
+	return (uint32_t)aValue;	
 }
 
 - (void) clearTheControlRegister
@@ -1591,10 +1591,10 @@ tubRegister;
 	}
 }
 
-- (void) setTheGTCounter:(unsigned long) theGTCounterValue
+- (void) setTheGTCounter:(uint32_t) theGTCounterValue
 {
 	@try {
-        [mtc okCommand:"set_gtid %lu",theGTCounterValue];
+        [mtc okCommand:"set_gtid %u",theGTCounterValue];
 	} @catch(NSException* localException) {
 		NSLog(@"Could not load the MTC GT counter!\n");			
 		[localException raise];
@@ -1842,16 +1842,16 @@ tubRegister;
     [mtc okCommand:"stop_multi_soft_gt"];
 }
 
-- (void) firePedestals:(unsigned long) count withRate:(float) rate
+- (void) firePedestals:(uint32_t) count withRate:(float) rate
 {
     /* Fires a fix number of pedestals at a specified rate in Hz.
      * This function should not be called on the main GUI thread, but
      * only by ORCA scripts since it blocks until completion */
 
-    long timeout = [mtc timeout];
+    int32_t timeout = [mtc timeout];
 
     /* Temporarily increase the timeout since it might take a while */
-    [mtc setTimeout:(long) 1500*count/rate];
+    [mtc setTimeout:(int32_t) 1500*count/rate];
 
     @try {
         [mtc okCommand:"fire_pedestals %d %f", count, rate];
@@ -1927,10 +1927,10 @@ tubRegister;
 - (void) loadTubRegister
 {
 	@try {
-		unsigned long aValue = [self tubRegister];
+		uint32_t aValue = [self tubRegister];
 		
-		unsigned long shift_value;
-		unsigned long theRegValue;
+		uint32_t shift_value;
+		uint32_t theRegValue;
 		theRegValue = [self read:kMtcDacCntReg];
 		short j;
 		for ( j = 0; j < 32; j++) {
@@ -2013,7 +2013,7 @@ tubRegister;
     [self mtcatLoadCrateMask:0 toMtcat:6];
 }
 
-- (void) mtcatLoadCrateMask:(unsigned long) mask toMtcat:(unsigned char) mtcat
+- (void) mtcatLoadCrateMask:(uint32_t) mask toMtcat:(unsigned char) mtcat
 {
     if (mtcat > 7) {
         NSLog(@"MTCA load crate mask ignored, mtcat > 6\n");

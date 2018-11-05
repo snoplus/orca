@@ -359,7 +359,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
                 }
             }
             
-            unsigned long aMask = [[self interfaceObj] readRelayMask];
+            uint32_t aMask = [[self interfaceObj] readRelayMask];
             
 			NSString* currentRecord = @"";
 			if(saveCurrentToFile){
@@ -449,7 +449,7 @@ static NSString* ORHVRampConnector				= @"HV Ramp Connector";
 
 - (int) currentTrendCount:(int)index 
 {
-	return [[currentTrends objectAtIndex:index] count];
+	return (int)[[currentTrends objectAtIndex:index] count];
 }
 
 - (float) currentValue:(int)index supply:(int)aSupplyIndex
@@ -680,7 +680,7 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
     [self setCurrentFile:[decoder decodeObjectForKey:@"ORHVRampModelCurrentFile"]];
     [self setSaveCurrentToFile:[decoder decodeBoolForKey:@"ORHVRampModelSaveCurrentToFile"]];
     [self setSupplies:[decoder decodeObjectForKey:ORHVSupplies]];
-    [self setPollingState:[decoder decodeIntForKey:ORHVPollingState]];
+    [self setPollingState:[decoder decodeIntegerForKey:ORHVPollingState]];
     [self setDirName:[decoder decodeObjectForKey:ORHVDirName]];
     if(dirName == nil){
         [self setDirName:@"~"];
@@ -704,7 +704,7 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
     [encoder encodeObject:currentFile forKey:@"ORHVRampModelCurrentFile"];
     [encoder encodeBool:saveCurrentToFile forKey:@"ORHVRampModelSaveCurrentToFile"];
     [encoder encodeObject:[self supplies] forKey:ORHVSupplies];
-    [encoder encodeInt:[self pollingState] forKey:ORHVPollingState];
+    [encoder encodeInteger:[self pollingState] forKey:ORHVPollingState];
     [encoder encodeObject:[self dirName] forKey:ORHVDirName];
 }
 
@@ -763,7 +763,7 @@ static NSString *ORHVDirName 		= @"ORHVDirName";
 
 - (NSString*) stateFileName
 {
-    return [NSString stringWithFormat:@"HVState%lu",[self uniqueIdNumber]];
+    return [NSString stringWithFormat:@"HVState%u",[self uniqueIdNumber]];
 }
 
 #pragma mark ¥¥¥Safety Check

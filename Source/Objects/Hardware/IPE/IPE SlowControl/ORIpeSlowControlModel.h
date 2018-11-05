@@ -361,7 +361,7 @@
     int				 channelDataId;
  	NSString*		 IPNumber;
 	NSMutableArray*	 connectionHistory;
-	unsigned 		 ipNumberIndex;	
+	NSInteger 		 ipNumberIndex;	
     int				 pollTime;
 	
 	NSMutableArray* itemTreeRoot;
@@ -380,7 +380,7 @@
                                         //this represents the contents of the list view (subset of requestCache) -tb-
 	
 	NSMutableDictionary* pendingRequests;	//itemKeys in this are requests that have not come back
-	long histogram[kResponseTimeHistogramSize];
+	int32_t histogram[kResponseTimeHistogramSize];
     int timeOutCount;
     int totalRequestCount;
     BOOL shipRecords;
@@ -470,7 +470,7 @@
 
 - (NSMutableDictionary*) topLevelPollingDictionary:(id)anItemKey;
 - (int)	 nextUnusedChannelNumber;
-- (BOOL) itemExists:(int)anIndex;
+- (BOOL) itemExists:(NSUInteger)anIndex;
 - (BOOL) channelExists:(int)aChan;
 - (BOOL) isControlItem:(int)anIndex;
 - (BOOL) isControlItemWithItemKey:(NSString*)itemKey;
@@ -480,7 +480,7 @@
 
 #pragma mark •••Statistics
 - (void) histogram:(int)milliSecs;
-- (long) dataTimeHist:(int)index;
+- (int32_t) dataTimeHist:(int)index;
 
 #pragma mark •••Archival
 - (id) initWithCoder:(NSCoder*)decoder;

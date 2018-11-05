@@ -156,7 +156,7 @@
 - (void) itemsAdded:(NSNotification*)aNote
 {
 	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
-	index = MIN(index,[model itemCount]);
+	index = MIN(index,(int)[model itemCount]);
 	index = MAX(index,0);
 	[itemsListView reloadData];
 	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
@@ -168,7 +168,7 @@
 - (void) itemsRemoved:(NSNotification*)aNote
 {
 	int index = [[[aNote userInfo] objectForKey:@"Index"] intValue];
-	index = MIN(index,[model itemCount]-1);
+	index = MIN(index,(int)[model itemCount]-1);
 	index = MAX(index,0);
 	[itemsListView reloadData];
 	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
@@ -193,7 +193,7 @@
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == itemsListView || aNotification == nil){
-		int selectedIndex = [itemsListView selectedRow];
+		int selectedIndex = (int)[itemsListView selectedRow];
 		[removeItemButton setEnabled:selectedIndex>=0];
 	}
 }
@@ -376,7 +376,7 @@
 }
 
 #pragma mark Data Source Methods
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == itemsListView){
         if((rowIndex == 0) && [[aTableColumn identifier] isEqualToString:@"SubRun"])return nil;
@@ -387,12 +387,12 @@
 	else return nil;
 }
 
-- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView willDisplayCell:(id)aCell forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
     if(rowIndex == 0 && [[aTableColumn identifier] isEqualToString:@"SubRun"])[aCell setEnabled:NO];
     else [aCell setEnabled:YES];
 }
-- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if(aTableView == itemsListView){
         if((rowIndex == 0) && [[aTableColumn identifier] isEqualToString:@"SubRun"])return;
@@ -402,7 +402,7 @@
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == itemsListView){
 		return [model itemCount];

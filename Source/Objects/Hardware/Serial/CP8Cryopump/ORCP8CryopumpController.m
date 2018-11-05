@@ -77,17 +77,17 @@
     expertOpsSize	= NSMakeSize(490,660);
     plotSize		= NSMakeSize(610,545);
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORCryoPump%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCryoPump%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 
 	NSUInteger style = [[self window] styleMask];
 	if(index == 2){
-		[[self window] setStyleMask: style | NSResizableWindowMask];
+		[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 	}
 	else {
-		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+		[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 	}
 	
 	
@@ -366,7 +366,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"CP-8 (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CP-8 (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -431,21 +431,21 @@
 	switch([tabView indexOfTabViewItem:tabViewItem]){
 		case  0: 
 			[self resizeWindowToSize:basicOpsSize];   
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 		case  1: 
 			[self resizeWindowToSize:expertOpsSize];     
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 		default: 
 			[self resizeWindowToSize:plotSize];	
-			[[self window] setStyleMask: style | NSResizableWindowMask];
+			[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 			break;
 	}
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORCryoPump%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCryoPump%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -604,7 +604,7 @@
 
 - (void) statusChanged:(NSNotification*)aNote
 {
-	int mask = [model status];
+	int mask = [(ORCP8CryopumpModel*)model status];
 	[pumpOnBiStateView				 setState: mask & (0x1<<0)];
 	[roughOpenBiStateView			 setState: (mask & (0x1<<1))>0];
 	[purgeOpenBiStateView			 setState: (mask & (0x1<<2))>0];
@@ -745,7 +745,7 @@
 - (void) firstStageTempChanged:(NSNotification*)aNote
 {
 	[firstStageTempField setFloatValue: [model firstStageTemp]];
-	unsigned long t = [model timeMeasured];
+	uint32_t t = [model timeMeasured];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -920,14 +920,14 @@
 - (IBAction) roughValveInterlockAction:(id)sender	  { [model setRoughValveInterlock:		[sender intValue]]; }
 - (IBAction) roughValveStatusAction:(id)sender		  { [model setRoughValveStatus:			[sender intValue]]; }
 - (IBAction) regenerationStartDelayAction:(id)sender  { [model setRegenerationStartDelay:	[sender intValue]]; }
-- (IBAction) powerFailureRecoveryAction:(id)sender	  { [model setPowerFailureRecovery:		[sender indexOfSelectedItem]]; }
-- (IBAction) firstStageControlMethodAction:(id)sender { [model setFirstStageControlMethod:	[sender indexOfSelectedItem]]; }
+- (IBAction) powerFailureRecoveryAction:(id)sender	  { [model setPowerFailureRecovery:		(int)[sender indexOfSelectedItem]]; }
+- (IBAction) firstStageControlMethodAction:(id)sender { [model setFirstStageControlMethod:	(int)[sender indexOfSelectedItem]]; }
 - (IBAction) firstStageControlTempAction:(id)sender   { [model setFirstStageControlTemp:	[sender intValue]]; }
 - (IBAction) shipTemperaturesAction:(id)sender		  { [model setShipTemperatures:			[sender intValue]]; }
 
 - (IBAction) lockAction:(id) sender					  { [gSecurity tryToSetLock:ORCP8CryopumpLock to:[sender intValue] forWindow:[self window]];}
 - (IBAction) readTemperaturesAction:(id)sender		  { [model pollHardware];}
-- (IBAction) pollTimeAction:(id)sender				  { [model setPollTime:[[sender selectedItem] tag]];}
+- (IBAction) pollTimeAction:(id)sender				  { [model setPollTime:(int)[[sender selectedItem] tag]];}
 - (IBAction) pollNowAction:(id)sender				  { [model pollHardware]; }
 
 - (IBAction) initHardwareAction:(id)sender			  
@@ -954,7 +954,7 @@
         [alert setInformativeText:@"Really turn ON the cryopump?"];
         [alert addButtonWithTitle:@"YES/Turn ON Cryopump"];
         [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertFirstButtonReturn){
@@ -978,7 +978,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOnCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:YES];
+	if(returnCode == NSAlertFirstButtonReturn)[model writeCryoPumpOn:YES];
 }
 #endif
 
@@ -1005,7 +1005,7 @@
         [alert setInformativeText:@"Really turn OFF the cryopump?"];
         [alert addButtonWithTitle:@"YES/Turn OFF Cryopump"];
         [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertFirstButtonReturn){
@@ -1029,7 +1029,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOffCryoPumpDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writeCryoPumpOn:NO];
+	if(returnCode == NSAlertFirstButtonReturn)[model writeCryoPumpOn:NO];
 }
 #endif
 - (IBAction) openPurgeValveAction:(id)sender
@@ -1049,7 +1049,7 @@
         [alert setInformativeText:@"Really OPEN the purge valve?"];
         [alert addButtonWithTitle:@"YES/OPEN Purge Valve"];
         [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertFirstButtonReturn){
@@ -1073,24 +1073,23 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) openPurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:YES];
+	if(returnCode == NSAlertFirstButtonReturn)[model writePurgeValveOpen:YES];
 }
 #endif
 - (void) beginConstraintPanel:(NSDictionary*)constraints actionTitle:(NSString*)aTitle
 {
 	NSArray* allKeys = [constraints allKeys];
-	int n = [allKeys count];
+	NSUInteger n = [allKeys count];
 	[constraintTitleField setStringValue:[NSString stringWithFormat:@"Action: <%@> can not be done because there %d constraint%@ in effect. See below for more info.",
 										  aTitle,
-										  n,
+										  (int)n,
 										  n==1?@"":@"s"]];
 	NSMutableString* s = [NSMutableString string];
 	for(id aKey in allKeys){
 		[s appendFormat:@"%@ --> %@\n\n",aKey,[constraints objectForKey:aKey]];
 	}
 	[constraintView setString:s];
-	[NSApp beginSheet:constraintPanel modalForWindow:[self window]
-		modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [[self window] beginSheet:constraintPanel completionHandler:nil];
 }
 
 
@@ -1103,7 +1102,7 @@
     [alert setInformativeText:@"Really CLOSE the purge valve?"];
     [alert addButtonWithTitle:@"YES/CLOSE Purge Valve"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -1126,7 +1125,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) closePurgeValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writePurgeValveOpen:NO];
+	if(returnCode == NSAlertFirstButtonReturn)[model writePurgeValveOpen:NO];
 }
 #endif
 - (IBAction) openRoughingValveAction:(id)sender
@@ -1146,7 +1145,7 @@
         [alert setInformativeText:@"Really OPEN the Roughing valve?"];
         [alert addButtonWithTitle:@"YES/OPEN Roughing Valve"];
         [alert addButtonWithTitle:@"Cancel"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertFirstButtonReturn){
@@ -1170,7 +1169,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) openRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:YES];
+	if(returnCode == NSAlertFirstButtonReturn)[model writeRoughValveOpen:YES];
 }
 #endif
 
@@ -1183,7 +1182,7 @@
     [alert setInformativeText:@"Really CLOSE the Roughing valve?"];
     [alert addButtonWithTitle:@"YES/CLOSE Roughing Valve"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -1206,7 +1205,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) closeRoughingValveDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writeRoughValveOpen:NO];
+	if(returnCode == NSAlertFirstButtonReturn)[model writeRoughValveOpen:NO];
 }
 #endif
 - (IBAction) turnThermocoupleOnAction:(id)sender
@@ -1218,7 +1217,7 @@
     [alert setInformativeText:@"Really turn ON the Thermocouple?"];
     [alert addButtonWithTitle:@"YES/Turn ON Thermocouple"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -1241,7 +1240,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOnThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:YES];
+	if(returnCode == NSAlertFirstButtonReturn)[model writeThermocoupleOn:YES];
 }
 #endif
 - (IBAction) turnThermocoupleOffAction:(id)sender
@@ -1253,7 +1252,7 @@
     [alert setInformativeText:@"Really turn OFF the Thermocouple?"];
     [alert addButtonWithTitle:@"Yes/Turn OFF Thermocouple"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -1276,7 +1275,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) turnOffThermocoupleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn)[model writeThermocoupleOn:NO];
+	if(returnCode == NSAlertFirstButtonReturn)[model writeThermocoupleOn:NO];
 }
 #endif
 
@@ -1311,14 +1310,14 @@
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	return [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	return (int)[[model timeRate:set] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[[model timeRate:set] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate:set]timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index];

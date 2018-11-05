@@ -129,7 +129,7 @@ void registryChanged(
 
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat:@"%@ %d",[self className],[self tag]];
+    return [NSString stringWithFormat:@"%@ %d",[self className],(int)[self tag]];
 }
 
 -(void)makeConnectors
@@ -263,7 +263,7 @@ void registryChanged(
 	if(!fwBus){
 		fwBus = [[ORFireWireBus alloc] init];
 	}
-	return [fwBus getFireWireInterface:aVenderID];
+	return [fwBus getFireWireInterface:(uint32_t)aVenderID];
 }
 
 #pragma mark ¥¥¥USB
@@ -339,7 +339,7 @@ void registryChanged(
 
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt:eolType forKey:@"ORMacModelEolType"];
+    [encoder encodeInteger:eolType forKey:@"ORMacModelEolType"];
     [super encodeWithCoder:encoder];	
 }
 

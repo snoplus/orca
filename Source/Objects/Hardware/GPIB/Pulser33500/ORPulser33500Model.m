@@ -215,10 +215,10 @@ NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     if(connectionProtocol == kPulser33500UseIP){
-        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
         theOffset.x += 10;
     }
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];	
     if(connectionProtocol == kPulser33500UseUSB && (!usbInterface || ![self getUSBController])){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,10)];
@@ -246,7 +246,7 @@ NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
 		case kPulser33500UseUSB:	return [NSString stringWithFormat:@"33500 Pulser (Serial# %@)",[usbInterface serialNumber]];
 		case kPulser33500UseIP:	return [NSString stringWithFormat:@"33500 Pulser (%@)",[self ipAddress]];
 	}
-	return [NSString stringWithFormat:@"33500 Pulser (%d)",[self tag]];
+	return [NSString stringWithFormat:@"33500 Pulser (%d)",(int)[self tag]];
 }
 
 - (NSArray*) vendorIDs
@@ -435,7 +435,7 @@ NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
     if([self isConnected]){
         char reply[1024];
         reply[0]='\0';
-        long n = [self writeReadDevice:@"*IDN?" data:reply maxLength:1024];
+        int32_t n = [self writeReadDevice:@"*IDN?" data:reply maxLength:1024];
         if(n>0)reply[n-1]='\0';
         NSMutableString* rs =  [NSMutableString stringWithCString:reply encoding:NSASCIIStringEncoding];
 		if(rs){
@@ -571,11 +571,11 @@ NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
 	}
 	else {
 		return;   //stopped asking for response because of device time-outs and errors. MAH 12/18/09
-		char reply[1024];
-		long n = [self writeReadDevice:@"SYST:ERR?" data:reply maxLength:1024];
-		if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
-			NSLog(@"%s\n",reply);
-		}
+//        char reply[1024];
+//        int32_t n = [self writeReadDevice:@"SYST:ERR?" data:reply maxLength:1024];
+//        if(n && [[NSString stringWithCString:reply encoding:NSASCIIStringEncoding] rangeOfString:@"No error"].location == NSNotFound){
+//            NSLog(@"%s\n",reply);
+//        }
 		
 	}
 }
@@ -720,7 +720,7 @@ NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:serialNumber		forKey:@"serialNumber"];
     [encoder encodeObject:ipAddress			forKey:@"ipAddress"];
-    [encoder encodeInt:connectionProtocol	forKey:@"connectionProtocol"];
+    [encoder encodeInteger:connectionProtocol	forKey:@"connectionProtocol"];
     [encoder encodeObject:channels			forKey:@"channels"];
     [encoder encodeBool:showInKHz           forKey:@"showInKHz"];
 }
@@ -738,18 +738,18 @@ NSString* ORPulser33500ShowInKHzChanged				= @"ORPulser33500ShowInKHzChanged";
 }
 
 #pragma mark ***Comm methods
-- (long) writeReadDevice: (NSString*) aCommand data: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) writeReadDevice: (NSString*) aCommand data: (char*) aData maxLength: (uint32_t) aMaxLength
 {
     [ self writeToDevice: aCommand ];
     return( [ self readFromDevice: aData maxLength: aMaxLength ] );
 }
-- (long) readFromDevice: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) readFromDevice: (char*) aData maxLength: (uint32_t) aMaxLength
 {
 	switch(connectionProtocol){
 		case kPulser33500UseGPIB: return [super readFromGPIBDevice:aData maxLength:aMaxLength];
 		case kPulser33500UseUSB:  
 			if(usbInterface && [self getUSBController]){
-				return [usbInterface readUSB488:aData length:aMaxLength];;
+				return [usbInterface readUSB488:aData length:(uint32_t)aMaxLength];;
 			}
 			else {
 				NSString *errorMsg = @"Must establish connection prior to issuing command\n";

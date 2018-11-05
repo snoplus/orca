@@ -105,7 +105,7 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 		
 	NSBezierPath* channelPath = [NSBezierPath bezierPath];
 	
-	int n = [points count];
+	int n = (int)[points count];
 	int i;
 	
 	if(n){
@@ -117,30 +117,30 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 		
 		unsigned short numBinsPerSide;
 		NSData* data = [dataSource plotter:aPlot numberBinsPerSide:&numBinsPerSide];
-		unsigned long* dataPtr = (unsigned long*)[data bytes];
-		long sumVal  = 0;
-		long maxVal  = 0;
-		long xLoc    = 0;
-		long yLoc    = 0;
+		uint32_t* dataPtr = (uint32_t*)[data bytes];
+		int32_t sumVal  = 0;
+		int32_t maxVal  = 0;
+		int32_t xLoc    = 0;
+		int32_t yLoc    = 0;
 		float aveVal = 0;
 		
 		NSRect gateBounds = [channelPath bounds];
 		unsigned short dataXMin,dataXMax,dataYMin,dataYMax;
 		[dataSource plotter:aPlot xMin:&dataXMin xMax:&dataXMax yMin:&dataYMin yMax:&dataYMax];
-		long xStart = MAX(gateBounds.origin.x,dataXMin);
-		long xEnd   = MIN(gateBounds.origin.x + gateBounds.size.width,dataXMax);
+		int32_t xStart = MAX(gateBounds.origin.x,dataXMin);
+		int32_t xEnd   = MIN(gateBounds.origin.x + gateBounds.size.width,dataXMax);
 		
-		long yStart = MAX(gateBounds.origin.y,dataYMin);
-		long yEnd   = MIN(gateBounds.origin.y + gateBounds.size.height,dataYMax);
+		int32_t yStart = MAX(gateBounds.origin.y,dataYMin);
+		int32_t yEnd   = MIN(gateBounds.origin.y + gateBounds.size.height,dataYMax);
 		
 
-		long x,y;
-		long count = 0;
+		int32_t x,y;
+		int32_t count = 0;
 		for (y=yStart; y<yEnd; ++y) {
 			for (x=xStart; x<xEnd; ++x) {
 				if([channelPath containsPoint:NSMakePoint(x,y)]){
 					++count;
-					unsigned long z = dataPtr[x + y*numBinsPerSide];
+					uint32_t z = dataPtr[x + y*numBinsPerSide];
 					if(z > maxVal){
 						maxVal = z;
 						xLoc = x;
@@ -166,8 +166,8 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 #pragma mark ***Event Handling
 - (void)flagsChanged:(NSEvent *)theEvent
 {
-	cmdKeyIsDown = ([theEvent modifierFlags] & NSControlKeyMask)!=0;
-	optionKeyIsDown = ([theEvent modifierFlags] & NSAlternateKeyMask)!=0;
+	cmdKeyIsDown = ([theEvent modifierFlags] & NSEventModifierFlagControl)!=0;
+	optionKeyIsDown = ([theEvent modifierFlags] & NSEventModifierFlagOption)!=0;
 	if(cmdKeyIsDown) drawControlPoints = !drawControlPoints;	
 }
 
@@ -315,7 +315,7 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 		aveX += [aPoint xyPosition].x ;
 		aveY += [aPoint xyPosition].y;
 	}
-	int count = [points count];
+	int count = (int)[points count];
 	if(count){
 		
 		double deltaX = centerX - aveX/(double)count;
@@ -345,7 +345,7 @@ NSString* OR2dRoiCurveFitChanged = @"OR2dRoiCurveFitChanged";
 	[theRoiPath release];
 	theRoiPath = [[NSBezierPath bezierPath] retain];
 
-	int n = [points count];
+	int n = (int)[points count];
 	int i;
 	
 	NSPoint aPoint = [[points objectAtIndex:0] xyPosition];

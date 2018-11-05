@@ -76,17 +76,17 @@
     processLimitSize = NSMakeSize(400,170);
     plotSize		 = NSMakeSize(400,315);
 	
-	NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
 	NSUInteger style = [[self window] styleMask];
 	if(index == 2){
-		[[self window] setStyleMask: style | NSResizableWindowMask];
+		[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 	}
 	else {
-		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+		[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 	}
 	
 	
@@ -102,7 +102,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"CC4189 (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"CC4189 (Unit %u)",[model uniqueIdNumber]]];
 }
 
 #pragma mark ***Notifications
@@ -199,29 +199,29 @@
 			
 		case  0: 
 			[self resizeWindowToSize:basicOpsSize];   
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 			
 		case  1: 
 			[self resizeWindowToSize:processLimitSize];     
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 			
 		case  2: 
 			[self resizeWindowToSize:plotSize];	
-			[[self window] setStyleMask: style | NSResizableWindowMask];
+			[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 			break;
 			
 		default:
 			[self resizeWindowToSize:valuesSize];   
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 	}
 	
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORCC4189%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -302,7 +302,7 @@
 - (void) temperatureChanged:(NSNotification*)aNote
 {
 	[temperatureField setFloatValue:[model temperature]];
-	unsigned long t = [model timeMeasured];
+	uint32_t t = [model timeMeasured];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -374,12 +374,12 @@
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate:[aPlotter tag]] count];
+	return (int)[[model timeRate:(int)[aPlotter tag]] count];
 } 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[[model timeRate:set] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index];

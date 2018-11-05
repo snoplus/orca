@@ -117,17 +117,17 @@
     historyOpsSize	= NSMakeSize(422,480);
     summaryOpsSize	= NSMakeSize(400,270);
 	
-	NSString* key = [NSString stringWithFormat: @"orca.ORRad7%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+	NSString* key = [NSString stringWithFormat: @"orca.ORRad7%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
 	if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
 	[tabView selectTabViewItemAtIndex: index];
 	
 	NSUInteger style = [[self window] styleMask];
 	if(index == 2){
-		[[self window] setStyleMask: style | NSResizableWindowMask];
+		[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 	}
 	else {
-		[[self window] setStyleMask: style & ~NSResizableWindowMask];
+		[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 	}
 	
 	
@@ -137,7 +137,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Met637 (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Met637 (Unit %u)",[model uniqueIdNumber]]];
 }
 - (BOOL) portLocked
 {
@@ -574,25 +574,25 @@
 	switch([tabView indexOfTabViewItem:tabViewItem]){
 		case  0: 
 			[self resizeWindowToSize:basicOpsSize];   
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 		case  1: 
 			[self resizeWindowToSize:processOpsSize];     
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 		case  2: 
 			[self resizeWindowToSize:historyOpsSize];	
-			[[self window] setStyleMask: style | NSResizableWindowMask];
+			[[self window] setStyleMask: style | NSWindowStyleMaskResizable];
 			break;
 		default: 
 			[self resizeWindowToSize:summaryOpsSize];     
-			[[self window] setStyleMask: style & ~NSResizableWindowMask];
+			[[self window] setStyleMask: style & ~NSWindowStyleMaskResizable];
 			break;
 	}
     [[self window] setContentView:totalView];
 	
-    NSString* key = [NSString stringWithFormat: @"orca.ORMet637%lu.selectedtab",[model uniqueIdNumber]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSString* key = [NSString stringWithFormat: @"orca.ORMet637%u.selectedtab",[model uniqueIdNumber]];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 }
 
@@ -617,22 +617,22 @@
 
 - (IBAction) countingModeAction:(id)sender
 {
-	[model setCountingMode:[sender indexOfSelectedItem]];
+	[model setCountingMode:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) tempUnitsAction:(id)sender
 {
-	[model setTempUnits:[sender indexOfSelectedItem]];	
+	[model setTempUnits:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) countAlarmLimitAction:(id)sender
 {
-	[model setIndex:[[sender selectedCell] tag] countAlarmLimit:[[sender selectedCell] floatValue]];	
+	[model setIndex:(int)[[sender selectedCell] tag] countAlarmLimit:[[sender selectedCell] floatValue]];	
 }
 
 - (IBAction) maxCountsAction:(id)sender
 {
-	[model setIndex:[[sender selectedCell] tag] maxCounts:[[sender selectedCell] floatValue]];	
+	[model setIndex:(int)[[sender selectedCell] tag] maxCounts:[[sender selectedCell] floatValue]];
 }
 
 - (IBAction) startCycleAction:(id)sender
@@ -661,7 +661,7 @@
 
 - (IBAction) countUnitsAction:(id)sender
 {
-	[model setCountUnits:[sender indexOfSelectedItem]];
+	[model setCountUnits:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) dumpAllDataAction:(id)sender
@@ -682,7 +682,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Yes, Clear All"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -712,13 +712,13 @@
 #pragma mark •••Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate:[aPlotter tag]]   count];
+	return (int)[[model timeRate:(int)[aPlotter tag]]   count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[[model timeRate:set] count];
 	int index = count-i-1;
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];

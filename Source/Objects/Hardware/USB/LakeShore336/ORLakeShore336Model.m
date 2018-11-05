@@ -203,11 +203,11 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
     if(connectionProtocol == kLakeShore336UseIP){
-        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [netConnectIcon drawAtPoint:NSZeroPoint fromRect:[netConnectIcon imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
         theOffset.x += 10;
         theOffset.y += 15;
     }
-    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];	
+    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];	
     if(connectionProtocol == kLakeShore336UseUSB && (!usbInterface || ![self getUSBController])){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSMakePoint(20,2)];
@@ -240,7 +240,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 		case kLakeShore336UseUSB:	return [NSString stringWithFormat:@"LakeShore336 (Serial# %@)",[usbInterface serialNumber]];
 		case kLakeShore336UseIP:	return [NSString stringWithFormat:@"LakeShore336 (%@)",[self ipAddress]];
 	}
-	return [NSString stringWithFormat:@"33220 Pulser (%d)",[self tag]];
+	return [NSString stringWithFormat:@"33220 Pulser (%d)",(int)[self tag]];
 }
 
 - (NSUInteger) vendorID
@@ -764,8 +764,8 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
     [super encodeWithCoder:encoder];
     [encoder encodeObject:serialNumber      forKey:@"serialNumber"];
     [encoder encodeObject:ipAddress         forKey:@"ipAddress"];
-    [encoder encodeInt:connectionProtocol   forKey:@"connectionProtocol"];
-    [encoder encodeInt:pollTime             forKey:@"pollTime"];
+    [encoder encodeInteger:connectionProtocol   forKey:@"connectionProtocol"];
+    [encoder encodeInteger:pollTime             forKey:@"pollTime"];
     [encoder encodeObject:inputs            forKey:@"inputs"];
     [encoder encodeObject:heaters           forKey:@"heaters"];
 }
@@ -909,7 +909,7 @@ NSString* ORLakeShore336PollTimeChanged         = @"ORLakeShore336PollTimeChange
 {
 	NSString* s;
  	@synchronized(self){
-        s =  [NSString stringWithFormat:@"LS336,%lu",[self uniqueIdNumber]];
+        s =  [NSString stringWithFormat:@"LS336,%u",[self uniqueIdNumber]];
     }
     return s;
 }

@@ -19,10 +19,10 @@
 //-------------------------------------------------------------
 #pragma mark •••Imported Files
 #import "ORCrate.h"
-#import "Sno_Monitor_Adcs.h"
-#import "ORDataTaker.h"
-#import "VME_eCPU_Config.h"
-#import "SBC_Config.h"
+//#import "Sno_Monitor_Adcs.h"
+//#import "ORDataTaker.h"
+//#import "VME_eCPU_Config.h"
+//#import "SBC_Config.h"
 
 @interface ORSNOCrateModel : ORCrate {
 	int slot;
@@ -41,10 +41,10 @@
 - (int)  slot;
 
 #pragma mark •••Accessors
-- (unsigned long) memoryBaseAddress;
-- (unsigned long) registerBaseAddress;
+- (uint32_t) memoryBaseAddress;
+- (uint32_t) registerBaseAddress;
 - (NSString*) iPAddress;
-- (unsigned long) portNumber;
+- (uint32_t) portNumber;
 
 #pragma mark •••Notifications
 - (void) registerNotificationObservers;
@@ -62,7 +62,7 @@
 @interface ORSNOCrateModel (OROrderedObjHolding)
 - (int) maxNumberOfObjects;
 - (int) objWidth;
-- (int) stationForSlot:(int)aSlot;
+- (NSUInteger) stationForSlot:(int)aSlot;
 @end
 
 extern NSString* ORSNOCrateSlotChanged;

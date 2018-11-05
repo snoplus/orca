@@ -29,7 +29,7 @@ NSString* ORcPCICardSlotChangedNotification 	= @"ORcPCICardSlotChangedNotificati
 @implementation ORcPCICard
 #pragma mark ¥¥¥accessors
 
-- (int) tagBase
+- (NSUInteger) tagBase
 {
     return 1;
 }
@@ -51,7 +51,7 @@ NSString* ORcPCICardSlotChangedNotification 	= @"ORcPCICardSlotChangedNotificati
 
 - (int) stationNumber
 {
-    return [self tag]+1;
+    return (int)[self tag]+1;
 }
 
 #pragma mark ¥¥¥archival
@@ -59,7 +59,7 @@ NSString* ORcPCICardSlotChangedNotification 	= @"ORcPCICardSlotChangedNotificati
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
-    [objDictionary setObject:[NSNumber numberWithInt:[self stationNumber]] forKey:@"Card"];
+    [objDictionary setObject:[NSNumber numberWithInteger:[self stationNumber]] forKey:@"Card"];
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
 }

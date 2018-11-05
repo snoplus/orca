@@ -195,14 +195,14 @@ NSString* historyConnectors[4] = {
 #pragma mark ¥¥¥Plot Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	return [inputValue[set] count];
+	int set = (int)[aPlotter tag];
+	return (int)[inputValue[set] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [inputValue[set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[inputValue[set] count];
 	int index = count-i-1;
 	*yValue =  [inputValue[set] valueAtIndex:index];
 	*xValue =  [inputValue[set] timeSampledAtIndex:index];
@@ -254,7 +254,7 @@ NSString* historyConnectors[4] = {
 	
 	NSFont* theFont = [NSFont messageFontOfSize:9];
 	NSAttributedString* iconLabel =  [[[NSAttributedString alloc] 
-											initWithString:[NSString stringWithFormat:@"%lu",[self processID]]
+											initWithString:[NSString stringWithFormat:@"%u",[self processID]]
 											attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
 	NSSize textSize = [iconLabel size];
 	NSImage* anImage = [NSImage imageNamed:@"ProcessHistory"];
@@ -263,7 +263,7 @@ NSString* historyConnectors[4] = {
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	[self drawPlotRepIntoRect:NSMakeRect(18,6,theIconSize.width-29,theIconSize.height-11) maxPoints:250];
 	
 	[iconLabel drawInRect:NSMakeRect(theIconSize.width - textSize.width - 2,theIconSize.height-textSize.height-3,textSize.width,textSize.height)];
@@ -285,7 +285,7 @@ NSString* historyConnectors[4] = {
 	}
 	else {
 		iconLabel =  [[[NSAttributedString alloc] 
-					   initWithString:[NSString stringWithFormat:@"History %lu",[self processID]] 
+					   initWithString:[NSString stringWithFormat:@"History %u",[self processID]] 
 					   attributes:[NSDictionary dictionaryWithObjectsAndKeys:theFont,NSFontAttributeName,[NSColor blackColor],NSForegroundColorAttributeName,nil]]autorelease];
 	}
 	NSSize textSize = [iconLabel size];
@@ -296,7 +296,7 @@ NSString* historyConnectors[4] = {
 	
     NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
     [finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     [self drawPlotRepIntoRect:NSMakeRect(textStart,17,theIconSize.width-textStart-5,23) maxPoints:500];
 	
 	
@@ -312,7 +312,7 @@ NSString* historyConnectors[4] = {
 	float scaleFactorX = 0;
 	int i,plot,numPoints;
 	float yValue,xValue;
-	int count = [inputValue[0] count];
+	int count = (int)[inputValue[0] count];
 	if(aRect.size.width != 0 && aRect.size.height != 0){
 		[NSBezierPath setDefaultLineWidth:0];
 		[[NSColor colorWithCalibratedRed:.9 green:.9 blue:.9 alpha:1] set];

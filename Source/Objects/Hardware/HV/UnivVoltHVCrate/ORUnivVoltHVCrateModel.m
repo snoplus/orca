@@ -139,7 +139,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
     NSImage* aCachedImage = [NSImage imageNamed: @"UnivVoltHVCrateSmall"];
     NSImage* i = [[NSImage alloc] initWithSize: [aCachedImage size]];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     if([self powerOff]){
         NSAttributedString* s = [[[NSAttributedString alloc] initWithString: @"No Pwr"
                                                                  attributes: [NSDictionary dictionaryWithObjectsAndKeys:
@@ -477,7 +477,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	bool		f_NotFound = YES;
 	int			retSlotNum;
 	int			retChnlNum;
-	int			scanLoc;
+	NSUInteger			scanLoc;
 //	int			j;
 	int			i;
 
@@ -823,7 +823,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	char		returnBufferString[ 257 ];
 	char		returnCodeArray[ NUMcCODENUM + 1  ];
 //	char		displayArray[ 2 ];
-	int			lengthOfReturn = 0;
+	uint32_t			lengthOfReturn = 0;
 	int			i;
 	int			responseIndex;
 	int			j;
@@ -835,7 +835,7 @@ NSString* HVkErrorMsg = @"ErrorMsg";
 	@try
 	{
 		// Get amount of data and data itself.
-		lengthOfReturn = [aDataObject length];
+		lengthOfReturn = (uint32_t)[aDataObject length];
 		[aDataObject getBytes: returnBufferArray length: lengthOfReturn];
 		NSLog( @"ORUnivVoltHVCrateModel - Return string '%s'  length: %d\n", returnBufferArray, lengthOfReturn );
 		

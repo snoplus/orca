@@ -272,7 +272,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     NSSize theIconSize = [aCachedImage size];
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     if(!hwObject && hwName){
         [[NSColor redColor] set];
         float oldWidth = [NSBezierPath defaultLineWidth];
@@ -310,7 +310,7 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
     if([self uniqueIdNumber]){
         theFont = [NSFont messageFontOfSize:9];
         n = [[NSAttributedString alloc] 
-            initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]] 
+            initWithString:[NSString stringWithFormat:@"%u",[self uniqueIdNumber]] 
                 attributes:[NSDictionary dictionaryWithObject:theFont forKey:NSFontAttributeName]];
         
         NSSize textSize = [n size];
@@ -431,9 +431,9 @@ NSString* ORHWAccessLock									= @"ORHWAccessLock";
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:hwName forKey:@"hwName"];
-    [encoder encodeInt:bit forKey:@"bit"];
-    [encoder encodeInt:viewIconType		forKey:@"viewIconType"];
-    [encoder encodeInt:labelType		forKey:@"labelType"];
+    [encoder encodeInteger:bit forKey:@"bit"];
+    [encoder encodeInteger:viewIconType		forKey:@"viewIconType"];
+    [encoder encodeInteger:labelType		forKey:@"labelType"];
     [encoder encodeObject:customLabel	forKey:@"customLabel"];
     [encoder encodeObject:displayFormat forKey:@"displayFormat"];
 }

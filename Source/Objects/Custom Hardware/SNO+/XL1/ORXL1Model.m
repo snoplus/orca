@@ -322,7 +322,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
     [encoder encodeObject:clockFile			forKey:@"clockFile"];
     [encoder encodeObject:connectorName		forKey:@"connectorName"];
     [encoder encodeObject:connector			forKey:@"connector"];
-	[encoder encodeInt:[self slot]			forKey:@"slot"];
+	[encoder encodeInteger:[self slot]			forKey:@"slot"];
 	[encoder encodeObject:xilinxFile		forKey:@"xilinxFile"];
 	[encoder encodeObject:cableFile			forKey:@"cableFile"];
 	[encoder encodeFloat:adcClock			forKey:@"adcClock"];
@@ -355,7 +355,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 
 #pragma mark •••Hardware Access
 
-- (void) writeHardwareRegister:(unsigned long) regAddress value:(unsigned long) aValue
+- (void) writeHardwareRegister:(uint32_t) regAddress value:(uint32_t) aValue
 {
 	[[self adapter] writeLongBlock:&aValue
               atAddress:regAddress
@@ -364,9 +364,9 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
           usingAddSpace:0x01];
 }
 
-- (unsigned long) readHardwareRegister:(unsigned long) regAddress
+- (uint32_t) readHardwareRegister:(uint32_t) regAddress
 {
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	[[self adapter] readLongBlock:&aValue
               atAddress:regAddress
              numToRead:1
@@ -376,7 +376,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 	return aValue;
 }
 
-- (id) writeHardwareRegisterCmd:(unsigned long) regAddress value:(unsigned long) aValue
+- (id) writeHardwareRegisterCmd:(uint32_t) regAddress value:(uint32_t) aValue
 {
 	return [ORVmeReadWriteCommand writeLongBlock:&aValue
 								  atAddress:regAddress
@@ -385,7 +385,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 							  usingAddSpace:0x01];
 }
 
-- (id) readHardwareRegisterCmd:(unsigned long) regAddress
+- (id) readHardwareRegisterCmd:(uint32_t) regAddress
 {
 	return [ORVmeReadWriteCommand readLongBlockAtAddress:regAddress
 						numToRead:1
@@ -393,7 +393,7 @@ NSString* ORXL1Lock						= @"ORXL1Lock";
 					usingAddSpace:0x01];
 }
 
-- (id) delayCmd:(unsigned long) milliSeconds
+- (id) delayCmd:(uint32_t) milliSeconds
 {
 	return [ORVmeReadWriteCommand delayCmd:milliSeconds];
 }

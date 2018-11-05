@@ -457,10 +457,10 @@ static NSString *ORSupplyVoltageAdcSlope  = @"ORHV4032Supply Volt adc slope";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [encoder encodeObject:owner forKey:ORHV4032SupplyOwner];
-    [encoder encodeInt:[self supply] forKey:ORSupplyId];
-    [encoder encodeInt:[self controlled] forKey:ORSupplyControlled];
-    [encoder encodeInt:[self rampTime] forKey:ORSupplyRampTime];
-    [encoder encodeInt:[self targetVoltage] forKey:ORSupplyTargetVoltage];
+    [encoder encodeInteger:[self supply] forKey:ORSupplyId];
+    [encoder encodeInteger:[self controlled] forKey:ORSupplyControlled];
+    [encoder encodeInteger:[self rampTime] forKey:ORSupplyRampTime];
+    [encoder encodeInteger:[self targetVoltage] forKey:ORSupplyTargetVoltage];
     [encoder encodeFloat:[self voltageAdcOffset] forKey:ORSupplyVoltageAdcOffset];
     [encoder encodeFloat:[self voltageAdcSlope] forKey:ORSupplyVoltageAdcSlope];
 }
@@ -489,7 +489,7 @@ static NSString *ORSupplyDacValue 	= @"ORHV4032Supply Dac Voltage";
 {	
     [[owner undoManager] disableUndoRegistration];
 	
-    [self setDacValue:[decoder decodeIntForKey:[ORSupplyDacValue stringByAppendingFormat:@"%d",supply]]];
+    [self setDacValue:(int)[decoder decodeIntegerForKey:[ORSupplyDacValue stringByAppendingFormat:@"%d",supply]]];
     
     [[owner undoManager] enableUndoRegistration];
 }

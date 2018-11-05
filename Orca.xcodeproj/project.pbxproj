@@ -118,7 +118,6 @@
 		2ACEE0E30612266000CAD497 /* ThresholdCalibrationChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */; };
 		2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */; };
 		2ACEE0E50612266000CAD497 /* ThresholdCalibrationTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */; };
-		2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2AE87BDD0D6E486900A839FC /* libmysqlclient.a */; };
 		2D12EDA6150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h in Headers */ = {isa = PBXBuildFile; fileRef = 2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */; };
 		2D12EDA9150FDD6200EBD8A2 /* EdelweissSLTv4_HW_Definitions.h in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */; };
 		2D12EDCB150FE26600EBD8A2 /* HW_Readout.cc in EdelweissSLTv4_Copy */ = {isa = PBXBuildFile; fileRef = 2D12EDB1150FE02A00EBD8A2 /* HW_Readout.cc */; };
@@ -377,6 +376,7 @@
 		43E9ED471339044100888F93 /* ORAuxHw.m in Sources */ = {isa = PBXBuildFile; fileRef = 43E9ED451339044100888F93 /* ORAuxHw.m */; };
 		4547F56C1CECB9B1006CA8E3 /* ORRunningAverageGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 4547F56A1CECB9B1006CA8E3 /* ORRunningAverageGroup.h */; };
 		4547F56D1CECB9B1006CA8E3 /* ORRunningAverageGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4547F56B1CECB9B1006CA8E3 /* ORRunningAverageGroup.m */; };
+		4A3FF9782100E05700191150 /* binary_log_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A3FF9772100E05600191150 /* binary_log_types.h */; };
 		4AB9E5271DE5D820007C75E0 /* libpq-fe.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5181DE5D820007C75E0 /* libpq-fe.h */; };
 		4AB9E5281DE5D820007C75E0 /* libpq-fs.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5191DE5D820007C75E0 /* libpq-fs.h */; };
 		4AB9E52F1DE5D820007C75E0 /* ORPQController.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5201DE5D820007C75E0 /* ORPQController.h */; };
@@ -390,7 +390,6 @@
 		4AB9E53C1DE5D955007C75E0 /* ORPQConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E5381DE5D955007C75E0 /* ORPQConnection.m */; };
 		4AB9E53D1DE5D955007C75E0 /* ORPQResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 4AB9E5391DE5D955007C75E0 /* ORPQResult.h */; };
 		4AB9E53E1DE5D955007C75E0 /* ORPQResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 4AB9E53A1DE5D955007C75E0 /* ORPQResult.m */; };
-		4AB9E5401DE5D9DB007C75E0 /* libpq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AB9E53F1DE5D9DB007C75E0 /* libpq.a */; };
 		543BF2031E5481C3003E4582 /* HVcRIO.nib in Resources */ = {isa = PBXBuildFile; fileRef = 543BF1FB1E5481C3003E4582 /* HVcRIO.nib */; };
 		543BF2041E5481C3003E4582 /* HVcRIO.tif in Resources */ = {isa = PBXBuildFile; fileRef = 543BF1FC1E5481C3003E4582 /* HVcRIO.tif */; };
 		543BF2051E5481C3003E4582 /* ORHVcRIOController.h in Headers */ = {isa = PBXBuildFile; fileRef = 543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */; };
@@ -3140,6 +3139,22 @@
 		84EA1FB120E28F810099F3DF /* RefClock.gif in Resources */ = {isa = PBXBuildFile; fileRef = 84EA1FB020E28F800099F3DF /* RefClock.gif */; };
 		84EA6CAC0C73D15B00083319 /* ORAcqirisDC440Decoders.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */; };
 		84EA6CAD0C73D15B00083319 /* ORAcqirisDC440Decoders.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */; };
+		84EA916820FE5A3700110B85 /* libmysqlclient.21.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84EA916720FE5A3700110B85 /* libmysqlclient.21.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		84EA916A20FE5A6200110B85 /* mysql.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA916920FE5A6100110B85 /* mysql.h */; };
+		84EA917020FE5C5100110B85 /* my_list.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA916F20FE5C5100110B85 /* my_list.h */; };
+		84EA917220FE5C9000110B85 /* mysql_com.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA917120FE5C9000110B85 /* mysql_com.h */; };
+		84EA917420FE5CC700110B85 /* my_command.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA917320FE5CC700110B85 /* my_command.h */; };
+		84EA917A20FE5D0900110B85 /* udf_registration_types.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA917720FE5D0900110B85 /* udf_registration_types.h */; };
+		84EA917D20FE5D5800110B85 /* mysql_version.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA917C20FE5D5700110B85 /* mysql_version.h */; };
+		84EA917F20FE5D8700110B85 /* mysql_time.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA917E20FE5D8700110B85 /* mysql_time.h */; };
+		84EA918120FE5DB000110B85 /* errmsg.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EA918020FE5DB000110B85 /* errmsg.h */; };
+		84EA918320FE5DDF00110B85 /* libssl.1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84EA918220FE5DDE00110B85 /* libssl.1.0.0.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		84EA918520FE5DF800110B85 /* libcrypto.1.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84EA918420FE5DF800110B85 /* libcrypto.1.0.0.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		84EA918720FE5F7800110B85 /* libpq.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 84EA918620FE5F7800110B85 /* libpq.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		84EA919420FF840F00110B85 /* libmysqlclient.21.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 84EA916720FE5A3700110B85 /* libmysqlclient.21.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		84EA919520FF840F00110B85 /* libssl.1.0.0.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 84EA918220FE5DDE00110B85 /* libssl.1.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		84EA919620FF840F00110B85 /* libcrypto.1.0.0.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 84EA918420FE5DF800110B85 /* libcrypto.1.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		84EA919720FF840F00110B85 /* libpq.dylib in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = 84EA918620FE5F7800110B85 /* libpq.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		84EB2DDE1E32990D00C273AA /* LabJackU6.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84EB2DD51E32990D00C273AA /* LabJackU6.nib */; };
 		84EB2DE11E32990D00C273AA /* ORLabJackU6Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84EB2DD81E32990D00C273AA /* ORLabJackU6Controller.h */; };
 		84EB2DE21E32990D00C273AA /* ORLabJackU6Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84EB2DD91E32990D00C273AA /* ORLabJackU6Controller.m */; };
@@ -3260,13 +3275,6 @@
 		84F7F3CF0AE3F1A000A5AA4C /* OrcaPrecompiledHeader.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7F3CE0AE3F1A000A5AA4C /* OrcaPrecompiledHeader.h */; };
 		84F7FA81077896B000E8A6DA /* ORColorScale.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FA7F077896B000E8A6DA /* ORColorScale.h */; };
 		84F7FA82077896B000E8A6DA /* ORColorScale.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F7FA80077896B000E8A6DA /* ORColorScale.m */; };
-		84F7FB560AE555C600A5AA4C /* mysql.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB550AE555C600A5AA4C /* mysql.h */; };
-		84F7FB5E0AE5566D00A5AA4C /* mysql_version.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB590AE5566D00A5AA4C /* mysql_version.h */; };
-		84F7FB5F0AE5566D00A5AA4C /* mysql_time.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5A0AE5566D00A5AA4C /* mysql_time.h */; };
-		84F7FB600AE5566D00A5AA4C /* typelib.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5B0AE5566D00A5AA4C /* typelib.h */; };
-		84F7FB610AE5566D00A5AA4C /* my_list.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5C0AE5566D00A5AA4C /* my_list.h */; };
-		84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */; };
-		84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F7FB630AE5569100A5AA4C /* my_alloc.h */; };
 		84F909871638383C00E9FD24 /* Pulser33500.nib in Resources */ = {isa = PBXBuildFile; fileRef = 84F909801638383C00E9FD24 /* Pulser33500.nib */; };
 		84F909891638383C00E9FD24 /* ORPulser33500Controller.h in Headers */ = {isa = PBXBuildFile; fileRef = 84F909821638383C00E9FD24 /* ORPulser33500Controller.h */; };
 		84F9098A1638383C00E9FD24 /* ORPulser33500Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 84F909831638383C00E9FD24 /* ORPulser33500Controller.m */; };
@@ -3492,8 +3500,6 @@
 		DB704A1418EBA4E100839B42 /* ELLIEModel.m in Sources */ = {isa = PBXBuildFile; fileRef = DB704A1218EBA4E100839B42 /* ELLIEModel.m */; };
 		DB704A1618EBA61E00839B42 /* ellie.xib in Resources */ = {isa = PBXBuildFile; fileRef = DB704A1518EBA61E00839B42 /* ellie.xib */; };
 		DBEC755518EB9E9B0077D493 /* ellie.gif in Resources */ = {isa = PBXBuildFile; fileRef = DBEC755418EB9E9B0077D493 /* ellie.gif */; };
-		EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; };
-		EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */ = {isa = PBXBuildFile; fileRef = EF37879112DFFF81003C814E /* YAJL.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		EF69C433116E5DC3008ABADC /* ORSNOCrateReadout.hh in Headers */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
 		EF69C482116E6526008ABADC /* ORSNOCrateReadout.cc in VME_Copy */ = {isa = PBXBuildFile; fileRef = EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */; };
 		EF69C483116E6526008ABADC /* ORSNOCrateReadout.hh in VME_Copy */ = {isa = PBXBuildFile; fileRef = EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */; };
@@ -3829,7 +3835,10 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				EF3787A012DFFF90003C814E /* YAJL.framework in Frameworks_Copy */,
+				84EA919420FF840F00110B85 /* libmysqlclient.21.dylib in Frameworks_Copy */,
+				84EA919520FF840F00110B85 /* libssl.1.0.0.dylib in Frameworks_Copy */,
+				84EA919620FF840F00110B85 /* libcrypto.1.0.0.dylib in Frameworks_Copy */,
+				84EA919720FF840F00110B85 /* libpq.dylib in Frameworks_Copy */,
 			);
 			name = Frameworks_Copy;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3950,7 +3959,6 @@
 		2ACEE0DF0612266000CAD497 /* ThresholdCalibrationChannel.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationChannel.m; sourceTree = "<group>"; };
 		2ACEE0E00612266000CAD497 /* ThresholdCalibrationTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ThresholdCalibrationTask.h; sourceTree = "<group>"; };
 		2ACEE0E10612266000CAD497 /* ThresholdCalibrationTask.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = ThresholdCalibrationTask.m; sourceTree = "<group>"; };
-		2AE87BDD0D6E486900A839FC /* libmysqlclient.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libmysqlclient.a; sourceTree = "<group>"; };
 		2D12EDA5150FDD1300EBD8A2 /* EdelweissSLTv4_HW_Definitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EdelweissSLTv4_HW_Definitions.h; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/EdelweissSLTv4_HW_Definitions.h; sourceTree = "<group>"; };
 		2D12EDB1150FE02A00EBD8A2 /* HW_Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HW_Readout.cc; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/HW_Readout.cc; sourceTree = "<group>"; };
 		2D12EE53150FE7B400EBD8A2 /* OREdelweissSLTv4Readout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OREdelweissSLTv4Readout.cc; path = EdelweissSLT/EdelweissSLTv4_Readout_Code/OREdelweissSLTv4Readout.cc; sourceTree = "<group>"; };
@@ -4186,6 +4194,7 @@
 		43E9ED451339044100888F93 /* ORAuxHw.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORAuxHw.m; path = "Source/Objects/Hardware/Hardware Base Classes/ORAuxHw.m"; sourceTree = SOURCE_ROOT; };
 		4547F56A1CECB9B1006CA8E3 /* ORRunningAverageGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORRunningAverageGroup.h; sourceTree = "<group>"; };
 		4547F56B1CECB9B1006CA8E3 /* ORRunningAverageGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORRunningAverageGroup.m; sourceTree = "<group>"; };
+		4A3FF9772100E05600191150 /* binary_log_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = binary_log_types.h; sourceTree = "<group>"; };
 		4AB9E5181DE5D820007C75E0 /* libpq-fe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "libpq-fe.h"; sourceTree = "<group>"; };
 		4AB9E5191DE5D820007C75E0 /* libpq-fs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "libpq-fs.h"; sourceTree = "<group>"; };
 		4AB9E5201DE5D820007C75E0 /* ORPQController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPQController.h; sourceTree = "<group>"; };
@@ -4199,7 +4208,6 @@
 		4AB9E5381DE5D955007C75E0 /* ORPQConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPQConnection.m; sourceTree = "<group>"; };
 		4AB9E5391DE5D955007C75E0 /* ORPQResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORPQResult.h; sourceTree = "<group>"; };
 		4AB9E53A1DE5D955007C75E0 /* ORPQResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORPQResult.m; sourceTree = "<group>"; };
-		4AB9E53F1DE5D9DB007C75E0 /* libpq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libpq.a; path = Libraries/libIntel/libpq.a; sourceTree = SOURCE_ROOT; };
 		543BF1FB1E5481C3003E4582 /* HVcRIO.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = HVcRIO.nib; path = HVcRIO/HVcRIO.nib; sourceTree = "<group>"; };
 		543BF1FC1E5481C3003E4582 /* HVcRIO.tif */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; name = HVcRIO.tif; path = HVcRIO/HVcRIO.tif; sourceTree = "<group>"; };
 		543BF1FD1E5481C3003E4582 /* ORHVcRIOController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORHVcRIOController.h; path = HVcRIO/ORHVcRIOController.h; sourceTree = "<group>"; };
@@ -6847,6 +6855,18 @@
 		84EA1FB020E28F800099F3DF /* RefClock.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = RefClock.gif; sourceTree = "<group>"; };
 		84EA6CAA0C73D15B00083319 /* ORAcqirisDC440Decoders.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORAcqirisDC440Decoders.h; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.h; sourceTree = SOURCE_ROOT; };
 		84EA6CAB0C73D15B00083319 /* ORAcqirisDC440Decoders.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORAcqirisDC440Decoders.m; path = Source/Objects/Hardware/CompactPCI/AcqirisDC440/ORAcqirisDC440Decoders.m; sourceTree = SOURCE_ROOT; };
+		84EA916720FE5A3700110B85 /* libmysqlclient.21.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libmysqlclient.21.dylib; sourceTree = "<group>"; };
+		84EA916920FE5A6100110B85 /* mysql.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mysql.h; sourceTree = "<group>"; };
+		84EA916F20FE5C5100110B85 /* my_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = my_list.h; sourceTree = "<group>"; };
+		84EA917120FE5C9000110B85 /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mysql_com.h; sourceTree = "<group>"; };
+		84EA917320FE5CC700110B85 /* my_command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = my_command.h; sourceTree = "<group>"; };
+		84EA917720FE5D0900110B85 /* udf_registration_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = udf_registration_types.h; sourceTree = "<group>"; };
+		84EA917C20FE5D5700110B85 /* mysql_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mysql_version.h; sourceTree = "<group>"; };
+		84EA917E20FE5D8700110B85 /* mysql_time.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mysql_time.h; sourceTree = "<group>"; };
+		84EA918020FE5DB000110B85 /* errmsg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = errmsg.h; sourceTree = "<group>"; };
+		84EA918220FE5DDE00110B85 /* libssl.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libssl.1.0.0.dylib; sourceTree = "<group>"; };
+		84EA918420FE5DF800110B85 /* libcrypto.1.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libcrypto.1.0.0.dylib; sourceTree = "<group>"; };
+		84EA918620FE5F7800110B85 /* libpq.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libpq.dylib; sourceTree = "<group>"; };
 		84EB2DD51E32990D00C273AA /* LabJackU6.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = LabJackU6.nib; sourceTree = "<group>"; };
 		84EB2DD81E32990D00C273AA /* ORLabJackU6Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORLabJackU6Controller.h; sourceTree = "<group>"; };
 		84EB2DD91E32990D00C273AA /* ORLabJackU6Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ORLabJackU6Controller.m; sourceTree = "<group>"; };
@@ -6972,13 +6992,6 @@
 		84F7F3CE0AE3F1A000A5AA4C /* OrcaPrecompiledHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OrcaPrecompiledHeader.h; path = "Source/App Delegate/OrcaPrecompiledHeader.h"; sourceTree = SOURCE_ROOT; };
 		84F7FA7F077896B000E8A6DA /* ORColorScale.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ORColorScale.h; path = "Source/Widgets/Bar Graph/ORColorScale.h"; sourceTree = SOURCE_ROOT; };
 		84F7FA80077896B000E8A6DA /* ORColorScale.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; name = ORColorScale.m; path = "Source/Widgets/Bar Graph/ORColorScale.m"; sourceTree = SOURCE_ROOT; };
-		84F7FB550AE555C600A5AA4C /* mysql.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql.h; path = Libraries/mysql.h; sourceTree = SOURCE_ROOT; };
-		84F7FB590AE5566D00A5AA4C /* mysql_version.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_version.h; path = Libraries/mysql_version.h; sourceTree = SOURCE_ROOT; };
-		84F7FB5A0AE5566D00A5AA4C /* mysql_time.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_time.h; path = Libraries/mysql_time.h; sourceTree = SOURCE_ROOT; };
-		84F7FB5B0AE5566D00A5AA4C /* typelib.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = typelib.h; path = Libraries/typelib.h; sourceTree = SOURCE_ROOT; };
-		84F7FB5C0AE5566D00A5AA4C /* my_list.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_list.h; path = Libraries/my_list.h; sourceTree = SOURCE_ROOT; };
-		84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = mysql_com.h; path = Libraries/mysql_com.h; sourceTree = SOURCE_ROOT; };
-		84F7FB630AE5569100A5AA4C /* my_alloc.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = my_alloc.h; path = Libraries/my_alloc.h; sourceTree = SOURCE_ROOT; };
 		84F909801638383C00E9FD24 /* Pulser33500.nib */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; path = Pulser33500.nib; sourceTree = "<group>"; };
 		84F909821638383C00E9FD24 /* ORPulser33500Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ORPulser33500Controller.h; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500Controller.h; sourceTree = SOURCE_ROOT; };
 		84F909831638383C00E9FD24 /* ORPulser33500Controller.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ORPulser33500Controller.m; path = Source/Objects/Hardware/GPIB/Pulser33500/ORPulser33500Controller.m; sourceTree = SOURCE_ROOT; };
@@ -7202,7 +7215,6 @@
 		DB704A1218EBA4E100839B42 /* ELLIEModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ELLIEModel.m; sourceTree = "<group>"; };
 		DB704A1518EBA61E00839B42 /* ellie.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ellie.xib; sourceTree = "<group>"; };
 		DBEC755418EB9E9B0077D493 /* ellie.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = ellie.gif; sourceTree = "<group>"; };
-		EF37879112DFFF81003C814E /* YAJL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = YAJL.framework; path = Frameworks/YAJL.framework; sourceTree = "<group>"; };
 		EF69C430116E5DC3008ABADC /* ORSNOCrateReadout.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ORSNOCrateReadout.cc; sourceTree = "<group>"; };
 		EF69C431116E5DC3008ABADC /* ORSNOCrateReadout.hh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ORSNOCrateReadout.hh; sourceTree = "<group>"; };
 		EF7722B211E813120064A1CF /* ORXL3Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ORXL3Model.h; sourceTree = "<group>"; };
@@ -7315,21 +7327,22 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				84EA918520FE5DF800110B85 /* libcrypto.1.0.0.dylib in Frameworks */,
+				84EA918320FE5DDF00110B85 /* libssl.1.0.0.dylib in Frameworks */,
 				8434A359055B3287002D3102 /* Cocoa.framework in Frameworks */,
+				84EA918720FE5F7800110B85 /* libpq.dylib in Frameworks */,
+				84EA916820FE5A3700110B85 /* libmysqlclient.21.dylib in Frameworks */,
 				8470D01518241FEE0054F7D4 /* Accelerate.framework in Frameworks */,
 				8439D5EF05BEFF3A0077EFF2 /* Carbon.framework in Frameworks */,
 				840F377B08F322F800FC4408 /* IOKit.framework in Frameworks */,
 				84F5E11B0A151E0B00707A0F /* OpenGL.framework in Frameworks */,
 				847599860B5FF26500123411 /* QuartzCore.framework in Frameworks */,
-				2AE87C600D6E636700A839FC /* libmysqlclient.a in Frameworks */,
 				3620200E1CBD38EE0089296E /* libiconv.2.dylib in Frameworks */,
 				2DC1EE800F33724E00E93C75 /* WebKit.framework in Frameworks */,
 				840F5B191222C90000D49A75 /* QTKit.framework in Frameworks */,
-				EF37879212DFFF81003C814E /* YAJL.framework in Frameworks */,
 				84E6CD001E4247BD004D6978 /* libusb-1.0.a in Frameworks */,
 				8458E91515DA8A2A005C43A9 /* ScriptingBridge.framework in Frameworks */,
 				8481E67917653766001AB905 /* SystemConfiguration.framework in Frameworks */,
-				4AB9E5401DE5D9DB007C75E0 /* libpq.a in Frameworks */,
 				4322E9B217830004008E78A4 /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7420,7 +7433,6 @@
 				8481E67817653766001AB905 /* SystemConfiguration.framework */,
 				8470D01418241FEE0054F7D4 /* Accelerate.framework */,
 				8458E91415DA8A2A005C43A9 /* ScriptingBridge.framework */,
-				EF37879112DFFF81003C814E /* YAJL.framework */,
 				840F5B181222C90000D49A75 /* QTKit.framework */,
 				84F5E11A0A151E0B00707A0F /* OpenGL.framework */,
 				84AA7A540545B1B2005F64B1 /* Cocoa.framework */,
@@ -7641,9 +7653,10 @@
 		2AE87BDC0D6E486900A839FC /* libUniversal */ = {
 			isa = PBXGroup;
 			children = (
-				2AE87BDD0D6E486900A839FC /* libmysqlclient.a */,
-				84F7FB550AE555C600A5AA4C /* mysql.h */,
-				4AB9E53F1DE5D9DB007C75E0 /* libpq.a */,
+				84EA916720FE5A3700110B85 /* libmysqlclient.21.dylib */,
+				84EA918220FE5DDE00110B85 /* libssl.1.0.0.dylib */,
+				84EA918420FE5DF800110B85 /* libcrypto.1.0.0.dylib */,
+				84EA918620FE5F7800110B85 /* libpq.dylib */,
 			);
 			path = libUniversal;
 			sourceTree = "<group>";
@@ -14002,6 +14015,14 @@
 			path = Source/Objects/Hardware/HV/NHQ226L;
 			sourceTree = SOURCE_ROOT;
 		};
+		84EA917520FE5D0900110B85 /* mysql */ = {
+			isa = PBXGroup;
+			children = (
+				84EA917720FE5D0900110B85 /* udf_registration_types.h */,
+			);
+			path = mysql;
+			sourceTree = "<group>";
+		};
 		84EB2DD41E32990D00C273AA /* LabJackU6 */ = {
 			isa = PBXGroup;
 			children = (
@@ -14267,12 +14288,15 @@
 				3620200C1CBD38EE0089296E /* libSNO+ */,
 				8475EC0414759D53003A165D /* libusb */,
 				2AE87BDC0D6E486900A839FC /* libUniversal */,
-				84F7FB630AE5569100A5AA4C /* my_alloc.h */,
-				84F7FB590AE5566D00A5AA4C /* mysql_version.h */,
-				84F7FB5A0AE5566D00A5AA4C /* mysql_time.h */,
-				84F7FB5B0AE5566D00A5AA4C /* typelib.h */,
-				84F7FB5C0AE5566D00A5AA4C /* my_list.h */,
-				84F7FB5D0AE5566D00A5AA4C /* mysql_com.h */,
+				84EA917520FE5D0900110B85 /* mysql */,
+				84EA916920FE5A6100110B85 /* mysql.h */,
+				4A3FF9772100E05600191150 /* binary_log_types.h */,
+				84EA916F20FE5C5100110B85 /* my_list.h */,
+				84EA917120FE5C9000110B85 /* mysql_com.h */,
+				84EA917320FE5CC700110B85 /* my_command.h */,
+				84EA917C20FE5D5700110B85 /* mysql_version.h */,
+				84EA917E20FE5D8700110B85 /* mysql_time.h */,
+				84EA918020FE5DB000110B85 /* errmsg.h */,
 			);
 			path = Libraries;
 			sourceTree = SOURCE_ROOT;
@@ -15165,6 +15189,7 @@
 			files = (
 				8434A186055B3287002D3102 /* ORAppDelegate.h in Headers */,
 				8434A187055B3287002D3102 /* ORAboutBox.h in Headers */,
+				4A3FF9782100E05700191150 /* binary_log_types.h in Headers */,
 				8434A188055B3287002D3102 /* ORCatalogController.h in Headers */,
 				844AEE901ACDB10200139C57 /* ORGretina4AReadout.hh in Headers */,
 				8434A189055B3287002D3102 /* ORStatusController.h in Headers */,
@@ -15334,6 +15359,7 @@
 				2ACEE0E40612266000CAD497 /* ThresholdCalibrationTask.h in Headers */,
 				84ABE7A319C896CE00BD8DC7 /* ORDataProcessing.h in Headers */,
 				840C7FE01955CA0000E36622 /* NSApplication+Extensions.h in Headers */,
+				84EA917D20FE5D5800110B85 /* mysql_version.h in Headers */,
 				848463AD0625D65F00128299 /* ORSmartFolder.h in Headers */,
 				84FFCAA80636D5B10069432F /* ORCaen792Controller.h in Headers */,
 				84FFCAAA0636D5B10069432F /* ORCaen792Model.h in Headers */,
@@ -15357,6 +15383,7 @@
 				4AB9E5331DE5D820007C75E0 /* postgres_ext.h in Headers */,
 				846799570694B82200DF8B2A /* NcdThresholdTask.h in Headers */,
 				84F9836D06A441CF0087FA3E /* ORGTIDGenerator.h in Headers */,
+				84EA917020FE5C5100110B85 /* my_list.h in Headers */,
 				848326E906DA614B00172F1C /* ORDualPortLAMController.h in Headers */,
 				848326EB06DA614B00172F1C /* ORDualPortLAMModel.h in Headers */,
 				842A634F0700A81C007536B6 /* ORShaperDecoders.h in Headers */,
@@ -15542,6 +15569,7 @@
 				840E004D0944B29000049827 /* ORProcessThread.h in Headers */,
 				84B489370944E63800DFC618 /* ORCountDownController.h in Headers */,
 				84B489390944E63800DFC618 /* ORCountDownModel.h in Headers */,
+				84EA918120FE5DB000110B85 /* errmsg.h in Headers */,
 				84B48980094506C000DFC618 /* OROneShotController.h in Headers */,
 				84B48982094506C000DFC618 /* OROneShotModel.h in Headers */,
 				84B489BB0945142300DFC618 /* ORInvertedOutputNub.h in Headers */,
@@ -15617,20 +15645,14 @@
 				84861D320ACD83F300C543D7 /* ORL4532Model.h in Headers */,
 				84861DAA0ACDA9B600C543D7 /* ORL4532Decoders.h in Headers */,
 				84F7F3CF0AE3F1A000A5AA4C /* OrcaPrecompiledHeader.h in Headers */,
-				84F7FB560AE555C600A5AA4C /* mysql.h in Headers */,
-				84F7FB5E0AE5566D00A5AA4C /* mysql_version.h in Headers */,
-				84F7FB5F0AE5566D00A5AA4C /* mysql_time.h in Headers */,
-				84F7FB600AE5566D00A5AA4C /* typelib.h in Headers */,
-				84F7FB610AE5566D00A5AA4C /* my_list.h in Headers */,
 				6B5EFA481C4D76AF00B9A80B /* ORMultiStateBox.h in Headers */,
-				84F7FB620AE5566D00A5AA4C /* mysql_com.h in Headers */,
-				84F7FB640AE5569100A5AA4C /* my_alloc.h in Headers */,
 				844BF49A0B1B85560047C9BF /* KatrinDetectorView.h in Headers */,
 				844384C80B273FB600A94E26 /* ORAdcInfoProviding.h in Headers */,
 				84E6FB230B2DDC6100CAA7C5 /* ObjectFactory.h in Headers */,
 				849B25EE0B2F34FA0007484F /* PrespectrometerController.h in Headers */,
 				842FCCC219784AAA00B89723 /* OREDSF130pModel.h in Headers */,
 				849B25F00B2F34FA0007484F /* PrespectrometerView.h in Headers */,
+				84EA917420FE5CC700110B85 /* my_command.h in Headers */,
 				849B25F20B2F34FA0007484F /* PrespectrometerModel.h in Headers */,
 				8461CB011CB2D8DB001E4044 /* ORPulseCheckModel.h in Headers */,
 				849B26D90B2F48490007484F /* ORDetectorSegment.h in Headers */,
@@ -15658,6 +15680,7 @@
 				849E7C9A0B6957BF00353D50 /* ORADU200Controller.h in Headers */,
 				849E7C9C0B6957BF00353D50 /* ORADU200Model.h in Headers */,
 				84AD4CD50BA232FF003C7ABE /* ORWindowListController.h in Headers */,
+				84EA917F20FE5D8700110B85 /* mysql_time.h in Headers */,
 				842538530BC6E006004C8065 /* ORHP6622aController.h in Headers */,
 				842538550BC6E006004C8065 /* ORHP6622aModel.h in Headers */,
 				842539FA0BCD7BFE004C8065 /* ORCARootService.h in Headers */,
@@ -15767,6 +15790,8 @@
 				842251360D8845390048D331 /* ORIpeV4SLTDecoder.h in Headers */,
 				842251380D8845390048D331 /* ORIpeV4SLTDefs.h in Headers */,
 				842251390D8845390048D331 /* ORIpeV4SLTModel.h in Headers */,
+				84EA917220FE5C9000110B85 /* mysql_com.h in Headers */,
+				84EA917A20FE5D0900110B85 /* udf_registration_types.h in Headers */,
 				8422513C0D8845390048D331 /* HW_Readout.h in Headers */,
 				8422513E0D8845390048D331 /* SLTv4_HW_Definitions.h in Headers */,
 				84FB4E230D92F7560055813E /* ORBugReporter.h in Headers */,
@@ -16331,6 +16356,7 @@
 				84F9098B1638383C00E9FD24 /* ORPulser33500Model.h in Headers */,
 				842BB6AA1639746300393470 /* ORPulser33500Chan.h in Headers */,
 				849951761D5CE50700A6FA40 /* ORMJDBiasWatcherController.h in Headers */,
+				84EA916A20FE5A6200110B85 /* mysql.h in Headers */,
 				842BB6C516397A2000393470 /* ORPulser33500ChanController.h in Headers */,
 				842BC974163ED4E300393470 /* ORGretina4MReadout.hh in Headers */,
 				CED38D1E165CDB6600358681 /* ANSIEscapeHelper.h in Headers */,
@@ -16466,7 +16492,6 @@
 			buildConfigurationList = 84F201BA0B6531990084F4C3 /* Build configuration list for PBXNativeTarget "Orca" */;
 			buildPhases = (
 				8434A185055B3287002D3102 /* Headers */,
-				8429B1C80B03B5140096045E /* ShellScript */,
 				CE6885F90D0CDEAD00FA4158 /* CopyFiles */,
 				EF37879012DFFE77003C814E /* Frameworks_Copy */,
 				8434A243055B3287002D3102 /* Resources */,
@@ -16501,7 +16526,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0940;
 				TargetAttributes = {
 					369E73371C7B5E6400A7F89E = {
 						CreatedOnToolsVersion = 6.1.1;
@@ -17509,20 +17534,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8429B1C80B03B5140096045E /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			comments = "ranlib is needed to be run to make sure the archive ";
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cp Libraries/libUniversal/libmysqlclientRepo.a Libraries/libUniversal/libmysqlclient.a\n/usr/bin/ranlib Libraries/libUniversal/libmysqlclient.a\n";
-		};
 		8491DD760EB616630084BAD6 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -17534,7 +17545,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ -x \"/usr/bin/svnversion\" ]; then\n   svnver=`/usr/bin/svnversion .`\nelse\n   svnver=\"-\"\nfi\n\nif [ \"$svnver\" == \"Unversioned directory\" ]; then\n   if [ -x \"/usr/bin/git\" ]; then\n      svnver=`/usr/bin/git -C $SOURCE_ROOT svn info | grep '^Revision: ' | cut -c 11-`\n   fi\nfi\n\necho \"$svnver\" > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\n";
+			shellScript = "if [ -x \"/usr/bin/svnversion\" ]; then\n   svnver=`/usr/bin/svnversion .`\nelse\n   svnver=\"-\"\nfi\n\nif [ \"$svnver\" == \"Unversioned directory\" ]; then\n   if [ -x \"/usr/bin/git\" ]; then\n      svnver=`/usr/bin/git -C $SOURCE_ROOT svn info | grep '^Revision: ' | cut -c 11-`\n   fi\nfi\n\necho \"$svnver\" > $TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Resources/svnversion\n\n#\n# add dynamic libraries to the app bundle - PH\n#\nmkdir -p \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks\"\n\nexport DYLIB=libcrypto.1.0.0.dylib\ncp -f \"$SRCROOT/Libraries/libUniversal/$DYLIB\" \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks\"\n# note: run \"otool -L\" on the library to get the source library name for \"-change\"\ninstall_name_tool -change $DYLIB @loader_path/../Frameworks/$DYLIB \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$PRODUCT_NAME\"\n\nexport DYLIB=libmysqlclient.21.dylib\ncp -f \"$SRCROOT/Libraries/libUniversal/$DYLIB\" \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks\"\ninstall_name_tool -change @rpath/$DYLIB @loader_path/../Frameworks/$DYLIB \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$PRODUCT_NAME\"\n\nexport DYLIB=libpq.dylib\ncp -f \"$SRCROOT/Libraries/libUniversal/$DYLIB\" \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks\"\ninstall_name_tool -change $DYLIB @loader_path/../Frameworks/$DYLIB \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$PRODUCT_NAME\"\n\nexport DYLIB=libssl.1.0.0.dylib\ncp -f \"$SRCROOT/Libraries/libUniversal/$DYLIB\" \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/Frameworks\"\ninstall_name_tool -change $DYLIB @loader_path/../Frameworks/$DYLIB \"$TARGET_BUILD_DIR/$TARGET_NAME.app/Contents/MacOS/$PRODUCT_NAME\"\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -18994,6 +19005,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -19024,7 +19036,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = RelaunchOrca;
 				SDKROOT = "";
-				VALID_ARCHS = i386;
+				VALID_ARCHS = x86_64;
 			};
 			name = Development;
 		};
@@ -19036,6 +19048,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -19060,7 +19073,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = RelaunchOrca;
 				SDKROOT = "";
-				VALID_ARCHS = i386;
+				VALID_ARCHS = x86_64;
 			};
 			name = Deployment;
 		};
@@ -19072,6 +19085,7 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -19096,7 +19110,7 @@
 				MACOSX_DEPLOYMENT_TARGET = "";
 				PRODUCT_NAME = RelaunchOrca;
 				SDKROOT = "";
-				VALID_ARCHS = i386;
+				VALID_ARCHS = x86_64;
 			};
 			name = Default;
 		};
@@ -19104,8 +19118,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				" CFBundlerHelpBookFolder" = OrcaHelp;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
@@ -19116,6 +19130,7 @@
 					"$(inherited)",
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(SRCROOT)",
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -19158,6 +19173,7 @@
 					"$(PROJECT_DIR)/Libraries/libIntel",
 					"$(PROJECT_DIR)/Libraries/exodriver",
 					"$(PROJECT_DIR)/Libraries/libusb",
+					"$(PROJECT_DIR)/Libraries/libUniversal",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_2 = "\"$(SRCROOT)/Libraries\"";
@@ -19167,6 +19183,7 @@
 					"-lz",
 					"-lnetsnmp",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = edu.washington.npl.orca;
 				PRODUCT_NAME = Orca;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -19182,11 +19199,11 @@
 		84F201BC0B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				CFBundleHelpBookName = OrcaHelp;
 				CFBundlerHelpBookFolder = OrcaHelp;
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
-				CODE_SIGN_IDENTITY = "Don't Code Sign";
+				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = NO;
@@ -19195,6 +19212,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(SRCROOT)",
 					/Users/markhowe/Dev/Orca,
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -19234,6 +19252,7 @@
 					"$(PROJECT_DIR)/Libraries/libIntel",
 					"$(PROJECT_DIR)/Libraries/exodriver",
 					"$(PROJECT_DIR)/Libraries/libusb",
+					"$(PROJECT_DIR)/Libraries/libUniversal",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
@@ -19243,6 +19262,7 @@
 					"-lnetsnmp",
 					"-lz",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = edu.washington.npl.orca;
 				PRODUCT_NAME = Orca;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -19256,7 +19276,7 @@
 		84F201BD0B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
@@ -19266,6 +19286,7 @@
 					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
 					"$(SRCROOT)",
 					/Users/markhowe/Dev/Orca,
+					"$(PROJECT_DIR)/Frameworks",
 				);
 				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Frameworks\"";
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
@@ -19307,6 +19328,7 @@
 					"$(PROJECT_DIR)/Libraries/libIntel",
 					"$(PROJECT_DIR)/Libraries/exodriver",
 					"$(PROJECT_DIR)/Libraries/libusb",
+					"$(PROJECT_DIR)/Libraries/libUniversal",
 				);
 				LIBRARY_SEARCH_PATHS_QUOTED_2 = "\"$(SRCROOT)/Libraries\"";
 				LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/Libraries/libUniversal\"";
@@ -19316,6 +19338,7 @@
 					"-lz",
 					"-Wl,-stack_size,1000000",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = edu.washington.npl.orca;
 				PRODUCT_NAME = Orca;
 				SDKROOT = "";
 				SECTORDER_FLAGS = "";
@@ -19329,13 +19352,35 @@
 		84F201BF0B6531990084F4C3 /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = __ORCA_DEVELOPMENT__CONFIGURATION__;
 				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_GLOBAL_CONSTRUCTORS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_CHECK_SWITCH_STATEMENTS = YES;
 				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = YES;
 				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
@@ -19356,7 +19401,7 @@
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = "";
@@ -19367,10 +19412,32 @@
 		84F201C00B6531990084F4C3 /* Deployment */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
@@ -19379,8 +19446,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = "";
 				STRIP_INSTALLED_PRODUCT = YES;
 			};
@@ -19389,10 +19457,32 @@
 		84F201C10B6531990084F4C3 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = "";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_PEDANTIC = YES;
 				GCC_WARN_SHADOW = YES;
 				GCC_WARN_SIGN_COMPARE = YES;
@@ -19401,8 +19491,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNKNOWN_PRAGMAS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
 				SDKROOT = "";
 				STRIP_INSTALLED_PRODUCT = NO;
 			};

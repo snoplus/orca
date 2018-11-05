@@ -307,9 +307,9 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (long) readFromGPIBDevice: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) readFromGPIBDevice: (char*) aData maxLength: (int32_t) aMaxLength
 {
-    long		returnLength = 0;
+    int32_t		returnLength = 0;
     
     @try {
         if ( [ self isConnected ] )
@@ -366,8 +366,8 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (long) writeReadGPIBDevice: (NSString*) aCommand data: (char*) aData
-                   maxLength: (long) aMaxLength
+- (int32_t) writeReadGPIBDevice: (NSString*) aCommand data: (char*) aData
+                   maxLength: (int32_t) aMaxLength
 {
     [ self writeToGPIBDevice: aCommand ];
     return( [ self readFromGPIBDevice: aData maxLength: aMaxLength ] );
@@ -440,7 +440,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (double) convertStringToDouble: (char*) aString withLength: (long) aLength
+- (double) convertStringToDouble: (char*) aString withLength: (int32_t) aLength
 {
 	char 	*tmpString;
 	double	retVal = 0.0;
@@ -462,7 +462,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (float) convertStringToFloat: (char*) aString withLength: (long) aLength
+- (float) convertStringToFloat: (char*) aString withLength: (int32_t) aLength
 {
 	char 	*tmpString;
 	float	retVal = 0.0;
@@ -477,22 +477,22 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
 
 //--------------------------------------------------------------------------------
 /*!\method  convertStringToLong 
- * \brief	This converts a number at the end of a returned string to a long.
+ * \brief	This converts a number at the end of a returned string to a int32_t.
  * \param	aString		- The string to search.
  * \param	aLength		- The length of the string.
  * \return	The number.
  * \note	
  */
 //--------------------------------------------------------------------------------
-- (long) convertStringToLong: (char*) aString withLength: (long) aLength
+- (int32_t) convertStringToLong: (char*) aString withLength: (int32_t) aLength
 {
 	char 	*tmpString;
-	long	retVal = -32767;
+	int32_t	retVal = -32767;
 	
 	tmpString = [ self findNumber: aString withLength: aLength ];
 	if ( tmpString )
 	{
-		retVal = atol( tmpString );	
+		retVal = (int32_t)atol( tmpString );	
 	}
 	return( retVal );
 }
@@ -507,7 +507,7 @@ NSString*   ORGpibDeviceConnectedNotification			= @"GPIB Device connected";
  * \note	This routine can handle a full return or just a number return.
  */
 //--------------------------------------------------------------------------------
-- (char*) findNumber: (char*) aString withLength: (long) aLength
+- (char*) findNumber: (char*) aString withLength: (int32_t) aLength
 {
 	short i = 0;
 	short j = 0;
@@ -565,8 +565,8 @@ static NSString *ORGpibSecondaryAddress			= @"ORGpib Secondary Address";
     
     [[ self undoManager ] disableUndoRegistration ];
     
-    [ self setPrimaryAddress: [ aDecoder decodeIntForKey: ORGpibPrimaryAddress ]]; 
-    [ self setSecondaryAddress: [ aDecoder decodeIntForKey: ORGpibSecondaryAddress ]];
+    [ self setPrimaryAddress: [ aDecoder decodeIntegerForKey: ORGpibPrimaryAddress ]]; 
+    [ self setSecondaryAddress: [ aDecoder decodeIntegerForKey: ORGpibSecondaryAddress ]];
     
     [[ self undoManager ] enableUndoRegistration];
     
@@ -586,8 +586,8 @@ static NSString *ORGpibSecondaryAddress			= @"ORGpib Secondary Address";
 - (void) encodeWithCoder: (NSCoder*) anEncoder
 {
     [ super encodeWithCoder: anEncoder ];
-    [ anEncoder encodeInt: mPrimaryAddress forKey: ORGpibPrimaryAddress ];
-    [ anEncoder encodeInt: mSecondaryAddress forKey: ORGpibSecondaryAddress ];
+    [ anEncoder encodeInteger: mPrimaryAddress forKey: ORGpibPrimaryAddress ];
+    [ anEncoder encodeInteger: mSecondaryAddress forKey: ORGpibSecondaryAddress ];
 }
 
 - (void) addObjectInfoToArray:(NSMutableArray*)anArray

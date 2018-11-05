@@ -188,7 +188,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"MKS660B (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"MKS660B (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -325,7 +325,7 @@
 	NSString* format = [NSString stringWithFormat:@"%%.%df",4 - [model decimalPtPosition]];
 	NSString* theValue = [NSString stringWithFormat:format,[model pressure]];
 	[pressureField setStringValue:theValue];
-	unsigned long t = [model timeMeasured];
+	uint32_t t = [model timeMeasured];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -446,7 +446,7 @@
 
 - (void) decimalPtPositionAction:(id)sender
 {
-	[model setDecimalPtPosition:[sender indexOfSelectedItem]];
+	[model setDecimalPtPosition:(int)[sender indexOfSelectedItem]];
 	[model writeDecimalPtPosition];
 	[model performSelector:@selector(readPressure) withObject:nil afterDelay:.1];
 }
@@ -460,7 +460,7 @@
     [alert setInformativeText:@"This will read the values that are in the hardware unit and put those values into the dialog.\n\nReally do this?"];
     [alert addButtonWithTitle:@"Yes/Do It"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -483,7 +483,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) loadDialogDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model readAndLoad];
     }
 }
@@ -518,19 +518,19 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) lowSetPointAction:(id)sender;
 {
-	int index = [[sender selectedCell] tag];
+	int index = (int)[[sender selectedCell] tag];
 	float theValue = [[sender selectedCell] floatValue] * powf(10.,4-[model decimalPtPosition]);;
 	[model setLowSetPoint:index withValue:theValue];
 }
 
 - (IBAction) highSetPointAction:(id)sender;
 {
-	int index = [[sender selectedCell] tag];
+	int index = (int)[[sender selectedCell] tag];
 	float theValue = [[sender selectedCell] floatValue] * powf(10.,4-[model decimalPtPosition]);
 	[model setHighSetPoint:index withValue:theValue];
 }
@@ -552,7 +552,7 @@
     [alert setInformativeText:@"This will zero the display.\n\nReally do this?"];
     [alert addButtonWithTitle:@"YES/Do it"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -575,7 +575,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) zeroDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model writeZeroDisplay];
     }
 }
@@ -590,7 +590,7 @@
     [alert setInformativeText:@"This will make the current value the full scale value.\n\nReally do this?"];
     [alert addButtonWithTitle:@"YES/Do it"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -613,7 +613,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) fullScaleDidFinish:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model writeFullScale];
 		[ORTimer delay:1];
 		[model writeFullScale]; //have to write it twice with a delay
@@ -624,12 +624,12 @@
 #pragma mark ***Data Source
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[model timeRate] count];
+	return (int)[[model timeRate] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int count = [[model timeRate] count];
+	int count = (int)[[model timeRate] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate]timeSampledAtIndex:index];
 	*yValue = [[model timeRate] valueAtIndex:index];

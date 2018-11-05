@@ -206,7 +206,7 @@
 
 - (void) pixelBusEnableRegChanged:(NSNotification*)aNote
 {
-	[pixelBusEnableRegTextField setIntValue: [model pixelBusEnableReg]];
+	[pixelBusEnableRegTextField setIntegerValue: [model pixelBusEnableReg]];
 	int i;
 	for(i=0;i<20;i++){
 		[[pixelBusEnableRegMatrix cellWithTag:i] setIntValue: ([model pixelBusEnableReg] & (0x1 <<i))];
@@ -237,49 +237,49 @@
 
 - (void) clockTimeChanged:(NSNotification*)aNote
 {
-	[[countersMatrix cellWithTag:5] setIntValue:[model clockTime]];
+	[[countersMatrix cellWithTag:5] setIntegerValue:[model clockTime]];
 }
 
 - (void) runTimeChanged:(NSNotification*)aNote
 {
-	unsigned long long t=[model runTime];
+	uint64_t t=[model runTime];
 	[[countersMatrix cellWithTag:0] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) vetoTimeChanged:(NSNotification*)aNote
 {
-	//unsigned long long t=[model vetoTime];
+	//uint64_t t=[model vetoTime];
 	//[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) deadTimeChanged:(NSNotification*)aNote
 {
-	unsigned long long t=[model deadTime];
+	uint64_t t=[model deadTime];
 	[[countersMatrix cellWithTag:1] setStringValue: [NSString stringWithFormat:@"%.3f",t/1.E7]];
 }
 
 - (void) lostEventsChanged:(NSNotification*)aNote
 {
-    unsigned long long t=[model lostEvents];
+    uint64_t t=[model lostEvents];
     [[countersMatrix cellWithTag:2] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 }
 
 - (void) lostFltEventsChanged:(NSNotification*)aNote
 {
-    unsigned long long t=[model lostFltEvents];
+    uint64_t t=[model lostFltEvents];
     [[countersMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 }
 
 - (void) lostFltEventsTrChanged:(NSNotification*)aNote
 {
-    unsigned long long t=[model lostFltEventsTr];
+    uint64_t t=[model lostFltEventsTr];
     [[countersMatrix cellWithTag:3] setStringValue: [NSString stringWithFormat:@"%llu",t]];
 }
 
 
 - (void) secondsSetChanged:(NSNotification*)aNote
 {
-	[secondsSetField setIntValue: [model secondsSet]];
+	[secondsSetField setIntegerValue: [model secondsSet]];
 }
 
 - (void) statusRegChanged:(NSNotification*)aNote
@@ -288,12 +288,12 @@
         [self performSelectorOnMainThread:@selector(statusRegChanged:) withObject:aNote waitUntilDone:NO];
         return;
     }
-	unsigned long statusReg = [model statusReg];
+	uint32_t statusReg = [model statusReg];
 	[[statusMatrix cellWithTag:0] setStringValue: IsBitSet(statusReg,kStatusFltRq)?@"ERR":@"OK"];
 	[[statusMatrix cellWithTag:1] setStringValue: IsBitSet(statusReg,kStatusWDog)?@"ERR":@"OK"];
 	[[statusMatrix cellWithTag:2] setStringValue: IsBitSet(statusReg,kStatusPixErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:3] setStringValue: IsBitSet(statusReg,kStatusPpsErr)?@"ERR":@"OK"]; 
-	[[statusMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"0x%02lx",ExtractValue(statusReg,kStatusClkErr,4)]];
+	[[statusMatrix cellWithTag:4] setStringValue: [NSString stringWithFormat:@"0x%02x",ExtractValue(statusReg,kStatusClkErr,4)]];
 	[[statusMatrix cellWithTag:5] setStringValue: IsBitSet(statusReg,kStatusGpsErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:6] setStringValue: IsBitSet(statusReg,kStatusVttErr)?@"ERR":@"OK"]; 
 	[[statusMatrix cellWithTag:7] setStringValue: IsBitSet(statusReg,kStatusFanErr)?@"ERR":@"OK"]; 
@@ -340,7 +340,7 @@
 
 - (void) interruptMaskChanged:(NSNotification*)aNote
 {
-	unsigned long aMaskValue = [model interruptMask];
+	uint32_t aMaskValue = [model interruptMask];
 	int i;
 	for(i=0;i<16;i++){
 		if(aMaskValue & (1L<<i))[[interruptMaskMatrix cellWithTag:i] setIntValue:1];
@@ -458,14 +458,14 @@
 
 - (void) hwVersionChanged:(NSNotification*) aNote
 {
-	NSString* s = [NSString stringWithFormat:@"%lu 0x%lx,0x%lx",[model projectVersion],[model documentVersion],[model implementation]];
+	NSString* s = [NSString stringWithFormat:@"%u 0x%x,0x%x",[model projectVersion],[model documentVersion],[model implementation]];
 	[hwVersionField setStringValue:s];
 }
 
 - (void) writeValueChanged:(NSNotification*) aNote
 {
 	[self updateStepper:regWriteValueStepper setting:[model writeValue]];
-	[regWriteValueTextField setIntValue:[model writeValue]];
+	[regWriteValueTextField setIntegerValue:[model writeValue]];
 }
 
 - (void) selectedRegIndexChanged:(NSNotification*) aNote
@@ -479,8 +479,8 @@
 
 - (void) controlRegChanged:(NSNotification*)aNote
 {
-	unsigned long value = [model controlReg];
-	unsigned long aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
+	uint32_t value = [model controlReg];
+	uint32_t aMask = (value & kCtrlInhEnMask)>>kCtrlInhEnShift;
     int i;
 	for(i=0;i<4;i++)[[inhibitEnableMatrix cellWithTag:i] setIntValue:aMask & (0x1<<i)];
 	
@@ -584,28 +584,28 @@
 
 - (IBAction) inhibitEnableAction:(id)sender;
 {
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	int i;
 	for(i=0;i<4;i++){
 		if([[inhibitEnableMatrix cellWithTag:i] intValue]) aMask |= (1L<<i);
 		else aMask &= ~(1L<<i);
 	}
-	unsigned long theRegValue = [model controlReg] & ~kCtrlInhEnMask; 
+	uint32_t theRegValue = [model controlReg] & ~kCtrlInhEnMask; 
 	theRegValue |= (aMask<<kCtrlInhEnShift);
 	[model setControlReg:theRegValue];
 }
 
 - (IBAction) testPatternEnableAction:(id)sender;
 {
-	unsigned long aMask       = [[testPatternEnableMatrix selectedCell] tag];
-	unsigned long theRegValue = [model controlReg] & ~kCtrlTpEnMask; 
+	uint32_t aMask       = (uint32_t)[[testPatternEnableMatrix selectedCell] tag];
+	uint32_t theRegValue = [model controlReg] & ~kCtrlTpEnMask; 
 	theRegValue |= (aMask<<kCtrlTpEnEnShift);
 	[model setControlReg:theRegValue];
 }
 
 - (IBAction) miscCntrlBitsAction:(id)sender;
 {
-	unsigned long theRegValue = [model controlReg] & ~(kCtrlPPSMask | kCtrlShapeMask | kCtrlRunMask | kCtrlTstSltMask | kCtrlIntEnMask | kCtrlLedOffmask); 
+	uint32_t theRegValue = [model controlReg] & ~(kCtrlPPSMask | kCtrlShapeMask | kCtrlRunMask | kCtrlTstSltMask | kCtrlIntEnMask | kCtrlLedOffmask); 
 	if([[miscCntrlBitsMatrix cellWithTag:0] intValue])	theRegValue |= kCtrlPPSMask;
 	if([[miscCntrlBitsMatrix cellWithTag:1] intValue])	theRegValue |= kCtrlShapeMask;
 	if([[miscCntrlBitsMatrix cellWithTag:2] intValue])	theRegValue |= kCtrlRunMask;
@@ -624,12 +624,12 @@
 
 - (IBAction) pollRateAction:(id)sender
 {
-    [model setPollTime:[[pollRatePopup selectedItem] tag]];
+    [model setPollTime:(int)[[pollRatePopup selectedItem] tag]];
 }
 
 - (IBAction) interruptMaskAction:(id)sender
 {
-	unsigned long aMaskValue = 0;
+	uint32_t aMaskValue = 0;
 	int i;
 	for(i=0;i<16;i++){
 		if([[interruptMaskMatrix cellWithTag:i] intValue]) aMaskValue |= (1L<<i);
@@ -685,7 +685,7 @@
 		NSLogFont(aFont,@"Seconds    : %d\n",  [model getSeconds]);
 		[model printInterruptMask];
 		[model printInterruptRequests];
-	    long fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
+	    int32_t fdhwlibVersion = [model getFdhwlibVersion];  //TODO: write a method [model printFdhwlibVersion];
 	    int ver=(fdhwlibVersion>>16) & 0xff,maj =(fdhwlibVersion>>8) & 0xff,min = fdhwlibVersion & 0xff;
 	    NSLogFont(aFont,@"%@: SBC PrPMC running with fdhwlib version: %i.%i.%i (0x%08x)\n",[model fullID],ver,maj,min, fdhwlibVersion);
 	    NSLogFont(aFont,@"SBC PrPMC readout code version: %i \n", [model getSBCCodeVersion]);
@@ -725,9 +725,9 @@
 
 - (IBAction) readRegAction: (id) sender
 {
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
-		unsigned long value = [model readReg:index];
+		uint32_t value = [model readReg:index];
 		NSLog(@"SLT reg: %@ value: 0x%x (%u)\n",[model getRegisterName:index],value,value);
 	}
 	@catch(NSException* localException) {
@@ -739,7 +739,7 @@
 - (IBAction) writeRegAction: (id) sender
 {
 	[self endEditing];
-	int index = [registerPopUp indexOfSelectedItem];
+	int index = (int)[registerPopUp indexOfSelectedItem];
 	@try {
 		[model writeReg:index value:[model writeValue]];
 		NSLog(@"wrote 0x%x to SLT reg: %@ \n",[model writeValue],[model getRegisterName:index]);
@@ -792,7 +792,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -842,7 +842,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -894,7 +894,7 @@
     [alert setInformativeText:@"Is this really what you want?"];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:@"Yes, Kill Crate"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertSecondButtonReturn){
@@ -998,7 +998,7 @@
     [alert setInformativeText:  @"Really run threshold calibration for ALL FLTs?\n This will change ALL thresholds on ALL cards."];
     [alert addButtonWithTitle:  @"Yes/Do Calibrate"];
     [alert addButtonWithTitle:  @"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){

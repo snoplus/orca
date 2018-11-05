@@ -107,11 +107,11 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
     
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeCopy fraction:1.0];
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationCopy fraction:1.0];
     
     if([self uniqueIdNumber]){
         NSAttributedString* n = [[NSAttributedString alloc] 
-                                initWithString:[NSString stringWithFormat:@"%lu",[self uniqueIdNumber]]
+                                initWithString:[NSString stringWithFormat:@"%u",[self uniqueIdNumber]]
                                     attributes:[NSDictionary dictionaryWithObject:[NSFont labelFontOfSize:12] forKey:NSFontAttributeName]];
         
         [n drawInRect:NSMakeRect(3,[i size].height-17,[i size].width-20,16)];
@@ -424,7 +424,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
         [self setDataSet:[[[ORDataSet alloc]initWithKey:@"System" guardian:nil] autorelease] ];
     }
 	  
-	long runNumber = -1;
+	int32_t runNumber = -1;
 	if(userInfo){
 		runNumber = [[userInfo objectForKey:kRunNumber] intValue];
 	}
@@ -432,7 +432,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 		id header = [userInfo objectForKey:kHeader];
 		NSArray* dataChainObjects = [header objectForNestedKey:@"ObjectInfo,DataChain"];
 		NSDictionary* runControlEntry = [(NSDictionary*)[dataChainObjects objectAtIndex:0] objectForKey:@"Run Control"];
-		runNumber = [[runControlEntry objectForKey:@"RunNumber"] longValue];
+		runNumber = (uint32_t)[[runControlEntry objectForKey:@"RunNumber"] longValue];
 	}	  
 	[dataSet setRunNumber:runNumber];
 	
@@ -513,7 +513,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 }
 
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(ORDataSet*)item
+- (NSUInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(ORDataSet*)item
 {
     return (item == nil) ? 1  : [item numberOfChildren];
 }
@@ -536,7 +536,7 @@ static NSString *ORHistoPassThruConnection 	= @"Histogrammer PassThru Connector"
 
 - (NSUInteger)  numberOfChildren
 {
-    int count =  [dataSet count];
+    NSUInteger count =  [dataSet count];
     return count;
 }
 
@@ -601,7 +601,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
     [self setDecodingDisabled:[decoder decodeBoolForKey:@"decodingDisabled"]];
     [self setShipFinalHistograms:[decoder decodeBoolForKey:@"shipFinalHistograms"]];
     [self setDirectoryName:[decoder decodeObjectForKey:ORHistoDirName]];
-    [self setWriteFile:[decoder decodeIntForKey:ORHistoWriteFile]];
+    [self setWriteFile:[decoder decodeIntegerForKey:ORHistoWriteFile]];
     [self setDataSet:[decoder decodeObjectForKey:ORHistoDataSet]];
     [self setMultiPlots:[decoder decodeObjectForKey:ORHistoMultiPlots]];
     [[self undoManager] enableUndoRegistration];
@@ -618,7 +618,7 @@ static NSString *ORHistoMultiPlots 				= @"Histo Multiplot Set";
     [encoder encodeBool:accumulate forKey:@"accumulate"];
     [encoder encodeBool:shipFinalHistograms forKey:@"shipFinalHistograms"];
     [encoder encodeObject:[self directoryName] forKey:ORHistoDirName];
-    [encoder encodeInt:[self writeFile] forKey:ORHistoWriteFile];
+    [encoder encodeInteger:[self writeFile] forKey:ORHistoWriteFile];
     [encoder encodeObject:dataSet forKey:ORHistoDataSet];
     [encoder encodeObject:[self multiPlots] forKey:ORHistoMultiPlots];
 }

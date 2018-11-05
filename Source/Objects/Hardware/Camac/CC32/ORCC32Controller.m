@@ -277,7 +277,7 @@
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
 {
-    int theTag = [menuItem tag];
+    int theTag = (int)[menuItem tag];
     if([helpStrings count]) return [[[helpStrings objectAtIndex:theTag] objectForKey:@"Active"] boolValue];
     else return NO;
 }
@@ -334,7 +334,7 @@
         statusCC32 = [model execute];
 	}
 	@catch(NSException* localException) {
-        int i = [cmdSelectPopUp indexOfSelectedItem];
+        int i = (int)[cmdSelectPopUp indexOfSelectedItem];
         NSDictionary* dict = [helpStrings objectAtIndex:i];
         NSString* name = [dict objectForKey:@"Name"];
         
@@ -446,7 +446,7 @@
 - (IBAction) readLamMaskAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    unsigned long maskValue;
+    uint32_t maskValue;
     @try {
         [model checkCratePower];
         statusCC32 = [model readLAMMask:&maskValue];
@@ -465,7 +465,7 @@
 - (IBAction) readLamStationsAction:(id)sender
 {
     unsigned short statusCC32 = 0;
-    unsigned long value;
+    uint32_t value;
     @try {
         [model checkCratePower];
         statusCC32 = [model readLAMStations:&value];
@@ -610,7 +610,7 @@
 {
 	if([sender indexOfSelectedItem] != [model cmdSelection]){
 		[[self undoManager] setActionName: @"Set Camac Command Number"];
-        [model setCmdSelection:[sender indexOfSelectedItem]];
+        [model setCmdSelection:(int)[sender indexOfSelectedItem]];
 	}
 }
 

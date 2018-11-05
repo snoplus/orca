@@ -415,14 +415,14 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3820ModelLemoInModeChanged object:self];
 }
 
-- (unsigned long) counts:(int)i
+- (uint32_t) counts:(int)i
 {
 	if(i>=0 && i<32)return counts[i];
 	else return 0;
 }
 
-- (unsigned long) countEnableMask { return countEnableMask; }
-- (void) setCountEnableMask:(unsigned long)aCountEnableMask
+- (uint32_t) countEnableMask { return countEnableMask; }
+- (void) setCountEnableMask:(uint32_t)aCountEnableMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setCountEnableMask:countEnableMask];
     countEnableMask = aCountEnableMask;
@@ -434,14 +434,14 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 - (void) setCountEnabled:(short)chan withValue:(BOOL)aValue		
 { 
 	NSLog(@"setting %d to %d\n",chan,aValue);
-	unsigned long aMask = countEnableMask;
+	uint32_t aMask = countEnableMask;
 	if(aValue)aMask |= (1L<<chan);
 	else aMask &= ~(1L<<chan);
 	[self setCountEnableMask:aMask];
 }
 
-- (unsigned long) overFlowMask { return overFlowMask; }
-- (void) setOverFlowMask:(unsigned long)aMask
+- (uint32_t) overFlowMask { return overFlowMask; }
+- (void) setOverFlowMask:(uint32_t)aMask
 {
     overFlowMask = aMask;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORSIS3820ModelOverFlowMaskChanged object:self];
@@ -463,7 +463,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 #pragma mark •••Hardware Access
 - (void) generateTestPulse
 {
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kKeyTestPulse
 						numToWrite:1
@@ -474,7 +474,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) arm
 {
-	unsigned long result = 0;
+	uint32_t result = 0;
 	[[self adapter] writeLongBlock:&result
 						atAddress:[self baseAddress] + kKeyOpArm
                         numToWrite:1
@@ -484,7 +484,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) readModuleID:(BOOL)verbose
 {	
-	unsigned long result = 0;
+	uint32_t result = 0;
 	[[self adapter] readLongBlock:&result
                          atAddress:[self baseAddress] + kModuleIDReg
                         numToRead:1
@@ -513,7 +513,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 }
 - (void) readStatusRegister
 {		
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	[[self adapter] readLongBlock:&aMask
                          atAddress:[self baseAddress] + kControlStatus
                         numToRead:1
@@ -524,7 +524,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) writeControlRegister
 {
-	unsigned long aMask = 0x0;
+	uint32_t aMask = 0x0;
 	aMask |= 
 	((enable25MHzPulses & 0x1) << 4)		|
 	((enableCounterTestMode & 0x1) << 5)	|
@@ -542,7 +542,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) writeAcquisitionRegister
 {
-	unsigned long aMask = 0x0;
+	uint32_t aMask = 0x0;
 	aMask |= ((lemoInMode  & 0x7) << 16) |
 			 ((lemoOutMode & 0x3) << 20) |
 			 ((invertLemoOut & 0x1) << 23) |
@@ -559,7 +559,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) setLed:(BOOL)state
 {
-	unsigned long aValue;
+	uint32_t aValue;
 	if(state)	aValue = kSwitchUserLEDOn;
 	else		aValue = kSwitchUserLEDOff;
 	
@@ -580,7 +580,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) clockShadow
 {
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kKeyVmeLneClockShadow
                         numToWrite:1
@@ -607,7 +607,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 	}
 	[self readOverFlowRegister];
 	if(clear){
-		unsigned long aValue = 0xffffffff;
+		uint32_t aValue = 0xffffffff;
 		[[self adapter] writeLongBlock:&aValue
 							 atAddress:[self baseAddress] + kCounterClear
 							numToWrite:1
@@ -623,7 +623,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) readOverFlowRegister
 {
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	[[self adapter] readLongBlock:&aValue
 						 atAddress:[self baseAddress] + kCounterOverflowRdAndClr
 						 numToRead: 1
@@ -644,7 +644,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) writeCountEnableMask
 {
-	unsigned long aValue = ~countEnableMask;
+	uint32_t aValue = ~countEnableMask;
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kInhibitCountDisable
 						numToWrite:1
@@ -654,7 +654,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) clearAllOverFlowFlags
 {
-	unsigned long aMask = 0xffffffff;
+	uint32_t aMask = 0xffffffff;
 	[[self adapter] writeLongBlock:&aMask
 						 atAddress:[self baseAddress] + kCounterOverflowRdAndClr
 						numToWrite:1
@@ -667,7 +667,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) clearAll
 {
-	unsigned long aValue = 0xffffffff;
+	uint32_t aValue = 0xffffffff;
 	[[self adapter] writeLongBlock:&aValue
 					atAddress:[self baseAddress] + kCounterClear
 					numToWrite:1
@@ -682,7 +682,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) clearCounter:(int)i
 {
-	unsigned long aMask = (1L<<i);
+	uint32_t aMask = (uint32_t)(1L<<i);
 	
 	[[self adapter] writeLongBlock:&aMask
 						 atAddress:[self baseAddress] + kCounterClear
@@ -696,7 +696,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) enableReferencePulser:(BOOL)state
 {
-	unsigned long aValue = (state?kSwitchOnRefPulser:kSwitchOnRefPulser);
+	uint32_t aValue = (state?kSwitchOnRefPulser:kSwitchOnRefPulser);
 
 	[[self adapter] writeLongBlock:&aValue
 						 atAddress:[self baseAddress] + kControlStatus
@@ -708,8 +708,8 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 }
 
 #pragma mark •••Data Taker
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -786,7 +786,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
     NSMutableDictionary* objDictionary = [super addParametersToDictionary:dictionary];
 	[objDictionary setObject:[NSNumber numberWithLong:countEnableMask] forKey:@"countEnableMask"];
 
-	unsigned long options =	
+	uint32_t options =	
 		lemoInMode				 | 
 		enable25MHzPulses<<3	 | 
 		enableCounterTestMode<<4	 |
@@ -850,7 +850,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) reset
 {
- 	unsigned long aValue = 0; //value doesn't matter 
+ 	uint32_t aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kKeyReset
                         numToWrite:1
@@ -862,7 +862,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 - (void) startCounting
 {
 	[self initBoard];
- 	unsigned long aValue = 0; //value doesn't matter 
+ 	uint32_t aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kKeyOpEnable
                         numToWrite:1
@@ -874,7 +874,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 
 - (void) stopCounting
 {
-	unsigned long aValue = 0; //value doesn't matter 
+	uint32_t aValue = 0; //value doesn't matter 
 	[[self adapter] writeLongBlock:&aValue
                          atAddress:[self baseAddress] + kKeyOpDisable
                         numToWrite:1
@@ -913,7 +913,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
     [self setEnable25MHzPulses:[decoder decodeBoolForKey:@"enable25MHzPulses"]];
     [self setLemoInMode:[decoder decodeIntForKey:@"lemoInMode"]];
     [self setPollTime:[decoder decodeIntForKey:@"pollTime"]];
-    [self setCountEnableMask:[decoder decodeInt32ForKey:@"countEnableMask"]];
+    [self setCountEnableMask:[decoder decodeIntForKey:@"countEnableMask"]];
 	int i;
 	for(i=0;i<32;i++) {
 		NSString* aName = [decoder decodeObjectForKey:[NSString stringWithFormat:@"channelName%d",i]];
@@ -930,7 +930,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 {
     [super encodeWithCoder:encoder];
 	[encoder encodeBool:showDeadTime forKey:@"showDeadTime"];
-	[encoder encodeInt:deadTimeRefChannel forKey:@"deadTimeRefChannel"];
+	[encoder encodeInteger:deadTimeRefChannel forKey:@"deadTimeRefChannel"];
 	[encoder encodeBool:shipAtRunEndOnly forKey:@"shipAtRunEndOnly"];
 	[encoder encodeBool:invertLemoOut forKey:@"invertLemoOut"];
     [encoder encodeBool:invertLemoIn forKey:@"invertLemoIn"];
@@ -940,9 +940,9 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
     [encoder encodeBool:enableReferencePulser forKey:@"enableReferencePulser"];
     [encoder encodeBool:enableCounterTestMode forKey:@"enableCounterTestMode"];
     [encoder encodeBool:enable25MHzPulses forKey:@"enable25MHzPulses"];
-    [encoder encodeInt:lemoInMode forKey:@"lemoInMode"];
-    [encoder encodeInt:pollTime forKey:@"pollTime"];
-    [encoder encodeInt32:countEnableMask forKey:@"countEnableMask"];
+    [encoder encodeInteger:lemoInMode forKey:@"lemoInMode"];
+    [encoder encodeInteger:pollTime forKey:@"pollTime"];
+    [encoder encodeInt:countEnableMask forKey:@"countEnableMask"];
 	int i;
 	for(i=0;i<32;i++) {
 		[encoder encodeObject:channelName[i] forKey:[NSString stringWithFormat:@"channelName%d",i]];
@@ -956,7 +956,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 {
 	time_t	ut_Time;
 	time(&ut_Time);
-	timeMeasured = ut_Time;
+	timeMeasured = (uint32_t)ut_Time;
 }
 
 - (void) shipData
@@ -964,7 +964,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 	if([[ORGlobal sharedGlobal] runInProgress]){
 		if(!shipAtRunEndOnly || endOfRun){
 			endOfRun = NO;
-			unsigned long data[kSIS3820DataLen];
+			uint32_t data[kSIS3820DataLen];
 			data[0] = dataId | kSIS3820DataLen;
 			data[1] = (([self crateNumber]&0x0000000f)<<21) | (([self slot]& 0x0000001f)<<16);
 			if(moduleID == 3820)data[1] |= 1;
@@ -987,7 +987,7 @@ NSString* ORSIS3820ModelShipAtRunEndOnlyChanged		 = @"ORSIS3820ModelShipAtRunEnd
 				data[7+i] = counts[i];
 			}
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:sizeof(long)*kSIS3820DataLen]];
+																object:[NSData dataWithBytes:data length:sizeof(int32_t)*kSIS3820DataLen]];
 			lastTimeMeasured = timeMeasured;
 		}
 	}

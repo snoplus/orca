@@ -205,10 +205,10 @@ NSString* ORCamacControllerCmdValuesChangedNotification        = @"ORCamacContro
     [super encodeWithCoder:encoder];
     [[self undoManager] disableUndoRegistration];
     [encoder encodeInt:cmdSelection  forKey:@"ORCamacCardCmdSelection"];
-    [encoder encodeInt:cmdStation    forKey:@"ORCamacCardCmdStation"];
-    [encoder encodeInt:cmdSubAddress forKey:@"ORCamacCardCmdSubAddress"];
-    [encoder encodeInt:cmdWriteValue forKey:@"ORCamacCardCmdWriteValue"];
-    [encoder encodeInt:moduleWriteValue forKey:@"ORCamacCardModuleWriteValue"];
+    [encoder encodeInteger:cmdStation    forKey:@"ORCamacCardCmdStation"];
+    [encoder encodeInteger:cmdSubAddress forKey:@"ORCamacCardCmdSubAddress"];
+    [encoder encodeInteger:cmdWriteValue forKey:@"ORCamacCardCmdWriteValue"];
+    [encoder encodeInteger:moduleWriteValue forKey:@"ORCamacCardModuleWriteValue"];
     [encoder encodeObject:[self connector] forKey:@"Connector"];
     [[self undoManager] enableUndoRegistration];
 }

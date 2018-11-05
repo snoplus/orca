@@ -33,7 +33,7 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 @implementation OR1dRoi
 
 #pragma mark ***Initialization
-- (id) initWithMin:(int)aMin max:(int)aMax
+- (id) initWithMin:(int32_t)aMin max:(int32_t)aMax
 {
 	self = [super init];
 	[self setMaxChannel:aMax];
@@ -109,28 +109,28 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 	fft = aFFT;
 }
 
-- (long) minChannel
+- (int32_t) minChannel
 {
     return minChannel;
 }
-- (void) setDefaultMin:(long)aMinChannel max:(long)aMaxChannel
+- (void) setDefaultMin:(int32_t)aMinChannel max:(int32_t)aMaxChannel
 {
 	[self setMinChannel:aMinChannel];
 	[self setMaxChannel:aMaxChannel];
 }
-- (void) setMinChannel:(long)aChannel
+- (void) setMinChannel:(int32_t)aChannel
 {
 	minChannel = aChannel;
     [[NSNotificationCenter defaultCenter] postNotificationName:OR1dRoiMinChanged object:self];
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORPlotViewRedrawEvent object:self];
 }
 
-- (long) maxChannel
+- (int32_t) maxChannel
 {
     return maxChannel;
 }
 
-- (void) setMaxChannel:(long)aChannel
+- (void) setMaxChannel:(int32_t)aChannel
 {
 	maxChannel = aChannel;
     [[NSNotificationCenter defaultCenter] postNotificationName:OR1dRoiMaxChanged object:self];
@@ -186,13 +186,13 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 	double maxX		= 0;
 	double minY		= 3.402e+38;
 	double maxY		= -3.402e+38;
-	long xStart		= [self minChannel];
-	long xEnd		= [self maxChannel];
+	int32_t xStart		= [self minChannel];
+	int32_t xEnd		= [self maxChannel];
 	
-	long x = xStart;
+	int32_t x = xStart;
 	do {
 		double xDummy,y;
-		[dataSource plotter:aPlot index:x x:&xDummy y:&y];
+		[dataSource plotter:aPlot index:(int)x x:&xDummy y:&y];
 		sumY	+= y;
 		sumXY	+= x*y;
 		sumX2Y	+= x*x*y;
@@ -249,40 +249,40 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 
 - (BOOL) mouseDown:(NSEvent*)theEvent inPlotView:(ORPlotView*)aPlotter
 {
-	gate1 = minChannel;
-	gate2 = maxChannel;
-	NSEventType modifierKeys = [theEvent modifierFlags];
-	if((modifierKeys & NSCommandKeyMask) != NSCommandKeyMask){
+	gate1 = (int)minChannel;
+	gate2 = (int)maxChannel;
+	NSEventModifierFlags modifierKeys = [theEvent modifierFlags];
+	if((modifierKeys & NSEventModifierFlagCommand) != NSEventModifierFlagCommand){
 		
 		NSPoint p = [aPlotter convertPoint:[theEvent locationInWindow] fromView:nil];
 		ORAxis* xScale = [aPlotter xScale];
 		int mouseChan = floor([xScale convertPoint:p.x]+.5);
 		startChan = mouseChan;
 		
-		if(([theEvent modifierFlags] & NSAlternateKeyMask) || (gate1 == 0 && gate2 == 0)){
+		if(([theEvent modifierFlags] & NSEventModifierFlagOption) || (gate1 == 0 && gate2 == 0)){
 			dragType = kInitialDrag;
 			gate1 = mouseChan;
 			gate2 = gate1;
 			[self setMinChannel:MIN(gate1,gate2)];
 			[self setMaxChannel:MAX(gate1,gate2)];
 		}
-		else if(!([theEvent modifierFlags] & NSCommandKeyMask)){
+		else if(!([theEvent modifierFlags] & NSEventModifierFlagCommand)){
 			if(fabs([xScale getPixAbs:startChan]-[xScale getPixAbs:[self minChannel]])<3){
 				dragType = kMinDrag;
-				gate1 = [self maxChannel];
-				gate2 = [self minChannel];
+				gate1 = (int)[self maxChannel];
+				gate2 = (int)[self minChannel];
 			}
 			else if(fabs([xScale getPixAbs:startChan]-[xScale getPixAbs:[self maxChannel]])<3){
 				dragType = kMaxDrag;
-				gate1 = [self minChannel];
-				gate2 = [self maxChannel];
+				gate1 = (int)[self minChannel];
+				gate2 = (int)[self maxChannel];
 			}
 			else if([xScale getPixAbs:startChan]>[xScale getPixAbs:[self minChannel]] && [xScale getPixAbs:startChan]<[xScale getPixAbs:[self maxChannel]]){
 				dragType = kCenterDrag;
 			}
 			else dragType = kNoDrag;
 		}
-		else if(([theEvent modifierFlags] & NSCommandKeyMask) &&
+		else if(([theEvent modifierFlags] & NSEventModifierFlagCommand) &&
 				([xScale getPixAbs:startChan]>=[xScale getPixAbs:[self minChannel]] && [xScale getPixAbs:startChan]<=[xScale getPixAbs:[self maxChannel]])){
 			dragType = kCenterDrag;
 		}
@@ -382,8 +382,8 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 {
     self = [super init];
     
-    [self setMinChannel:[decoder decodeInt32ForKey:@"minChannel"]];
-    [self setMaxChannel:[decoder decodeInt32ForKey:@"maxChannel"]];
+    [self setMinChannel:[decoder decodeIntForKey:@"minChannel"]];
+    [self setMaxChannel:[decoder decodeIntForKey:@"maxChannel"]];
 	[self setFit:[decoder decodeObjectForKey:@"fit"]];
 	[self setFFT:[decoder decodeObjectForKey:@"fft"]];
 	if(!fit)[self setFit:[self makeFitObject]];
@@ -394,8 +394,8 @@ NSString* OR1dRoiCurveFitChanged = @"OR1dRoiCurveFitChanged";
 
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
-    [encoder encodeInt32:minChannel forKey:@"minChannel"];
-    [encoder encodeInt32:maxChannel forKey:@"maxChannel"];
+    [encoder encodeInt:minChannel forKey:@"minChannel"];
+    [encoder encodeInt:maxChannel forKey:@"maxChannel"];
 	[encoder encodeObject:fit forKey:@"fit"];
 	[encoder encodeObject:fft forKey:@"fft"];
 }

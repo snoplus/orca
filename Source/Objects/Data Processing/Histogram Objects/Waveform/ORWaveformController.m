@@ -133,21 +133,21 @@
 	[fftController setModel:[topRoi fft]];
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model numberBins];
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	if([[tableColumn identifier] isEqualToString:@"Value"]){
-		return [NSNumber numberWithInt:[model value:row]];
+        return [NSNumber numberWithInteger:[model value:(int)row]];
 	}
     else if([[tableColumn identifier] isEqualToString:@"Hex"]){
-		return [NSString stringWithFormat:@"0x%lx",[model value:row]];
+		return [NSString stringWithFormat:@"0x%x",[model value:(int)row]];
 	}
 
-	else return [NSNumber numberWithInt:row];
+	else return [NSNumber numberWithInteger:row];
 }
 
 - (BOOL) useUnsignedValues
@@ -163,7 +163,7 @@
 
 - (int) numberPointsInPlot:(id)aPlot
 {
-	int numBins = [model numberBins];
+	int numBins = (int)[model numberBins];
 	if(numBins != [[plotView xAxis] maxLimit]){
 	   [[plotView xAxis] setRngLimitsLow:0 withHigh:numBins withMinRng:25];
 	}
@@ -321,21 +321,21 @@
     }
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
 	return [model numberBins];
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(int)row
+- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
 	if([[tableColumn identifier] isEqualToString:@"Value"]){
-		return [NSNumber numberWithInt:[model value:row]];
+		return [NSNumber numberWithInteger:[model value:(uint32_t)row]];
 	}
     else if([[tableColumn identifier] isEqualToString:@"Hex"]){
-		return [NSString stringWithFormat:@"0x%lx",[model value:row]];
+		return [NSString stringWithFormat:@"0x%x",[model value:(uint32_t)row]];
 	}
 
-	else return [NSNumber numberWithInt:row];
+	else return [NSNumber numberWithInteger:row];
 }
 
 - (BOOL) useUnsignedValues
@@ -351,7 +351,7 @@
 
 - (int) numberPointsInPlot:(id)aPlot
 {
-	int numBins = [model numberBins];
+	int numBins = (int)[model numberBins];
 	if(numBins != [[plotView xAxis] maxLimit]){
 	   [[plotView xAxis] setRngLimitsLow:0 withHigh:numBins withMinRng:25];
 	}

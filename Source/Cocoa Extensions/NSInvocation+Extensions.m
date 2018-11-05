@@ -101,7 +101,7 @@
 
 + (SEL) makeSelectorFromArray:(NSArray*)cmdItems
 {
-    int n = [cmdItems count];
+    NSUInteger n = [cmdItems count];
     int i=0;
     NSMutableString* theSelectorString = [NSMutableString string];
     if(n>1)for(i=0;i<n;i+=2){
@@ -130,11 +130,11 @@
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'l'){
-        long c = (long)[aVal intValue];
+        int32_t c = (int32_t)[aVal intValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'q'){
-        long long c = [aVal longLongValue];
+        int64_t c = [aVal longLongValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'C'){
@@ -150,11 +150,11 @@
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'L'){
-        unsigned long c = [aVal unsignedLongValue];
+        uint32_t c = (uint32_t)[aVal unsignedLongValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'Q'){
-        unsigned long long c = [aVal unsignedLongLongValue];
+        uint64_t c = [aVal unsignedLongLongValue];
         [self setArgument:&c atIndex:argIndex];
     }
     else if(*theArg == 'f'){
@@ -177,21 +177,21 @@
     else if(*theArg == '@'){
         [self setArgument:&aVal atIndex:argIndex];
     }
-	else if(!strncmp(theArg,"{_NSPo",6)){
+	else if(!strncmp(theArg,"{_NSPo",6) || !strncmp(theArg,"{CGPoi",6)){
 		aVal = [aVal substringFromIndex:2];
 		aVal = [aVal substringToIndex:[aVal length]-1];
 		NSArray* xy = [aVal componentsSeparatedByString:@","];
 		NSPoint thePoint = NSMakePoint([[xy objectAtIndex:0] floatValue], [[xy objectAtIndex:1] floatValue]);
 		[self setArgument:&thePoint atIndex:argIndex];
 	}
-	else if(!strncmp(theArg,"{_NSRa",6)){
+	else if(!strncmp(theArg,"{_NSRa",6) | !strncmp(theArg,"{CGRan",6)){
 		aVal = [aVal substringFromIndex:2];
 		aVal = [aVal substringToIndex:[aVal length]-1];
 		NSArray* xy = [aVal componentsSeparatedByString:@","];
 		NSRange theRange = NSMakeRange([[xy objectAtIndex:0] floatValue], [[xy objectAtIndex:1] floatValue]);
 		[self setArgument:&theRange atIndex:argIndex];
 	}
-	else if(!strncmp(theArg,"{_NSRe",6)){
+	else if(!strncmp(theArg,"{_NSRe",6) || !strncmp(theArg,"{CGRec",6)){
 		aVal = [aVal substringFromIndex:2];
 		aVal = [aVal substringToIndex:[aVal length]-1];
 		NSArray* xy = [aVal componentsSeparatedByString:@","];
@@ -201,7 +201,7 @@
 									[[xy objectAtIndex:3] floatValue]);
 		[self setArgument:&theRect atIndex:argIndex];
 	}
-	else if(!strncmp(theArg,"{_NSSi",6)){
+	else if(!strncmp(theArg,"{_NSSi",6) || !strncmp(theArg,"{CGSiz",6)){
 		aVal = [aVal substringFromIndex:2];
 		aVal = [aVal substringToIndex:[aVal length]-1];
 		NSArray* xy = [aVal componentsSeparatedByString:@","];
@@ -240,7 +240,7 @@
 		returnValueAsString = [[NSNumber numberWithShort:buffer] stringValue];
     }
     else if(*theArg == 'l'){
-		long buffer;
+		int32_t buffer;
         [self getReturnValue:&buffer]; 
 		returnValueAsString = [[NSNumber numberWithLong:buffer] stringValue];
     }
@@ -260,9 +260,19 @@
 		returnValueAsString = [[NSNumber numberWithUnsignedShort:buffer] stringValue];
     }
     else if(*theArg == 'L'){
-		unsigned long buffer;
+		uint32_t buffer;
         [self getReturnValue:&buffer]; 
 		returnValueAsString = [[NSNumber numberWithUnsignedLong:buffer] stringValue];
+    }
+    else if(*theArg == 'q'){
+        int64_t buffer;
+        [self getReturnValue:&buffer];
+        returnValueAsString = [[NSNumber numberWithLongLong:buffer] stringValue];
+    }
+    else if(*theArg == 'Q'){
+        uint64_t buffer;
+        [self getReturnValue:&buffer];
+        returnValueAsString = [[NSNumber numberWithUnsignedLongLong:buffer] stringValue];
     }
     else if(*theArg == 'f'){
 		float buffer;
@@ -284,22 +294,22 @@
         [self getReturnValue:&obj]; 
 		return obj;
     }
-	else if(!strncmp(theArg,"{_NSPo",6)){
+	else if(!strncmp(theArg,"{_NSPo",6) || !strncmp(theArg,"{CGPoi",6)){
 		NSPoint thePoint;
         [self getReturnValue:&thePoint]; 
 		return [NSString stringWithFormat:@"@(%f,%f)",thePoint.x,thePoint.y];
 	}
-	else if(!strncmp(theArg,"{_NSRa",6)){
+	else if(!strncmp(theArg,"{_NSRa",6) || !strncmp(theArg,"{CGRan",6)){
 		NSRange theRange;
         [self getReturnValue:&theRange]; 
 		return [NSString stringWithFormat:@"@(%f,%f)",(float)theRange.location,(float)theRange.length];
 	}
-	else if(!strncmp(theArg,"{_NSRe",6)){
+	else if(!strncmp(theArg,"{_NSRe",6) || !strncmp(theArg,"{CGRec",6)){
 		NSRect theRect;
         [self getReturnValue:&theRect]; 
 		return [NSString stringWithFormat:@"@(%f,%f,%f,%f)",theRect.origin.x,theRect.origin.y,theRect.size.width,theRect.size.height];
 	}
-	else if(!strncmp(theArg,"{_NSSi",6)){
+	else if(!strncmp(theArg,"{_NSSi",6) || !strncmp(theArg,"{CGSiz",6)){
 		NSSize theSize;
         [self getReturnValue:&theSize]; 
 		return [NSString stringWithFormat:@"@(%f,%f)",theSize.width,theSize.height];
@@ -320,7 +330,7 @@
 	NSArray* pairList = [args componentsSeparatedByString:@"#"];
 	NSMutableArray* orderedList = [NSMutableArray array];
 	NSString* pairString;
-	int n = [pairList count];
+	NSUInteger n = [pairList count];
 	int i;
 	for(i=0;i<n;i++){
 		pairString = [pairList objectAtIndex:i];
@@ -340,17 +350,17 @@
 	int returnLength = 0;
 	if([aTarget respondsToSelector:theSelector]){
 		NSMethodSignature* theSignature = [aTarget methodSignatureForSelector:theSelector];
-		returnLength = [theSignature methodReturnLength];
+		returnLength = (int)[theSignature methodReturnLength];
 		NSInvocation* theInvocation = [NSInvocation invocationWithMethodSignature:theSignature];
 		[theInvocation setSelector:theSelector];
-		int n = [theSignature numberOfArguments]-2; //first two are hidden
+		NSUInteger n = [theSignature numberOfArguments]-2; //first two are hidden
 		int i;
 		int argI;
 		BOOL ok = YES;
 		for(i=1,argI=0 ; i<=n*2 ; i+=2,argI++){
 			id str = [orderedList objectAtIndex:i];
 			NSDecimalNumber* ptrNum = [NSDecimalNumber decimalNumberWithString:str];
-			unsigned long ptr = [ptrNum unsignedLongValue];
+			uint64_t ptr = [ptrNum unsignedLongLongValue];
 			id theVar = (id)(ptr);
 			if(![theInvocation setArgument:argI to:theVar]){
 				ok = NO;

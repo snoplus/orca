@@ -28,7 +28,7 @@
 @class ORPlotFFTController;
 
 @interface ORPlotFFT : ORDataSetModel  {
-    unsigned long dataId;
+    uint32_t dataId;
     NSArray* 	realArray;
     NSArray* 	imaginaryArray;
 	NSArray*	powerSpectrumArray;
@@ -60,7 +60,7 @@
 #pragma mark ¥¥¥Data Source Methods
 - (id)   name;
 - (int)	numberPointsInPlot:(id)aPlotter;
-- (void) plotter:(id)aPlotter index:(unsigned long)i x:(double*)xValue y:(double*)yValue;
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x; 
 @end
 

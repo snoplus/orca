@@ -177,7 +177,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"AMI 286 (Unit %lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"AMI 286 (Unit %u)",[model uniqueIdNumber]]];
 }
 
 - (void) updateWindow
@@ -210,7 +210,7 @@
 
 - (void) expiredTimeChanged:(NSNotification*)aNote
 {
-	[expiredTimeField setIntValue: [model expiredTime]];
+	[expiredTimeField setIntegerValue: [model expiredTime]];
 }
 
 - (void) sendOnExpiredChanged:(NSNotification*)aNote
@@ -351,7 +351,7 @@
 	[[levelMatrix cellWithTag:index] setStringValue:levelAsString];
 	[[level1Matrix cellWithTag:index] setStringValue:levelAsString];
 	
-	unsigned long t = [model timeMeasured:index];
+	uint32_t t = [model timeMeasured:index];
 	NSDate* theDate;
 	if(t){
 		theDate = [NSDate dateWithTimeIntervalSince1970:t];
@@ -526,32 +526,32 @@
 
 - (IBAction) fillStateAction:(id)sender;
 {
-	if([model fillState:[sender tag]] != [sender indexOfSelectedItem]){
-		[model setFillState:[sender tag] value:[sender indexOfSelectedItem]];
+	if([model fillState:(int)[sender tag]] != [sender indexOfSelectedItem]){
+		[model setFillState:(int)[sender tag] value:(int)[sender indexOfSelectedItem]];
 	}
 }
 
 - (IBAction) hiAlarmAction:(id)sender
 {
-	int index = [[hiAlarmMatrix selectedCell] tag];
+	int index = (int)[[hiAlarmMatrix selectedCell] tag];
 	[model setHiAlarmLevel:index value:[sender floatValue]];
 }
 
 - (IBAction) lowAlarmAction:(id)sender
 {
-	int index = [[lowAlarmMatrix selectedCell] tag];
+	int index = (int)[[lowAlarmMatrix selectedCell] tag];
 	[model setLowAlarmLevel:index value:[sender floatValue]];
 }
 
 - (IBAction) hiFillPointAction:(id)sender
 {
-	int index = [[hiFillPointMatrix selectedCell] tag];
+	int index = (int)[[hiFillPointMatrix selectedCell] tag];
 	[model setHiFillPoint:index value:[sender floatValue]];
 }
 
 - (IBAction) lowFillPointAction:(id)sender
 {
-	int index = [[lowFillPointMatrix selectedCell] tag];
+	int index = (int)[[lowFillPointMatrix selectedCell] tag];
 	[model setLowFillPoint:index value:[sender floatValue]];
 }
 
@@ -582,7 +582,7 @@
 
 - (IBAction) pollTimeAction:(id)sender
 {
-	[model setPollTime:[[sender selectedItem] tag]];
+	[model setPollTime:(int)[[sender selectedItem] tag]];
 }
 
 - (IBAction) addAddress:(id)sender
@@ -624,32 +624,32 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	return [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	return (int)[[model timeRate:set] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
-	int count = [[model timeRate:set] count];
+	int set = (int)[aPlotter tag];
+	int count = (int)[[model timeRate:set] count];
 	int index = count-i-1;
 	*xValue = [[model timeRate:set] timeSampledAtIndex:index];
 	*yValue = [[model timeRate:set] valueAtIndex:index];
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	return [model addressAtIndex:rowIndex];
 }
 
-- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void) tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	NSMutableArray* theList = [model eMailList];
 	[theList replaceObjectAtIndex:rowIndex withObject:anObject];
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	return [[model eMailList] count];
 }
@@ -657,7 +657,7 @@
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == addressList || aNotification == nil){
-		int selectedIndex = [addressList selectedRow];
+		int selectedIndex = (int)[addressList selectedRow];
 		[removeAddressButton setEnabled:selectedIndex>=0];
 	}
 }

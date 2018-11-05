@@ -30,12 +30,12 @@
 	[nodeData release];
 	[super dealloc];
 }
-- (int)	line
+- (uint32_t)	line
 {
 	return line;
 }
 
-- (void) setLine:(int)aLine
+- (void) setLine:(uint32_t)aLine
 {
 	line = aLine;
 }
@@ -63,7 +63,7 @@
 
 - (id) description
 {
-	return [NSString stringWithFormat:@"line-type-data-retainCount: %d-%d-%@-%d\n",line,type,nodeData,[nodeData retainCount]];
+	return [NSString stringWithFormat:@"line-type-data-retainCount: %d-%d-%@-%d\n",line,type,nodeData,(int)[nodeData retainCount]];
 }
 
 @end
@@ -74,12 +74,12 @@
 	[operands release];
 	[super dealloc];
 }
-- (int)	line
+- (int32_t)	line
 {
 	return line;
 }
 
-- (void) setLine:(int)aLine
+- (void) setLine:(int32_t)aLine
 {
 	line = aLine;
 }

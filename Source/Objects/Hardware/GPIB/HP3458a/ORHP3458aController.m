@@ -149,12 +149,12 @@
 #pragma mark •••Actions
 - (void) maxInputAction:(id)sender
 {
-	[model setMaxInput:[sender indexOfSelectedItem]];	
+	[model setMaxInput:(int)[sender indexOfSelectedItem]];
 }
 
 - (void) functionDefAction:(id)sender
 {
-	[model setFunctionDef:[[sender selectedItem] tag]];	
+	[model setFunctionDef:(int)[[sender selectedItem] tag]];	
 }
 
 - (IBAction) sendCommandAction:(id)sender
@@ -165,7 +165,7 @@
 		if(cmd){
 			if([cmd rangeOfString:@"?"].location != NSNotFound){
 				char reply[1024];
-				long n = [model writeReadGPIBDevice:cmd data:reply maxLength:1024];
+				int32_t n = [model writeReadGPIBDevice:cmd data:reply maxLength:1024];
 				if(n>0)reply[n-1]='\0';
 				NSLog(@"%@\n",[model trucateToCR:reply]);
 			}

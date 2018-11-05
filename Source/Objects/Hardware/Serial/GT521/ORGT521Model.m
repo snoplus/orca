@@ -228,7 +228,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     
 	if(missedCycleCount >= 3){
 		if(!missingCyclesAlarm){
-			NSString* s = [NSString stringWithFormat:@"GT521 (Unit %lu) Missing Cycles",[self uniqueIdNumber]];
+			NSString* s = [NSString stringWithFormat:@"GT521 (Unit %u) Missing Cycles",[self uniqueIdNumber]];
 			missingCyclesAlarm = [[ORAlarm alloc] initWithName:s severity:kHardwareAlarm];
 			[missingCyclesAlarm setSticky:YES];
             [missingCyclesAlarm setHelpString:@"The particle counter is not reporting counts at the end of its cycle. ORCA tried to kick start it at least three times.\n\nThis alarm will not go away until the problem is cleared. Acknowledging the alarm will silence it."];
@@ -436,7 +436,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORGT521ModelMeasurementDateChanged object:self];
 }
 
-- (unsigned long) timeMeasured
+- (uint32_t) timeMeasured
 {
 	return timeMeasured;
 }
@@ -491,8 +491,8 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:     location        forKey:@"location"];
-    [encoder encodeInt:		cycleDuration	forKey:@"cycleDuration"];
+    [encoder encodeInteger:     location        forKey:@"location"];
+    [encoder encodeInteger:		cycleDuration	forKey:@"cycleDuration"];
     [encoder encodeBool:	wasRunning		forKey:	@"wasRunning"];
 	int i;
 	for(i=0;i<4;i++){
@@ -597,7 +597,7 @@ NSString* ORGT521Lock = @"ORGT521Lock";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"GT521,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"GT521,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }

@@ -21,7 +21,7 @@
 
 #import "SMPieChartView.h"
 
-// Set this to one to turn on a timer that NSLogs how long it takes to draw all the slices on a chart.
+// Set this to one to turn on a timer that NSLogs how int32_t it takes to draw all the slices on a chart.
 #define	SMPIE_TIMER					0
 
 typedef struct
@@ -173,7 +173,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
     myPrivateData->tag = tempInt;
 
     // Determine version number of encoded class.
-    versionNumber = [ decoder versionForClassName:NSStringFromClass( [ SMPieChartView class ] ) ];
+    versionNumber = (unsigned int)[ decoder versionForClassName:NSStringFromClass( [ SMPieChartView class ] ) ];
 
     if ( versionNumber >= 2 )
     {
@@ -309,7 +309,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
             timer = [ NSDate date ];
 #endif
 
-            sliceCount = [ myPrivateData->slicePaths count ];
+            sliceCount = (unsigned int)[ myPrivateData->slicePaths count ];
             for ( sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++ )
             {
                 BOOL		tempBool = YES;
@@ -343,7 +343,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
 
 #if defined( SMPIE_TIMER ) && ( SMPIE_TIMER == 1 )
             timeInterval = [ timer timeIntervalSinceNow ];
-            NSLog( @"drawing all slices took this long: %g", timeInterval );
+            NSLog( @"drawing all slices took this int32_t: %g", timeInterval );
 #endif
         } // end have to draw our slices.
         else
@@ -378,7 +378,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
         if ( nil != myPrivateData->slicePaths && [ myPrivateData->slicePaths count ] > 0 )
 //                    && ![ self inLiveResize ] )
         {
-            sliceCount = [ myPrivateData->slicePaths count ];
+            sliceCount = (unsigned int)[ myPrivateData->slicePaths count ];
             for ( sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++ )
             {
                 if ( myPrivateData->flags.delegateLabelsSlices )
@@ -406,7 +406,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
                     if ( NSIntersectsRect( drawRect, rect ) )
                     {
                         [ tempColor set ];
-                        NSRectFillUsingOperation( NSInsetRect( drawRect, 1.0, 1.0 ), NSCompositeSourceOver );
+                        NSRectFillUsingOperation( NSInsetRect( drawRect, 1.0, 1.0 ), NSCompositingOperationSourceOver );
                         [ [ NSColor blackColor ] set ];
                         NSFrameRect( drawRect );
                     }
@@ -522,11 +522,11 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
 - (id)delegate
 {	return delegate;	}
 
-- (void)setTag:(int)inTag
-{	myPrivateData->tag = inTag;	}
+- (void)setTag:(NSInteger)inTag
+{	myPrivateData->tag = (int)inTag;	}
 
-- (int)tag
-{	return myPrivateData->tag;	}
+- (NSInteger)tag
+{	return (NSInteger)myPrivateData->tag;	}
 
 - (void)setBackgroundColor:(NSColor *)inColor
 {
@@ -790,7 +790,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
     if ( nil != myPrivateData->slicePaths && [ myPrivateData->slicePaths count ] > 0 )
     {
         // Now, determine which slice it was in.
-        sliceCount = [ myPrivateData->slicePaths count ];
+        sliceCount = (unsigned int)[ myPrivateData->slicePaths count ];
         for ( sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++ )
         {
             path = [ myPrivateData->slicePaths objectAtIndex:sliceIndex ];
@@ -915,7 +915,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
     centerPoint.x = NSMidX( pieRect );
     centerPoint.y = NSMidY( pieRect );
 
-    sliceCount = [ myPrivateData->sliceData count ];
+    sliceCount = (unsigned int)[ myPrivateData->sliceData count ];
     myPrivateData->slicePaths = [ [ NSMutableArray arrayWithCapacity:sliceCount ] retain ];
 
     for ( sliceIndex = 0; sliceIndex < sliceCount; sliceIndex++ )
@@ -983,7 +983,7 @@ static NSDictionary *_sm_local_defaultSliceAttributes( unsigned int inSliceIndex
             [ transform translateXBy:[ self explodeDistance ] yBy:0.0 ];
             [ transform rotateByDegrees:-( startExplode + endExplode ) / 2.0 ];
 
-            for ( sliceIndex = explodeRange.location; sliceIndex < sliceCount &&
+            for ( sliceIndex = (unsigned int)explodeRange.location; sliceIndex < sliceCount &&
                         sliceIndex < explodeRange.location + explodeRange.length; sliceIndex++ )
             {
                 // Transform each of the slice paths in this explode group.

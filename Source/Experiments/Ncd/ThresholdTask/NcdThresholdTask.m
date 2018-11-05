@@ -153,7 +153,7 @@
     return width;
 }
 
-- (void)setWidth:(float)aWidth 
+- (void)setWidth:(CGFloat)aWidth 
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setWidth:width];
     width = aWidth;
@@ -189,7 +189,7 @@
 {
     if([sender indexOfSelectedItem] != selectedWaveform){ 	
         [[self undoManager] setActionName: @"Selected Waveform"];
-        [self setSelectedWaveform:[selectionPopUpButton indexOfSelectedItem]];
+        [self setSelectedWaveform:(int)[selectionPopUpButton indexOfSelectedItem]];
     }
 }
 
@@ -444,7 +444,7 @@ static NSString* NcdThresholdDoAll          = @"NcdThresholdDoAll";
     
     [self setDefaults];
     
-    [self setTimeOnOneChannel:[decoder decodeIntForKey:NcdThresholdTaskTime]];    
+    [self setTimeOnOneChannel:[decoder decodeIntForKey:NcdThresholdTaskTime]];
     [self setStartAmplitude:[decoder decodeFloatForKey:NcdThresholdStartAmplitude]];
     [self setEndAmplitude:[decoder decodeFloatForKey:NcdThresholdEndAmplitude]];
     [self setBurstRate:[decoder decodeFloatForKey:NcdThresholdBurstRate]];
@@ -465,13 +465,13 @@ static NSString* NcdThresholdDoAll          = @"NcdThresholdDoAll";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:timeOnOneChannel forKey:NcdThresholdTaskTime];
+    [encoder encodeInteger:timeOnOneChannel forKey:NcdThresholdTaskTime];
     [encoder encodeFloat:startAmplitude forKey:NcdThresholdStartAmplitude];
     [encoder encodeFloat:endAmplitude forKey:NcdThresholdEndAmplitude];
     [encoder encodeFloat:burstRate forKey:NcdThresholdBurstRate];
     [encoder encodeFloat:width forKey:NcdThresholdWidth];
-    [encoder encodeInt:numOfValues forKey:NcdThresholdNumOfValues];
-    [encoder encodeInt:selectedWaveform forKey:NcdThresholdSelectedWaveform];
-    [encoder encodeInt:doAllChannels forKey:NcdThresholdDoAll];
+    [encoder encodeInteger:numOfValues forKey:NcdThresholdNumOfValues];
+    [encoder encodeInteger:selectedWaveform forKey:NcdThresholdSelectedWaveform];
+    [encoder encodeInteger:doAllChannels forKey:NcdThresholdDoAll];
 }
 @end

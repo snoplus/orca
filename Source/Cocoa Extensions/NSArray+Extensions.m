@@ -70,7 +70,7 @@
 	else {
 		id aKey = [anArray objectAtIndex:0];
 		[anArray removeObjectAtIndex:0];
-		long index = [aKey intValue];
+		int32_t index = [aKey intValue];
 		if(index>=0 && index < [self count]){
 			id anObj = [self objectAtIndex:index];
 			if([anObj respondsToSelector:@selector(objectForKeyArray:)]){
@@ -90,7 +90,7 @@
 	}
 }
 
-+ (NSArray*) arrayFromLongCArray:(long*)cArray size:(int)num;
++ (NSArray*) arrayFromLongCArray:(int32_t*)cArray size:(int)num;
 {
     NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
     int i;
@@ -98,7 +98,7 @@
     return [anArray autorelease];
 }
 
-+ (NSArray*) arrayFromULongCArray:(unsigned long*)cArray size:(int)num;
++ (NSArray*) arrayFromULongCArray:(uint32_t*)cArray size:(int)num;
 {
     NSMutableArray* anArray = [[NSMutableArray alloc] initWithCapacity:num];
     int i;
@@ -145,51 +145,51 @@
     for(i=0;i<num;i++)[anArray addObject:[NSNumber numberWithBool:cArray[i]]];
     return [anArray autorelease];
 }
-- (void) loadLongCArray:(long*)cArray size:(int)num
+- (void) loadLongCArray:(int32_t*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
-    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] longValue];
+    for(i=0;i<n;i++)cArray[i] = (uint32_t)[[self objectAtIndex:i] longValue];
 }
 
 
-- (void) loadULongCArray:(unsigned long*)cArray size:(int)num
+- (void) loadULongCArray:(uint32_t*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
-    for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedLongValue];
+    for(i=0;i<n;i++)cArray[i] = (uint32_t)[[self objectAtIndex:i] unsignedLongValue];
 }
 
 
 - (void) loadShortCArray:(short*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] shortValue];
 }
 
 - (void) loadUShortCArray:(unsigned short*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedShortValue];
 }
 
 - (void) loadBoolCArray:(BOOL*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] boolValue];
 }
 - (void) loadCharCArray:(char*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] charValue];
 }
 - (void) loadUCharCArray:(unsigned char*)cArray size:(int)num
 {
-    int n = MIN([self count],num);
+    uint32_t n = (uint32_t)MIN([self count],num);
     int i;
     for(i=0;i<n;i++)cArray[i] = [[self objectAtIndex:i] unsignedCharValue];
 }

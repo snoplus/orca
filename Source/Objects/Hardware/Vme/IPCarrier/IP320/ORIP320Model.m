@@ -53,7 +53,7 @@ NSString* ORIP320ModelModeChanged					= @"ORIP320ModelModeChanged";
 
 static struct {
     NSString* regName;
-    unsigned long addressOffset;
+    uint32_t addressOffset;
 }reg[kNum320Registers]={
 {@"Control Reg",  0x0000},
 {@"Convert Cmd",  0x0010},
@@ -299,7 +299,7 @@ static struct {
 		[fh seekToEndOfFile];
 		
 		int i;
-		int n = [logBuffer count];
+		int n = (int)[logBuffer count];
 		for(i=0;i<n;i++){
 			[fh writeData:[[logBuffer objectAtIndex:i] dataUsingEncoding:NSASCIIStringEncoding]];
 		}
@@ -338,13 +338,13 @@ static struct {
 }
 
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) aDataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) aDataId
 {
     dataId = aDataId;
 }
-- (unsigned long) convertedDataId { return convertedDataId; }
-- (void) setConvertedDataId: (unsigned long) aDataId
+- (uint32_t) convertedDataId { return convertedDataId; }
+- (void) setConvertedDataId: (uint32_t) aDataId
 {
     convertedDataId = aDataId;
 }
@@ -377,13 +377,13 @@ static struct {
 }
 
 #pragma mark ¥¥¥Hardware Access
-- (unsigned long) getRegisterAddress:(short) aRegister
+- (uint32_t) getRegisterAddress:(short) aRegister
 {
     int ip = [self slotConv];
     return [guardian baseAddress] + ip*0x100 + reg[aRegister].addressOffset;
 }
 
-- (unsigned long) getAddressOffset:(short) anIndex
+- (uint32_t) getAddressOffset:(short) anIndex
 {
     return reg[anIndex].addressOffset;
 }
@@ -772,7 +772,7 @@ static struct {
     [self setLogToFile:					[decoder decodeBoolForKey:@"ORIP320ModelLogToFile"]];
     [self setDisplayRaw:				[decoder decodeBoolForKey:@"ORIP320ModelDisplayRaw"]];
     [self setChanObjs:					[decoder decodeObjectForKey:@"kORIP320chanObjs"]];
-	[self setPollingState:				[decoder decodeIntForKey:@"kORIP320PollingState"]];
+	[self setPollingState:				[decoder decodeIntegerForKey:@"kORIP320PollingState"]];
 	[self setMultiPlots:				[decoder decodeObjectForKey:@"multiPlots"]];
     [self setDataSet:					[decoder decodeObjectForKey:@"dataSet"]];
     
@@ -796,7 +796,7 @@ static struct {
 		calibrationConstants[gain].kVoltCALLO		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kVoltCALLO%d",gain]];
 		calibrationConstants[gain].kCountCALLO		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kCountCALLO%d",gain]];
 		calibrationConstants[gain].kVoltCALHI		= [decoder decodeFloatForKey:[NSString stringWithFormat:@"kVoltCALHI%d",gain]];
-		calibrationConstants[gain].kCountCALHI		= [decoder decodeIntForKey:  [NSString stringWithFormat:@"kCountCALHI%d",gain]];
+		calibrationConstants[gain].kCountCALHI		= [decoder decodeIntegerForKey:  [NSString stringWithFormat:@"kCountCALHI%d",gain]];
 	}
 	
 	[[self undoManager] enableUndoRegistration];
@@ -819,10 +819,10 @@ static struct {
     [encoder encodeBool:logToFile			forKey:@"ORIP320ModelLogToFile"];
     [encoder encodeBool:displayRaw			forKey:@"ORIP320ModelDisplayRaw"];
     [encoder encodeObject:chanObjs			forKey:@"kORIP320chanObjs"];
-    [encoder encodeInt:[self pollingState]	forKey:@"kORIP320PollingState"];
+    [encoder encodeInteger:[self pollingState]	forKey:@"kORIP320PollingState"];
     [encoder encodeObject:multiPlots		forKey:@"multiPlots"];
 	
-	[encoder encodeInt:cardJumperSetting	forKey:@"cardJumperSetting"];
+	[encoder encodeInteger:cardJumperSetting	forKey:@"cardJumperSetting"];
 	int gain;
 	for(gain=0;gain<kNumGainSettings;gain++){
 		[encoder encodeFloat:calibrationConstants[gain].kSlope_m			forKey:[NSString stringWithFormat:@"kSlope_m%d",gain]];
@@ -830,7 +830,7 @@ static struct {
 		[encoder encodeFloat:calibrationConstants[gain].kIdeal_Zero			forKey:[NSString stringWithFormat:@"kIdeal_Zero%d",gain]];
 		[encoder encodeFloat:calibrationConstants[gain].kCountCALLO			forKey:[NSString stringWithFormat:@"kCountCALLO%d",gain]];
 		[encoder encodeFloat:calibrationConstants[gain].kVoltCALHI			forKey:[NSString stringWithFormat:@"kVoltCALHI%d",gain]];
-		[encoder encodeInt:calibrationConstants[gain].kCountCALHI			forKey:[NSString stringWithFormat:@"kCountCALHI%d",gain]];		
+		[encoder encodeInteger:calibrationConstants[gain].kCountCALHI			forKey:[NSString stringWithFormat:@"kCountCALHI%d",gain]];		
 	}
 }
 
@@ -909,10 +909,10 @@ static struct {
 	}		
 }
 
-- (unsigned long) lowMask
+- (uint32_t) lowMask
 {
 	int i;
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	for(i=0;i<32;i++){
 		if([[chanObjs objectAtIndex:i] readEnabled]){
 			aMask |= 1L<<i;
@@ -921,9 +921,9 @@ static struct {
 	return aMask;
 }
 
-- (unsigned long) highMask
+- (uint32_t) highMask
 {
-	unsigned long aMask = 0;
+	uint32_t aMask = 0;
 	int i;
 	for(i=0;i<8;i++){
 		if([[chanObjs objectAtIndex:i+32] readEnabled]){
@@ -999,7 +999,7 @@ static struct {
 - (void) loadConvertedTimeSeries:(float)convertedValue atTime:(time_t) aTime forChannel:(int) channel
 {
 	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
-	[dataSet loadTimeSeries:convertedValue atTime:aTime sender:self withKeys:@"IP320",@"Value",
+	[dataSet loadTimeSeries:convertedValue atTime:(uint32_t)aTime sender:self withKeys:@"IP320",@"Value",
 	 [NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
 	 [NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
 	 [self getSlotKey:[self slot]],
@@ -1009,7 +1009,7 @@ static struct {
 - (void) loadRawTimeSeries:(float)aRawValue atTime:(time_t) aTime forChannel:(int) channel
 {
 	if(!dataSet)[self setDataSet:[[[ORDataSet alloc] initWithKey:@"IP320" guardian:nil] autorelease]];
-	[dataSet loadTimeSeries:aRawValue atTime:aTime sender:self withKeys:@"IP320",@"Raw",
+	[dataSet loadTimeSeries:aRawValue atTime:(uint32_t)aTime sender:self withKeys:@"IP320",@"Raw",
 	 [NSString stringWithFormat:@"Crate %d",[[self guardian] crateNumber]],
 	 [NSString stringWithFormat:@"Slot %02d",[[self guardian] slot]],
 	 [self getSlotKey:[self slot]],
@@ -1021,7 +1021,7 @@ static struct {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
 	
 	if(runInProgress){
-		unsigned long data[43];
+		uint32_t data[43];
 		
 		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
 		
@@ -1030,7 +1030,7 @@ static struct {
 		time(&ut_time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		//time_t ut_time = mktime(theTimeGMTAsStruct);
-		data[2] = ut_time;	//seconds since 1970
+		data[2] = (uint32_t)ut_time;	//seconds since 1970
 		
 		int index = 3;
 		int i;
@@ -1048,7 +1048,7 @@ static struct {
 		if(index>3){
 			//the full record goes into the data stream via a notification
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(int32_t)]];
 		}
 	}
 }
@@ -1058,7 +1058,7 @@ static struct {
     BOOL runInProgress = [gOrcaGlobals runInProgress];
 	
 	if(runInProgress){
-		unsigned long data[83];
+		uint32_t data[83];
 		
 		data[1] = (([self crateNumber]&0x01e)<<21) | ([guardian slot]& 0x0000001f)<<16 | ([self slot]&0xf);
 		
@@ -1067,7 +1067,7 @@ static struct {
 		time(&ut_time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
 		//time_t ut_time = mktime(theTimeGMTAsStruct);
-		data[2] = ut_time;	//seconds since 1970
+		data[2] = (uint32_t)ut_time;	//seconds since 1970
 		
 		int index = 3;
 		int n;
@@ -1075,7 +1075,7 @@ static struct {
 		else n = 40;
 		
 		union {
-			long asLong;
+			int32_t asLong;
 			float asFloat;
 		} theValue;
 		
@@ -1093,14 +1093,14 @@ static struct {
 		if(index>3){
 			//the full record goes into the data stream via a notification
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification 
-																object:[NSData dataWithBytes:data length:index*sizeof(long)]];
+																object:[NSData dataWithBytes:data length:index*sizeof(int32_t)]];
 		}
 	}
 }
 
 - (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-    return (item == nil) ? 1  : [item numberOfChildren];
+    return (item == nil) ? 1  : (int)[item numberOfChildren];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
@@ -1121,8 +1121,7 @@ static struct {
 
 - (NSUInteger)  numberOfChildren
 {
-    int count =  [dataSet count];
-    return count;
+    return [dataSet count];
 }
 
 - (id)   childAtIndex:(NSUInteger)index

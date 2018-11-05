@@ -77,7 +77,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"HV Ramper (%lu)",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"HV Ramper (%u)",[model uniqueIdNumber]]];
 }
 
 - (void) dealloc
@@ -490,7 +490,7 @@
         [alert setInformativeText:@"You can not Ramp HV until this problem is resolved.\nWhat would like to do?"];
         [alert addButtonWithTitle:@"Cancel"];
         [alert addButtonWithTitle: @"Set DACs = ADC's"];
-        [alert setAlertStyle:NSWarningAlertStyle];
+        [alert setAlertStyle:NSAlertStyleWarning];
         
         [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
             if (result == NSAlertSecondButtonReturn){
@@ -545,7 +545,7 @@
     [alert setInformativeText:@"Really Panic Selected High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         [model setStates:kHVRampPanic onlyControlled:YES];
@@ -579,7 +579,7 @@
     [alert setInformativeText:@"Really Panic ALL High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -610,7 +610,7 @@
     [alert setInformativeText:@"Really move ADC values into DAC fields?"];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -663,7 +663,7 @@
 - (IBAction) controllAction:(id)sender
 {
     [self endEditing];
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender intValue] != [[[model supplies] objectAtIndex:i] controlled]){
 		[[self undoManager] setActionName: @"Set HV Controlled"];
 		[[[model supplies] objectAtIndex:i] setControlled: [sender intValue]];
@@ -674,7 +674,7 @@
 - (IBAction) rampTimeAction:(id)sender
 {
     [self endEditing];
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender intValue] != [[[model supplies] objectAtIndex:i] rampTime]){
 		[[self undoManager] setActionName: @"Set HV Ramp Time"];
 		[[[model supplies] objectAtIndex:i] setRampTime: [sender intValue]];
@@ -683,7 +683,7 @@
 
 - (IBAction) targetAction:(id)sender
 {
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender intValue] != [[[model supplies] objectAtIndex:i] targetVoltage]){
 		[[self undoManager] setActionName: @"Set HV Ramp Time"];
 		[[[model supplies] objectAtIndex:i] setTargetVoltage: [sender intValue]];
@@ -692,7 +692,7 @@
 
 - (IBAction) adcOffsetAction:(id)sender
 {
-    int i = [[sender selectedCell] tag];
+    int i = (int)[[sender selectedCell] tag];
     if([sender floatValue] != [[[model supplies] objectAtIndex:i] voltageAdcOffset]){
 		[[self undoManager] setActionName: @"Set HV Adc Offset"];
 		[[[model supplies] objectAtIndex:i] setVoltageAdcOffset: [sender floatValue]];
@@ -702,7 +702,7 @@
 
 - (IBAction) adcSlopeAction:(id)sender
 {
-	int i = [[sender selectedCell] tag];
+	int i = (int)[[sender selectedCell] tag];
     if([sender floatValue] != [[[model supplies] objectAtIndex:i] voltageAdcSlope]){
 		[[self undoManager] setActionName: @"Set HV ADC Slope"];
 		[[[model supplies] objectAtIndex:i] setVoltageAdcSlope: [sender floatValue]];
@@ -855,15 +855,15 @@
 
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
+	int set = (int)[aPlotter tag];
 	return [model currentTrendCount:set];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	double aValue = 0;
-	int set = [aPlotter tag];
-	int count = [model currentTrendCount:set];
+	int set = (int)[aPlotter tag];
+	int count = (int)[model currentTrendCount:set];
 	aValue =  [model currentValue:count-i-1 supply:set];
 	*xValue = (double)i;
 	*yValue = aValue;
@@ -875,7 +875,7 @@
 @implementation ORHVRampController (private)
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
         [model setStates:kHVRampPanic onlyControlled:YES];
 		[model startRamping];
 		[self updateButtons];
@@ -896,7 +896,7 @@
 
 - (void) _systemPanicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
         [model setStates:kHVRampPanic onlyControlled:NO];
 		[model startRamping];
 		[self updateButtons];
@@ -904,7 +904,7 @@
 }
 - (void) _syncActionSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model forceDacToAdc];
 		[self updateButtons];
     }

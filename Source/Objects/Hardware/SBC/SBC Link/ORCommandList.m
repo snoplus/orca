@@ -46,7 +46,7 @@
 	if(aCommand){
 		if(!commands)commands = [[NSMutableArray array] retain];
 		[commands addObject:aCommand];
-		return [commands count] - 1;
+		return (int)[commands count] - 1;
 	}
 	else return -1;
 }
@@ -55,7 +55,7 @@
 	if(anOtherList){
 		if(!commands)commands = [[NSMutableArray array] retain];
 		[commands addObjectsFromArray:[anOtherList commands]];
-		return [commands count] - 1;
+		return (int)[commands count] - 1;
 	}
 	else return -1;
 }
@@ -107,7 +107,7 @@
 
 - (void) extractData:(SBC_Packet*) aPacket
 {
-	unsigned long totalBytesToProcess = aPacket->cmdHeader.numberBytesinPayload;
+	uint32_t totalBytesToProcess = aPacket->cmdHeader.numberBytesinPayload;
 	char* dataToProcess = (char*) aPacket->payload;
 	for(id aCmd in commands){
 		SBC_Packet* packetToProcess = (SBC_Packet*)dataToProcess;
@@ -117,10 +117,10 @@
 		if(totalBytesToProcess<=0)break; //we should drop out after all cmds processed, but just in case
 	}
 }
-- (long) longValueForCmd:(int)anIndex
+- (int32_t) longValueForCmd:(int)anIndex
 {
 	if(anIndex<[commands count]){
-		return [[commands objectAtIndex:anIndex] longValue];
+		return (int32_t)[[commands objectAtIndex:anIndex] longValue];
 	}
 	else return 0;
 }

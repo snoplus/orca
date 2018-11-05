@@ -31,7 +31,7 @@
 @end
 #endif
 
-int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 title]]; }
+NSInteger windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 title]]; }
 
 
 @implementation ORDataController
@@ -59,8 +59,8 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
     CGFloat smallestScreenWidth  = 9e10;
     CGFloat smallestScreenHeight = 9e10;
     NSArray* screenArray = [NSScreen screens];
-    unsigned screenCount = [screenArray count];
-    unsigned index;
+    NSUInteger screenCount = [screenArray count];
+    NSUInteger index;
     
     for (index=0; index < screenCount; index++) {
         NSScreen* aScreen = [screenArray objectAtIndex: index];
@@ -334,7 +334,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 }
 - (IBAction) refreshModeAction:(id)sender 
 {
-	[model setRefreshMode:[sender indexOfSelectedItem]];
+	[model setRefreshMode:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) pauseAction:(id)sender 
@@ -350,7 +350,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
      [alert setInformativeText:@"Really Clear them? You will not be able to undo this."];
      [alert addButtonWithTitle:@"Yes/Clear Counts"];
      [alert addButtonWithTitle:@"Cancel"];
-     [alert setAlertStyle:NSWarningAlertStyle];
+     [alert setAlertStyle:NSAlertStyleWarning];
      
      [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -387,8 +387,8 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 
 - (IBAction) toggleRaw:(NSToolbarItem*)item
 {
-	int index = [rawDataTabView indexOfTabViewItem:[rawDataTabView selectedTabViewItem]];
-	int maxIndex = [rawDataTabView numberOfTabViewItems];
+	NSInteger index = [rawDataTabView indexOfTabViewItem:[rawDataTabView selectedTabViewItem]];
+	NSInteger maxIndex = [rawDataTabView numberOfTabViewItems];
 	index++;
 	if(index>=maxIndex)index = 0;
 	[rawDataTabView selectTabViewItemAtIndex:index];
@@ -465,7 +465,7 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 			[plotWindows addObject:aWindow];
 		}
 	}
-	int numWindows = [plotWindows count];
+	NSUInteger numWindows = [plotWindows count];
 	NSRect screenRect = [[NSScreen mainScreen] frame];
 	
 	if(numWindows>1){
@@ -544,12 +544,12 @@ int windowSort(id w1, id w2, void *context) { return [[w2 title] compare:[w1 tit
 @end
 #endif
 @implementation NSObject (ORDataController_Cat)
-- (int) numberBins
+- (uint32_t) numberBins
 {
     return 0;
 }
 
-- (long) value:(unsigned long)aChan;
+- (int32_t) value:(uint32_t)aChan;
 {
     return 0;
 }

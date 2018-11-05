@@ -74,7 +74,7 @@ enum Bit3UserClientCommandCodes {
 
 typedef struct PCIConfigStruct
 {
-    UInt32 int32[64];
+    uint32_t int32[64];
 } PCIConfigStruct;
 
 // Bit3 CSR definitions - offsets from I/O base address
@@ -175,7 +175,7 @@ typedef struct PCIConfigStruct
 #define LOCAL_DMACMD_ACTIVE		0x01	// DMA active
 #define LOCAL_DMACMD_DONE		0x02	// DMA done
 #define LOCAL_DMACMD_ENABLEI	0x04	// enable done interrupt
-#define LOCAL_DMACMD_WDSEL		0x10	// word/long select
+#define LOCAL_DMACMD_WDSEL		0x10	// word/int32_t select
 #define LOCAL_DMACMD_DIRECT		0x20	// direction
 #define LOCAL_DMACMD_DPRAM		0x40	// dual port ram
 #define LOCAL_DMACMD_START		0x80	// start dma

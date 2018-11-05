@@ -32,7 +32,7 @@
 - (void) setModel:(id)aModel
 {
 	[super setModel:aModel];
-	[[self window] setTitle:[NSString stringWithFormat:@"Lan-NetIO-230 %lu",[model uniqueIdNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"Lan-NetIO-230 %u",[model uniqueIdNumber]]];
 }
 
 - (void) registerNotificationObservers
@@ -169,7 +169,7 @@
 #pragma mark ‚Ä¢‚Ä¢‚Ä¢Actions
 -(IBAction) outletNameAction:(id)sender
 {
-	int tag = [[sender selectedCell] tag];
+	int tag = (int)[[sender selectedCell] tag];
 	[model setOutlet:tag name:[[sender selectedCell]stringValue]];
 }
 
@@ -196,7 +196,7 @@
 - (IBAction) turnOnOffAction:(id)sender
 {
     [self endEditing];
-    int chan  = [[turnOnOffMatrix selectedCell] tag];
+    int chan  = (int)[[turnOnOffMatrix selectedCell] tag];
 	int state = [model outletStatus:chan];
     NSString* s1 = [NSString stringWithFormat:@"Really turn %@ Outlet #%d?",state?@"OFF":@"ON",chan];
     NSString* name = [model outletName:chan];
@@ -208,7 +208,7 @@
     [alert setMessageText:s1];
     [alert addButtonWithTitle:@"Cancel"];
     [alert addButtonWithTitle:[NSString stringWithFormat:@"YES/Turn %@ #%d",state?@"OFF":@"ON",chan]];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         int state = [model outletStatus:chan];
@@ -238,7 +238,7 @@
 {
     int chan  = [[userInfo objectForKey:@"chan"] intValue];
     int state = [model outletStatus:chan];
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
         if(state)[model turnOffOutlet:chan];
         else [model turnOnOutlet:chan];
     }
@@ -303,10 +303,10 @@
 	for(i=0;i<kLanNetio230OutletNum;i++){
 		BOOL state = stateMask & (1<<i);
 		if(state){
-			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+			[onLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:1];
 		}
 		else {
-			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositeSourceOver fraction:1];
+			[offLight drawAtPoint:frame.origin fromRect:sourceRect operation:NSCompositingOperationSourceOver fraction:1];
 		}
 		if(i<5)frame.origin.x += 50;
 		else frame.origin.x += 5;//21;

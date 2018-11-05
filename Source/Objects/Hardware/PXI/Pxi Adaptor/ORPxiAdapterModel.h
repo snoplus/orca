@@ -31,29 +31,29 @@
 - (void) resetContrl;
 - (void) checkStatusErrors;
 
--(void) readLongBlock:(unsigned long *) readAddress
-									atAddress:(unsigned long) pxiAddress
-									numToRead:(unsigned int) numberLongs;
+-(void) readLongBlock:(uint32_t *) readAddress
+									atAddress:(uint32_t) pxiAddress
+									numToRead:(uint32_t) numberLongs;
 
--(void) writeLongBlock:(unsigned long *) writeAddress
-										atAddress:(unsigned long) pxiAddress
-										numToWrite:(unsigned int) numberLongs;
+-(void) writeLongBlock:(uint32_t *) writeAddress
+										atAddress:(uint32_t) pxiAddress
+										numToWrite:(uint32_t) numberLongs;
 
 -(void) readByteBlock:(unsigned char *) readAddress
-									atAddress:(unsigned long) pxiAddress
-									numToRead:(unsigned int) numberBytes;
+									atAddress:(uint32_t) pxiAddress
+									numToRead:(uint32_t) numberBytes;
 
 -(void) writeByteBlock:(unsigned char *) writeAddress
-										atAddress:(unsigned long) pxiAddress
-										numToWrite:(unsigned int) numberBytes;
+										atAddress:(uint32_t) pxiAddress
+										numToWrite:(uint32_t) numberBytes;
 
 -(void) readWordBlock:(unsigned short *) readAddress
-									atAddress:(unsigned long) pxiAddress
-									numToRead:(unsigned int) numberWords;
+									atAddress:(uint32_t) pxiAddress
+									numToRead:(uint32_t) numberWords;
 
 -(void) writeWordBlock:(unsigned short *) writeAddress
-										atAddress:(unsigned long) pxiAddress
-										numToWrite:(unsigned int) numberWords;
+										atAddress:(uint32_t) pxiAddress
+										numToWrite:(uint32_t) numberWords;
 @end
 
 

@@ -172,7 +172,7 @@
     return [colors objectAtIndex:index];
 }
 
-- (unsigned short) getFastColorIndexForValue:(unsigned long)aValue log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad
+- (unsigned short) getFastColorIndexForValue:(uint32_t)aValue log:(BOOL)aLog integer:(BOOL)aInt minPad:(double)aMinPad
 {	 
 
 	aValue = [colorAxis getPixAbsFast:aValue log:aLog integer:aInt minPad:aMinPad];
@@ -188,7 +188,7 @@
 }
 
 
-- (unsigned short) getColorIndexForValue:(unsigned long)aValue 
+- (unsigned short) getColorIndexForValue:(uint32_t)aValue 
 {	
 	aValue = [colorAxis getPixAbs:aValue];
 	if(aValue <= 0)return 0;
@@ -245,11 +245,11 @@
 {
     self = [super initWithCoder:decoder];
     if([decoder allowsKeyedCoding]){
-        [self setNumColors:[decoder decodeIntForKey:@"ORColorScaleNumColors"]];
+        [self setNumColors:[decoder decodeIntegerForKey:@"ORColorScaleNumColors"]];
         [self setSpectrumRange:[decoder decodeFloatForKey:@"ORColorScaleSpectrumRange"]];
         [self setStartColor:[decoder decodeObjectForKey:@"ORColorScaleStartColor"]]; 
         [self setEndColor:[decoder decodeObjectForKey:@"ORColorScaleEndColor"]]; 
-        [self setUseRainBow:[decoder decodeIntForKey:@"ORColorScaleUseRainBow"]];
+        [self setUseRainBow:[decoder decodeIntegerForKey:@"ORColorScaleUseRainBow"]];
 		
 
     }
@@ -272,9 +272,9 @@
 {
     [super encodeWithCoder:encoder];
     if([encoder allowsKeyedCoding]){
-        [encoder encodeInt:numColors forKey:@"ORColorScaleNumColors"];
+        [encoder encodeInteger:numColors forKey:@"ORColorScaleNumColors"];
         [encoder encodeFloat:spectrumRange forKey:@"ORColorScaleSpectrumRange"];
-        [encoder encodeInt:useRainBow forKey:@"ORColorScaleUseRainBow"];
+        [encoder encodeInteger:useRainBow forKey:@"ORColorScaleUseRainBow"];
         [encoder encodeObject:startColor forKey:@"ORColorScaleStartColor"];
         [encoder encodeObject:endColor forKey:@"ORColorScaleEndColor"];
     }
@@ -306,15 +306,15 @@
 		NSColor* e = [endColor colorUsingColorSpaceName:NSDeviceRGBColorSpace];
 
         short i;
-        float startRed      = [s redComponent];
-        float startGreen    = [s greenComponent];
-        float startBlue     = [s blueComponent];
-        float startAlpha    = [s alphaComponent];
-        float endRed        = [e redComponent];
-        float endGreen      = [e greenComponent];
-        float endBlue       = [e blueComponent];
-        float endAlpha      = [e alphaComponent];
-        float red,green,blue,alpha;
+        CGFloat startRed      = [s redComponent];
+        CGFloat startGreen    = [s greenComponent];
+        CGFloat startBlue     = [s blueComponent];
+        CGFloat startAlpha    = [s alphaComponent];
+        CGFloat endRed        = [e redComponent];
+        CGFloat endGreen      = [e greenComponent];
+        CGFloat endBlue       = [e blueComponent];
+        CGFloat endAlpha      = [e alphaComponent];
+        CGFloat red,green,blue,alpha;
         if(numColors==0)numColors = 256;
         for (i=0; i<numColors; i++){
             float factor = i/(float)numColors;

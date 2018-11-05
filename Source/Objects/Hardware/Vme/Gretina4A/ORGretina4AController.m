@@ -60,13 +60,13 @@
 	[registerIndexPU setAutoenablesItems:NO];
 	int i;
 	for (i=0;i<kNumberOfGretina4ARegisters;i++) {
-        NSString* s = [NSString stringWithFormat:@"(0x%04lx) %@",[Gretina4ARegisters offsetforReg:i], [Gretina4ARegisters registerName:i]];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[Gretina4ARegisters offsetforReg:i], [Gretina4ARegisters registerName:i]];
 		[registerIndexPU insertItemWithTitle:s	atIndex:i];
 		[[registerIndexPU itemAtIndex:i] setEnabled:YES];
 	}
 	// And now the FPGA registers
     for (i=0;i<kNumberOfFPGARegisters;i++) {
-        NSString* s = [NSString stringWithFormat:@"(0x%04lx) %@",[Gretina4AFPGARegisters offsetforReg:i], [Gretina4AFPGARegisters registerName:i]];
+        NSString* s = [NSString stringWithFormat:@"(0x%04x) %@",[Gretina4AFPGARegisters offsetforReg:i], [Gretina4AFPGARegisters registerName:i]];
 
 		[registerIndexPU insertItemWithTitle:s	atIndex:(i+kNumberOfGretina4ARegisters)];
 	}
@@ -102,7 +102,7 @@
     }
     
     NSString* key = [NSString stringWithFormat: @"orca.Gretina4A%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -836,17 +836,17 @@
 }
 - (void) selectedChannelChanged:(NSNotification*)aNote
 {
-    [selectedChannelField setIntValue: [model selectedChannel]];
+    [selectedChannelField setIntegerValue: [model selectedChannel]];
 }
 
 - (void) registerWriteValueChanged:(NSNotification*)aNote
 {
-    [registerWriteValueField setIntValue: [model registerWriteValue]];
+    [registerWriteValueField setIntValue: (int)[model registerWriteValue]];
 }
 
 - (void) spiWriteValueChanged:(NSNotification*)aNote
 {
-    [spiWriteValueField setIntValue: [model spiWriteValue]];
+    [spiWriteValueField setIntValue: (int)[model spiWriteValue]];
 }
 
 - (void) diagnosticsEnabledChanged:(NSNotification*)aNote
@@ -858,7 +858,7 @@
 {
     int i;
     for(i=0;i<kNumGretina4AChannels;i++){
-         [[aHitCountMatrix cellWithTag:i] setIntValue:[model aHitCount:i]];
+         [[aHitCountMatrix cellWithTag:i] setIntegerValue:(int)[model aHitCount:i]];
     }
 }
 
@@ -866,7 +866,7 @@
 {
     int i;
     for(i=0;i<kNumGretina4AChannels;i++){
-        [[droppedEventCountMatrix cellWithTag:i] setIntValue:[model droppedEventCount:i]];
+        [[droppedEventCountMatrix cellWithTag:i] setIntegerValue:[model droppedEventCount:i]];
     }
 }
 
@@ -874,7 +874,7 @@
 {
     int i;
     for(i=0;i<kNumGretina4AChannels;i++){
-        [[discriminatorCountMatrix cellWithTag:i] setIntValue:[model discCount:i]];
+        [[discriminatorCountMatrix cellWithTag:i] setIntegerValue:[model discCount:i]];
     }
 }
 
@@ -882,7 +882,7 @@
 {
     int i;
     for(i=0;i<kNumGretina4AChannels;i++){
-        [[acceptedEventCountMatrix cellWithTag:i] setIntValue:[model acceptedEventCount:i]];
+        [[acceptedEventCountMatrix cellWithTag:i] setIntegerValue:[model acceptedEventCount:i]];
     }
 }
 
@@ -1020,7 +1020,7 @@
 //single values
 - (void) forceFullCardInitChanged:  (NSNotification*)aNote  { [forceFullCardInitCB setIntValue:[model forceFullCardInit]];      }
 - (void) initSerDesStateChanged:    (NSNotification*)aNote  { [initSerDesStateField setStringValue:[model serDesStateName]];    }
-- (void) userPackageDataChanged:    (NSNotification*)aNote  { [userPackageDataField setIntValue:[model userPackageData]];       }
+- (void) userPackageDataChanged:    (NSNotification*)aNote  { [userPackageDataField setIntegerValue:[model userPackageData]];       }
 - (void) windowCompMinChanged:      (NSNotification*)aNote  { [windowCompMinField   setIntValue:[model windowCompMin]];         }
 - (void) windowCompMaxChanged:      (NSNotification*)aNote  { [windowCompMaxField   setIntValue:[model windowCompMax]];         }
 - (void) rawDataLengthChanged:      (NSNotification*)aNote  { [rawDataLengthField   setIntValue:[model rawDataLength]];         }
@@ -1293,9 +1293,9 @@
 
 - (IBAction) extDiscrSrcAction:(id)sender
 {
-    unsigned long regValue = [model extDiscriminatorSrc];
+    uint32_t regValue = [model extDiscriminatorSrc];
     unsigned short chan    = [sender selectedRow];
-    unsigned long value   = [[sender selectedCell] indexOfSelectedItem];
+    uint32_t value   = (uint32_t)[[sender selectedCell] indexOfSelectedItem];
     regValue &= ~(0x00000007<<(chan*3));
     regValue |= ((value&0x7)<<(chan*3));
     [model setExtDiscriminatorSrc:regValue];
@@ -1303,9 +1303,9 @@
 
 - (IBAction) extDiscrModeAction:(id)sender
 {
-    unsigned long regValue = [model extDiscriminatorMode];
+    uint32_t regValue = [model extDiscriminatorMode];
     unsigned short chan    = [sender selectedRow];
-    unsigned long value   = [[sender selectedCell] indexOfSelectedItem];
+    uint32_t value   = (uint32_t)[[sender selectedCell] indexOfSelectedItem];
     regValue &= ~(0x00000003<<(chan*2));
     regValue |= ((value&0x3)<<(chan*2));
     [model setExtDiscriminatorMode:regValue];
@@ -1502,7 +1502,7 @@
 
 - (IBAction) registerIndexPUAction:(id)sender
 {
-	unsigned int index = [sender indexOfSelectedItem];
+	 int index = (int)[sender indexOfSelectedItem];
 	[model setRegisterIndex:index];
 	[self setRegisterDisplay:index];
 }
@@ -1536,13 +1536,13 @@
 - (IBAction) readRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = 0;
+	uint32_t aValue = 0;
 	unsigned int index = [model registerIndex];
 	if (index < kNumberOfGretina4ARegisters) {
-        unsigned long address   = [Gretina4ARegisters offsetforReg:index];
+        uint32_t address   = [Gretina4ARegisters offsetforReg:index];
         NSString* chanString;
         if([Gretina4ARegisters hasChannels:index]){
-            int chan = [model selectedChannel];
+            int chan = (int)[model selectedChannel];
             address += chan*0x04;
             chanString = [NSString stringWithFormat:@",%d",chan];
         }
@@ -1561,14 +1561,14 @@
 - (IBAction) writeRegisterAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue    = [model registerWriteValue];
+	uint32_t aValue    = [model registerWriteValue];
 	unsigned int index      = [model registerIndex];
     
 	if (index < kNumberOfGretina4ARegisters) {
-        unsigned long address   = [Gretina4ARegisters offsetforReg:index];
+        uint32_t address   = [Gretina4ARegisters offsetforReg:index];
         NSString* chanString;
         if([Gretina4ARegisters hasChannels:index]){
-            int chan = [model selectedChannel];
+            int chan = (int)[model selectedChannel];
             address += chan*0x04;
             chanString = [NSString stringWithFormat:@"%d",chan];
         }
@@ -1600,8 +1600,8 @@
 - (IBAction) writeSPIAction:(id)sender
 {
 	[self endEditing];
-	unsigned long aValue = [model spiWriteValue];
-	unsigned long readback = [model writeAuxIOSPI:aValue];
+	uint32_t aValue = [model spiWriteValue];
+	uint32_t readback = [model writeAuxIOSPI:aValue];
 	NSLog(@"Gretina4A(%d,%d) writeSPI(%u) readback: (0x%0x)\n",[model crateNumber],[model slot], aValue, readback);
 }
 
@@ -1663,14 +1663,14 @@
 
 - (IBAction) readLiveTimeStamp:(id)sender
 {
-    unsigned long long ts = [model readLiveTimeStamp];
+    uint64_t ts = [model readLiveTimeStamp];
     NSLog(@"Gretina4A (Slot %d <%p>) Live Timestamp: 0x%llx\n",[model slot],[model baseAddress],ts);
 
 }
 
 - (IBAction) readLatTimeStamp:(id)sender
 {
-    unsigned long long ts = [model readLatTimeStamp];
+    uint64_t ts = [model readLatTimeStamp];
     NSLog(@"Gretina4A (Slot %d <%p>) Lat Timestamp: 0x%llx\n",[model slot],[model baseAddress],ts);
     
 }
@@ -1762,7 +1762,7 @@
 
 - (IBAction) readVmeAuxStatus:(id)sender
 {
-    unsigned long status = [model readVmeAuxStatus];
+    uint32_t status = [model readVmeAuxStatus];
     NSLog(@"Gretina4A %d Aux VME Status: 0x%08x\n",[model slot],status);
     NSLog(@"Power: %@\n",       ((status>>0)&01)?@"FAULT":@"OK");
     NSLog(@"Over Volt: %@\n",   ((status>>1)&01)?@"FAULT":@"OK");
@@ -1815,7 +1815,7 @@
     }
     
     NSString* key = [NSString stringWithFormat: @"orca.ORGretina4A%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
     
 }
@@ -1828,12 +1828,12 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[[model waveFormRateGroup]timeRate]count];
+	return (int)[[[model waveFormRateGroup]timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int count = [[[model waveFormRateGroup]timeRate] count];
+	int count = (int)[[[model waveFormRateGroup]timeRate] count];
 	int index = count-i-1;
 	*yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
 	*xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];

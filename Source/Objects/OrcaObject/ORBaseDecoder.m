@@ -122,10 +122,10 @@ static NSString* kCrateKey[16] = {
 
 - (void) swapData:(void*)someData
 {
-	unsigned long* ptr = (unsigned long*)someData;
+	uint32_t* ptr = (uint32_t*)someData;
 	*ptr = CFSwapInt32(*ptr);
-	unsigned long length = ExtractLength(*ptr);
-	unsigned long i;
+	uint32_t length = ExtractLength(*ptr);
+	uint32_t i;
 	for(i=1;i<length;i++){
 		ptr[i] = CFSwapInt32(ptr[i]);
 	}

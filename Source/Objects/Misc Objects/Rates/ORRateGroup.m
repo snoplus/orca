@@ -104,7 +104,7 @@ NSString* ORRateGroupTotalRateChangedNotification   = @"ORRateGroupTotalRateChan
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORRateGroupTotalRateChangedNotification object:self userInfo:nil];
 }
 
-- (int) tag
+- (NSUInteger) tag
 {
 	return tag;
 }
@@ -200,7 +200,7 @@ static NSString *ORGroupRate_TimeRate 		= @"ORGroupRate_TimeRate";
 {
     [encoder encodeObject:[self rates] forKey:ORRateGroupRateArray];
     [encoder encodeDouble:[self integrationTime] forKey:ORRateGroupIntegrationTime];
-    [encoder encodeInt:[self tag] forKey:ORRateGroupTag];
+    [encoder encodeInteger:(int32_t)[self tag] forKey:ORRateGroupTag];
     [encoder encodeObject:[self timeRate] forKey:ORGroupRate_TimeRate];
 }
 

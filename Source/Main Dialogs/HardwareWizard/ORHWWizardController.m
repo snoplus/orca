@@ -105,7 +105,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     // Setup cell for add column
     NSButtonCell *buttonCell = [[[NSButtonCell alloc] init] autorelease];
     [buttonCell setBezelStyle: NSCircularBezelStyle];
-    [buttonCell setControlSize: NSSmallControlSize];
+    [buttonCell setControlSize: NSControlSizeSmall];
     [buttonCell setTarget: self];
     [buttonCell setAction: @selector(addAction:)];
     [addActionColumn setDataCell: buttonCell];
@@ -229,7 +229,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     objects = anObjects;
 }
 
-- (int)objectTag
+- (NSInteger)objectTag
 {
     return objectTag;
 }
@@ -491,7 +491,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         [marksPU setEnabled:YES];
         [clearMarksButton setEnabled:YES];
         [goToMarkButton setEnabled:YES];
-        int selectedItem = [marksPU indexOfSelectedItem];
+        NSInteger selectedItem = [marksPU indexOfSelectedItem];
         [marksPU removeAllItems];
         int n = [hwUndoManager numberOfMarks];
         int i;
@@ -575,7 +575,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 }
 
 
-- (void) addActionController:(id) obj atIndex:(int) index
+- (void) addActionController:(id) obj atIndex:(NSInteger) index
 {
     if (index < [actionControllers count]-1) [[self actionControllers] insertObject: obj atIndex: (index + 1)];
     else	    [[self actionControllers] addObject: obj];
@@ -585,7 +585,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [[[self undoManager] prepareWithInvocationTarget:self] removeActionControllerAtIndex:index+1];
 }
 
-- (void) removeActionControllerAtIndex:(int) index
+- (void) removeActionControllerAtIndex:(NSInteger) index
 {
     id obj = [[self actionControllers] objectAtIndex:index];
     [[[self undoManager] prepareWithInvocationTarget:self] addActionController:obj atIndex:index-1];
@@ -595,7 +595,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 }
 
 
-- (void) addSelectionController:(id) obj atIndex:(int) index
+- (void) addSelectionController:(id) obj atIndex:(NSInteger) index
 {
     if (index < [selectionControllers count]-1) [[self selectionControllers] insertObject: obj atIndex: (index + 1)];
     else	    [[self selectionControllers] addObject: obj];
@@ -604,7 +604,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [[[self undoManager] prepareWithInvocationTarget:self] removeSelectionControllerAtIndex:index+1];
 }
 
-- (void) removeSelectionControllerAtIndex:(int) index
+- (void) removeSelectionControllerAtIndex:(NSInteger) index
 {
     id obj = [[self selectionControllers] objectAtIndex:index];
     [[[self undoManager] prepareWithInvocationTarget:self] addSelectionController:obj atIndex:index-1];
@@ -659,7 +659,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [alert setInformativeText:[NSString stringWithFormat:@"Really Execute This HardwareWizard Set on %i channels?",chanCount]];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if(result == NSAlertFirstButtonReturn){
@@ -690,7 +690,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [alert setInformativeText:[NSString stringWithFormat:@"Really Execute This HardwareWizard Set on %i channels?",chanCount]];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -744,7 +744,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (IBAction) undoToMark:(id) sender
 {
-    [hwUndoManager undoToMark:[marksPU indexOfSelectedItem]];
+    [hwUndoManager undoToMark:(int)[marksPU indexOfSelectedItem]];
     [undoButton setEnabled:[hwUndoManager canUndo]];
     [redoButton setEnabled:[hwUndoManager canRedo]];
 }
@@ -761,7 +761,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [alert setInformativeText:@"Really Clear them? You will not be able to undo to the mark points."];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -794,7 +794,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [alert setInformativeText:@"Really clear them? You will not be able to undo."];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -926,7 +926,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 // Methods from SubviewTableViewDataSourceProtocol
 
-- (NSView *) tableView:(NSTableView *) tableView viewForRow:(int) row
+- (NSView *) tableView:(NSTableView *) tableView viewForRow:(NSUInteger) row
 {
     if(tableView == actionTableView){
         return [[[self actionControllers] objectAtIndex: row] view];
@@ -970,7 +970,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 // Methods from NSTableDataSource protocol
 
-- (int) numberOfRowsInTableView:(NSTableView *) tableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *) tableView
 {
     if(tableView == actionTableView)return [[self actionControllers] count];
     else return [[self selectionControllers] count];
@@ -1071,7 +1071,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     //fill with nil objects at start, will fill in below.
     NSArray* containers = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:containerClass]; 
     [self setControlArray:[NSMutableArray array]];
-    int maxContainerTag = 0;
+    NSUInteger maxContainerTag = 0;
     for( id containerObj in containers){
         if([containerObj stationNumber]>maxContainerTag){
             maxContainerTag = [containerObj stationNumber];
@@ -1088,7 +1088,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     if([containers count]){
         
         for(id containerObj in containers){
-            int containerTag = [containerObj stationNumber];
+            int containerTag = (int)[containerObj stationNumber];
             [controlArray replaceObjectAtIndex:containerTag withObject:[NSMutableArray array]]; //insert the container object
 			//set up this container's objects
             NSArray* objectList = [containerObj collectObjectsOfClass:objectClass]; 
@@ -1123,7 +1123,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             while(wizObject = [objectEnum nextObject]){
                 if([wizObject respondsToSelector:@selector(numberOfChannels)]){
                     int chan;
-                    unsigned long mask = [wizObject wizMask];
+                    uint32_t mask = [wizObject wizMask];
                     BOOL atLeastOneChan = NO;
                     for(chan=0;chan<[wizObject numberOfChannels];chan++){
                         if(mask & (1<<chan)){
@@ -1179,8 +1179,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void) setUpMasks:(NSNotification*)aNote
 {
-    int i;
-    unsigned long       mask;
+    int32_t i;
+    uint32_t       mask;
     eSelectionLogic	selectionLogic;
     eSelectionLevel	selectionLevel;
     eSelectionAction 	selectionAction;
@@ -1212,7 +1212,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
             firstObject = false;
         }
         /* get the search edit value */
-        long searchValue = [selectionController selectionValue];
+        int32_t searchValue = [selectionController selectionValue];
         /* initialize channel mask */
         mask = 0;
         
@@ -1241,7 +1241,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
         
         /* setup hardware parameters for searches independent of container and object level */
         int     count, shift = 0;
-        unsigned long mask1 = 0;
+        uint32_t mask1 = 0;
         switch (selectionLevel) {
             case kChannelLevel:
                 count = kMaxChannels;
@@ -1350,7 +1350,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                         }
                         
                         /* finally, combine this mask with the current mask for this FEC */
-                        unsigned long theFinalMask = [wizObject wizMask];
+                        uint32_t theFinalMask = [wizObject wizMask];
                         switch (selectionLogic) {
                             case kSearchLogic_And:
                                 /* combine the channel masks with a logical AND and save in array */
@@ -1444,7 +1444,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     
     SEL setterSelector = [paramObj setMethodSelector];
     SEL getterSelector = [paramObj getMethodSelector];
-    int numSetArgs = [[target methodSignatureForSelector:[paramObj setMethodSelector]] numberOfArguments]-2;
+    int numSetArgs = (int)[[target methodSignatureForSelector:[paramObj setMethodSelector]] numberOfArguments]-2;
     int numGetArgs = 0;
     //convert the chan to a NSNumber
     NSNumber* theChan = [NSNumber numberWithInt:chan];
@@ -1452,7 +1452,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     //set up the invocation for the 'getter'
 	if(getterSelector){
 	    invocationForGetter = [NSInvocation invocationWithMethodSignature:[target methodSignatureForSelector:getterSelector]];
-	    numGetArgs = [[target methodSignatureForSelector:getterSelector] numberOfArguments]-2;
+	    numGetArgs = (int)[[target methodSignatureForSelector:getterSelector] numberOfArguments]-2;
 	    //[invocationForGetter retainArguments];
 	    [invocationForGetter setSelector:getterSelector];
 	    [invocationForGetter setTarget:target];
@@ -1537,7 +1537,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				ORHWWizParam* aParam;
 				NSEnumerator* e = [[self selectedObjectsParameters] objectEnumerator];
 				while(aParam = [e nextObject]){
-					int numSetArgs = [[target methodSignatureForSelector:[aParam setMethodSelector]] numberOfArguments]-2;
+					int numSetArgs = (int)[[target methodSignatureForSelector:[aParam setMethodSelector]] numberOfArguments]-2;
 					if(numSetArgs>0){
 						[self doAction:kAction_Restore target:target parameter:aParam channel:chan value:aValue];
 					}
@@ -1568,7 +1568,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
     [alert setInformativeText:@"Really Restore ALL Parameters?\n(A run file will be requested, with one more chance to cancel.)"];
     [alert addButtonWithTitle:@"Yes"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -1620,7 +1620,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
                 
 				SEL methodSel = [paramObj setMethodSelector];
 				int numberOfSettableArguments = 0;
-				if(methodSel) numberOfSettableArguments = [[target methodSignatureForSelector:methodSel] numberOfArguments]-2;
+				if(methodSel) numberOfSettableArguments = (int)[[target methodSignatureForSelector:methodSel] numberOfArguments]-2;
 				
 				if(![paramObj enabledWhileRunning] && [[ORGlobal sharedGlobal] runInProgress]){
 					NSLog(@"HW Wizard selection <%@> can not be executed while running. It was skipped.\n",[paramObj name]);
@@ -1632,7 +1632,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 				if(numberOfSettableArguments <= 1){
 					if([paramObj useValue] || [paramObj oncePerCard]){
 						//no channels to deal with, just do the action
-						unsigned long chanMask = [wizObject wizMask];
+						uint32_t chanMask = [wizObject wizMask];
 						if(chanMask & 0xffffffff){									
 							
 							[self doAction:actionSelection 
@@ -1646,7 +1646,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 							//loop over the channels, doing the action for each channel in the mask.
 						int chan;
 						int numChan = [wizObject numberOfChannels];
-						unsigned long chanMask = [wizObject wizMask];
+						uint32_t chanMask = [wizObject wizMask];
 						for(chan=0;chan<numChan;chan++){
 							if(chanMask & (1<<chan)){									
 								[self doAction:actionSelection 
@@ -1672,7 +1672,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 						//loop over the channels, doing the action for each channel in the mask.
 						int chan;
 						int numChan = [wizObject numberOfChannels];
-						unsigned long chanMask = [wizObject wizMask];
+						uint32_t chanMask = [wizObject wizMask];
 						for(chan=0;chan<numChan;chan++){
 							if(chanMask & (1<<chan)){									
 								[self doAction:actionSelection 
@@ -1725,12 +1725,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 	while([actionControllers count] > 1)    [self removeActionControllerAtIndex:1];
 	while([selectionControllers count] > 1) [self removeSelectionControllerAtIndex:1];
 	
-	int oldObjectIndex = [objectPU indexOfSelectedItem];
+	int oldObjectIndex = (int)[objectPU indexOfSelectedItem];
 	
     [[self undoManager] enableUndoRegistration];
 	
 	//loop thru all availiable objects and do a 'Restore All'
-	n = [objectPU numberOfItems];
+	n = (int)[objectPU numberOfItems];
 	for(i=0;i<n;i++){
 		[objectPU selectItemAtIndex:i];
 		[self selectObject:objectPU];
@@ -1755,14 +1755,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _restoreAllSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         [self performSelector:@selector(_delayedRestoreAllFileRequest) withObject:nil afterDelay:.1];
     }    
 }
      
 - (void) _doItSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         [self setUseMark:NO];
         [self makeControlStruct:nil];
         [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
@@ -1770,7 +1770,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 }
 - (void) _doItWithMarkSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         [self setUseMark:YES];
         [self makeControlStruct:nil];
         [self performSelector:@selector(_delayedExecute) withObject:nil afterDelay:.1];
@@ -1780,7 +1780,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void)_clearMarksSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         [hwUndoManager clearMarks];
         [self marksChanged];
     }    
@@ -1788,7 +1788,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 
 - (void)_clearUndoSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
         [self clearUndoStacks];
     }    
 }
@@ -1814,12 +1814,12 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(HWWizardController);
 {
     return target;
 }
-- (unsigned long) wizMask
+- (uint32_t) wizMask
 {
     return wizMask;
 }
 
-- (void) setWizMask:(unsigned long )aMask
+- (void) setWizMask:(uint32_t )aMask
 {
     wizMask = aMask;
 }

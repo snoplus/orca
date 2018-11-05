@@ -1245,6 +1245,7 @@ void processMacAddressRequest(SBC_Packet* aPacket)
     p->macAddress[4] = mac[4];
     p->macAddress[5] = mac[5];
     
+    
     //no need to swap... just characters
     if (writeBuffer(aPacket) < 0) {
         LogError("Mac Address Error: %s", strerror(errno));
@@ -1254,7 +1255,7 @@ void processMacAddressRequest(SBC_Packet* aPacket)
 
 void processCmdBlock(SBC_Packet* aPacket)
 {
-	unsigned long totalBytes = aPacket->cmdHeader.numberBytesinPayload;	//total for all enclosed cmd packets
+	uint32_t totalBytes = aPacket->cmdHeader.numberBytesinPayload;	//total for all enclosed cmd packets
 	uint32_t* theCmdPacket = (uint32_t*)aPacket->payload;
 	while(totalBytes>0){
 		//might have to swap the first part of the payload which is really a size and an SBC_CommandHeader

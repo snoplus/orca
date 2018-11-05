@@ -278,7 +278,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     [[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelGainDisplayTypeChanged object:self];
 }
 
-- (int) queCount
+- (NSUInteger) queCount
 {
 	return [cmdQueue count];
 }
@@ -441,7 +441,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 		time_t	ut_Time;
 		time(&ut_Time);
 		//struct tm* theTimeGMTAsStruct = gmtime(&theTime);
-		timeMeasured[index] = ut_Time;
+		timeMeasured[index] = (uint32_t)ut_Time;
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORPacModelAdcChanged
 															object:self
@@ -591,7 +591,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 		[fh seekToEndOfFile];
 		
 		int i;
-		int n = [logBuffer count];
+		int n = (int)[logBuffer count];
 		for(i=0;i<n;i++){
 			[fh writeData:[[logBuffer objectAtIndex:i] dataUsingEncoding:NSASCIIStringEncoding]];
 		}
@@ -622,7 +622,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 	[self setModule:		[decoder decodeIntForKey:	 @"ORPacModelModule"]];
 	[self setGainValue:		[decoder decodeIntForKey:	 @"gainValue"]];
 	[self setPortWasOpen:	[decoder decodeBoolForKey:	 @"portWasOpen"]];
-	[self setPollingState:	[decoder decodeIntForKey:	 @"pollingState"]];
+	[self setPollingState:	[decoder decodeIntegerForKey:	 @"pollingState"]];
 	[self setLogFile:		[decoder decodeObjectForKey: @"logFile"]];
     [self setLogToFile:		[decoder decodeBoolForKey:	 @"logToFile"]];
 	[self setAdcChannel:    [decoder decodeIntForKey:    @"ORPacModelAdcChannel"]];
@@ -650,17 +650,17 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
     [encoder encodeObject:lastGainFile  forKey:@"lastGainFile"];
     [encoder encodeInt:gainDisplayType  forKey:@"gainDisplayType"];
     [encoder encodeBool:setAllGains		forKey:@"ORPacModelSetAllGains"];
-    [encoder encodeInt:gainChannel		forKey:@"ORPacModelGainChannel"];
+    [encoder encodeInteger:gainChannel		forKey:@"ORPacModelGainChannel"];
     [encoder encodeBool:lcmEnabled		forKey:@"ORPacModelLcmEnabled"];
-    [encoder encodeInt:preAmp			forKey:@"ORPacModelPreAmp"];
-    [encoder encodeInt:module			forKey:@"ORPacModelModule"];
-    [encoder encodeInt:gainValue			forKey:@"gainValue"];
+    [encoder encodeInteger:preAmp			forKey:@"ORPacModelPreAmp"];
+    [encoder encodeInteger:module			forKey:@"ORPacModelModule"];
+    [encoder encodeInteger:gainValue			forKey:@"gainValue"];
     [encoder encodeBool:portWasOpen		forKey:@"portWasOpen"];
     [encoder encodeObject:portName		forKey:@"portName"];
-    [encoder encodeInt:pollingState		forKey:@"pollingState"];
+    [encoder encodeInteger:pollingState		forKey:@"pollingState"];
     [encoder encodeObject:logFile		forKey:@"logFile"];
     [encoder encodeBool:logToFile		forKey:@"logToFile"];
-    [encoder encodeInt:adcChannel       forKey:@"ORPacModelAdcChannel"];
+    [encoder encodeInteger:adcChannel       forKey:@"ORPacModelAdcChannel"];
 	int i;
 	for(i=0;i<148;i++){
 		[encoder encodeInt:gain[i] forKey: [NSString stringWithFormat:@"gain%d",i]];
@@ -826,8 +826,8 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 }
 
 #pragma mark •••Data Records
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -913,7 +913,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 				else if(theCmd[1] == kPacGainReadAll){
                     unsigned char* ptr	 = (unsigned char*)[inComingData bytes];
                     int i;
-                    unsigned len = [inComingData length];
+                    unsigned len = (int)[inComingData length];
                     if(len >= 297) {
                         if(ptr[296] == kPacOkByte){
                             for(i=0;i<len-1;i+=2){
@@ -971,7 +971,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 	}
 }
 
-- (unsigned long) timeMeasured:(int)index
+- (uint32_t) timeMeasured:(int)index
 {
 	if(index<0)return 0;
 	else if(index>=8)return 0;
@@ -1088,7 +1088,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Pac,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Pac,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -1310,7 +1310,7 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 {
     if([[ORGlobal sharedGlobal] runInProgress]){
 		
-		unsigned long data[18];
+		uint32_t data[18];
 		data[0] = dataId | 18;
 		data[1] = ([self uniqueIdNumber]&0xfff);
 		
@@ -1321,14 +1321,14 @@ NSString* ORPacModelVetoChanged			= @"ORPacModelVetoChanged";
 			data[index++] = adc[i];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification
-															object:[NSData dataWithBytes:data length:sizeof(long)*18]];
+															object:[NSData dataWithBytes:data length:sizeof(int32_t)*18]];
 	}
 }
 - (void) loadLogBuffer
 {
 	NSString*   outputString = nil;
 	if(logToFile) {
-		outputString = [NSString stringWithFormat:@"%lu ",timeMeasured[0]];
+		outputString = [NSString stringWithFormat:@"%u ",timeMeasured[0]];
 		short chan;
 		for(chan=0;chan<8;chan++){
 			outputString = [outputString stringByAppendingFormat:@"%.2f ",[self convertedAdc:chan]];

@@ -75,10 +75,10 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
     
     NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
     [i lockFocus];
-    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [aCachedImage drawAtPoint:theOffset fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     if([[ORGlobal sharedGlobal] runMode] == kOfflineRun && !validRunType){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage drawAtPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aNoticeImage drawAtPoint:NSMakePoint(theOffset.x/2.+[i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     }
 
     [i unlockFocus];
@@ -165,11 +165,11 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
 
 #pragma mark •••Accessors
 
-- (unsigned long)	runType
+- (uint32_t)	runType
 {
     return runType;
 }
-- (void) setRunType:(unsigned long)aMask
+- (void) setRunType:(uint32_t)aMask
 {
     [[[self undoManager] prepareWithInvocationTarget:self] setRunType:runType];
     runType = aMask;
@@ -190,7 +190,7 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
    return runInProgress;
 }
 
-- (long) numberBytesSent
+- (int32_t) numberBytesSent
 {
     return numberBytesSent;
 }
@@ -276,7 +276,7 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
 
 - (void) runTaskStarted:(NSDictionary*)userInfo
 {
-    unsigned long runModelRunType = [runModel runType];
+    uint32_t runModelRunType = [runModel runType];
     validRunType = !(runModelRunType & runType);
     [self setUpImage];
 
@@ -325,7 +325,7 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
     [[self undoManager] disableUndoRegistration];
     [self setPipeName:     [decoder decodeObjectForKey:   @"pipeName"]];
     [self setReaderPath:   [decoder decodeObjectForKey:   @"readerPath"]];
-    [self setRunType:   [decoder decodeInt32ForKey:   @"runType"]];
+    [self setRunType:   [decoder decodeIntForKey:   @"runType"]];
     [[self undoManager] enableUndoRegistration];
     
     validRunType = YES; //assume ok. Check again when run starts
@@ -336,7 +336,7 @@ NSString* ORDataPipeTypeChangedNotification = @"ORDataPipeTypeChangedNotificatio
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt32:runType            forKey:@"runType"];
+    [encoder encodeInt:runType            forKey:@"runType"];
     [encoder encodeObject:readerPath         forKey:@"readerPath"];
     [encoder encodeObject:pipeName           forKey:@"pipeName"];
 }

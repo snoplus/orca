@@ -27,8 +27,8 @@
 #import "ORProcessElementModel.h"
 #import "ORProcessCenter.h"
 
-int sortUpFunction(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
-int sortDnFunction(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
+NSInteger sortUpFunction(id element1,id element2, void* context){ return [element1 compareStringTo:element2 usingKey:context];}
+NSInteger sortDnFunction(id element1,id element2, void* context){return [element2 compareStringTo:element1 usingKey:context];}
 
 @implementation ORProcessController
 
@@ -51,7 +51,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 {
     [super awakeFromNib];
     
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"orca.Process%lu.selectedtab",[model uniqueIdNumber]]];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey:[NSString stringWithFormat:@"orca.Process%u.selectedtab",[model uniqueIdNumber]]];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];	
     [tableView setDoubleAction:@selector(doubleClick:)];
@@ -353,7 +353,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
         }
     }
     
-    int selectedIndex = [emailListTable selectedRow];
+    NSInteger selectedIndex = [emailListTable selectedRow];
 
     [emailListTable      setHidden:  aDiffMasterExists];
 	[addAddressButton    setEnabled:!aDiffMasterExists];
@@ -377,7 +377,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
         
         NSIndexSet* theSelectedSet =  [tableView selectedRowIndexes];
         if(theSelectedSet){
-            int rowIndex = [theSelectedSet firstIndex];
+            NSInteger rowIndex = [theSelectedSet firstIndex];
             id item = [[model orcaObjects]objectAtIndex:rowIndex];
             theDetails = [NSString stringWithFormat:@"%@",[item description:@""]];
         }
@@ -400,7 +400,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 - (IBAction) addAddress:(id)sender
 {
-	int index = [[model emailList] count];
+	int index = (int)[[model emailList] count];
 	[model addAddress:@"<eMail>" atIndex:index];
 	NSIndexSet* indexSet = [NSIndexSet indexSetWithIndex:index];
 	[emailListTable selectRowIndexes:indexSet byExtendingSelection:NO];
@@ -415,7 +415,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 	NSIndexSet* theSet = [emailListTable selectedRowIndexes];
 	NSUInteger current_index = [theSet firstIndex];
     if(current_index != NSNotFound){
-		[model removeAddressAtIndex:current_index];
+		[model removeAddressAtIndex:(int)current_index];
 	}
 	[self updateButtons];
 	[emailListTable reloadData];
@@ -434,7 +434,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 - (IBAction) heartBeatIndexAction:(id)sender
 {
     if([sender indexOfSelectedItem] != [model heartBeatIndex]){
-        [model setHeartBeatIndex:[sender indexOfSelectedItem]];	
+        [model setHeartBeatIndex:(int)[sender indexOfSelectedItem]];
         if([model heartbeatSeconds] == 0){
             [model sendHeartbeatShutOffWarning];
         }
@@ -513,7 +513,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 
 #pragma mark ¥¥¥Data Source
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == tableView){
 		NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
@@ -534,7 +534,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 		else return @"";
 	}
 }
-- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(int)rowIndex
+- (void)tableView:(NSTableView *)aTableView setObjectValue:anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
 	if(aTableView == tableView){
 		NSParameterAssert(rowIndex >= 0 && rowIndex < [[model orcaObjects] count]);
@@ -549,7 +549,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 }
 
 // just returns the number of items we have.
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
  	if(aTableView == tableView){
 		return [[model orcaObjects] count];
@@ -561,14 +561,14 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    int index = [tabView indexOfTabViewItem:item];
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.Process%lu.selectedtab",[model uniqueIdNumber]]];
+    NSInteger index = [tabView indexOfTabViewItem:item];
+    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:[NSString stringWithFormat:@"orca.Process%u.selectedtab",[model uniqueIdNumber]]];
 }
 
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
 	if([aNotification object] == emailListTable || aNotification == nil){
-		int selectedIndex = [emailListTable selectedRow];
+		NSInteger selectedIndex = [emailListTable selectedRow];
 		[removeAddressButton setEnabled:selectedIndex>=0];
 	}
 }
@@ -598,7 +598,7 @@ int sortDnFunction(id element1,id element2, void* context){return [element2 comp
     NSString *key = [self sortColumn];
     NSArray *a = [tableView tableColumns];
     NSTableColumn *column = [tableView tableColumnWithIdentifier:key];
-    unsigned i = [a count];
+    uint32_t i = (uint32_t)[a count];
     
     while (i-- > 0) [tableView setIndicatorImage:nil inTableColumn:[a objectAtIndex:i]];
     

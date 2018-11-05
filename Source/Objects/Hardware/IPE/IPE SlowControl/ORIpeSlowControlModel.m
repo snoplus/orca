@@ -224,7 +224,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (int) setpointRequestsQueueCount
 {	
 	if(!setpointRequestsQueue) return 0;
-	return [setpointRequestsQueue count];  
+	return (int)[setpointRequestsQueue count];
 }
 
 
@@ -514,7 +514,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (void) setDataIds:(id)assigner
 {
-    channelDataId = [assigner assignDataIds:kLongForm];
+    channelDataId = (int)[assigner assignDataIds:kLongForm];
 }
 
 - (void) syncDataIdsWith:(id)anotherObject
@@ -540,7 +540,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 }
 
 #pragma mark ***Polled Item via LookupTable index
-- (BOOL) itemExists:(int)anIndex
+- (BOOL) itemExists:(NSUInteger)anIndex
 {
 	return anIndex<[pollingLookUp count];//TODO: this may be wrong as we can have gaps in the channel numbers? -tb-
 }
@@ -731,13 +731,13 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) removeSet:(NSIndexSet*)aSetToRemove
 {
 	NSMutableArray* itemsToRemove = [NSMutableArray array];
-	NSUInteger current_index = [aSetToRemove firstIndex];
+	int current_index = (int)[aSetToRemove firstIndex];
     while (current_index != NSNotFound) {
 		if(current_index<[pollingLookUp count]){
 			NSString* itemKey = [self requestCacheItemKey:current_index];
 			[itemsToRemove addObject:itemKey];
 		}
-		current_index = [aSetToRemove indexGreaterThanIndex: current_index];
+		current_index = (int)[aSetToRemove indexGreaterThanIndex: current_index];
     }
 	for(id aKey in itemsToRemove){
 		[self removeItemKeyFromPollingLookup:aKey];
@@ -806,7 +806,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 //input: URL, manual path, controlType, channelNumber
 
 	//CHECK WHETHER PATH has length 4 and URL not empty ...  -tb-
-	int componentCount = [[aPath componentsSeparatedByString:@"/"] count];
+	int componentCount = (int)[[aPath componentsSeparatedByString:@"/"] count];
 	if(componentCount!=4){
 	    NSLog(@"Path %@ needs to have 4 items, but has %i items!\n",manualPath,componentCount);
 	    return -1;
@@ -924,16 +924,16 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];    
-	[encoder encodeInt:rePostStillPendingRequests forKey:@"rePostStillPendingRequests"];
-	[encoder encodeInt:manualType			forKey:@"manualType"];
+	[encoder encodeInteger:rePostStillPendingRequests forKey:@"rePostStillPendingRequests"];
+	[encoder encodeInteger:manualType			forKey:@"manualType"];
 	[encoder encodeObject:manualPath		forKey:@"manualPath"];
 	[encoder encodeBool:showDebugOutput		forKey:@"showDebugOutput"];
 	[encoder encodeBool:shipRecords			forKey:@"shipRecords"];
 	[encoder encodeBool:fastGenSetup		forKey:@"fastGen"];
 	[encoder encodeDouble:setPoint			forKey:@"setPoint"];
-	[encoder encodeInt:itemType				forKey:@"itemType"];
+	[encoder encodeInteger:itemType				forKey:@"itemType"];
 	[encoder encodeBool:viewItemName		forKey:@"viewItemName"];
-	[encoder encodeInt:pollTime				forKey:@"pollTime"];
+	[encoder encodeInteger:pollTime				forKey:@"pollTime"];
  	[encoder encodeObject:IPNumber			forKey:@"IPNumber"];
  	//[encoder encodeObject:itemTreeRoot		forKey:@"itemTreeRoot"];
  	[encoder encodeObject:pollingLookUp		forKey:@"pollingLookUp"];
@@ -1050,7 +1050,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 
 - (NSString*) processingTitle
 {
-    return [NSString stringWithFormat: @"%@-%lu",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
+    return [NSString stringWithFormat: @"%@-%u",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
 }
 
 
@@ -1163,7 +1163,7 @@ NSString* ORIpeSlowControlSetpointRequestQueueChanged	= @"ORIpeSlowControlSetpoi
 #pragma mark •••ID Helpers (see OrcaObject)
 - (NSString*) identifier
 {
-    return [NSString stringWithFormat: @"%@-%lu",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
+    return [NSString stringWithFormat: @"%@-%u",IPE_SLOW_CONTROL_SHORT_NAME,[self uniqueIdNumber]];
 }
 
 #pragma mark •••Methods Useful For Scripting
@@ -1356,21 +1356,21 @@ enum {
 
     NSArray *csvtable = [myString csvRows];
 	if(!csvtable) return FALSE;
-	int nlines = [csvtable count];
+	int nlines = (int)[csvtable count];
 	//if(csvtable) NSLog(@"csvtable (%i lines) >>>%@<<<\n", nlines, csvtable);//TODO: enable with debug output setting??? -tb-
 	if(nlines<=1) return FALSE;
 	
 	int indexChan, indexName, indexURL, indexPath, indexLoAlarm, indexHiAlarm, indexLoLimit, indexHiLimit, indexType;
 	NSArray *colnames = [csvtable objectAtIndex: 0];
-	indexChan = [colnames indexOfObject: @"Chan"];
-	indexName = [colnames indexOfObject: @"Name"];
-	indexURL = [colnames indexOfObject: @"URL"];
-	indexPath = [colnames indexOfObject: @"Path"];
-	indexLoAlarm = [colnames indexOfObject: @"LoAlarm"];
-	indexHiAlarm = [colnames indexOfObject: @"HiAlarm"];
-	indexLoLimit = [colnames indexOfObject: @"LoLimit"];
-	indexHiLimit = [colnames indexOfObject: @"HiLimit"];
-	indexType = [colnames indexOfObject: @"Type"];
+	indexChan = (int)[colnames indexOfObject: @"Chan"];
+	indexName = (int)[colnames indexOfObject: @"Name"];
+	indexURL = (int)[colnames indexOfObject: @"URL"];
+	indexPath = (int)[colnames indexOfObject: @"Path"];
+	indexLoAlarm = (int)[colnames indexOfObject: @"LoAlarm"];
+	indexHiAlarm = (int)[colnames indexOfObject: @"HiAlarm"];
+	indexLoLimit = (int)[colnames indexOfObject: @"LoLimit"];
+	indexHiLimit = (int)[colnames indexOfObject: @"HiLimit"];
+	indexType = (int)[colnames indexOfObject: @"Type"];
 	
 	
 	//NSLog(@"colnames >>>%@<<<\n", colnames);
@@ -1819,7 +1819,7 @@ enum {
 		if([path isEqual:@"/"] || ([path length]==0)) count = 0;
 		else {
 			components = [path componentsSeparatedByString:@"/"];
-			count = [components count];
+			count = (int)[components count];
 		}
 //		NSMutableArray *pathThroughTree = [[NSMutableArray alloc] initWithObject: [obj objectForKey:@"URL"]];
 		NSMutableArray *pathThroughTree = [NSMutableArray arrayWithCapacity:5];
@@ -1843,7 +1843,7 @@ enum {
 	#endif
 
 	// now send the request(s) to ADEI
-	int count = [requestStringList count];
+	int count = (int)[requestStringList count];
 	//check whether this chan is already in queue, if yes, remove it
 	int i;
 	for(i=0; i<count; i++){
@@ -1945,7 +1945,7 @@ enum {
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORIpeSlowControlModelHistogramChanged object:self];
 }
 
-- (long) dataTimeHist:(int)index
+- (int32_t) dataTimeHist:(int)index
 {
 	if(index<kResponseTimeHistogramSize)return histogram[index];
 	else return 0;
@@ -2258,7 +2258,7 @@ enum {
 {
 	union {
 		float asFloat;
-		unsigned long asLong;
+		uint32_t asLong;
 	}dataUnion;
 	
 	if([pollingLookUp count]){
@@ -2278,10 +2278,10 @@ enum {
                 if(channelNumber ==-1) channelNumber = 0xff;//removed channels have channelNumber -1
                 
 				NSTimeInterval theTimeStamp =  [self timeFromADEIDate:[itemDictionary objectForKey:@"Date"]];//TODO: controls have no "Date" -tb-
-				unsigned long seconds	 = (unsigned long)theTimeStamp;	  //seconds since 1970
-				unsigned long subseconds = (theTimeStamp - seconds)*1000; //milliseconds
+				uint32_t seconds	 = (uint32_t)theTimeStamp;	  //seconds since 1970
+				uint32_t subseconds = (theTimeStamp - seconds)*1000; //milliseconds
 				
-				unsigned long data[7];
+				uint32_t data[7];
 				data[0] = channelDataId | 7;
 				data[1] = (([self uniqueIdNumber]&0xf) << 21) | (channelNumber&0xff);
 							
@@ -2292,7 +2292,7 @@ enum {
 				data[5] = 0; //spare
 				data[6] = 0; //spare
 				
-				[theData appendBytes:data length:7*sizeof(unsigned long)];
+				[theData appendBytes:data length:7*sizeof(uint32_t)];
 			}
 			[[NSNotificationCenter defaultCenter] postNotificationName:ORQueueRecordForShippingNotification object:theData];
 		}

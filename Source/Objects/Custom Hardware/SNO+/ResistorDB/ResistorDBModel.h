@@ -6,8 +6,7 @@
 //
 //
 
-#import <Foundation/Foundation.h>
-#import "ResistorDBViewController.h"
+//#import "ResistorDBViewController.h"
 
 @class ORCouchDB;
 
@@ -38,7 +37,7 @@
 - (void) updateResistorDb:(NSMutableDictionary*)aResistorDocDic;
 - (void) addNeweResistorDoc:(NSMutableDictionary*)aResistorDocDic;
 - (void) checkIfDocumentExists:(int)aCrate withCard:(int)aCard withChannel:(int)aChannel withRunRange:(NSMutableArray*)aRunRange;
-- (unsigned int) getCurrentRunNumber;
+- (uint32_t) getCurrentRunNumber;
 
 @end
 

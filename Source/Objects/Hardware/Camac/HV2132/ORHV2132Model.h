@@ -31,7 +31,7 @@
 //#define HV2132NoHardware
 
 
-enum {
+static enum {
 	kHV2132ModifyOneVoltage					= 0,				
 	kHV2132SetValue							= 1,							
 	kHV2132ModifyAll3_3kVVoltages			= 2,		
@@ -50,7 +50,7 @@ enum {
 	kHV2132IdPodComplement					= 15					
 } hv2132Cmds;
 
-enum {
+static enum {
 	kHV2132TrueVoltage			 = 3,		
 	kHV2132HVOnOffStatus		 = 5,	
 	kHV2132DemandValue			 = 8,
@@ -123,15 +123,15 @@ enum {
 - (void) clearBuffer;
 - (void) sendCmd:(unsigned short)aCmd label:(NSString*)aLabel;
 - (void) readData:(unsigned short*)data numWords:(int)num;
-- (void) setVoltage:(int) hvValue mainFrame:(int) mainFrame channel:(int) channel;
-- (void) readVoltage:(int*) hvValue mainFrame:(int) mainFrame channel:(int) channel;
-- (void) readAllVoltages:(int*)hvValues mainFrame:(int) mainFrame;
-- (void) setEnableResponse:(BOOL)state mainFrame:(int)aMainFrame;
-- (void) setHV:(BOOL)state mainFrame:(int)aMainFrame;
-- (void) readTarget:(int*) aValue mainFrame:(int) aMainFrame channel:(int) aChannel;
-- (void) readAllTargets:(int*)aValues mainFrame:(int) aMainFrame;
-- (void) readStatus:(int*) aValue failedMask:(unsigned short*)failed mainFrame:(int) aMainFrame;
-- (void) readPodComplement:(unsigned short*) typeMask mainFrame:(int) aMainFrame;
+- (void) setVoltage:(int) hvValue mainFrame:(uint32_t) mainFrame channel:(int) channel;
+- (void) readVoltage:(int*) hvValue mainFrame:(uint32_t) mainFrame channel:(int) channel;
+- (void) readAllVoltages:(int*)hvValues mainFrame:(uint32_t) mainFrame;
+- (void) setEnableResponse:(BOOL)state mainFrame:(uint32_t)aMainFrame;
+- (void) setHV:(BOOL)state mainFrame:(uint32_t)aMainFrame;
+- (void) readTarget:(int*) aValue mainFrame:(uint32_t) aMainFrame channel:(int) aChannel;
+- (void) readAllTargets:(int*)aValues mainFrame:(uint32_t) aMainFrame;
+- (void) readStatus:(int*) aValue failedMask:(unsigned short*)failed mainFrame:(uint32_t) aMainFrame;
+- (void) readPodComplement:(unsigned short*) typeMask mainFrame:(uint32_t) aMainFrame;
 
 #pragma mark ¥¥¥Archival
 - (id) initWithCoder:(NSCoder*)decoder;
@@ -150,5 +150,5 @@ extern NSString* ORHV2132VoltageChanged;
 extern NSString* ORHV2132OnOffChanged;
 
 @interface OrcaObject (HVController)
-- (void) setMainFrameID:(unsigned long)aValue;
+- (void) setMainFrameID:(uint32_t)aValue;
 @end

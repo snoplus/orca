@@ -29,7 +29,7 @@
 // Constants
 const float	 kDefaultChnlPos	=	0.0;
 const float	 kDefaultChnlScale	=	1.0;
-const long	 kDefaultPulseLength = 5000;
+const int32_t	 kDefaultPulseLength = 5000;
 const float	 kDefaultHorizScale = 1.0e-6;
 const float	 kDefaultHorizPos = 0.5;
 
@@ -127,11 +127,11 @@ NSString*	OROscChnl								= @"Osc Chnl";
 //--------------------------------------------------------------------------------
 /*!\method  scopeType  
 * \brief	Returns the scope type.
-* \return	The scope type as unsigned long.  Might be up to 4 character text.
+* \return	The scope type as uint32_t.  Might be up to 4 character text.
 * \note	
 */
 //--------------------------------------------------------------------------------
-- (unsigned long) scopeType
+- (uint32_t) scopeType
 {
     return( mScopeType );
 }
@@ -139,11 +139,11 @@ NSString*	OROscChnl								= @"Osc Chnl";
 //--------------------------------------------------------------------------------
 /*!\method  scopeVersion  
 * \brief	Returns the scope version.
-* \return	The scope version as unsigned long.  Might be character text.
+* \return	The scope version as uint32_t.  Might be character text.
 * \note	
 */
 //--------------------------------------------------------------------------------
-- (unsigned long) scopeVersion
+- (uint32_t) scopeVersion
 {
     return( mScopeVersion );
 }
@@ -431,7 +431,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 * \note	
 */
 //--------------------------------------------------------------------------------
-- (long) waveformLength
+- (int32_t) waveformLength
 {
     return mWaveformLength;
 }
@@ -443,7 +443,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 * \note	
 */
 //--------------------------------------------------------------------------------
-- (void) setWaveformLength: (long) aWaveformLength
+- (void) setWaveformLength: (int32_t) aWaveformLength
 {
 	// Set the undo manager action.  The label has already been set by the controller calling this method.
     [[[ self undoManager ] prepareWithInvocationTarget: self ]
@@ -750,22 +750,22 @@ NSString*	OROscChnl								= @"Osc Chnl";
     [ self setDoFullInit: savedstate ];
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
 
 
-- (unsigned long) gtidDataId { return gtidDataId; }
-- (void) setGtidDataId: (unsigned long) GtidDataId
+- (uint32_t) gtidDataId { return gtidDataId; }
+- (void) setGtidDataId: (uint32_t) GtidDataId
 {
     gtidDataId = GtidDataId;
 }
 
 
-- (unsigned long) clockDataId { return clockDataId; }
-- (void) setClockDataId: (unsigned long) ClockDataId
+- (uint32_t) clockDataId { return clockDataId; }
+- (void) setClockDataId: (uint32_t) ClockDataId
 {
     clockDataId = ClockDataId; 
 }
@@ -920,7 +920,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 	
 	// [ self oscSetScreenDisplay: true ];			// Display message box.
     //[ self oscLockPanel: true ];			// Lock front panel of oscilloscope.
-    //[ self oscSetQueryFormat: kLongLabel ];		// Set label format to long.
+    //[ self oscSetQueryFormat: kLongLabel ];		// Set label format to int32_t.
     //[ self oscSendTextMessage: aStartMsg ];		// Writes start message
     //[ self clearStatusReg ];				// Resets GPIB device status registers
     if(mDoFullInit){
@@ -1010,7 +1010,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
 
 - (void) reset {};
 
-- (int) tag
+- (NSUInteger) tag
 {
     return [self primaryAddress];
 }
@@ -1020,7 +1020,7 @@ NSString*	OROscChnl								= @"Osc Chnl";
     eventCount[aChannel]++;
 }
 
-- (unsigned long) eventCount:(int)aChannel
+- (uint32_t) eventCount:(int)aChannel
 {
     return eventCount[aChannel];
 }
@@ -1149,7 +1149,7 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 	// Retrieve channel parameters.
     for ( i = 0; i < [self numberChannels]; i++ ){
         [self setChnlAcquire:i setting:[aDecoder decodeBoolForKey:[NSString stringWithFormat: OROscAcqChnl, i]]];
-        [self setChnlCoupling:i coupling:[aDecoder decodeIntForKey:[NSString stringWithFormat: OROscCouplingChnl, i]]];
+        [self setChnlCoupling:i coupling:[aDecoder decodeIntegerForKey:[NSString stringWithFormat: OROscCouplingChnl, i]]];
         [self setChnlPos:i position:[aDecoder decodeFloatForKey:[NSString stringWithFormat: OROscPosChnl, i]]];
         [self setChnlScale:i scale:[aDecoder decodeFloatForKey:[NSString stringWithFormat: OROscScaleChnl, i]]];
     }
@@ -1157,15 +1157,15 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 	// Retrieve horizontal parameters
     [ self setHorizontalPos:    [aDecoder decodeFloatForKey: OROscHorizPos]];
     [ self setHorizontalScale:  [aDecoder decodeFloatForKey: OROscHorizScale]];
-    [ self setWaveformLength:   [aDecoder decodeInt32ForKey: OROscPulseLength]];
+    [ self setWaveformLength:   [aDecoder decodeIntForKey: OROscPulseLength]];
     
 	// Retrieve trigger parameters
-    [ self setTriggerCoupling:  [aDecoder decodeIntForKey:  OROscTriggerCoupling]];
+    [ self setTriggerCoupling:  [aDecoder decodeIntegerForKey:  OROscTriggerCoupling]];
     [ self setTriggerLevel:     [aDecoder decodeFloatForKey:OROscTriggerLevel]];
-    [ self setTriggerMode:      [aDecoder decodeIntForKey:  OROscTriggerMode]];
+    [ self setTriggerMode:      [aDecoder decodeIntegerForKey:  OROscTriggerMode]];
     [ self setTriggerPos:       [aDecoder decodeFloatForKey:OROscTriggerPos]];
     [ self setTriggerSlopeIsPos:[aDecoder decodeBoolForKey: OROscTriggerSlopeIsPos]];
-    [ self setTriggerSource:    [aDecoder decodeIntForKey:  OROscTriggerSource]];
+    [ self setTriggerSource:    [aDecoder decodeIntegerForKey:  OROscTriggerSource]];
 	
     [[ self undoManager ] enableUndoRegistration];
     
@@ -1192,7 +1192,7 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 	// Save the channel parameters
     for ( i = 0; i < [self numberChannels]; i++ ){
         [anEncoder encodeBool: [self chnlAcquire: i]    forKey: [ NSString stringWithFormat: OROscAcqChnl, i ]];
-        [anEncoder encodeInt: [self chnlCoupling: i]    forKey: [ NSString stringWithFormat: OROscCouplingChnl, i ]];
+        [anEncoder encodeInteger: [self chnlCoupling: i]    forKey: [ NSString stringWithFormat: OROscCouplingChnl, i ]];
         [anEncoder encodeFloat: [self chnlPos: i]       forKey: [ NSString stringWithFormat: OROscPosChnl, i ]];
         [anEncoder encodeFloat: [self chnlScale: i]     forKey: [ NSString stringWithFormat: OROscScaleChnl, i ]];
     }
@@ -1200,15 +1200,15 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 	// Save horizontal parameters
     [ anEncoder encodeFloat: [self horizontalPos]      forKey: OROscHorizPos];
     [ anEncoder encodeFloat: [self horizontalScale]     forKey: OROscHorizScale];
-    [ anEncoder encodeInt32: [self waveformLength]      forKey: OROscPulseLength];
+    [ anEncoder encodeInt: [self waveformLength]      forKey: OROscPulseLength];
 	
 	// Save trigger parameters
-    [anEncoder encodeInt: [self triggerCoupling]	forKey: OROscTriggerCoupling ];
+    [anEncoder encodeInteger: [self triggerCoupling]	forKey: OROscTriggerCoupling ];
     [anEncoder encodeFloat: [self triggerLevel]		forKey: OROscTriggerLevel];
-    [anEncoder encodeInt: [self triggerMode]		forKey: OROscTriggerMode];
+    [anEncoder encodeInteger: [self triggerMode]		forKey: OROscTriggerMode];
     [anEncoder encodeFloat: [self triggerPos ]		forKey: OROscTriggerPos];
     [anEncoder encodeBool: [self triggerSlopeIsPos ]    forKey: OROscTriggerSlopeIsPos];
-    [anEncoder encodeInt: [self triggerSource]		forKey: OROscTriggerSource];
+    [anEncoder encodeInteger: [self triggerSource]		forKey: OROscTriggerSource];
 }
 
 
@@ -1256,8 +1256,8 @@ static NSString*	OROscTriggerSource		= @"ORTriggerSource";
 #pragma mark ***Abstract - General;
 - (short)	oscScopeId { return( -1 ); }
 - (bool) 	oscBusy { return true; }
-- (long)	oscGetDateTime { return( 0 ); }
-- (void)	oscSetDateTime: (long) aTime {}
+- (int32_t)	oscGetDateTime { return( 0 ); }
+- (void)	oscSetDateTime: (int32_t) aTime {}
 - (void)	oscLockPanel: (bool) aFlag {}
 - (void)	oscResetOscilloscope {}
 - (void)	oscSendTextMessage: (NSString*) aMessage {}

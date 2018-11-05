@@ -73,10 +73,10 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
 	NSImage* aCachedImage = [NSImage imageNamed:@"Dispatcher"];
 	NSImage* i = [[NSImage alloc] initWithSize:[aCachedImage size]];
 	[i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     if((runMode == kOfflineRun) && !_ignoreMode){
         NSImage* aNoticeImage = [NSImage imageNamed:@"notice"];
-        [aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+        [aNoticeImage drawAtPoint:NSMakePoint([i size].width/2-[aNoticeImage size].width/2 ,[i size].height/2-[aNoticeImage size].height/2) fromRect:[aNoticeImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
     }
 	[i unlockFocus];
     
@@ -115,7 +115,7 @@ NSString* ORDispatcherLock                      = @"ORDispatcherLock";
     
     [super setGuardian:aGuardian];
 }
-- (int) clientCount
+- (NSUInteger) clientCount
 {
 	return [clients count];
 }
@@ -483,7 +483,7 @@ static NSString *ORDispatcherRefusedList	 	= @"ORDispatcherRefusedList";
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:socketPort forKey:ORDispatcherPortNumber];
+    [encoder encodeInteger:socketPort forKey:ORDispatcherPortNumber];
     [encoder encodeBool:checkAllowed forKey:ORDispatcherCheckAllowed];
     [encoder encodeBool:checkRefused forKey:ORDispatcherCheckRefused];
     [encoder encodeObject:allowedList forKey:ORDispatcherAllowedList];

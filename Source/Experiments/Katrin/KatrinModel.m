@@ -501,7 +501,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
     [super encodeWithCoder:encoder];
 	
     [encoder encodeObject:slowControlName	forKey: @"slowControlName"];
-    [encoder encodeInt:viewType				forKey: @"viewType"];
+    [encoder encodeInteger:viewType				forKey: @"viewType"];
     [encoder encodeObject:fltSNs			forKey: @"fltSNs"];
     [encoder encodeObject:preAmpSNs			forKey: @"preAmpSNs"];
     [encoder encodeObject:osbSNs			forKey: @"osbSNs"];
@@ -763,7 +763,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 {
 	NSString* s;
  	@synchronized(self){
-		s= [NSString stringWithFormat:@"Katrin,%lu",[self uniqueIdNumber]];
+		s= [NSString stringWithFormat:@"Katrin,%u",[self uniqueIdNumber]];
 	}
 	return s;
 }
@@ -856,7 +856,7 @@ static NSString* KatrinDbConnector		= @"KatrinDbConnector";
 	result = [result substringToIndex:[result length]-1];
 	result = [result stringByAppendingString:@"\n"];
 	for(id anItem in auxArray){
-		int n = [keys count];
+		int n = (int)[keys count];
 		int i;
 		for(i=0;i<n;i++){
 			id aParam = [anItem objectForKey:[keys objectAtIndex:i]];

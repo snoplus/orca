@@ -195,7 +195,7 @@
 			NSArray* parameters = [model rampableParametersForTarget:obj];
 			if([parameters count]){
 				NSString* theName = [obj className];
-				int index = [targetNamePU indexOfItemWithTitle:theName];
+				int index = (int)[targetNamePU indexOfItemWithTitle:theName];
 				if(index<0)[targetNamePU addItemWithTitle:theName];
 			}
 		}
@@ -388,7 +388,7 @@
     [alert setInformativeText:@"REALLY Panic this parameter to zero?\nIs this really what you want?"];
     [alert addButtonWithTitle:@"Yes, Do Panic"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[owner window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){

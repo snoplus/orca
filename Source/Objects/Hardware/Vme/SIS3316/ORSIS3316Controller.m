@@ -54,7 +54,7 @@
     [self tabView:tabView didSelectTabViewItem:[tabView selectedTabViewItem]];
 	
     NSString* key = [NSString stringWithFormat: @"orca.SIS3316%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 				
@@ -711,19 +711,19 @@
 
 - (void) pileUpWindowLenChanged:(NSNotification*)aNote
 {
-    [pileUpWindowLenField setIntValue:[model pileUpWindowLength]];
+    [pileUpWindowLenField setIntegerValue:[model pileUpWindowLength]];
 }
 
 - (void) rePileUpWindowLenChanged:(NSNotification*)aNote
 {
-    [rePileUpWindowLenField setIntValue:[model rePileUpWindowLength]];
+    [rePileUpWindowLenField setIntegerValue:[model rePileUpWindowLength]];
 }
 
 - (void) internalGateLenChanged:(NSNotification*)aNote
 {
     short i;
     for(i=0;i<kNumSIS3316Groups;i++){
-        [[internalGateLengthMatrix cellWithTag:i] setIntValue:[model internalGateLen:i]];
+        [[internalGateLengthMatrix cellWithTag:i] setIntegerValue:[model internalGateLen:i]];
     }
 }
 
@@ -731,13 +731,13 @@
 {
     short i;
     for(i=0;i<kNumSIS3316Groups;i++){
-        [[internalCoinGateLengthMatrix cellWithTag:i] setIntValue:[model internalCoinGateLen:i]];
+        [[internalCoinGateLengthMatrix cellWithTag:i] setIntegerValue:[model internalCoinGateLen:i]];
     }
 }
 
 - (void) lemoToMaskChanged:(NSNotification*)aNote
 {
-    unsigned long aMask = [model lemoToMask];
+    uint32_t aMask = [model lemoToMask];
     int i;
     for(i=0;i<32; i++){
         [[lemoToMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
@@ -746,7 +746,7 @@
 
 - (void) lemoUoMaskChanged:(NSNotification*)aNote
 {
-    unsigned long aMask = [model lemoUoMask];
+    uint32_t aMask = [model lemoUoMask];
     int i;
     for(i=0;i<32; i++){
         [[lemoUoMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1UL<<i))!=0];
@@ -755,7 +755,7 @@
 
 - (void) lemoCoMaskChanged:(NSNotification*)aNote
 {
-    unsigned long aMask = [model lemoCoMask];
+    uint32_t aMask = [model lemoCoMask];
     int i;
     for(i=0;i<32; i++){
         [[lemoCoMaskMatrix cellWithTag:i] setIntValue: (aMask & (0x1<<i))!=0];
@@ -804,7 +804,7 @@
 - (void) eventConfigChanged:(NSNotification*)aNote
 {
     short i;
-    unsigned long aMask = [model eventConfigMask];
+    uint32_t aMask = [model eventConfigMask];
     for(i=0;i<8;i++){
         [[eventConfigMatrix cellWithTag:i] setState:aMask & (0x1<<i)];
     }
@@ -916,12 +916,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Channels;i++){
-            [[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+            [[thresholdMatrix cellWithTag:i] setIntegerValue:[model threshold:i]];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[thresholdMatrix cellWithTag:i] setIntValue:[model threshold:i]];
+        [[thresholdMatrix cellWithTag:i] setIntegerValue:[model threshold:i]];
     }
 }
 
@@ -932,12 +932,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Groups; i++){
-            [[endAddressMatrix cellWithTag:i] setIntValue:[model endAddress:i]];
+            [[endAddressMatrix cellWithTag:i] setIntegerValue:[model endAddress:i]];
         }
     }
     else{
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[endAddressMatrix cellWithTag:i] setIntValue:[model endAddress:i]];
+        [[endAddressMatrix cellWithTag:i] setIntegerValue:[model endAddress:i]];
     }
 }
 
@@ -1040,12 +1040,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Channels;i++){
-            [[heTrigThresholdMatrix cellWithTag:i] setIntValue:[model heTrigThreshold:i]];
+            [[heTrigThresholdMatrix cellWithTag:i] setIntegerValue:[model heTrigThreshold:i]];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Channel"] intValue];
-        [[heTrigThresholdMatrix cellWithTag:i] setIntValue:[model heTrigThreshold:i]];
+        [[heTrigThresholdMatrix cellWithTag:i] setIntegerValue:[model heTrigThreshold:i]];
     }
 }
 - (void) enableSumChanged:(NSNotification*)aNote  //bools and possibly more changed like this
@@ -1061,12 +1061,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Groups; i++){
-            [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+            [[thresholdSumMatrix cellWithTag:i] setIntegerValue:[model thresholdSum:i]];
         }
     }
     else{
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[thresholdSumMatrix cellWithTag:i] setIntValue:[model thresholdSum:i]];
+        [[thresholdSumMatrix cellWithTag:i] setIntegerValue:[model thresholdSum:i]];
     }
 }
 
@@ -1075,12 +1075,12 @@
     if(aNote == nil){
         short i;
         for(i=0;i<kNumSIS3316Groups;i++){
-            [[heTrigThresholdSumMatrix cellWithTag:i] setIntValue:[model heTrigThresholdSum:i]];
+            [[heTrigThresholdSumMatrix cellWithTag:i] setIntegerValue:[model heTrigThresholdSum:i]];
         }
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[heTrigThresholdSumMatrix cellWithTag:i] setIntValue:[model heTrigThresholdSum:i]];
+        [[heTrigThresholdSumMatrix cellWithTag:i] setIntegerValue:[model heTrigThresholdSum:i]];
     }
 }
 
@@ -1088,11 +1088,11 @@
 {
     if(aNote == nil){
         short i;
-        for(i=0;i<kNumSIS3316Groups;i++)[[riseTimeSumMatrix cellWithTag:i] setIntValue:[model riseTimeSum:i]];
+        for(i=0;i<kNumSIS3316Groups;i++)[[riseTimeSumMatrix cellWithTag:i] setIntegerValue:[model riseTimeSum:i]];
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[riseTimeSumMatrix cellWithTag:i] setIntValue:[model riseTimeSum:i]];
+        [[riseTimeSumMatrix cellWithTag:i] setIntegerValue:[model riseTimeSum:i]];
     }
 }
 
@@ -1100,11 +1100,11 @@
 {
     if(aNote == nil){
         short i;
-        for(i=0;i<kNumSIS3316Groups;i++)[[gapTimeSumMatrix cellWithTag:i] setIntValue:[model gapTimeSum:i]];
+        for(i=0;i<kNumSIS3316Groups;i++)[[gapTimeSumMatrix cellWithTag:i] setIntegerValue:[model gapTimeSum:i]];
     }
     else {
         int i = [[[aNote userInfo] objectForKey:@"Group"] intValue];
-        [[gapTimeSumMatrix cellWithTag:i] setIntValue:[model gapTimeSum:i]];
+        [[gapTimeSumMatrix cellWithTag:i] setIntegerValue:[model gapTimeSum:i]];
     }
 }
 
@@ -1390,7 +1390,7 @@
 {
     short i;
     for(i=0;i<kNumSIS3316Groups;i++){
-        [[mawBufferLengthMatrix cellWithTag:i] setIntValue:[model mawBufferLength:i]];
+        [[mawBufferLengthMatrix cellWithTag:i] setIntegerValue:[model mawBufferLength:i]];
     }
 }
 
@@ -1398,24 +1398,24 @@
 {
     short i;
     for(i=0;i<kNumSIS3316Groups;i++){
-        [[mawPretrigDelayMatrix cellWithTag:i] setIntValue:[model mawPretrigDelay:i]];
+        [[mawPretrigDelayMatrix cellWithTag:i] setIntegerValue:[model mawPretrigDelay:i]];
     }
 }
 
 - (void) rawDataBufferLenChanged:  (NSNotification*)aNote
 {
-    [rawDataBufferLenField setIntValue:[model rawDataBufferLen]];
+    [rawDataBufferLenField setIntegerValue:[model rawDataBufferLen]];
 }
 
 - (void) rawDataBufferStartChanged:(NSNotification*)aNote
 {
-    [rawDataBufferStartField setIntValue:[model rawDataBufferStart]];
+    [rawDataBufferStartField setIntegerValue:[model rawDataBufferStart]];
 }
 
 - (void) acquisitionControlChanged:(NSNotification*)aNote  //bools and possibly more changed like this
 {
     short i;
-    unsigned long aMask = [model acquisitionControlMask];
+    uint32_t aMask = [model acquisitionControlMask];
     for(i=0;i<16;i++){
         [[acquisitionControlMatrix cellWithTag:i] setState:(aMask&(0x1<<i))!=0];
     }
@@ -1423,7 +1423,7 @@
 
 - (void) nimControlStatusChanged:(NSNotification*)aNote
 {
-    unsigned long aMask = [model nimControlStatusMask];
+    uint32_t aMask = [model nimControlStatusMask];
     short i;
     for(i=0;i<14;i++){
         [[nimControlStatusMatrix cellWithTag:i] setState:(aMask& (0x1<<i))!=0];
@@ -1595,7 +1595,7 @@
     [energyOffsetMatrix         setEnabled:!lockedOrRunningMaintenance];
     [energyDividerMatrix        setEnabled:!lockedOrRunningMaintenance];
 
-    long formatMask = [model formatMask];
+    int32_t formatMask = [model formatMask];
     BOOL enable1_6 = (formatMask>>0) & 0x1;
     BOOL enable7_8 = (formatMask>>1) & 0x1;
     [accGate1LenMatrix      setEnabled: enable1_6];
@@ -1630,7 +1630,7 @@
 
 - (void) baseAddressChanged:(NSNotification*)aNote
 {
-    [addressText setIntValue: [model baseAddress]];
+    [addressText setIntegerValue: [model baseAddress]];
 }
 
 - (void) integrationChanged:(NSNotification*)aNotification
@@ -1727,12 +1727,12 @@
 }
 - (IBAction) sharingAction:(id)sender
 {
-    [model setSharing:[sender indexOfSelectedItem]];
+    [model setSharing:(int)[sender indexOfSelectedItem]];
 }
 
 - (IBAction) histogramsEnabledAction:(id)sender
 {
-    int tag =[[sender selectedCell] tag];
+    int tag =(int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setHistogramsEnabled:tag withValue:aValue]; 
 }
@@ -1752,14 +1752,14 @@
 
 - (IBAction) enabledAction:(id)sender //-=**
 {
-    int tag =[[sender selectedCell] tag];
+    int tag =(int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setEnabledBit:tag withValue:aValue];
 }
 
 - (IBAction) formatAction:(id)sender //-=**
 {
-    int bit =[[sender selectedCell] tag];
+    int bit = (int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setFormatBit:bit withValue:aValue];
 }
@@ -1771,8 +1771,8 @@
 
 - (IBAction) lemoToMaskAction:(id)sender
 {
-    unsigned long aMask = [model lemoToMask];
-    int tag    = [[sender selectedCell] tag];
+    uint32_t aMask = [model lemoToMask];
+    int tag    = (int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     if(aValue==0)aMask &= ~(0x1<<tag);
     else         aMask |= (0x1<<tag);
@@ -1782,8 +1782,8 @@
 
 - (IBAction) lemoUoMaskAction:(id)sender
 {
-    unsigned long aMask = [model lemoUoMask];
-    int tag    = [[sender selectedCell] tag];
+    uint32_t aMask = [model lemoUoMask];
+    int tag    = (int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     if(aValue==0)aMask &= ~(0x1<<tag);
     else         aMask |= (0x1<<tag);
@@ -1793,8 +1793,8 @@
 
 - (IBAction) lemoCoMaskAction:(id)sender
 {
-    unsigned long aMask = [model lemoCoMask];
-    int tag    = [[sender selectedCell] tag];
+    uint32_t aMask = [model lemoCoMask];
+    int tag    = (int)[[sender selectedCell] tag];
     int aValue = [[sender selectedCell] intValue];
     if(aValue==0)aMask &= ~(0x1<<tag);
     else         aMask |= (0x1<<tag);
@@ -1804,8 +1804,8 @@
 
 - (IBAction) acquisitionControlAction:(id)sender
 {
-    unsigned long aMask = [model acquisitionControlMask];
-    int tag =[[sender selectedCell] tag];
+    uint32_t aMask = [model acquisitionControlMask];
+    int tag =(int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     if(aValue==0)aMask &= ~(0x1<<tag);
     else         aMask |= (0x1<<tag);
@@ -1815,7 +1815,7 @@
 
 - (IBAction) nimControlStatusAction:(id)sender
 {
-    int tag =[[sender selectedCell] tag];
+    int tag =(int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setNIMControlStatusBit:tag withValue:aValue];
 }
@@ -1827,7 +1827,7 @@
 
 - (IBAction) enableSumAction:(id)sender
 {
-    int tag =[[sender selectedCell] tag];
+    int tag = (int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setEnableSum:tag withValue:aValue];
 }
@@ -1844,7 +1844,7 @@
 
 - (IBAction) endAddressSuppressionAction:(id)sender
 {
-    int tag    = [[sender selectedCell] tag];
+    int tag    = (int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setEndAddressSuppressionBit:tag withValue:aValue];
 }
@@ -1861,7 +1861,7 @@
 
 - (IBAction) eventConfigAction:(id)sender
 {
-    int tag =[[sender selectedCell] tag];
+    int tag = (int)[[sender selectedCell] tag];
     int aValue = [sender intValue];
     [model setEventConfigBit:tag withValue:aValue];
 }
@@ -1873,12 +1873,12 @@
 
 - (IBAction) extraFilterAction:(id)sender
 {
-    [model setExtraFilterBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+    [model setExtraFilterBits:[sender selectedRow] withValue:(uint32_t)[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) tauTableAction:(id)sender
 {
-    [model setTauTableBits:[sender selectedRow] withValue:[[sender selectedCell] indexOfSelectedItem]];
+    [model setTauTableBits:[sender selectedRow] withValue:(uint32_t)[[sender selectedCell] indexOfSelectedItem]];
 }
 
 - (IBAction) riseTimeAction:(id)sender
@@ -2060,7 +2060,7 @@
 
 - (IBAction) clockSourceAction:(id)sender
 {
-	[model setClockSource:[sender indexOfSelectedItem]];
+	[model setClockSource:(uint32_t)[sender indexOfSelectedItem]];
 }
 
 
@@ -2107,7 +2107,7 @@
     }
 	
     NSString* key = [NSString stringWithFormat: @"orca.ORSIS3316%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:tabViewItem];
+    NSInteger index = [tabView indexOfTabViewItem:tabViewItem];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -2232,12 +2232,12 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-    return [[[model waveFormRateGroup] timeRate]count];
+    return (int)[[[model waveFormRateGroup] timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-    int count = [[[model waveFormRateGroup]timeRate] count];
+    int count = (int)[[[model waveFormRateGroup]timeRate] count];
     int index = count-i-1;
     *yValue = [[[model waveFormRateGroup] timeRate] valueAtIndex:index];
     *xValue = [[[model waveFormRateGroup] timeRate] timeSampledAtIndex:index];

@@ -195,7 +195,7 @@ NSString* ORRandomPulserSettingsLock						= @"ORRandomPulserSettingsLock";
 {
     ORIP408Model* the408 = [self objectConnectedTo:ORRandomPulser408Connector];
     //build the output word...
-    unsigned long dataWord = (negPulserState&0x1)<<25   |
+    uint32_t dataWord = (negPulserState&0x1)<<25   |
         (ttlPulserState&0x1)<<24    | 
         (pulserAmp&0xff)<<16		| 
         (pulserRate&0xfff); 
@@ -206,7 +206,7 @@ NSString* ORRandomPulserSettingsLock						= @"ORRandomPulserSettingsLock";
 - (void) readHardware
 {
     ORIP408Model* the408 = [self objectConnectedTo:ORRandomPulser408Connector];
-    unsigned long dataWord = ~[the408 getInputWithMask:0xffffffff];
+    uint32_t dataWord = ~[the408 getInputWithMask:0xffffffff];
     //decode the data word
 	[self setNegPulserState:(dataWord>>25)&0x1];
 	[self setTtlPulserState:(dataWord>>24)&0x1];
@@ -239,7 +239,7 @@ static NSString* ORRandomNegPulserState		= @"ORRandomNegPulserState";
 	[[self undoManager] disableUndoRegistration];
     
 	[self setPulserRate:[decoder decodeIntForKey:ORRandomPulserPulserRate]];
-	[self setPulserAmp:[decoder decodeIntForKey:ORRandomPulserPulserAmp]];
+	[self setPulserAmp:[decoder decodeIntegerForKey:ORRandomPulserPulserAmp]];
 	[self setTtlPulserState:[decoder decodeBoolForKey:ORRandomTTLPulserState]];
 	[self setNegPulserState:[decoder decodeBoolForKey:ORRandomNegPulserState]];
     
@@ -252,8 +252,8 @@ static NSString* ORRandomNegPulserState		= @"ORRandomNegPulserState";
 - (void) encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-	[encoder encodeInt:pulserRate forKey:ORRandomPulserPulserRate];
-    [encoder encodeInt:pulserAmp forKey:ORRandomPulserPulserAmp];
+	[encoder encodeInteger:pulserRate forKey:ORRandomPulserPulserRate];
+    [encoder encodeInteger:pulserAmp forKey:ORRandomPulserPulserAmp];
 	[encoder encodeBool:ttlPulserState forKey:ORRandomTTLPulserState];
 	[encoder encodeBool:negPulserState forKey:ORRandomNegPulserState];
     

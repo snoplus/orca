@@ -174,7 +174,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	}
 }
 
-- (void) claimInterfaceWithVendor:(unsigned long)aVendorID product:(NSUInteger) aProductID for:(id)obj
+- (void) claimInterfaceWithVendor:(uint32_t)aVendorID product:(NSUInteger) aProductID for:(id)obj
 {
 	//just grab the first one....someday this will probably have to be fixed
     NSArray* someInterfaces;
@@ -229,7 +229,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 	return [devices objectAtIndex:index];
 }
 
-- (ORUSBInterface*) getUSBInterface:(unsigned long)aVendorID productID:(NSUInteger) aProductID
+- (ORUSBInterface*) getUSBInterface:(uint32_t)aVendorID productID:(NSUInteger) aProductID
 {
 	id intf;
 	NSEnumerator* e = [interfaces objectEnumerator];
@@ -299,10 +299,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     kern_return_t	kr;
     io_service_t	usbDevice;
     HRESULT			res;
-	UInt16			vendor;
-	UInt16			product;
-	UInt16			release;
-	UInt32			locationID;
+	uint16_t			vendor;
+	uint16_t			product;
+	uint16_t			release;
+	uint32_t			locationID;
 	
     while ((usbDevice = IOIteratorNext(iterator))){
 		IOCFPlugInInterface**	    plugInInterface=NULL;
@@ -352,7 +352,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			
 			// Now that we have the IOUSBDeviceInterface182, we can call the routines in IOUSBLib.h.
 			// In this case, fetch the locationID. The locationID uniquely identifies the device
-			// and will remain the same, even across reboots, so long as the bus topology doesn't change.
+			// and will remain the same, even across reboots, so int32_t as the bus topology doesn't change.
 			
 			kr = (*deviceInterface)->GetLocationID(deviceInterface, &locationID);
 			if (KERN_SUCCESS != kr) {
@@ -379,7 +379,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			// Save the device's name to our private data.
 			[ usbCallbackData setDeviceName:deviceNameAsString];
 						
-			UInt8 snsi;
+			uint8 snsi;
 			kr = (*deviceInterface)->USBGetSerialNumberStringIndex(deviceInterface, &snsi);
 			char serialString[128];
 			if(snsi){
@@ -402,7 +402,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 				//NSString* s = [NSString stringWithFormat:@"0x%8x", locationID];
 				[usbCallbackData setSerialNumber:@"0"];
 				/*
-				UInt8 psi;
+				uint8 psi;
 				kr = (*deviceInterface)->USBGetProductStringIndex(deviceInterface, &psi);
 				if(psi){
 					IOUSBDevRequest   req;
@@ -517,7 +517,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 -(IOReturn) _configureAnchorDevice:(IOUSBDeviceInterface182**)dev
 {
-    UInt8                               numConf;
+    uint8                               numConf;
     IOReturn                            kr;
     IOUSBConfigurationDescriptorPtr     confDesc;
 	
@@ -542,8 +542,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 
 - (IOReturn) _findInterfaces:(IOUSBDeviceInterface182**)dev userInfo:(ORUSBInterface*) usbCallbackData supported:(BOOL)supported
 {
-	// UInt8                       intfClass;
-    //UInt8                       intfSubClass;
+	// uint8                       intfClass;
+    //uint8                       intfSubClass;
 	
     IOUSBFindInterfaceRequest   request;
     request.bInterfaceClass		= kIOUSBFindInterfaceDontCare;
@@ -562,14 +562,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		IOCreatePlugInInterfaceForService(usbInterface, kIOUSBInterfaceUserClientTypeID, kIOCFPlugInInterfaceID, &plugInInterface, &score);
 		kr = IOObjectRelease(usbInterface);                             // done with the usbInterface object now that I have the plugin
 		if ((kIOReturnSuccess != kr) || !plugInInterface) {
-			[NSException raise: @"USB Exception" format:@"unable to create a plugin (%08x)\n", kr];
+			[NSException raise: @"USB Exception" format:@"unable to create a plugin (0x%08x)\n", kr];
 		}
 		
 		// I have the interface plugin. I need the interface interface
 		HRESULT res = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID), (void**) &intf);
 		(*plugInInterface)->Release(plugInInterface);                   // done with this
 		if (res || !intf) {
-			[NSException raise: @"USB Exception" format:@"couldn't create an IOUSBInterfaceInterface (%08lx)\n", res];
+			[NSException raise: @"USB Exception" format:@"couldn't create an IOUSBInterfaceInterface (0x%08x)\n", res];
 		}
 		
 		//kr = (*intf)->GetInterfaceClass(intf, &intfClass);
@@ -584,16 +584,16 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 			if(kr != kIOReturnExclusiveAccess){
 				kr = (*intf)->USBInterfaceClose(intf);				
 				(void) (*intf)->Release(intf);
-				[NSException raise: @"USB Exception" format:@"Interface already open for exclusive access (%08x)\n", kr];
+				[NSException raise: @"USB Exception" format:@"Interface already open for exclusive access (0x%08x)\n", kr];
 			}
 		}
 		
-		UInt8 intfNumEndpoints;
+		uint8 intfNumEndpoints;
 		kr = (*intf)->GetNumEndpoints(intf, &intfNumEndpoints);
 		if (kIOReturnSuccess != kr) {
 			(void) (*intf)->USBInterfaceClose(intf);
 			(void) (*intf)->Release(intf);
-			[NSException raise: @"USB Exception" format:@"unable to get number of endpoints (%08x)\n", kr];
+			[NSException raise: @"USB Exception" format:@"unable to get number of endpoints (0x%08x)\n", kr];
 		}
 		
 		unsigned char inPipes[8];
@@ -608,14 +608,14 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		int interruptOutPipeCount= 0;
 		
         if(supported){
-            UInt8 pipeRef;
+            uint8 pipeRef;
             for (pipeRef = 1; pipeRef <= intfNumEndpoints; pipeRef++){
                 IOReturn    kr2;
-                UInt8       direction;
-                UInt8       number;
-                UInt8       transferType;
-                UInt16      maxPacketSize;
-                UInt8       interval;
+                uint8       direction;
+                uint8       number;
+                uint8       transferType;
+                uint16_t      maxPacketSize;
+                uint8       interval;
                 
                 kr2 = (*intf)->GetPipeProperties(intf, pipeRef, &direction, &number, &transferType, &maxPacketSize, &interval);
                 if(kIOReturnNoDevice == kr2)     NSLog(@"no Device\n");
@@ -645,7 +645,7 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		//if (kIOReturnSuccess != kr) {
 		//	(void) (*intf)->USBInterfaceClose(intf);
 		//	(void) (*intf)->Release(intf);
-		//	[NSException raise: @"USB Exception" format:@"unable to create async event source (%08x)\n", kr];
+		//	[NSException raise: @"USB Exception" format:@"unable to create async event source (0x%08x)\n", kr];
 		//}
 		//CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
 		
@@ -670,10 +670,10 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
 		[[NSNotificationCenter defaultCenter] postNotificationName:ORUSBInterfaceAdded object:self userInfo:nil];
 		
 		if (KERN_SUCCESS != kr){
-			[NSException raise: @"USB Exception" format:@"IOServiceAddInterestNotification returned %08x\n", kr];
+			[NSException raise: @"USB Exception" format:@"IOServiceAddInterestNotification returned 0x%08x\n", kr];
 		}
 		//startUp Interrupt handling
-		//        UInt32 numBytesRead = sizeof(_recieveBuffer); // leave one byte at the end for NUL termination
+		//        uint32_t numBytesRead = sizeof(_recieveBuffer); // leave one byte at the end for NUL termination
 		//        bzero(&_recieveBuffer, numBytesRead);
 		//        kr = (*intf)->ReadPipeAsync(intf, kInPipe, &_recieveBuffer, numBytesRead, (IOAsyncCallback1)_interruptRecieved, this);
 		
@@ -690,9 +690,9 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     return kr;
 }
 
-- (NSString*) keyForVendorID:(unsigned long)aVendorID productID:(NSUInteger) aProductID
+- (NSString*) keyForVendorID:(uint32_t)aVendorID productID:(NSUInteger) aProductID
 {
-	return [NSString stringWithFormat:@"%lu_%lu",(unsigned long)aVendorID,(unsigned long)aProductID];
+	return [NSString stringWithFormat:@"%u_%u",(uint32_t)aVendorID,(uint32_t)aProductID];
 }
 
 - (NSArray*) interfacesForVender:(NSUInteger) aVenderID product:(NSUInteger) aProductID
@@ -715,8 +715,8 @@ SYNTHESIZE_SINGLETON_FOR_ORCLASS(USB);
     if([someVendorIDs count] == [someProductIDs count]){
         int i;
         for(i=0;i<[someVendorIDs count];i++){
-            unsigned long aVendorID  = [[someVendorIDs objectAtIndex:i] unsignedLongValue];
-            unsigned long aProductID = [[someProductIDs objectAtIndex:i] unsignedLongValue];
+            NSInteger aVendorID  = [[someVendorIDs objectAtIndex:i] unsignedLongValue];
+            NSInteger aProductID = [[someProductIDs objectAtIndex:i] unsignedLongValue];
             [matchingInterfaces addObjectsFromArray:[self interfacesForVender:aVendorID product:aProductID]];
         }
        return  matchingInterfaces;

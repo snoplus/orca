@@ -29,14 +29,14 @@ NSString* ORCamacCardSlotChangedNotification 	= @"ORCamacCardSlotChangedNotifica
 @implementation ORCamacCard
 #pragma mark ¥¥¥accessors
 
-- (int) tagBase
+- (NSUInteger) tagBase
 {
     return 1;
 }
 
 - (NSString*) fullID
 {
-    return [NSString stringWithFormat:@"%@,%d,%d",NSStringFromClass([self class]),[self crateNumber], [self stationNumber]];
+    return [NSString stringWithFormat:@"%@,%d,%d",NSStringFromClass([self class]),(uint32_t)[self crateNumber], (uint32_t)[self stationNumber]];
 }
 
 - (Class) guardianClass 
@@ -56,12 +56,12 @@ NSString* ORCamacCardSlotChangedNotification 	= @"ORCamacCardSlotChangedNotifica
 
 - (int) slot
 {
-	return [self tag];
+	return (int)[self tag];
 }
 
 - (int) stationNumber
 {
-    return [self tag]+1;
+    return (int)([self tag])+1;
 }
 
 - (BOOL)    cmdResponse
@@ -118,7 +118,7 @@ NSString* ORCamacCardSlotChangedNotification 	= @"ORCamacCardSlotChangedNotifica
 {
     NSMutableDictionary* objDictionary = [NSMutableDictionary dictionary];
     [objDictionary setObject:NSStringFromClass([self class]) forKey:@"Class Name"];
-    [objDictionary setObject:[NSNumber numberWithInt:[self stationNumber]] forKey:@"Card"];
+    [objDictionary setObject:[NSNumber numberWithInteger:[self stationNumber]] forKey:@"Card"];
     [dictionary setObject:objDictionary forKey:[self identifier]];
     return objDictionary;
 }

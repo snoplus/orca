@@ -83,8 +83,8 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	return @"AD413";
 }
 
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -384,7 +384,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
     
     //----------------------------------------------------------------------------------------
     controller = [[self adapter] controller]; //cache the controller for alittle bit more speed.
-    unChangingDataPart   = (([self crateNumber]&0xf)<<21) | ((([self stationNumber]+1)& 0x0000001f)<<16); //doesn't change so do it here.
+    unChangingDataPart   = (uint32_t)((([self crateNumber]&0xf)<<21) | ((([self stationNumber]+1)& 0x0000001f)<<16)); //doesn't change so do it here.
 	cachedStation = [self stationNumber]+1;
 	
     [self clearExceptionCount];
@@ -470,7 +470,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	return 4;
 }
 
-- (void) shipFeraData:(ORDataPacket*)aDataPacket data:(unsigned long)data 
+- (void) shipFeraData:(ORDataPacket*)aDataPacket data:(uint32_t)data 
 {
 	int chan = (data>>13)&0x3;
 	[self ship:aDataPacket adc:data&0x1fff forChan:chan];
@@ -484,7 +484,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 	
     [[self undoManager] disableUndoRegistration];
     
-    [self setOnlineMask:			[decoder decodeIntForKey:   @"ORAD413AOnlineMask"]];
+    [self setOnlineMask:			[decoder decodeIntegerForKey:   @"ORAD413AOnlineMask"]];
     [self setDiscriminators:		[decoder decodeObjectForKey:@"OR413Discriminators"]];
     [self setSingles:				[decoder decodeBoolForKey:	@"singles"]];
     [self setRandomAccessMode:		[decoder decodeBoolForKey:	@"randomAccessMode"]];
@@ -505,7 +505,7 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void)encodeWithCoder:(NSCoder*)encoder
 {
     [super encodeWithCoder:encoder];
-    [encoder encodeInt:onlineMask			forKey:@"ORAD413AOnlineMask"];
+    [encoder encodeInteger:onlineMask			forKey:@"ORAD413AOnlineMask"];
     [encoder encodeObject:discriminators	forKey:@"OR413Discriminators"];
 	
     [encoder encodeBool:singles				forKey:@"singles"];
@@ -584,11 +584,11 @@ NSString* ORAD413AControlReg2ChangedNotification     = @"ORAD413AControlReg2Chan
 - (void) ship:(ORDataPacket*)aDataPacket adc:(unsigned short)adcValue forChan:(int)i
 {
     if(IsShortForm(dataId)){
-        unsigned long data = dataId | unChangingDataPart | (i&0x3)<<13 | (adcValue & 0x1FFF);
+        uint32_t data = dataId | unChangingDataPart | (i&0x3)<<13 | (adcValue & 0x1FFF);
         [aDataPacket addLongsToFrameBuffer:&data length:1];
     }
     else {
-        unsigned long data[2];
+        uint32_t data[2];
         data[0] =  dataId | 2;
         data[1] =  unChangingDataPart | (i&0x3)<<13 | (adcValue & 0x1FFF);
         [aDataPacket addLongsToFrameBuffer:data length:2];

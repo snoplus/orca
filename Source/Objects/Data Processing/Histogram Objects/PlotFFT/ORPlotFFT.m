@@ -95,7 +95,7 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 	[imaginaryArray release];
 	imaginaryArray = anImaginaryArray;
 	int i;
-	int n = [imaginaryArray count];
+	int n = (int)[imaginaryArray count];
 	NSMutableArray* array = [NSMutableArray array];
 	for(i=0;i<n;i++){
 		float r = [[realArray objectAtIndex:i] floatValue];
@@ -155,7 +155,7 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
     fprintf( aFile, "WAVES/I/N=(%d) '%s'\nBEGIN\n",numberBins,[shortName cStringUsingEncoding:NSASCIIStringEncoding]);
     int i;
     for (i=0; i<numberBins; ++i) {
-        fprintf(aFile, "%ld\n",histogram[i]);
+        fprintf(aFile, "%d\n",histogram[i]);
     }
     fprintf(aFile, "END\n\n");
 	[dataSetLock unlock];
@@ -164,16 +164,16 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	if(set == 0) return showReal?[realArray count]:0;
-	else if(set==1)return showImaginary?[imaginaryArray count]:0;
-	else return showPowerSpectrum?[powerSpectrumArray count]:0;
+	int set = (int)[aPlotter tag];
+	if(set == 0) return (int)(showReal?[realArray count]:0);
+	else if(set==1)return (int)(showImaginary?[imaginaryArray count]:0);
+	else return (int)(showPowerSpectrum?[powerSpectrumArray count]:0);
 }
 
-- (void) plotter:(id)aPlotter index:(unsigned long)i x:(double*)xValue y:(double*)yValue
+- (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
 	[dataLock lock];
-	int set = [aPlotter tag];
+	int set = (int)[aPlotter tag];
 	if(set==0){
 		*yValue = [[realArray objectAtIndex:i] floatValue];
 		*xValue = i;
@@ -192,12 +192,19 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 - (float) plotter:(id) aPlotter dataSet:(int)set dataValue:(int) x 
 {
 	[dataLock lock];
-	if(set==0)return [[realArray objectAtIndex:x] floatValue];
-    else if(set==1)return [[imaginaryArray objectAtIndex:x] floatValue];
-    else return [[powerSpectrumArray objectAtIndex:x] floatValue];
-	[dataLock unlock];
+    @try{
+        if(set==0)      return [[realArray objectAtIndex:x] floatValue];
+        else if(set==1) return [[imaginaryArray objectAtIndex:x] floatValue];
+        else            return [[powerSpectrumArray objectAtIndex:x] floatValue];
+    }
+    @catch(NSException*e){
+        
+    }
+    @finally
+    {
+        [dataLock unlock];
+    }
 }
-
 
 - (NSColor*) colorForDataSet:(int)set
 {
@@ -215,7 +222,7 @@ NSString* ORPlotFFTShowChanged = @"ORPlotFFTShowChanged";
 
 - (id)   name
 {
-    return [NSString stringWithFormat:@"%@ FFT Counts: %lu",[self key], [self totalCounts]];
+    return [NSString stringWithFormat:@"%@ FFT Counts: %u",[self key], [self totalCounts]];
 }
 
 - (BOOL) canJoinMultiPlot

@@ -226,7 +226,7 @@ static NSString* DT5720RunModeString[4] = {
 		NSImage* i = [[NSImage alloc] initWithSize:theIconSize];
 		[i lockFocus];
 		
-        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];		
+        [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];		
 		NSBezierPath* path = [NSBezierPath bezierPath];
 		[path moveToPoint:NSMakePoint(15,8)];
 		[path lineToPoint:NSMakePoint(30,28)];
@@ -725,12 +725,12 @@ static NSString* DT5720RunModeString[4] = {
     coincidenceLevel = aCoincidenceLevel;
     [[NSNotificationCenter defaultCenter] postNotificationName:ORDT5720ModelCoincidenceLevelChanged object:self];
 }
-- (unsigned long) triggerSourceMask
+- (uint32_t) triggerSourceMask
 {
     return triggerSourceMask;
 }
 
- - (void) setTriggerSourceMask:(unsigned long)aTriggerSourceMask
+ - (void) setTriggerSourceMask:(uint32_t)aTriggerSourceMask
 {
     aTriggerSourceMask &= 0xf;
     if(aTriggerSourceMask!=triggerSourceMask){
@@ -770,12 +770,12 @@ static NSString* DT5720RunModeString[4] = {
     }
 }
 
-- (unsigned long) triggerOutMask
+- (uint32_t) triggerOutMask
 {
     return triggerOutMask;
 }
 
-- (void) setTriggerOutMask:(unsigned long)aTriggerOutMask
+- (void) setTriggerOutMask:(uint32_t)aTriggerOutMask
 {
     aTriggerOutMask &= 0xf;
     if(aTriggerOutMask!=triggerOutMask){
@@ -787,12 +787,12 @@ static NSString* DT5720RunModeString[4] = {
 
 //------------------------------
 //Reg Post Trigger Setting (0x8114)
-- (unsigned long) postTriggerSetting
+- (uint32_t) postTriggerSetting
 {
     return postTriggerSetting;
 }
 
-- (void) setPostTriggerSetting:(unsigned long)aPostTriggerSetting
+- (void) setPostTriggerSetting:(uint32_t)aPostTriggerSetting
 {
     if(aPostTriggerSetting!=postTriggerSetting){
         [[[self undoManager] prepareWithInvocationTarget:self] setPostTriggerSetting:postTriggerSetting];
@@ -852,7 +852,7 @@ static NSString* DT5720RunModeString[4] = {
 	return bufferState;
 }
 
-- (unsigned long) getCounter:(int)counterTag forGroup:(int)groupTag
+- (uint32_t) getCounter:(int)counterTag forGroup:(int)groupTag
 {
 	if(groupTag == 0){
 		if(counterTag>=0 && counterTag<kNumDT5720Channels){
@@ -918,12 +918,12 @@ static NSString* DT5720RunModeString[4] = {
     }
 }
 
-- (unsigned long) selectedRegValue
+- (uint32_t) selectedRegValue
 {
     return selectedRegValue;
 }
 
-- (void) setSelectedRegValue:(unsigned long) aValue
+- (void) setSelectedRegValue:(uint32_t) aValue
 {
     if(aValue!=selectedRegValue){
         [[[self undoManager] prepareWithInvocationTarget:self] setSelectedRegValue:[self selectedRegValue]];
@@ -940,13 +940,13 @@ static NSString* DT5720RunModeString[4] = {
 
 #pragma mark ***Register - Register specific routines
 - (NSString*) getRegisterName:(short) anIndex       {return reg[anIndex].regName;}
-- (unsigned long) getAddressOffset:(short) anIndex  {return reg[anIndex].addressOffset;}
+- (uint32_t) getAddressOffset:(short) anIndex  {return reg[anIndex].addressOffset;}
 - (short) getAccessType:(short) anIndex             {return reg[anIndex].accessType;}
 - (BOOL) dataReset:(short) anIndex                  {return reg[anIndex].dataReset;}
 - (BOOL) swReset:(short) anIndex                    {return reg[anIndex].softwareReset;}
 - (BOOL) hwReset:(short) anIndex                    {return reg[anIndex].hwReset;}
 
-- (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(unsigned long*) pValue
+- (void) readChan:(unsigned short)chan reg:(unsigned short) pReg returnValue:(uint32_t*) pValue
 {
     if (pReg >= [self getNumberRegisters]) {
         [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
@@ -961,9 +961,9 @@ static NSString* DT5720RunModeString[4] = {
                atAddress:[self getAddressOffset:pReg] + chan*0x100];
 }
 
-- (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(unsigned long) pValue
+- (void) writeChan:(unsigned short)chan reg:(unsigned short) pReg sendValue:(uint32_t) pValue
 {
-	unsigned long theValue = pValue;
+	uint32_t theValue = pValue;
     // Check that register is a valid register.
     if (pReg >= [self getNumberRegisters]){
         [NSException raise:@"Illegal Register" format:@"Register index out of bounds on %@",[self identifier]];
@@ -990,7 +990,7 @@ static NSString* DT5720RunModeString[4] = {
 	short		start;
     short		end;
     short		i;
-    unsigned long 	theValue = 0;
+    uint32_t 	theValue = 0;
     short theChannelIndex	 = [self selectedChannel];
     short theRegIndex		 = [self selectedRegIndex];
     
@@ -1029,7 +1029,7 @@ static NSString* DT5720RunModeString[4] = {
     short	end;
     short	i;
 	
-    long theValue			= [self selectedRegValue];
+    int32_t theValue			= [self selectedRegValue];
     short theChannelIndex	= [self selectedChannel];
     short theRegIndex 		= [self selectedRegIndex];
     
@@ -1069,7 +1069,7 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 
-- (void) read:(unsigned short) pReg returnValue:(unsigned long*) pValue
+- (void) read:(unsigned short) pReg returnValue:(uint32_t*) pValue
 {
     // Make sure that register is valid
     if (pReg >= [self getNumberRegisters]) {
@@ -1088,7 +1088,7 @@ static NSString* DT5720RunModeString[4] = {
     
 }
 
-- (void) write:(unsigned short) pReg sendValue:(unsigned long) pValue
+- (void) write:(unsigned short) pReg sendValue:(uint32_t) pValue
 {
     // Check that register is a valid register.
     if (pReg >= [self getNumberRegisters]){
@@ -1113,7 +1113,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) report
 {
-	unsigned long enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
+	uint32_t enabled, threshold, numOU, status, bufferOccupancy, dacValue,triggerSrc;
 	[self read:kChanEnableMask returnValue:&enabled];
 	[self read:kTrigSrcEnblMask returnValue:&triggerSrc];
 	int chan;
@@ -1142,7 +1142,7 @@ static NSString* DT5720RunModeString[4] = {
 	}
 	NSLogFont(theFont,@"-----------------------------------------------------------\n");
 	
-    unsigned long zThres,nsAmp;
+    uint32_t zThres,nsAmp;
     NSLogFont(theFont,@"-----------------------------------------------------------\n");
     NSLogFont(theFont,@"                    Zeros Suppression                      \n");
     NSLogFont(theFont,@"Chan logic  Thres     NumOver \n");
@@ -1155,9 +1155,9 @@ static NSString* DT5720RunModeString[4] = {
     }
     NSLogFont(theFont,@"-----------------------------------------------------------\n");
     
-	unsigned long aValue;
+	uint32_t aValue;
 	[self read:kBufferOrganization returnValue:&aValue];
-	NSLogFont(theFont,@"# Buffer Blocks : %d\n",(long)powf(2.,(float)aValue));
+	NSLogFont(theFont,@"# Buffer Blocks : %d\n",(int32_t)powf(2.,(float)aValue));
 	
 	NSLogFont(theFont,@"Software Trigger: %@\n",triggerSrc&0x80000000?@"Enabled":@"Disabled");
 	NSLogFont(theFont,@"External Trigger: %@\n",triggerSrc&0x40000000?@"Enabled":@"Disabled");
@@ -1204,7 +1204,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) readConfigurationROM
 {
-    unsigned long value;
+    uint32_t value;
     int err;
     
     //test we can write and read
@@ -1295,7 +1295,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeZSThreshold:(unsigned short) i
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     aValue |= logicType[i]<<31;
     aValue |= [self zsThreshold:i] & 0xFFF;
     
@@ -1315,13 +1315,13 @@ static NSString* DT5720RunModeString[4] = {
 {
     
     if(zsAlgorithm == kFullSuppressionBasedOnAmplitude){
-        unsigned long 	aValue = [self numOverUnderZsThreshold:i] & 0xFFFFF;
+        uint32_t 	aValue = [self numOverUnderZsThreshold:i] & 0xFFFFF;
     
         [self writeLongBlock:&aValue
                    atAddress:reg[kZS_NsAmp].addressOffset + (i * 0x100)];
     }
     else if(zsAlgorithm == kZeroLengthEncoding){
-        unsigned long aValue = ([self nLbk:i] & 0xFFFF)<<16 |
+        uint32_t aValue = ([self nLbk:i] & 0xFFFF)<<16 |
                                ([self nLfwd:i]& 0xFFFF);
         [self writeLongBlock:&aValue
                    atAddress:reg[kZS_NsAmp].addressOffset + (i * 0x100)];
@@ -1339,7 +1339,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeThreshold:(unsigned short) i
 {
-    unsigned long 	aValue = [self threshold:i];
+    uint32_t 	aValue = [self threshold:i];
     [self writeLongBlock:&aValue
                atAddress:reg[kThresholds].addressOffset + (i * 0x100)];
 }
@@ -1353,7 +1353,7 @@ static NSString* DT5720RunModeString[4] = {
 }
 - (void) writeNumOverUnderThreshold:(unsigned short) i
 {
-    unsigned long 	aValue = [self numOverUnderThreshold:i];
+    uint32_t 	aValue = [self numOverUnderThreshold:i];
     [self writeLongBlock:&aValue
                atAddress:reg[kNumOUThreshold].addressOffset + (i * 0x100)];
 }
@@ -1369,14 +1369,14 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeDac:(unsigned short) i
 {
-    unsigned long 	aValue = [self dac:i];
+    uint32_t 	aValue = [self dac:i];
     [self writeLongBlock:&aValue
                atAddress:reg[kDacs].addressOffset + (i * 0x100)];
 }
 
 - (void) writeChannelConfiguration
 {
-    unsigned long mask = 0;
+    uint32_t mask = 0;
     if(zsAlgorithm == kNoZeroSuppression)  mask |= (0x0   << 16);
     else if(zsAlgorithm == kZeroLengthEncoding) mask |= (0x2   << 16);
     else                                   mask |= (0x3   << 16);
@@ -1392,7 +1392,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeBufferOrganization
 {
-    unsigned long aValue = eventSize & 0xf; //(unsigned long)pow(2.,(float)eventSize);
+    uint32_t aValue = eventSize & 0xf; //(uint32_t)pow(2.,(float)eventSize);
     [self writeLongBlock:&aValue
                atAddress:reg[kBufferOrganization].addressOffset];
 }
@@ -1400,7 +1400,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeAcquistionControl:(BOOL)start
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     aValue |= (clockSource & 0x1)       << 6;
     aValue |= (countAllTriggers & 0x1)  << 3;
     if(start) aValue |= (0x1 << 2);
@@ -1413,7 +1413,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) trigger
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWTrigger].addressOffset];
    
@@ -1421,7 +1421,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeTriggerSourceEnableMask
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     aValue |= (softwareTrigEnabled & 0x1) << 31;
     aValue |= (externalTrigEnabled & 0x1) << 30;
     aValue |= (coincidenceLevel    & 0x7) << 24;
@@ -1433,7 +1433,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeFrontPanelIOControl
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     aValue |= (gpoEnabled & 0x1) << 1;
     aValue |= (ttlEnabled & 0x1) << 0;
     
@@ -1444,7 +1444,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeFrontPanelTriggerOutEnableMask
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     aValue = (fpSoftwareTrigEnabled & 0x1) << 31;
     aValue = (fpExternalTrigEnabled & 0x1) << 30;
     aValue = (triggerOutMask        & 0xf) <<  0;
@@ -1455,7 +1455,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writePostTriggerSetting
 {
-    unsigned long aValue = postTriggerSetting/4;
+    uint32_t aValue = postTriggerSetting/4;
     if(packed)aValue = aValue*1.25;
     
     [self writeLongBlock:&aValue
@@ -1465,7 +1465,7 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeChannelEnabledMask
 {
-    unsigned long aValue = enabledMask & 0xf;
+    uint32_t aValue = enabledMask & 0xf;
     [self writeLongBlock:&aValue
                atAddress:reg[kChanEnableMask].addressOffset];
     
@@ -1473,14 +1473,14 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) writeNumBLTEventsToReadout
 {
-    unsigned long aValue = pow(2.,eventSize);
+    uint32_t aValue = pow(2.,eventSize);
     [self writeLongBlock:&aValue
                atAddress:reg[kBLTEventNum].addressOffset];
 }
 
 - (void) softwareReset
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWReset].addressOffset];
     
@@ -1488,14 +1488,14 @@ static NSString* DT5720RunModeString[4] = {
 
 - (void) clearAllMemory
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWClear].addressOffset];
     
 }
 - (void) configReload
 {
-    unsigned long aValue = 0;
+    uint32_t aValue = 0;
     [self writeLongBlock:&aValue
                atAddress:reg[kSWClear].addressOffset];
     
@@ -1580,12 +1580,12 @@ static NSString* DT5720RunModeString[4] = {
 
 - (NSString*) identifier
 {
-	return [NSString stringWithFormat:@"DT5720 %lu",[self uniqueIdNumber]];
+	return [NSString stringWithFormat:@"DT5720 %u",[self uniqueIdNumber]];
 }
 
 #pragma mark •••Data Taker
-- (unsigned long) dataId { return dataId; }
-- (void) setDataId: (unsigned long) DataId
+- (uint32_t) dataId { return dataId; }
+- (void) setDataId: (uint32_t) DataId
 {
     dataId = DataId;
 }
@@ -1630,16 +1630,16 @@ static NSString* DT5720RunModeString[4] = {
     isRunning = YES;
     [self checkBufferAlarm];
 
-    unsigned long totalDataSizeInLongs;
-    unsigned long recordSizeBytes;
-    unsigned long numSamplesPerEvent = 1024*1024./pow(2.,[self eventSize]);
-    unsigned long numBlts = pow(2.,[self eventSize]);
+    uint32_t totalDataSizeInLongs;
+    uint32_t recordSizeBytes;
+    uint32_t numSamplesPerEvent = 1024*1024./pow(2.,[self eventSize]);
+    uint32_t numBlts = pow(2.,[self eventSize]);
     
     recordSizeBytes      = (4+numSamplesPerEvent/2)*4;
     totalDataSizeInLongs = recordSizeBytes/4 + 2;
     
-    eventData = [[NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(long)]retain];
-    [eventData setLength:numBlts*(totalDataSizeInLongs*sizeof(long))];
+    eventData = [[NSMutableData dataWithCapacity:totalDataSizeInLongs*sizeof(int32_t)]retain];
+    [eventData setLength:numBlts*(totalDataSizeInLongs*sizeof(int32_t))];
     cachedPack = packed;
     
     [NSThread detachNewThreadSelector:@selector(dataWorker:) toTarget:self withObject:nil];
@@ -1692,7 +1692,7 @@ static NSString* DT5720RunModeString[4] = {
 
 #pragma mark ***Archival
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer in otherwise
-- (int) writeLongBlock:(unsigned long*) writeValue atAddress:(unsigned int) anAddress
+- (int) writeLongBlock:(uint32_t*) writeValue atAddress:(uint32_t) anAddress
 {
     //-----------------------------------------------
     //AM = 0x09 A32 non-priviledged access
@@ -1715,7 +1715,7 @@ static NSString* DT5720RunModeString[4] = {
     cmdBuffer[count++] = (char)((anAddress >> 16) & 0xFF);
     cmdBuffer[count++] = (char)((anAddress >> 24) & 0xFF);
 
-    unsigned long localData = *writeValue;
+    uint32_t localData = *writeValue;
     cmdBuffer[count++] = (char)(localData & 0xFF);
     cmdBuffer[count++] = (char)((localData >> 8) & 0xFF);
     cmdBuffer[count++] = (char)((localData >> 16) & 0xFF);
@@ -1753,7 +1753,7 @@ static NSString* DT5720RunModeString[4] = {
 
 
 //returns 0 if success, -1 if request fails, and number of bytes returned by digitizer otherwise
--(int) readLongBlock:(unsigned long*) readValue atAddress:(unsigned int) anAddress
+-(int) readLongBlock:(uint32_t*) readValue atAddress:(uint32_t) anAddress
 {
     
     //-----------------------------------------------
@@ -1812,15 +1812,15 @@ static NSString* DT5720RunModeString[4] = {
 }
 
 //returns 0 if success; -1 if request fails, and number of bytes returned by digitizer otherwise
-- (int) readFifo:(char*)readBuffer numBytesToRead:(unsigned long)    numBytes
+- (int) readFifo:(char*)readBuffer numBytesToRead:(uint32_t)    numBytes
 {
-    unsigned long fifoAddress = 0x0000;
+    uint32_t fifoAddress = 0x0000;
     
     if (numBytes == 0) return 0;
     int maxBLTSize = 0x100000; //8 MBytes
     numBytes = (numBytes + 7) & ~7UL;
 
-    int np = numBytes/maxBLTSize;
+    int np = (int)(numBytes/maxBLTSize);
     if(np*maxBLTSize != numBytes)np++;
 
     //request is an array of readLongBlock like requests
@@ -1880,7 +1880,7 @@ static NSString* DT5720RunModeString[4] = {
   
     int num_read = 0;
     @try {
-        num_read = [[self usbInterface] readBytes:readBuffer length:numBytes+2 pipe:0];
+        num_read = [[self usbInterface] readBytes:readBuffer length:(uint32_t)numBytes+2 pipe:0];
         num_read -= 2;
         if( num_read < 0 ) {
             // -----------------------------------------------------------
@@ -1930,12 +1930,12 @@ static NSString* DT5720RunModeString[4] = {
     [self setFpExternalTrigEnabled: [aDecoder decodeBoolForKey:     @"fpExternalTrigEnabled"]];
     [self setFpSoftwareTrigEnabled: [aDecoder decodeBoolForKey:     @"fpSoftwareTrigEnabled"]];
     [self setTriggerOutMask:        [aDecoder decodeIntForKey:      @"triggerOutMask"]];
-    [self setPostTriggerSetting:    [aDecoder decodeInt32ForKey:    @"postTriggerSetting"]];
+    [self setPostTriggerSetting:    [aDecoder decodeIntForKey:    @"postTriggerSetting"]];
     [self setGpoEnabled:            [aDecoder decodeBoolForKey:     @"gpoEnabled"]];
     [self setTtlEnabled:            [aDecoder decodeIntForKey:      @"ttlEnabled"]];
-    [self setEnabledMask:           [aDecoder decodeIntForKey:      @"enabledMask"]];
+    [self setEnabledMask:           [aDecoder decodeIntegerForKey:      @"enabledMask"]];
 
-    [self setCoincidenceLevel:      [aDecoder decodeIntForKey:      @"coincidenceLevel"]];
+    [self setCoincidenceLevel:      [aDecoder decodeIntegerForKey:      @"coincidenceLevel"]];
     [self setWaveFormRateGroup:     [aDecoder decodeObjectForKey:   @"waveFormRateGroup"]];
     
     if(!waveFormRateGroup){
@@ -1948,13 +1948,13 @@ static NSString* DT5720RunModeString[4] = {
 	int i;
     for (i = 0; i < kNumDT5720Channels; i++){
         [self setLogicType:i    withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"logicType%d", i]]];
-        [self setZsThreshold:i  withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"zsThreshold%d", i]]];
-        [self setThreshold:i    withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"threshold%d", i]]];
-        [self setNumOverUnderZsThreshold:i withValue:[aDecoder decodeIntForKey:  [NSString stringWithFormat:@"numOverUnderZsThreshold%d", i]]];
-        [self setNlbk:i         withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"nLbk%d", i]]];
-        [self setNlfwd:i        withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"nLfwd%d", i]]];
-        [self setNumOverUnderThreshold:i withValue:  [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"numOverUnderThreshold%d", i]]];
-        [self setDac:i          withValue:           [aDecoder decodeIntForKey:  [NSString stringWithFormat:@"dac%d", i]]];
+        [self setZsThreshold:i  withValue:           [aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"zsThreshold%d", i]]];
+        [self setThreshold:i    withValue:           [aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"threshold%d", i]]];
+        [self setNumOverUnderZsThreshold:i withValue:[aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"numOverUnderZsThreshold%d", i]]];
+        [self setNlbk:i         withValue:           [aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"nLbk%d", i]]];
+        [self setNlfwd:i        withValue:           [aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"nLfwd%d", i]]];
+        [self setNumOverUnderThreshold:i withValue:  [aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"numOverUnderThreshold%d", i]]];
+        [self setDac:i          withValue:           [aDecoder decodeIntegerForKey:  [NSString stringWithFormat:@"dac%d", i]]];
     }
     
     [[self undoManager] enableUndoRegistration];
@@ -1966,12 +1966,12 @@ static NSString* DT5720RunModeString[4] = {
 {
     [super encodeWithCoder:anEncoder];
     
-    [anEncoder encodeInt: zsAlgorithm               forKey:@"zsAlgorithm"];
+    [anEncoder encodeInteger: zsAlgorithm               forKey:@"zsAlgorithm"];
     [anEncoder encodeBool:packed                    forKey:@"packed"];
     [anEncoder encodeBool:trigOnUnderThreshold      forKey:@"trigOnUnderThreshold"];
     [anEncoder encodeBool:testPatternEnabled        forKey:@"testPatternEnabled"];
     [anEncoder encodeBool:trigOverlapEnabled        forKey:@"trigOverlapEnabled"];
-    [anEncoder encodeInt:eventSize                  forKey:@"eventSize"];
+    [anEncoder encodeInteger:eventSize                  forKey:@"eventSize"];
     [anEncoder encodeBool:clockSource               forKey:@"clockSource"];
     [anEncoder encodeBool:countAllTriggers          forKey:@"countAllTriggers"];
     [anEncoder encodeBool:gpiRunMode                forKey:@"gpiRunMode"];
@@ -1980,25 +1980,25 @@ static NSString* DT5720RunModeString[4] = {
     [anEncoder encodeInt:triggerSourceMask          forKey:@"triggerSourceMask"];
     [anEncoder encodeBool:fpExternalTrigEnabled     forKey:@"fpExternalTrigEnabled"];
     [anEncoder encodeBool:fpSoftwareTrigEnabled     forKey:@"fpSoftwareTrigEnabled"];
-    [anEncoder encodeInt32:postTriggerSetting       forKey:@"postTriggerSetting"];
+    [anEncoder encodeInt:postTriggerSetting       forKey:@"postTriggerSetting"];
     [anEncoder encodeBool:gpoEnabled                forKey:@"gpoEnabled"];
-    [anEncoder encodeInt:ttlEnabled                 forKey:@"ttlEnabled"];
+    [anEncoder encodeInteger:ttlEnabled                 forKey:@"ttlEnabled"];
     [anEncoder encodeInt:triggerOutMask             forKey:@"triggerOutMask"];
-    [anEncoder encodeInt:enabledMask                forKey:@"enabledMask"];
+    [anEncoder encodeInteger:enabledMask                forKey:@"enabledMask"];
 
-	[anEncoder encodeInt:coincidenceLevel           forKey:@"coincidenceLevel"];
+	[anEncoder encodeInteger:coincidenceLevel           forKey:@"coincidenceLevel"];
     [anEncoder encodeObject:waveFormRateGroup       forKey:@"waveFormRateGroup"];
     
 	int i;
 	for (i = 0; i < kNumDT5720Channels; i++){
-        [anEncoder encodeInt:logicType[i]               forKey:[NSString stringWithFormat:@"logicType%d", i]];
-        [anEncoder encodeInt:zsThresholds[i]            forKey:[NSString stringWithFormat:@"zsThreshold%d", i]];
-        [anEncoder encodeInt:numOverUnderZsThreshold[i] forKey:[NSString stringWithFormat:@"numOverUnderZsThreshold%d", i]];
-        [anEncoder encodeInt:nLbk[i]                    forKey:[NSString stringWithFormat:@"nLbk%d", i]];
-        [anEncoder encodeInt:nLfwd[i]                   forKey:[NSString stringWithFormat:@"nLfwd%d", i]];
-        [anEncoder encodeInt:thresholds[i]              forKey:[NSString stringWithFormat:@"threshold%d", i]];
-        [anEncoder encodeInt:numOverUnderThreshold[i]   forKey:[NSString stringWithFormat:@"numOverUnderThreshold%d", i]];
-        [anEncoder encodeInt:dac[i]                     forKey:[NSString stringWithFormat:@"dac%d", i]];
+        [anEncoder encodeInteger:logicType[i]               forKey:[NSString stringWithFormat:@"logicType%d", i]];
+        [anEncoder encodeInteger:zsThresholds[i]            forKey:[NSString stringWithFormat:@"zsThreshold%d", i]];
+        [anEncoder encodeInteger:numOverUnderZsThreshold[i] forKey:[NSString stringWithFormat:@"numOverUnderZsThreshold%d", i]];
+        [anEncoder encodeInteger:nLbk[i]                    forKey:[NSString stringWithFormat:@"nLbk%d", i]];
+        [anEncoder encodeInteger:nLfwd[i]                   forKey:[NSString stringWithFormat:@"nLfwd%d", i]];
+        [anEncoder encodeInteger:thresholds[i]              forKey:[NSString stringWithFormat:@"threshold%d", i]];
+        [anEncoder encodeInteger:numOverUnderThreshold[i]   forKey:[NSString stringWithFormat:@"numOverUnderThreshold%d", i]];
+        [anEncoder encodeInteger:dac[i]                     forKey:[NSString stringWithFormat:@"dac%d", i]];
     }
 }
 
@@ -2019,29 +2019,29 @@ static NSString* DT5720RunModeString[4] = {
     [objDictionary setObject:[NSNumber numberWithInt:fpSoftwareTrigEnabled] forKey:@"fpSoftwareTrigEnabled"];
     [objDictionary setObject:[NSNumber numberWithInt:gpoEnabled]            forKey:@"gpoEnabled"];
     [objDictionary setObject:[NSNumber numberWithInt:ttlEnabled]            forKey:@"ttlEnabled"];
-    [objDictionary setObject:[NSNumber numberWithInt:triggerSourceMask]     forKey:@"triggerSourceMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:(int32_t)triggerSourceMask]     forKey:@"triggerSourceMask"];
     [objDictionary setObject:[NSNumber numberWithInt:countAllTriggers]      forKey:@"countAllTriggers"];
     [objDictionary setObject:[NSNumber numberWithInt:coincidenceLevel]      forKey:@"coincidenceLevel"];
-    [objDictionary setObject:[NSNumber numberWithInt:triggerOutMask]        forKey:@"triggerOutMask"];
-    [objDictionary setObject:[NSNumber numberWithInt:postTriggerSetting]    forKey:@"postTriggerSetting"];
+    [objDictionary setObject:[NSNumber numberWithInt:(int32_t)triggerOutMask]        forKey:@"triggerOutMask"];
+    [objDictionary setObject:[NSNumber numberWithInt:(int32_t)postTriggerSetting]    forKey:@"postTriggerSetting"];
     [objDictionary setObject:[NSNumber numberWithInt:enabledMask]           forKey:@"enabledMask"];
     [objDictionary setObject:[NSNumber numberWithInt:eventSize]             forKey:@"eventSize"];
     
-    [self addCurrentState:objDictionary cArray:(long*)zsThresholds         forKey:@"zsThresholds"];
-    [self addCurrentState:objDictionary cArray:(long*)thresholds           forKey:@"thresholds"];
-    [self addCurrentState:objDictionary cArray:(long*)nLbk                 forKey:@"nLbk"];
-    [self addCurrentState:objDictionary cArray:(long*)nLfwd                forKey:@"nLfwd"];
-    [self addCurrentState:objDictionary cArray:(long*)logicType            forKey:@"logicType"];
-    [self addCurrentState:objDictionary cArray:(long*)dac                  forKey:@"dac"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)zsThresholds         forKey:@"zsThresholds"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)thresholds           forKey:@"thresholds"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)nLbk                 forKey:@"nLbk"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)nLfwd                forKey:@"nLfwd"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)logicType            forKey:@"logicType"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)dac                  forKey:@"dac"];
     
-    [self addCurrentState:objDictionary cArray:(long*)numOverUnderThreshold    forKey:@"numOverUnderThreshold"];
-    [self addCurrentState:objDictionary cArray:(long*)numOverUnderZsThreshold  forKey:@"numOverUnderZsThreshold"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)numOverUnderThreshold    forKey:@"numOverUnderThreshold"];
+    [self addCurrentState:objDictionary cArray:(int32_t*)numOverUnderZsThreshold  forKey:@"numOverUnderZsThreshold"];
 
     
     return objDictionary;
 }
 
-- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(long*)anArray forKey:(NSString*)aKey
+- (void) addCurrentState:(NSMutableDictionary*)dictionary cArray:(int32_t*)anArray forKey:(NSString*)aKey
 {
     NSMutableArray* ar = [NSMutableArray array];
     int i;
@@ -2054,7 +2054,7 @@ static NSString* DT5720RunModeString[4] = {
 
 
 #pragma mark ***DataSource
-- (void) getQueMinValue:(unsigned long*)aMinValue maxValue:(unsigned long*)aMaxValue head:(unsigned long*)aHeadValue tail:(unsigned long*)aTailValue
+- (void) getQueMinValue:(uint32_t*)aMinValue maxValue:(uint32_t*)aMaxValue head:(uint32_t*)aHeadValue tail:(uint32_t*)aTailValue
 {
     *aMinValue  = 0;
     *aMaxValue  = [circularBuffer bufferSize];
@@ -2072,7 +2072,7 @@ static NSString* DT5720RunModeString[4] = {
 
     while (!self.isTimeToStopDataWorker) {
         NSAutoreleasePool* workerPool = [[NSAutoreleasePool alloc] init];
-        unsigned long acqStatus = 0;
+        uint32_t acqStatus = 0;
         [self read:kAcqStatus returnValue:&acqStatus];
         BOOL isDataAvailable = (acqStatus >> 3) & 0x1;
         if(isDataAvailable){
@@ -2080,26 +2080,26 @@ static NSString* DT5720RunModeString[4] = {
             else                       bufferState = kDT5720BufferReady;
             
             
-            unsigned long* theData = (unsigned long*)[eventData bytes];
-            int num     = [self readFifo:(char*)theData numBytesToRead:[eventData length]];
+            uint32_t* theData = (uint32_t*)[eventData bytes];
+            uint32_t num     = (uint32_t)[self readFifo:(char*)theData numBytesToRead:(uint32_t)[eventData length]];
             if(num>0){
-                unsigned long index=0;
+                uint32_t index=0;
                 do {
                     if((theData[index]>>28 & 0xf) == 0xA){
-                        unsigned long theSize = theData[index] & 0xfffffff;
-                        NSMutableData* record = [NSMutableData dataWithCapacity:(theSize+2)*sizeof(long)];
-                        [record setLength:(theSize+2)*sizeof(long)];
-                        unsigned long* theRecord = (unsigned long*)[record bytes];
+                        uint32_t theSize = theData[index] & 0xfffffff;
+                        NSMutableData* record = [NSMutableData dataWithCapacity:(theSize+2)*sizeof(int32_t)];
+                        [record setLength:(theSize+2)*sizeof(int32_t)];
+                        uint32_t* theRecord = (uint32_t*)[record bytes];
                         theRecord[0]  = dataId | theSize+2;
                         theRecord[1]  = (([self uniqueIdNumber] & 0xf)<<16) |
                                         ((cachedPack            & 0x1)<< 0) ;
 
-                        [record replaceBytesInRange:NSMakeRange(8, theSize*sizeof(long))
+                        [record replaceBytesInRange:NSMakeRange(8, theSize*sizeof(int32_t))
                                           withBytes:(char*)&theData[index]
-                                             length:theSize*sizeof(long)];
+                                             length:theSize*sizeof(int32_t)];
                         [circularBuffer writeData:record];
                         index += theSize;
-                        totalBytesTransfered += theSize*sizeof(long);
+                        totalBytesTransfered += theSize*sizeof(int32_t);
                     }
                     else break;
                 }while(index<num/4);

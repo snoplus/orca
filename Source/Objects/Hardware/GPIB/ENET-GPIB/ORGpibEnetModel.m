@@ -125,7 +125,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     NSImage* aCachedImage = [NSImage imageNamed:@"GpibEnetBox"];
     NSImage* i = [[[NSImage alloc] initWithSize:[aCachedImage size]]autorelease];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     if(![self isEnabled]){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSZeroPoint];
@@ -208,7 +208,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
     return 0;
 }
 
-- (long) ibcntl
+- (int32_t) ibcntl
 {
     if ( [ self isEnabled ]) {
         return( [gpibEnetInstance ibcntl] );
@@ -420,10 +420,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-- (long) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (long) aMaxLength
+- (int32_t) readFromDevice: (short) aPrimaryAddress data: (char*) aData maxLength: (int32_t) aMaxLength
 {
     if ( ! [ self isEnabled ]) return -1;
-    long	nReadBytes = -1;
+    int32_t	nReadBytes = -1;
     
     @try {
         // Make sure that device is initialized.
@@ -453,7 +453,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
             {
                 NSMutableDictionary* userInfo = [ NSMutableDictionary dictionary ];			
                 NSString* dataStr = [[ NSString alloc ] initWithBytes: aData length: nReadBytes encoding: NSASCIIStringEncoding ];
-                [ userInfo setObject: [ NSString stringWithFormat: @"Read - Address: %d length: %ld data: %@\n", 
+                [ userInfo setObject: [ NSString stringWithFormat: @"Read - Address: %d length: %d data: %@\n",
 									   aPrimaryAddress, nReadBytes, dataStr ] 
                               forKey: ORGpibMonitor ]; 
                 
@@ -502,7 +502,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         // Write to device.
         [ gpibEnetInstance ibwrt:mDeviceUnit[ aPrimaryAddress ]
 							 buf:(char *)[ aCommand cStringUsingEncoding:NSASCIIStringEncoding ]
-							 cnt:[ aCommand length ] ];
+							 cnt:(int32_t)[ aCommand length ] ];
         if ( [ gpibEnetInstance ibsta ] & [ gpibEnetInstance err ] ) {
             [ mErrorMsg setString:  @"***Error: ibwrt" ];
             [ self GpibError: mErrorMsg ]; 
@@ -517,10 +517,10 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
 }
 
 
-- (long) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
-               maxLength: (long) aMaxLength
+- (int32_t) writeReadDevice: (short) aPrimaryAddress command: (NSString*) aCommand data: (char*) aData
+               maxLength: (int32_t) aMaxLength
 {
-    long retVal = 0;
+    int32_t retVal = 0;
     if ( ! [ self isEnabled ]) return -1;
     @try {
         
@@ -683,7 +683,7 @@ NSString*			ORGPIBBoardChangedNotification = @"ORGpibBoardChangedNotification";
         
         [ errorMsg release ];
         
-        [ aMsg appendString: [ NSString stringWithFormat: @"ibcntl = %ld\n", [ gpibEnetInstance ibcntl ]]];
+        [ aMsg appendString: [ NSString stringWithFormat: @"ibcntl = %d\n", [ gpibEnetInstance ibcntl ]]];
         
         [theHWLock unlock];   //-----end critical section
 		// Call ibonl to take the device and interface offline
@@ -706,7 +706,7 @@ static NSString	*ORBoardIndex			= @"GPIB-ENET Board Index";
     
     [[ self undoManager ] disableUndoRegistration ];
     [ self commonInit ];
-    [ self setBoardIndex: [ decoder decodeIntForKey: ORBoardIndex ]];
+    [ self setBoardIndex: [ decoder decodeIntegerForKey: ORBoardIndex ]];
     
     [[ self undoManager ] enableUndoRegistration ];
     
@@ -716,7 +716,7 @@ static NSString	*ORBoardIndex			= @"GPIB-ENET Board Index";
 - (void) encodeWithCoder: (NSCoder*) encoder
 {
     [ super encodeWithCoder: encoder ];
-    [ encoder encodeInt: mBoardIndex forKey: ORBoardIndex ];
+    [ encoder encodeInteger: mBoardIndex forKey: ORBoardIndex ];
 }
 
 

@@ -304,7 +304,7 @@ NSString* ORAlarmElementeMailDelaChangedNotification = @"ORAlarmElementeMailDela
     [self setAlarmSeverity:[decoder decodeIntForKey: @"alarmSeverity"]];
     [self setAlarmName:[decoder decodeObjectForKey:  @"alarmName"]];
     [self setAlarmHelp:[decoder decodeObjectForKey:  @"alarmHelp"]];
-    [self setEMailDelay:[decoder decodeIntForKey:    @"eMailDelay"]];
+    [self setEMailDelay:[decoder decodeIntegerForKey:    @"eMailDelay"]];
 
     [[self undoManager] enableUndoRegistration];
 	[self registerNotificationObservers];
@@ -316,10 +316,10 @@ NSString* ORAlarmElementeMailDelaChangedNotification = @"ORAlarmElementeMailDela
 {
     [super encodeWithCoder:encoder];
     [encoder encodeObject:noAlarmName   forKey:@"noAlarmName"];
-    [encoder encodeInt:alarmSeverity    forKey:@"alarmSeverity"];
+    [encoder encodeInteger:alarmSeverity    forKey:@"alarmSeverity"];
     [encoder encodeObject:alarmName     forKey:@"alarmName"];
     [encoder encodeObject:alarmHelp     forKey:@"alarmHelp"];
-    [encoder encodeInt:eMailDelay       forKey:@"eMailDelay"];
+    [encoder encodeInteger:eMailDelay       forKey:@"eMailDelay"];
 }
 
 @end
@@ -370,12 +370,12 @@ NSString* ORAlarmElementeMailDelaChangedNotification = @"ORAlarmElementeMailDela
 	NSImage* finalImage = [[NSImage alloc] initWithSize:theIconSize];
 
 	[finalImage lockFocus];
-    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+    [anImage drawAtPoint:NSZeroPoint fromRect:[anImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 	float y = theIconSize.height/2 - textSize.height/2;
 	float x;
 	if([self state]) {
 		NSImage* alarmImage = [[NSImage imageNamed:@"AlarmIcon"] copy];
-		[alarmImage drawAtPoint:NSZeroPoint fromRect:[alarmImage imageRect] operation:NSCompositeSourceOver fraction:1.0];
+		[alarmImage drawAtPoint:NSZeroPoint fromRect:[alarmImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];
 		x = 53/2.+(theIconSize.width-53/2.)/2 - textSize.width/2;
 		[alarmImage release];
 	}

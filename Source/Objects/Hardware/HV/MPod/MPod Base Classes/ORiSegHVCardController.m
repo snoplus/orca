@@ -28,16 +28,17 @@
 #import "ORTimedTextField.h"
 #import "ORMPodCrate.h"
 
-#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 @interface ORiSegHVCardController (private)
+#if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _panicAllRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _allOnSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _allOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
 - (void) _allRampToZeroSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info;
-@end
 #endif
+@end
+
 
 @implementation ORiSegHVCardController
 - (void) dealloc
@@ -309,7 +310,7 @@
 - (void) tableViewSelectionDidChange:(NSNotification*)aNote
 {
 	if([aNote object] == hvTableView || !aNote){
-		int index = [hvTableView selectedRow];
+		int index = (int)[hvTableView selectedRow];
         if(index<0 || index>[model numberOfChannels])index=0;
 		[model setSelectedChannel:index];
 		[self maxVoltageChanged:nil];
@@ -343,8 +344,8 @@
 	int numberOnChannels = [model numberChannelsOn];
 	[channelCountField setIntValue:numberOnChannels];
 	[self outputStatusChanged:aNote];
-	int events = [model failureEvents:selectedChannel];
-    int moduleEvents = [model moduleFailureEvents];
+	uint32_t events = [model failureEvents:selectedChannel];
+    uint32_t moduleEvents = [model moduleFailureEvents];
 	int state  = [model channel:selectedChannel readParamAsInt:@"outputSwitch"];
 	[temperatureField setIntValue:[model channel:0 readParamAsInt:@"outputMeasurementTemperature"]];
 
@@ -476,7 +477,7 @@
 		}
 		
 		int numberOnChannels			= [model numberChannelsOn];
-		unsigned long channelStateMask	= [model channelStateMask];
+		uint32_t channelStateMask	= [model channelStateMask];
 		int numChannelsRamping			= [model numberChannelsRamping];
 		int numChannelsAboveZero		= [model numberChannelsWithNonZeroVoltage];
 		int numChannelsNonZeroHwGoal	= [model numberChannelsWithNonZeroHwGoal];
@@ -657,11 +658,11 @@
 }
 
 #pragma mark •••Data Source Methods
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
 	if(aTableView == hvTableView){
 		NSParameterAssert(rowIndex >= 0 && rowIndex < [model numberOfChannels]);
-		if([[aTableColumn identifier] isEqualToString:@"channel"])return [NSNumber numberWithInt:rowIndex];
+		if([[aTableColumn identifier] isEqualToString:@"channel"])return [NSNumber numberWithInteger:rowIndex];
 		else {
 			if([[aTableColumn identifier] isEqualToString:@"outputSwitch"]){
 				return [model channelState:rowIndex];
@@ -693,7 +694,7 @@
 	else return @"";
 }
 
-- (void) tableView: (NSTableView*) aTableView setObjectValue: (id) anObject forTableColumn: (NSTableColumn*) aTableColumn row: (int) aRowIndex
+- (void) tableView: (NSTableView*) aTableView setObjectValue: (id) anObject forTableColumn: (NSTableColumn*) aTableColumn row: (NSInteger) aRowIndex
 {
 	if(aTableView == hvTableView){
 		NSParameterAssert(aRowIndex >= 0 && aRowIndex < [model numberOfChannels]);
@@ -707,7 +708,7 @@
 	}
 }
 
-- (int) numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger) numberOfRowsInTableView:(NSTableView *)aTableView
 {
 	if(aTableView == hvTableView)return [model numberOfChannels];
 	else return 0;
@@ -745,12 +746,12 @@
     [alert setInformativeText:[NSString stringWithFormat:@"Really Panic Channel %d High Voltage OFF?",chan]];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
             [model panic:chan];
-            NSLog(@"Panicked MPod (%lu), Card %d Channel %d\n",[[model guardian]uniqueIdNumber],[model slot], chan);
+            NSLog(@"Panicked MPod (%u), Card %d Channel %d\n",[[model guardian]uniqueIdNumber],[model slot], chan);
         }
     }];
 #else
@@ -804,7 +805,7 @@
     [alert setInformativeText:s2];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -849,7 +850,7 @@
     [alert setInformativeText:s2];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -884,7 +885,7 @@
     [alert setInformativeText:@"Really Ramp ALL Channels to Zero?"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -925,12 +926,12 @@
     [alert setInformativeText:@"Really Panic ALL Channels High Voltage OFF?"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
             [model panicAll];
-            NSLog(@"Panicked All Channels MPod (%lu), Card %d\n",[[model guardian]uniqueIdNumber],[model slot]);
+            NSLog(@"Panicked All Channels MPod (%u), Card %d\n",[[model guardian]uniqueIdNumber],[model slot]);
        }
     }];
 #else
@@ -961,7 +962,7 @@
     [alert setInformativeText:@"This will set the target voltages to the actual hw voltages. The actual hw voltages will not change until you 'load' the values.\n\nReally sync these values?\n\n"];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -995,22 +996,22 @@
 #pragma mark •••Plot Data Source
 - (int)	numberPointsInPlot:(id)aPlotter
 {
-	int set = [aPlotter tag];
-	if(set < [model numberOfChannels]) return [[model currentHistory:set] count];
-	else		return [[model voltageHistory:set-[model numberOfChannels]] count];
+	int set = (int)[aPlotter tag];
+	if(set < [model numberOfChannels]) return (int)[[model currentHistory:set] count];
+	else		return (int)[[model voltageHistory:set-[model numberOfChannels]] count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue
 {
-	int set = [aPlotter tag];
+	int set = (int)[aPlotter tag];
 	if(set < [model numberOfChannels]){
-		int count = [[model currentHistory:set] count];
+		int count = (int)[[model currentHistory:set] count];
 		int index = count-i-1;
 		*xValue = [[model currentHistory:set] timeSampledAtIndex:index];
 		*yValue = [[model currentHistory:set] valueAtIndex:index] * 1000000.;
 	}
 	else {
-		int count = [[model voltageHistory:set-[model numberOfChannels]] count];
+		int count = (int)[[model voltageHistory:set-[model numberOfChannels]] count];
 		int index = count-i-1;
 		*xValue = [[model voltageHistory:set-[model numberOfChannels]] timeSampledAtIndex:index];
 		*yValue = [[model voltageHistory:set-[model numberOfChannels]] valueAtIndex:index];
@@ -1024,44 +1025,44 @@
 
 - (void) _allRampToZeroSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model rampAllToZero];
 	}
 }
 
 - (void) _panicRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
         int aChannel = [model selectedChannel];
 		[model panic:aChannel];
-        NSLog(@"Panicked MPod (%lu), Card %d Channel %d\n",[[model guardian]uniqueIdNumber],[model slot], aChannel);
+        NSLog(@"Panicked MPod (%u), Card %d Channel %d\n",[[model guardian]uniqueIdNumber],[model slot], aChannel);
 	}
 }
 
 - (void) _panicAllRampSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model panicAll];
-        NSLog(@"Panicked All Channels MPod (%lu), Card %d\n",[[model guardian]uniqueIdNumber],[model slot]);
+        NSLog(@"Panicked All Channels MPod (%u), Card %d\n",[[model guardian]uniqueIdNumber],[model slot]);
 
 	}
 }
 - (void) _syncSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model syncDialog];
 	}
 }
 - (void) _allOnSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model turnAllChannelsOn];
 	}
 }
 
 - (void) _allOffSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model turnAllChannelsOff];
 	}
 }

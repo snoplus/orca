@@ -276,7 +276,7 @@
 		if(cmd){
 			if([cmd rangeOfString:@"?"].location != NSNotFound){
 				char reply[1024];
-				long n = [model writeReadGPIBDevice:cmd data:reply maxLength:1024];
+				int32_t n = [model writeReadGPIBDevice:cmd data:reply maxLength:1024];
 				if(n>0)reply[n-1]='\0';
 				NSLog(@"%s\n",reply);
 			}
@@ -305,7 +305,7 @@
     [alert setInformativeText:@"Really Clear the Non-Volatile Memory in Pulser?"];
     [alert addButtonWithTitle:@"YES/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if(result == NSAlertFirstButtonReturn){
@@ -554,7 +554,7 @@
 {
     if([sender indexOfSelectedItem] != [model selectedWaveform]){ 	
         [[self undoManager] setActionName: @"Selected Waveform"];
-        [model setSelectedWaveform:[selectionPopUpButton indexOfSelectedItem]];
+        [model setSelectedWaveform:(int)[selectionPopUpButton indexOfSelectedItem]];
     }
 }
 
@@ -711,7 +711,7 @@
 
 - (void) randomCountChanged:(NSNotification*)aNote
 {
-	[randomCountField setIntValue:[model randomCount]];
+	[randomCountField setIntegerValue:[model randomCount]];
 }
 
 
@@ -846,7 +846,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
 		@try {
 			[model emptyVolatileMemory];
 		}

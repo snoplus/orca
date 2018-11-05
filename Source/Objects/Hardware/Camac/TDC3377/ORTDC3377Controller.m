@@ -244,7 +244,7 @@
 
 - (void) slotChanged:(NSNotification*)aNotification
 {
-	[[self window] setTitle:[NSString stringWithFormat:@"TDC3377 (Station %d)",[model stationNumber]]];
+	[[self window] setTitle:[NSString stringWithFormat:@"TDC3377 (Station %d)",(int)[model stationNumber]]];
 }
 
 - (void) runModeChanged:(NSNotification*)aNotification
@@ -355,7 +355,7 @@
 {
 	if([runModePopUp indexOfSelectedItem] != [model controlMode]){
 		[[self undoManager] setActionName: @"Set Run Mode"];
-		[model setControlMode:[runModePopUp indexOfSelectedItem]];
+		[model setControlMode:(int)[runModePopUp indexOfSelectedItem]];
 	}
 }
 

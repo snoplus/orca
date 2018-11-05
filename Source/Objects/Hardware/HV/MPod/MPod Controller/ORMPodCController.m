@@ -116,7 +116,7 @@
 
 - (void) queueCountChanged:(NSNotification*)aNote
 {
-	[queueCountField setIntValue: [ORSNMPQueue operationCount]];
+	[queueCountField setIntegerValue: [ORSNMPQueue operationCount]];
 	[queueValueBar setNeedsDisplay:YES];
 }	
 
@@ -228,7 +228,7 @@
     [alert setInformativeText:[NSString stringWithFormat:@"Really turn MPod HV Crate Power %@?",pwr?@"OFF":@"ON" ]];
     [alert addButtonWithTitle:@"Yes/Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -255,7 +255,7 @@
 @implementation ORMPodCController (private)
 - (void) _powerSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(id)info
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[model togglePower];
 	}
 }

@@ -70,7 +70,7 @@ NSString* ORPCICardSlotChangedNotification 	= @"ORPCICardSlotChangedNotification
     NSImage* aCachedImage = [NSImage imageNamed:anImageName];
     NSImage* i = [[[NSImage alloc] initWithSize:[aCachedImage size]]autorelease];
     [i lockFocus];
-    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositeSourceOver fraction:1.0];    
+    [aCachedImage drawAtPoint:NSZeroPoint fromRect:[aCachedImage imageRect] operation:NSCompositingOperationSourceOver fraction:1.0];    
     if(![self hardwareExists]){
         NSBezierPath* path = [NSBezierPath bezierPath];
         [path moveToPoint:NSZeroPoint];
@@ -172,7 +172,7 @@ static NSString *ORPciConnector 		= @"ORPciCard Connector";
     [super encodeWithCoder:encoder];
     [encoder encodeObject:[self connectorName] forKey:ORPciConnectorName];
     [encoder encodeObject:[self connector] forKey:ORPciConnector];
-    [encoder encodeInt:[self slot] forKey:ORPciSlotNumber];
+    [encoder encodeInteger:[self slot] forKey:ORPciSlotNumber];
 }
 
 @end

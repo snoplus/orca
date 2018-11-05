@@ -42,7 +42,7 @@
 {
     [super awakeFromNib];
     NSString* key = [NSString stringWithFormat: @"orca.ORCaen419_%d.selectedtab",[model slot]];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: key];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	[[rate0 xAxis] setRngLimitsLow:0 withHigh:500000 withMinRng:128];
@@ -225,13 +225,13 @@
 - (void) lowThresholdChanged:(NSNotification*) aNote
 {
 	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[lowThresholdMatrix cellWithTag:chnl] setIntValue:[model lowThreshold:chnl]];
+	[[lowThresholdMatrix cellWithTag:chnl] setIntegerValue:[model lowThreshold:chnl]];
 }
 
 - (void) highThresholdChanged:(NSNotification*) aNote
 {
 	int chnl = [[[aNote userInfo] objectForKey:@"channel"] intValue];
-	[[highThresholdMatrix cellWithTag:chnl] setIntValue:[model highThreshold:chnl]];
+	[[highThresholdMatrix cellWithTag:chnl] setIntegerValue:[model highThreshold:chnl]];
 }
 
 - (void) linearGateModeChanged:(NSNotification*)aNote
@@ -244,7 +244,7 @@
 
 - (void) auxAddressChanged:(NSNotification*)aNote
 {
-	[auxAddressField setIntValue: [model auxAddress]];
+	[auxAddressField setIntegerValue: [model auxAddress]];
 }
 
 
@@ -257,7 +257,7 @@
 
 - (void) baseAddressChanged:(NSNotification*)aNote
 {
-	[baseAddressField setIntValue: [model baseAddress]];
+	[baseAddressField setIntegerValue: [model baseAddress]];
 }
 
 - (void) slotChanged:(NSNotification*)aNotification
@@ -307,7 +307,7 @@
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
     NSString* key = [NSString stringWithFormat: @"orca.ORCaen419_%d.selectedtab",[model slot]];
-    int index = [tabView indexOfTabViewItem:item];
+    NSInteger index = [tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:key];
 	
 }
@@ -566,12 +566,12 @@
 
 - (int) numberPointsInPlot:(id)aPlotter
 {
-	return [[[model adcRateGroup]timeRate]count];
+	return (int)[[[model adcRateGroup]timeRate]count];
 }
 
 - (void) plotter:(id)aPlotter index:(int)i x:(double*)xValue y:(double*)yValue;
 {
-	int count = [[[model adcRateGroup]timeRate] count];
+	int count = (int)[[[model adcRateGroup]timeRate] count];
 	int index = count-i-1;
 	*yValue =  [[[model adcRateGroup] timeRate] valueAtIndex:index];
 	*xValue =  [[[model adcRateGroup] timeRate] timeSampledAtIndex:index];

@@ -392,7 +392,7 @@
 - (IBAction) selectWaveformAction:(id)sender;
 {
     if([sender indexOfSelectedItem] != [model selectedWaveform]){ 	
-        [model setSelectedWaveform:[sender indexOfSelectedItem]];
+        [model setSelectedWaveform:(int)[sender indexOfSelectedItem]];
     }
 } 
 
@@ -490,7 +490,7 @@
     [alert setInformativeText:@"Really Clear the Non-Volatile Memory?"];
     [alert addButtonWithTitle:@"Yes, Do it NOW"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[owner window] completionHandler:^(NSModalResponse result){
         if (result == NSAlertFirstButtonReturn){
@@ -599,7 +599,7 @@
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void) _clearSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-    if(returnCode == NSAlertDefaultReturn){
+    if(returnCode == NSAlertFirstButtonReturn){
 		@try {
 			[model emptyVolatileMemory];
 		}

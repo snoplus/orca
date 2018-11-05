@@ -48,7 +48,7 @@ enum {
 - (void) awakeFromNib
 {
     [super awakeFromNib];
-    int index = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.ORDataFileMode.selectedtab"];
+    NSInteger index = [[NSUserDefaults standardUserDefaults] integerForKey: @"orca.ORDataFileMode.selectedtab"];
     if((index<0) || (index>[tabView numberOfTabViewItems]))index = 0;
     [tabView selectTabViewItemAtIndex: index];
 	
@@ -110,7 +110,7 @@ enum {
 
 - (IBAction) sizeLimitReachedAction:(NSMatrix*)sender
 {
-	[model setSizeLimitReachedAction:[[sender selectedCell] tag]];
+	[model setSizeLimitReachedAction:(int)[[sender selectedCell] tag]];
 }
 
 - (IBAction) lockButtonAction:(id)sender
@@ -135,7 +135,7 @@ enum {
     [alert setInformativeText:@"You can always send them later."];
     [alert addButtonWithTitle:@"Stop"];
     [alert addButtonWithTitle:@"Cancel"];
-    [alert setAlertStyle:NSWarningAlertStyle];
+    [alert setAlertStyle:NSAlertStyleWarning];
     
     [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse result){
         if(result == NSAlertFirstButtonReturn){
@@ -159,7 +159,7 @@ enum {
 #if !defined(MAC_OS_X_VERSION_10_10) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_10 // 10.10-specific
 - (void)_stopSendingSheetDidEnd:(id)sheet returnCode:(int)returnCode contextInfo:(NSDictionary*)userInfo
 {
-	if(returnCode == NSAlertDefaultReturn){
+	if(returnCode == NSAlertFirstButtonReturn){
 		[[model dataFolder] stopTheQueue];
 		[[model statusFolder] stopTheQueue];
 		[[model configFolder] stopTheQueue];
@@ -375,7 +375,7 @@ enum {
 
 - (void) tabView:(NSTabView*)aTabView didSelectTabViewItem:(NSTabViewItem*)item
 {
-    int index = [tabView indexOfTabViewItem:item];
+    int index = (int)[tabView indexOfTabViewItem:item];
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"orca.ORDataFileMode.selectedtab"];
 	
 }
@@ -488,9 +488,9 @@ enum {
 
 - (void) fileSizeChanged:(NSNotification*)note
 {
-	unsigned long long theSize = [model dataFileSize];
-	if(theSize<1000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%lu Bytes",(unsigned long)[model dataFileSize]]];
-	else if(theSize<100000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f KB",(unsigned long)[model dataFileSize]/1000.]];
+	uint64_t theSize = [model dataFileSize];
+	if(theSize<1000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%u Bytes",(uint32_t)[model dataFileSize]]];
+	else if(theSize<100000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f KB",(uint32_t)[model dataFileSize]/1000.]];
 	else if(theSize<1000000000UL)[sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f MB",[model dataFileSize]/1000000.]];
 	else [sizeTextField setStringValue: [NSString stringWithFormat:@"%.2f GB",[model dataFileSize]/1000000000.]];
 }

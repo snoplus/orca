@@ -128,7 +128,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
     dataRecords = aDataRecords;
 }
 
-- (id) dataRecordAtIndex:(int)index
+- (id) dataRecordAtIndex:(int32_t)index
 {
     return [dataRecords objectAtIndex:index];
 }
@@ -191,8 +191,7 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 
 - (NSUInteger)  numberOfChildren
 {
-    int count =  [dataSet count];
-    return count;
+    return [dataSet count];
 }
 
 - (void) removeDataSet:(ORDataSet*)item
@@ -273,8 +272,8 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 	if(headerOnly){
 		NSFileHandle* fh = [NSFileHandle fileHandleForReadingAtPath:fileToExplore];
 		NSData* data =  [fh readDataOfLength:8];
-		unsigned long* ptr = (unsigned long*)[data bytes];
-		unsigned long headerLenInBytes = ptr[1];
+		uint32_t* ptr = (uint32_t*)[data bytes];
+		uint32_t headerLenInBytes = ptr[1];
 		NSData* headerAsData = [fh readDataOfLength:headerLenInBytes];
 		NSString* theHeaderAsString = [[NSString alloc] initWithBytes:[headerAsData bytes] length:headerLenInBytes encoding:NSASCIIStringEncoding];
 		NSDictionary* theHeader = [theHeaderAsString propertyList];
@@ -306,17 +305,17 @@ NSString* ORDataExplorerDataChanged                 = @"ORDataExplorerDataChange
 	[[NSNotificationCenter defaultCenter] postNotificationName:ORDataExplorerParseEndedNotification object: self];
 }
 
-- (void) byteSwapOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey
+- (void) byteSwapOneRecordAtOffset:(uint32_t)anOffset forKey:(id)aKey
 {
     [recordIndexer byteSwapOneRecordAtOffset:anOffset forKey:aKey];
 }
 
-- (void) decodeOneRecordAtOffset:(unsigned long)anOffset forKey:(id)aKey
+- (void) decodeOneRecordAtOffset:(uint32_t)anOffset forKey:(id)aKey
 {
     [recordIndexer decodeOneRecordAtOffset:anOffset intoDataSet:dataSet forKey:aKey];
 }
 
-- (NSString*) dataRecordDescription:(unsigned long)anOffset forKey:(NSNumber*)aKey
+- (NSString*) dataRecordDescription:(uint32_t)anOffset forKey:(NSNumber*)aKey
 {
 	return [recordIndexer dataRecordDescription:anOffset forKey:aKey];
 }

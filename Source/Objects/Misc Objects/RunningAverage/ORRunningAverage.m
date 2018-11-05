@@ -24,7 +24,7 @@
 
 @implementation ORRunningAverage
 
-- (id) initWithTag: (short)aTag
+- (id) initWithTag: (NSUInteger)aTag
          andLength: (short) wl
 {
     self = [super init];
@@ -34,12 +34,12 @@
     return self;
 }
 
-- (int) tag
+- (NSUInteger) tag
 {
     return tag;
 }
 
-- (void) setTag:(int)newTag
+- (void) setTag:(NSUInteger)newTag
 {
     tag=newTag;
 }
@@ -184,7 +184,7 @@
 {
     NSString* s = [NSString stringWithFormat:@"\nspiked:%@\ntag:%d\nave:%.3f\nspikeValue:%.3f",
                    self.spiked?@"YES":@"NO",
-                   self.tag,
+                   (int)self.tag,
                    self.ave,
                    self.spikeValue];
     return s;

@@ -87,7 +87,7 @@
 
 - (IBAction) scanNextButtonAction:(id)sender
 {
-    int row = [dataView selectedRow];
+    int row = (int)[dataView selectedRow];
     if(row != -1){    
 
         [dataView deselectAll:self];
@@ -111,7 +111,7 @@
 
 - (void) scanForNext:(id)currentDataName
 {
-    unsigned long num = [[model dataRecords] count];
+    uint32_t num = (uint32_t)[[model dataRecords] count];
     if(stopScan || currentSearchIndex>=num){
         [self setScanInProgress:NO];
         return;
@@ -137,7 +137,7 @@
 
 - (IBAction) scanPreviousButtonAction:(id)sender
 {
-   int row = [dataView selectedRow];
+   int row = (int)[dataView selectedRow];
     if(row >= 1){  
         
         [dataView deselectAll:self];
@@ -269,7 +269,7 @@
 
 - (void) catalogAll
 {
-    unsigned long num = [[model dataRecords] count];
+    uint32_t num = (uint32_t)[[model dataRecords] count];
 	if(num >0){
 	
 		if([model multiCatalog])[model setHistoErrorFlag:YES];
@@ -457,7 +457,7 @@
 
 
 #pragma mark ¥¥¥Data Source Methods
-- (int)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item 
+- (NSUInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
     if(outlineView == dataCatalogView){
         if(!item) return 1;
@@ -515,7 +515,7 @@
         else if([[tableColumn identifier] isEqualToString:@"Value"]){
             if(item==0){
                 return [[[NSAttributedString alloc] 
-                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[[model header] count]] 
+                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",(uint32_t)[[model header] count]]
                             attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]] autorelease];
             }
             else {
@@ -524,7 +524,7 @@
                 }
                 else {
                     return [[[NSAttributedString alloc] 
-                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",[item count]] 
+                        initWithString:[NSString stringWithFormat:@"%d key/value pairs",(uint32_t)[item count]]
                             attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor grayColor],NSForegroundColorAttributeName,nil]] autorelease];            
                 }
             }
@@ -534,15 +534,15 @@
     }
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
    return [[model dataRecords] count];
 }
 
-- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(int) rowIndex
+- (id) tableView:(NSTableView *) aTableView objectValueForTableColumn:(NSTableColumn *) aTableColumn row:(NSInteger) rowIndex
 {
     if([[aTableColumn identifier] isEqualToString: @"Number"]){
-        return [NSNumber numberWithInt:rowIndex];
+        return [NSNumber numberWithInteger:rowIndex];
     }
    else {
         NSDictionary* aDictionary = [[model dataRecords] objectAtIndex:rowIndex];
@@ -563,18 +563,18 @@
 - (void) tableViewSelectionDidChange:(NSNotification *)aNotification
 {
     NSTableView* tv = [aNotification object];
-    int row = [tv selectedRow];
+    uint32_t row = (uint32_t)[tv selectedRow];
     if(tv == dataView && row != -1){
         [self process:row];
 		if([model multiCatalog])[model setHistoErrorFlag:YES];
     }
 }
 
-- (void) process:(unsigned long)row
+- (void) process:(uint32_t)row
 {
     if(![model dataSet])[model createDataSet];
-    NSMutableDictionary* dataDictionary = [model dataRecordAtIndex:row];
-    unsigned long offset = [[dataDictionary objectForKey:@"StartingOffset"] longValue];
+    NSMutableDictionary* dataDictionary = [model dataRecordAtIndex:(int)row];
+    uint32_t offset = (uint32_t)[[dataDictionary objectForKey:@"StartingOffset"] longValue];
     id aKey = [dataDictionary objectForKey:@"Key"];
 	BOOL alreadyDecodedOnce = [[dataDictionary objectForKey:@"DecodedOnce"] boolValue];
     if(!alreadyDecodedOnce || [model multiCatalog]){
@@ -583,7 +583,7 @@
         [dataDictionary setObject:[NSNumber numberWithBool:YES] forKey:@"DecodedOnce"]; 
     }
     if(!scanInProgress){
-        NSString* header = [NSString stringWithFormat:@"Record %lu / %d\n",row,[[model dataRecords]count]-1];
+        NSString* header = [NSString stringWithFormat:@"Record %u / %lu\n",row,[[model dataRecords]count]-1];
         header = [header stringByAppendingFormat:@"%@",[model dataRecordDescription:offset forKey:aKey]];
         [detailsView setString:header];
     }
