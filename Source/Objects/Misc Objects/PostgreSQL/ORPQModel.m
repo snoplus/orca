@@ -992,15 +992,6 @@ static NSString* ORPQModelInConnector 	= @"ORPQModelInConnector";
     {
         NSLog(@"Loaded %@ DB: PMTHV(%d), FEC(%d), Crate(%d), MTC(%d), CAEN(%d)\n", [delegate dataBaseName],
               detDB->pmthvLoaded, detDB->fecLoaded, detDB->crateLoaded, detDB->mtcLoaded, detDB->caenLoaded);
-        if (countBadNhit100Enabled || countBadNhit20Enabled) {
-            NSLogColor([NSColor redColor], @"Warning!  Some bad channels have triggers enabled:\n");
-            if (countBadNhit100Enabled) NSLogColor([NSColor redColor], @"  - %d bad channels with NHIT100 enabled\n", countBadNhit100Enabled);
-            if (countBadNhit20Enabled)  NSLogColor([NSColor redColor], @"  - %d bad channels with NHIT20 enabled\n", countBadNhit20Enabled);
-        } else if (countBadSequencerEnabled || countBadThresholdNotMax) {
-            NSLog(@"Note!  Some bad channels are enabled:\n");
-        }
-        if (countBadSequencerEnabled) NSLog(@"  - %d bad channels with sequencer enabled\n", countBadSequencerEnabled);
-        if (countBadThresholdNotMax)  NSLog(@"  - %d bad channels with threshold not set to max\n", countBadThresholdNotMax);
         return detDB;
     } else {
         [detDB release];

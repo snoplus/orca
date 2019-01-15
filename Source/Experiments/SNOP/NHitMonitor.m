@@ -706,6 +706,10 @@ err:
         NSLog(@"nhit_20_lb   threshold is %.2f nhit\n", threshold_n20_lb);
     }
 
+    NSLog(@"Note these thresholds were calculated by Orca and might be incorrect.");
+    NSLog(@"The results of the nearline nhit monitor process are available at the end of the run.");
+    NSLog(@"They can be found on the monitoring page. Under the Detector tab, select NHit Monitor.");
+
     NSDictionary *userInfo = @{@"n100_lo": @(threshold_n100_lo),
                                @"n100_med": @(threshold_n100_med),
                                @"n100_hi": @(threshold_n100_hi),
