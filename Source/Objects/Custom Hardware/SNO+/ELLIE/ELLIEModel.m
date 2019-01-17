@@ -611,7 +611,7 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
         return YES;
     }
      */
-    if(frequency > 1.01e3)
+    if(frequency > 1.01e4)
         return NO;
     return YES;
 }
@@ -805,12 +805,17 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
 }
 
 
-
+//////////////////////////////////////////////////////
+// AMELLIE parameter functions
 -(void)startTellieRunThread:(NSDictionary*)fireCommands forTELLIE:(BOOL)forTELLIE
 {
     /*
      Launch a thread to host the tellie run functionality.
     */
+    /////////////////////////////////////
+    // Set Flag for TELLIE / AMELLIE run
+    [self setTellieRunFlag:forTELLIE];
+
     //////////////////////
     // Make invocation so we can pass multiple args into thread
     NSMethodSignature *signature = [self methodSignatureForSelector:@selector(startTellieRun:)];
@@ -826,6 +831,8 @@ NSString* ORSMELLIEEmergencyStop = @"ORSMELLIEEmergencyStop";
     [[self tellieThread] start];
 }
 
+//////////////////////////////////////////////////////
+// T/AMELLIE run control methods
 -(void)startTellieMultiRunThread:(NSArray*)fireCommandArray forTELLIE:(BOOL)forTELLIE
 {
     /*
@@ -1237,8 +1244,11 @@ err:
         
         ////////////
         // Update run document
-        [[[self tellieRunDoc] objectForKey:@"sub_run_info"] addObject:valuesToFillPerSubRun];
-        [[[self amellieRunDoc] objectForKey:@"sub_run_info"] addObject:valuesToFillPerSubRun];
+        if([self tellieRunFlag]){
+            [[[self tellieRunDoc] objectForKey:@"sub_run_info"] addObject:valuesToFillPerSubRun];
+        } else {
+            [[[self amellieRunDoc] objectForKey:@"sub_run_info"] addObject:valuesToFillPerSubRun];
+        }
 
         //////////////////
         // Start a new subrun
@@ -1271,6 +1281,8 @@ err:
             NSLogColor([NSColor redColor], @"%@: Problem stopping TUBii pulser!\n", prefix);
         }
 
+        ////////////
+        // Post a note which will call the stop method on the main thread (as if from button push)
         dispatch_sync(dispatch_get_main_queue(), ^{
             [[NSNotificationCenter defaultCenter] postNotificationName:ORTELLIERunFinishedNotification object:self];
         });
@@ -1432,7 +1444,7 @@ err:{
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
     NSString* docType = [NSMutableString stringWithFormat:@"TELLIE_RUN"];
-    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:1000];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10000];
 
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
@@ -1546,6 +1558,7 @@ err:{
      variables and push up to the telliedb. Additionally, the run doc dictionary set as
      the tellieRunDoc propery, to be updated later in the run.
      */
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     NSMutableDictionary* runDocDict = [NSMutableDictionary dictionaryWithCapacity:10];
 
     NSArray*  runModels = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -1556,7 +1569,7 @@ err:{
     ORRunModel* runControl = [runModels objectAtIndex:0];
 
     NSString* docType = [NSMutableString stringWithFormat:@"AMELLIE_RUN"];
-    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10];
+    NSMutableArray* subRunArray = [NSMutableArray arrayWithCapacity:10000];
 
     [runDocDict setObject:docType forKey:@"type"];
     [runDocDict setObject:[NSString stringWithFormat:@"%i",0] forKey:@"version"];
@@ -1570,6 +1583,7 @@ err:{
 
     [self setAmellieRunDoc:runDocDict];
     [[self couchDBRef:self withDB:@"amellie"] addDocument:runDocDict tag:kAmellieRunDocumentAdded];
+    [pool release];
 }
 
 - (void) updateAmellieRunDocument
@@ -2517,6 +2531,11 @@ err:
                 NSMutableDictionary* runDoc = [[self tellieRunDoc] mutableCopy];
                 [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
                 [self setTellieRunDoc:runDoc];
+                [runDoc release];
+            } else if ([aTag isEqualToString:kAmellieRunDocumentAdded]){
+                NSMutableDictionary* runDoc = [[self amellieRunDoc] mutableCopy];
+                [runDoc setObject:[aResult objectForKey:@"id"] forKey:@"_id"];
+                [self setAmellieRunDoc:runDoc];
                 [runDoc release];
             } else if ([aTag isEqualToString:kSmellieRunDocumentAdded]){
                 NSMutableDictionary* runDoc = [[self smellieRunDoc] mutableCopy];
