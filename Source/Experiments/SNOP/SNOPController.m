@@ -851,8 +851,8 @@ snopGreenColor;
         [standardRunVersionPopupMenu setEnabled:false];
 	}
 
-    if ([runControl isRunning] && ([runControl runType] & kECARun)) {
-        /* Disable the ping crates button if we are in an ECA run. */
+    if ([runControl isRunning] && (([runControl runType] & kECARun) || ([runControl runType] & kPhysicsRun))){
+        /* Disable the ping crates button if we are in an ECA or physics run. */
         [pingCratesButton setEnabled:FALSE];
     } else {
         [pingCratesButton setEnabled:TRUE];
