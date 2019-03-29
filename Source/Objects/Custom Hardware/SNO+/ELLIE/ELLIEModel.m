@@ -1172,6 +1172,7 @@ err:
         [valuesToFillPerSubRun setDictionary:fireCommands];
         [valuesToFillPerSubRun setObject:noShots forKey:@"number_of_shots"];
         [valuesToFillPerSubRun setObject:photonOutput forKey:@"photons"];
+        [valuesToFillPerSubRun setObject:[NSNumber numberWithInt:[runControl subRunNumber]] forKey:@"sub_run_number"];
         
         NSLog(@"%@: Firing fibre %@: %d pulses, %1.0f Hz\n", prefix, [fireCommands objectForKey:@"fibre"], [noShots integerValue], rate);
         
