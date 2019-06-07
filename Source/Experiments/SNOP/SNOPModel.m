@@ -851,7 +851,7 @@ tellieRunFiles = _tellieRunFiles;
         /* Tell the run control to wait. */
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-        [[ORPQModel getCurrent] dbQuery:@"SELECT nextval('run_number')"
+        [[ORPQModel getCurrent] dbQuery:@"SELECT run_number,nextval('run_number')"
              object:self selector:@selector(waitForRunNumber:) timeout:1.0];
     } else {
         /* If there is no database object, just continue with the existing run
@@ -879,7 +879,7 @@ err:
 
 - (void) waitForRunNumber: (ORPQResult *) result
 {
-    NSInteger numRows, numCols, run_number;
+    NSInteger numRows, numCols, run_number, old_number;
 
     if (!result) {
         NSLogColor([NSColor redColor], @"Error getting the run number from the database. Using default run number. Data is going in the bit bucket.\n");
@@ -894,12 +894,18 @@ err:
         goto err;
     }
 
-    if (numCols != 1) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1. Using default run number. Data is going in the bit bucket.", numCols);
+    if (numCols != 2) {
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 2. Using default run number. Data is going in the bit bucket.", numCols);
         goto err;
     }
 
-    run_number = [result getInt64atRow:0 column:0];
+    old_number = [result getInt64atRow:0 column:0];
+    run_number = [result getInt64atRow:0 column:1];
+
+    if (old_number + 1 != run_number) {
+        NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i. Using default run number. Data is going in the bit bucket.", old_number, run_number);
+        goto err;
+    }
 
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
