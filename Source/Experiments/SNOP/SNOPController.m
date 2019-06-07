@@ -245,12 +245,12 @@ snopGreenColor;
 
 -(void) awakeFromNib
 {
-    detectorSize		= NSMakeSize(1200,700);
-    detailsSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
-    focalPlaneSize		= NSMakeSize(1200,700);//NSMakeSize(450,589);
-    couchDBSize		= NSMakeSize(1200,700);//(620,595);//NSMakeSize(450,480);
-    hvMasterSize		= NSMakeSize(1200,700);
-    runsSize		= NSMakeSize(1200,700);
+    detectorSize		= NSMakeSize(1250,700);
+    detailsSize		= NSMakeSize(1250,700);
+    focalPlaneSize		= NSMakeSize(1250,700);
+    couchDBSize		= NSMakeSize(1250,700);
+    hvMasterSize		= NSMakeSize(1250,700);
+    runsSize		= NSMakeSize(1250,700);
     
     blankView = [[NSView alloc] init];
     [tabView setFocusRingType:NSFocusRingTypeNone];
@@ -2198,9 +2198,9 @@ snopGreenColor;
     [nhitMonitorRunTypeWordMatrix setEnabled:!locked];
     [nhitMonitorCrateMaskMatrix setEnabled:!locked];
     [nhitMonitorTimeInterval setEnabled:!locked];
-
     //Do not lock detector state bits to the operator
-    for(int irow=0;irow<21;irow++){
+    //Lock mutually exclusive run type word bits forever and for everyone
+    for(int irow=11;irow<21;irow++){
         [[runTypeWordMatrix cellAtRow:irow column:0] setEnabled:!lockedOrNotRunningMaintenance];
     }
     [rampDownCrateButton setEnabled:notRunningOrInMaintenance];
@@ -2665,21 +2665,6 @@ snopGreenColor;
     NSString *standardRun = [[[standardRunPopupMenu stringValue] uppercaseString] copy];
     [standardRunPopupMenu setStringValue:standardRun];
 
-    // Create new SR if does not exist
-    if ([standardRunPopupMenu indexOfItemWithObjectValue:standardRun] == NSNotFound && [standardRun isNotEqualTo:@""]) {
-        BOOL cancel = ORRunAlertPanel([NSString stringWithFormat:@"Creating new Standard Run: \"%@\"", standardRun],@"Is this really what you want?",@"Cancel",@"Yes, Make New Standard Run",nil);
-        if (cancel) {
-            [standardRunPopupMenu selectItemWithObjectValue:[model standardRunType]];
-            [standardRunVersionPopupMenu selectItemWithObjectValue:[model standardRunVersion]];
-            [standardRun release];
-            return;
-        } else {
-            [standardRunPopupMenu addItemWithObjectValue:standardRun];
-            [standardRunVersionPopupMenu addItemWithObjectValue:@"DEFAULT"];
-            [model saveStandardRun:standardRun withVersion:@"DEFAULT"];
-        }
-    }
-    
     // Set run type name
     if(![[model standardRunType] isEqualToString:standardRun]) {
         [model setStandardRunType:standardRun];
