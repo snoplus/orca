@@ -367,7 +367,7 @@ tellieRunFiles = _tellieRunFiles;
     */
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!\n");
         /* This should never happen. */
         return;
     }
@@ -890,12 +890,12 @@ err:
     numCols = [result numOfFields];
 
     if (numRows != 2) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 2. Using default run number. Data is going in the bit bucket.", numRows);
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 2. Using default run number. Data is going in the bit bucket.\n", numRows);
         goto err;
     }
 
     if (numCols != 1) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1. Using default run number. Data is going in the bit bucket.", numCols);
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1. Using default run number. Data is going in the bit bucket.\n", numCols);
         goto err;
     }
 
@@ -903,13 +903,13 @@ err:
     run_number = [result getInt64atRow:1 column:0];
 
     if (old_number + 1 != run_number) {
-        NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i. Using default run number. Data is going in the bit bucket.", old_number, run_number);
+        NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i. Using default run number. Data is going in the bit bucket.\n", old_number, run_number);
         goto err;
     }
 
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!\n");
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
         /* This should never happen. */
         return;
@@ -930,7 +930,7 @@ err:
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!\n");
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
         /* This should never happen. */
         return;
@@ -1226,7 +1226,7 @@ err:
 
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!\n");
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
