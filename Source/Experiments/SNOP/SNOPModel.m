@@ -929,6 +929,9 @@ err:
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
+    if (retryGetRunNumber) {
+        NSLogColor([NSColor redColor], @"Got run number OK on second try.\n");
+    }
     return;
 
 err:
