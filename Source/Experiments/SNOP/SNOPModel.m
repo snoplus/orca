@@ -889,7 +889,7 @@ err:
 
     if (!result) {
         NSLogColor([NSColor redColor], @"Error getting the run number from the database.\n");
-        goto retryRunNum;
+        goto err;
     }
 
     numRows = [result numOfRows];
@@ -897,12 +897,12 @@ err:
 
     if (numRows != 2) {
         NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 2.\n", numRows);
-        goto retryRunNum;
+        goto err;
     }
 
     if (numCols != 1) {
         NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1.\n", numCols);
-        goto retryRunNum;
+        goto err;
     }
 
     old_number = [result getInt64atRow:0 column:0];
@@ -910,7 +910,7 @@ err:
 
     if (old_number + 1 != run_number) {
         NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i.\n", old_number, run_number);
-        goto retryRunNum;
+        goto err;
     }
 
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -931,7 +931,7 @@ err:
 
     return;
 
-retryRunNum:
+err:
 {
     if (!retryGetRunNumber) {
         NSLogColor([NSColor redColor], @"Retrying...\n");
