@@ -888,35 +888,29 @@ err:
     NSInteger numRows, numCols, run_number, old_number;
 
     if (!result) {
-        NSLogColor([NSColor redColor], @"Error getting the run number from the database. Using default run number. Data is going in the bit bucket.\n");
-        goto err;
+        NSLogColor([NSColor redColor], @"Error getting the run number from the database.\n");
+        goto retryRunNum;
     }
 
     numRows = [result numOfRows];
     numCols = [result numOfFields];
 
     if (numRows != 2) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 2. Using default run number. Data is going in the bit bucket.\n", numRows);
-        goto err;
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 2.\n", numRows);
+        goto retryRunNum;
     }
 
     if (numCols != 1) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1. Using default run number. Data is going in the bit bucket.\n", numCols);
-        goto err;
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1.\n", numCols);
+        goto retryRunNum;
     }
 
     old_number = [result getInt64atRow:0 column:0];
     run_number = [result getInt64atRow:1 column:0];
 
     if (old_number + 1 != run_number) {
-        if (!retryGetRunNumber) {
-            NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i. Retrying....\n", old_number, run_number);
-            ++retryGetRunNumber;
-            [self getRunNumberFromDb];
-            return;
-        }
-        NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i. Using default run number. Data is going in the bit bucket.\n", old_number, run_number);
-        goto err;
+        NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i.\n", old_number, run_number);
+        goto retryRunNum;
     }
 
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
@@ -936,6 +930,16 @@ err:
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
     return;
+
+retryRunNum:
+    if (!retryGetRunNumber) {
+        NSLogColor([NSColor redColor], @"Retrying...\n");
+        ++retryGetRunNumber;
+        [self getRunNumberFromDb];
+        return;
+    }
+    NSLogColor([NSColor redColor], @"Using default run number. Data is going in the bit bucket.\n");
+    // (fall through to err)
 
 err:
 {
