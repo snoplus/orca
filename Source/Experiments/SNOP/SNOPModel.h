@@ -104,6 +104,8 @@ BOOL isNotRunningOrIsInMaintenance(void);
 
     bool rolloverRun;
 
+    int retryGetRunNumber;
+
     NSString *mtcHost;
     int mtcPort;
 
@@ -228,6 +230,7 @@ BOOL isNotRunningOrIsInMaintenance(void);
 - (id) debugDBConnectionHistoryItem:(unsigned int)index;
 - (void) debugDBPing;
 
+- (void) getRunNumberFromDb;
 - (void) taskFinished:(ORPingTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 
