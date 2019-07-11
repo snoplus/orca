@@ -45,7 +45,7 @@
 #define kNumTubes	20 //XL3s
 #define kNumOfCrates 19 //number of Crates in SNO+
 #define STANDARD_RUN_VERSION 2 //Increase if Standard Runs table structure is changed
-#define SNOP_ORCA_VERSION "1.1.2" //The current Orca release
+#define SNOP_ORCA_VERSION "1.1.3" //The current Orca release
 
 BOOL isNotRunningOrIsInMaintenance(void);
 
@@ -103,6 +103,8 @@ BOOL isNotRunningOrIsInMaintenance(void);
     NSNumber* standardRunTableVersion;
 
     bool rolloverRun;
+
+    int retryGetRunNumber;
 
     NSString *mtcHost;
     int mtcPort;
@@ -228,6 +230,7 @@ BOOL isNotRunningOrIsInMaintenance(void);
 - (id) debugDBConnectionHistoryItem:(unsigned int)index;
 - (void) debugDBPing;
 
+- (void) getRunNumberFromDb;
 - (void) taskFinished:(ORPingTask*)aTask;
 - (void) couchDBResult:(id)aResult tag:(NSString*)aTag op:(id)anOp;
 

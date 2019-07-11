@@ -367,7 +367,7 @@ tellieRunFiles = _tellieRunFiles;
     */
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!\n");
         /* This should never happen. */
         return;
     }
@@ -851,8 +851,8 @@ tellieRunFiles = _tellieRunFiles;
         /* Tell the run control to wait. */
         [[NSNotificationCenter defaultCenter] postNotificationName:ORAddRunStateChangeWait object: self userInfo: userInfo];
 
-        [[ORPQModel getCurrent] dbQuery:@"SELECT nextval('run_number')"
-             object:self selector:@selector(waitForRunNumber:) timeout:1.0];
+        retryGetRunNumber = 0;
+        [self getRunNumberFromDb];
     } else {
         /* If there is no database object, just continue with the existing run
          * number saved to Orca. */
@@ -877,33 +877,45 @@ err:
 }
 }
 
+- (void) getRunNumberFromDb
+{
+    [[ORPQModel getCurrent] dbQuery:@"(SELECT last_value FROM run_number) UNION ALL SELECT nextval('run_number');"
+                             object:self selector:@selector(waitForRunNumber:) timeout:1.0];
+}
+
 - (void) waitForRunNumber: (ORPQResult *) result
 {
-    NSInteger numRows, numCols, run_number;
+    NSInteger numRows, numCols, run_number, old_number;
 
     if (!result) {
-        NSLogColor([NSColor redColor], @"Error getting the run number from the database. Using default run number. Data is going in the bit bucket.\n");
+        NSLogColor([NSColor redColor], @"Error getting the run number from the database.\n");
         goto err;
     }
 
     numRows = [result numOfRows];
     numCols = [result numOfFields];
 
-    if (numRows != 1) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 1. Using default run number. Data is going in the bit bucket.", numRows);
+    if (numRows != 2) {
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i rows but expected 2.\n", numRows);
         goto err;
     }
 
     if (numCols != 1) {
-        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1. Using default run number. Data is going in the bit bucket.", numCols);
+        NSLogColor([NSColor redColor], @"Error getting run number from database: got %i columns but expected 1.\n", numCols);
         goto err;
     }
 
-    run_number = [result getInt64atRow:0 column:0];
+    old_number = [result getInt64atRow:0 column:0];
+    run_number = [result getInt64atRow:1 column:0];
+
+    if (old_number + 1 != run_number) {
+        NSLogColor([NSColor redColor], @"Error verifying run number from database: %i + 1 != %i.\n", old_number, run_number);
+        goto err;
+    }
 
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!\n");
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
         /* This should never happen. */
         return;
@@ -917,14 +929,25 @@ err:
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
+    if (retryGetRunNumber) {
+        NSLogColor([NSColor redColor], @"Got run number OK on second try.\n");
+    }
     return;
 
 err:
 {
+    if (!retryGetRunNumber) {
+        NSLogColor([NSColor redColor], @"Retrying...\n");
+        ++retryGetRunNumber;
+        [self getRunNumberFromDb];
+        return;
+    }
+    NSLogColor([NSColor redColor], @"Using default run number. Data is going in the bit bucket.\n");
+
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"waitForRunNumber: couldn't find run control object!\n");
         [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
         /* This should never happen. */
         return;
@@ -1220,7 +1243,7 @@ err:
 
     NSArray *runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
     if(![runObjects count]){
-        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!");
+        NSLogColor([NSColor redColor], @"detectorStateChanged: couldn't find run control object!\n");
         return;     // (should never happen)
     }
     ORRunModel* runControl = [runObjects objectAtIndex:0];
