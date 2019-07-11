@@ -932,6 +932,7 @@ err:
     return;
 
 retryRunNum:
+{
     if (!retryGetRunNumber) {
         NSLogColor([NSColor redColor], @"Retrying...\n");
         ++retryGetRunNumber;
@@ -939,10 +940,7 @@ retryRunNum:
         return;
     }
     NSLogColor([NSColor redColor], @"Using default run number. Data is going in the bit bucket.\n");
-    // (fall through to err)
 
-err:
-{
     NSArray*  runObjects = [[(ORAppDelegate*)[NSApp delegate] document] collectObjectsOfClass:NSClassFromString(@"ORRunModel")];
 
     if(![runObjects count]){
