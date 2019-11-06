@@ -888,7 +888,7 @@ err:
     NSInteger numRows, numCols, run_number, old_number;
 
     if (!result) {
-        NSLogColor([NSColor redColor], @"Error getting the run number from the database.\n");
+        NSLogColor([NSColor redColor], @"Error getting run number from the database.\n");
         goto err;
     }
 
@@ -923,15 +923,17 @@ err:
 
     ORRunModel* runControl = [runObjects objectAtIndex:0];
 
+    if (retryGetRunNumber) {
+        NSLogColor([NSColor redColor], @"Got run number OK on second try.\n");
+    }
+    NSLog(@"New run number: %2d\n", run_number);
+
     /* We set the run to the next run number - 1 because the run control will
      * increment the run number before the run starts. */
     [runControl setRunNumber:(uint32_t)run_number-1];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:ORReleaseRunStateChangeWait object: self];
 
-    if (retryGetRunNumber) {
-        NSLogColor([NSColor redColor], @"Got run number OK on second try.\n");
-    }
     return;
 
 err:

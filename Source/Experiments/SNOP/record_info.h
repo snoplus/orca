@@ -220,6 +220,8 @@ enum RecordTypes {
 #define RECIRCULATION_RUN       0x2000000
 #define SLASSAY_RUN             0x4000000
 #define UNUSUAL_ACTIVITY_RUN    0x8000000
+#define AV_RECIRCULATION_RUN    0x10000000
+#define SCINTILLATOR_FILL_RUN   0x20000000
 
 //   Source... 
 enum SourceType {

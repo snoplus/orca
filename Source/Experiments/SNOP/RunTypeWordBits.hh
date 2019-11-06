@@ -45,11 +45,11 @@ static char *RunTypeWordBitNames[32] = {
     "Comp. Coils OFF",
     "PMTs OFF",
     "Bubblers ON",
-    "Cavity Recirculation ON",
+    "Cavity Recirc. ON",
     "SLAssay",
     "Unusual Activity",
-    "AV Recirculation ON",
-    "Spare",
+    "AV Recirc. ON",
+    "Scint. Fill",
     "Spare",
     "Spare"
 };
@@ -80,7 +80,9 @@ enum RunTypeWordBits {
     kBubblersONRun=0x1000000,
     kRecirculationRun=0x2000000,
     kSLAssayRun=0x4000000,
-    kUnusualActivityRun=0x8000000
+    kUnusualActivityRun=0x8000000,
+    kAVRecirculationRun=0x10000000,
+    kScintillatorFillRun=0x20000000
 };
 
 #endif
