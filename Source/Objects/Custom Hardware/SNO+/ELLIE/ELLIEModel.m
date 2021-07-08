@@ -2123,7 +2123,8 @@ err:{
                     if([trigger_mode isEqualTo:@"slave"]){
 
                         @try{
-                            [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:nTriggers/rate*1.2 withGainVoltage:gain];
+                            NSNumber withEstimatedTime = nTriggers/rate*1.2 + 60;
+                            [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:withEstimatedTime withGainVoltage:gain];
                         } @catch(NSException* e){
                             NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
                             goto err;
