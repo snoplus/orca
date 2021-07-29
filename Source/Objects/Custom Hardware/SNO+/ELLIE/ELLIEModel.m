@@ -1731,7 +1731,7 @@ err:{
     :param fs_input_channel: the fibre switch input channel
     :param fs_output_channel: the fibre switch output channel
     :param n_pulses: the number of pulses
-    :param time: time until SNODROP exits slave mode
+    :param time: time until SNODROP exits slave mode (seconds)
     :param gain: the gain setting to be applied at the MPU
     */
     NSArray* args = @[laserSwitchChan, intensity, fibreInChan, fibreOutChan, time, gain];
@@ -1928,6 +1928,7 @@ err:{
     int counter=0;
     NSString* laser;
     NSString* fibre;
+    NSString* trigger_mode;
     NSNumber* wavelengthLowEdge;
     NSNumber* wavelengthHighEdge;
     NSNumber* intensity;
@@ -2029,6 +2030,7 @@ err:{
         @try{
             laser = [subRun objectForKey:@"laser"];
             fibre = [subRun objectForKey:@"fibre"];
+            trigger_mode = [subRun objectForKey:@"trigger_mode"];
             wavelengthLowEdge = [NSNumber numberWithInteger:[[subRun objectForKey:@"wavelength_low"] integerValue]];
             wavelengthHighEdge  = [NSNumber numberWithInteger:[[subRun objectForKey:@"wavelength_hi"] integerValue]];
             intensity = [NSNumber numberWithInteger:[[subRun objectForKey:@"intensity"] integerValue]];
@@ -2040,9 +2042,10 @@ err:{
 
         ///////////////////////
         // Loop settings to be passed to couchdb
-        NSMutableDictionary* valuesToFillPerSubRun = [NSMutableDictionary dictionaryWithCapacity:10];
+        NSMutableDictionary* valuesToFillPerSubRun = [NSMutableDictionary dictionaryWithCapacity:11];
         [valuesToFillPerSubRun setObject:laser forKey:@"laser"];
         [valuesToFillPerSubRun setObject:fibre forKey:@"fibre"];
+        [valuesToFillPerSubRun setObject:trigger_mode forKey:@"trigger_mode"];
         [valuesToFillPerSubRun setObject:nTriggers forKey:@"number_of_shots"];
         [valuesToFillPerSubRun setObject:intensity forKey:@"intensity"];
         [valuesToFillPerSubRun setObject:gain forKey:@"gain"];
@@ -2070,6 +2073,7 @@ err:{
         NSLog(@"--------------  Settings summary : Sub Run %d\n", [[valuesToFillPerSubRun objectForKey:@"sub_run_number"] integerValue]);
         NSLog(@"[SMELLIE]: Laser \t\t: %@\n", laser);
         NSLog(@"[SMELLIE]: Fibre \t\t: %@\n", fibre);
+        NSLog(@"[SMELLIE]: Trigger mode \t\t: %@\n", trigger_mode);
         NSLog(@"[SMELLIE]: Wavelength \t: %d\n", [wavelengthLowEdge integerValue]);
         NSLog(@"[SMELLIE]: Intensity\t\t: %1.1f\n", [intensity floatValue]);
         NSLog(@"[SMELLIE]: PMT Gain \t\t: %1.2f\n", [gain floatValue]);
@@ -2078,36 +2082,65 @@ err:{
 
         ///////////////////////
         // Tell the hardware what to do
-        if([laser isEqualTo:@"superK"]){
+        if([laser isEqualTo:@"superK"] || [laser isEqualTo:@"PQ375"] || [laser isEqualTo:@"PQ405"] || [laser isEqualTo:@"PQ440"] || [laser isEqualTo:@"PQ495"]){
 
-            @try{
-                [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_superK"] intValue]];
-            } @catch(NSException* e) {
-                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
-                goto err;
+            if([laser isEqualTo:@"superK"]){
+
+                @try{
+                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_superK"] intValue]];
+                } @catch(NSException* e) {
+                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: %@\n", [e reason]);
+                    goto err;
+                }
+
+                @try{
+                    [self setSmellieSuperkMasterMode:intensity withRepRate:rate withWavelengthLow:wavelengthLowEdge withWavelengthHi:wavelengthHighEdge withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:nTriggers withGainVoltage:gain];
+                } @catch(NSException* e){
+                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                    goto err;
+                }
             }
 
-            @try{
-                [self setSmellieSuperkMasterMode:intensity withRepRate:rate withWavelengthLow:wavelengthLowEdge withWavelengthHi:wavelengthHighEdge withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:nTriggers withGainVoltage:gain];
-            } @catch(NSException* e){
-                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
-                goto err;
-            }
-        } else {
+            if([laser isEqualTo:@"PQ375"] || [laser isEqualTo:@"PQ405"] || [laser isEqualTo:@"PQ440"] || [laser isEqualTo:@"PQ495"]){
 
-            @try{
-                [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
-            } @catch(NSException* e) {
-                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: @\n", [e reason]);
-                goto err;
-            }
+                @try{
+                    [theTubiiModel setSmellieDelay:[[smellieSettings objectForKey:@"delay_fixed_wavelength"] intValue]];
+                } @catch(NSException* e){
+                    NSLogColor([NSColor redColor], @"[SMELLIE]: Problem setting trigger delay at TUBii: @\n", [e reason]);
+                    goto err;
+                }
 
-            @try{
-                [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:nTriggers withGainVoltage:gain];
-            } @catch(NSException* e){
-                NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
-                goto err;
+                if([trigger_mode isEqualTo:@"master"] || [trigger_mode isEqualTo:@"slave"]){
+                    if([trigger_mode isEqualTo:@"master"]){
+
+                        @try{
+                            [self setSmellieLaserHeadMasterMode:laserSwitchChannel withIntensity:intensity withRepRate:rate withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withNPulses:nTriggers withGainVoltage:gain];
+                        } @catch(NSException* e){
+                            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                            goto err;
+                        }
+                    }
+                    if([trigger_mode isEqualTo:@"slave"]){
+
+                        @try{
+                            NSNumber *withEstimatedTime = @([nTriggers integerValue]/[rate floatValue]*1.2 + 60);
+							NSLog(@"[SMELLIE]: Timeout slave mode time\t\t\t: %1.1f seconds\n", [withEstimatedTime floatValue]);
+                            [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:withEstimatedTime withGainVoltage:gain];
+                        } @catch(NSException* e){
+                            NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
+                            goto err;
+                        }
+                    }
+                }
+                else {
+                    NSLogColor([NSColor redColor], @"[SMELLIE]: Specified trigger mode is neither master or slave. Check run plan. Specified: %@\n", trigger_mode);
+                    goto err;
+                }
             }
+        }
+        else {
+            NSLogColor([NSColor redColor], @"[SMELLIE]: Specified laser did not match any known laser. Check run plan. Specified: %@\n", laser);
+            goto err;
         }
 
         //////////////////
