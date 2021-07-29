@@ -2124,6 +2124,7 @@ err:{
 
                         @try{
                             NSNumber *withEstimatedTime = @([nTriggers integerValue]/[rate floatValue]*1.2 + 60);
+							NSLog(@"[SMELLIE]: Timeout slave mode time\t\t\t: %1.1f seconds\n", [withEstimatedTime floatValue]);
                             [self setSmellieLaserHeadSlaveMode:laserSwitchChannel withIntensity:intensity withFibreInput:fibreInputSwitchChannel withFibreOutput:fibreOutputSwitchChannel withTime:withEstimatedTime withGainVoltage:gain];
                         } @catch(NSException* e){
                             NSLogColor([NSColor redColor], @"[SMELLIE]: Problem with smellie server request: %@\n", [e reason]);
